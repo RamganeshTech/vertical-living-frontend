@@ -20,7 +20,7 @@ const Sidebar: React.FC = () => {
     return (
         <>
             {showSideBar ?
-                <aside className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen text-[#9ca3af] select-none transition-all duration-300">
+                <aside className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
                     <div className="flex flex-col flex-grow overflow-y-auto p-2">
                         <div className='flex justify-between items-center border-b-1 py-2'>
                             <span className='text-xl'>{COMPANY_DETAILS.COMPANY_NAME}</span>
@@ -31,7 +31,7 @@ const Sidebar: React.FC = () => {
 
                         <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
                             {Object.entries(SIDEBAR_LABELS).map(([_, value]) =>
-                                <Link to={`/${value.toLowerCase()}`}>
+                                <Link to={`/${value.toLowerCase()}`} className='outline-none'>
                                     <div
                                         onClick={() => setActiveSidebar(value)}
                                         className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar === value ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'

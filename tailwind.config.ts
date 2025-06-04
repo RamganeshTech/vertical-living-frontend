@@ -3,8 +3,8 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
     content: [
-        "./index.html",
-        "./src/**/*.{js,ts,jsx,tsx}", // includes all JS/TS/React files
+        './index.html',
+        './src/**/*.{js,ts,jsx,tsx}'
     ],
     theme: {
         extend: {
@@ -33,6 +33,25 @@ const config: Config = {
             borderRadius: {
                 'xl': '1.5rem',
                 '2xl': '2rem',
+            },
+            keyframes: {
+                bounceOnce: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-20px)' },
+                },
+                fadeInOnce: {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' },
+                },
+                fadeOutOnce: {
+                    '0%': { opacity: '1' },
+                    '100%': { opacity: '0' },
+                },
+            },
+            animation: {
+                bounceOnce: 'bounceOnce 0.6s ease-out forwards',
+                fadeInOnce: 'fadeInOnce 0.5s ease-out forwards',
+                fadeOutOnce: 'fadeOutOnce 0.5s ease-in forwards',
             },
         },
     },

@@ -2,7 +2,8 @@ import React from 'react'
 
 const Phase = () => {
   return (
-    <div>Phase</div>
+        <div className="w-[100%] flex flex-col h-full min-h-0 ">
+Phase</div>
   )
 }
 

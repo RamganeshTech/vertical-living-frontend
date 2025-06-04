@@ -1,9 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Sidebar from '../../shared/Sidebar'
+import ErrorComponent from '../../components/ErrorComponent'
 
 const Home = () => {
+
+  const [error, setError] = useState(false)
+
+
+
   return (
     <main className="bg-[#f5f7fa] min-w-full font-sans text-[13px] text-[#1f2937]">
+     {error &&  <ErrorComponent message='sorry not logged in' onClick={()=> setError(false)} />}
       <div className="flex min-h-screen">
         <main className="flex-grow p-4">
           <div className="flex items-center justify-between mb-4">
