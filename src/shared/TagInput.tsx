@@ -27,7 +27,7 @@ const TagInput:React.FC<TaginputProp> = ({ tags, setFormData }) => {
   };
 
   return (
-    <div className="flex flex-wrap items-center border border-gray-400 rounded-md p-2 gap-2">
+    <div className="flex flex-wrap items-center rounded-md p-2 gap-2">
       {tags.map((tag, index) => (
         <div
           key={index}
@@ -47,7 +47,7 @@ const TagInput:React.FC<TaginputProp> = ({ tags, setFormData }) => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="flex-1 outline-none text-sm"
+        className="input flex-1 outline-none text-sm border-b-1 border-[#565656]"
         placeholder="Type and press Enter"
       />
     </div>

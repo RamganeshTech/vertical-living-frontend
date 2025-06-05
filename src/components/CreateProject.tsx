@@ -1,5 +1,7 @@
 import React, { Fragment, useState, type ChangeEvent, type FormEvent } from "react";
 import TagInput from "../shared/TagInput";
+import { useCreateProject } from "../apiList/projectApi";
+import ErrorComponent from "./ErrorComponent";
 
 const priorities = ["none", "low", "medium", "high"];
 const statuses = [
@@ -67,21 +69,27 @@ const CreateProject = ({ onClose }: { onClose: () => void }) => {
       setFormData(p => ({ ...p, [name]: new Date(e.target.value) }))
       return;
     }
-
     setFormData(p => ({ ...p, [name]: value }))
-
   }
 
+  const { mutate: createProject, isPending, error, isError, reset } = useCreateProject()
 
-  const handleSubmit = (e:FormEvent)=>{
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-
-    console.log("formDate", formData)
+    try {
+      console.log("formDate", formData)
+      if (!isPending) {
+        createProject(formData)
+      }
+    }
+    catch (error) {
+      console.log("error", error)
+    }
   }
 
   return (
-    // DESIGN TWO 
     <div className="bg-white w-full max-w-2xl mx-auto rounded-2xl shadow-2xl p-8 border border-gray-200 relative">
+      {isError && <ErrorComponent message={error.message} onClick={() => reset()} />}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-blue-700 flex items-center gap-2">
           <i className="fa-solid fa-plus"></i> Create New Project
@@ -135,7 +143,7 @@ const CreateProject = ({ onClose }: { onClose: () => void }) => {
               {priorities.map(priority => {
                 return (
                   <Fragment key={priority}>
-                    <option  value={priority}>{priority}</option>
+                    <option className="cursor-pointer" value={priority}>{priority}</option>
                   </Fragment>
                 )
               })}
@@ -143,11 +151,11 @@ const CreateProject = ({ onClose }: { onClose: () => void }) => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select name="status" onChange={handleChange} value={formData.status} className="input border-b-1 border-[#155dfc]">
+            <select name="status" onChange={handleChange} value={formData.status} className="input cursor-pointer border-b-1 border-[#565656]">
               {statuses.map(status => {
                 return (
                   <Fragment key={status}>
-                    <option className={`${statusColors[status]}`} value={status}>{status}</option>
+                    <option className={`${statusColors[status]} cursor-pointer`} value={status}>{status}</option>
                   </Fragment>
                 )
               })}
