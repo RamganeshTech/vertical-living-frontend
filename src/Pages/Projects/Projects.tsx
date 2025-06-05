@@ -90,7 +90,6 @@ const getPriorityColor = (priority: string) => {
 };
 
 const Projects = () => {
-  const [rotated, setRotated] = useState(false);
 
   const [showForm, setShowForm] = useState(false);
 
@@ -104,13 +103,12 @@ const Projects = () => {
 
         <div
           onClick={() => {
-            setRotated(!rotated)
             setShowForm(!showForm)
           }}
           className="bg-blue-600 w-[3.5%] cursor-pointer !h-[40px] flex justify-center items-center rounded-full"
         >
           <i
-            className={`fa-solid fa-plus text-white transition-transform duration-300 ${rotated ? "rotate-135" : "rotate-0"
+            className={`fa-solid fa-plus text-white transition-transform duration-300 ${showForm ? "rotate-135" : "rotate-0"
               }`}
           ></i>
         </div>
@@ -198,27 +196,11 @@ const Projects = () => {
         })}
       </div>
 
-
-       {showForm && (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-    {/* <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 md:p-8 animate-fadeIn border border-gray-200"> */}
-      
-      {/* <button
-        onClick={() => setShowForm(false)}
-        className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition"
-      >
-        <i className="fa-solid fa-xmark text-xl"></i>
-      </button>
-
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-        <i className="fa-solid fa-folder-plus text-blue-600"></i>
-        Create New Project
-      </h2> */}
-
-      <CreateProject onClose={()=> setShowForm(false)} />
-    {/* </div> */}
-  </div>
-  )}
+      {showForm && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <CreateProject onClose={() => setShowForm(false)} />
+        </div>
+      )}
 
     </div>
   );
