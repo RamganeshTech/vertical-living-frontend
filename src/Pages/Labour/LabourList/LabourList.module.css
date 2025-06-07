@@ -1,0 +1,17 @@
+/* You can add these to your global CSS or Tailwind config for convenience */
+
+.input-blue {
+  @apply w-full border border-blue-300 rounded-md px-3 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.btn-blue {
+  @apply bg-blue-600 text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300;
+}
+
+.btn-gray {
+  @apply bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-4 focus:ring-gray-300;
+}
+
+.btn-red {
+  @apply bg-red-500 text-white hover:bg-red-700 focus:ring-4 focus:ring-red-300;
+}

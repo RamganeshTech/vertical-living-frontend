@@ -1,12 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import Api from "../apiService/apiService"
 import { queryClient } from "../QueryClient/queryClient"
+import type { ProjectInput } from "../components/CreateProject"
 
 const createProject = async (projectData: Record<any, any>) => {
     try {
         let { data } = await Api.post(`/project/createproject`, projectData)
+        console.log("create project", data)
         if (data.ok) {
-            return data.data
+            return data
         }
     }
     catch (error) {
@@ -39,11 +41,11 @@ const deleteProject = async (projectId:string)=>{
     }
 }
 
-const assignClientProject = async ({proejctId, clientId}:{proejctId:string, clientId:string})=>{
+const assignClientProject = async ({projectId, clientId}:{projectId:string, clientId:string})=>{
   try {
-        let { data } = await Api.patch(`/project/assignprojectclient/${proejctId}/${clientId}`)
+        let { data } = await Api.patch(`/project/assignprojectclient/${projectId}/${clientId}`)
         if (data.ok) {
-            return data.data
+            return data
         }
     }
     catch (error) {
@@ -51,8 +53,19 @@ const assignClientProject = async ({proejctId, clientId}:{proejctId:string, clie
     }
 }
 
+const updateProject = async ({projectId, formData}:{projectId:string, formData:ProjectInput})=>{
+  try {
+        let { data } = await Api.put(`/project/updateproject/${projectId}`, formData)
+        if (data.ok) {
+            return data
+        }
+    }
+    catch (error) {
+        throw error
+    }
+}
 
-export const useGetProject = ()=>{
+export const useGetProjects = ()=>{
     return useQuery({
     queryKey:["project"],
     queryFn: getProjects,
@@ -75,6 +88,15 @@ export const useCreateProject = ()=>{
 export const useDeleteProject = ()=>{
     return useMutation({
     mutationFn:deleteProject,
+    onSuccess:()=>{
+        queryClient.invalidateQueries({queryKey:['project']})
+    }
+})
+} 
+
+export const useUpdateProject = ()=>{
+    return useMutation({
+    mutationFn:updateProject,
     onSuccess:()=>{
         queryClient.invalidateQueries({queryKey:['project']})
     }

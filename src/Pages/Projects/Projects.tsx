@@ -1,97 +1,55 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { SIDEBAR_LABELS } from "../../constants/constants";
-import CreateProject from "../../components/CreateProject";
-
-type Project = {
-  name: string;
-  id: string;
-  startDate: string;
-  endDate: string;
-  priority: "High" | "Medium" | "Low";
-  duration: string;
-  tasksLeft: number;
-  totalTasks: number;
-};
-
-const projects: Project[] = [
-  {
-    name: "CRM Dashboard",
-    id: "P-2025-01",
-    startDate: "May 1, 2025",
-    endDate: "May 21, 2025",
-    priority: "Medium",
-    duration: "20 days",
-    tasksLeft: 8,
-    totalTasks: 12,
-  },
-  {
-    name: "Website Redesign",
-    id: "P-2025-02",
-    startDate: "Apr 10, 2025",
-    endDate: "May 15, 2025",
-    priority: "High",
-    duration: "35 days",
-    tasksLeft: 2,
-    totalTasks: 10,
-  },
-  {
-    name: "Website Redesign",
-    id: "P-2025-02",
-    startDate: "Apr 10, 2025",
-    endDate: "May 15, 2025",
-    priority: "High",
-    duration: "35 days",
-    tasksLeft: 2,
-    totalTasks: 10,
-  },
-  {
-    name: "Website Redesign",
-    id: "P-2025-02",
-    startDate: "Apr 10, 2025",
-    endDate: "May 15, 2025",
-    priority: "High",
-    duration: "35 days",
-    tasksLeft: 2,
-    totalTasks: 10,
-  },
-  {
-    name: "Website Redesign",
-    id: "P-2025-02",
-    startDate: "Apr 10, 2025",
-    endDate: "May 15, 2025",
-    priority: "High",
-    duration: "35 days",
-    tasksLeft: 2,
-    totalTasks: 10,
-  },
-  // {
-  //   name: "Website Redesign",
-  //   id: "P-2025-02",
-  //   startDate: "Apr 10, 2025",
-  //   endDate: "May 15, 2025",
-  //   priority: "High",
-  //   duration: "35 days",
-  //   tasksLeft: 2,
-  //   totalTasks: 10,
-  // },
-];
-
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case "High":
-      return "bg-red-100 text-red-500";
-    case "Medium":
-      return "bg-yellow-100 text-yellow-600";
-    case "Low":
-      return "bg-green-100 text-green-600";
-    default:
-      return "";
-  }
-};
+import CreateProject, { type ProjectInput } from "../../components/CreateProject";
+import SingleProject from "../../shared/SingleProject";
+import { projects } from "../../utils/dummyData";
+import { useGetProjects } from "../../apiList/projectApi";
+import type { IProject, ProjectType } from "../../types/types";
+import { mapProjectToProjectInput } from "../../utils/editProjectRequiredFields";
+import ProjectCardLoading from "../../LoadingUI/ProjectCartLoading";
 
 const Projects = () => {
 
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const [isEditing, setisEditing] = useState<boolean>(false);
+
+  const [editForm, setEditForm] = useState<ProjectInput>({
+    projectName: "",
+    description: "",
+    duration: 0,
+    tags: [],
+    startDate: new Date(),
+    endDate: null,
+    dueDate: null,
+    priority: "none",
+    status: "Active",
+  });
+  const [editProjectId, setEditProjectId] = useState<string | null>(null);
+
+  let { data: getProjects, isError, isPending, error } = useGetProjects()
+
+
+  const handleEdit = useCallback((project: IProject, id: string) => {
+    const projectInput = mapProjectToProjectInput(project);
+    setEditForm(projectInput);
+    setEditProjectId(id)
+    setisEditing(true);
+    setShowForm(true);
+
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setShowForm(false);
+    setisEditing(false);
+  }, []);
+
+  const handleEditProject = useCallback((project: IProject, id: string) => {
+    handleEdit(project, id);
+  }, [handleEdit]);
+
+
+  console.log("getProjects", getProjects)
+  // getProjects = []
 
   return (
     <div className="w-[100%] flex flex-col h-full min-h-0 ">
@@ -114,91 +72,40 @@ const Projects = () => {
         </div>
       </div>
 
-      <div className="h-full flex-1 !overflow-y-scroll   grid md:grid-cols-2 gap-6">
-        {projects.map((project) => {
-          const completed =
-            ((project.totalTasks - project.tasksLeft) / project.totalTasks) *
-            100;
+      {!isPending && (getProjects?.length ?? 0) === 0 && <div className="flex h-full flex-col items-center justify-center w-full py-16 text-center text-gray-500">
+        <div className="text-6xl mb-4">
+          📂
+        </div>
+        <h2 className="text-xl font-semibold mb-2">No Projects Found</h2>
+        <p className="text-sm text-gray-400 mb-4 max-w-md">
+          Looks like you haven’t added any projects yet. Click the “+” button to get started and create your first project.
+        </p>
+        <button onClick={()=> setShowForm(true)} className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white px-4 py-2 rounded-md transition">
+          Create New Project
+        </button>
+      </div>
+      }
+
+      <div className="h-full flex-1 !overflow-y-scroll  grid md:grid-cols-2 gap-6">
+
+        {isPending && [...Array(6)].map(() => <ProjectCardLoading />)}
+
+        {!isPending && getProjects.length > 0 && getProjects?.map((project: IProject, index: number) => {
 
           return (
             <div
-              key={project.id}
+              key={index}
               className="h-[262px] flex flex-col shadow-md rounded-xl overflow-hidden border-l-8 border-blue-600 bg-white"
             >
-              <div className="p-5 space-y-3">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-xl font-semibold text-[#1f2d3d]">
-                    <i className="fa-solid fa-folder-open text-blue-600"></i>
-                    {project.name}
-                  </div>
-                  <span
-                    className={`text-sm px-3 py-1 rounded-full font-medium ${getPriorityColor(
-                      project.priority
-                    )}`}
-                  >
-                    {project.priority} Priority
-                  </span>
-                </div>
-
-                <div className="text-sm text-gray-700 grid grid-cols-3 sm:grid-cols-2 gap-y-1 sm:gap-y-2 gap-x-4">
-                  <div className="flex items-center gap-1">
-                    <i className="fa-solid fa-hashtag text-gray-500" />
-                    <strong>ID:</strong> {project.id}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <i className="fa-solid fa-calendar-day text-gray-500" />
-                    <strong>Start:</strong> {project.startDate}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <i className="fa-solid fa-calendar-check text-gray-500" />
-                    <strong>End:</strong> {project.endDate}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <i className="fa-solid fa-tasks text-gray-500" />
-                    <strong>Tasks Left:</strong> {project.tasksLeft} of {project.totalTasks}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <i className="fa-solid fa-hourglass-half text-gray-500" />
-                    <strong>Duration:</strong> {project.duration}
-                  </div>
-                </div>
-
-
-
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Progress
-                  </label>
-                  <div className="mt-1 w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-600"
-                      style={{ width: `${completed}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-sm text-right text-gray-600 mt-1">
-                    {Math.round(completed)}% Complete
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-4 pt-2 text-sm text-blue-600">
-                  <button className="hover:underline flex items-center gap-1">
-                    <i className="fa-solid fa-eye" />
-                    View
-                  </button>
-                  <button className="hover:underline flex items-center gap-1 text-red-500">
-                    <i className="fa-solid fa-trash" />
-                    Delete
-                  </button>
-                </div>
-              </div>
+              <SingleProject onEdit={handleEditProject} index={index} project={project} />
             </div>
           );
         })}
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <CreateProject onClose={() => setShowForm(false)} />
+        <div onClick={handleClose} className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <CreateProject onClose={handleClose} isEditing={isEditing} setEditForm={setEditForm} editForm={editForm} editProjectId={editProjectId} />
         </div>
       )}
 

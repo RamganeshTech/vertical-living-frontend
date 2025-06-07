@@ -1,33 +1,34 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import type { ProjectInput } from "../components/CreateProject";
 
 
 type TaginputProp = {
-    tags:string[],
-    setFormData: React.Dispatch<React.SetStateAction<ProjectInput>>
+  tags: string[],
+  setState: React.Dispatch<React.SetStateAction<ProjectInput>>
+
 }
 
-const TagInput:React.FC<TaginputProp> = ({ tags, setFormData }) => {
+const TagInput: React.FC<TaginputProp> = ({ tags, setState }) => {
   const [input, setInput] = useState("");
 
-  const handleKeyDown = (e:any) => {
+  const handleKeyDown = (e: any) => {
     if ((e.key === "Enter" || e.key === ",") && input.trim()) {
       e.preventDefault();
       if (!tags.includes(input.trim())) {
-        setFormData(p=> ({...p, "tags":[...tags, input.trim()]}));
+        setState(p => ({ ...p, "tags": [...tags, input.trim()] }));
       }
       setInput("");
     } else if (e.key === "Backspace" && !input) {
-      setFormData(p=> ({...p, "tags":tags.slice(0, -1)}));
+      setState(p => ({ ...p, "tags": tags.slice(0, -1) }));
     }
   };
 
-  const removeTag = (indexToRemove:number) => {
-      setFormData(p=> ({...p, "tags":tags.filter((_, index) => index !== indexToRemove)}));
+  const removeTag = (indexToRemove: number) => {
+    setState(p => ({ ...p, "tags": tags.filter((_, index) => index !== indexToRemove) }));
   };
 
   return (
-    <div className="flex flex-wrap items-center rounded-md p-2 gap-2">
+    <div className="flex flex-wrap items-center border-b-1 border-[#565656] p-2 gap-2">
       {tags.map((tag, index) => (
         <div
           key={index}
@@ -47,11 +48,11 @@ const TagInput:React.FC<TaginputProp> = ({ tags, setFormData }) => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="input flex-1 outline-none text-sm border-b-1 border-[#565656]"
+        className="input flex-1 outline-none text-sm border-none"
         placeholder="Type and press Enter"
       />
     </div>
   );
 };
 
-export default TagInput;
+export default memo(TagInput);
