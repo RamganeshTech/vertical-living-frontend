@@ -1,9 +1,18 @@
-import React, { useState } from 'react'
-import { COMPANY_DETAILS, SIDEBAR_ICONS, SIDEBAR_LABELS } from '../constants/constants'
+import React, { memo, useState } from 'react'
+import { COMPANY_DETAILS, } from '../constants/constants'
 import useSidebarShortcut from '../Hooks/useSideBarShortcut'
 import { Link } from 'react-router-dom'
+import SidebarIcons from '../components/SidebarIcons'
 
-const Sidebar: React.FC = () => {
+
+type SidebarProp = {
+    labels: Record<string, string>,
+    icons: Record<string, string>,
+    projectId?: string | null,
+    path: Record<string, string>,
+}
+
+const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     const [showSideBar, setShowSideBar] = useState(true)
 
     const handleSideBarClose = () => {
@@ -30,8 +39,9 @@ const Sidebar: React.FC = () => {
                         </div>
 
                         <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
-                            {Object.entries(SIDEBAR_LABELS).map(([_, value]) =>
-                                <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
+                            {Object.entries(labels).map(([key, value]) =>
+                                // <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
+                                path[key] ? <Link key={value} to={path[key]} className='outline-none'>
                                     <div
                                         onClick={() => setActiveSidebar(value)}
                                         className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar === value ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
@@ -40,6 +50,12 @@ const Sidebar: React.FC = () => {
                                         <span><i className="fa-solid fa-chevron-right"></i></span>
                                     </div>
                                 </Link>
+                                    :
+                                    <div
+                                        className={`cursor-not-allowed flex justify-between max-w-[95%] py-4 px-4`}>
+                                        <span className='text-lg'>{value}</span>
+                                        <span><i className="fa-solid fa-chevron-right"></i></span>
+                                    </div>
                             )}
                         </section>
                     </div>
@@ -64,16 +80,22 @@ const Sidebar: React.FC = () => {
                     <div>
                         <div className='flex items-center flex-col justify-between w-full'>
 
-                            {Object.entries(SIDEBAR_ICONS).map(([key, value]) =>
-                                <Link to={`/${key.toLowerCase()}`}>
+                            {/* <SidebarIcons path icons={icons} activeSidebar={activeSidebar} setActiveSidebar={setActiveSidebar} /> */}
+                            {Object.entries(icons).map(([key, value]) =>
+                                path[key] ?
+                                    <Link to={path[key]} className={`${path[key] ? "" : "cursor-not-allowed"}`}>
+                                        <div
+                                            onClick={() => setActiveSidebar(key)}
+                                            className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar.toLowerCase() === key.toLowerCase() ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
+                                                } `}>
+                                            <i className={`${value} ${activeSidebar.toLowerCase() === key.toLowerCase() ? 'text-[#4a86f7]' : 'text-[#9ca3af]'} `}></i>
+                                        </div>
+                                    </Link>
+                                    :
                                     <div
-                                        onClick={() => setActiveSidebar(key)}
-                                        className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar.toLowerCase() === key.toLowerCase() ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
-                                            } `}>
-                                        <i 
-                                        className={`${value} ${activeSidebar.toLowerCase() === key.toLowerCase() ? 'text-[#4a86f7]' : 'text-[#9ca3af]'} `}></i>
+                                        className={`cursor-not-allowed flex justify-between max-w-[95%] py-4 px-4`}>
+                                        <i className={`${value}`}></i>
                                     </div>
-                                </Link>
                             )}
 
                         </div>
@@ -90,4 +112,4 @@ const Sidebar: React.FC = () => {
     )
 }
 
-export default Sidebar
+export default memo(Sidebar)

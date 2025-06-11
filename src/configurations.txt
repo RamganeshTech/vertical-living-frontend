@@ -117,3 +117,7 @@ blue : 000000 70% opacity selecteed Background or use #494950
 494950 black
 35353d black
 272c36 black
+
+fonts to use
+
+FoundersGrotesk, sans-serif

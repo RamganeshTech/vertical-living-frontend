@@ -30,7 +30,7 @@ const createLabour = async ({
     labourListId: string;
 }) => {
     const { data } = await Api.post(
-        `labour/createlabour/${projectId}/${labourListId}`,
+        `labour/createlabour/${projectId}?labourListId=${labourListId}`,
         labourData
     );
     console.log('create labour item', data);
@@ -40,7 +40,7 @@ const createLabour = async ({
 const getLabourLists = async ({ projectId }: { projectId: string }) => {
     const { data } = await Api.get(`labour/getlabourlist/${projectId}`);
     console.log('get labour lists', data);
-    if (data.ok) return data.data;
+    if (data.ok) return data;
     return []
 };
 

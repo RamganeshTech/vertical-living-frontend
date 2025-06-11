@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import Sidebar from '../../shared/Sidebar'
+import { useState } from 'react'
 import ErrorComponent from '../../components/ErrorComponent'
 
 const Home = () => {

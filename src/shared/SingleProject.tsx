@@ -4,13 +4,30 @@ import type { IProject } from '../types/types';
 import { dateFormate } from '../utils/dateFormator';
 import { Link } from 'react-router-dom';
 
+import { useOutletContext } from "react-router-dom";
+
+
 type SingleProjectProp = {
     project: IProject,
     onEdit: (project: IProject, id:string) => void;
     index: number
 }
 
-const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit, index }) => {
+
+type ProjectsOutletContextType = {
+  projectId: string;
+  setProjectId: React.Dispatch<React.SetStateAction<string>>;
+};
+
+const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit }) => {
+
+  const { projectId, setProjectId } = useOutletContext<ProjectsOutletContextType>();
+
+
+          const handleSetProejctId = (id:string)=>{
+            setProjectId(id)
+          }
+    
 
     const getPriorityColor = (priority: string) => {
         switch (priority) {
@@ -105,7 +122,7 @@ const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit, index })
             </div>
 
             <div className="flex justify-end gap-4 pt-2 text-sm text-blue-600">
-                <Link to={`/projects/${(project as any)._id}/labourlist`} className="hover:underline cursor-pointer flex items-center gap-1">
+                <Link to={`/projectdetails/${(project as any)._id}/labourlist`} onClick={()=> handleSetProejctId((project as any)._id)} className="hover:underline cursor-pointer flex items-center gap-1">
                     <i className="fa-solid fa-eye" />
                     View
                 </Link>

@@ -15,13 +15,21 @@ export const SIDEBAR_ICONS = {
     PHASES: "fa-solid fa-briefcase text-2xl",
 }
 
+export const PROJECTS_LABELS = {
+  MATERIALS:"Materials",
+  LABOURS:"Labours",
+  TRANSPORTATION: "Transportation"
+}
+
+
+export const PROJECTS_ICONS = {
+  MATERIALS:"fa-solid fa-cubes-stacked text-2xl",
+  LABOURS:"fa-solid fa-users text-2xl",
+  TRANSPORTATION: "fa-solid fa-road text-2xl"
+}
+
 
 export const COMPANY_DETAILS = {
   COMPANY_NAME:"Vertical living",
   COMPANY_LOGO:"https://th.bing.com/th/id/OIP.Uparc9uI63RDb82OupdPvwAAAA?w=80&h=80&c=1&bgcl=c77779&r=0&o=6&dpr=1.3&pid=ImgRC"
-}
-
-
-export const PROJECT_LABELS = {
-
 }

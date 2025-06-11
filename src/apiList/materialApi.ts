@@ -4,8 +4,9 @@ import type { MaterialItemType } from './../types/types';
 import { queryClient } from "../QueryClient/queryClient";
 
 const createMaterial = async ({ materialData, projectId, materialListId }: { materialData: MaterialItemType, projectId: string, materialListId: string }) => {
+    console.log("materialListId", materialListId)
     try {
-        let { data } = await Api.post(`/material/creatematerial/${projectId}/${materialListId}`, materialData)
+        let { data } = await Api.post(`/material/creatematerial/${projectId}?materialListId=${materialListId}`, materialData)
         console.log("create material", data)
         if (data.ok) {
             return data
@@ -17,9 +18,10 @@ const createMaterial = async ({ materialData, projectId, materialListId }: { mat
 }
 
 
-const createMaterialList = async ({ materialList, projectId }: { materialList: string, projectId: string }) => {
+const createMaterialList = async ({ materialListName, projectId }: { materialListName: string, projectId: string }) => {
     try {
-        let { data } = await Api.post(`/material/createmateriallist/${projectId}`, materialList)
+        console.log("create material", materialListName)
+        let { data } = await Api.post(`/material/createmateriallist/${projectId}`, {materialListName})
         console.log("create material list", data)
         if (data.ok) {
             return data
@@ -32,12 +34,14 @@ const createMaterialList = async ({ materialList, projectId }: { materialList: s
 
 
 const getMaterialList = async ({ projectId }: { projectId: string }) => {
+    console.log("projectId", projectId)
     try {
         let { data } = await Api.get(`/material/getmateriallist/${projectId}`)
         console.log("get material list", data)
         if (data.ok) {
             return data
         }
+        return []
     }
     catch (error) {
         throw error
@@ -47,11 +51,12 @@ const getMaterialList = async ({ projectId }: { projectId: string }) => {
 
 const getMaterials = async ({ materialListId }: { materialListId: string }) => {
     try {
-        let { data } = await Api.get(`/material/getmaterial/:${materialListId}`)
+        let { data } = await Api.get(`/material/getmaterial/${materialListId}`)
         console.log("get materials", data)
         if (data.ok) {
             return data
         }
+        return []
     }
     catch (error) {
         throw error
@@ -60,9 +65,10 @@ const getMaterials = async ({ materialListId }: { materialListId: string }) => {
 
 
 
-const updateMaterialList = async ({ projectId, materailListId, materialList }: { projectId: string, materailListId: string, materialList: string }) => {
+const updateMaterialList = async ({ projectId, materailListId, materialListName }: { projectId: string, materailListId: string, materialListName: string }) => {
     try {
-        let { data } = await Api.put(`/material/updatemateraillist/${projectId}/${materailListId}`, { materialList })
+        console.log(materialListName)
+        let { data } = await Api.put(`/material/updatemateraillist/${projectId}/${materailListId}`, { materialListName })
         console.log("update material list", data)
         if (data.ok) {
             return data
@@ -172,7 +178,6 @@ export const useUpdateMaterialList = () => {
         }
     })
 }
-
 
 export const useUpdateMaterialItem = () => {
     return useMutation({

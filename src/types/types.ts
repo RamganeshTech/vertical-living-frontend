@@ -12,37 +12,37 @@ export interface ProjectType {
 
 
 export interface projectInformation {
-    owner: string
-    tags: string[] | []
-    startDate: (string | null)
-    endDate: (string | null)
-    dueDate: (string | null)
-    duration: (number | null)
-    priority: "none" | "low" | "medium" | "high"
-    status: "Active" | "Delayed" | "In Progress" | "In Testing" | "On Track" | "On Hold" | "Approved" | "Cancelled" | "Planning" | "Invoice";
-    projectGroup: string | null,
-    completionTime: (string | null),
-    TaskAndIssuePrefix: (string | null),
+  owner: string
+  tags: string[] | []
+  startDate: (string | null)
+  endDate: (string | null)
+  dueDate: (string | null)
+  duration: (number | null)
+  priority: "none" | "low" | "medium" | "high"
+  status: "Active" | "Delayed" | "In Progress" | "In Testing" | "On Track" | "On Hold" | "Approved" | "Cancelled" | "Planning" | "Invoice";
+  projectGroup: string | null,
+  completionTime: (string | null),
+  TaskAndIssuePrefix: (string | null),
 }
 
 // PROJECT TYPE
-export  interface IProject extends Document {
-    userId: string
-    projectId: string,
-    projectName: string,
-    accessibleClientId: string[],
-    description: (string | null);
-    projectInformation: projectInformation
-    tasks: (number | null),
-    issues: (number | null),
-    phases: (number | null),
-    completionPercentage: (number | null),
-    projectAccess: string,
-    taskLists: string[],
-    materials: string[]
-    labours: string[],
-    materialsFullyApproved: "approved" | "rejected" | "pending"
-    laboursFullyApproved: "approved" | "rejected" | "pending"
+export interface IProject extends Document {
+  userId: string
+  projectId: string,
+  projectName: string,
+  accessibleClientId: string[],
+  description: (string | null);
+  projectInformation: projectInformation
+  tasks: (number | null),
+  issues: (number | null),
+  phases: (number | null),
+  completionPercentage: (number | null),
+  projectAccess: string,
+  taskLists: string[],
+  materials: string[]
+  labours: string[],
+  materialsFullyApproved: "approved" | "rejected" | "pending"
+  laboursFullyApproved: "approved" | "rejected" | "pending"
 
 }
 
@@ -52,9 +52,11 @@ export  interface IProject extends Document {
 
 
 export interface ILabourList {
-    projectId: string,
-    labourListName: string,
-    labours: string[]
+  projectId: string,
+  labourListName: string,
+  labours: string[]
+  _id?: string,
+  clientApproval: string
 }
 
 
@@ -65,22 +67,27 @@ export interface LabourItemType {
   hourlyRate: number;
   totalCost: number;
   notes?: string | null;
+  _id?: string,
+  clientApproved?: string;
+  clientFeedback?: string | null
 }
 
 export interface LabourEstimate {
   labourListId: string;   // references LabourList model
-  labourItems: LabourItemType[];
+  mergedMaterials: LabourItemType[];
   totalLabourCost: number;
+  _id?: string,
 }
 
 
 
 // MATERIAL LIST TYPE 
 
-export interface MaterialList {
-    projectId: string;
-    materialListName: string;
-    materials: string[],
+export interface MaterialListType {
+  projectId: string;
+  materialListName: string;
+  materials: string[],
+  _id?: string
 }
 
 
@@ -92,10 +99,16 @@ export interface MaterialItemType {
   vendor?: string;
   notes?: string;
   singleMaterialCost: number;
+  clientApproved?: string;
+  clientFeedback?: string | null
+  _id?: string
+
 }
 
 export interface MaterialEstimate extends Document {
   materialListId: string;
   materials: MaterialItemType[];
   totalCost: number;
+  _id?: string
+
 }
