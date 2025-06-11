@@ -18,6 +18,9 @@ import ProjectLists from './Pages/Projects/ProjectLists'
 import { useState } from 'react'
 import Transportationlist from './Pages/Transportation/Transportationlist'
 import NotFound from './Pages/Not Found/NotFound'
+import Organization from './Pages/Organization/Organization'
+import OrganizationCard from './components/OrganizationCard'
+import OrganizationDetails from './Pages/Organization/OrganizationDetails'
 
 function App() {
 
@@ -54,6 +57,10 @@ function App() {
           <Route path=":projectId/materiallist" element={<MaterialList />} />
           <Route path=":projectId/transportationlist" element={<Transportationlist />} />
         </Route>
+
+        <Route path='/organization' element={<Organization />} />
+        <Route path='/organization/:organizationId' element={<OrganizationDetails />} />
+
 
 
         <Route path="*" element={<NotFound />} />

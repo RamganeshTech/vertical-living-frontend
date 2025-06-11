@@ -112,3 +112,24 @@ export interface MaterialEstimate extends Document {
   _id?: string
 
 }
+
+
+
+// ORGANIZATION TYPES 
+export interface IOrganization  {
+    organizationName: string;
+    type?: string;
+    address?: string;
+    logoUrl?: string;
+    organizationPhoneNo?: string
+}
+
+// STAFFS TYPES
+export interface IStaff {
+    email: string,
+    password: string,
+    staffName: string,
+    phoneNo: string,
+    role: string;
+    organizationId?: string[];
+}
