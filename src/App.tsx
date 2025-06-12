@@ -19,13 +19,21 @@ import { useState } from 'react'
 import Transportationlist from './Pages/Transportation/Transportationlist'
 import NotFound from './Pages/Not Found/NotFound'
 import Organization from './Pages/Organization/Organization'
-import OrganizationCard from './components/OrganizationCard'
 import OrganizationDetails from './Pages/Organization/OrganizationDetails'
+import StaffRegister from './Pages/Staff/StaffRegister'
+import StaffLogin from './Pages/Staff/StaffLogin'
+import Workers from './Pages/Workers/Workers'
+import WorkerRegister from './Pages/Workers/WorkerRegister'
+import WorkerLogin from './Pages/Workers/WorkerLogin'
+import { useAuthCheck } from './Hooks/useAuthCheck'
 
 function App() {
 
   const [projectId, setProjectId] = useState<string | null>(null)
 
+  //it is used to check whether which user is now currently using the application
+  useAuthCheck() 
+  
   return (
     <>
       <Routes>
@@ -56,10 +64,17 @@ function App() {
           <Route path=":projectId/labourlist" element={<LabourList />} />
           <Route path=":projectId/materiallist" element={<MaterialList />} />
           <Route path=":projectId/transportationlist" element={<Transportationlist />} />
+          <Route path=":projectId/workers" element={<Workers />} />
         </Route>
 
         <Route path='/organization' element={<Organization />} />
         <Route path='/organization/:organizationId' element={<OrganizationDetails />} />
+
+        <Route path='/stafflogin' element={<StaffLogin />} />
+        <Route path='/staffregister' element={<StaffRegister />} />
+
+        <Route path='/workerlogin' element={<WorkerLogin />} />
+        <Route path='/workerregister' element={<WorkerRegister />} />
 
 
 

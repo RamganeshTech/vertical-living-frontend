@@ -1,5 +1,6 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import Api from "../apiService/apiService";
+import { queryClient } from "../QueryClient/queryClient";
 
 type CreateUserParams = {
     email: string;
@@ -94,6 +95,28 @@ const resetPasswordUser = async ({ token, password }: ResetPasswordParams) => {
     }
 }
 
+
+
+const inviteWorkerByOwner = async (payload: { projectId: string; specifiedRole: string }) => {
+  const { data } = await Api.post("/owner/inviteworker", payload);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+const getWorkersByProjectAsOwner = async (projectId: string) => {
+  const { data } = await Api.get(`/owner/getworker/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+const removeWorkerAsOwner = async ({ workerId, projectId }: { workerId: string; projectId: string }) => {
+  const { data } = await Api.put(`/owner/removeworker/${workerId}/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
 export const useCreateUser = () => {
     return useMutation({
         mutationFn: createUser,
@@ -128,3 +151,22 @@ export const useResetPasswordUser = () => {
         mutationFn: resetPasswordUser
     })
 }
+
+
+
+export const useInviteWorkerByOwner = () => useMutation({ mutationFn: inviteWorkerByOwner });
+
+export const useGetWorkersAsOwner = (projectId: string) =>
+  useQuery({
+    queryKey: ["workers", projectId],
+    queryFn: () => getWorkersByProjectAsOwner(projectId),
+    enabled: !!projectId,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+export const useRemoveWorkerAsOwner = () =>
+  useMutation({
+    mutationFn: removeWorkerAsOwner,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workers"] }),
+  });

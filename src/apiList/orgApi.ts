@@ -27,20 +27,19 @@ const fetchMyOrganizations = async () => {
 const fetchSingleOrganization = async (organizationId:string) => {
   const { data } = await Api.get(`/orgs/getsingleorganization/${organizationId}`);
   if (!data.ok) return {};
+  console.log("from single orgs api", data)
   return data.data;
 };
    
 
 // 3) updateOrganizationName
 const updateOrganizationName = async ({
-  organizationName, orgsId
+  updateField, orgsId
 }: {
-  organizationName: string;
+  updateField: Record<string, string>;
   orgsId:string
 }) => {
-  const { data } = await Api.put(`/orgs/updateorganization/${orgsId}`, {
-    organizationName,
-  });
+  const { data } = await Api.put(`/orgs/updateorganization/${orgsId}`, updateField);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -104,7 +103,7 @@ export const useGetSingleOrganization = (organizationId:string) => {
     queryFn: ()=> fetchSingleOrganization(organizationId),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    retry:false
+    retry:false,
   });
 };
 

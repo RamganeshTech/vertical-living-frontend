@@ -1,11 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
-import Api from "../apiService/apiService";     // your configured axios instance
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../QueryClient/queryClient";
+import staffApi from "../apiService/staffApiservice";
 
 
 // 1) loginStaff
 const loginStaff = async ({ email, password }: { email: string; password: string }) => {
-  const { data } = await Api.post("/auth/staff/login", { email, password });
+  const { data } = await staffApi.post("/auth/staff/login", { email, password });
   if (!data.ok) throw new Error(data.message);
   return data;
 };
@@ -27,7 +27,7 @@ const registerStaff = async (payload: {
   phoneNo: string;
   staffName: string;
 }) => {
-  const { data } = await Api.post("/auth/staff/registerstaff", payload);
+  const { data } = await staffApi.post("/auth/staff/registerstaff", payload);
   if (!data.ok) throw new Error(data.message);
   return data;
 };
@@ -39,7 +39,7 @@ export const useRegisterStaff = () => {
 
 // 3) logoutStaff
 const logoutStaff = async () => {
-  const { data } = await Api.post("/auth/staff/logout");
+  const { data } = await staffApi.post("/auth/staff/logout");
   if (!data.ok) throw new Error(data.message);
   return data;
 };
@@ -51,3 +51,45 @@ export const useLogoutStaff = () => {
     },
   });
 };
+
+
+
+
+
+const inviteWorkerByStaff = async (payload: { projectId: string; specificRole: string , role:string}) => {
+  console.log("payload", payload)
+  const { data } = await staffApi.post("/staff/inviteworker", payload);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+const getWorkersByProjectAsStaff = async (projectId: string) => {
+  const { data } = await staffApi.get(`/staff/getworker/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+const removeWorkerAsStaff = async ({ workerId, projectId }: { workerId: string; projectId: string }) => {
+  const { data } = await staffApi.put(`/staff/removeworker/${workerId}/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+export const useInviteWorkerByStaff = () => useMutation({ mutationFn: inviteWorkerByStaff });
+
+export const useGetWorkersAsStaff = (projectId: string) =>
+  useQuery({
+    queryKey: ["workers", projectId],
+    queryFn: () => getWorkersByProjectAsStaff(projectId),
+    enabled: !!projectId,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+export const useRemoveWorkerAsStaff = () =>
+  useMutation({
+    mutationFn: removeWorkerAsStaff,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workers"] }),
+  });

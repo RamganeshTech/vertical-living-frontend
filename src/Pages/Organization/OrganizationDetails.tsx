@@ -1,496 +1,3 @@
-// import { Button } from '../../components/ui/Button'
-// import { Badge } from '../../components/ui/Badge'
-// import { toast } from '../../utils/toast';
-// import { Skeleton } from '../../components/ui/Skeleton';
-// import { Card, CardContent, CardHeader, CardTitle } from "./../../components/ui/Card"
-// import { Avatar,  AvatarFallback, AvatarImage } from './../../components/ui/Avatar';
-// import { useRemoveStaffFromOrganization, useGetStaffsByOrganization, useGetSingleOrganization, useInviteStaffToOrganization, useUpdateOrganizationName, useDeleteOrganization } from './../../apiList/orgApi';
-
-// import {
-//   FiArrowLeft as ArrowLeft,
-//   FiUsers as Users,
-//   FiMapPin as MapPin,
-//   FiPhone as Phone,
-//   FiMail as Mail,
-//   FiUserPlus as UserPlus,
-//   FiUserMinus as UserMinus,
-//   FiEdit as Edit,
-//   FiTrash2 as Trash2,
-//   FiCopy as Copy,
-//   FiMessageCircle as MessageCircle,
-//   FiCheck as Check,
-// } from "react-icons/fi"
-// import { useParams } from 'react-router-dom';
-// import { useState } from 'react';
-// import { Input } from '../../components/ui/Input';
-// import { Label } from '../../components/ui/Label';
-// import { COMPANY_DETAILS } from '../../constants/constants';
-
-
-
-// export default function OrganizationDetails() {
-//   const { organizationId } = useParams<{ organizationId: string }>()
-
-//   if(!organizationId) return;
-
-//   const [isEditing, setIsEditing] = useState(false)
-//   const [editName, setEditName] = useState("")
-//   const [inviteLink, setInviteLink] = useState("")
-//   const [copied, setCopied] = useState(false)
-
-//   // Fetch organization and staff data
-//   const { data: organization, isLoading: orgLoading, error: orgError } = useGetSingleOrganization(organizationId!)
-//   const { data: staffs, isLoading: staffsLoading } = useGetStaffsByOrganization(organizationId!)
-
-//   // Mutations
-//   const removeStaff = useRemoveStaffFromOrganization()
-//   const inviteStaff = useInviteStaffToOrganization()
-//   const updateOrganization = useUpdateOrganizationName()
-//   const deleteOrganization = useDeleteOrganization()
-
-//   const handleRemoveStaff = async (staffId: string, staffName: string) => {
-//     if (window.confirm(`Are you sure you want to remove ${staffName} from this organization?`)) {
-//       try {
-//         await removeStaff.mutateAsync({
-//           staffId,
-//           orgId: organizationId!,
-//         })
-//         toast({
-//           title: "Success",
-//           description: `${staffName} has been removed from the organization`,
-//         })
-//       } catch (error: any) {
-//         toast({
-//           title: "Error",
-//           description: error.message || "Failed to remove staff member",
-//           variant: "destructive",
-//         })
-//       }
-//     }
-//   }
-
-//   const handleGenerateInviteLink = async () => {
-//     try {
-//       const response = await inviteStaff.mutateAsync({
-//         organizationId: organizationId!,
-//         role: "employee", // Default role
-//       })
-//       setInviteLink(response.inviteLink || response)
-//       toast({
-//         title: "Success",
-//         description: "Invitation link generated successfully",
-//       })
-//     } catch (error: any) {
-//       toast({
-//         title: "Error",
-//         description: error.message || "Failed to generate invitation link",
-//         variant: "destructive",
-//       })
-//     }
-//   }
-
-//   const handleCopyLink = async () => {
-//     try {
-//       await navigator.clipboard.writeText(inviteLink)
-//       setCopied(true)
-//       toast({
-//         title: "Success",
-//         description: "Link copied to clipboard",
-//       })
-//       setTimeout(() => setCopied(false), 2000)
-//     } catch (error) {
-//       toast({
-//         title: "Error",
-//         description: "Failed to copy link",
-//         variant: "destructive",
-//       })
-//     }
-//   }
-
-//   const handleShareWhatsApp = () => {
-//     const message = `You're invited to join ${organization?.organizationName}! Click this link to register: ${inviteLink}`
-//     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
-//     window.open(whatsappUrl, "_blank")
-//   }
-
-//   const handleUpdateName = async () => {
-//     if (!editName.trim()) {
-//       toast({
-//         title: "Error",
-//         description: "Organization name cannot be empty",
-//         variant: "destructive",
-//       })
-//       return
-//     }
-
-//     try {
-//       await updateOrganization.mutateAsync({ organizationName: editName })
-//       toast({
-//         title: "Success",
-//         description: "Organization name updated successfully",
-//       })
-//       setIsEditing(false)
-//     } catch (error: any) {
-//       toast({
-//         title: "Error",
-//         description: error.message || "Failed to update organization name",
-//         variant: "destructive",
-//       })
-//     }
-//   }
-
-//   const handleDeleteOrganization = async () => {
-//     if (
-//       window.confirm(
-//         `Are you sure you want to delete "${organization?.organizationName}"? This action cannot be undone and will remove all associated staff.`,
-//       )
-//     ) {
-//       try {
-//         await deleteOrganization.mutateAsync(organizationId!)
-//         toast({
-//           title: "Success",
-//           description: "Organization deleted successfully",
-//         })
-//         window.location.href = "/organizations"
-//       } catch (error: any) {
-//         toast({
-//           title: "Error",
-//           description: error.message || "Failed to delete organization",
-//           variant: "destructive",
-//         })
-//       }
-//     }
-//   }
-
-//   const getInitials = (name: string) => {
-//     return name
-//       .split(" ")
-//       .map((n) => n[0])
-//       .join("")
-//       .toUpperCase()
-//   }
-
-//   // Loading state
-//   if (orgLoading) {
-//     return (
-//       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 p-6">
-//         <div className="max-w-7xl mx-auto">
-//           <div className="flex items-center space-x-4 mb-8">
-//             <Skeleton className="h-10 w-32" />
-//             <Skeleton className="h-8 w-px" />
-//             <Skeleton className="h-12 w-12 rounded-xl" />
-//             <Skeleton className="h-8 w-48" />
-//           </div>
-//           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-//             <Skeleton className="h-64 w-full rounded-2xl" />
-//             <div className="lg:col-span-2">
-//               <Skeleton className="h-96 w-full rounded-2xl" />
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     )
-//   }
-
-//   // Error state
-// //   if (orgError || !organization) {
-// //     return (
-// //       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
-// //         <div className="text-center bg-white p-8 rounded-2xl shadow-lg">
-// //           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-// //             <ArrowLeft className="w-8 h-8 text-red-600" />
-// //           </div>
-// //           <h2 className="text-2xl font-bold text-red-600 mb-2">Organization Not Found</h2>
-// //           <p className="text-gray-600 mb-4">
-// //             The organization you're looking for doesn't exist or you don't have access to it.
-// //           </p>
-// //           <Button variant="primary" onClick={() => (window.location.href = "/organizations")}>
-// //             Back to Organizations
-// //           </Button>
-// //         </div>
-// //       </div>
-// //     )
-// //   }
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
-//       {/* Header */}
-//       <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10">
-//         <div className="max-w-full mx-auto px-6 py-6">
-//           <div className="flex items-center justify-between">
-//             <div className="flex items-center space-x-4">
-//               <Button
-//                 variant="ghost"
-//                 size="sm"
-//                 onClick={() => (window.location.href = "/organization")}
-//                 className="text-blue-600 hover:bg-blue-50 rounded-xl"
-//               >
-//                 <ArrowLeft className="w-4 h-4 mr-2" />
-//                 Back to Organizations
-//               </Button>
-//               <div className="h-6 w-px bg-gray-300" />
-//               <div className="flex items-center space-x-3">
-//                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-//                   {organization?.logoUrl ? (
-//                     <img
-//                       src={organization?.logoUrl || COMPANY_DETAILS.COMPANY_LOGO}
-//                       alt={organization?.organizationName}
-//                       className="w-7 h-7 rounded-lg object-cover"
-//                     />
-//                   ) : (
-//                     // <ArrowLeft className="w-6 h-6 text-white" />
-//                     <img
-//                       src={COMPANY_DETAILS.COMPANY_LOGO} />
-//                   )}
-//                 </div>
-//                 <div>
-//                   {isEditing ? (
-//                     <div className="flex items-center space-x-2">
-//                       <Input
-//                         value={editName}
-//                         onChange={(e) => setEditName(e.target.value)}
-//                         className="text-xl font-bold"
-//                         onKeyPress={(e) => e.key === "Enter" && handleUpdateName()}
-//                       />
-//                       <Button
-//                         size="sm"
-//                         variant="primary"
-//                         onClick={handleUpdateName}
-//                         isLoading={updateOrganization.isPending}
-//                       >
-//                         Save
-//                       </Button>
-//                       <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>
-//                         Cancel
-//                       </Button>
-//                     </div>
-//                   ) : (
-//                     <h1 className="text-2xl font-bold text-blue-900">{organization?.organizationName}</h1>
-//                   )}
-//                   {organization?.type && <Badge className="mt-1">{organization?.type}</Badge>}
-//                 </div>
-//               </div>
-//             </div>
-//             <div className="flex items-center space-x-2">
-//               <Button
-//                 variant="outline"
-//                 onClick={() => {
-//                   setEditName(organization?.organizationName)
-//                   setIsEditing(true)
-//                 }}
-//                 className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl"
-//               >
-//                 <Edit className="w-4 h-4 mr-2" />
-//                 Edit Name
-//               </Button>
-//               <Button
-//                 variant="danger"
-//                 onClick={handleDeleteOrganization}
-//                 className="border-red-200 text-red-600 hover:bg-red-50 rounded-xl"
-//               >
-//                 <Trash2 className="w-4 h-4 mr-2" />
-//                 Delete
-//               </Button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="max-w-7xl mx-auto p-6">
-//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-//           {/* Organization Info */}
-//           <div className="lg:col-span-1">
-//             <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-lg">
-//               <CardHeader>
-//                 <CardTitle className="text-blue-900 flex items-center">
-//                   <ArrowLeft className="w-5 h-5 mr-2" />
-//                   Organization Details
-//                 </CardTitle>
-//               </CardHeader>
-//               <CardContent className="space-y-4">
-//                 {organization?.organizationPhoneNo && (
-//                   <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-xl">
-//                     <Phone className="w-5 h-5 text-blue-600" />
-//                     <span className="text-gray-700">{organization?.organizationPhoneNo}</span>
-//                   </div>
-//                 )}
-//                 {organization?.address && (
-//                   <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-xl">
-//                     <MapPin className="w-5 h-5 text-blue-600 mt-0.5" />
-//                     <span className="text-gray-700">{organization?.address}</span>
-//                   </div>
-//                 )}
-//                 <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-xl">
-//                   <Users className="w-5 h-5 text-blue-600" />
-//                   <span className="text-gray-700">{staffs?.length || 0} Staff Members</span>
-//                 </div>
-//               </CardContent>
-//             </Card>
-
-//             {/* Invite Staff */}
-//             <Card className="mt-6 bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-lg">
-//               <CardHeader>
-//                 <CardTitle className="text-blue-900 flex items-center">
-//                   <UserPlus className="w-5 h-5 mr-2" />
-//                   Invite Staff
-//                 </CardTitle>
-//               </CardHeader>
-//               <CardContent className="space-y-4">
-//                 {!inviteLink ? (
-//                   <Button
-//                     variant="primary"
-//                     onClick={handleGenerateInviteLink}
-//                     isLoading={inviteStaff.isPending}
-//                     className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl"
-//                   >
-//                     {inviteStaff.isPending ? "Generating..." : "Generate Invitation Link"}
-//                   </Button>
-                  
-//                 ) : (
-//                   <div className="space-y-3">
-//                     <div className="space-y-2">
-//                       <Label className="text-blue-800">Invitation Link</Label>
-//                       <div className="flex space-x-2">
-//                         <Input value={inviteLink} readOnly className="border-blue-200 bg-blue-50 text-sm" />
-//                         <Button
-//                           onClick={handleCopyLink}
-//                           variant="outline"
-//                           size="icon"
-//                           className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl"
-//                         >
-//                           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-//                         </Button>
-//                       </div>
-//                     </div>
-//                     <div className="flex flex-col space-y-2">
-//                       <Button
-//                         onClick={handleCopyLink}
-//                         variant="outline"
-//                         className="w-full border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl"
-//                       >
-//                         <Copy className="w-4 h-4 mr-2" />
-//                         Copy Link
-//                       </Button>
-//                       <Button
-//                         onClick={handleShareWhatsApp}
-//                         className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl"
-//                       >
-//                         <MessageCircle className="w-4 h-4 mr-2" />
-//                         Share on WhatsApp
-//                       </Button>
-//                        <Button
-//                     variant="primary"
-//                     onClick={handleGenerateInviteLink}
-//                     isLoading={inviteStaff.isPending}
-//                     className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl"
-//                   >
-//                     {inviteStaff.isPending ? "Generating..." : "Generate another"}
-//                   </Button>
-//                     </div>
-//                   </div>
-//                 )}
-//               </CardContent>
-//             </Card>
-//           </div>
-
-//           {/* Staff List */}
-//           <div className="lg:col-span-2">
-//             <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-lg">
-//               <CardHeader>
-//                 <CardTitle className="text-blue-900 flex items-center justify-between">
-//                   <div className="flex items-center">
-//                     <Users className="w-5 h-5 mr-2" />
-//                     Staff Members ({staffs?.length || 0})
-//                   </div>
-//                 </CardTitle>
-//               </CardHeader>
-//               <CardContent>
-//                 {staffsLoading ? (
-//                   <div className="space-y-4">
-//                     {[1, 2, 3].map((i) => (
-//                       <div key={i} className="flex items-center space-x-4 p-4 border border-blue-100 rounded-xl">
-//                         <Skeleton className="w-12 h-12 rounded-full" />
-//                         <div className="flex-1 space-y-2">
-//                           <Skeleton className="h-4 w-32" />
-//                           <Skeleton className="h-3 w-48" />
-//                         </div>
-//                         <Skeleton className="h-8 w-20" />
-//                       </div>
-//                     ))}
-//                   </div>
-//                 ) : staffs && staffs.length > 0 ? (
-//                   <div className="space-y-4">
-//                     {staffs?.map((staff: any) => (
-//                       <div
-//                         key={staff._id}
-//                         className="flex items-center justify-between p-4 border border-blue-100 rounded-xl hover:bg-blue-50/50 transition-all duration-200"
-//                       >
-//                         <div className="flex items-center space-x-4">
-//                           <Avatar className="w-12 h-12 border-2 border-blue-200">
-//                             <AvatarImage src={staff?.avatarUrl || COMPANY_DETAILS.COMPANY_LOGO} />
-//                             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">
-//                               {getInitials(staff?.staffName)}
-//                             </AvatarFallback>
-//                           </Avatar>
-//                           <div>
-//                             <h4 className="font-semibold text-blue-900">{staff?.staffName}</h4>
-//                             <div className="flex items-center space-x-4 text-sm text-gray-600">
-//                               <div className="flex items-center space-x-1">
-//                                 <Mail className="w-3 h-3" />
-//                                 <span>{staff.email}</span>
-//                               </div>
-//                               {staff.phoneNo && (
-//                                 <div className="flex items-center space-x-1">
-//                                   <Phone className="w-3 h-3" />
-//                                   <span>{staff?.phoneNo}</span>
-//                                 </div>
-//                               )}
-//                             </div>
-//                             <Badge variant="outline" className="mt-1 text-xs border-blue-200 text-blue-700">
-//                               {staff?.role}
-//                             </Badge>
-//                           </div>
-//                         </div>
-//                         <Button
-//                           onClick={() => handleRemoveStaff(staff?._id, staff?.staffName)}
-//                           variant="danger"
-//                           size="sm"
-//                           className="text-red-600 border-red-200 hover:bg-red-50 rounded-xl"
-//                           isLoading={removeStaff.isPending}
-//                         >
-//                           <UserMinus className="w-4 h-4 mr-1" />
-//                           Remove
-//                         </Button>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 ) : (
-//                   <div className="text-center py-12">
-//                     <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-//                       <Users className="w-10 h-10 text-blue-500" />
-//                     </div>
-//                     <h3 className="text-lg font-semibold text-blue-900 mb-2">No Staff Members Yet</h3>
-//                     <p className="text-blue-600 mb-4">Invite staff members to start building your team</p>
-//                     <Button
-//                       onClick={handleGenerateInviteLink}
-//                       variant="primary"
-//                       className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl"
-//                     >
-//                       <UserPlus className="w-4 h-4 mr-2" />
-//                       Generate Invite Link
-//                     </Button>
-//                   </div>
-//                 )}
-//               </CardContent>
-//             </Card>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-
 import { useNavigate, useParams } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Badge } from "../../components/ui/Badge"
@@ -520,11 +27,20 @@ export default function OrganizationDetails() {
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
 
+    const [editingPhone, setEditingPhone] = useState(false)
+  const [editingAddress, setEditingAddress] = useState(false)
+  const [tempPhone, setTempPhone] = useState("")
+  const [tempAddress, setTempAddress] = useState("")
+
+
   // Fetch organization and staff data
-  const { data: organization, isLoading: orgLoading, error: orgError } = useGetSingleOrganization(organizationId!)
+  let { data: organization, isLoading: orgLoading, error: orgError } = useGetSingleOrganization(organizationId!)
   const { data: staffs, isLoading: staffsLoading } = useGetStaffsByOrganization(organizationId!)
 
-
+  if(Array.isArray(organization)){
+    organization = organization[0]
+  }
+console.log(organization, "isArray:",Array.isArray(organization))
 
   // Mutations
   const removeStaff = useRemoveStaffFromOrganization()
@@ -607,7 +123,7 @@ export default function OrganizationDetails() {
     }
 
     try {
-      await updateOrganization.mutateAsync({ organizationName: editName , orgsId:organizationId!})
+      await updateOrganization.mutateAsync({ updateField:{organizationName:editName} , orgsId:organizationId!})
       toast({
         title: "Success",
         description: "Organization name updated successfully",
@@ -638,6 +154,85 @@ export default function OrganizationDetails() {
       .map((n) => n[0])
       .join("")
       .toUpperCase()
+  }
+
+
+  const handleStartEditPhone = () => {
+    setTempPhone(organization?.organizationPhoneNo || "")
+    setEditingPhone(true)
+  }
+
+  const handleStartEditAddress = () => {
+    setTempAddress(organization?.address || "")
+    setEditingAddress(true)
+  }
+
+  const handleSavePhone = async () => {
+    if (!tempPhone.trim()) {
+      toast({
+        title: "Error",
+        description: "Phone number cannot be empty",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      await updateOrganization.mutateAsync({
+        orgsId: organizationId!,
+        updateField: {organizationPhoneNo:tempPhone},
+      })
+      toast({
+        title: "Success",
+        description: "Phone number updated successfully",
+      })
+      setEditingPhone(false)
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update phone number",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleSaveAddress = async () => {
+    if (!tempAddress.trim()) {
+      toast({
+        title: "Error",
+        description: "Address cannot be empty",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      await updateOrganization.mutateAsync({
+        orgsId: organizationId!,
+        updateField: {address:tempAddress},
+      })
+      toast({
+        title: "Success",
+        description: "Address updated successfully",
+      })
+      setEditingAddress(false)
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update address",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleCancelEditPhone = () => {
+    setTempPhone("")
+    setEditingPhone(false)
+  }
+
+  const handleCancelEditAddress = () => {
+    setTempAddress("")
+    setEditingAddress(false)
   }
 
   // Loading state
@@ -813,19 +408,131 @@ export default function OrganizationDetails() {
                   Organization Details
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {organization?.organizationPhoneNo && (
-                  <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-xl">
-                    <i className="fas fa-phone text-blue-600"></i>
-                    <span className="text-gray-700 text-sm sm:text-base">{organization?.organizationPhoneNo}</span>
+               <CardContent className="space-y-4">
+                {
+                  <div className="p-3 bg-blue-50 rounded-xl">
+                    {editingPhone ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <i className="fas fa-phone text-blue-600"></i>
+                          <div className="flex-1">
+                            <Input
+                              value={tempPhone}
+                              onChange={(e) => setTempPhone(e.target.value)}
+                              placeholder="Enter phone number"
+                              className="text-sm border-blue-200 focus:border-blue-500 bg-white"
+                              onKeyPress={(e) => e.key === "Enter" && handleSavePhone()}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancelEditPhone}
+                            className="text-gray-600 border-gray-300 hover:bg-gray-50 text-xs px-3 py-1"
+                          >
+                            <i className="fas fa-times mr-1"></i>
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={handleSavePhone}
+                            isLoading={updateOrganization.isPending}
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
+                          >
+                            <i className="fas fa-check mr-1"></i>
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between group">
+                        <div className="flex items-center space-x-3">
+                          <i className="fas fa-phone text-blue-600"></i>
+                          <span className="text-gray-700 text-sm sm:text-base">
+                            {organization?.organizationPhoneNo || "N/A"}
+                          </span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleStartEditPhone}
+                          className=" text-blue-600 hover:bg-blue-100 p-1 h-auto"
+                        >
+                          <i className="fas fa-edit text-xs"></i>
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                )}
-                {organization?.address && (
-                  <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-xl">
-                    <i className="fas fa-map-marker-alt text-blue-600 mt-1"></i>
-                    <span className="text-gray-700 text-sm sm:text-base">{organization?.address}</span>
+                }
+                {
+                  <div className="p-3 bg-blue-50 rounded-xl">
+                    {editingAddress ? (
+                      <div className="space-y-3">
+                        <div className="flex items-start space-x-3">
+                          <i className="fas fa-map-marker-alt text-blue-600 mt-1"></i>
+                          <div className="flex-1">
+                            <textarea
+                              value={tempAddress}
+                              onChange={(e) => setTempAddress(e.target.value)}
+                              placeholder="Enter address"
+                              className="w-full text-sm border-2 border-blue-200 focus:border-blue-500 bg-white rounded-lg p-2 resize-none focus:outline-none"
+                              rows={3}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                  e.preventDefault()
+                                  handleSaveAddress()
+                                }
+                              }}
+                            />
+                            <div className="flex items-center gap-[5px]   text-blue-600">
+                               <i className="fa-solid fa-circle-info"></i>
+                            <span className=" sm:text-sm text-[12px]">press shift + enter for next Line</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancelEditAddress}
+                            className="text-gray-600 border-gray-300 hover:bg-gray-50 text-xs px-3 py-1"
+                          >
+                            <i className="fas fa-times mr-1"></i>
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onClick={handleSaveAddress}
+                            isLoading={updateOrganization.isPending}
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
+                          >
+                            <i className="fas fa-check mr-1"></i>
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start justify-between group">
+                        <div className="flex items-start space-x-3 space-y-14">
+                          <i className="fas fa-map-marker-alt text-blue-600 mt-1"></i>
+                          <span className="text-gray-700 text-sm sm:text-base flex-1 break-words whitespace-normal">{organization?.address || "N/A"}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={handleStartEditAddress}
+                          className="text-blue-600 hover:bg-blue-100 p-1 h-auto flex-shrink-0"
+                        >
+                          <i className="fas fa-edit text-xs"></i>
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                )}
+                }
                 <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-xl">
                   <i className="fas fa-users text-blue-600"></i>
                   <span className="text-gray-700 text-sm sm:text-base">{staffs?.length || 0} Staff Members</span>

@@ -2,6 +2,8 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import Api from "../apiService/apiService"
 import { queryClient } from "../QueryClient/queryClient"
 import type { ProjectInput } from "../components/CreateProject"
+import { getApiForRole } from "../utils/roleCheck"
+import useGetRole from "../Hooks/useGetRole"
 
 const createProject = async (projectData: Record<any, any>) => {
     try {
@@ -17,12 +19,19 @@ const createProject = async (projectData: Record<any, any>) => {
 }
 
 
-const getProjects = async () => {
+const getProjects = async (role:string|null) => {
     try {
-        let { data } = await Api.get(`/project/getprojects`)
+         if (!role) return []
+
+        let api = getApiForRole(role)
+
+        if(!api) return [];
+
+        let { data } = await api.get(`/project/getprojects`)
         if (data.ok) {
             return data.data
         }
+        return []
     }
     catch (error) {
         throw error
@@ -66,9 +75,11 @@ const updateProject = async ({projectId, formData}:{projectId:string, formData:P
 }
 
 export const useGetProjects = ()=>{
+    const {role} = useGetRole()
     return useQuery({
     queryKey:["project"],
-    queryFn: getProjects,
+    queryFn: ()=> getProjects(role),
+     enabled: !!role,
     refetchOnWindowFocus:false,
     retry:false,
     staleTime: 1000 * 60 * 10

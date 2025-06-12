@@ -84,14 +84,14 @@ export default function OrganizationCard({ organization }: OrganizationCardProps
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <Edit className="w-4 h-4 mr-2" />
                 Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem>
+              </DropdownMenuItem> */}
+              {/* <DropdownMenuItem>
                 <UserPlus className="w-4 h-4 mr-2" />
                 Invite Staff
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem onClick={handleDelete} className="text-red-600 focus:text-red-600">
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete
@@ -102,23 +102,21 @@ export default function OrganizationCard({ organization }: OrganizationCardProps
       </CardHeader>
       <CardContent className="p-6">
         <div className="space-y-2">
-          {organization.address && (
             <p className="text-sm text-gray-600 flex items-start">
               <MapPin className="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0" />
-              {organization.address}
+              {organization?.address || "N/A"}
             </p>
-          )}
           {organization.organizationPhoneNo && (
             <p className="text-sm text-gray-600 flex items-center">
               <Phone className="w-4 h-4 mr-2 text-blue-500" />
               {organization.organizationPhoneNo}
             </p>
           )}
-          <div className="flex items-center justify-between pt-3 border-t border-blue-100">
-            <div className="flex items-center text-blue-600">
+          <div className="flex items-center justify-end pt-3 border-t border-blue-100">
+            {/* <div className="flex items-center text-blue-600">
               <Users className="w-4 h-4 mr-1" />
               <span className="text-sm">{organization.staffCount || 0} Staff</span>
-            </div>
+            </div> */}
             <Button
               variant="outline"
               size="sm"

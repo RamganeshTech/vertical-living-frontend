@@ -25,6 +25,7 @@ useLayoutEffect(()=>{
   LABOURS: projectId ? `/projectdetails/${projectId}/labourlist` : "",
   MATERIALS: projectId ? `/projectdetails/${projectId}/materiallist` : "",
   TRANSPORTATION: projectId ? `/projectdetails/${projectId}/transportationlist` : "",
+  WORKERS: projectId ? `/projectdetails/${projectId}/workers` : "",
 };
 
   return (

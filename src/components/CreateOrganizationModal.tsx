@@ -70,7 +70,7 @@ export default function CreateOrganizationModal({ isOpen, onClose }: CreateOrgan
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md p-4">
         <DialogHeader>
           <DialogTitle className="text-blue-900">Create New Organization</DialogTitle>
         </DialogHeader>

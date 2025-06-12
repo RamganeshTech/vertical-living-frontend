@@ -1,12 +1,12 @@
 import axios from "axios";
-import Api from "../apiService/apiService";
-import {store} from './../store/store';
-import { setAuth } from "../features/userSlices";
+import {store} from '../../store/store';
+import { setAuth } from "../../features/workerSlice";
+import workerApi from "../../apiService/workerApiService";
 
 
-const getRefreshtoken = async (): Promise<{ ok: boolean }> => {
+const getWorkerRefreshtoken = async (): Promise<{ ok: boolean }> => {
   try {
-    let { data } = await Api.get('/auth/refreshtoken')
+    let { data } = await workerApi.get('/auth/worker/refreshtoken')
     store.dispatch(setAuth({ isAuthenticated: data.ok, }))
     return { ok: data.ok }
   }
@@ -22,4 +22,4 @@ const getRefreshtoken = async (): Promise<{ ok: boolean }> => {
 }
 
 
-export default getRefreshtoken;
+export default getWorkerRefreshtoken;

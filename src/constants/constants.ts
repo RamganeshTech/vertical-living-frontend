@@ -18,14 +18,16 @@ export const SIDEBAR_ICONS = {
 export const PROJECTS_LABELS = {
   MATERIALS:"Materials",
   LABOURS:"Labours",
-  TRANSPORTATION: "Transportation"
+  TRANSPORTATION: "Transportation",
+  WORKERS: "Workers",
 }
 
 
 export const PROJECTS_ICONS = {
   MATERIALS:"fa-solid fa-cubes-stacked text-2xl",
   LABOURS:"fa-solid fa-users text-2xl",
-  TRANSPORTATION: "fa-solid fa-road text-2xl"
+  TRANSPORTATION: "fa-solid fa-road text-2xl",
+  WORKERS: "fa-solid fa-circle-info text-2xl"
 }
 
 

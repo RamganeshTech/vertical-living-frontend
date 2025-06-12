@@ -1,15 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    userId:"",
-    userName:"",
+    staffId:"",
+    staffName:"",
     email:"",
     phoneNo:"",
     isauthenticated:false
 }
 
-const userSlice = createSlice({
-    name:"userprofile",
+const staffSlice = createSlice({
+    name:"staffprofile",
     initialState,
     reducers:{
         setProfileData:(_, action)=>{
@@ -21,6 +21,6 @@ const userSlice = createSlice({
     }
 })
 
-export const {setProfileData, setAuth} = userSlice.actions
+export const {setProfileData, setAuth} = staffSlice.actions
 
-export default userSlice.reducer
+export default staffSlice.reducer
