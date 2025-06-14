@@ -50,10 +50,11 @@ type CreateProjectProp = {
   setEditForm: React.Dispatch<React.SetStateAction<ProjectInput>>,
   editForm: ProjectInput,
   isEditing: boolean,
-  editProjectId: string | null
+  editProjectId: string | null,
+  organizationId:string
 }
 
-const CreateProject: React.FC<CreateProjectProp> = ({ onClose, isEditing, setEditForm, editForm, editProjectId }) => {
+const CreateProject: React.FC<CreateProjectProp> = ({ onClose, organizationId, isEditing, setEditForm, editForm, editProjectId }) => {
 
   const [formData, setFormData] = useState<ProjectInput>({
     projectName: "",
@@ -133,6 +134,7 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, isEditing, setEdi
   const { mutate: createProject, isPending, error, isError, reset } = useCreateProject()
   const { mutate: updateProject, isPending: updatePending, error: updateError, isError: updateIsError, reset: updateReset } = useUpdateProject()
 
+  // console.log("error of creating", error)
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -142,7 +144,7 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, isEditing, setEdi
       const validationErrors = isEditing ? handleProjectValidate(editForm) : handleProjectValidate(formData)
       setErrors(validationErrors);
 
-      console.log("validationErrors", validationErrors)
+      // console.log("validationErrors", validationErrors)
 
       if (Object.keys(validationErrors).length === 0) {
 
@@ -152,17 +154,17 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, isEditing, setEdi
             updateProject({ projectId: editProjectId, formData: editForm }, {
               onSuccess: (data) => {
                 setToast(data.message)
-              }
+              }, 
             }
             )
           }
         }
         else {
           if (!isPending) {
-            console.log("formData", formData)
-            createProject(formData, {
+            // console.log("formData", formData)
+            createProject({projectData:formData, orgsId:organizationId},{
               onSuccess: (data) => {
-                setToast(data.message)
+                setToast((data as any)?.message || "project created successfully")
               }
             })
           }

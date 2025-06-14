@@ -147,7 +147,7 @@ export default function StaffRegister() {
               <i className="fas fa-exclamation-triangle text-white text-2xl"></i>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-2">Invalid Invitation</h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-4 sm:text-base text-sm">
               Please use a valid invitation link to register. Redirecting you to the home page...
             </p>
             <div className="flex justify-center">
@@ -161,29 +161,23 @@ export default function StaffRegister() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
-      {/* Background Pattern */}
-      {/* <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div> */}
-
-      <div className="relative w-full max-w-lg">
+      
+      <div className="relative w-full sm:max-w-lg max-w-full">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
           <CardHeader className="text-center pb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="sm:w-20 sm:h-20 w-15 h-15 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <i className="fas fa-user-plus text-white text-2xl"></i>
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-900 to-blue-600 bg-clip-text text-transparent">
               Join Organization
             </CardTitle>
             <CardDescription className="text-blue-600 text-base">
-              Complete your registration to join the team
+              Complete your registration to join the team as staff member
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-2">
               {/* Full Name Field */}
               <div className="space-y-2">
                 <Label htmlFor="staffName" className="text-blue-800 font-medium">
@@ -329,13 +323,13 @@ export default function StaffRegister() {
                 <ul className="text-xs text-gray-600 space-y-1">
                   <li className="flex items-center">
                     <i
-                      className={`fas fa-check mr-2 ${formData.password.length >= 6 ? "text-green-500" : "text-gray-400"}`}
+                      className={`fas fa-check mr-2 ${formData.password.length >= 6 ? "text-blue-500" : "text-gray-400"}`}
                     ></i>
                     At least 6 characters long
                   </li>
                   <li className="flex items-center">
                     <i
-                      className={`fas fa-check mr-2 ${formData.password === formData.confirmPassword && formData.confirmPassword ? "text-green-500" : "text-gray-400"}`}
+                      className={`fas fa-check mr-2 ${formData.password === formData.confirmPassword && formData.confirmPassword ? "text-blue-500" : "text-gray-400"}`}
                     ></i>
                     Passwords match
                   </li>
@@ -345,7 +339,7 @@ export default function StaffRegister() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
                 isLoading={registerStaff.isPending}
               >
                 {registerStaff.isPending ? (
@@ -369,7 +363,7 @@ export default function StaffRegister() {
                 <button
                   type="button"
                   className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors"
-                  onClick={() => navigate("/staff/login")}
+                  onClick={() => navigate("/stafflogin")}
                 >
                   Sign in here
                 </button>

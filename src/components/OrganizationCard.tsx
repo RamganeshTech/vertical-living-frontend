@@ -120,7 +120,7 @@ export default function OrganizationCard({ organization }: OrganizationCardProps
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate(`/organization/${organization._id}`)}
+              onClick={() => navigate(`/organizations/${organization._id}`)}
               className="border-blue-200 text-blue-600 hover:bg-blue-50"
             >
               View Details

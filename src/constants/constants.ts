@@ -15,6 +15,14 @@ export const SIDEBAR_ICONS = {
     PHASES: "fa-solid fa-briefcase text-2xl",
 }
 
+export const ORGANIZATION_ICONS = {
+  PROJECTS: "fa-solid fa-bars-progress text-2xl"
+}
+
+export const ORGANIZATION_LABELS = {
+  PROJECTS: "Projects"
+}
+
 export const PROJECTS_LABELS = {
   MATERIALS:"Materials",
   LABOURS:"Labours",

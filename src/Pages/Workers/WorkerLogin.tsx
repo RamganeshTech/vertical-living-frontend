@@ -82,24 +82,19 @@ export default function WorkerLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-4">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+    
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
           <CardHeader className="text-center pb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <i className="fas fa-hard-hat text-white text-2xl"></i>
             </div>
-            <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-900 to-red-800 bg-clip-text text-transparent">
+            <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-900 to-blue-600 bg-clip-text text-transparent">
               Worker Login
             </CardTitle>
-            <CardDescription className="text-orange-700 text-base">
+            <CardDescription className="text-blue-600 text-base">
               Sign in to access your projects and tasks
             </CardDescription>
           </CardHeader>
@@ -108,12 +103,12 @@ export default function WorkerLogin() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email Field */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-orange-800 font-medium">
+                <Label htmlFor="email" className="text-blue-800 font-medium">
                   Email Address
                 </Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="fas fa-envelope text-orange-400"></i>
+                    <i className="fas fa-envelope text-blue-400"></i>
                   </div>
                   <Input
                     id="email"
@@ -123,7 +118,7 @@ export default function WorkerLogin() {
                     onChange={handleChange}
                     placeholder="Enter your email address"
                     className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.email ? "border-red-300 focus:border-red-500" : "border-orange-200 focus:border-orange-500"
+                      errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
                     } bg-white/70 backdrop-blur-sm`}
                     error={errors.email}
                   />
@@ -132,12 +127,12 @@ export default function WorkerLogin() {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-orange-800 font-medium">
+                <Label htmlFor="password" className="text-blue-800 font-medium">
                   Password
                 </Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="fas fa-lock text-orange-400"></i>
+                    <i className="fas fa-lock text-blue-400"></i>
                   </div>
                   <Input
                     id="password"
@@ -149,13 +144,13 @@ export default function WorkerLogin() {
                     className={`pl-10 pr-12 border-2 transition-all duration-200 ${
                       errors.password
                         ? "border-red-300 focus:border-red-500"
-                        : "border-orange-200 focus:border-orange-500"
+                        : "border-blue-200 focus:border-blue-500"
                     } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-orange-400 hover:text-orange-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-400 hover:text-blue-600 transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
@@ -166,7 +161,7 @@ export default function WorkerLogin() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-orange-600 to-red-700 hover:from-orange-700 hover:to-red-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
                 isLoading={loginWorker.isPending}
               >
                 {loginWorker.isPending ? (
@@ -184,16 +179,16 @@ export default function WorkerLogin() {
             </form>
 
             {/* Footer */}
-            <div className="text-center pt-4 border-t border-orange-100">
+            <div className="text-center pt-4 border-t border-blue-100">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <span className="text-orange-600 font-medium">Contact your project manager for an invitation</span>
+                <span className="text-blue-600 font-medium">Contact your project manager for an invitation</span>
               </p>
             </div>
 
             {/* Help Section */}
-            <div className="bg-orange-50 rounded-xl p-4 text-center">
-              <p className="text-xs text-orange-600 mb-2">
+            <div className="bg-blue-50 rounded-xl p-4 text-center">
+              <p className="text-xs text-blue-600 mb-2">
                 <i className="fas fa-info-circle mr-1"></i>
                 Need help?
               </p>

@@ -158,7 +158,7 @@ export default function WorkerRegister() {
 
   if (!invite) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl max-w-md w-full">
           <CardContent className="pt-8 text-center">
             <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -178,26 +178,20 @@ export default function WorkerRegister() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center p-4">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
-
+    <div className="min-h-full bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
+     
       <div className="relative w-full max-w-lg">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
           <CardHeader className="text-center pb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <i className="fas fa-hard-hat text-white text-2xl"></i>
             </div>
-            <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-900 to-red-800 bg-clip-text text-transparent">
+            <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-900 to-blue-800 bg-clip-text text-transparent">
               Join as Worker
             </CardTitle>
-            <CardDescription className="text-orange-700 text-base">
+            <CardDescription className="text-blue-700 text-base">
               {inviteData?.specifiedRole && (
-                <span className="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium mb-2">
+                <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mb-2">
                   Role: {inviteData.specifiedRole}
                 </span>
               )}
@@ -207,15 +201,15 @@ export default function WorkerRegister() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-2">
               {/* workerName Field */}
               <div className="space-y-2">
-                <Label htmlFor="workerName" className="text-orange-800 font-medium">
+                <Label htmlFor="workerName" className="text-blue-800 font-medium">
                   workerName *
                 </Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="fas fa-user text-orange-400"></i>
+                    <i className="fas fa-user text-blue-400"></i>
                   </div>
                   <Input
                     id="workerName"
@@ -227,7 +221,7 @@ export default function WorkerRegister() {
                     className={`pl-10 border-2 transition-all duration-200 ${
                       errors.workerName
                         ? "border-red-300 focus:border-red-500"
-                        : "border-orange-200 focus:border-orange-500"
+                        : "border-blue-200 focus:border-blue-500"
                     } bg-white/70 backdrop-blur-sm`}
                     error={errors.workerName}
                   />
@@ -236,12 +230,12 @@ export default function WorkerRegister() {
 
               {/* Email Field */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-orange-800 font-medium">
+                <Label htmlFor="email" className="text-blue-800 font-medium">
                   Email Address *
                 </Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="fas fa-envelope text-orange-400"></i>
+                    <i className="fas fa-envelope text-blue-400"></i>
                   </div>
                   <Input
                     id="email"
@@ -251,7 +245,7 @@ export default function WorkerRegister() {
                     onChange={handleChange}
                     placeholder="Enter your email address"
                     className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.email ? "border-red-300 focus:border-red-500" : "border-orange-200 focus:border-orange-500"
+                      errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
                     } bg-white/70 backdrop-blur-sm`}
                     error={errors.email}
                   />
@@ -260,12 +254,12 @@ export default function WorkerRegister() {
 
               {/* Phone Number Field */}
               <div className="space-y-2">
-                <Label htmlFor="phoneNo" className="text-orange-800 font-medium">
+                <Label htmlFor="phoneNo" className="text-blue-800 font-medium">
                   Phone Number *
                 </Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="fas fa-phone text-orange-400"></i>
+                    <i className="fas fa-phone text-blue-400"></i>
                   </div>
                   <Input
                     id="phoneNo"
@@ -277,7 +271,7 @@ export default function WorkerRegister() {
                     className={`pl-10 border-2 transition-all duration-200 ${
                       errors.phoneNo
                         ? "border-red-300 focus:border-red-500"
-                        : "border-orange-200 focus:border-orange-500"
+                        : "border-blue-200 focus:border-blue-500"
                     } bg-white/70 backdrop-blur-sm`}
                     error={errors.phoneNo}
                   />
@@ -286,12 +280,12 @@ export default function WorkerRegister() {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-orange-800 font-medium">
+                <Label htmlFor="password" className="text-blue-800 font-medium">
                   Password *
                 </Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="fas fa-lock text-orange-400"></i>
+                    <i className="fas fa-lock text-blue-400"></i>
                   </div>
                   <Input
                     id="password"
@@ -303,13 +297,13 @@ export default function WorkerRegister() {
                     className={`pl-10 pr-12 border-2 transition-all duration-200 ${
                       errors.password
                         ? "border-red-300 focus:border-red-500"
-                        : "border-orange-200 focus:border-orange-500"
+                        : "border-blue-200 focus:border-blue-500"
                     } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-orange-400 hover:text-orange-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-400 hover:text-blue-600 transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
@@ -319,12 +313,12 @@ export default function WorkerRegister() {
 
               {/* Confirm Password Field */}
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-orange-800 font-medium">
+                <Label htmlFor="confirmPassword" className="text-blue-800 font-medium">
                   Confirm Password *
                 </Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className="fas fa-lock text-orange-400"></i>
+                    <i className="fas fa-lock text-blue-400"></i>
                   </div>
                   <Input
                     id="confirmPassword"
@@ -336,13 +330,13 @@ export default function WorkerRegister() {
                     className={`pl-10 pr-12 border-2 transition-all duration-200 ${
                       errors.confirmPassword
                         ? "border-red-300 focus:border-red-500"
-                        : "border-orange-200 focus:border-orange-500"
+                        : "border-blue-200 focus:border-blue-500"
                     } bg-white/70 backdrop-blur-sm`}
                     error={errors.confirmPassword}
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-orange-400 hover:text-orange-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-400 hover:text-blue-600 transition-colors"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     <i className={`fas ${showConfirmPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
@@ -351,8 +345,8 @@ export default function WorkerRegister() {
               </div>
 
               {/* Password Requirements */}
-              <div className="bg-orange-50 rounded-xl p-3">
-                <p className="text-xs text-orange-600 mb-1">
+              <div className="bg-blue-50 rounded-xl p-3">
+                <p className="text-xs text-blue-600 mb-1">
                   <i className="fas fa-info-circle mr-1"></i>
                   Password Requirements:
                 </p>
@@ -375,7 +369,7 @@ export default function WorkerRegister() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-orange-600 to-red-700 hover:from-orange-700 hover:to-red-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
                 isLoading={registerWorker.isPending}
               >
                 {registerWorker.isPending ? (
@@ -393,12 +387,12 @@ export default function WorkerRegister() {
             </form>
 
             {/* Footer */}
-            <div className="text-center pt-4 border-t border-orange-100">
+            <div className="text-center pt-4 border-t border-blue-100">
               <p className="text-sm text-gray-600">
                 Already have an account?{" "}
                 <button
                   type="button"
-                  className="text-orange-600 hover:text-orange-700 hover:underline font-medium transition-colors"
+                  className="text-blue-600 hover:text-blue-700 hover:underline font-medium transition-colors"
                   onClick={() => navigate("/workerlogin")}
                 >
                   Sign in here

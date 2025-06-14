@@ -1,8 +1,4 @@
-import React from 'react'
-
-
-
-import { useCallback, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { SIDEBAR_LABELS } from "../../constants/constants";
 import CreateProject, { type ProjectInput } from "../../components/CreateProject";
 import SingleProject from "../../shared/SingleProject";
@@ -10,9 +6,12 @@ import { useGetProjects } from "../../apiList/projectApi";
 import type { IProject } from "../../types/types";
 import { mapProjectToProjectInput } from "../../utils/editProjectRequiredFields";
 import ProjectCardLoading from "../../LoadingUI/ProjectCartLoading";
+import { useParams } from "react-router-dom";
 
 
 const ProjectLists = () => {
+
+  const {organizationId} = useParams() 
     
    const [showForm, setShowForm] = useState<boolean>(false);
   const [isEditing, setisEditing] = useState<boolean>(false);
@@ -30,7 +29,7 @@ const ProjectLists = () => {
   });
   const [editProjectId, setEditProjectId] = useState<string | null>(null);
 
-  let { data: getProjects, isError, isPending, error } = useGetProjects()
+  let { data: getProjects, isError, isPending, error } = useGetProjects(organizationId!)
 
 
   const handleEdit = useCallback((project: IProject, id: string) => {
@@ -52,7 +51,7 @@ const ProjectLists = () => {
   }, [handleEdit]);
 
 
-  console.log("getProjects", getProjects)
+  // console.log("getProjects", getProjects)
   // getProjects = []
   return (
     <div className="w-[100%] flex flex-col h-full min-h-0 ">
@@ -92,7 +91,7 @@ const ProjectLists = () => {
 
       <div className="h-full flex-1 !overflow-y-scroll  grid md:grid-cols-2 gap-6">
 
-        {isPending && [...Array(6)].map(() => <ProjectCardLoading />)}
+        {isPending && [...Array(6)].map((_, i) => <Fragment key={i}><ProjectCardLoading /></Fragment>)}
 
         {!isPending && getProjects?.length > 0 && getProjects?.map((project: IProject, index: number) => {
 
@@ -109,7 +108,7 @@ const ProjectLists = () => {
 
       {showForm && (
         <div onClick={handleClose} className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <CreateProject onClose={handleClose} isEditing={isEditing} setEditForm={setEditForm} editForm={editForm} editProjectId={editProjectId} />
+          <CreateProject onClose={handleClose} organizationId={organizationId!} isEditing={isEditing} setEditForm={setEditForm} editForm={editForm} editProjectId={editProjectId} />
         </div>
       )}
 

@@ -40,7 +40,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
                         <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
                             {Object.entries(labels).map(([key, value]) =>
-                                // <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
+                           // <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
                                 path[key] ? <Link key={value} to={path[key]} className='outline-none'>
                                     <div
                                         onClick={() => setActiveSidebar(value)}

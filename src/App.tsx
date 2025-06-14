@@ -26,32 +26,32 @@ import Workers from './Pages/Workers/Workers'
 import WorkerRegister from './Pages/Workers/WorkerRegister'
 import WorkerLogin from './Pages/Workers/WorkerLogin'
 import { useAuthCheck } from './Hooks/useAuthCheck'
+import ProtectedRoutes from './lib/ProtectedRoutes'
+import UnAuthorized from './Pages/UnAuthorized/UnAuthorized'
 
 function App() {
 
   const [projectId, setProjectId] = useState<string | null>(null)
 
   //it is used to check whether which user is now currently using the application
-  useAuthCheck() 
-  
+  useAuthCheck()
+
   return (
     <>
-      <Routes>
+      {/* <Routes> */}
 
-        {/* <Route path="/" element={<Navigate to="/dashboard" replace />} /> */}
+      {/* <Route path="/" element={<Navigate to="/dashboard" replace />} /> */}
 
-        <Route path="/login" element={<Login />} />
+      {/* <Route path="/login" element={<Login />} />
 
         <Route path="/" element={<Dashboard />}>
           <Route index element={<Home />} />
           <Route path='issues' element={<Issues />} />
           <Route path='phases' element={<Phase />} />
-          <Route path='tasks' element={<Tasks />} />
 
-          {/* <Route path="projects/:projectId/materiallist" element={<MaterialList />} />
-          <Route path="projects/:projectId/materiallist/:materialListId" element={<MaterialItem />} />
-
-          <Route path="projects/:projectId/labourlist/:labourListId" element={<LabourItem />} /> */}
+          <Route path='tasks' element={<ProtectedRoutes allowedRoles={["owner", "staff"]}>
+            <Tasks />
+          </ProtectedRoutes>} />
 
         </Route>
 
@@ -67,6 +67,8 @@ function App() {
           <Route path=":projectId/workers" element={<Workers />} />
         </Route>
 
+
+
         <Route path='/organization' element={<Organization />} />
         <Route path='/organization/:organizationId' element={<OrganizationDetails />} />
 
@@ -78,11 +80,72 @@ function App() {
 
 
 
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} /> */}
+
+
+      {/* </Routes> */}
+
+      <Routes>
+
+        <Route path="/" element={<Navigate to="/organizations" replace />} />
+
+
+        <Route path="/" element={<Home />} />
+        <Route path="/select-model" element={<NotFound />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/unauthorized" element={<UnAuthorized />} />
+
+        <Route path='/stafflogin' element={<StaffLogin />} />
+        <Route path='/staffregister' element={<StaffRegister />} />
+
+        <Route path='/workerlogin' element={<WorkerLogin />} />
+        <Route path='/workerregister' element={<WorkerRegister />} />
+
+
+
+
+        <Route path="/organizations" element={<ProtectedRoutes allowedRoles={["owner"]} >
+          <Organization />
+        </ProtectedRoutes>} />
+
+        <Route path="/organizations/:organizationId" element={<ProtectedRoutes allowedRoles={["owner"]}>
+          <OrganizationDetails />
+        </ProtectedRoutes>} />
+
+
+        <Route path='/organizations/:organizationId/projects' element={<Projects projectId={projectId} setProjectId={setProjectId} />} >
+          <Route index element={<ProjectLists />} />
+        </Route>
+
+        <Route path='/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner"]}>
+          <ProjectDetails projectId={projectId} setProjectId={setProjectId} />
+        </ProtectedRoutes>}>
+
+          <Route path=":projectId/labourlist" element={<LabourList />} />
+          <Route path=":projectId/materiallist" element={<MaterialList />} />
+          <Route path=":projectId/transportationlist" element={<Transportationlist />} />
+          <Route path=":projectId/workers" element={<Workers />} />
+        </Route>
+
+        <Route path="/phase" element={<ProtectedRoutes allowedRoles={["owner"]}>
+          <Phase />
+        </ProtectedRoutes>} />
+
+         <Route path="/issues" element={<ProtectedRoutes allowedRoles={["owner"]}>
+          <Issues />
+        </ProtectedRoutes>} />
+
+         <Route path="/tasks" element={<ProtectedRoutes allowedRoles={["owner"]}>
+          <Tasks />
+        </ProtectedRoutes>} />
+
+
+        <Route path="/workers" element={<ProtectedRoutes allowedRoles={["staff"]} >
+          <Workers />
+        </ProtectedRoutes>} />
 
 
       </Routes>
-
 
     </>
   )

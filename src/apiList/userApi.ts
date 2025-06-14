@@ -30,7 +30,8 @@ const createUser = async ({ email, password, userName, phoneNo }: CreateUserPara
             email,
             password,
             username: userName, // 👈 here we rename it for backend
-            phoneNo
+            phoneNo,
+            role:"owner"
         };
         let { data } = await Api.post(`/auth/registeruser`, payload)
 
