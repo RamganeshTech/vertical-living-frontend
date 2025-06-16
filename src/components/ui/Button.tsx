@@ -11,12 +11,12 @@ export const Button: React.FC<ButtonProps> = ({
   variant = "primary",
   size = "md",
   children,
-  isLoading = false,
+  isLoading = true,
   className = "",
   disabled,
   ...props
 }) => {
-  const baseStyles = "inline-flex items-center justify-center font-medium transition-colors focus:outline-none"
+  const baseStyles = "inline-flex cursor-pointer items-center justify-center font-medium transition-colors focus:outline-none"
 
   const variantStyles = {
     primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",

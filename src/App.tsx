@@ -28,6 +28,11 @@ import WorkerLogin from './Pages/Workers/WorkerLogin'
 import { useAuthCheck } from './Hooks/useAuthCheck'
 import ProtectedRoutes from './lib/ProtectedRoutes'
 import UnAuthorized from './Pages/UnAuthorized/UnAuthorized'
+import InviteStaffs from './Pages/Organization/InviteStaffs'
+import InviteCTO from './Pages/Organization/InviteCTO'
+import OrganizationChildrens from './Pages/Organization/OrganizationChildren'
+import CTORegister from './Pages/CTO/CTORegister'
+import CTOLogin from './Pages/CTO/CTOLogin'
 
 function App() {
 
@@ -101,16 +106,40 @@ function App() {
         <Route path='/workerlogin' element={<WorkerLogin />} />
         <Route path='/workerregister' element={<WorkerRegister />} />
 
+        <Route path='/ctologin' element={<CTOLogin />} />
+        <Route path='/ctoregister' element={<CTORegister />} />
 
 
 
-        <Route path="/organizations" element={<ProtectedRoutes allowedRoles={["owner"]} >
+        {/* commented organizaion route */}
+        {/* <Route path="/organizations" element={<ProtectedRoutes allowedRoles={["owner"]} >
           <Organization />
-        </ProtectedRoutes>} />
+        </ProtectedRoutes>} /> */}
+
+        <Route path="/organizations" element={
+          <Organization />
+        } />
 
         <Route path="/organizations/:organizationId" element={<ProtectedRoutes allowedRoles={["owner"]}>
-          <OrganizationDetails />
-        </ProtectedRoutes>} />
+          <OrganizationChildrens />
+        </ProtectedRoutes>} >
+
+          <Route index
+            element={<ProtectedRoutes allowedRoles={["CTO", "owner"]}>
+              <OrganizationDetails />
+            </ProtectedRoutes>} />
+
+          <Route path='invitestaff'
+            element={<ProtectedRoutes allowedRoles={["CTO", "owner"]}>
+              <InviteStaffs />
+            </ProtectedRoutes>} />
+
+          <Route path='invitecto'
+            element={<ProtectedRoutes allowedRoles={["owner"]}>
+              <InviteCTO />
+            </ProtectedRoutes>} />
+
+        </Route>
 
 
         <Route path='/organizations/:organizationId/projects' element={<Projects projectId={projectId} setProjectId={setProjectId} />} >
@@ -131,11 +160,11 @@ function App() {
           <Phase />
         </ProtectedRoutes>} />
 
-         <Route path="/issues" element={<ProtectedRoutes allowedRoles={["owner"]}>
+        <Route path="/issues" element={<ProtectedRoutes allowedRoles={["owner"]}>
           <Issues />
         </ProtectedRoutes>} />
 
-         <Route path="/tasks" element={<ProtectedRoutes allowedRoles={["owner"]}>
+        <Route path="/tasks" element={<ProtectedRoutes allowedRoles={["owner"]}>
           <Tasks />
         </ProtectedRoutes>} />
 

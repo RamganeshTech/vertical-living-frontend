@@ -20,6 +20,9 @@ export const ORGANIZATION_ICONS = {
 }
 
 export const ORGANIZATION_LABELS = {
+  INVITECTO: "Invite CTO",
+  INVITESTAFFS: "Invite Staffs",
+  DETAILS: "Org Details",
   PROJECTS: "Projects"
 }
 

@@ -8,6 +8,8 @@ import workerApi from "../apiService/workerApiService";
 import { resetOwnerProfile, setOwnerProfileData } from "../features/userSlices";
 import { resetWorkerProfile, setWorkerProfileData } from "../features/workerSlice";
 import { resetStaffProfile, setStaffProfileData } from "../features/staffSlices";
+import CTOApi from "../apiService/CTOService";
+import { resetCTOProfile, setCTOProfileData } from "../features/CTOSlice";
 
 export const useAuthCheck = () => {
   const dispatch = useDispatch();
@@ -26,10 +28,11 @@ export const useAuthCheck = () => {
       setError(null);
 
       try {
-        const [ownerRes, staffRes, workerRes] = await Promise.allSettled([
+        const [ownerRes, staffRes, workerRes, CTORes] = await Promise.allSettled([
           Api.get("/auth/isauthenticated"),
           staffApi.get("/auth/staff/isauthenticated"),
-          workerApi.get("/auth/worker/isauthenticated")
+          workerApi.get("/auth/worker/isauthenticated"),
+          CTOApi.get('/auth/CTO/isauthenticated')
         ]);
 
         if (ownerRes.status === "fulfilled" && ownerRes.value.data.ok) {
@@ -57,12 +60,21 @@ export const useAuthCheck = () => {
           return setLoading(false);
         }
 
+        if (CTORes.status === "fulfilled" && CTORes.value.data.ok) {
+          const info = { role: "CTO", isauthenticated: true };
+          dispatch(setRole(info));
+          dispatch(setCTOProfileData(CTORes.value.data.data))
+          setAuthInfo(info);
+          return setLoading(false);
+        }
+
         dispatch(setRole({ role: null, isauthenticated: false }));
         setAuthInfo({ role: null, isauthenticated: false });
 
         dispatch(resetOwnerProfile())
         dispatch(resetStaffProfile())
         dispatch(resetWorkerProfile())
+        dispatch(resetCTOProfile())
 
         setLoading(false);
       } catch (error) {
@@ -74,6 +86,8 @@ export const useAuthCheck = () => {
         dispatch(resetOwnerProfile())
         dispatch(resetStaffProfile())
         dispatch(resetWorkerProfile())
+        dispatch(resetCTOProfile())
+
        
         setLoading(false);
       }

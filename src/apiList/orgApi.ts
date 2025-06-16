@@ -52,37 +52,6 @@ const deleteOrganization = async (orgId: string) => {
   return data;
 };
   
-// 5) getStaffsByOrganization
-const fetchStaffsByOrganization = async (orgId: string) => {
-  const { data } = await Api.get(`/orgs/getstaffsoforganization/${orgId}`);
-  if (!data.ok) [];
-  return data.data;
-};
-
-// 6) inviteStaffToOrganization
-const inviteStaffToOrganization = async (payload: {
-  organizationId: string;
-  role: string;
-}) => {
-  const { data } = await Api.post("/orgs/invitestafftoorganization", payload);
-  if (!data.ok) throw new Error(data.message);
-  return data.data; // invitation link
-};
-
-// 7) removeStaffFromOrganization
-const removeStaffFromOrganization = async ({
-  staffId,
-  orgId,
-}: {
-  staffId: string;
-  orgId: string;
-}) => {
-  const { data } = await Api.patch(
-    `/orgs/removestafffromorganziation?staffId=${staffId}&orgId=${orgId}`
-  );
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
-};
 
 
 
@@ -108,15 +77,6 @@ export const useGetSingleOrganization = (organizationId:string) => {
 };
 
 
-export const useGetStaffsByOrganization = (orgId: string) => {
-  return useQuery({
-    queryKey: ["staffs", orgId],
-    queryFn: () => fetchStaffsByOrganization(orgId),
-    enabled: !!orgId,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
-};
 
 export const useCreateOrganization = () => {
   return useMutation({
@@ -145,6 +105,50 @@ export const useDeleteOrganization = () => {
   });
 };
 
+
+
+// STAFFS API BY OWNER
+const fetchStaffsByOrganization = async (orgId: string) => {
+  const { data } = await Api.get(`/orgs/getstaffsoforganization/${orgId}`);
+  if (!data.ok) [];
+  return data.data;
+};
+
+const inviteStaffToOrganization = async (payload: {
+  organizationId: string;
+  role: string;
+}) => {
+  const { data } = await Api.post("/orgs/invitestafftoorganization", payload);
+  if (!data.ok) throw new Error(data.message);
+  return data.data; // invitation link
+};
+
+const removeStaffFromOrganization = async ({
+  staffId,
+  orgId,
+}: {
+  staffId: string;
+  orgId: string;
+}) => {
+  const { data } = await Api.patch(
+    `/orgs/removestafffromorganziation?staffId=${staffId}&orgId=${orgId}`
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+export const useGetStaffsByOrganization = (orgId: string) => {
+  return useQuery({
+    queryKey: ["staffs", orgId],
+    queryFn: () => fetchStaffsByOrganization(orgId),
+    enabled: !!orgId,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+
 export const useInviteStaffToOrganization = () => {
   return useMutation({
     mutationFn: inviteStaffToOrganization,
@@ -160,3 +164,68 @@ export const useRemoveStaffFromOrganization = () => {
     },
   });
 };
+
+
+
+
+// CTO ROUTES
+
+const fetchCTOByOrganization = async (orgId: string) => {
+  const { data } = await Api.get(`/orgs/getctooforganization/${orgId}`);
+  if (!data.ok) [];
+  return data.data;
+};
+
+const inviteCTOToOrganization = async (payload: {
+  organizationId: string;
+  role: string;
+}) => {
+  const { data } = await Api.post("/orgs/invitectotoorganization", payload);
+  if (!data.ok) throw new Error(data.message);
+  return data.data; // invitation link
+};
+
+const removeCTOFromOrganization = async ({
+  CTOId,
+  orgId,
+}: {
+  CTOId: string;
+  orgId: string;
+}) => {
+  const { data } = await Api.patch(
+    `/orgs/removectofromorganziation?CTOId=${CTOId}&orgId=${orgId}`
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+export const useGetCTOByOrganization = (orgId: string) => {
+  return useQuery({
+    queryKey: ["CTO", orgId],
+    queryFn: () => fetchCTOByOrganization(orgId),
+    enabled: !!orgId,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+
+export const useInviteCTOToOrganization = () => {
+  return useMutation({
+    mutationFn: inviteCTOToOrganization,
+    
+  });
+};
+
+export const useRemoveCTOFromOrganization = () => {
+  return useMutation({
+    mutationFn: removeCTOFromOrganization,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["CTO", variables.orgId] });
+    },
+  });
+};
+
+
+
