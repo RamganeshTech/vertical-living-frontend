@@ -16,17 +16,37 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
 
-    const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
-    const { name, value, type } = target;
-    const newValue = type === "checkbox" ? (target as HTMLInputElement).checked : value;
+     const { name, value, type } = e.target;
+
+    let finalValue: string | number | boolean = value;
+      if (type === "checkbox") {
+    finalValue = (e.target as HTMLInputElement).checked;
+  } else if (type === "number") {
+      const parsedValue = parseFloat(value);
+      finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
+    }
+
+
 
     setFormData((prev: any) => ({
       ...prev,
       wardrobe: {
         ...prev.wardrobe,
-        [name]: type === "number" ? parseInt(newValue as string) || "" : newValue,
+        [name]: finalValue,
       },
     }));
+
+    // const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    // const { name, value, type } = target;
+    // const newValue = type === "checkbox" ? (target as HTMLInputElement).checked : value;
+
+    // setFormData((prev: any) => ({
+    //   ...prev,
+    //   wardrobe: {
+    //     ...prev.wardrobe,
+    //     [name]: type === "number" ? parseInt(newValue as string) || "" : newValue,
+    //   },
+    // }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -48,11 +68,11 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
         <div>
           <Label>Wardrobe Type</Label>
           <Select
-            value={formData?.wardrobe?.wardrobeType || ""}
+            // value={formData?.wardrobe?.wardrobeType || ""}
             onValueChange={(val) => handleSelectChange("wardrobeType", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select type" />
+              <SelectValue placeholder="Select type" selectedValue={formData?.wardrobe?.wardrobeType || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Sliding">Sliding</SelectItem>
@@ -67,7 +87,7 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
           <Input
             type="number"
             name="lengthInFeet"
-            value={formData?.wardrobe?.lengthInFeet || ""}
+            value={formData?.wardrobe?.lengthInFeet}
             onChange={handleChange}
             placeholder="e.g., 6"
           />
@@ -79,7 +99,7 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
           <Input
             type="number"
             name="heightInFeet"
-            value={formData?.wardrobe?.heightInFeet || ""}
+            value={formData?.wardrobe?.heightInFeet}
             onChange={handleChange}
             placeholder="e.g., 8"
           />
@@ -88,12 +108,13 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
         {/* Mirror Included */}
         <div className="flex items-center gap-2">
           <input
+          id="mirrorIncluded"
             type="checkbox"
             name="mirrorIncluded"
             checked={formData?.wardrobe?.mirrorIncluded || false}
             onChange={handleChange}
           />
-          <Label>Mirror Included?</Label>
+          <Label htmlFor="mirrorIncluded">Mirror Included?</Label>
         </div>
 
         {/* Number of Shelves */}
@@ -102,7 +123,7 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
           <Input
             type="number"
             name="numberOfShelves"
-            value={formData?.wardrobe?.numberOfShelves || ""}
+            value={formData?.wardrobe?.numberOfShelves}
             onChange={handleChange}
             placeholder="e.g., 4"
           />
@@ -114,7 +135,7 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
           <Input
             type="number"
             name="numberOfDrawers"
-            value={formData?.wardrobe?.numberOfDrawers || ""}
+            value={formData?.wardrobe?.numberOfDrawers}
             onChange={handleChange}
             placeholder="e.g., 2"
           />
@@ -124,11 +145,11 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
         <div>
           <Label>Wardrobe Package</Label>
           <Select
-            value={formData?.wardrobe?.wardrobePackage || ""}
+            // value={formData?.wardrobe?.wardrobePackage || ""}
             onValueChange={(val) => handleSelectChange("wardrobePackage", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select package" />
+              <SelectValue placeholder="Select package" selectedValue={formData?.wardrobe?.wardrobePackage || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Essentials">Essentials</SelectItem>

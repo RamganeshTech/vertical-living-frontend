@@ -12,22 +12,29 @@ import { Separator } from "../../../components/ui/Seperator";
 import { Textarea } from "../../../components/ui/TextArea";
 
 const BedroomSectionPublic = ({ formData, setFormData }: any) => {
-  const handleChange = (
+ const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    const target = e.target;
+  const { name, type, value } = target;
 
-   const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
-    const { name, value, type } = target;
-    const newValue = type === "checkbox" ? (target as HTMLInputElement).checked : value;
+  let finalValue: string | number | boolean = value;
 
+  if (type === "checkbox") {
+    finalValue = (target as HTMLInputElement).checked;
+  } else if (type === "number") {
+       const parsedValue = parseFloat(value);
+    finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
+   }
     setFormData((prev: any) => ({
       ...prev,
       bedroom: {
         ...prev.bedroom,
-        [name]: type === "number" ? parseInt(newValue as string) || "" : newValue,
+        [name]: finalValue,
       },
     }));
   };
+
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev: any) => ({
@@ -50,7 +57,7 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
           <Input
             type="number"
             name="numberOfBedrooms"
-            value={formData?.bedroom?.numberOfBedrooms || ""}
+            value={formData?.bedroom?.numberOfBedrooms}
             onChange={handleChange}
             placeholder="e.g., 2"
           />
@@ -60,11 +67,11 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
         <div>
           <Label>Bed Type</Label>
           <Select
-            value={formData?.bedroom?.bedType || ""}
+            // value={formData?.bedroom?.bedType || ""}
             onValueChange={(val) => handleSelectChange("bedType", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select bed type" />
+              <SelectValue placeholder="Select bed type" selectedValue={formData?.bedroom?.bedType || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Single">Single</SelectItem>
@@ -80,32 +87,35 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
           <input
             type="checkbox"
             name="wardrobeIncluded"
+            id="wardrobeIncluded"
             checked={formData?.bedroom?.wardrobeIncluded || false}
             onChange={handleChange}
           />
-          <Label>Wardrobe Included?</Label>
+          <Label htmlFor="wardrobeIncluded">Wardrobe Included?</Label>
         </div>
 
         {/* False Ceiling Required */}
         <div className="flex items-center gap-2">
           <input
+          id="falseCeilingRequired"
             type="checkbox"
             name="falseCeilingRequired"
             checked={formData?.bedroom?.falseCeilingRequired || false}
             onChange={handleChange}
           />
-          <Label>False Ceiling Required?</Label>
+          <Label htmlFor="falseCeilingRequired">False Ceiling Required?</Label>
         </div>
 
         {/* TV Unit Required */}
         <div className="flex items-center gap-2">
           <input
+          id="tvUnitRequired"
             type="checkbox"
             name="tvUnitRequired"
             checked={formData?.bedroom?.tvUnitRequired || false}
             onChange={handleChange}
           />
-          <Label>TV Unit Required?</Label>
+          <Label htmlFor="tvUnitRequired">TV Unit Required?</Label>
         </div>
 
         {/* Study Table Required */}
@@ -113,21 +123,22 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
           <input
             type="checkbox"
             name="studyTableRequired"
+            id="studyTableRequired"
             checked={formData?.bedroom?.studyTableRequired || false}
             onChange={handleChange}
           />
-          <Label>Study Table Required?</Label>
+          <Label htmlFor="studyTableRequired">Study Table Required?</Label>
         </div>
 
         {/* Bedroom Package */}
         <div>
           <Label>Bedroom Package</Label>
           <Select
-            value={formData?.bedroom?.bedroomPackage || ""}
+            // value={formData?.bedroom?.bedroomPackage || ""}
             onValueChange={(val) => handleSelectChange("bedroomPackage", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select package" />
+              <SelectValue placeholder="Select package" selectedValue={formData?.bedroom?.bedroomPackage || ""}/>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Essentials">Essentials</SelectItem>

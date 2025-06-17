@@ -23,10 +23,11 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
   if (type === "checkbox") {
     finalValue = (target as HTMLInputElement).checked;
   } else if (type === "number") {
-    finalValue = parseFloat(value) || "";
-  }
+       const parsedValue = parseFloat(value);
+    finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
+   }
 
-  if (["A", "B", "C"].includes(name)) {
+  if (["top", "left", "right"].includes(name)) {
     setFormData((prev: any) => ({
       ...prev,
       kitchen: {
@@ -68,11 +69,11 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
         <div>
           <Label>Layout Type</Label>
           <Select
-            value={formData?.kitchen?.layoutType || ""}
+            // value={formData?.kitchen?.layoutType || ""}
             onValueChange={(val) => handleSelectChange("layoutType", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select layout" />
+              <SelectValue placeholder="Select layout" selectedValue={formData?.kitchen?.layoutType || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="L-shaped">L-shaped</SelectItem>
@@ -87,11 +88,11 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
         <div>
           <Label>Kitchen Package</Label>
           <Select
-            value={formData?.kitchen?.kitchenPackage || ""}
+            // value={formData?.kitchen?.kitchenPackage || ""}
             onValueChange={(val) => handleSelectChange("kitchenPackage", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select package" />
+              <SelectValue placeholder="Select package" selectedValue={formData?.kitchen?.kitchenPackage || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Essentials">Essentials</SelectItem>
@@ -104,16 +105,7 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
           </Select>
         </div>
 
-        {/* Granite Countertop */}
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="graniteCountertop"
-            checked={formData?.kitchen?.graniteCountertop || false}
-            onChange={handleChange}
-          />
-          <Label>Granite Countertop?</Label>
-        </div>
+      
 
         {/* Number of Shelves */}
         <div>
@@ -121,7 +113,7 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
           <Input
             type="number"
             name="numberOfShelves"
-            value={formData?.kitchen?.numberOfShelves || ""}
+            value={formData?.kitchen?.numberOfShelves}
             onChange={handleChange}
             placeholder="e.g., 3"
           />
@@ -129,34 +121,47 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
 
         {/* Measurements */}
         <div>
-          <Label>Measurement A (ft)</Label>
+          <Label>Measurement Top (ft)</Label>
           <Input
             type="number"
-            name="A"
-            value={formData?.kitchen?.measurements?.A || ""}
+            name="top"
+            value={formData?.kitchen?.measurements?.top ?? 0}
             onChange={handleChange}
-            placeholder="Length A"
+            placeholder="Length Top"
           />
         </div>
         <div>
-          <Label>Measurement B (ft)</Label>
+          <Label>Measurement Left (ft)</Label>
           <Input
             type="number"
-            name="B"
-            value={formData?.kitchen?.measurements?.B || ""}
+            name="left"
+            value={formData?.kitchen?.measurements?.left}
             onChange={handleChange}
-            placeholder="Length B"
+            placeholder="Length Left"
           />
         </div>
         <div>
-          <Label>Measurement C (ft)</Label>
+          <Label>Measurement Right (ft)</Label>
           <Input
             type="number"
-            name="C"
-            value={formData?.kitchen?.measurements?.C || ""}
+            name="right"
+            value={formData?.kitchen?.measurements?.right}
             onChange={handleChange}
-            placeholder="Length C"
+            placeholder="Length right"
           />
+        </div>
+
+          {/* Granite Countertop */}
+        <div className="flex  items-center">
+          <input
+          id="graniteCountertop"
+            type="checkbox"
+            name="graniteCountertop"
+            checked={formData?.kitchen?.graniteCountertop || false}
+            onChange={handleChange}
+            className="!w-[10%]"
+          />
+          <Label htmlFor="graniteCountertop">Granite Countertop?</Label>
         </div>
 
         {/* Notes */}
@@ -172,6 +177,8 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
           />
         </div>
       </div>
+
+
 
       <Separator className="my-6" />
     </div>

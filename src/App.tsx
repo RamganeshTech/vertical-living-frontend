@@ -193,7 +193,7 @@ function App() {
 
         {/* REQUIREMENT FORM LINK */}
 
-        <Route path='requirementform/:projectId/:token' element={<RequirementFormPublic />} />
+        <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
 
 
       </Routes>

@@ -133,3 +133,75 @@ export interface IStaff {
     role: string;
     organizationId?: string[];
 }
+
+
+
+// REQUIREMENT FORM TYPE STAGE 1
+export interface IRequirementFormSchema{
+  projectId?: string,
+  clientData: {
+    clientName: string,
+    email: string,
+    whatsapp: string,
+    location: string
+  },
+  isEditable: boolean,
+  kitchen: IKitchenRequirement,
+  livingHall: ILivingHallRequirement,
+  bedroom: IBedroomRequirement,
+  wardrobe: IWardrobeRequirement,
+  additionalNotes: string | null,
+}
+
+export interface IKitchenRequirement {
+    layoutType: "L-shaped" | "Straight" | "U-shaped" | "Parallel";
+    measurements?: {
+        top: number;
+        left: number;
+        right: number;
+    };
+    kitchenPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+    // packageDetails?: {
+    //     affordablePricing?: boolean;
+    //     premiumDesigns?: boolean;
+    //     elitePricing?: boolean;
+    //     customDesign?: boolean;
+    // };
+    graniteCountertop?: boolean;
+    numberOfShelves?: (number | null);
+    notes?: string;
+}
+
+export interface IWardrobeRequirement {
+  wardrobeType: "Sliding" | "Openable";
+  lengthInFeet?: number;
+  heightInFeet?: number;
+  mirrorIncluded?: boolean;
+  wardrobePackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+  numberOfShelves?: (number | null);
+  numberOfDrawers?: (number | null);
+  notes?: (string | null);
+}
+
+
+export interface ILivingHallRequirement {
+  seatingStyle?: "Sofa Set" | "L-Shaped Sofa" | "Recliner Chairs" | "Floor Seating";
+  tvUnitDesignRequired?: boolean;
+  falseCeilingRequired?: boolean;
+  wallDecorStyle?: "Paint" | "Wallpaper" | "Wood Paneling" | "Stone Cladding";
+  numberOfFans?: number;
+  numberOfLights?: number;
+  livingHallPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+  notes?: (string | null);
+}
+
+export interface IBedroomRequirement {
+  numberOfBedrooms: number;
+  bedType?: "Single" | "Double" | "Queen" | "King";
+  wardrobeIncluded?: boolean;
+  falseCeilingRequired?: boolean;
+  tvUnitRequired?: boolean;
+  studyTableRequired?: boolean;
+  bedroomPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+  notes?: (string | null);
+}

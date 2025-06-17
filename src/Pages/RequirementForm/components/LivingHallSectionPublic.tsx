@@ -23,12 +23,21 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+
+    let finalValue: string | number | boolean = value;
+    
+    if (type === "number") {
+      const parsedValue = parseFloat(value);
+      finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
+    }
+
+
     setFormData((prev: any) => ({
       ...prev,
       livingHall: {
         ...prev.livingHall,
-        [name]: value,
+        [name]: finalValue,
       },
     }));
   };
@@ -52,11 +61,11 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
         <div>
           <Label>Seating Style</Label>
           <Select
-            value={formData.livingHall.seatingStyle || ""}
+            // value={formData.livingHall.seatingStyle || ""}
             onValueChange={(val) => handleSelectChange("seatingStyle", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select seating style" />
+              <SelectValue placeholder="Select seating style" selectedValue={formData.livingHall.seatingStyle || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Sofa Set">Sofa Set</SelectItem>
@@ -71,19 +80,23 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
         <div>
           <Label>TV Unit Design Required</Label>
           <Select
-            value={
-              formData.livingHall.tvUnitDesignRequired === true
-                ? "Yes"
-                : formData.livingHall.tvUnitDesignRequired === false
-                ? "No"
-                : ""
-            }
+            // value={
+            //   formData.livingHall.tvUnitDesignRequired === true
+            //     ? "Yes"
+            //     : formData.livingHall.tvUnitDesignRequired === false
+            //     ? "No"
+            //     : ""
+            // }
             onValueChange={(val) =>
               handleSelectChange("tvUnitDesignRequired", val === "Yes")
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select option" />
+              <SelectValue placeholder="Select option" selectedValue={formData.livingHall.tvUnitDesignRequired === true
+                ? "Yes"
+                : formData.livingHall.tvUnitDesignRequired === false
+                  ? "No"
+                  : ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Yes">Yes</SelectItem>
@@ -96,19 +109,26 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
         <div>
           <Label>False Ceiling Required</Label>
           <Select
-            value={
-              formData.livingHall.falseCeilingRequired === true
-                ? "Yes"
-                : formData.livingHall.falseCeilingRequired === false
-                ? "No"
-                : ""
-            }
+            // value={
+            //   formData.livingHall.falseCeilingRequired === true
+            //     ? "Yes"
+            //     : formData.livingHall.falseCeilingRequired === false
+            //     ? "No"
+            //     : ""
+            // }
             onValueChange={(val) =>
               handleSelectChange("falseCeilingRequired", val === "Yes")
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select option" />
+              <SelectValue placeholder="Select option"
+                selectedValue={
+                  formData.livingHall.falseCeilingRequired === true
+                    ? "Yes"
+                    : formData.livingHall.falseCeilingRequired === false
+                      ? "No"
+                      : ""
+                } />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Yes">Yes</SelectItem>
@@ -121,11 +141,11 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
         <div>
           <Label>Wall Decor Style</Label>
           <Select
-            value={formData.livingHall.wallDecorStyle || ""}
+            // value={formData.livingHall.wallDecorStyle || ""}
             onValueChange={(val) => handleSelectChange("wallDecorStyle", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select wall decor" />
+              <SelectValue placeholder="Select wall decor" selectedValue={formData.livingHall.wallDecorStyle || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Paint">Paint</SelectItem>
@@ -142,7 +162,7 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
           <Input
             name="numberOfFans"
             type="number"
-            value={formData.livingHall.numberOfFans || ""}
+            value={formData.livingHall.numberOfFans}
             onChange={handleInputChange}
             placeholder="e.g., 2"
           />
@@ -154,7 +174,7 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
           <Input
             name="numberOfLights"
             type="number"
-            value={formData.livingHall.numberOfLights || ""}
+            value={formData.livingHall.numberOfLights}
             onChange={handleInputChange}
             placeholder="e.g., 6"
           />
@@ -164,11 +184,11 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
         <div>
           <Label>Living Hall Package</Label>
           <Select
-            value={formData.livingHall.livingHallPackage || ""}
+            // value={formData.livingHall.livingHallPackage || ""}
             onValueChange={(val) => handleSelectChange("livingHallPackage", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select package" />
+              <SelectValue placeholder="Select package" selectedValue={formData.livingHall.livingHallPackage || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Essentials">Essentials</SelectItem>
