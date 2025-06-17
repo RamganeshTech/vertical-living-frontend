@@ -33,6 +33,11 @@ import InviteCTO from './Pages/Organization/InviteCTO'
 import OrganizationChildrens from './Pages/Organization/OrganizationChildren'
 import CTORegister from './Pages/CTO/CTORegister'
 import CTOLogin from './Pages/CTO/CTOLogin'
+import ClientLogin from './Pages/Client/ClientLogin'
+import ClientRegister from './Pages/Client/ClientRegister'
+import InviteClient from './Pages/Organization/inviteClient'
+import RequirementFormPublic from './Pages/RequirementForm/RequirementFormPublic'
+import RequriementForm from './Pages/RequirementForm/RequriementForm'
 
 function App() {
 
@@ -109,6 +114,9 @@ function App() {
         <Route path='/ctologin' element={<CTOLogin />} />
         <Route path='/ctoregister' element={<CTORegister />} />
 
+         <Route path='/clientlogin' element={<ClientLogin />} />
+        <Route path='/clientregister' element={<ClientRegister />} />
+
 
 
         {/* commented organizaion route */}
@@ -150,12 +158,19 @@ function App() {
           <ProjectDetails projectId={projectId} setProjectId={setProjectId} />
         </ProtectedRoutes>}>
 
-          <Route path=":projectId/labourlist" element={<LabourList />} />
-          <Route path=":projectId/materiallist" element={<MaterialList />} />
-          <Route path=":projectId/transportationlist" element={<Transportationlist />} />
-          <Route path=":projectId/workers" element={<Workers />} />
+          <Route path="labourlist" element={<LabourList />} />
+          <Route path="materiallist" element={<MaterialList />} />
+          <Route path="transportationlist" element={<Transportationlist />} />
+          <Route path="workers" element={<Workers />} />
+          <Route path="inviteclient" element={<InviteClient />} />
+          <Route path="requirementform" element={<RequriementForm />} />
+
         </Route>
 
+
+
+{
+  <>
         <Route path="/phase" element={<ProtectedRoutes allowedRoles={["owner"]}>
           <Phase />
         </ProtectedRoutes>} />
@@ -167,11 +182,18 @@ function App() {
         <Route path="/tasks" element={<ProtectedRoutes allowedRoles={["owner"]}>
           <Tasks />
         </ProtectedRoutes>} />
+        </>
+        }
 
 
         <Route path="/workers" element={<ProtectedRoutes allowedRoles={["staff"]} >
           <Workers />
         </ProtectedRoutes>} />
+
+
+        {/* REQUIREMENT FORM LINK */}
+
+        <Route path='requirementform/:projectId/:token' element={<RequirementFormPublic />} />
 
 
       </Routes>

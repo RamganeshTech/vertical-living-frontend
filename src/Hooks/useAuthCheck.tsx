@@ -10,6 +10,8 @@ import { resetWorkerProfile, setWorkerProfileData } from "../features/workerSlic
 import { resetStaffProfile, setStaffProfileData } from "../features/staffSlices";
 import CTOApi from "../apiService/CTOService";
 import { resetCTOProfile, setCTOProfileData } from "../features/CTOSlice";
+import clientApi from "../apiService/clientService";
+import { resetClientProfile, setClientProfileData } from "../features/clientSlice";
 
 export const useAuthCheck = () => {
   const dispatch = useDispatch();
@@ -28,11 +30,12 @@ export const useAuthCheck = () => {
       setError(null);
 
       try {
-        const [ownerRes, staffRes, workerRes, CTORes] = await Promise.allSettled([
+        const [ownerRes, staffRes, workerRes, CTORes, clientRes] = await Promise.allSettled([
           Api.get("/auth/isauthenticated"),
           staffApi.get("/auth/staff/isauthenticated"),
           workerApi.get("/auth/worker/isauthenticated"),
-          CTOApi.get('/auth/CTO/isauthenticated')
+          CTOApi.get('/auth/CTO/isauthenticated'),
+          clientApi.get('/auth/client/isauthenticated')
         ]);
 
         if (ownerRes.status === "fulfilled" && ownerRes.value.data.ok) {
@@ -68,6 +71,14 @@ export const useAuthCheck = () => {
           return setLoading(false);
         }
 
+         if (clientRes.status === "fulfilled" && clientRes.value.data.ok) {
+          const info = { role: "client", isauthenticated: true };
+          dispatch(setRole(info));
+          dispatch(setClientProfileData(clientRes.value.data.data))
+          setAuthInfo(info);
+          return setLoading(false);
+        }
+
         dispatch(setRole({ role: null, isauthenticated: false }));
         setAuthInfo({ role: null, isauthenticated: false });
 
@@ -75,6 +86,7 @@ export const useAuthCheck = () => {
         dispatch(resetStaffProfile())
         dispatch(resetWorkerProfile())
         dispatch(resetCTOProfile())
+        dispatch(resetClientProfile())
 
         setLoading(false);
       } catch (error) {
@@ -87,6 +99,7 @@ export const useAuthCheck = () => {
         dispatch(resetStaffProfile())
         dispatch(resetWorkerProfile())
         dispatch(resetCTOProfile())
+        dispatch(resetClientProfile())
 
        
         setLoading(false);

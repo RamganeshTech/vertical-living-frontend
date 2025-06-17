@@ -11,7 +11,7 @@ export const Button: React.FC<ButtonProps> = ({
   variant = "primary",
   size = "md",
   children,
-  isLoading = true,
+  isLoading = false,
   className = "",
   disabled,
   ...props

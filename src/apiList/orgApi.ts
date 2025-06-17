@@ -1,6 +1,9 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import Api from "../apiService/apiService";     // your configured axios instance
 import { queryClient } from "../QueryClient/queryClient";
+import { getApiForRole } from "../utils/roleCheck";
+import useGetRole from "../Hooks/useGetRole";
+import type { AxiosInstance } from "axios";
 
 // 1) createOrganization
 const createOrganization = async (orgData: {
@@ -228,4 +231,29 @@ export const useRemoveCTOFromOrganization = () => {
 };
 
 
+// client routes
+const inviteClient = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
+    const { data } = await api.post('orgs/inviteclienttoproject', { projectId })
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+}
 
+export const useInviteClientToProject = () => {
+    const allowedRoles = ["owner", "CTO"]
+
+    const { role } = useGetRole()
+
+    const api = getApiForRole(role!)
+
+    return useMutation({
+        mutationFn: async ({ projectId }: { projectId: string }) => {
+            if (!role) throw new Error("not authrized")
+
+            if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+            if (!api) throw new Error("api is null")
+
+            return await inviteClient({ projectId, api })
+        }
+    })
+}
