@@ -373,7 +373,7 @@ const LabourList: React.FC = () => {
           )}
 
         {/* Labour Lists */}
-        <div className="space-y-4 !h-[85%] overflow-y-scroll">
+       {labourLists.length>0 && <div className="space-y-4 !h-[85%] overflow-y-scroll">
           {labourLists?.map((list: ILabourList) => {
             const isExpanded = expandedLists.includes(list._id!)
             const isEditingThisList = isCurrentlyEditingList(list._id!)
@@ -570,7 +570,7 @@ const LabourList: React.FC = () => {
               </div>
             )
           })}
-        </div>
+        </div>}
 
         {/* Empty State */}
         {labourLists.length === 0 && (

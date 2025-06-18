@@ -67,7 +67,6 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
         <div>
           <Label>Bed Type</Label>
           <Select
-            // value={formData?.bedroom?.bedType || ""}
             onValueChange={(val) => handleSelectChange("bedType", val)}
           >
             <SelectTrigger>

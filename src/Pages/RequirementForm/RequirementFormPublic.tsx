@@ -9,6 +9,8 @@ import { Button } from "./../../components/ui/Button";
 import { Input } from "./../../components/ui/Input";
 import { Label } from "./../../components/ui/Label";
 import type { IRequirementFormSchema } from "../../types/types";
+import { Textarea } from "../../components/ui/TextArea";
+import { toast } from "../../utils/toast";
 
 const RequirementFormPublic: React.FC = () => {
   const { token, projectId } = useParams<{ token: string; projectId: string }>();
@@ -65,16 +67,24 @@ const RequirementFormPublic: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [step, setStep] = useState(0);
-  const { mutate, isPending, isSuccess, isError, error } = useCreateFormSubmission();
+  const { mutateAsync, isPending, isSuccess, isError, error } = useCreateFormSubmission();
 
   const handleClientChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    if (name === "whatsapp") {
+      // Strip all non-numeric characters
+      value = value.replace(/[^0-9]/g, "");
+    }
+
+
+
     setFormData((prev: any) => ({
       ...prev,
       clientData: {
-        ...prev.filledBy,
+        ...prev.clientData,
         [name]: value,
       },
     }));
@@ -105,29 +115,33 @@ const RequirementFormPublic: React.FC = () => {
 
     if (!whatsapp || whatsapp.trim() === "") {
       errors.whatsapp = "WhatsApp number is required";
-      if (whatsapp?.length !== 10) {
-        errors.whatsapp = "Number should be 10 digits long"
-      }
+    } else if (whatsapp.trim().length !== 10) {
+      errors.whatsapp = "Number should be 10 digits long";
     }
-
 
     return errors
   }
 
-  const handleSubmit = () => {
-    setErrors({})
-    if (!projectId) return;
+  const handleSubmit = async () => {
+    try {
+      setErrors({})
+      if (!projectId) return;
 
-    const errors = handleValidate(formData)
+      const errors = handleValidate(formData)
 
-    console.log(errors)
+      console.log(errors)
 
-    if (Object.keys(errors).length) {
-      setErrors(errors)
-      return;
+      if (Object.keys(errors).length) {
+        setErrors(errors)
+        return;
+      }
+
+      await mutateAsync({ projectId, payload: formData, token: token! });
+      toast({ title: "Success", description: "form data submitted successfully" })
     }
-
-    // mutate({ projectId, payload: formData, token: token! });
+    catch (error: any) {
+      toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to generate invitation link", variant: "destructive" })
+    }
   };
 
   const steps = [
@@ -179,6 +193,9 @@ const RequirementFormPublic: React.FC = () => {
               <Label>WhatsApp Number</Label>
               <Input
                 name="whatsapp"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
                 value={formData.clientData.whatsapp}
                 onChange={handleClientChange}
                 required={true}
@@ -198,7 +215,7 @@ const RequirementFormPublic: React.FC = () => {
 
           <div className="mt-4">
             <Label>Additional Notes</Label>
-            <textarea
+            <Textarea
               name="additionalNotes"
               value={formData.additionalNotes || ""}
               onChange={(e) =>
@@ -221,36 +238,39 @@ const RequirementFormPublic: React.FC = () => {
           </div>
 
           {isSuccess && <p className="text-green-600 mt-4">Form submitted successfully!</p>}
-          {isError && <p className="text-red-600 mt-4">{(error as Error).message}</p>}
+          {isError && <p className="text-red-600 mt-4">{(error as any)?.response?.data?.message || (error as Error).message || "Form Submission Failed"}</p>}
         </div>
       ),
     },
   ];
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center text-blue-800">House Requirements Form</h1>
+    <div className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-blue-100 !p-6 h-full w-full">
+      <div className="max-w-5xl mx-auto space-y-5">
+        <h1 className="text-3xl font-bold text-center text-blue-800">House Requirements Form</h1>
 
-      <div>{steps[step].content}</div>
+        <div className="max-w-5xl mx-auto">{steps[step].content}</div>
 
-      <div className="flex justify-between mt-8">
-        {step > 0 && (
-          <Button variant="secondary" onClick={() => setStep((prev) => prev - 1)}>
-            Previous
-          </Button>
-        )}
+        <div className={`flex ${step > 0 ? "justify-between" : "justify-end"} mt-8`}>
+          {step > 0 && (
+            <Button variant="secondary" onClick={() => setStep((prev) => prev - 1)}>
+              Previous
+            </Button>
+          )}
 
-        {step < steps.length - 1 && (
-          <Button variant="primary" onClick={() => setStep((prev) => prev + 1)}>
-            Skip & Continue
-          </Button>
-        )}
+          {step < steps.length - 1 && (
+            <Button variant="primary" onClick={() => setStep((prev) => prev + 1)}>
+              Skip & Continue
+            </Button>
+          )}
+        </div>
+
       </div>
     </div>
   );
 };
 
-export default memo(RequirementFormPublic);
+export default RequirementFormPublic;
 
 
 

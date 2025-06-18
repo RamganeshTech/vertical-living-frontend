@@ -137,7 +137,7 @@ export const SelectItem: React.FC<SelectItemProps> = ({ value, children, onSelec
   return (
     <button
       type="button"
-      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+      className="w-full cursor-pointer text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
       onClick={() => onSelect?.(value)}
     >
       {children}

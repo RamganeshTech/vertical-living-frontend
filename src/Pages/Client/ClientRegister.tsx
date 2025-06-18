@@ -236,6 +236,7 @@ export default function ClientRegister() {
                                         id="phoneNo"
                                         name="phoneNo"
                                         type="tel"
+                                        maxLength={10}
                                         value={formData.phoneNo}
                                         onChange={handleChange}
                                         placeholder="Enter your phone number"

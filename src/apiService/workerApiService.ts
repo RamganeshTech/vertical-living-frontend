@@ -13,6 +13,12 @@ workerApi.interceptors.response.use(
   res => res,
   async (error) => {
     const originalRequest = error.config;
+
+     if (originalRequest.url.includes('/auth/worker/isauthenticated')) {
+            return Promise.reject(error);
+        }
+
+
     if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
       originalRequest._retry = true;
 

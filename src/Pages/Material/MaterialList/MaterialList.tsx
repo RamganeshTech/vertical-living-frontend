@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 import { useState } from "react"
 import { useParams } from "react-router-dom"
@@ -122,9 +120,8 @@ const MaterialList: React.FC = () => {
   })
 
   // Extract material lists from response
-  const materialLists: MaterialListType[] = materialListsResponse?.data || []
+  let materialLists: MaterialListType[] = materialListsResponse?.data || []
 
-  // Helper functions
   const toggleListExpansion = (listId: string) => {
     setExpandedLists((prev) => (prev.includes(listId) ? prev.filter((id) => id !== listId) : [...prev, listId]))
   }
@@ -190,6 +187,7 @@ const MaterialList: React.FC = () => {
       console.error("Failed to update material list:", error)
     }
   }
+
 
   const handleDeleteList = async (listId: string) => {
     const list = materialLists.find((l) => l._id === listId)
@@ -374,7 +372,7 @@ const MaterialList: React.FC = () => {
           )}
 
         {/* Material Lists */}
-        <div className="space-y-4 !h-[85%] overflow-y-scroll">
+       {materialLists.length > 0 && <div className="space-y-4 h-[85%] overflow-y-scroll">
           {materialLists?.map((list: MaterialListType) => {
             const isExpanded = expandedLists.includes(list._id!)
             const isEditingThisList = isCurrentlyEditingList(list._id!)
@@ -529,7 +527,7 @@ const MaterialList: React.FC = () => {
                     <div className="flex justify-between items-center mb-4">
                       <h4 className="text-lg font-medium text-gray-900">Material Items</h4>
                       <button
-                        onClick={() =>openItemModal(list._id)}
+                        onClick={() => openItemModal(list._id)}
                         disabled={isCreatingItem}
                         className="bg-blue-600 cursor-pointer hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
                       >
@@ -563,7 +561,7 @@ const MaterialList: React.FC = () => {
               </div>
             )
           })}
-        </div>
+        </div>}
 
         {/* Empty State */}
         {materialLists.length === 0 && (

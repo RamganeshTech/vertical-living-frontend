@@ -154,7 +154,7 @@ function App() {
           <Route index element={<ProjectLists />} />
         </Route>
 
-        <Route path='/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner"]}>
+        <Route path='/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner", "client"]}>
           <ProjectDetails projectId={projectId} setProjectId={setProjectId} />
         </ProtectedRoutes>}>
 
