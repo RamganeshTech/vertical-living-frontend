@@ -7,7 +7,7 @@ import { Button } from "../../../components/ui/Button";
 import { Textarea } from "../../../components/ui/TextArea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
 import { useParams } from "react-router-dom";
-import { useWardrobeFormUpdation } from "../../../apiList/requirementFormApi";
+import { useWardrobeFormUpdation } from "../../../apiList/Stage Api/requirementFormApi";
 import { toast } from "../../../utils/toast";
 
 const WardrobeSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable, setVisibleSection }) => {

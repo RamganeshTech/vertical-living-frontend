@@ -7,7 +7,7 @@ import { Button } from "../../../components/ui/Button";
 import { Textarea } from "../../../components/ui/TextArea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
 import { useParams } from "react-router-dom";
-import { useBedroomFormUpdation } from "../../../apiList/requirementFormApi";
+import { useBedroomFormUpdation } from "../../../apiList/Stage Api/requirementFormApi";
 import { toast } from "../../../utils/toast";
 
 const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable, setVisibleSection }) => {

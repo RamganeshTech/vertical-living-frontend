@@ -1,8 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getApiForRole } from "../utils/roleCheck";
-import useGetRole from "../Hooks/useGetRole";
+import { getApiForRole } from "../../utils/roleCheck";
+import useGetRole from "../../Hooks/useGetRole";
 import type { AxiosInstance } from "axios";
-import clientApi from "../apiService/clientService";
+import clientApi from "../../apiService/clientService";
+
+export interface UploadFilePayload {
+    formId: string;
+    files: File[];
+}
 
 // below api is used for submitting the form details form the form link submitted through whatsapp to the client 
 const createPublicFromSubmission = async ({ projectId, payload, token }: { projectId: string, payload: any, token: string }) => {
@@ -15,7 +20,7 @@ const createPublicFromSubmission = async ({ projectId, payload, token }: { proje
 const getRequrimentformDetails = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
     const { data } = await api.get(`/requirementform/getrequirementform/${projectId}`);
     if (!data.ok) throw new Error(data.message);
-    return data.data; 
+    return data.data;
 }
 
 
@@ -26,7 +31,7 @@ const generateRequirementFormLink = async ({ projectId, api }: { projectId: stri
 };
 
 const lockUpdationOfForm = async ({ formId, api }: { formId: string, api: AxiosInstance }) => {
-    
+
     const { data } = await api.patch(`/requirementform/lockupdation/${formId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
@@ -38,29 +43,58 @@ const formCompletion = async ({ formId, api }: { formId: string, api: AxiosInsta
     return data.data;
 }
 
+const setDeadlineFormRequirement = async ({ formId, deadLine, api }: { formId: string, deadLine: string, api: AxiosInstance }) => {
+    const { data } = await api.patch(`/requirementform/deadline/${formId}`, { deadLine });
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+}
+
+
+const deleteFormRequirements = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
+    const { data } = await api.delete(`/requirementform/deleteform/${projectId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+}
+
+const uploadRequirementFiles = async ({ formId, files, api }: UploadFilePayload & { api: any }) => {
+console.log("getig iside 1")
+    const formData = new FormData();
+    files.forEach((file) => formData.append("file", file));
+console.log("getig iside 1")
+
+    const response = await api.post(`/requirementform/upload/multiple/${formId}`,formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+console.log("reposen",response)
+    return response.data;
+}
 
 //updation part of the requriement form
 
 const kitchenRequriementFormUpdation = async ({ projectId, api, updateData }: { projectId: string, api: AxiosInstance, updateData: any }) => {
-    const { data } = await api.put(`/requirementform/${projectId}/updatekitchen`, {kitchen:updateData});
+    const { data } = await api.put(`/requirementform/${projectId}/updatekitchen`, { kitchen: updateData });
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
 
 const bedroomRequriementFormUpdation = async ({ projectId, api, updateData }: { projectId: string, api: AxiosInstance, updateData: any }) => {
-    const { data } = await api.put(`/requirementform/${projectId}/updatebedroom`, {bedroom:updateData});
+    const { data } = await api.put(`/requirementform/${projectId}/updatebedroom`, { bedroom: updateData });
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
 
 const wardrobeRequriementFormUpdation = async ({ projectId, api, updateData }: { projectId: string, api: AxiosInstance, updateData: any }) => {
-    const { data } = await api.put(`/requirementform/${projectId}/updatewardrobe`, {wardrobe:updateData});
+    const { data } = await api.put(`/requirementform/${projectId}/updatewardrobe`, { wardrobe: updateData });
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
 
 const livingHallRequriementFormUpdation = async ({ projectId, api, updateData }: { projectId: string, api: AxiosInstance, updateData: any }) => {
-    const { data } = await api.put(`/requirementform/${projectId}/updatelivinghall`, {livingHall:updateData});
+    const { data } = await api.put(`/requirementform/${projectId}/updatelivinghall`, { livingHall: updateData });
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
@@ -72,14 +106,14 @@ export const useCreateFormSubmission = () => {
     })
 }
 
-export const useGetFormRequriemetn = ({projectId}:{projectId:string}) => {
+export const useGetFormRequriemetn = ({ projectId }: { projectId: string }) => {
     const allowedRoles = ["owner", "staff", "CTO", "client"]
 
     const { role } = useGetRole()
 
     const api = getApiForRole(role!)
     return useQuery({
-        queryKey:["requirementForm"],
+        queryKey: ["requirementForm"],
         queryFn: async () => {
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
@@ -89,10 +123,29 @@ export const useGetFormRequriemetn = ({projectId}:{projectId:string}) => {
             return await getRequrimentformDetails({ projectId, api });
         },
         retry: false,
-        refetchOnWindowFocus:false,
+        refetchOnWindowFocus: false,
         staleTime: 1000 * 60 * 5
     })
 }
+
+
+export const useDeleteRequriementForm = () => {
+    const allowedRoles = ["owner", "staff", "CTO"]
+    const { role } = useGetRole()
+
+    const api = getApiForRole(role!)
+
+    return useMutation({
+        mutationFn: async ({ projectId }: { projectId: string }) => {
+
+            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+            if (!api) throw new Error("API instance not found for role");
+
+            return await deleteFormRequirements({ projectId, api });
+        },
+    });
+};
 
 export const useGenerateShareableLink = () => {
     const allowedRoles = ["owner", "staff", "CTO"]
@@ -150,6 +203,50 @@ export const useFormCompletion = () => {
         }
     })
 }
+
+export const useSetDeadLineFormRequirement = () => {
+    const allowedRoles = ["owner", "staff", "CTO"]
+    const { role } = useGetRole()
+    const api = getApiForRole(role!)
+    return useMutation({
+        mutationFn: async ({ formId, deadLine }: { formId: string, deadLine: string }) => {
+            if (!role) throw new Error("not authorized")
+
+            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
+
+            if (!api) throw new Error("api is null")
+
+            return await setDeadlineFormRequirement({ formId, deadLine, api })
+
+        }
+    })
+}
+
+
+
+export const useUploadRequirementFiles = () => {
+    const allowedRoles = ["owner", "staff", "CTO", "client"]
+
+    const { role } = useGetRole()
+    const api = getApiForRole(role!)
+
+
+    return useMutation({
+        mutationFn: async ({ formId, files }: UploadFilePayload) => {
+
+            if (!role) throw new Error("not authorized")
+
+            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
+
+            if (!api) throw new Error("api is null")
+
+            return await uploadRequirementFiles({ formId, files, api })
+        },
+    });
+};
+
+
+
 
 //updation part of the requriement form of custom hooks
 
@@ -236,3 +333,5 @@ export const useLivingHallFormUpdation = () => {
         }
     })
 }
+
+

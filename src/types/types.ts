@@ -116,28 +116,28 @@ export interface MaterialEstimate extends Document {
 
 
 // ORGANIZATION TYPES 
-export interface IOrganization  {
-    organizationName: string;
-    type?: string;
-    address?: string;
-    logoUrl?: string;
-    organizationPhoneNo?: string
+export interface IOrganization {
+  organizationName: string;
+  type?: string;
+  address?: string;
+  logoUrl?: string;
+  organizationPhoneNo?: string
 }
 
 // STAFFS TYPES
 export interface IStaff {
-    email: string,
-    password: string,
-    staffName: string,
-    phoneNo: string,
-    role: string;
-    organizationId?: string[];
+  email: string,
+  password: string,
+  staffName: string,
+  phoneNo: string,
+  role: string;
+  organizationId?: string[];
 }
 
 
 
 // REQUIREMENT FORM TYPE STAGE 1
-export interface IRequirementFormSchema{
+export interface IRequirementFormSchema {
   projectId?: string,
   clientData: {
     clientName: string,
@@ -154,22 +154,22 @@ export interface IRequirementFormSchema{
 }
 
 export interface IKitchenRequirement {
-    layoutType: "L-shaped" | "Straight" | "U-shaped" | "Parallel";
-    measurements?: {
-        top: number;
-        left: number;
-        right: number;
-    };
-    kitchenPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
-    // packageDetails?: {
-    //     affordablePricing?: boolean;
-    //     premiumDesigns?: boolean;
-    //     elitePricing?: boolean;
-    //     customDesign?: boolean;
-    // };
-    graniteCountertop?: boolean;
-    numberOfShelves?: (number | null);
-    notes?: string;
+  layoutType: "L-shaped" | "Straight" | "U-shaped" | "Parallel";
+  measurements?: {
+    top: number;
+    left: number;
+    right: number;
+  };
+  kitchenPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+  // packageDetails?: {
+  //     affordablePricing?: boolean;
+  //     premiumDesigns?: boolean;
+  //     elitePricing?: boolean;
+  //     customDesign?: boolean;
+  // };
+  graniteCountertop?: boolean;
+  numberOfShelves?: (number | null);
+  notes?: string;
 }
 
 export interface IWardrobeRequirement {
@@ -204,4 +204,50 @@ export interface IBedroomRequirement {
   studyTableRequired?: boolean;
   bedroomPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
   notes?: (string | null);
+}
+
+
+
+
+// STAGE 2 SITE MEASUREMENT
+
+export interface ISiteMeasurement {
+  projectId: string;
+  status: "pending" | "completed";
+  isEditable: boolean;
+
+  timer: {
+    startedAt: Date | null;
+    completedAt: Date | null;
+    deadLine: Date | null;
+  };
+
+  uploads: {
+    type: "image" | "pdf";
+    url: string;
+    originalName: string;
+    uploadedAt: Date;
+  }[];
+
+  siteDetails: SiteDetails
+
+  rooms: SiteRooms[];
+}
+
+
+export interface SiteDetails {
+  totalPlotAreaSqFt: number | null;
+  builtUpAreaSqFt: number | null;
+  roadFacing: boolean | null;
+  numberOfFloors: number | null;
+  hasSlope?: boolean | null;
+  boundaryWallExists?: boolean | null;
+  additionalNotes?: string | null;
+}
+
+export interface SiteRooms {
+  name: "LivingHall" | "Bedroom" | "Kitchen" | "wardrobe" | null; 
+  length: number | null;
+  breadth: number | null;
+  height?: number | null;
 }

@@ -35,7 +35,8 @@ export const PROJECTS_LABELS = {
   TRANSPORTATION: "Transportation",
   WORKERS: "Workers",
   INVITECLIENT: "Invite Client",
-  REQUIREMENTFORM: "Requirement Form"
+  REQUIREMENTFORM: "Requirement Form",
+  SITEMEASUREMENT: "Site Measurement"
 }
 
 
@@ -45,7 +46,8 @@ export const PROJECTS_ICONS = {
   TRANSPORTATION: "fa-solid fa-road text-2xl",
   WORKERS: "fa-solid fa-circle-info text-2xl",
   INVITECLIENT: "fa-solid fa-user-group text-2xl",
-  REQUIREMENTFORM: "fa-solid fa-form text-2xl"
+  REQUIREMENTFORM: "fa-solid fa-form text-2xl",
+  SITEMEASUREMENT: "fa-solid fa-trash text-2xl"
 }
 
 

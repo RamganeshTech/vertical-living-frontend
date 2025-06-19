@@ -27,7 +27,8 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     TRANSPORTATION: projectId ? `/projectdetails/${projectId}/transportationlist` : "",
     WORKERS: projectId ? `/projectdetails/${projectId}/workers` : "",
     INVITECLIENT: projectId ? `/projectdetails/${projectId}/inviteclient` : "",
-    REQUIREMENTFORM: projectId ? `/projectdetails/${projectId}/requirementform` : ""
+    REQUIREMENTFORM: projectId ? `/projectdetails/${projectId}/requirementform` : "",
+    SITEMEASUREMENT: projectId ? `/projectdetails/${projectId}/sitemeasurement` : ""
   };
 
   return (

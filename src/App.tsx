@@ -38,6 +38,7 @@ import ClientRegister from './Pages/Client/ClientRegister'
 import InviteClient from './Pages/Organization/inviteClient'
 import RequirementFormPublic from './Pages/RequirementForm/RequirementFormPublic'
 import RequriementForm from './Pages/RequirementForm/RequriementForm'
+import SiteMeasurement from './Pages/Stage Pages/Site Measurement/SiteMeasurement'
 
 function App() {
 
@@ -48,52 +49,6 @@ function App() {
 
   return (
     <>
-      {/* <Routes> */}
-
-      {/* <Route path="/" element={<Navigate to="/dashboard" replace />} /> */}
-
-      {/* <Route path="/login" element={<Login />} />
-
-        <Route path="/" element={<Dashboard />}>
-          <Route index element={<Home />} />
-          <Route path='issues' element={<Issues />} />
-          <Route path='phases' element={<Phase />} />
-
-          <Route path='tasks' element={<ProtectedRoutes allowedRoles={["owner", "staff"]}>
-            <Tasks />
-          </ProtectedRoutes>} />
-
-        </Route>
-
-        <Route path='/projects' element={<Projects projectId={projectId} setProjectId={setProjectId} />} >
-          <Route index element={<ProjectLists />} />
-        </Route>
-
-
-        <Route path='/projectdetails' element={<ProjectDetails projectId={projectId} setProjectId={setProjectId} />} >
-          <Route path=":projectId/labourlist" element={<LabourList />} />
-          <Route path=":projectId/materiallist" element={<MaterialList />} />
-          <Route path=":projectId/transportationlist" element={<Transportationlist />} />
-          <Route path=":projectId/workers" element={<Workers />} />
-        </Route>
-
-
-
-        <Route path='/organization' element={<Organization />} />
-        <Route path='/organization/:organizationId' element={<OrganizationDetails />} />
-
-        <Route path='/stafflogin' element={<StaffLogin />} />
-        <Route path='/staffregister' element={<StaffRegister />} />
-
-        <Route path='/workerlogin' element={<WorkerLogin />} />
-        <Route path='/workerregister' element={<WorkerRegister />} />
-
-
-
-        <Route path="*" element={<NotFound />} /> */}
-
-
-      {/* </Routes> */}
 
       <Routes>
 
@@ -164,6 +119,7 @@ function App() {
           <Route path="workers" element={<Workers />} />
           <Route path="inviteclient" element={<InviteClient />} />
           <Route path="requirementform" element={<RequriementForm />} />
+          <Route path="sitemeasurement" element={<SiteMeasurement />} />
 
         </Route>
 
