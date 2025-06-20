@@ -126,7 +126,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, existin
                             <li key={i} className="flex justify-between items-center bg-blue-50 p-2 rounded-xl">
                                 <span>{file.originalName}</span>
                                 <a href={file.url} target="_blank" download className="text-blue-600 underline">
-                                      <i className="fa-solid fa-download"></i>
+                                    <i className="fa-solid fa-download"></i>
                                 </a>
                             </li>
                         ))}

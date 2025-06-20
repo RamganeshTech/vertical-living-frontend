@@ -2,12 +2,14 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthState {
   role: string | null;
-  isauthenticated:boolean
+  isauthenticated:boolean,
+  _id:string | null
 }
 
 const initialState: AuthState = {
   role: null,
-  isauthenticated:false
+  isauthenticated:false,
+  _id:null
 };
 
 const authSlice = createSlice({

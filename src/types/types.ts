@@ -245,8 +245,9 @@ export interface SiteDetails {
   additionalNotes?: string | null;
 }
 
+export type RoomName = "LivingHall" | "Bedroom" | "Kitchen" | "Wardrobe" | null; 
 export interface SiteRooms {
-  name: "LivingHall" | "Bedroom" | "Kitchen" | "wardrobe" | null; 
+  name: RoomName
   length: number | null;
   breadth: number | null;
   height?: number | null;

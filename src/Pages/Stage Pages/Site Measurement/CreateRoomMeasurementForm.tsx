@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Input } from "../../components/ui/Input";
-import { Label } from "../../components/ui/Label";
-import { Button } from "../../components/ui/Button";
-import { useCreateMeasurement } from "../../apiList/Stage Api/siteMeasurementApi";
-import { Dialog ,  DialogContent, DialogHeader, DialogTitle} from './../../components/ui/Dialog';
+import { Input } from "../../../components/ui/Input";
+import { Label } from "../../../components/ui/Label";
+import { Button } from "../../../components/ui/Button";
+import { useCreateMeasurement } from "../../../apiList/Stage Api/siteMeasurementApi";
+import { Dialog ,  DialogContent, DialogHeader, DialogTitle} from '../../../components/ui/Dialog';
 
-import type { SiteDetails, SiteRooms } from './../../types/types';
+import type { SiteDetails, SiteRooms } from '../../../types/types';
 
 const roomOptions = ["LivingHall", "Bedroom", "Kitchen", "wardrobe"];
 
@@ -85,7 +85,7 @@ const CreateMeasurementPopup = ({ projectId, open, onClose }: {
       setErrorMsg("Please add at least one room.");
       return;
     }
-    createMeasurement.mutate({ projectId, siteDetails, rooms }, {
+    createMeasurement.mutate({ projectId, siteDetails }, {
       onSuccess: () => {
         onClose();
         setStep("site");

@@ -39,6 +39,8 @@ import InviteClient from './Pages/Organization/inviteClient'
 import RequirementFormPublic from './Pages/RequirementForm/RequirementFormPublic'
 import RequriementForm from './Pages/RequirementForm/RequriementForm'
 import SiteMeasurement from './Pages/Stage Pages/Site Measurement/SiteMeasurement'
+import SampleDesign from './Pages/Stage Pages/Sample design/SampleDesign'
+import TechnicalConsultant from './Pages/Stage Pages/Technical Consultant/TechnicalConsultant'
 
 function App() {
 
@@ -120,6 +122,8 @@ function App() {
           <Route path="inviteclient" element={<InviteClient />} />
           <Route path="requirementform" element={<RequriementForm />} />
           <Route path="sitemeasurement" element={<SiteMeasurement />} />
+          <Route path="sampledesign" element={<SampleDesign />} />
+          <Route path="technicalconsultant" element={<TechnicalConsultant />} />
 
         </Route>
 
