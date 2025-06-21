@@ -4,28 +4,46 @@ import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { Label } from "../../../components/ui/Label";
 import { Separator } from "../../../components/ui/Seperator";
-import { useAddConsultationMessage, useGetConsultationMessages, useDeleteConsultationMessage, useEditConsultationMessage } from "../../../apiList/Stage Api/technicalConsultationApi";
+import { useAddConsultationMessage, useGetConsultationMessages, useDeleteConsultationMessage, useEditConsultationMessage, useSetDeadLineTechConsultation, useCompletionStatusTechConsultation } from "../../../apiList/Stage Api/technicalConsultationApi";
 import useGetRole from './../../../Hooks/useGetRole';
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../store/store";
 import { toast } from "../../../utils/toast";
+import { Card } from "../../../components/ui/Card";
+import StageTimerInfo from "../../../shared/StagetimerInfo";
 
 const TechnicalConsultant = () => {
     const { projectId } = useParams<{ projectId: string }>();
     const { role, _id: userId } = useGetRole();
-
-    //   cosnt {} = useSelector((state:RootState)=> state.authStore)
-
-    let { data: techDoc, isLoading: getMessageLoading, error: getMessageError, isError: getMessageIsError } = useGetConsultationMessages(projectId!);
-    const { mutate: sendMessage, isPending: sendMessagePending } = useAddConsultationMessage();
-    const { mutate: deleteMessage, isPending: deletePending } = useDeleteConsultationMessage();
-    const { mutate: editMessage, isPending: editPending } = useEditConsultationMessage();
 
 
     const [text, setText] = useState("");
     const [attachments, setAttachments] = useState<File[]>([]);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editText, setEditText] = useState("");
+
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+
+    let { data: techDoc, isLoading: getMessageLoading, error: getMessageError, isError: getMessageIsError, refetch } = useGetConsultationMessages(projectId!);
+    const { mutate: sendMessage, isPending: sendMessagePending } = useAddConsultationMessage();
+    const { mutate: deleteMessage, isPending: deletePending } = useDeleteConsultationMessage();
+    const { mutate: editMessage, isPending: editPending } = useEditConsultationMessage();
+
+    const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetDeadLineTechConsultation()
+    const updateCompletionStatus = useCompletionStatusTechConsultation();
+
+
+    const handleCompletionStatus = async () => {
+        try {
+            await updateCompletionStatus.mutateAsync({ projectId: projectId! });
+            toast({ description: 'Completion status updated successfully', title: "Success" });
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
+
+        }
+    };
+
 
     const handleSend = () => {
         try {
@@ -59,6 +77,10 @@ const TechnicalConsultant = () => {
         setEditingId(id);
         setEditText(originalText);
     };
+     const handleCancelEdit = () => {
+        setEditingId(null);
+        setEditText("");
+    };
 
     const handleEditSubmit = () => {
         if (!editingId || !editText) return;
@@ -68,16 +90,140 @@ const TechnicalConsultant = () => {
     };
 
 
+
+     const attachemnts= [
+
+        {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+          {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+          {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+          {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "kitchen-view.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "pdf",
+            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            originalName: "site-layout.pdf",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "pdf",
+            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            originalName: "site-layout.pdf",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "pdf",
+            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            originalName: "site-layout.pdf",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+            type: "pdf",
+            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            originalName: "site-layout.pdf",
+            uploadedAt: new Date().toISOString(),
+        },
+
+  ]
+
+
     console.log("messages", techDoc)
+    console.log("tech error", getMessageError)
+    console.log("tech error boolean", getMessageIsError)
 
     return (
         <div className="max-w-full h-full  mx-auto p-2">
-            <h2 className="text-2xl font-semibold text-blue-800 mb-6 flex items-center">
-                <i className="fas fa-comments mr-2"></i> Technical Consultation
-            </h2>
+             <div className='flex justify-between w-full'>
+                <h2 className="text-2xl font-semibold text-blue-800 mb-6 flex items-center">
+                    <i className="fas fa-comments mr-2"></i> Technical Consultation
+                </h2>
 
-            <div className="space-y-4 border-2 border-[#0a0a0a18] h-[70%]">
+                <Button onClick={handleCompletionStatus} className="bg-green-600 mt-2 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
+                    <i className="fa-solid fa-circle-check mr-2"></i>
+                    Mark as Complete
+                </Button>
+            </div>
+
+            <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
+                <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
+                    <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+                    <span>Stage Timings</span>
+                </div>
+
+                <StageTimerInfo
+                    completedAt={techDoc?.timer?.completedAt}
+                    formId={(techDoc as any)?._id}
+                    deadLine={techDoc?.timer?.deadLine}
+                    startedAt={techDoc?.timer?.startedAt}
+                    refetchStageMutate={refetch}
+                    deadLineMutate={deadLineAsync}
+                    isPending={deadLinePending}
+                />
+            </Card>
+
+            <div className="space-y-4 border-2 border-[#0a0a0a18] h-[52%]">
                 <div className="flex flex-col-reverse overflow-y-auto h-full px-2 py-4 space-y-reverse space-y-4">
+                    { (getMessageIsError || getMessageError) && <div className="text-center flex h-full items-center justify-center py-10">
+                            <div>
+                                <i className="fas fa-ban text-9xl text-blue-300 mb-4"></i>
+                                <p className="text-lg">{(getMessageError as any).response.data.message || (getMessageError as any)?.message ||"Failed to load , please try again"}</p>
+                                <p className="text-sm"></p>
+                            </div>
+                        </div>}
                     {getMessageLoading ? (
                         <div className="flex  h-full items-center justify-center py-10">
                             <i className="fas fa-spinner fa-spin text-blue-600 text-2xl"></i>
@@ -99,7 +245,7 @@ const TechnicalConsultant = () => {
                                     ?.slice()
                                     .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                                     .map((msg: any) => (
-                                        <div key={msg._id} className="bg-blue-50 group p-4 rounded-lg shadow flex flex-col">
+                                        <div key={msg._id} className="bg-blue-50 w-full group p-4 rounded-lg shadow flex flex-col">
                                             <div className="flex justify-between items-center mb-2">
                                                 <p className="text-sm text-gray-600">{msg.senderRole.toUpperCase()} - {new Date(msg.createdAt).toLocaleString()}</p>
                                                 <div className="opacity-0 scale-95 group-hover:opacity-100 transition-all duration-300">
@@ -118,28 +264,42 @@ const TechnicalConsultant = () => {
                                             </div>
 
                                             {editingId === msg._id ? (
-                                                <div className="flex gap-2 items-center">
-                                                    <Input value={editText} onChange={(e) => setEditText(e.target.value)} />
+                                                <div className="flex gap-2 items-center mb-2">
+                                                    <Input  value={editText} onChange={(e) => setEditText(e.target.value)} />
                                                     <Button isLoading={editPending} onClick={handleEditSubmit}>Save</Button>
+                                                    <Button variant="danger"  className={"border-red-200 hover:bg-red-700 bg-red-600 text-white"} onClick={handleCancelEdit}>cancel</Button>
                                                 </div>
                                             ) : (
                                                 <p className="text-gray-900 text-base mb-2">{msg.message}</p>
                                             )}
 
-                                            <div className="flex flex-wrap gap-2">
-                                                {msg.attachments.map((att: any, index: number) => (
-                                                    <a
-                                                        key={index}
-                                                        href={att.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-blue-600 text-sm underline flex items-center gap-1"
-                                                    >
-                                                        <i className={`fas ${att.type === "pdf" ? "fa-file-pdf" : "fa-image"}`}></i>
-                                                        {att.originalName}
-                                                    </a>
+                                            <div className="flex flex-wrap max-w-[80%] gap-3">
+                                                {msg.attachments?.map((att: any, index: number) => (
+                                                // {attachemnts?.map((att: any, index: number) => (
+                                                    <div key={index} className="flex items-center gap-2 bg-white border px-3 py-2 rounded shadow-sm">
+                                                        <i className={`fas ${att.type === "pdf" ? "fa-file-pdf text-red-500" : "fa-image text-blue-500"}`}></i>
+                                                        <span className="text-sm text-gray-700 truncate max-w-[120px]">{att.originalName}</span>
+
+                                                        {att.type === "image" && (
+                                                            <button
+                                                                onClick={() => setPreviewImage(att.url)}
+                                                                className="text-blue-600 hover:underline text-xs"
+                                                            >
+                                                                View
+                                                            </button>
+                                                        )}
+
+                                                        <a
+                                                            href={att.url}
+                                                            download
+                                                            className="text-green-600 hover:underline text-xs"
+                                                        >
+                                                            Download
+                                                        </a>
+                                                    </div>
                                                 ))}
                                             </div>
+
                                         </div>
                                     ))
                                 }
@@ -178,6 +338,22 @@ const TechnicalConsultant = () => {
                 />
 
             </div>
+
+            {previewImage && (
+                <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
+                    <div className="bg-white p-4 rounded-lg shadow-lg max-w-[90%] max-h-[90%] overflow-auto">
+                        <div className="flex justify-end mb-2">
+                            <button
+                                onClick={() => setPreviewImage(null)}
+                                className="text-red-500 text-xl"
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <img src={previewImage} alt="Preview" className="max-h-[80vh] rounded" />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

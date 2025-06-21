@@ -38,7 +38,8 @@ export const PROJECTS_LABELS = {
   REQUIREMENTFORM: "Requirement Form",
   SITEMEASUREMENT: "Site Measurement",
   SAMPLEDESIGN: "Sample Designs",
-  TECHNICALCONSULTANT: "Technical consultant"
+  TECHNICALCONSULTANT: "Technical consultant",
+  MATERIALSELECTION: "Material Selection"
 }
 
 
@@ -51,7 +52,8 @@ export const PROJECTS_ICONS = {
   REQUIREMENTFORM: "fa-solid fa-pencil text-2xl",
   SITEMEASUREMENT: "fa-solid fa-measurement text-2xl",
   SAMPLEDESIGN: "fa-solid fa-form-design text-2xl",
-  TECHNICALCONSULTANT: "fa-solid fa-tech text-2xl"
+  TECHNICALCONSULTANT: "fa-solid fa-tech text-2xl",
+  MATERIALSELECTION: "fas fa-box text-2xl"
 
 }
 

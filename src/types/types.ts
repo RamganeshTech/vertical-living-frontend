@@ -252,3 +252,109 @@ export interface SiteRooms {
   breadth: number | null;
   height?: number | null;
 }
+
+
+
+
+// SAMPLE DESIGN STAGE 3 
+
+export interface IFileItem {
+  type: "image" | "pdf";
+  url: string;
+  originalName?: string;
+  uploadedAt?: Date;
+}
+
+export interface IRoom {
+  roomName: string;
+  files: IFileItem[];
+}
+
+export interface ISampleDesign {
+  projectId: string;
+  rooms: IRoom[];
+  timer: {
+    startedAt: Date | null;
+    completedAt: Date | null;
+    deadLine: Date | null;
+  };
+  status: "pending" | "completed";
+  additionalNotes?: string | null;
+  isEditable: boolean;
+}
+
+
+
+// TECH CONSUTLATION TYPE STAGE 4
+
+
+export interface IConsultationAttachment {
+    // _id?: string;
+    type: "image" | "pdf";
+    url: string;
+    originalName?: string;
+}
+
+
+export interface IConsultationMessage {
+    // _id?: string;
+    sender: string; // the persons id who sent the message
+    senderModel: string,
+    senderRole: "owner" | "staff" | "CTO" | "worker";
+    message: string;
+    section?: string; // Optional tag like "Kitchen"
+    attachments?: IConsultationAttachment[];
+    createdAt: Date;
+}
+
+export interface IConsultationTimer {
+    startedAt: Date | null;
+    completedAt: Date | null;
+    deadLine: Date | null;
+}
+
+export interface ITechnicalConsultation {
+    projectId: string;
+    messages: IConsultationMessage[];
+    timer: IConsultationTimer;
+    status: "pending" | "completed";
+    isEditable: boolean;
+}
+
+
+
+
+
+
+// MATERIAL SELECTION STAGE 5 
+
+export interface IMaterialSelectionRoomUpload {
+  type: "image" | "pdf";
+  url: string;
+  originalName?: string;
+  uploadedAt: Date
+}
+
+export interface IMaterialSelectionWork {
+  workName: string;
+  notes?: string;
+  materials: string[]; // Can be expanded to object if needed later
+}
+
+export interface IMaterialSelectionRoom {
+  roomName: string;
+  uploads: IMaterialSelectionRoomUpload[];
+  modularWorks: IMaterialSelectionWork[];
+}
+
+export interface IMaterialSelectionRoomConfirmation {
+  projectId: string;
+  rooms: IMaterialSelectionRoom[];
+  status: "pending" | "completed";
+  isEditable: boolean;
+  timer: {
+    startedAt: Date | null;
+    completedAt: Date | null;
+    deadLine: Date | null;
+  };
+}

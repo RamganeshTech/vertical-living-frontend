@@ -57,19 +57,19 @@ const deleteFormRequirements = async ({ projectId, api }: { projectId: string, a
 }
 
 const uploadRequirementFiles = async ({ formId, files, api }: UploadFilePayload & { api: any }) => {
-console.log("getig iside 1")
+    console.log("getig iside 1")
     const formData = new FormData();
     files.forEach((file) => formData.append("file", file));
-console.log("getig iside 1")
+    console.log("getig iside 1")
 
-    const response = await api.post(`/requirementform/upload/multiple/${formId}`,formData,
+    const response = await api.post(`/requirementform/upload/multiple/${formId}`, formData,
         {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
         }
     );
-console.log("reposen",response)
+    console.log("reposen", response)
     return response.data;
 }
 

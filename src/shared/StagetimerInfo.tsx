@@ -29,7 +29,7 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, completedAt, deadLine
 
     const [editMode, setEditMode] = useState(false);
 
-
+    console.log("completed date form teech", completedAt)
     useEffect(() => {
         const interval = setInterval(() => {
             setNow(new Date());
@@ -44,11 +44,18 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, completedAt, deadLine
     const showTimer = () => {
         if (!startedDate) return "Not started yet";
 
+        if (startedDate && completedDate) {
+            // const duration = completedDate.getTime() - startedDate.getTime();
+            const duration = completedDate.getTime() - startedDate.getTime();
+            return `⏱ Completed in: ${formatDuration(duration)}`;
+        }
+
+
         const current = deadlineDate ? deadlineDate : now;
         const duration = current.getTime() - startedDate.getTime();
         return deadlineDate
             ? `⏳ Remaining: ${formatDuration(deadlineDate.getTime() - now.getTime())}`
-            : `🕒 Elapsed: ${formatDuration(duration)}`;
+            : `🕒 created: ${formatDuration(duration)} ago`;
     };
 
     const formatDisplayDate = (date: Date | null) => {
@@ -78,46 +85,6 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, completedAt, deadLine
     };
 
     return (
-        // <div className="bg-white border  border-blue-200 rounded-xl p-4 space-y-4 text-sm text-blue-900">
-        //     {/* <h3 className="text-xl font-semibold text-blue-700">Time Period</h3> */}
-
-        //     <div>
-        //         <strong>Started At:</strong> {formatDisplayDate(startedDate)}
-        //     </div>
-        //     <div>
-        //         <strong>Completed At:</strong> {formatDisplayDate(completedDate)}
-        //     </div>
-
-
-        //     <div className="flex items-center justify-between">
-        //         <div className="flex gap-2 items-center">
-        //             <strong>Deadline:</strong> {formatDisplayDate(deadlineDate)}
-        //             {!editMode && (
-        //                 <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
-        //                     <i className="fa-solid fa-pen mr-1" /> Edit
-        //                 </Button>
-        //             )}
-        //         </div>
-
-        //     </div>
-        //     <div className="pt-2 font-semibold text-blue-700">{showTimer()}</div>
-
-        //     {editMode && (
-        //         <div className="flex items-center gap-4 pt-4">
-        //             <Input
-        //                 type="date"
-        //                 value={newDeadline}
-        //                 onChange={(e) => setNewDeadline(e.target.value)}
-        //             />
-        //             <Button onClick={handleSetDeadline} isLoading={isPending} className="bg-blue-600 text-white">
-        //                 Update Deadline
-        //             </Button>
-        //             <Button onClick={() => setEditMode(false)} variant="ghost">
-        //                 Cancel
-        //             </Button>
-        //         </div>
-        //     )}
-        // </div>
 
         <div className="text-sm w-full text-blue-900 space-y-3">
             <div className="flex w-full justify-between flex-wrap gap-x-6 gap-y-2 items-center">

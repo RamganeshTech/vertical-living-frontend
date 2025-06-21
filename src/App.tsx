@@ -41,6 +41,8 @@ import RequriementForm from './Pages/RequirementForm/RequriementForm'
 import SiteMeasurement from './Pages/Stage Pages/Site Measurement/SiteMeasurement'
 import SampleDesign from './Pages/Stage Pages/Sample design/SampleDesign'
 import TechnicalConsultant from './Pages/Stage Pages/Technical Consultant/TechnicalConsultant'
+import MaterialSelection from './Pages/Stage Pages/MaterialSelection/MaterialSelection'
+import MaterialSelectionRoom from './Pages/Stage Pages/MaterialSelection/MaterialSelectionRoom'
 
 function App() {
 
@@ -71,7 +73,7 @@ function App() {
         <Route path='/ctologin' element={<CTOLogin />} />
         <Route path='/ctoregister' element={<CTORegister />} />
 
-         <Route path='/clientlogin' element={<ClientLogin />} />
+        <Route path='/clientlogin' element={<ClientLogin />} />
         <Route path='/clientregister' element={<ClientRegister />} />
 
 
@@ -124,25 +126,29 @@ function App() {
           <Route path="sitemeasurement" element={<SiteMeasurement />} />
           <Route path="sampledesign" element={<SampleDesign />} />
           <Route path="technicalconsultant" element={<TechnicalConsultant />} />
+          <Route path="materialselection" element={<MaterialSelection />} >
+            <Route path="materialroom" element={<MaterialSelectionRoom />} />
+
+          </Route>
 
         </Route>
 
 
 
-{
-  <>
-        <Route path="/phase" element={<ProtectedRoutes allowedRoles={["owner"]}>
-          <Phase />
-        </ProtectedRoutes>} />
+        {
+          <>
+            <Route path="/phase" element={<ProtectedRoutes allowedRoles={["owner"]}>
+              <Phase />
+            </ProtectedRoutes>} />
 
-        <Route path="/issues" element={<ProtectedRoutes allowedRoles={["owner"]}>
-          <Issues />
-        </ProtectedRoutes>} />
+            <Route path="/issues" element={<ProtectedRoutes allowedRoles={["owner"]}>
+              <Issues />
+            </ProtectedRoutes>} />
 
-        <Route path="/tasks" element={<ProtectedRoutes allowedRoles={["owner"]}>
-          <Tasks />
-        </ProtectedRoutes>} />
-        </>
+            <Route path="/tasks" element={<ProtectedRoutes allowedRoles={["owner"]}>
+              <Tasks />
+            </ProtectedRoutes>} />
+          </>
         }
 
 

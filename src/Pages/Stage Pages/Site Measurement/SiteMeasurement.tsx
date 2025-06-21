@@ -185,6 +185,9 @@ import { Card } from '../../../components/ui/Card';
 import StageTimerInfo from '../../../shared/StagetimerInfo';
 import RequirementFileUploader from '../../../shared/StageFileUploader';
 import { Button } from '../../../components/ui/Button';
+import CommonSiteInfo from './CommonSiteInfo';
+import SiteRoomInfo from './SiteRoomInfo';
+import CommonSiteForm from './CommonSiteForm';
 
 const initialSiteDetails: SiteDetails = {
   totalPlotAreaSqFt: null,
@@ -224,9 +227,6 @@ function HomeInteriorProject() {
 
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetDeadLineSiteMeasurement()
   const { mutateAsync: uploadFilesMutate, isPending: uploadPending } = useUploadRequirementFiles()
-
-
-  // const {mutateAsync:uploadFiles} = useUploadRequirementFiles()
 
   // Handlers
 
@@ -362,8 +362,6 @@ function HomeInteriorProject() {
         />
       </Card>
 
-
-
       <div className="">
         <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
           <RequirementFileUploader
@@ -393,296 +391,21 @@ function HomeInteriorProject() {
         </div>
       )
         :
-        <>
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Site Measurements</h2>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowSiteForm(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Edit Details
-                </button>
-                <button
-                  onClick={() => handleDeleteSiteMeasurement()}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">Total Plot Area</span>
-                <p className="text-lg font-semibold text-blue-700">
-                  {measurementData.siteDetails.totalPlotAreaSqFt !== null ? `${measurementData.siteDetails.totalPlotAreaSqFt} sq.ft` : "Not mentioned"}
-                </p>
-              </div>
-
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">Built-up Area</span>
-                <p className="text-lg font-semibold text-blue-700">
-                  {measurementData.siteDetails.builtUpAreaSqFt != null ? `${measurementData.siteDetails.builtUpAreaSqFt} sq.ft` : "Not mentioned"}
-                </p>
-              </div>
-
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">Road Facing</span>
-                <p className="text-lg font-semibold text-blue-700">
-                  {measurementData.siteDetails.roadFacing === true ? "YES" : measurementData.siteDetails.roadFacing === false ? "NO" : "Not mentioned"}
-                </p>
-              </div>
-
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">Number of Floors</span>
-                <p className="text-lg font-semibold text-blue-700">
-                  {measurementData.siteDetails.numberOfFloors != null ? measurementData.siteDetails.numberOfFloors : "Not mentioned"}
-                </p>
-              </div>
-
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">Is having Slope</span>
-                <p className="text-lg font-semibold text-blue-700">
-                  {measurementData.siteDetails.hasSlope === true ? "YES" : measurementData.siteDetails.hasSlope === false ? "NO" : "Not mentioned"}
-                </p>
-              </div>
-
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">Is Boundary Wall exists</span>
-                <p className="text-lg font-semibold text-blue-700">
-                  {measurementData.siteDetails.boundaryWallExists === true ? "YES" : measurementData.siteDetails.boundaryWallExists === false ? "NO" : "Not mentioned"}
-                </p>
-              </div>
-
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <span className="text-sm text-gray-600">Additional Notes</span>
-                <p className="text-lg font-semibold text-blue-700">
-                  {measurementData.siteDetails.additionalNotes ? measurementData.siteDetails.additionalNotes : "Not mentioned"}
-                </p>
-              </div>
-
-            </div>
-          </div>
-
-          {measurementData.siteDetails.totalPlotAreaSqFt !== null && <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Rooms</h2>
-              <button
-                onClick={() => setShowRoomForm(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                + Add Room
-              </button>
-            </div>
-            {/* Rooms list will go here */}
-            {measurementData.rooms.length === 0 ?
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                </div>
-                <p className="text-gray-500">No rooms added yet</p>
-              </div>
-              :
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {measurementData.rooms.map((room: SiteRooms, index: number) => (
-                  <RoomCard
-                    key={index}
-                    room={room}
-                    onEdit={() => handleEditRoom(room)}
-                    onDelete={() => handleDeleteRoom((room as any)._id)}
-                  />
-                ))}
-              </div>
-            }
-
-          </div>}
-        </>
-
-
-
+       <CommonSiteInfo measurementData={measurementData} handleDeleteSiteMeasurement={handleDeleteSiteMeasurement}
+         setShowSiteForm={setShowSiteForm} setShowRoomForm={setShowRoomForm} handleEditRoom={handleEditRoom}
+          handleDeleteRoom={handleDeleteRoom} />
       }
 
       {showSiteForm && (
-        <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg w-full max-w-2xl p-6">
-            <h2 className="text-2xl font-semibold mb-6">Site Measurements</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label htmlFor="">Total Plot Area (sq.ft)</label>
-                <input
-                  type="number"
-                  placeholder="Total Plot Area (sq.ft)"
-                  value={siteDetails.totalPlotAreaSqFt || 0}
-                  onChange={(e) => setSiteDetails({ ...siteDetails, totalPlotAreaSqFt: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label htmlFor="">Built-up Area (sq.ft)</label>
-                <input
-                  type="number"
-                  placeholder="Built-up Area (sq.ft)"
-                  value={siteDetails.builtUpAreaSqFt || 0}
-                  onChange={(e) => setSiteDetails({ ...siteDetails, builtUpAreaSqFt: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label htmlFor="">Number of Floors</label>
-                <input
-                  type="number"
-                  placeholder="Number of Floors"
-                  value={siteDetails.numberOfFloors || 0}
-                  onChange={(e) => setSiteDetails({ ...siteDetails, numberOfFloors: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-            </div>
-            <div className="flex flex-wrap gap-4 mb-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={siteDetails.hasSlope ?? false}
-                  onChange={(e) => setSiteDetails({ ...siteDetails, hasSlope: e.target.checked })}
-                  className="mr-2"
-                />
-                Has Slope
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={siteDetails.roadFacing ?? false}
-                  onChange={(e) => setSiteDetails({ ...siteDetails, roadFacing: e.target.checked })}
-                  className="mr-2"
-                />
-                Road Facing
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={siteDetails.boundaryWallExists ?? false}
-                  onChange={(e) => setSiteDetails({ ...siteDetails, boundaryWallExists: e.target.checked })}
-                  className="mr-2"
-                />
-                Boundary Wall Exists
-              </label>
-            </div>
-            <textarea
-              placeholder="Additional Notes"
-              value={siteDetails.additionalNotes || ""}
-              onChange={(e) => setSiteDetails({ ...siteDetails, additionalNotes: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
-              rows={4}
-            />
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setShowSiteForm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSiteSubmit}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Save Details
-              </button>
-            </div>
-          </div>
-        </div>
+        <CommonSiteForm siteDetails={siteDetails} setSiteDetails={setSiteDetails}
+         handleSiteSubmit={handleSiteSubmit} setShowSiteForm={setShowSiteForm} />
       )}
-
-
-
-
-
 
       {/* Room Form Modal */}
       {showRoomForm && (
-        <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg w-full max-w-md p-6">
-            <h2 className="text-2xl font-semibold mb-6">Add New Room</h2>
-            {/* <input
-              type="text"
-              placeholder="Room Name"
-              value={roomDetails.name || ""}
-              onChange={(e) => setRoomDetails({ ...roomDetails, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
-            /> */}
-
-            <select
-              value={roomDetails.name || ''}
-              onChange={(e) => setRoomDetails(prev => ({ ...prev, name: e.target.value as RoomName }))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
-            >
-              <option value="">Select Room Type</option>
-              <option value="LivingHall">Living Hall</option>
-              <option value="Bedroom">Bedroom</option>
-              <option value="Kitchen">Kitchen</option>
-              <option value="Wardrobe">Wardrobe</option>
-            </select>
-
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div>
-                <label htmlFor="">Length (ft)</label>
-                <input
-                  type="number"
-                  placeholder="Length (ft)"
-                  value={roomDetails.length || 0}
-                  onChange={(e) => setRoomDetails({ ...roomDetails, length: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label htmlFor="">Breadth (ft)</label>
-                <input
-                  type="number"
-                  placeholder="Breadth (ft)"
-                  value={roomDetails.breadth || 0}
-                  onChange={(e) => setRoomDetails({ ...roomDetails, breadth: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label htmlFor="">Height (ft)</label>
-                <input
-                  type="number"
-                  placeholder="Height (ft)"
-                  value={roomDetails.height || 0}
-                  onChange={(e) => setRoomDetails({ ...roomDetails, height: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-            {roomDetails.length && roomDetails.breadth && (
-              <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                <p className="text-blue-700 font-medium">
-                  Calculated Area: {(Number(roomDetails.length) * Number(roomDetails.breadth)).toFixed(2)} sq.ft
-                </p>
-              </div>
-            )}
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setShowRoomForm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRoomSubmit}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Add Room
-              </button>
-            </div>
-          </div>
-        </div>
+        <SiteRoomInfo  handleRoomSubmit={handleRoomSubmit} setShowRoomForm={setShowRoomForm} 
+        roomDetails={roomDetails} setRoomDetails={setRoomDetails} />
       )}
-
     </div>
   );
 }

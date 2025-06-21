@@ -21,9 +21,9 @@ Api.interceptors.response.use(
         const originalRequest = error.config;
 
         // If the failing request is for the refresh token, reject immediately
-        if (originalRequest.url.includes('/auth/isauthenticated')) {
-            return Promise.reject(error);
-        }
+        // if (originalRequest.url.includes('/auth/isauthenticated')) {
+        //     return Promise.reject(error);
+        // }
 
         // Handle both 401 (Unauthorized) & 403 (Forbidden) errors
         if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {

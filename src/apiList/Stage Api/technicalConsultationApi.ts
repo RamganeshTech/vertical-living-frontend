@@ -2,6 +2,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import useGetRole from "../../Hooks/useGetRole";
 import { getApiForRole } from "../../utils/roleCheck";
 import { queryClient } from "../../QueryClient/queryClient";
+import type { UploadFilePayload } from "./requirementFormApi";
+import type { AxiosInstance } from "axios";
 
 const addConsultationMessage = async ({
   projectId,
@@ -26,6 +28,7 @@ const getConsultationMessages = async ({
   api: any;
 }) => {
   const { data } = await api.get(`/technicalconsultation/getmessages/${projectId}`);
+  console.log("data form the message", data)
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -77,6 +80,36 @@ const editConsultationMessage = async ({
 };
 
 
+// deadline and completion
+const setDeadlineTechnicalConsult = async ({ formId, deadLine, api }: { formId: string, deadLine: string, api: AxiosInstance }) => {
+    const { data } = await api.put(`/technicalconsultation/deadline/${formId}`, { deadLine });
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+}
+
+const updateCompletionStatus = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
+    const { data } = await api.put(`/technicalconsultation/completionstatus/${projectId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+}
+
+// file upload api
+
+
+const uploadFiles = async ({ formId, files, api }: UploadFilePayload & { api: any }) => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("file", file));
+
+    const response = await api.post(`/technicalconsultation/upload/multiple/${formId}`, formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+    console.log("reposen", response)
+    return response.data;
+}
 
 
 export const useGetConsultationMessages = (projectId: string) => {
@@ -93,7 +126,8 @@ export const useGetConsultationMessages = (projectId: string) => {
     },
     enabled: !!projectId,
     retry:false,
-    refetchOnMount:false
+    refetchOnMount:false,
+    refetchOnWindowFocus:false,
   });
 };
 
@@ -183,3 +217,71 @@ export const useDeleteConsultationMessage = () => {
 };
 
 
+// file upload hook
+export const useUploadRequirementFiles = () => {
+    const allowedRoles = ["owner", "staff", "CTO", "client"]
+
+    const { role } = useGetRole()
+    const api = getApiForRole(role!)
+
+
+    return useMutation({
+        mutationFn: async ({ formId, files }: UploadFilePayload) => {
+
+            if (!role) throw new Error("not authorized")
+
+            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
+
+            if (!api) throw new Error("api is null")
+
+            return await uploadFiles({ formId, files, api })
+        },
+        onSuccess:()=>{
+      queryClient.invalidateQueries({ queryKey: ["consultationMessages"] });
+
+        }
+    });
+};
+
+
+
+
+
+export const useCompletionStatusTechConsultation  = () => {
+    const allowedRoles = ["owner", "staff", "CTO"]
+    const { role } = useGetRole()
+
+    const api = getApiForRole(role!)
+
+    return useMutation({
+        mutationFn: async ({ projectId  }: { projectId: string}) => {
+
+            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+            if (!api) throw new Error("API instance not found for role");
+
+            return await updateCompletionStatus({ projectId, api });
+        },
+        onSuccess: ()=>{
+            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        }
+    });
+};
+
+export const useSetDeadLineTechConsultation = () => {
+    const allowedRoles = ["owner", "staff", "CTO"]
+    const { role } = useGetRole()
+    const api = getApiForRole(role!)
+    return useMutation({
+        mutationFn: async ({ formId, deadLine }: { formId: string, deadLine: string }) => {
+            if (!role) throw new Error("not authorized")
+
+            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
+
+            if (!api) throw new Error("api is null")
+
+            return await setDeadlineTechnicalConsult({ formId, deadLine, api })
+
+        }
+    })
+}
