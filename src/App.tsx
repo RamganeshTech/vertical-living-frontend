@@ -43,6 +43,8 @@ import SampleDesign from './Pages/Stage Pages/Sample design/SampleDesign'
 import TechnicalConsultant from './Pages/Stage Pages/Technical Consultant/TechnicalConsultant'
 import MaterialSelection from './Pages/Stage Pages/MaterialSelection/MaterialSelection'
 import MaterialSelectionRoom from './Pages/Stage Pages/MaterialSelection/MaterialSelectionRoom'
+import MaterialRoomOverview from './Pages/Stage Pages/MaterialSelectionRoom/MaterialOverview'
+import RoomDetailCard from './Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCard'
 
 function App() {
 
@@ -126,8 +128,13 @@ function App() {
           <Route path="sitemeasurement" element={<SiteMeasurement />} />
           <Route path="sampledesign" element={<SampleDesign />} />
           <Route path="technicalconsultant" element={<TechnicalConsultant />} />
-          <Route path="materialselection" element={<MaterialSelection />} >
+          {/* <Route path="materialselection" element={<MaterialSelection />} >
             <Route path="materialroom" element={<MaterialSelectionRoom />} />
+
+          </Route> */}
+
+          <Route path="materialselection" element={<MaterialRoomOverview />} >
+            <Route path="materialroom/:roomId" element={<RoomDetailCard />} />
 
           </Route>
 

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Input } from "../../../components/ui/Input";
 import { Label } from "../../../components/ui/Label";
 import { Button } from "../../../components/ui/Button";
-import { useCreateMaterialRoom } from "../../../apiList/Stage Api/materialSelectionApi"; 
-import { toast } from "../../../utils/toast"; 
+import { useCreateMaterialRoom } from "../../../apiList/Stage Api/materialSelectionApi";
+import { toast } from "../../../utils/toast";
 
 interface CreateRoomFormProps {
   onClose: () => void;
@@ -16,13 +16,13 @@ const CreateRoomForm = ({ onClose, projectId }: CreateRoomFormProps) => {
 
   const handleCreateRoom = async () => {
     if (!roomName.trim()) {
-      toast({ title:"Error" , description: "Room name is required", variant: "destructive" });
+      toast({ title: "Error", description: "Room name is required", variant: "destructive" });
       return;
     }
 
     try {
       await createRoom({ projectId, roomName });
-      toast({ title:"Success" , description: "Room created successfully ✅" });
+      toast({ title: "Success", description: "Room created successfully ✅" });
       onClose();
     } catch (err: any) {
       toast({
@@ -53,7 +53,7 @@ const CreateRoomForm = ({ onClose, projectId }: CreateRoomFormProps) => {
         disabled={isPending}
         className="w-full bg-blue-600 text-white hover:bg-blue-700 transition rounded-xl"
       >
-         Create Room
+        Create Room
       </Button>
     </div>
   );

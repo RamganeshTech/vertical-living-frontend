@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "../../../components/ui/Button"; 
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetAllMaterialRooms } from "../../../apiList/Stage Api/materialSelectionApi"; 
+import { useGetMaterialConfirmationByProject } from "../../../apiList/Stage Api/materialSelectionApi"; 
 import CreateRoomForm from "./CreateRoomformModel"; 
 import useGetRole from './../../../Hooks/useGetRole';
 import { Card } from "../../../components/ui/Card";
@@ -14,7 +14,7 @@ const MaterialRoomList:React.FC = () => {
   const navigate = useNavigate();
     const [showCreateRoomForm, setShowCreateRoomForm] = useState<boolean>(false)
 
-  const { data: rooms, isLoading, isError, error } = useGetAllMaterialRooms({ projectId: projectId! });
+  const { data: rooms, isLoading, isError, error } = useGetMaterialConfirmationByProject(projectId!);
 
   if (isLoading) return <div className="text-blue-600 text-center py-10">Loading rooms...</div>;
   if (isError) return <div className="text-red-600 text-center py-10">{(error as any)?.response?.data?.message || error.message}</div>;
