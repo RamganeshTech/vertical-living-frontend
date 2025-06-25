@@ -11,6 +11,7 @@ import type { RootState } from "../../../store/store";
 import { toast } from "../../../utils/toast";
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
+import { ResetStageButton } from "../../../shared/ResetStageButton";
 
 const TechnicalConsultant = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -77,7 +78,7 @@ const TechnicalConsultant = () => {
         setEditingId(id);
         setEditText(originalText);
     };
-     const handleCancelEdit = () => {
+    const handleCancelEdit = () => {
         setEditingId(null);
         setEditText("");
     };
@@ -91,7 +92,7 @@ const TechnicalConsultant = () => {
 
 
 
-     const attachemnts= [
+    const attachemnts = [
 
         {
             type: "image",
@@ -129,19 +130,19 @@ const TechnicalConsultant = () => {
             originalName: "living-room.jpg",
             uploadedAt: new Date().toISOString(),
         },
-          {
+        {
             type: "image",
             url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
             originalName: "living-room.jpg",
             uploadedAt: new Date().toISOString(),
         },
-          {
+        {
             type: "image",
             url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
             originalName: "living-room.jpg",
             uploadedAt: new Date().toISOString(),
         },
-          {
+        {
             type: "image",
             url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
             originalName: "living-room.jpg",
@@ -178,7 +179,7 @@ const TechnicalConsultant = () => {
             uploadedAt: new Date().toISOString(),
         },
 
-  ]
+    ]
 
 
     console.log("messages", techDoc)
@@ -187,15 +188,20 @@ const TechnicalConsultant = () => {
 
     return (
         <div className="max-w-full h-full  mx-auto p-2">
-             <div className='flex justify-between w-full'>
+            <div className='flex justify-between w-full'>
                 <h2 className="text-2xl font-semibold text-blue-800 mb-6 flex items-center">
                     <i className="fas fa-comments mr-2"></i> Technical Consultation
                 </h2>
 
-                <Button onClick={handleCompletionStatus} className="bg-green-600 mt-2 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
+               <div className='flex items-center gap-2 justify-between'>
+                 <Button onClick={handleCompletionStatus} className="bg-green-600 mt-2 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
                     <i className="fa-solid fa-circle-check mr-2"></i>
                     Mark as Complete
                 </Button>
+
+                <ResetStageButton projectId={projectId!} stageNumber={4} stagePath="technicalconsultation" />
+
+               </div>
             </div>
 
             <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
@@ -217,13 +223,13 @@ const TechnicalConsultant = () => {
 
             <div className="space-y-4 border-2 border-[#0a0a0a18] h-[52%]">
                 <div className="flex flex-col-reverse overflow-y-auto h-full px-2 py-4 space-y-reverse space-y-4">
-                    { (getMessageIsError || getMessageError) && <div className="text-center flex h-full items-center justify-center py-10">
-                            <div>
-                                <i className="fas fa-ban text-9xl text-blue-300 mb-4"></i>
-                                <p className="text-lg">{(getMessageError as any).response.data.message || (getMessageError as any)?.message ||"Failed to load , please try again"}</p>
-                                <p className="text-sm"></p>
-                            </div>
-                        </div>}
+                    {(getMessageIsError || getMessageError) && <div className="text-center flex h-full items-center justify-center py-10">
+                        <div>
+                            <i className="fas fa-ban text-9xl text-blue-300 mb-4"></i>
+                            <p className="text-lg">{(getMessageError as any).response.data.message || (getMessageError as any)?.message || "Failed to load , please try again"}</p>
+                            <p className="text-sm"></p>
+                        </div>
+                    </div>}
                     {getMessageLoading ? (
                         <div className="flex  h-full items-center justify-center py-10">
                             <i className="fas fa-spinner fa-spin text-blue-600 text-2xl"></i>
@@ -265,9 +271,9 @@ const TechnicalConsultant = () => {
 
                                             {editingId === msg._id ? (
                                                 <div className="flex gap-2 items-center mb-2">
-                                                    <Input  value={editText} onChange={(e) => setEditText(e.target.value)} />
+                                                    <Input value={editText} onChange={(e) => setEditText(e.target.value)} />
                                                     <Button isLoading={editPending} onClick={handleEditSubmit}>Save</Button>
-                                                    <Button variant="danger"  className={"border-red-200 hover:bg-red-700 bg-red-600 text-white"} onClick={handleCancelEdit}>cancel</Button>
+                                                    <Button variant="danger" className={"border-red-200 hover:bg-red-700 bg-red-600 text-white"} onClick={handleCancelEdit}>cancel</Button>
                                                 </div>
                                             ) : (
                                                 <p className="text-gray-900 text-base mb-2">{msg.message}</p>
@@ -275,7 +281,7 @@ const TechnicalConsultant = () => {
 
                                             <div className="flex flex-wrap max-w-[80%] gap-3">
                                                 {msg.attachments?.map((att: any, index: number) => (
-                                                // {attachemnts?.map((att: any, index: number) => (
+                                                    // {attachemnts?.map((att: any, index: number) => (
                                                     <div key={index} className="flex items-center gap-2 bg-white border px-3 py-2 rounded shadow-sm">
                                                         <i className={`fas ${att.type === "pdf" ? "fa-file-pdf text-red-500" : "fa-image text-blue-500"}`}></i>
                                                         <span className="text-sm text-gray-700 truncate max-w-[120px]">{att.originalName}</span>

@@ -64,44 +64,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, existin
     };
 
 
-    existingUploads = [
-        {
-            type: "image",
-            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
-            originalName: "living-room.jpg",
-            uploadedAt: new Date().toISOString(),
-        },
-        {
-            type: "image",
-            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
-            originalName: "kitchen-view.jpg",
-            uploadedAt: new Date().toISOString(),
-        },
-        {
-            type: "pdf",
-            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-            originalName: "site-layout.pdf",
-            uploadedAt: new Date().toISOString(),
-        },
-        {
-            type: "pdf",
-            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-            originalName: "site-layout.pdf",
-            uploadedAt: new Date().toISOString(),
-        },
-        {
-            type: "pdf",
-            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-            originalName: "site-layout.pdf",
-            uploadedAt: new Date().toISOString(),
-        },
-        {
-            type: "pdf",
-            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-            originalName: "site-layout.pdf",
-            uploadedAt: new Date().toISOString(),
-        },
-    ];
+   
 
 
     const pdfFiles = existingUploads.filter((file) => file.type === "pdf");

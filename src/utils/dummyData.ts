@@ -162,3 +162,51 @@ export const mockLabourEstimates: LabourEstimate[] = [
     totalLabourCost: 19200,
   },
 ]
+
+
+
+
+export const existingUploads = [
+        {
+          _id: "kkkkkkk9kkkk",
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "living-room.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+          _id: "kkkk49kkkkkk",
+            type: "image",
+            url: "https://www.bing.com/images/search?q=images%20good&FORM=IQFRBA&id=86B6D89E9BD96770DEF7716BCF2B25F6EED734FB",
+            originalName: "kitchen-view.jpg",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+          _id: "kkkk1kkkkkkk",
+            type: "pdf",
+            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            originalName: "site-layout.pdf",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+          _id: "kkkskkkkkkkk",
+            type: "pdf",
+            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            originalName: "site-layout.pdf",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+          _id: "kkkk11kkkkkkk",
+            type: "pdf",
+            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            originalName: "site-layout.pdf",
+            uploadedAt: new Date().toISOString(),
+        },
+        {
+          _id: "kkkkkkkkkkllkkkkkk",
+            type: "pdf",
+            url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            originalName: "site-layout.pdf",
+            uploadedAt: new Date().toISOString(),
+        },
+    ];

@@ -39,7 +39,8 @@ export const PROJECTS_LABELS = {
   SITEMEASUREMENT: "Site Measurement",
   SAMPLEDESIGN: "Sample Designs",
   TECHNICALCONSULTANT: "Technical consultant",
-  MATERIALSELECTION: "Material Selection"
+  MATERIALSELECTION: "Material Selection",
+  COSTESTIMATION: "Cost Estiamtion"
 }
 
 
@@ -53,7 +54,9 @@ export const PROJECTS_ICONS = {
   SITEMEASUREMENT: "fa-solid fa-measurement text-2xl",
   SAMPLEDESIGN: "fa-solid fa-form-design text-2xl",
   TECHNICALCONSULTANT: "fa-solid fa-tech text-2xl",
-  MATERIALSELECTION: "fas fa-box text-2xl"
+  MATERIALSELECTION: "fas fa-box text-2xl",
+  COSTESTIMATION: "fas fa-box"
+
 
 }
 

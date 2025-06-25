@@ -41,10 +41,11 @@ import RequriementForm from './Pages/RequirementForm/RequriementForm'
 import SiteMeasurement from './Pages/Stage Pages/Site Measurement/SiteMeasurement'
 import SampleDesign from './Pages/Stage Pages/Sample design/SampleDesign'
 import TechnicalConsultant from './Pages/Stage Pages/Technical Consultant/TechnicalConsultant'
-import MaterialSelection from './Pages/Stage Pages/MaterialSelection/MaterialSelection'
-import MaterialSelectionRoom from './Pages/Stage Pages/MaterialSelection/MaterialSelectionRoom'
 import MaterialRoomOverview from './Pages/Stage Pages/MaterialSelectionRoom/MaterialOverview'
 import RoomDetailCard from './Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCard'
+import { CostEstimationContainer } from './Pages/Stage Pages/Cost Estimation/CostEstimationContainer'
+import CostEstimationRoomDetails from './Pages/Stage Pages/Cost Estimation/CostEstimationRoomDetails'
+import LabourEstimateContainer from './Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer'
 
 function App() {
 
@@ -136,6 +137,12 @@ function App() {
           <Route path="materialselection" element={<MaterialRoomOverview />} >
             <Route path="materialroom/:roomId" element={<RoomDetailCard />} />
 
+          </Route>
+
+
+          <Route path="costestimation" element={<CostEstimationContainer />} >
+            <Route path="roomdetails/:roomId" element={<CostEstimationRoomDetails />} />
+            <Route path="roomdetails/labour" element={<LabourEstimateContainer />} />
           </Route>
 
         </Route>

@@ -7,6 +7,7 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { Card } from "../../../components/ui/Card";
 import AddRoomModel from "./AddRoomModel";
 import FileUploadSection from "./FileUploadSection";
+import { ResetStageButton } from "../../../shared/ResetStageButton";
 
 // Main component
 const SampleDesignModule: React.FC = () => {
@@ -185,7 +186,7 @@ const SampleDesignModule: React.FC = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-blue-700">Sample Design Files</h1>
 
-        <div className="space-x-2">
+        <div className='flex items-center gap-2 justify-between'>
           <button
             onClick={() => setShowAddRoomModal(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -198,6 +199,8 @@ const SampleDesignModule: React.FC = () => {
             <i className="fa-solid fa-circle-check mr-2"></i>
             Mark as Complete
           </Button>
+
+        <ResetStageButton projectId={projectId!} stageNumber={3} stagePath="sampledesign" />
         </div>
       </div>
 

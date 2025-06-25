@@ -267,7 +267,7 @@ export const setMaterialDeadlineApi = async ({
   deadLine: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/materialconfirmation/deadline/${formId}`, deadLine);
+  const { data } = await api.put(`/materialconfirmation/deadline/${formId}`, {deadLine});
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -602,7 +602,7 @@ export const useDeleteCustomRoomField = () => {
 
 
 
-export const useUploadRoomFiles = () => {
+export const useUploadMaterialSelectionRoomFiles = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
@@ -628,7 +628,7 @@ export const useUploadRoomFiles = () => {
   });
 };
 
-export const useDeleteRoomFile = () => {
+export const useDeleteMaterialSelectionRoomFile = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
