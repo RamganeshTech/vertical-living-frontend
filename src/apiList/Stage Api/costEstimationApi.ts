@@ -6,6 +6,9 @@ import type { AxiosInstance } from "axios";
 import useGetRole from './../../Hooks/useGetRole';
 import type { EditLabourType } from "../../Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer";
 
+const allowedRoles = ["owner", "staff", "CTO"]
+
+
 // GET entire cost estimation data for a project
 export const getCostEstimationByProjectApi = async (projectId: string, api: AxiosInstance) => {
   const { data } = await api.get(`/costestimation/${projectId}`);
@@ -50,7 +53,7 @@ export const addLabourEstimationApi = async (
   labourData: any,
   api: AxiosInstance
 ) => {
-  console.log("labordata", labourData )
+  console.log("labordata", labourData)
   const { data } = await api.post(`/costestimation/${projectId}/labour`, labourData);
   if (!data.ok) throw new Error(data.message);
   return data.data;
@@ -116,7 +119,7 @@ export const setCostDeadlineApi = async ({
   deadLine: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/costestimation/deadline/${formId}`, {deadLine});
+  const { data } = await api.put(`/costestimation/deadline/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -137,12 +140,23 @@ export const completeCostEstiamtionStageApi = async ({
 // ---------------- Custom Hooks ----------------
 
 export const useGetCostEstimationByProject = (projectId: string) => {
+
+  const allowedRoles = ["staff", "CTO", "owner"]
+
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
   return useQuery({
     queryKey: ["cost-estimation", projectId],
-    queryFn: () => getCostEstimationByProjectApi(projectId, api!),
+    queryFn: async () => {
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role");
+
+
+      return await getCostEstimationByProjectApi(projectId, api!)
+    },
     enabled: !!role && !!projectId && !!api,
     retry: false,
     refetchOnMount: false
@@ -155,7 +169,14 @@ export const useGetSingleRoomEstimation = (projectId: string, roomId: string) =>
 
   return useQuery({
     queryKey: ["cost-estimation", projectId, roomId],
-    queryFn: () => getSingleRoomEstimationApi(projectId, roomId, api!),
+    queryFn: async () => {
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role");
+
+      return await getSingleRoomEstimationApi(projectId, roomId, api!)
+    },
     enabled: !!role && !!projectId && !!roomId && !!api,
     retry: false,
     refetchOnMount: false
@@ -163,12 +184,15 @@ export const useGetSingleRoomEstimation = (projectId: string, roomId: string) =>
 };
 
 export const useUpdateMaterialEstimationItem = () => {
+  const allowedRoles = ["owner", "staff", "CTO"]
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ projectId, materialKey, updates }: any) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
       if (!api) throw new Error("API not available");
       return await updateMaterialEstimationItemApi(projectId, materialKey, updates, api);
     },
@@ -179,7 +203,7 @@ export const useUpdateMaterialEstimationItem = () => {
 };
 
 export const useGetLabourEstimation = (projectId: string) => {
-  const allowedRoles = ["owner", "staff", "CTO", "worker"]
+  const allowedRoles = ["owner", "staff", "CTO"]
 
   const { role } = useGetRole();
   const api = getApiForRole(role!);
@@ -207,8 +231,11 @@ export const useAddLabourEstimation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ projectId, labourData }: {projectId:string, labourData:EditLabourType}) => {
-      if (!api) throw new Error("API not available");
+    mutationFn: async ({ projectId, labourData }: { projectId: string, labourData: EditLabourType }) => {
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role");
       return await addLabourEstimationApi(projectId, labourData, api);
     },
     onSuccess: (_, { projectId }) => {
@@ -224,7 +251,10 @@ export const useEditLabourEstimation = () => {
 
   return useMutation({
     mutationFn: async ({ projectId, labourId, updates }: { projectId: string, labourId: string, updates: EditLabourType }) => {
-      if (!api) throw new Error("API not available");
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role");
       return await editLabourEstimationApi(projectId, labourId, updates, api);
     },
     onSuccess: (_, { projectId }) => {
@@ -240,8 +270,10 @@ export const useDeleteLabourEstimation = () => {
 
   return useMutation({
     mutationFn: async ({ projectId, labourId }: any) => {
-      if (!api) throw new Error("API not available");
-      return await deleteLabourEstimationApi(projectId, labourId, api);
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role"); return await deleteLabourEstimationApi(projectId, labourId, api);
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["cost-estimation", projectId] });
@@ -256,8 +288,10 @@ export const useUploadCostEstimationFiles = () => {
 
   return useMutation({
     mutationFn: async ({ projectId, roomId, formData }: any) => {
-      if (!api) throw new Error("API not available");
-      return await uploadCostEstimationFilesApi(projectId, roomId, formData, api);
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role"); return await uploadCostEstimationFilesApi(projectId, roomId, formData, api);
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["cost-estimation", projectId] });
@@ -272,8 +306,10 @@ export const useDeleteCostEstimationFile = () => {
 
   return useMutation({
     mutationFn: async ({ projectId, roomId, fileId }: any) => {
-      if (!api) throw new Error("API not available");
-      return await deleteCostEstimationFileApi(projectId, roomId, fileId, api);
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role"); return await deleteCostEstimationFileApi(projectId, roomId, fileId, api);
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["cost-estimation", projectId] });
@@ -300,7 +336,7 @@ export const useSetCostEstimateDeadline = () => {
       formId: string;
       deadLine: string;
     }) => {
-      if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await setCostDeadlineApi({ formId, deadLine, api });
     },
@@ -318,7 +354,7 @@ export const useCompleteMaterialStage = () => {
 
   return useMutation({
     mutationFn: async ({ projectId }: { projectId: string }) => {
-      if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await completeCostEstiamtionStageApi({ projectId, api });
     },

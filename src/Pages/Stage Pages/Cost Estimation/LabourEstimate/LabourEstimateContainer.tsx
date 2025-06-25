@@ -27,16 +27,7 @@ const LabourEstimateContainer = () => {
     const [showAddRow, setShowAddRow] = useState(false);
     const [showform, setShowForm] = useState<boolean>(false);
 
-    console.log("projectId in component:", projectId); // MUST not be undefined
-
     const { data: labourList, isLoading, isError, error, refetch } = useGetLabourEstimation(projectId!);
-
-    console.log("Labour", labourList)
-
-
-    // console.log("error occured", error)
-    // console.log("Is Error occured", isError)
-
 
     const { mutateAsync: deleteLabour, isPending: deletePending } = useDeleteLabourEstimation();
     const { mutateAsync: editLabour, isPending: editPending } = useEditLabourEstimation();
@@ -60,11 +51,6 @@ const LabourEstimateContainer = () => {
             Retry
         </Button>
     </div>;
-
-
-
-
-
 
     const handleEdit = (labour: any) => {
         setEditingId(labour._id);
@@ -116,6 +102,9 @@ const LabourEstimateContainer = () => {
 
     const handleAdd = async () => {
         try {
+            if(newData.workType) {
+                throw new Error("Please Enter the workType")
+            }
             await addLabour({ projectId: projectId!, labourData: newData });
             setNewData({
                 workType: "",
@@ -134,88 +123,88 @@ const LabourEstimateContainer = () => {
     };
 
 
-    const llabourList = [
-  {
-    workType: "Carpenter",
-    noofPeople: 4,
-    daysPlanned: 30,
-    perdaySalary: 800,
-    weeklySalary: 22400,
-    totalCost: 96000
-  },
-  {
-    workType: "Electrician",
-    noofPeople: 3,
-    daysPlanned: 28,
-    perdaySalary: 700,
-    weeklySalary: 14700,
-    totalCost: 58800
-  },
-  {
-    workType: "Painter",
-    noofPeople: 5,
-    daysPlanned: 21,
-    perdaySalary: 600,
-    weeklySalary: 21000,
-    totalCost: 63000
-  },
-  {
-    workType: "Plumber",
-    noofPeople: 2,
-    daysPlanned: 14,
-    perdaySalary: 800,
-    weeklySalary: 11200,
-    totalCost: 22400
-  },
-  {
-    workType: "Welder",
-    noofPeople: 3,
-    daysPlanned: 35,
-    perdaySalary: 750,
-    weeklySalary: 15750,
-    totalCost: 78750
-  },
-  {
-    workType: "Mason",
-    noofPeople: 6,
-    daysPlanned: 25,
-    perdaySalary: 650,
-    weeklySalary: 27300,
-    totalCost: 97500
-  },
-  {
-    workType: "Tile Worker",
-    noofPeople: 2,
-    daysPlanned: 20,
-    perdaySalary: 800,
-    weeklySalary: 11200,
-    totalCost: 32000
-  },
-  {
-    workType: "Supervisor",
-    noofPeople: 1,
-    daysPlanned: 40,
-    perdaySalary: 1000,
-    weeklySalary: 7000,
-    totalCost: 40000
-  },
-  {
-    workType: "Fabricator",
-    noofPeople: 2,
-    daysPlanned: 18,
-    perdaySalary: 900,
-    weeklySalary: 12600,
-    totalCost: 32400
-  },
-  {
-    workType: "Cleaner",
-    noofPeople: 2,
-    daysPlanned: 15,
-    perdaySalary: 400,
-    weeklySalary: 5600,
-    totalCost: 12000
-  }
-];
+//     const llabourList = [
+//   {
+//     workType: "Carpenter",
+//     noofPeople: 4,
+//     daysPlanned: 30,
+//     perdaySalary: 800,
+//     weeklySalary: 22400,
+//     totalCost: 96000
+//   },
+//   {
+//     workType: "Electrician",
+//     noofPeople: 3,
+//     daysPlanned: 28,
+//     perdaySalary: 700,
+//     weeklySalary: 14700,
+//     totalCost: 58800
+//   },
+//   {
+//     workType: "Painter",
+//     noofPeople: 5,
+//     daysPlanned: 21,
+//     perdaySalary: 600,
+//     weeklySalary: 21000,
+//     totalCost: 63000
+//   },
+//   {
+//     workType: "Plumber",
+//     noofPeople: 2,
+//     daysPlanned: 14,
+//     perdaySalary: 800,
+//     weeklySalary: 11200,
+//     totalCost: 22400
+//   },
+//   {
+//     workType: "Welder",
+//     noofPeople: 3,
+//     daysPlanned: 35,
+//     perdaySalary: 750,
+//     weeklySalary: 15750,
+//     totalCost: 78750
+//   },
+//   {
+//     workType: "Mason",
+//     noofPeople: 6,
+//     daysPlanned: 25,
+//     perdaySalary: 650,
+//     weeklySalary: 27300,
+//     totalCost: 97500
+//   },
+//   {
+//     workType: "Tile Worker",
+//     noofPeople: 2,
+//     daysPlanned: 20,
+//     perdaySalary: 800,
+//     weeklySalary: 11200,
+//     totalCost: 32000
+//   },
+//   {
+//     workType: "Supervisor",
+//     noofPeople: 1,
+//     daysPlanned: 40,
+//     perdaySalary: 1000,
+//     weeklySalary: 7000,
+//     totalCost: 40000
+//   },
+//   {
+//     workType: "Fabricator",
+//     noofPeople: 2,
+//     daysPlanned: 18,
+//     perdaySalary: 900,
+//     weeklySalary: 12600,
+//     totalCost: 32400
+//   },
+//   {
+//     workType: "Cleaner",
+//     noofPeople: 2,
+//     daysPlanned: 15,
+//     perdaySalary: 400,
+//     weeklySalary: 5600,
+//     totalCost: 12000
+//   }
+// ];
 
 
     return (
@@ -280,11 +269,11 @@ const LabourEstimateContainer = () => {
                     </div>
 
                     <div className="divide-y divide-gray-100 shadow-md  rounded-lg max-h-[65vh] overflow-y-auto bg-white">
-                        {llabourList?.map((labour: any) => (
+                        {labourList?.map((labour: any) => (
                             <div key={labour._id} className={`grid grid-cols-7 rounded-lg items-center gap-2 px-6 py-4 text-sm ${editingId === labour._id ? "" : "hover:bg-[#f7fbff]"}`}>
                                 {editingId === labour._id ? (
                                     <>
-                                        <Input value={editData.workType} onChange={(e) => setEditData({ ...editData, workType: e.target.value })} />
+                                        <Input required={true} value={editData.workType} onChange={(e) => setEditData({ ...editData, workType: e.target.value })} />
                                         <Input type="number" value={editData.noOfPeople} onChange={(e) => setEditData({ ...editData, noOfPeople: +e.target.value })} />
                                         <Input type="number" value={editData.daysPlanned} onChange={(e) => setEditData({ ...editData, daysPlanned: +e.target.value })} />
                                         <Input type="number" value={editData.perdaySalary} onChange={(e) => setEditData({ ...editData, perdaySalary: +e.target.value })} />
@@ -315,6 +304,7 @@ const LabourEstimateContainer = () => {
                         {showAddRow &&
                             <div className="grid grid-cols-7 gap-2  px-6 py-4 text-sm  !bg-none">
                                 <Input
+                                required={true}
                                     placeholder="Work Type"
                                     value={newData.workType}
                                     onChange={(e) => setNewData({ ...newData, workType: e.target.value })}
