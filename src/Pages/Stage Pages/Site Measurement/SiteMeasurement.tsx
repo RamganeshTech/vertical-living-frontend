@@ -334,7 +334,7 @@ function HomeInteriorProject() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-full h-full overflow-y-scroll">
-      <div className='flex justify-between items-center border-2 mb-8'>
+      <div className='flex justify-between items-center  mb-8'>
         <div>
           <h1 className="text-3xl font-bold text-blue-700 mb-2">Home Interior Project</h1>
           <p className="text-gray-600">Plan your dream home by adding site measurements and room details</p>

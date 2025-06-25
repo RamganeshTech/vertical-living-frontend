@@ -46,6 +46,8 @@ import RoomDetailCard from './Pages/Stage Pages/MaterialSelectionRoom/RoomDetail
 import { CostEstimationContainer } from './Pages/Stage Pages/Cost Estimation/CostEstimationContainer'
 import CostEstimationRoomDetails from './Pages/Stage Pages/Cost Estimation/CostEstimationRoomDetails'
 import LabourEstimateContainer from './Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer'
+import OrderMaterialOverview from './Pages/Stage Pages/Ordering Materials/OrderMaterialOverview'
+import OrderMaterialRoomDetails from './Pages/Stage Pages/Ordering Materials/OrderMaterialRoomDetails'
 
 function App() {
 
@@ -143,6 +145,11 @@ function App() {
           <Route path="costestimation" element={<CostEstimationContainer />} >
             <Route path="roomdetails/:roomId" element={<CostEstimationRoomDetails />} />
             <Route path="roomdetails/labour" element={<LabourEstimateContainer />} />
+          </Route>
+
+
+            <Route path="orderingmaterial" element={<OrderMaterialOverview />} >
+            <Route path="roomdetails/:roomId" element={<OrderMaterialRoomDetails />} />
           </Route>
 
         </Route>
