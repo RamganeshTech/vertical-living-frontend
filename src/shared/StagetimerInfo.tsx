@@ -29,7 +29,7 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, completedAt, deadLine
 
     const [editMode, setEditMode] = useState(false);
 
-    console.log("completed date form teech", completedAt)
+    // console.log("completed date form teech", completedAt)
     useEffect(() => {
         const interval = setInterval(() => {
             setNow(new Date());

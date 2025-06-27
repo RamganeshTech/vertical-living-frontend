@@ -8,22 +8,21 @@ import type { EditLabourType } from "../../Pages/Stage Pages/Cost Estimation/Lab
 
 const allowedRoles = ["owner", "staff", "CTO"]
 
-
 // GET entire cost estimation data for a project
-export const getCostEstimationByProjectApi = async (projectId: string, api: AxiosInstance) => {
+ const getCostEstimationByProjectApi = async (projectId: string, api: AxiosInstance) => {
   const { data } = await api.get(`/costestimation/${projectId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
 // GET single room estimation
-export const getSingleRoomEstimationApi = async (projectId: string, roomId: string, api: AxiosInstance) => {
+ const getSingleRoomEstimationApi = async (projectId: string, roomId: string, api: AxiosInstance) => {
   const { data } = await api.get(`/costestimation/${projectId}/room/${roomId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
-export const getLabourEstiamtionApi = async (projectId: string, api: AxiosInstance) => {
+ const getLabourEstiamtionApi = async (projectId: string, api: AxiosInstance) => {
   const { data } = await api.get(`/costestimation/${projectId}/labour/getlabour`);
   console.log(data, "data form labour estiamtion")
   if (!data.ok) throw new Error(data.message);
@@ -32,7 +31,7 @@ export const getLabourEstiamtionApi = async (projectId: string, api: AxiosInstan
 
 
 // PATCH material estimation
-export const updateMaterialEstimationItemApi = async (
+ const updateMaterialEstimationItemApi = async (
   projectId: string,
   materialKey: string,
   updates: {
@@ -48,7 +47,7 @@ export const updateMaterialEstimationItemApi = async (
 };
 
 // POST labour estimation
-export const addLabourEstimationApi = async (
+ const addLabourEstimationApi = async (
   projectId: string,
   labourData: any,
   api: AxiosInstance
@@ -60,7 +59,7 @@ export const addLabourEstimationApi = async (
 };
 
 // PATCH labour estimation
-export const editLabourEstimationApi = async (
+ const editLabourEstimationApi = async (
   projectId: string,
   labourId: string,
   updates: any,
@@ -72,7 +71,7 @@ export const editLabourEstimationApi = async (
 };
 
 // DELETE labour estimation
-export const deleteLabourEstimationApi = async (
+ const deleteLabourEstimationApi = async (
   projectId: string,
   labourId: string,
   api: AxiosInstance
@@ -83,7 +82,7 @@ export const deleteLabourEstimationApi = async (
 };
 
 // UPLOAD files
-export const uploadCostEstimationFilesApi = async (
+ const uploadCostEstimationFilesApi = async (
   projectId: string,
   roomId: string,
   formData: FormData,
@@ -95,7 +94,7 @@ export const uploadCostEstimationFilesApi = async (
 };
 
 // DELETE file
-export const deleteCostEstimationFileApi = async (
+ const deleteCostEstimationFileApi = async (
   projectId: string,
   roomId: string,
   fileId: string,
@@ -110,7 +109,7 @@ export const deleteCostEstimationFileApi = async (
 
 
 // ✅ 10. Set Deadline
-export const setCostDeadlineApi = async ({
+ const setCostDeadlineApi = async ({
   formId,
   deadLine,
   api,
@@ -125,7 +124,7 @@ export const setCostDeadlineApi = async ({
 };
 
 // ✅ 11. Complete Stage
-export const completeCostEstiamtionStageApi = async ({
+ const completeCostEstiamtionStageApi = async ({
   projectId,
   api,
 }: {
@@ -140,9 +139,7 @@ export const completeCostEstiamtionStageApi = async ({
 // ---------------- Custom Hooks ----------------
 
 export const useGetCostEstimationByProject = (projectId: string) => {
-
   const allowedRoles = ["staff", "CTO", "owner"]
-
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -153,7 +150,6 @@ export const useGetCostEstimationByProject = (projectId: string) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
       if (!api) throw new Error("API instance not found for role");
-
 
       return await getCostEstimationByProjectApi(projectId, api!)
     },

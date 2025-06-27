@@ -188,8 +188,8 @@ const TechnicalConsultant = () => {
 
     return (
         <div className="max-w-full h-full  mx-auto p-2">
-            <div className='flex justify-between w-full'>
-                <h2 className="text-2xl font-semibold text-blue-800 mb-6 flex items-center">
+            <div className='flex justify-between w-full mb-4'>
+                <h2 className="text-3xl font-semibold text-blue-600 flex items-center">
                     <i className="fas fa-comments mr-2"></i> Technical Consultation
                 </h2>
 

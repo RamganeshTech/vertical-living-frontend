@@ -2,6 +2,7 @@ import React, { memo, useState } from 'react'
 import { COMPANY_DETAILS, } from '../constants/constants'
 import useSidebarShortcut from '../Hooks/useSideBarShortcut'
 import { Link } from 'react-router-dom'
+import '../../src/App.css'
 import SidebarIcons from '../components/SidebarIcons'
 
 
@@ -30,7 +31,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
         <>
             {showSideBar ?
                 <aside className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
-                    <div className="flex flex-col flex-grow overflow-y-auto p-2">
+                    <div className="flex flex-col flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar p-2">
                         <div className='flex justify-between items-center border-b-1 py-2'>
                             <span className='text-xl'>{COMPANY_DETAILS.COMPANY_NAME}</span>
                             <div className='w-[30px] h-[30px]' >
@@ -65,19 +66,10 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                         onClick={handleSideBarClose} className='absolute flex items-center justify-center outline-none bg-[#2f303a] right-[-5%] bottom-[0%] cursor-pointer w-[40px] h-[40px] border-2 border-blue-600'>
                         <i className="fa-solid fa-chevron-left"></i>
                     </button>
-
-                    {/* <div className="flex justify-between items-center px-3 py-2 border-t border-[#3f4050] text-[#fbbf24] text-[12px]">
-                        <button aria-label="User A" className="flex items-center justify-center w-7 h-7 rounded-full bg-[#fbbf24] text-[#1f2937] font-bold">A</button>
-                        <button aria-label="Calendar" className="hover:text-white"><i className="far fa-calendar-alt"></i></button>
-                        <button aria-label="Users" className="hover:text-white"><i className="fas fa-users"></i></button>
-                        <button aria-label="Tasks" className="hover:text-white"><i className="fas fa-tasks"></i></button>
-                        <button aria-label="Notifications" className="hover:text-white"><i className="far fa-bell"></i></button>
-                    </div> */}
-
                 </aside>
                 :
-                <aside className="flex flex-col py-2 justify-between bg-[#2f303a] w-[4%] min-h-screen text-[#9ca3af] transition-all duration-300 ">
-                    <div>
+                <aside className="flex flex-col relative justify-between bg-[#2f303a] w-[6%]  max-h-full  text-[#9ca3af] transition-all duration-300 ">
+                    <div className='max-h-[95%] overflow-y-auto overflow-x-hidden custom-scrollbar'>
                         <div className='flex items-center flex-col justify-between w-full'>
 
                             {/* <SidebarIcons path icons={icons} activeSidebar={activeSidebar} setActiveSidebar={setActiveSidebar} /> */}
@@ -99,11 +91,11 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                             )}
 
                         </div>
-                    </div>
 
+                    </div>
                     <button
                         title=" Ctrl+[ to open"
-                        onClick={handleSideBarOpen} className='cursor-pointer outline-none border-[#9ca3af]  h-[5%] w-full'>
+                        onClick={handleSideBarOpen} className='cursor-pointer outline-none border-[#9ca3af]  h-[5%] !w-[82%]'>
                         <i className={` fa-solid fa-chevron-right text-[#4a86f7]`}></i>
                     </button>
                 </aside>

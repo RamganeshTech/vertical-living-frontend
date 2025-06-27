@@ -336,18 +336,20 @@ function HomeInteriorProject() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-full h-full overflow-y-scroll">
       <div className='flex justify-between items-center  mb-8'>
         <div>
-          <h1 className="text-3xl font-bold text-blue-700 mb-2">Home Interior Project</h1>
+          <h2 className="text-3xl font-semibold text-blue-600 mb-3 flex items-center">
+            <i className="fa-solid fa-receipt mr-2"></i>Site Measurement
+          </h2>
           <p className="text-gray-600">Plan your dream home by adding site measurements and room details</p>
         </div>
 
-       <div className='flex items-center gap-2 justify-between'>
-         <Button onClick={handleCompletionStatus} className="bg-green-600 mt-2 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
-          <i className="fa-solid fa-circle-check mr-2"></i>
-          Mark as Complete
-        </Button>
+        <div className='flex items-center gap-2 justify-between'>
+          <Button onClick={handleCompletionStatus} className="bg-green-600 mt-2 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
+            <i className="fa-solid fa-circle-check mr-2"></i>
+            Mark as Complete
+          </Button>
 
-        <ResetStageButton projectId={projectId!} stageNumber={2} stagePath="sitemeasurement" />
-       </div>
+          <ResetStageButton projectId={projectId!} stageNumber={2} stagePath="sitemeasurement" />
+        </div>
       </div>
 
       <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">

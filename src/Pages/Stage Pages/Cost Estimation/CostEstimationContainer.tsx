@@ -62,7 +62,7 @@ export const CostEstimationContainer = () => {
           <div className='h-full overflow-y-scroll'>
             <div className="flex justify-between w-full mb-3">
               <h2 className="text-3xl font-semibold text-blue-600 mb-3 flex items-center">
-                <i className="fas fa-box mr-2"></i> Cost Estimation
+               <i className="fa-solid fa-money-bill-1-wave mr-2"></i> Cost Estimation
               </h2>
 
               <div className="flex gap-2 items-center ">

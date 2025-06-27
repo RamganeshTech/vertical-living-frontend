@@ -182,9 +182,12 @@ const SampleDesignModule: React.FC = () => {
   }
 
   return (
-    <div className="container h-full overflow-y-scroll mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-full">
+    <div className="container h-full overflow-y-scroll mx-auto max-w-full">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-700">Sample Design Files</h1>
+
+         <h2 className="text-3xl font-semibold text-blue-600 mb-3 flex items-center">
+            <i className="fa-solid fa-object-group mr-2"></i>Sample Design Files
+          </h2>
 
         <div className='flex items-center gap-2 justify-between'>
           <button

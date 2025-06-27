@@ -203,7 +203,9 @@ export default function RequirementForm() {
 
           <div className='flex justify-between w-full'>
             <div>
-              <h1 className="text-3xl font-bold text-blue-700 mb-2">Client Requriement</h1>
+                <h2 className="text-3xl font-semibold text-blue-600 mb-3 flex items-center">
+            <i className="fa-solid fa-pencil mr-2"></i>Client Requriement
+          </h2>
             </div>
 
            <ResetStageButton projectId={projectId!} stageNumber={1} stagePath="requirementform" />

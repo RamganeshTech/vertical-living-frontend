@@ -48,6 +48,11 @@ import CostEstimationRoomDetails from './Pages/Stage Pages/Cost Estimation/CostE
 import LabourEstimateContainer from './Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer'
 import OrderMaterialOverview from './Pages/Stage Pages/Ordering Materials/OrderMaterialOverview'
 import OrderMaterialRoomDetails from './Pages/Stage Pages/Ordering Materials/OrderMaterialRoomDetails'
+import FormOrderMaterial from './Pages/Stage Pages/Ordering Materials/FormOrderMaterial'
+import MaterialArrivalOverview from './Pages/Stage Pages/MaterialArrival/MaterialArrivalOverview'
+import MaterialArrivalRoomDetail from './Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail'
+import PublicMaterialArrival from './Pages/Stage Pages/MaterialArrival/PublicMaterialArrival'
+import PublicOrderMaterial from './Pages/Stage Pages/Ordering Materials/PublicOrderMaterial'
 
 function App() {
 
@@ -148,8 +153,13 @@ function App() {
           </Route>
 
 
-            <Route path="orderingmaterial" element={<OrderMaterialOverview />} >
-            <Route path="roomdetails/:roomId" element={<OrderMaterialRoomDetails />} />
+            <Route path="ordermaterial" element={<OrderMaterialOverview />} >
+            <Route path="ordermaterialroom/:roomKey" element={<OrderMaterialRoomDetails />} />
+          </Route>
+
+
+             <Route path="materialarrival" element={<MaterialArrivalOverview />} >
+            <Route path="materialarrivalroom/:roomKey" element={<MaterialArrivalRoomDetail />} />
           </Route>
 
         </Route>
@@ -181,6 +191,8 @@ function App() {
         {/* REQUIREMENT FORM LINK */}
 
         <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
+        <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderMaterial />} />
+        <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
 
 
       </Routes>
