@@ -53,6 +53,9 @@ import MaterialArrivalOverview from './Pages/Stage Pages/MaterialArrival/Materia
 import MaterialArrivalRoomDetail from './Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail'
 import PublicMaterialArrival from './Pages/Stage Pages/MaterialArrival/PublicMaterialArrival'
 import PublicOrderMaterial from './Pages/Stage Pages/Ordering Materials/PublicOrderMaterial'
+import WorkMainOverview from './Pages/Stage Pages/Work Schedule/WorkMainOverView'
+import WorkSchedulePage from './Pages/Stage Pages/Work Schedule/WorkSchedulePage'
+import DailySchedulePage from './Pages/Stage Pages/Work Schedule/DailySchedulePage'
 
 function App() {
 
@@ -160,6 +163,11 @@ function App() {
 
              <Route path="materialarrival" element={<MaterialArrivalOverview />} >
             <Route path="materialarrivalroom/:roomKey" element={<MaterialArrivalRoomDetail />} />
+          </Route>
+
+            <Route path="workmainschedule" element={<WorkMainOverview />} >
+            <Route path="workschedule/:sectionId" element={<WorkSchedulePage />} />
+            <Route path="dailyschedule/:sectionId" element={<DailySchedulePage />} />
           </Route>
 
         </Route>

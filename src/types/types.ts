@@ -358,3 +358,161 @@ export interface IMaterialSelectionRoomConfirmation {
     deadLine: Date | null;
   };
 }
+
+
+
+
+
+
+// TYPES FOR WORK SCHEDULE, STAGE 10 
+
+// export interface IUploadFile {
+//     type: "image" | "pdf";
+//     url: string;
+//     originalName?: string;
+//     uploadedAt?: Date;
+// }
+
+// export interface IWorkScheduleTimer {
+//     startedAt: Date | null;
+//     completedAt: Date | null;
+//     deadLine: Date | null;
+//     reminderSent: boolean
+// }
+
+// // interfaces/ProjectStageSchedule.ts
+// export interface IWorkMainStageSchedule {
+//     projectId: string;
+//     dailyScheduleId: string; // ref to DailySchedule
+//     workScheduleId: string;  // ref to WorkSchedule
+//     mdApproval: {
+//         status: "pending" | "approved" | "rejected";
+//         remarks: string;
+//     };
+//     timer: IWorkScheduleTimer;
+//     status: "pending" | "completed";
+//     isEditable: boolean;
+// }
+
+// // interfaces/DailySchedule.ts
+// export interface IDailySchedule {
+//     projectId: string;
+//     stageId: string; // ref to ProjectStageSchedule
+//     tasks: IDailyTask[];
+//     status: "pending" | "completed";
+//     remarks: string;
+// }
+
+// export interface IDailyTask {
+//     date: string; // ISO date
+//     description: string;
+//     taskName: String
+//     status: "not_started" | "in_progress" | "completed";
+//     upload:IUploadFile,
+//     assignedTo: string
+// }
+
+// // interfaces/WorkSchedule.ts
+// export interface IWorkSchedule {
+//     projectId: string;
+//     stageId: string; // ref to ProjectStageSchedule
+//     plans: IWorkPlan[];
+//     status: "pending" | "completed";
+//     remarks: string;
+// }
+
+// export interface IWorkPlan {
+//     workType: string;
+//     startDate: string; // ISO date
+//     endDate: string;   // ISO date
+//     assignedTo: string;
+//     notes: string;
+//     upload:IUploadFile
+// }
+
+
+// TYPES FOR WORK SCHEDULE, STAGE 10 
+
+export interface IUploadFile {
+  type: "image" | "pdf";
+  url: string;
+  originalName?: string;
+  uploadedAt?: Date;
+}
+
+export interface IWorkScheduleTimer {
+  startedAt: Date | null;
+  completedAt: Date | null;
+  deadLine: Date | null;
+  reminderSent: boolean;
+}
+
+export interface IWorkMainStageSchedule {
+  projectId: string;
+  dailyScheduleId: string;
+  workScheduleId: string;
+  mdApproval: {
+    status: "pending" | "approved" | "rejected";
+    remarks: string;
+  };
+  timer: IWorkScheduleTimer;
+  status: "pending" | "completed";
+  isEditable: boolean;
+}
+
+export interface IDailySchedule {
+  projectId: string;
+  stageId: string;
+  tasks: IDailyTask[];
+  status: "pending" | "completed";
+  remarks: string;
+}
+
+export interface IDailyTask {
+  taskName: string;
+  date: string;
+  description: string;
+  status: "not_started" | "in_progress" | "completed";
+  upload?: IUploadFile;
+  assignedTo: string;
+}
+
+export interface IWorkSchedule {
+  projectId: string;
+  stageId: string;
+  plans: IWorkPlan[];
+  status: "pending" | "completed";
+  remarks: string;
+}
+
+export interface IWorkPlan {
+  workType: string;
+  startDate: string;
+  endDate: string;
+  assignedTo: string;
+  notes: string;
+  upload?: IUploadFile;
+}
+
+// ✅ New: Payloads for form usage
+
+export interface AddDailyTaskPayload {
+  taskName: string;
+  date: string;
+  description: string;
+  assignedTo: string;
+  file?: File;
+}
+
+export interface UpdateDailyTaskPayload extends AddDailyTaskPayload {
+  status: "not_started" | "in_progress" | "completed";
+}
+
+export interface AddWorkPlanPayload {
+  workType: string;
+  startDate: string;
+  endDate: string;
+  assignedTo: string;
+  notes: string;
+  file?: File;
+}

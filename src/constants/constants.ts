@@ -43,6 +43,7 @@ export const PROJECTS_LABELS = {
   COSTESTIMATION: "Cost Estiamtion",
   ORDERMATERIALS: "Ordering Material",
   MATERIALARRIVED: "Material Arrival",
+  WORKSCHEDULE: "Work Schedule",
 }
 
 
@@ -60,6 +61,8 @@ export const PROJECTS_ICONS = {
   COSTESTIMATION: "fa-solid fa-money-bill-1-wave text-2xl",
   ORDERMATERIALS: "fa-solid fa-shopping-cart text-2xl",
   MATERIALARRIVED: "fa-solid fa-receipt text-2xl",
+  WORKSCHEDULE: "fas fa-digging text-2xl",
+
 }
 
 
@@ -67,8 +70,6 @@ export const COMPANY_DETAILS = {
   COMPANY_NAME: "Vertical living",
   COMPANY_LOGO: "https://th.bing.com/th/id/OIP.Uparc9uI63RDb82OupdPvwAAAA?w=80&h=80&c=1&bgcl=c77779&r=0&o=6&dpr=1.3&pid=ImgRC"
 }
-
-
 
 
 export const requiredFieldsByRoomOrderMaterials: Record<string, string[]> = {
