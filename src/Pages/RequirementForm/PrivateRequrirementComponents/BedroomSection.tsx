@@ -76,7 +76,7 @@ const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label>Number of Bedrooms</Label>
-          <Input type="number" name="numberOfBedrooms" value={formData.numberOfBedrooms} onChange={handleChange} min={1} />
+          <Input type="number" name="numberOfBedrooms" value={formData.numberOfBedrooms ?? ""} onChange={handleChange} min={1} />
         </div>
 
         <div>
@@ -95,22 +95,22 @@ const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable
         </div>
 
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="wardrobeIncluded" checked={formData.wardrobeIncluded} onChange={handleChange} />
+          <input type="checkbox" name="wardrobeIncluded" checked={formData.wardrobeIncluded ?? undefined} onChange={handleChange} />
           <Label>Wardrobe Included</Label>
         </div>
 
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="falseCeilingRequired" checked={formData.falseCeilingRequired} onChange={handleChange} />
+          <input type="checkbox" name="falseCeilingRequired" checked={formData.falseCeilingRequired ?? undefined} onChange={handleChange} />
           <Label>False Ceiling Required</Label>
         </div>
 
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="tvUnitRequired" checked={formData.tvUnitRequired} onChange={handleChange} />
+          <input type="checkbox" name="tvUnitRequired" checked={formData.tvUnitRequired ?? undefined} onChange={handleChange} />
           <Label>TV Unit Required</Label>
         </div>
 
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="studyTableRequired" checked={formData.studyTableRequired} onChange={handleChange} />
+          <input type="checkbox" name="studyTableRequired" checked={formData.studyTableRequired ?? undefined} onChange={handleChange} />
           <Label>Study Table Required</Label>
         </div>
 

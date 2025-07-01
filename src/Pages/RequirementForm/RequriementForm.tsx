@@ -15,6 +15,9 @@ import StageTimerInfo from "../../shared/StagetimerInfo";
 import RequirementFileUploader from "../../shared/StageFileUploader";
 import useGetRole from "../../Hooks/useGetRole";
 import { ResetStageButton } from "../../shared/ResetStageButton";
+import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import ClientInfoCard from "./components/ClientInfoCard";
+import SectionCards from "./components/SectionCards";
 
 
 export type PrivateRequriementFromProp = {
@@ -68,28 +71,10 @@ export default function RequirementForm() {
   const { mutateAsync: uploadFilesMutate, isPending: uploadPending } = useUploadRequirementFiles();
   const { mutateAsync: deleteFormMutate, isPending: deleteFormPending } = useDeleteRequriementForm();
 
-
-
-
-  if (isLoading) return <div className="p-8">Loading form...</div>;
+  if (isLoading) return <MaterialOverviewLoading />;
   // if (isError || !formData) return <div className="p-8">{(error as any).response?.data.message || "Failed to fetch form data."}</div>;
 
-
   const client = formData?.clientData;
-
-
-
-  // const handleSetDeadline = async () => {
-  //   try {
-  //     if (!formData._id || !deadLine) return;
-  //     await deadLineMutate({ formId: formData._id, deadLine })
-  //     toast({ title: "Success", description: "deadline updated successfully" })
-  //   }
-  //   catch (error: any) {
-  //     toast({ title: "Error", description: error?.response?.data?.message || "Failed to update to deadline the form", variant: "destructive" })
-  //   }
-  // };
-
 
   const handleFormDeletion = async () => {
     if (!window.confirm(`Are you sure you want to delete this form?`)) return
@@ -131,18 +116,9 @@ export default function RequirementForm() {
 
     try {
       const allowedRoles = ["owner", "staff", "CTO"]
-      // console.log("role is not get")
-
-
-      // console.log("role is not get")
-
-      // console.log(role, role, role)
-
       if (!role) throw new Error("Not Authorized")
       console.log(role, role, role)
       if (!allowedRoles.includes(role)) throw new Error("Dont have the access")
-
-
       await navigator.clipboard.writeText(link)
       setCopied(true)
       toast({ title: "Success", description: "Link copied to clipboard" })
@@ -173,9 +149,6 @@ export default function RequirementForm() {
     }
   }
 
-
-
-
   const handleShareWhatsApp = () => {
     const message = `You're requeted to fill the form, Click this link to fill the form: ${inviteLink}`
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
@@ -199,175 +172,134 @@ export default function RequirementForm() {
           ))}
         </>
       ) : (
-        <div className="p-4 h-full overflow-y-auto sm:p-8 space-y-6">
+        <div className="h-full space-y-4 p-2">
 
-          <div className='flex justify-between w-full'>
+          <div className='flex justify-between w-full items-center '>
             <div>
-                <h2 className="text-3xl font-semibold text-blue-600 mb-3 flex items-center">
-            <i className="fa-solid fa-pencil mr-2"></i>Client Requriement
-          </h2>
+              <h2 className="text-3xl font-semibold text-blue-600 mb-3 flex items-center">
+                <i className="fa-solid fa-pencil mr-2"></i>Client Requriement
+              </h2>
             </div>
 
-           <ResetStageButton projectId={projectId!} stageNumber={1} stagePath="requirementform" />
+
+            <div className="flex gap-3">
+              <Button onClick={handleLockForm} className="bg-yellow-100 hover:bg-yellow-100  border-yellow-400 text-yellow-800 w-full sm:w-auto">
+                <i className="fa-solid fa-lock mr-2"></i>
+                Lock Form
+              </Button>
+              <Button onClick={handleFormCompletion} className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
+                <i className="fa-solid fa-circle-check mr-2"></i>
+                Mark as Complete
+              </Button>
+              <Button onClick={handleFormDeletion} className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto">
+                <i className="fa-solid fa-trash-can mr-2"></i>
+                Delete Form
+              </Button>
+
+              <ResetStageButton projectId={projectId!} stageNumber={1} stagePath="requirementform" />
+            </div>
           </div>
 
-          {/* 1. Timer Section */}
-          <Card className="p-4  w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
-            <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
-              <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
-              <span>Stage Timings</span>
-            </div>
-
-            {/* Keep content within this component, it will now handle horizontal layout */}
-            <StageTimerInfo
-              startedAt={formData.timer.startedAt}
-              refetchStageMutate={refetch}
-              completedAt={formData.timer.completedAt}
-              deadLine={formData.timer.deadLine}
-              formId={formData._id}
-              deadLineMutate={deadLineMutate}
-              isPending={deadLinePending}
-            />
-          </Card>
-
-
-          {/* 2. Client Info & Uploads */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <i className="fa-solid fa-user-tie text-blue-500"></i>
-                Client Info
-              </h2>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-user text-gray-600"></i>
-                  <strong>Name:</strong> {client?.clientName || "No data"}
-                </div>
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-envelope text-gray-600"></i>
-                  <strong>Email:</strong> {client?.email || "No data"}
-                </div>
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-phone text-gray-600"></i>
-                  <strong>WhatsApp:</strong> {client?.whatsapp || "No data"}
-                </div>
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-location-dot text-gray-600"></i>
-                  <strong>Location:</strong> {client?.location || "No data"}
-                </div>
+          <main className="max-h-[90%] space-y-4 overflow-y-auto">
+            {/* 1. Timer Section */}
+            <Card className="p-4  w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
+              <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
+                <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+                <span>Stage Timings</span>
               </div>
+
+              {/* Keep content within this component, it will now handle horizontal layout */}
+              <StageTimerInfo
+                startedAt={formData.timer.startedAt}
+                refetchStageMutate={refetch}
+                completedAt={formData.timer.completedAt}
+                deadLine={formData.timer.deadLine}
+                formId={formData._id}
+                deadLineMutate={deadLineMutate}
+                isPending={deadLinePending}
+              />
             </Card>
 
-            <div className="">
-              <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
-                <RequirementFileUploader
-                  formId={formData._id}
-                  existingUploads={formData.uploads}
-                  onUploadComplete={refetch}
-                  uploadFilesMutate={uploadFilesMutate}
-                  uploadPending={uploadPending}
-                />
-              </Card>
-            </div>
-          </div>
 
-          {/* 3. Section Config Cards */}
-          <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {SectionConfig.map(({ key, label, icon }, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl border-l-4 border-blue-600 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group"
-                onClick={() => setVisibleSection(key)}
-              >
-                <div className="flex items-center justify-between p-5 gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 text-blue-600 p-3 rounded-full text-xl">
-                      <i className={icon}></i>
-                    </div>
-                    <span className="text-sm font-medium text-gray-800 group-hover:text-blue-700">
-                      {label}
-                    </span>
-                  </div>
-                  <i className="fa-solid fa-chevron-right text-blue-400 group-hover:text-blue-600 transition" />
-                </div>
-              </div>
-            ))}
-          </section>
+            {/* 2. Client Info & Uploads */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ClientInfoCard client={formData.clientData} />
 
-          {/* 4. Control Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-6">
-            <Button onClick={handleLockForm} variant="outline" className="bg-yellow-100 border-yellow-400 text-yellow-800 w-full sm:w-auto">
-              <i className="fa-solid fa-lock mr-2"></i>
-              Lock Form
-            </Button>
-            <Button onClick={handleFormCompletion} className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
-              <i className="fa-solid fa-circle-check mr-2"></i>
-              Mark as Complete
-            </Button>
-            <Button onClick={handleFormDeletion} className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto">
-              <i className="fa-solid fa-trash-can mr-2"></i>
-              Delete Form
-            </Button>
-          </div>
-
-          {/* 5. Form Link Section */}
-          <div className="pt-6">
-            {!formData.projectId ? (
-              <div className="bg-white p-6 rounded-2xl shadow-lg space-y-6">
-                <h2 className="text-xl font-bold text-blue-900 flex items-center">
-                  <i className="fas fa-link mr-2" /> Generate Form Link
-                </h2>
-                <p className="text-sm text-gray-600">
-                  Request to fill the form by generating a link.
-                </p>
-                {!inviteLink ? (
-                  <Button
-                    onClick={handleGenerateInviteLink}
-                    isLoading={linkPending}
-                    className="w-full bg-blue-600 text-white py-3"
-                  >
-                    <i className="fas fa-link mr-2" /> Generate Form Link
-                  </Button>
-                ) : (
-                  <div className="space-y-4">
-                    <Label>Form Link</Label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        value={inviteLink}
-                        readOnly
-                        className="bg-blue-50 text-blue-800 flex-1"
-                      />
-                      <Button onClick={handleCopyLink}>
-                        <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
-                      </Button>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button onClick={handleShareWhatsApp} className="w-full bg-green-600 text-white">
-                        <i className="fab fa-whatsapp mr-2" /> Share on WhatsApp
-                      </Button>
-                      <Button onClick={handleCopyLink} className="w-full border border-blue-400 text-blue-700">
-                        <i className="fas fa-copy mr-2" /> Copy
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <Label>Form Link</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={`http://localhost:5173/requirementform/${projectId}/token=${formData?.shareToken}`}
-                    readOnly
-                    className="bg-blue-50 text-blue-800 flex-1"
+              <div className="">
+                <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
+                  <RequirementFileUploader
+                    formId={formData._id}
+                    existingUploads={formData.uploads}
+                    onUploadComplete={refetch}
+                    uploadFilesMutate={uploadFilesMutate}
+                    uploadPending={uploadPending}
                   />
-                  <Button onClick={() => handleCopyStaticLink(`http://localhost:5173/requirementform/${projectId}/token=${formData?.shareToken}`)}>
-                    <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
-                  </Button>
-                </div>
+                </Card>
               </div>
-            )}
-          </div>
+            </div>
+
+            {/* 3. Section Config Cards */}
+            <SectionCards sections={SectionConfig} setVisibleSection={setVisibleSection} />
+
+            {/* 4. Form Link Section */}
+            <div className="pt-6">
+              {!formData.projectId ? (
+                <div className="bg-white p-6 rounded-2xl shadow-lg space-y-6">
+                  <h2 className="text-xl font-bold text-blue-900 flex items-center">
+                    <i className="fas fa-link mr-2" /> Generate Form Link
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Request to fill the form by generating a link.
+                  </p>
+                  {!inviteLink ? (
+                    <Button
+                      onClick={handleGenerateInviteLink}
+                      isLoading={linkPending}
+                      className="w-full bg-blue-600 text-white py-3"
+                    >
+                      <i className="fas fa-link mr-2" /> Generate Form Link
+                    </Button>
+                  ) : (
+                    <div className="space-y-4">
+                      <Label>Form Link</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={inviteLink}
+                          readOnly
+                          className="bg-blue-50 text-blue-800 flex-1"
+                        />
+                        <Button onClick={handleCopyLink}>
+                          <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
+                        </Button>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Button onClick={handleShareWhatsApp} className="w-full bg-green-600 text-white">
+                          <i className="fab fa-whatsapp mr-2" /> Share on WhatsApp
+                        </Button>
+                        <Button onClick={handleCopyLink} className="w-full border border-blue-400 text-blue-700">
+                          <i className="fas fa-copy mr-2" /> Copy
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <Label>Form Link</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={`http://localhost:5173/requirementform/${projectId}/token=${formData?.shareToken}`}
+                      readOnly
+                      className="bg-blue-50 text-blue-800 flex-1"
+                    />
+                    <Button onClick={() => handleCopyStaticLink(`http://localhost:5173/requirementform/${projectId}/token=${formData?.shareToken}`)}>
+                      <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </main>
         </div>
       )}
     </>

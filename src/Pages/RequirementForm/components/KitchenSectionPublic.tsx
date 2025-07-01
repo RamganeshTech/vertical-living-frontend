@@ -10,44 +10,45 @@ import {
 } from "../../../components/ui/Select";
 import { Separator } from "../../../components/ui/Seperator";
 import { Textarea } from "../../../components/ui/TextArea";
+import { Button } from "../../../components/ui/Button";
 
 const KitchenSectionPublic = ({ formData, setFormData }: any) => {
- const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-) => {
-  const target = e.target;
-  const { name, type, value } = target;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const target = e.target;
+    const { name, type, value } = target;
 
-  let finalValue: string | number | boolean = value;
+    let finalValue: string | number | boolean = value;
 
-  if (type === "checkbox") {
-    finalValue = (target as HTMLInputElement).checked;
-  } else if (type === "number") {
-       const parsedValue = parseFloat(value);
-    finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
-   }
+    if (type === "checkbox") {
+      finalValue = (target as HTMLInputElement).checked;
+    } else if (type === "number") {
+      const parsedValue = parseFloat(value);
+      finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
+    }
 
-  if (["top", "left", "right"].includes(name)) {
-    setFormData((prev: any) => ({
-      ...prev,
-      kitchen: {
-        ...prev.kitchen,
-        measurements: {
-          ...prev.kitchen?.measurements,
+    if (["top", "left", "right"].includes(name)) {
+      setFormData((prev: any) => ({
+        ...prev,
+        kitchen: {
+          ...prev.kitchen,
+          measurements: {
+            ...prev.kitchen?.measurements,
+            [name]: finalValue,
+          },
+        },
+      }));
+    } else {
+      setFormData((prev: any) => ({
+        ...prev,
+        kitchen: {
+          ...prev.kitchen,
           [name]: finalValue,
         },
-      },
-    }));
-  } else {
-    setFormData((prev: any) => ({
-      ...prev,
-      kitchen: {
-        ...prev.kitchen,
-        [name]: finalValue,
-      },
-    }));
-  }
-};
+      }));
+    }
+  };
 
 
   const handleSelectChange = (name: string, value: string) => {
@@ -57,6 +58,22 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
         ...prev.kitchen,
         [name]: value,
       },
+    }));
+  };
+
+
+
+  const handleResetBedroom = () => {
+    setFormData((prev: any) => ({
+      ...prev,
+      kitchen: {
+        layoutType: null,
+        kitchenPackage: null,
+        measurements: { top: null, left: null, right: null },
+        graniteCountertop: null,
+        numberOfShelves: null,
+        notes: null,
+      },// or {} if you prefer to use empty object instead of null
     }));
   };
 
@@ -105,7 +122,7 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
           </Select>
         </div>
 
-      
+
 
         {/* Number of Shelves */}
         <div>
@@ -151,10 +168,10 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
           />
         </div>
 
-          {/* Granite Countertop */}
+        {/* Granite Countertop */}
         <div className="flex  items-center">
           <input
-          id="graniteCountertop"
+            id="graniteCountertop"
             type="checkbox"
             name="graniteCountertop"
             checked={formData?.kitchen?.graniteCountertop || false}
@@ -178,9 +195,18 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
         </div>
       </div>
 
+      <div className="flex justify-end mt-4">
+        <Button
+          variant="outline"
+          className="border-red-500 text-red-500 hover:bg-red-50"
+          onClick={handleResetBedroom}
+        >
+          <i className="fa-solid fa-rotate-left mr-2"></i> Reset Kitchen Section
+        </Button>
+      </div>
 
 
-      <Separator className="my-6" />
+      {/* <Separator className="my-6" /> */}
     </div>
   );
 };

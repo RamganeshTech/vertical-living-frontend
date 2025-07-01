@@ -99,9 +99,9 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, existin
 
                 {/* <Separator orientation="vertical" /> */}
 
-                <div className="overflow-y-scroll">
+                <div className="overflow-y-auto">
                     <h4 className="font-semibold text-blue-800 mb-2">🖼️ Image Files</h4>
-                    <ul className="space-y-2 overflow-y-scroll max-h-[150px]">
+                    <ul className="space-y-2 overflow-y-auto max-h-[150px]">
                         {imageFiles.map((file, i) => (
                             <li key={i} className="flex justify-between items-center bg-green-50 p-2 rounded-xl">
                                 <span>{file.originalName}</span>

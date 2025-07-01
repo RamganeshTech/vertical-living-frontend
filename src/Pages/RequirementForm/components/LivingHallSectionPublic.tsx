@@ -10,6 +10,7 @@ import {
   SelectItem,
 } from "../../../components/ui/Select";
 import { Separator } from "../../../components/ui/Seperator";
+import { Button } from "../../../components/ui/Button";
 
 interface LivingHallSectionProps {
   formData: any;
@@ -49,6 +50,25 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
         ...prev.livingHall,
         [name]: value,
       },
+    }));
+  };
+
+
+
+  
+  const handleResetBedroom = () => {
+    setFormData((prev: any) => ({
+      ...prev,
+      livingHall: {
+    seatingStyle: null,
+    tvUnitDesignRequired: null,
+    falseCeilingRequired: null,
+    wallDecorStyle: null,
+    numberOfFans: null,
+    numberOfLights: null,
+    livingHallPackage: null,
+    notes: null,
+  }, // or {} if you prefer to use empty object instead of null
     }));
   };
 
@@ -211,7 +231,18 @@ const LivingHallSectionPublic: React.FC<LivingHallSectionProps> = ({
         </div>
       </div>
 
-      <Separator className="my-6" />
+
+       <div className="flex justify-end mt-4">
+              <Button
+                variant="outline"
+                className="border-red-500 text-red-500 hover:bg-red-50"
+                onClick={handleResetBedroom}
+              >
+                <i className="fa-solid fa-rotate-left mr-2"></i> Reset LivingHall Section
+              </Button>
+            </div>
+
+      {/* <Separator className="my-6" /> */}
     </div>
   );
 };

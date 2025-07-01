@@ -1,68 +1,68 @@
 import React, { useState, memo } from "react";
 import { useParams } from "react-router-dom";
-import KitchenSectionPublic from "./components/KitchenSectionPublic";
-import LivingHallSectionPublic from "./components/LivingHallSectionPublic";
-import BedroomSectionPublic from "./components/BedroomSectionPublic";
-import WardrobeSectionPublic from "./components/WardrobeSectionPublic";
-import { useCreateFormSubmission } from "../../apiList/Stage Api/requirementFormApi";
-import { Button } from "./../../components/ui/Button";
-import { Input } from "./../../components/ui/Input";
-import { Label } from "./../../components/ui/Label";
-import type { IRequirementFormSchema } from "../../types/types";
-import { Textarea } from "../../components/ui/TextArea";
-import { toast } from "../../utils/toast";
+import KitchenSectionPublic from "./KitchenSectionPublic";
+import LivingHallSectionPublic from "./LivingHallSectionPublic";
+import BedroomSectionPublic from "./BedroomSectionPublic";
+import WardrobeSectionPublic from "./WardrobeSectionPublic";
+import { useCreateFormSubmission } from "../../../apiList/Stage Api/requirementFormApi";
+import { Button } from "../../../components/ui/Button";
+import { Input } from "../../../components/ui/Input";
+import { Label } from "../../../components/ui/Label";
+import type { IRequirementFormSchema } from "../../../types/types";
+import { Textarea } from "../../../components/ui/TextArea";
+import { toast } from "../../../utils/toast";
 
 const RequirementFormPublic: React.FC = () => {
   const { token, projectId } = useParams<{ token: string; projectId: string }>();
 
-  const [formData, setFormData] = useState<IRequirementFormSchema>({
-    clientData: {
-      clientName: "",
-      email: "",
-      whatsapp: "",
-      location: ""
-    },
-    isEditable: true, // or false, depending on your logic
-    kitchen: {
-      layoutType: "L-shaped",
-      kitchenPackage: "Essentials",
-      measurements: { top: 0, left: 0, right: 0 },
-      graniteCountertop: false,
-      numberOfShelves: 0,
-      notes: ""
-    },
-    livingHall: {
-      seatingStyle: "Sofa Set",
-      tvUnitDesignRequired: false,
-      falseCeilingRequired: false,
-      wallDecorStyle: "Paint",
-      numberOfFans: 0,
-      numberOfLights: 0,
-      livingHallPackage: "Essentials",
-      notes: ""
-    },
-    bedroom: {
-      numberOfBedrooms: 0,
-      bedType: "Single",
-      wardrobeIncluded: false,
-      falseCeilingRequired: false,
-      tvUnitRequired: false,
-      studyTableRequired: false,
-      bedroomPackage: "Essentials",
-      notes: ""
-    },
-    wardrobe: {
-      wardrobeType: "Sliding",
-      lengthInFeet: 0,
-      heightInFeet: 0,
-      mirrorIncluded: false,
-      wardrobePackage: "Essentials",
-      numberOfShelves: 0,
-      numberOfDrawers: 0,
-      notes: ""
-    },
-    additionalNotes: ""
-  });
+ const [formData, setFormData] = useState<IRequirementFormSchema>({
+  clientData: {
+    clientName: null,
+    email: null,
+    whatsapp: null,
+    location: null,
+  },
+  isEditable: true,
+  kitchen: {
+    layoutType: null,
+    kitchenPackage: null,
+    measurements: { top: null, left: null, right: null },
+    graniteCountertop: null,
+    numberOfShelves: null,
+    notes: null,
+  },
+  livingHall: {
+    seatingStyle: null,
+    tvUnitDesignRequired: null,
+    falseCeilingRequired: null,
+    wallDecorStyle: null,
+    numberOfFans: null,
+    numberOfLights: null,
+    livingHallPackage: null,
+    notes: null,
+  },
+  bedroom: {
+    numberOfBedrooms: null,
+    bedType: null,
+    wardrobeIncluded: null,
+    falseCeilingRequired: null,
+    tvUnitRequired: null,
+    studyTableRequired: null,
+    bedroomPackage: null,
+    notes: null,
+  },
+  wardrobe: {
+    wardrobeType: null,
+    lengthInFeet: null,
+    heightInFeet: null,
+    mirrorIncluded: null,
+    wardrobePackage: null,
+    numberOfShelves: null,
+    numberOfDrawers: null,
+    notes: null,
+  },
+  additionalNotes: null,
+});
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -171,7 +171,7 @@ const RequirementFormPublic: React.FC = () => {
               <Label>Client Name</Label>
               <Input
                 name="clientName"
-                value={formData.clientData.clientName}
+                value={formData.clientData.clientName ?? ""}
                 onChange={handleClientChange}
                 required={true}
                 error={errors.clientName || ""}
@@ -183,7 +183,7 @@ const RequirementFormPublic: React.FC = () => {
               <Input
                 type="email"
                 name="email"
-                value={formData.clientData.email}
+                value={formData.clientData.email ?? ""}
                 onChange={handleClientChange}
                 required={true}
                 error={errors.email || ""}
@@ -196,7 +196,7 @@ const RequirementFormPublic: React.FC = () => {
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]{10}"
-                value={formData.clientData.whatsapp}
+                value={formData.clientData.whatsapp ?? ""}
                 onChange={handleClientChange}
                 required={true}
                 error={errors.whatsapp || ""}
@@ -207,7 +207,7 @@ const RequirementFormPublic: React.FC = () => {
               <Label>Location</Label>
               <Input
                 name="location"
-                value={formData.clientData.location}
+                value={formData.clientData.location ?? ""}
                 onChange={handleClientChange}
               />
             </div>
@@ -246,12 +246,12 @@ const RequirementFormPublic: React.FC = () => {
 
   return (
     <div className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-blue-100 !p-6 h-full w-full">
-      <div className="max-w-5xl mx-auto space-y-5">
+      <div className="max-w-5xl max-h-full mx-auto space-y-5">
         <h1 className="text-3xl font-bold text-center text-blue-800">House Requirements Form</h1>
 
-        <div className="max-w-5xl mx-auto">{steps[step].content}</div>
+        <div className="max-w-5xl  mx-auto">{steps[step].content}</div>
 
-        <div className={`flex ${step > 0 ? "justify-between" : "justify-end"} mt-8`}>
+        <div className={`flex ${step > 0 ? "justify-between" : "justify-end"} mt-2`}>
           {step > 0 && (
             <Button variant="secondary" onClick={() => setStep((prev) => prev - 1)}>
               Previous
@@ -271,6 +271,3 @@ const RequirementFormPublic: React.FC = () => {
 };
 
 export default RequirementFormPublic;
-
-
-

@@ -16,7 +16,7 @@ export const resetStageApi = async ({
   stagePath: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/reset/stage${stageNumber}/${stagePath}/${projectId}`);
+  const { data } = await api.put(`/stage${stageNumber}/${stagePath}/${projectId}`);
   if (!data.ok) throw new Error(data.message);
   return data;
 };
@@ -27,7 +27,7 @@ export const resetStageApi = async ({
 export const useResetStage = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowedRoles = ["staff", "admin", "CTO"];
+  const allowedRoles = ["staff", "owner", "CTO"];
 
   return useMutation({
     mutationFn: async ({

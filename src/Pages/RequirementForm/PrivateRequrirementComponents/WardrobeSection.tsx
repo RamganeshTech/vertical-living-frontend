@@ -107,18 +107,18 @@ const WardrobeSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditabl
         </div>
 
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="mirrorIncluded" checked={formData.mirrorIncluded} onChange={handleChange} />
+          <input type="checkbox" name="mirrorIncluded" checked={formData.mirrorIncluded ?? undefined} onChange={handleChange} />
           <Label>Mirror Included</Label>
         </div>
 
         <div>
           <Label>Number of Shelves</Label>
-          <Input type="number" name="numberOfShelves" value={formData.numberOfShelves || 0} onChange={handleChange} min={0} />
+          <Input type="number" name="numberOfShelves" value={formData.numberOfShelves || ""} onChange={handleChange} min={0} />
         </div>
 
         <div>
           <Label>Number of Drawers</Label>
-          <Input type="number" name="numberOfDrawers" value={formData.numberOfDrawers || 0} onChange={handleChange} min={0} />
+          <Input type="number" name="numberOfDrawers" value={formData.numberOfDrawers || ""} onChange={handleChange} min={0} />
         </div>
 
         <div>

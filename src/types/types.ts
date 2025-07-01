@@ -140,10 +140,10 @@ export interface IStaff {
 export interface IRequirementFormSchema {
   projectId?: string,
   clientData: {
-    clientName: string,
-    email: string,
-    whatsapp: string,
-    location: string
+    clientName: string | null,
+    email: string | null,
+    whatsapp: string | null,
+    location: string | null
   },
   isEditable: boolean,
   kitchen: IKitchenRequirement,
@@ -154,30 +154,30 @@ export interface IRequirementFormSchema {
 }
 
 export interface IKitchenRequirement {
-  layoutType: "L-shaped" | "Straight" | "U-shaped" | "Parallel";
+  layoutType: "L-shaped" | "Straight" | "U-shaped" | "Parallel" | null;
   measurements?: {
-    top: number;
-    left: number;
-    right: number;
+    top: number | null;
+    left: number | null;
+    right: number | null;
   };
-  kitchenPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+  kitchenPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package" | null;
   // packageDetails?: {
   //     affordablePricing?: boolean;
   //     premiumDesigns?: boolean;
   //     elitePricing?: boolean;
   //     customDesign?: boolean;
   // };
-  graniteCountertop?: boolean;
+  graniteCountertop?: boolean | null;
   numberOfShelves?: (number | null);
-  notes?: string;
+  notes: string | null;
 }
 
 export interface IWardrobeRequirement {
-  wardrobeType: "Sliding" | "Openable";
-  lengthInFeet?: number;
-  heightInFeet?: number;
-  mirrorIncluded?: boolean;
-  wardrobePackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+  wardrobeType: "Sliding" | "Openable" | null;
+  lengthInFeet?: number | null;
+  heightInFeet?: number | null;
+  mirrorIncluded?: boolean | null;
+  wardrobePackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package" | null;
   numberOfShelves?: (number | null);
   numberOfDrawers?: (number | null);
   notes?: (string | null);
@@ -185,24 +185,24 @@ export interface IWardrobeRequirement {
 
 
 export interface ILivingHallRequirement {
-  seatingStyle?: "Sofa Set" | "L-Shaped Sofa" | "Recliner Chairs" | "Floor Seating";
-  tvUnitDesignRequired?: boolean;
-  falseCeilingRequired?: boolean;
-  wallDecorStyle?: "Paint" | "Wallpaper" | "Wood Paneling" | "Stone Cladding";
-  numberOfFans?: number;
-  numberOfLights?: number;
-  livingHallPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+  seatingStyle?: "Sofa Set" | "L-Shaped Sofa" | "Recliner Chairs" | "Floor Seating"  | null;
+  tvUnitDesignRequired?: boolean | null;
+  falseCeilingRequired?: boolean | null;
+  wallDecorStyle?: "Paint" | "Wallpaper" | "Wood Paneling" | "Stone Cladding" | null;
+  numberOfFans?: number | null;
+  numberOfLights?: number | null;
+  livingHallPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package" | null;
   notes?: (string | null);
 }
 
 export interface IBedroomRequirement {
-  numberOfBedrooms: number;
-  bedType?: "Single" | "Double" | "Queen" | "King";
-  wardrobeIncluded?: boolean;
-  falseCeilingRequired?: boolean;
-  tvUnitRequired?: boolean;
-  studyTableRequired?: boolean;
-  bedroomPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package";
+  numberOfBedrooms: number | null;
+  bedType?: "Single" | "Double" | "Queen" | "King" | null;
+  wardrobeIncluded?: boolean | null;
+  falseCeilingRequired?: boolean | null;
+  tvUnitRequired?: boolean | null;
+  studyTableRequired?: boolean | null;
+  bedroomPackage: "Essentials" | "Premium" | "Luxury" | "Build Your Own Package" | null;
   notes?: (string | null);
 }
 

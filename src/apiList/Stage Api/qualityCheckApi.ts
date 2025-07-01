@@ -2,6 +2,7 @@ import { type AxiosInstance } from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApiForRole } from "../../utils/roleCheck"; 
 import useGetRole from "../../Hooks/useGetRole"; 
+import { queryClient } from "../../QueryClient/queryClient";
 
 // === CREATE ===
  const createQualityCheckItemApi = async (
@@ -166,8 +167,7 @@ export const useGetQualityCheckRoomItems = (projectId: string, roomName: string)
   const api = getApiForRole(role!);
 
   return useQuery({
-    queryKey: ["quality-checku
-        p-room", projectId, roomName],
+    queryKey: ["quality-checkup-room", projectId, roomName],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed.");
       if(!api) throw new Error("can't make the call")
@@ -177,3 +177,83 @@ export const useGetQualityCheckRoomItems = (projectId: string, roomName: string)
    enabled: !!projectId && !!roomName,
   });
 };
+
+
+
+
+
+
+
+
+
+// ✅ 10. Set Deadline
+ const setQualityCheckDeadlineApi = async ({
+  formId,
+  deadLine,
+  api,
+}: {
+  formId: string;
+  deadLine: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.put(`/qualitycheck/deadline/${formId}`, { deadLine });
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+// ✅ 11. Complete Stage
+ const completeQualityCheckStageApi = async ({
+  projectId,
+  api,
+}: {
+  projectId: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.put(`/qualitycheck/completionstatus/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+
+export const useSetQualityCheckDeadline = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({
+      formId,
+      deadLine,
+    }: {
+      formId: string;
+      deadLine: string;
+    }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await setQualityCheckDeadlineApi({ formId, deadLine, api });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quality-checkup"] });
+    },
+  });
+};
+
+export const useCompleteQualityCheck = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId }: { projectId: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await completeQualityCheckStageApi({ projectId, api });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["quality-checkup", projectId] });
+    },
+  });
+};
+

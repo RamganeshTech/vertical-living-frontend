@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type JSX } from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
 import { useCompleteInstallation, useGetInstallationDetails, useSetInstallationDeadline } from "../../../apiList/Stage Api/installationWorkApi"; // your custom hook
 import { toast } from "../../../utils/toast";
@@ -8,7 +8,7 @@ import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
-const roomKeys = [
+export const roomKeys = [
     "LivingRoom",
     "Bedroom",
     "Kitchen",

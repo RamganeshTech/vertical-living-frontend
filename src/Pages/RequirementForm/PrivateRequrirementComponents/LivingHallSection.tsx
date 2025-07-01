@@ -89,6 +89,7 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, isEdita
               <SelectValue placeholder="Select seating style" selectedValue={formData.seatingStyle || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select Value</SelectItem>
               <SelectItem value="Sofa Set">Sofa Set</SelectItem>
               <SelectItem value="L-Shaped Sofa">L-Shaped Sofa</SelectItem>
               <SelectItem value="Recliner Chairs">Recliner Chairs</SelectItem>
@@ -104,6 +105,7 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, isEdita
               <SelectValue placeholder="Select wall decor" selectedValue={formData.wallDecorStyle || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select Value</SelectItem>
               <SelectItem value="Paint">Paint</SelectItem>
               <SelectItem value="Wallpaper">Wallpaper</SelectItem>
               <SelectItem value="Wood Paneling">Wood Paneling</SelectItem>
@@ -114,21 +116,21 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, isEdita
 
         <div>
           <Label>Number of Fans</Label>
-          <Input type="number" name="numberOfFans" value={formData.numberOfFans} onChange={handleChange} min={0} />
+          <Input type="number" name="numberOfFans" value={formData.numberOfFans || ""} onChange={handleChange} min={0} />
         </div>
 
         <div>
           <Label>Number of Lights</Label>
-          <Input type="number" name="numberOfLights" value={formData.numberOfLights} onChange={handleChange} min={0} />
+          <Input type="number" name="numberOfLights" value={formData.numberOfLights || ""} onChange={handleChange} min={0} />
         </div>
 
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="tvUnitDesignRequired" checked={formData.tvUnitDesignRequired} onChange={handleChange} />
+          <input type="checkbox" name="tvUnitDesignRequired" checked={formData.tvUnitDesignRequired || undefined} onChange={handleChange} />
           <Label>TV Unit Design Required</Label>
         </div>
 
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="falseCeilingRequired" checked={formData.falseCeilingRequired} onChange={handleChange} />
+          <input type="checkbox" name="falseCeilingRequired" checked={formData.falseCeilingRequired || undefined} onChange={handleChange} />
           <Label>False Ceiling Required</Label>
         </div>
 
@@ -139,6 +141,7 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, isEdita
               <SelectValue placeholder="Select package" selectedValue={formData.livingHallPackage || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select Value</SelectItem>
               <SelectItem value="Essentials">Essentials</SelectItem>
               <SelectItem value="Premium">Premium</SelectItem>
               <SelectItem value="Luxury">Luxury</SelectItem>

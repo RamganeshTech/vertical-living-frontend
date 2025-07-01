@@ -8,7 +8,8 @@ interface TimerProps {
     completedAt: string | null;
     deadLine: string | null;
     formId: string;
-    deadLineMutate: ({ formId, deadLine }: { formId: string; deadLine: string }) => Promise<any>;
+    projectId: string;
+    deadLineMutate: ({ formId, projectId, deadLine }: { formId: string; projectId: string; deadLine: string }) => Promise<any>;
     refetchStageMutate: () => Promise<any>
     isPending: boolean;
 }
@@ -23,7 +24,7 @@ const formatDuration = (ms: number) => {
     return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 };
 
-const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, completedAt, deadLine, formId, deadLineMutate, isPending, refetchStageMutate }) => {
+const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, projectId, completedAt, deadLine, formId, deadLineMutate, isPending, refetchStageMutate }) => {
     const [now, setNow] = useState(new Date());
     const [newDeadline, setNewDeadline] = useState(deadLine ? new Date(deadLine).toISOString().split("T")[0] : "");
 
@@ -70,7 +71,7 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, completedAt, deadLine
     const handleSetDeadline = async () => {
         try {
             if (!formId || !newDeadline) return;
-            await deadLineMutate({ formId, deadLine: newDeadline });
+            await deadLineMutate({ formId, projectId, deadLine: newDeadline });
             refetchStageMutate()
             setEditMode(false);
 

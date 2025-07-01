@@ -57,8 +57,8 @@ const deleteSiteMeauserementStage = async ({ projectId, api }: {  projectId: str
 }
 
 
-const setDeadlineSiteMeasurement = async ({ formId, deadLine, api }: { formId: string, deadLine: string, api: AxiosInstance }) => {
-    const { data } = await api.put(`/sitemeasurement/deadline/${formId}`, { deadLine });
+const setDeadlineSiteMeasurement = async ({ formId, projectId, deadLine, api }: { formId: string, projectId:string, deadLine: string, api: AxiosInstance }) => {
+    const { data } = await api.put(`/sitemeasurement/deadline/${projectId}/${formId}`, { deadLine });
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
@@ -260,14 +260,14 @@ export const useSetDeadLineSiteMeasurement = () => {
     const { role } = useGetRole()
     const api = getApiForRole(role!)
     return useMutation({
-        mutationFn: async ({ formId, deadLine }: { formId: string, deadLine: string }) => {
+        mutationFn: async ({ formId, projectId, deadLine,  }: { formId: string, projectId:string, deadLine: string }) => {
             if (!role) throw new Error("not authorized")
 
             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
 
             if (!api) throw new Error("api is null")
 
-            return await setDeadlineSiteMeasurement({ formId, deadLine, api })
+            return await setDeadlineSiteMeasurement({ formId, deadLine, projectId, api })
 
         }
     })

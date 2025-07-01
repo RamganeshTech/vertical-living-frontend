@@ -10,22 +10,23 @@ import {
 } from "../../../components/ui/Select";
 import { Separator } from "../../../components/ui/Seperator";
 import { Textarea } from "../../../components/ui/TextArea";
+import { Button } from "../../../components/ui/Button";
 
 const BedroomSectionPublic = ({ formData, setFormData }: any) => {
- const handleChange = (
+  const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const target = e.target;
-  const { name, type, value } = target;
+    const { name, type, value } = target;
 
-  let finalValue: string | number | boolean = value;
+    let finalValue: string | number | boolean = value;
 
-  if (type === "checkbox") {
-    finalValue = (target as HTMLInputElement).checked;
-  } else if (type === "number") {
-       const parsedValue = parseFloat(value);
-    finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
-   }
+    if (type === "checkbox") {
+      finalValue = (target as HTMLInputElement).checked;
+    } else if (type === "number") {
+      const parsedValue = parseFloat(value);
+      finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
+    }
     setFormData((prev: any) => ({
       ...prev,
       bedroom: {
@@ -46,11 +47,28 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
     }));
   };
 
+
+  const handleResetBedroom = () => {
+    setFormData((prev: any) => ({
+      ...prev,
+      bedroom: {
+        numberOfBedrooms: null,
+        bedType: null,
+        wardrobeIncluded: null,
+        falseCeilingRequired: null,
+        tvUnitRequired: null,
+        studyTableRequired: null,
+        bedroomPackage: null,
+        notes: null,
+      }, // or {} if you prefer to use empty object instead of null
+    }));
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow p-6">
       <h2 className="text-2xl font-semibold text-blue-800 mb-4">Bedroom Requirements</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 space-y-4">
         {/* Number of Bedrooms */}
         <div>
           <Label>Number of Bedrooms</Label>
@@ -96,7 +114,7 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
         {/* False Ceiling Required */}
         <div className="flex items-center gap-2">
           <input
-          id="falseCeilingRequired"
+            id="falseCeilingRequired"
             type="checkbox"
             name="falseCeilingRequired"
             checked={formData?.bedroom?.falseCeilingRequired || false}
@@ -108,7 +126,7 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
         {/* TV Unit Required */}
         <div className="flex items-center gap-2">
           <input
-          id="tvUnitRequired"
+            id="tvUnitRequired"
             type="checkbox"
             name="tvUnitRequired"
             checked={formData?.bedroom?.tvUnitRequired || false}
@@ -137,7 +155,7 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
             onValueChange={(val) => handleSelectChange("bedroomPackage", val)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select package" selectedValue={formData?.bedroom?.bedroomPackage || ""}/>
+              <SelectValue placeholder="Select package" selectedValue={formData?.bedroom?.bedroomPackage || ""} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Essentials">Essentials</SelectItem>
@@ -162,7 +180,17 @@ const BedroomSectionPublic = ({ formData, setFormData }: any) => {
         </div>
       </div>
 
-      <Separator className="my-6" />
+      <div className="flex justify-end mt-4">
+        <Button
+          variant="outline"
+          className="border-red-500 text-red-500 hover:bg-red-50"
+          onClick={handleResetBedroom}
+        >
+          <i className="fa-solid fa-rotate-left mr-2"></i> Reset Bedroom Section
+        </Button>
+      </div>
+
+      {/* <Separator className="my-6" /> */}
     </div>
   );
 };

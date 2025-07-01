@@ -114,28 +114,28 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable
         </div>
 
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="graniteCountertop" checked={formData.graniteCountertop} onChange={handleChange} />
+          <input type="checkbox" name="graniteCountertop" checked={formData.graniteCountertop ?? undefined} onChange={handleChange} />
           <Label>Granite Countertop</Label>
         </div>
 
         <div>
           <Label>Number of Shelves</Label>
-          <Input type="number" name="numberOfShelves" value={formData.numberOfShelves || 0} onChange={handleChange} min={0} />
+          <Input type="number" name="numberOfShelves" value={formData.numberOfShelves || ""} onChange={handleChange} min={0} />
         </div>
 
         <div>
           <Label>Measurement - Top (in feet)</Label>
-          <Input type="number" name="top" value={formData.measurements?.top || 0} onChange={handleChange} min={0} />
+          <Input type="number" name="top" value={formData.measurements?.top || ""} onChange={handleChange} min={0} />
         </div>
 
         <div>
           <Label>Measurement - Left (in feet)</Label>
-          <Input type="number" name="left" value={formData.measurements?.left || 0} onChange={handleChange} min={0} />
+          <Input type="number" name="left" value={formData.measurements?.left || ""} onChange={handleChange} min={0} />
         </div>
 
         <div>
           <Label>Measurement - Right (in feet)</Label>
-          <Input type="number" name="right" value={formData.measurements?.right || 0} onChange={handleChange} min={0} />
+          <Input type="number" name="right" value={formData.measurements?.right || ""} onChange={handleChange} min={0} />
         </div>
 
         <div className="md:col-span-2">

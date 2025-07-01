@@ -92,29 +92,6 @@ const WorkMainOverview: FC = () => {
             />
           </Card>
 
-
-
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           
-            <Link
-              to={`workschedule/${data.workScheduleId}`}
-              className="block rounded-xl border border-blue-200 bg-blue-50 p-6 text-blue-800 shadow-sm hover:bg-blue-100 transition"
-            >
-              <h3 className="text-lg font-bold mb-2">Work Plans</h3>
-              <p className="text-sm text-blue-700">View and manage detailed work plans for this project.</p>
-            </Link>
-
-           
-            <Link
-              to={`dailyschedule/${data.dailyScheduleId}`}
-              className="block rounded-xl border border-green-200 bg-green-50 p-6 text-green-800 shadow-sm hover:bg-green-100 transition"
-            >
-              <h3 className="text-lg font-bold mb-2">Daily Tasks</h3>
-              <p className="text-sm text-green-700">View and manage daily tasks and updates.</p>
-            </Link>
-          </div> */}
-
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Work Plans Card */}
             <Link
@@ -175,31 +152,6 @@ const WorkMainOverview: FC = () => {
               </div>
             </div>
           </div>
-
-
-          {/* <div className="mt-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">MD Approval</h2>
-            <div className="space-y-2">
-              <p className="text-gray-600">
-                <span className="font-medium text-gray-800">Status:</span>{' '}
-                <span
-                  className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${data?.mdApproval?.status === 'approved'
-                    ? 'bg-green-100 text-green-800'
-                    : data?.mdApproval?.status === 'pending'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                    }`}
-                >
-                  {data?.mdApproval?.status ?? "Not Mentioned"}
-                </span>
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium text-gray-800">Remarks:</span> {data?.mdApproval?.remarks || 'No remarks.'}
-              </p>
-            </div>
-          </div> */}
-
-
 
         </div> : <Outlet />}
     </main>

@@ -10,18 +10,19 @@ import {
 } from "../../../components/ui/Select";
 import { Separator } from "../../../components/ui/Seperator";
 import { Textarea } from "../../../components/ui/TextArea";
+import { Button } from "../../../components/ui/Button";
 
 const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
 
-     const { name, value, type } = e.target;
+    const { name, value, type } = e.target;
 
     let finalValue: string | number | boolean = value;
-      if (type === "checkbox") {
-    finalValue = (e.target as HTMLInputElement).checked;
-  } else if (type === "number") {
+    if (type === "checkbox") {
+      finalValue = (e.target as HTMLInputElement).checked;
+    } else if (type === "number") {
       const parsedValue = parseFloat(value);
       finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
     }
@@ -56,6 +57,24 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
         ...prev.wardrobe,
         [name]: value,
       },
+    }));
+  };
+
+
+
+  const handleResetBedroom = () => {
+    setFormData((prev: any) => ({
+      ...prev,
+      wardrobe: {
+        wardrobeType: null,
+        lengthInFeet: null,
+        heightInFeet: null,
+        mirrorIncluded: null,
+        wardrobePackage: null,
+        numberOfShelves: null,
+        numberOfDrawers: null,
+        notes: null,
+      }, // or {} if you prefer to use empty object instead of null
     }));
   };
 
@@ -108,7 +127,7 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
         {/* Mirror Included */}
         <div className="flex items-center gap-2">
           <input
-          id="mirrorIncluded"
+            id="mirrorIncluded"
             type="checkbox"
             name="mirrorIncluded"
             checked={formData?.wardrobe?.mirrorIncluded || false}
@@ -174,7 +193,17 @@ const WardrobeSectionPublic = ({ formData, setFormData }: any) => {
         </div>
       </div>
 
-      <Separator className="my-6" />
+ <div className="flex justify-end mt-4">
+        <Button
+          variant="outline"
+          className="border-red-500 text-red-500 hover:bg-red-50"
+          onClick={handleResetBedroom}
+        >
+          <i className="fa-solid fa-rotate-left mr-2"></i> Reset Wardrobe Section
+        </Button>
+      </div>
+
+      {/* <Separator className="my-6" /> */}
     </div>
   );
 };

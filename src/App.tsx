@@ -36,7 +36,7 @@ import CTOLogin from './Pages/CTO/CTOLogin'
 import ClientLogin from './Pages/Client/ClientLogin'
 import ClientRegister from './Pages/Client/ClientRegister'
 import InviteClient from './Pages/Organization/inviteClient'
-import RequirementFormPublic from './Pages/RequirementForm/RequirementFormPublic'
+import RequirementFormPublic from './Pages/RequirementForm/components/RequirementFormPublic'
 import RequriementForm from './Pages/RequirementForm/RequriementForm'
 import SiteMeasurement from './Pages/Stage Pages/Site Measurement/SiteMeasurement'
 import SampleDesign from './Pages/Stage Pages/Sample design/SampleDesign'
@@ -58,6 +58,8 @@ import WorkSchedulePage from './Pages/Stage Pages/Work Schedule/WorkSchedulePage
 import DailySchedulePage from './Pages/Stage Pages/Work Schedule/DailySchedulePage'
 import InstallationOverview from './Pages/Stage Pages/Installation Stage/InstallationOverview'
 import InstallationRoomDetail from './Pages/Stage Pages/Installation Stage/InstallationRoomDetail'
+import QualityCheckOverview from './Pages/Stage Pages/QualityCheck Stage/QualityCheckOverview'
+import QualityCheckRoomDetails from './Pages/Stage Pages/QualityCheck Stage/QualityCheckRoomDetails'
 
 function App() {
 
@@ -176,9 +178,9 @@ function App() {
             <Route path="installationroom/:roomkey" element={<InstallationRoomDetail />} />
           </Route>
 
-          {/* <Route path="qualitycheck" element={<QualityCheckOverview />} >
-            <Route path="qualitycheck/:roomkey" element={<QualityCheckRoom />} />
-          </Route> */}
+          <Route path="qualitycheck" element={<QualityCheckOverview />} >
+            <Route path="qualitycheckroom/:roomkey" element={<QualityCheckRoomDetails />} />
+          </Route>
 
         </Route>
 
