@@ -221,8 +221,8 @@ const TechnicalConsultant = () => {
                 />
             </Card>
 
-            <div className="space-y-4 border-2 border-[#0a0a0a18] h-[52%]">
-                <div className="flex flex-col-reverse overflow-y-auto h-full px-2 py-4 space-y-reverse space-y-4">
+            <div className="space-y-4 border-2 border-[#0a0a0a18] h-[41%]">
+                <div className="flex flex-col-reverse overflow-y-auto h-full px-2 py-1 space-y-reverse space-y-4">
                     {(getMessageIsError || getMessageError) && <div className="text-center flex h-full items-center justify-center py-10">
                         <div>
                             <i className="fas fa-ban text-9xl text-blue-300 mb-4"></i>
@@ -251,9 +251,9 @@ const TechnicalConsultant = () => {
                                     ?.slice()
                                     .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                                     .map((msg: any) => (
-                                        <div key={msg._id} className="bg-blue-50 w-full group p-4 rounded-lg shadow flex flex-col">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <p className="text-sm text-gray-600">{msg.senderRole.toUpperCase()} - {new Date(msg.createdAt).toLocaleString()}</p>
+                                        <div key={msg._id} className="bg-blue-50 w-full group px-4 py-1 rounded-lg shadow flex flex-col">
+                                            <div className="flex justify-between items-center">
+                                                <p className="text-[10px] text-gray-600">{msg.senderRole.toUpperCase()} - {new Date(msg.createdAt).toLocaleString()}</p>
                                                 <div className="opacity-0 scale-95 group-hover:opacity-100 transition-all duration-300">
                                                     {(msg.sender === userId || role === "owner" || role === "CTO") && (
                                                         <div className="flex gap-2">
@@ -270,13 +270,13 @@ const TechnicalConsultant = () => {
                                             </div>
 
                                             {editingId === msg._id ? (
-                                                <div className="flex gap-2 items-center mb-2">
+                                                <div className="flex gap-2 items-center">
                                                     <Input value={editText} onChange={(e) => setEditText(e.target.value)} />
                                                     <Button isLoading={editPending} onClick={handleEditSubmit}>Save</Button>
                                                     <Button variant="danger" className={"border-red-200 hover:bg-red-700 bg-red-600 text-white"} onClick={handleCancelEdit}>cancel</Button>
                                                 </div>
                                             ) : (
-                                                <p className="text-gray-900 text-base mb-2">{msg.message}</p>
+                                                <p className="text-gray-900 text-sm ">{msg.message}</p>
                                             )}
 
                                             <div className="flex flex-wrap max-w-[80%] gap-3">

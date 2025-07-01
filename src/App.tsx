@@ -56,6 +56,8 @@ import PublicOrderMaterial from './Pages/Stage Pages/Ordering Materials/PublicOr
 import WorkMainOverview from './Pages/Stage Pages/Work Schedule/WorkMainOverView'
 import WorkSchedulePage from './Pages/Stage Pages/Work Schedule/WorkSchedulePage'
 import DailySchedulePage from './Pages/Stage Pages/Work Schedule/DailySchedulePage'
+import InstallationOverview from './Pages/Stage Pages/Installation Stage/InstallationOverview'
+import InstallationRoomDetail from './Pages/Stage Pages/Installation Stage/InstallationRoomDetail'
 
 function App() {
 
@@ -156,19 +158,27 @@ function App() {
           </Route>
 
 
-            <Route path="ordermaterial" element={<OrderMaterialOverview />} >
+          <Route path="ordermaterial" element={<OrderMaterialOverview />} >
             <Route path="ordermaterialroom/:roomKey" element={<OrderMaterialRoomDetails />} />
           </Route>
 
 
-             <Route path="materialarrival" element={<MaterialArrivalOverview />} >
+          <Route path="materialarrival" element={<MaterialArrivalOverview />} >
             <Route path="materialarrivalroom/:roomKey" element={<MaterialArrivalRoomDetail />} />
           </Route>
 
-            <Route path="workmainschedule" element={<WorkMainOverview />} >
+          <Route path="workmainschedule" element={<WorkMainOverview />} >
             <Route path="workschedule/:sectionId" element={<WorkSchedulePage />} />
             <Route path="dailyschedule/:sectionId" element={<DailySchedulePage />} />
           </Route>
+
+          <Route path="installation" element={<InstallationOverview />} >
+            <Route path="installationroom/:roomkey" element={<InstallationRoomDetail />} />
+          </Route>
+
+          {/* <Route path="qualitycheck" element={<QualityCheckOverview />} >
+            <Route path="qualitycheck/:roomkey" element={<QualityCheckRoom />} />
+          </Route> */}
 
         </Route>
 

@@ -3,7 +3,7 @@ import React from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
-import { useGetCostEstimationByProject, useGetSingleRoomEstimation, useUpdateMaterialEstimationItem, useAddLabourEstimation, useEditLabourEstimation, useDeleteLabourEstimation, useUploadCostEstimationFiles, useDeleteCostEstimationFile, useSetCostEstimateDeadline } from "../../../apiList/Stage Api/costEstimationApi";
+import { useGetCostEstimationByProject, useGetSingleRoomEstimation, useUpdateMaterialEstimationItem, useAddLabourEstimation, useEditLabourEstimation, useDeleteLabourEstimation, useUploadCostEstimationFiles, useDeleteCostEstimationFile, useSetCostEstimateDeadline, useCompleteCostEstimate } from "../../../apiList/Stage Api/costEstimationApi";
 import CostEstimateRoomCard from "./CostEstimateRoomCard";
 import { useCompleteMaterialStage } from "../../../apiList/Stage Api/materialSelectionApi";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
@@ -21,7 +21,7 @@ export const CostEstimationContainer = () => {
 
   const { data, isLoading, isError, error: getAllError, refetch } = useGetCostEstimationByProject(projectId!);
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetCostEstimateDeadline()
-  const { mutateAsync: completionStatus, isPending: completePending } = useCompleteMaterialStage()
+  const { mutateAsync: completionStatus, isPending: completePending } = useCompleteCostEstimate()
 
   if (isLoading) return <MaterialOverviewLoading />;
   if (getAllError) return <div className="max-w-xl mx-auto mt-12 p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">

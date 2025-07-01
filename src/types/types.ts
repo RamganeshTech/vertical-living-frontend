@@ -362,75 +362,6 @@ export interface IMaterialSelectionRoomConfirmation {
 
 
 
-
-
-// TYPES FOR WORK SCHEDULE, STAGE 10 
-
-// export interface IUploadFile {
-//     type: "image" | "pdf";
-//     url: string;
-//     originalName?: string;
-//     uploadedAt?: Date;
-// }
-
-// export interface IWorkScheduleTimer {
-//     startedAt: Date | null;
-//     completedAt: Date | null;
-//     deadLine: Date | null;
-//     reminderSent: boolean
-// }
-
-// // interfaces/ProjectStageSchedule.ts
-// export interface IWorkMainStageSchedule {
-//     projectId: string;
-//     dailyScheduleId: string; // ref to DailySchedule
-//     workScheduleId: string;  // ref to WorkSchedule
-//     mdApproval: {
-//         status: "pending" | "approved" | "rejected";
-//         remarks: string;
-//     };
-//     timer: IWorkScheduleTimer;
-//     status: "pending" | "completed";
-//     isEditable: boolean;
-// }
-
-// // interfaces/DailySchedule.ts
-// export interface IDailySchedule {
-//     projectId: string;
-//     stageId: string; // ref to ProjectStageSchedule
-//     tasks: IDailyTask[];
-//     status: "pending" | "completed";
-//     remarks: string;
-// }
-
-// export interface IDailyTask {
-//     date: string; // ISO date
-//     description: string;
-//     taskName: String
-//     status: "not_started" | "in_progress" | "completed";
-//     upload:IUploadFile,
-//     assignedTo: string
-// }
-
-// // interfaces/WorkSchedule.ts
-// export interface IWorkSchedule {
-//     projectId: string;
-//     stageId: string; // ref to ProjectStageSchedule
-//     plans: IWorkPlan[];
-//     status: "pending" | "completed";
-//     remarks: string;
-// }
-
-// export interface IWorkPlan {
-//     workType: string;
-//     startDate: string; // ISO date
-//     endDate: string;   // ISO date
-//     assignedTo: string;
-//     notes: string;
-//     upload:IUploadFile
-// }
-
-
 // TYPES FOR WORK SCHEDULE, STAGE 10 
 
 export interface IUploadFile {
@@ -515,4 +446,23 @@ export interface AddWorkPlanPayload {
   assignedTo: string;
   notes: string;
   file?: File;
+}
+
+
+
+
+
+// INSTALLATION WORK export 
+interface InstallationUpload {
+    type: "image" | "pdf";
+    url: string;
+    originalName: string;
+    uploadedAt: Date
+}
+
+export interface InstallationWorkItem {
+    workName: string,
+    descritpion: string,
+    completedDate: Date,
+    upload: InstallationUpload | null
 }

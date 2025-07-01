@@ -337,12 +337,12 @@ export const useSetCostEstimateDeadline = () => {
       return await setCostDeadlineApi({ formId, deadLine, api });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["material-rooms"] });
+      queryClient.invalidateQueries({ queryKey: ["cost-estimation"] });
     },
   });
 };
 
-export const useCompleteMaterialStage = () => {
+export const useCompleteCostEstimate = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
@@ -355,7 +355,7 @@ export const useCompleteMaterialStage = () => {
       return await completeCostEstiamtionStageApi({ projectId, api });
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["material-rooms", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["cost-estimation", projectId] });
     },
   });
 };

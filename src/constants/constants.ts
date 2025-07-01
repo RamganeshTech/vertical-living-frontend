@@ -44,6 +44,8 @@ export const PROJECTS_LABELS = {
   ORDERMATERIALS: "Ordering Material",
   MATERIALARRIVED: "Material Arrival",
   WORKSCHEDULE: "Work Schedule",
+  INSTALLATION: "Installation and execution",
+  QUALITYCHECK: "Quality Check"
 }
 
 
@@ -62,7 +64,8 @@ export const PROJECTS_ICONS = {
   ORDERMATERIALS: "fa-solid fa-shopping-cart text-2xl",
   MATERIALARRIVED: "fa-solid fa-receipt text-2xl",
   WORKSCHEDULE: "fas fa-digging text-2xl",
-
+  INSTALLATION: "fas fa-fit text-2xl",
+  QUALITYCHECK: "fas fa-fit text-2xl",
 }
 
 
@@ -97,11 +100,11 @@ export const requiredFieldsByRoomArrival: Record<string, string[]> = {
   lightsFixtures: ["type", "brandName", "specification", "quantity", "unit", "remarks", "image", "verifiedByAccountant"],
   glassMirrors: ["type", "brandName", "size", "thickness", "quantity", "remarks", "image", "verifiedByAccountant"],
   upholsteryCurtains: ["item", "fabric", "color", "quantity", "unit", "remarks", "image", "verifiedByAccountant"],
-  falseCeilingMaterials: ["item", "specification", "quantity", "unit", "remarks" , "image", "verifiedByAccountant"]
+  falseCeilingMaterials: ["item", "specification", "quantity", "unit", "remarks", "image", "verifiedByAccountant"]
 };
 
 
-export const predefinedOptionsRooms:any = {
+export const predefinedOptionsRooms: any = {
   brandName: {
     carpentry: ["Greenply", "Century", "Kitply", "Archid", "Austin"],
     hardware: ["Hettich", "Hafele", "Blum", "Godrej"],
