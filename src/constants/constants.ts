@@ -45,7 +45,9 @@ export const PROJECTS_LABELS = {
   MATERIALARRIVED: "Material Arrival",
   WORKSCHEDULE: "Work Schedule",
   INSTALLATION: "Installation and execution",
-  QUALITYCHECK: "Quality Check"
+  QUALITYCHECK: "Quality Check",
+  CLEANINGSANITATION: "Cleaning & Sanitation",
+  PROJECTDELIVERY: "Project Delivery",
 }
 
 
@@ -66,6 +68,8 @@ export const PROJECTS_ICONS = {
   WORKSCHEDULE: "fas fa-digging text-2xl",
   INSTALLATION: "fas fa-fit text-2xl",
   QUALITYCHECK: "fas fa-fit text-2xl",
+  CLEANINGSANITATION: "fas fa-map text-2xl",
+  PROJECTDELIVERY: "fas fa-project text-2xl",
 }
 
 

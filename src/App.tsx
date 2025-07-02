@@ -60,6 +60,8 @@ import InstallationOverview from './Pages/Stage Pages/Installation Stage/Install
 import InstallationRoomDetail from './Pages/Stage Pages/Installation Stage/InstallationRoomDetail'
 import QualityCheckOverview from './Pages/Stage Pages/QualityCheck Stage/QualityCheckOverview'
 import QualityCheckRoomDetails from './Pages/Stage Pages/QualityCheck Stage/QualityCheckRoomDetails'
+import CleaningOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningOverview'
+import CleaningRoomOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningRoomOverview'
 
 function App() {
 
@@ -180,6 +182,10 @@ function App() {
 
           <Route path="qualitycheck" element={<QualityCheckOverview />} >
             <Route path="qualitycheckroom/:roomkey" element={<QualityCheckRoomDetails />} />
+          </Route>
+
+           <Route path="cleaning" element={<CleaningOverview />} >
+            <Route path="cleaningroom/:roomId" element={<CleaningRoomOverview />} />
           </Route>
 
         </Route>

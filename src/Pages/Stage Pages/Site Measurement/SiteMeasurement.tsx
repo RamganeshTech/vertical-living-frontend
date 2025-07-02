@@ -24,6 +24,7 @@ import CommonSiteInfo from './CommonSiteInfo';
 import SiteRoomInfo from './SiteRoomInfo';
 import CommonSiteForm from './CommonSiteForm';
 import { ResetStageButton } from '../../../shared/ResetStageButton';
+import MaterialOverviewLoading from '../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 
 const initialSiteDetails: SiteDetails = {
   totalPlotAreaSqFt: null,
@@ -52,7 +53,7 @@ function HomeInteriorProject() {
   const [roomDetails, setRoomDetails] = useState<SiteRooms>(initialRoomDetails);
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
 
-  const { data: measurementData, isLoading, refetch } = useGetSiteMeasurementDetails({ projectId: projectId! });
+  let { data: measurementData, isLoading, refetch, error: getAllError } = useGetSiteMeasurementDetails({ projectId: projectId! });
   const createMeasurement = useCreateMeasurement();
   const createRoom = useCreateRoomSiteMeasurement();
   const updateSiteDetails = useUpdateCommonSiteMeasurementDetails();
@@ -159,13 +160,13 @@ function HomeInteriorProject() {
 
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    // return (
+    //   <div className="flex items-center justify-center min-h-screen">
+    //     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    //   </div>
+    // );
+    return <MaterialOverviewLoading />
   }
-
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-full h-full overflow-y-scroll">
@@ -187,6 +188,29 @@ function HomeInteriorProject() {
         </div>
       </div>
 
+
+      {getAllError &&
+
+        <div className="max-w-xl mx-auto mt-12 p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+          <div className="text-red-600 text-xl font-semibold mb-2">
+            ⚠️ Oops! An Error Occurred
+          </div>
+          <p className="text-red-500 text-sm mb-4">
+            {(getAllError as any)?.response?.data?.message ||
+              (getAllError as any)?.message ||
+              "Failed to load , please try again"}
+          </p>
+
+          <Button
+            isLoading={isLoading}
+            onClick={() => refetch()}
+            className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition"
+          >
+            Retry
+          </Button>
+        </div>
+      }
+
       <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
         <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
           <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
@@ -194,11 +218,11 @@ function HomeInteriorProject() {
         </div>
         {/* Keep content within this component, it will now handle horizontal layout */}
         <StageTimerInfo
-          completedAt={measurementData.timer.compltedAt}
-          formId={(measurementData as any)._id}
+          completedAt={measurementData?.timer?.compltedAt}
+          formId={(measurementData as any)?._id}
           projectId={projectId}
-          deadLine={measurementData.timer.deadLine}
-          startedAt={measurementData.timer.startedAt}
+          deadLine={measurementData?.timer?.deadLine}
+          startedAt={measurementData?.timer?.startedAt}
           refetchStageMutate={refetch}
           deadLineMutate={deadLineAsync}
           isPending={deadLinePending}
@@ -208,8 +232,8 @@ function HomeInteriorProject() {
       <div className="">
         <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
           <RequirementFileUploader
-            formId={measurementData._id}
-            existingUploads={measurementData.uploads}
+            formId={measurementData?._id}
+            existingUploads={measurementData?.uploads}
             onUploadComplete={refetch}
             uploadFilesMutate={uploadFilesMutate}
             uploadPending={uploadPending}
@@ -217,7 +241,7 @@ function HomeInteriorProject() {
         </Card>
       </div>
 
-      {!Object.values(measurementData.siteDetails).some((ele: any) => ele !== null) && !showSiteForm ? (
+      {!Object.values(measurementData?.siteDetails)?.some((ele: any) => ele !== null) && !showSiteForm ? (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
