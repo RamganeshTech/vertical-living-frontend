@@ -210,3 +210,67 @@ export const existingUploads = [
             uploadedAt: new Date().toISOString(),
         },
     ];
+
+
+
+
+
+
+
+    export const dummyStaffs = [
+  { _id: "s1", name: "John Doe", email: "john.doe@example.com" },
+  { _id: "s2", name: "Jane Smith", email: "jane.smith@example.com" },
+  { _id: "s3", name: "Robert Brown", email: "robert.brown@example.com" },
+  { _id: "s4", name: "Emily Davis", email: "emily.davis@example.com" },
+  { _id: "s5", name: "Michael Johnson", email: "michael.johnson@example.com" },
+  { _id: "s6", name: "Sarah Wilson", email: "sarah.wilson@example.com" },
+  { _id: "s7", name: "William Lee", email: "william.lee@example.com" },
+  { _id: "s8", name: "Olivia Martinez", email: "olivia.martinez@example.com" },
+  { _id: "s9", name: "James Anderson", email: "james.anderson@example.com" },
+  { _id: "s10", name: "Sophia Thomas", email: "sophia.thomas@example.com" },
+];
+
+
+export const dummyCTOs = [
+  { _id: "cto1", name: "Alice Carter", email: "alice.carter@example.com" },
+  { _id: "cto2", name: "David Evans", email: "david.evans@example.com" },
+  { _id: "cto3", name: "Grace Scott", email: "grace.scott@example.com" },
+  { _id: "cto4", name: "Henry Walker", email: "henry.walker@example.com" },
+  { _id: "cto5", name: "Isabella Young", email: "isabella.young@example.com" },
+  { _id: "cto6", name: "Jack Hall", email: "jack.hall@example.com" },
+  { _id: "cto7", name: "Katherine Allen", email: "katherine.allen@example.com" },
+  { _id: "cto8", name: "Liam Wright", email: "liam.wright@example.com" },
+  { _id: "cto9", name: "Mia King", email: "mia.king@example.com" },
+  { _id: "cto10", name: "Noah Hill", email: "noah.hill@example.com" },
+];
+
+
+
+export const dummyWorkers = [
+  { _id: "w1", name: "Owen Green", email: "owen.green@example.com" },
+  { _id: "w2", name: "Penelope Adams", email: "penelope.adams@example.com" },
+  { _id: "w3", name: "Quinn Baker", email: "quinn.baker@example.com" },
+  { _id: "w4", name: "Ryan Nelson", email: "ryan.nelson@example.com" },
+  { _id: "w5", name: "Samantha Perez", email: "samantha.perez@example.com" },
+  { _id: "w6", name: "Thomas Roberts", email: "thomas.roberts@example.com" },
+  { _id: "w7", name: "Uma Turner", email: "uma.turner@example.com" },
+  { _id: "w8", name: "Victor Phillips", email: "victor.phillips@example.com" },
+  { _id: "w9", name: "Wendy Campbell", email: "wendy.campbell@example.com" },
+  { _id: "w10", name: "Xavier Mitchell", email: "xavier.mitchell@example.com" },
+];
+
+
+
+
+export const dummyClients = [
+  { _id: "c1", name: "Yara Carter", email: "yara.carter@example.com" },
+  { _id: "c2", name: "Zachary Flores", email: "zachary.flores@example.com" },
+  { _id: "c3", name: "Abigail Ramirez", email: "abigail.ramirez@example.com" },
+  { _id: "c4", name: "Benjamin Rivera", email: "benjamin.rivera@example.com" },
+  { _id: "c5", name: "Charlotte Sanders", email: "charlotte.sanders@example.com" },
+  { _id: "c6", name: "Daniel Perry", email: "daniel.perry@example.com" },
+  { _id: "c7", name: "Ella Jenkins", email: "ella.jenkins@example.com" },
+  { _id: "c8", name: "Finn Long", email: "finn.long@example.com" },
+  { _id: "c9", name: "Gabriella Hughes", email: "gabriella.hughes@example.com" },
+  { _id: "c10", name: "Hudson Foster", email: "hudson.foster@example.com" },
+];

@@ -8,6 +8,7 @@ import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { useGetCleaningAndSanitation, useSetCleaningDeadline, useCompleteCleaningStage } from './../../../apiList/Stage Api/cleaningStageApi';
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 // same keys you showed:
 export const roomKeys = [
@@ -27,19 +28,19 @@ export const roomKeys = [
 ];
 
 export interface ICleaningUpload {
-    type: "image" | "pdf";
-    url: string;
-    originalName: string;
-    uploadedAt: Date
-    _id:string
+  type: "image" | "pdf";
+  url: string;
+  originalName: string;
+  uploadedAt: Date
+  _id: string
 }
 
 export interface IRoomCleaning {
-    // _id: mongoose.Types.ObjectId;
-    roomName: string;
-    uploads: ICleaningUpload[];
-    completelyCleaned: boolean;
-    notes: string;
+  // _id: mongoose.Types.ObjectId;
+  roomName: string;
+  uploads: ICleaningUpload[];
+  completelyCleaned: boolean;
+  notes: string;
 }
 
 export default function CleaningOverview() {
@@ -124,6 +125,13 @@ export default function CleaningOverview() {
               </Button>
 
               <ResetStageButton projectId={projectId!} stageNumber={13} stagePath="cleaning" />
+
+              <AssignStageStaff
+                stageName="CleaningAndSanitationModel"
+                projectId={projectId!}
+                organizationId={"684a57015e439b678e8f6918"}
+                currentAssignedStaff={data?.assignedTo || null}
+              />
             </div>
           </div>
 
@@ -146,7 +154,7 @@ export default function CleaningOverview() {
           </Card>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {data?.rooms?.map((room:IRoomCleaning & {_id:string}) => (
+            {data?.rooms?.map((room: IRoomCleaning & { _id: string }) => (
               <Link
                 key={room._id}
                 to={`cleaningroom/${room._id}`}

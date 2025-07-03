@@ -7,6 +7,7 @@ import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 export const roomKeys = [
   "LivingRoom",
@@ -106,6 +107,21 @@ export default function QualityCheckOverview() {
               </Button>
 
               <ResetStageButton projectId={projectId!} stageNumber={12} stagePath="qualitycheck" />
+
+              <AssignStageStaff
+                              stageName="QualityCheckupModel"
+                              projectId={projectId!}
+                              organizationId={"684a57015e439b678e8f6918"}
+                              currentAssignedStaff={data?.assignedTo || null}
+                            />
+
+
+                            <AssignStageStaff
+                              stageName="ProjectDeliveryModel"
+                              projectId={projectId!}
+                              organizationId={"684a57015e439b678e8f6918"}
+                              currentAssignedStaff={data?.assignedTo || null}
+                            />
             </div>
           </div>
 

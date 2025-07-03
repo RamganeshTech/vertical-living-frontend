@@ -69,7 +69,7 @@ export const PROJECTS_ICONS = {
   INSTALLATION: "fas fa-fit text-2xl",
   QUALITYCHECK: "fas fa-fit text-2xl",
   CLEANINGSANITATION: "fas fa-map text-2xl",
-  PROJECTDELIVERY: "fas fa-project text-2xl",
+  PROJECTDELIVERY: "fas fa-box text-2xl",
 }
 
 

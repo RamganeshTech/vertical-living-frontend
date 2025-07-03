@@ -266,14 +266,13 @@ export const useGetOrderingMaterialPublicDetails = (
 // ✅ 10. Set Deadline
  const setOrderMaterialDeadlineApi = async ({
   formId,
-  deadLine,
-  api,
-}: {
+  projectId,  deadLine, api }:
+   {  projectId: string,
   formId: string;
   deadLine: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/orderingmaterial/deadline/${formId}`, { deadLine });
+  const { data } = await api.put(`/orderingmaterial/deadline/${projectId}/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -351,14 +350,14 @@ export const useSetOrderingMaterialDeadline = () => {
   return useMutation({
     mutationFn: async ({
       formId,
-      deadLine,
-    }: {
+    projectId,  deadLine,
+   }: {  projectId: string,
       formId: string;
       deadLine: string;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await setOrderMaterialDeadlineApi({ formId, deadLine, api });
+      return await setOrderMaterialDeadlineApi({ formId, projectId, deadLine, api });
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({queryKey: ["ordering-material", vars.formId] });

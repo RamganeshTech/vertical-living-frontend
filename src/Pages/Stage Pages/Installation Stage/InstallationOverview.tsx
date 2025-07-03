@@ -7,6 +7,7 @@ import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 export const roomKeys = [
     "LivingRoom",
@@ -74,57 +75,65 @@ export default function InstallationOverview() {
         <main className="w-full h-full">
             {!isChildRoute ? <div className="p-2">
 
-                    <div className='flex justify-between w-full mb-4'>
-                        <h2 className="text-3xl font-semibold text-blue-600 flex items-center">
-                            <i className="fas fa-comments mr-2"></i> Installation Overview
-                        </h2>
+                <div className='flex justify-between w-full mb-4'>
+                    <h2 className="text-3xl font-semibold text-blue-600 flex items-center">
+                        <i className="fas fa-comments mr-2"></i> Installation Overview
+                    </h2>
 
-                        <div className="flex gap-2 items-center ">
-                            <Button isLoading={completePending} onClick={handleCompletionStatus} className="bg-green-600 mt-0 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
-                                <i className="fa-solid fa-circle-check mr-2"></i>
-                                Mark as Complete
-                            </Button>
+                    <div className="flex gap-2 items-center ">
+                        <Button isLoading={completePending} onClick={handleCompletionStatus} className="bg-green-600 mt-0 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
+                            <i className="fa-solid fa-circle-check mr-2"></i>
+                            Mark as Complete
+                        </Button>
 
-                            <ResetStageButton projectId={projectId!} stageNumber={11} stagePath="installation" />
-                        </div>
-                    </div>
+                        <ResetStageButton projectId={projectId!} stageNumber={11} stagePath="installation" />
 
-
-                    <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
-                        <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
-                            <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
-                            <span>Stage Timings</span>
-                        </div>
-
-                        <StageTimerInfo
-                            completedAt={data?.timer?.completedAt}
-                            formId={(data as any)?._id}
-                            deadLine={data?.timer?.deadLine}
-                            startedAt={data?.timer?.startedAt}
-                            refetchStageMutate={refetch}
-                            deadLineMutate={deadLineAsync}
-                            isPending={deadLinePending}
+                        <AssignStageStaff
+                            stageName="InstallationModel"
+                            projectId={projectId!}
+                            organizationId={"684a57015e439b678e8f6918"}
+                            currentAssignedStaff={data?.assignedTo || null}
                         />
-                    </Card>
+                    </div>
+                </div>
 
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {roomKeys.map((room) => (
-                            <Link
-                                key={room}
-                                to={`installationroom/${room}`}
-                                className="border-l-4 border-blue-600 p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer bg-white"
-                            >
-                                <h3 className="text-md font-semibold capitalize text-blue-800">{room}</h3>
-                                <p className="text-xs text-gray-400">{data[room]?.length || 0} works</p>
-                                <p className="text-xs text-gray-400">Click to view details</p>
-
-                            </Link>
-                        ))}
+                <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
+                    <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
+                        <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+                        <span>Stage Timings</span>
                     </div>
 
+                    <StageTimerInfo
+                        completedAt={data?.timer?.completedAt}
+                        projectId={projectId}
+                        formId={(data as any)?._id}
+                        deadLine={data?.timer?.deadLine}
+                        startedAt={data?.timer?.startedAt}
+                        refetchStageMutate={refetch}
+                        deadLineMutate={deadLineAsync}
+                        isPending={deadLinePending}
+                    />
+                </Card>
 
-                </div> :  <Outlet /> }
-            </main>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {roomKeys.map((room) => (
+                        <Link
+                            key={room}
+                            to={`installationroom/${room}`}
+                            className="border-l-4 border-blue-600 p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer bg-white"
+                        >
+                            <h3 className="text-md font-semibold capitalize text-blue-800">{room}</h3>
+                            <p className="text-xs text-gray-400">{data[room]?.length || 0} works</p>
+                            <p className="text-xs text-gray-400">Click to view details</p>
+
+                        </Link>
+                    ))}
+                </div>
+
+
+            </div> : <Outlet />}
+        </main>
     );
 }

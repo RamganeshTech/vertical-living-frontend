@@ -8,6 +8,7 @@ import { Card } from "../../../components/ui/Card";
 import AddRoomModel from "./AddRoomModel";
 import FileUploadSection from "./FileUploadSection";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 // Main component
 const SampleDesignModule: React.FC = () => {
@@ -204,6 +205,13 @@ const SampleDesignModule: React.FC = () => {
           </Button>
 
         <ResetStageButton projectId={projectId!} stageNumber={3} stagePath="sampledesign" />
+
+          <AssignStageStaff
+                    stageName="SampleDesignModel"
+                    projectId={projectId}
+                    organizationId={"684a57015e439b678e8f6918"}
+                    currentAssignedStaff={sampleDesign?.assignedTo || null}
+                  />
         </div>
       </div>
 
@@ -214,8 +222,10 @@ const SampleDesignModule: React.FC = () => {
         </div>
         {/* Keep content within this component, it will now handle horizontal layout */}
         <StageTimerInfo
+
           completedAt={sampleDesign.timer.compltedAt}
           formId={(sampleDesign as any)._id}
+          projectId={projectId}
           deadLine={sampleDesign.timer.deadLine}
           startedAt={sampleDesign.timer.startedAt}
           refetchStageMutate={refetch}

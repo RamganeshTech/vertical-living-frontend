@@ -15,11 +15,12 @@ interface UploadSectionProps {
         uploadedAt: string;
     }[];
     onUploadComplete?: () => void;
-    uploadFilesMutate: ({ formId, files }: { formId: string, files: any }) => Promise<any>,
+    uploadFilesMutate: ({ formId, files ,projectId}: { formId: string,projectId: string, files: any }) => Promise<any>,
     uploadPending: boolean
+    projectId:string
 }
 
-const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending }) => {
+const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, projectId, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending }) => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
 
@@ -32,7 +33,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, existin
     const handleUpload = async () => {
         if (!formId || selectedFiles.length === 0) return;
         try {
-            await uploadFilesMutate({ formId, files: selectedFiles });
+            await uploadFilesMutate({ formId, files: selectedFiles, projectId });
             toast({ title: "Success", description: "Files uploaded successfully." });
             setSelectedFiles([]);
             onUploadComplete?.();

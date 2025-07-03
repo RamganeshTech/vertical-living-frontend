@@ -169,14 +169,13 @@ export const useGetInstallationRoomDetails = (projectId: string, roomName: strin
 // ✅ 10. Set Deadline
  const setInstallationDeadlineApi = async ({
   formId,
-  deadLine,
-  api,
-}: {
+ projectId,  deadLine, api }:
+  {  projectId: string,
   formId: string;
   deadLine: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/installation/deadline/${formId}`, { deadLine });
+  const { data } = await api.put(`/installation/deadline/${projectId}/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -205,14 +204,13 @@ export const useSetInstallationDeadline = () => {
   return useMutation({
     mutationFn: async ({
       formId,
-      deadLine,
-    }: {
+      projectId,  deadLine }: {  projectId: string,
       formId: string;
       deadLine: string;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await setInstallationDeadlineApi({ formId, deadLine, api });
+      return await setInstallationDeadlineApi({ formId, projectId, deadLine, api });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["installation-details"] });

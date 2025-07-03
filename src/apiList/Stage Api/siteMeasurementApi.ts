@@ -64,12 +64,11 @@ const setDeadlineSiteMeasurement = async ({ formId, projectId, deadLine, api }: 
 }
 
 
-
-const uploadFiles = async ({ formId, files, api }: UploadFilePayload & { api: any }) => {
+const uploadFiles = async ({ formId, files, api, projectId }: UploadFilePayload & { api: any }) => {
     const formData = new FormData();
     files.forEach((file) => formData.append("file", file));
 
-    const response = await api.post(`/sitemeasurement/upload/multiple/${formId}`, formData,
+    const response = await api.post(`/sitemeasurement/upload/multiple/${projectId}/${formId}`, formData,
         {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -282,7 +281,7 @@ export const useUploadRequirementFiles = () => {
 
 
     return useMutation({
-        mutationFn: async ({ formId, files }: UploadFilePayload) => {
+        mutationFn: async ({ formId, files, projectId }: UploadFilePayload) => {
 
             if (!role) throw new Error("not authorized")
 
@@ -290,7 +289,7 @@ export const useUploadRequirementFiles = () => {
 
             if (!api) throw new Error("api is null")
 
-            return await uploadFiles({ formId, files, api })
+            return await uploadFiles({ formId, files, projectId, api })
         },
     });
 };

@@ -132,6 +132,7 @@ import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionL
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 const OrderMaterialOverview = () => {
   const { projectId } = useParams();
@@ -224,6 +225,13 @@ const OrderMaterialOverview = () => {
             </Button>
 
             <ResetStageButton projectId={projectId!} stageNumber={8} stagePath="orderingmaterial" />
+
+              <AssignStageStaff
+            stageName="OrderingMaterialModel"
+            projectId={projectId!}
+            organizationId={"684a57015e439b678e8f6918"}
+            currentAssignedStaff={data?.assignedTo || null}
+          />
           </div>
         </div>
 
@@ -236,6 +244,7 @@ const OrderMaterialOverview = () => {
             <StageTimerInfo
               completedAt={data?.timer?.completedAt}
               formId={(data as any)?._id}
+              projectId={projectId!}
               deadLine={data?.timer?.deadLine}
               startedAt={data?.timer?.startedAt}
               refetchStageMutate={refetch}

@@ -337,14 +337,13 @@ export const useUpdateWorkScheduleStatus = () => {
 // ✅ 10. Set Deadline
  const setWorkScheduleDeadlineApi = async ({
   formId,
-  deadLine,
-  api,
-}: {
+ projectId,  deadLine, api }: 
+ {  projectId: string,
   formId: string;
   deadLine: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/worktasks/deadline/${formId}`, { deadLine });
+  const { data } = await api.put(`/worktasks/deadline/${projectId}/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -373,14 +372,14 @@ export const useSetWorkScheduleDeadline = () => {
   return useMutation({
     mutationFn: async ({
       formId,
-      deadLine,
-    }: {
+     projectId,  deadLine }: 
+     {  projectId: string,
       formId: string;
       deadLine: string;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await setWorkScheduleDeadlineApi({ formId, deadLine, api });
+      return await setWorkScheduleDeadlineApi({ formId, projectId, deadLine, api });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["material-rooms"] });

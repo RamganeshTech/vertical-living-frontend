@@ -12,6 +12,9 @@ import {
 } from "../../apiList/orgApi"
 import { COMPANY_DETAILS, } from "../../constants/constants"
 import { useState } from "react"
+import { useGetAllUsers } from "../../apiList/getAll Users Api/getAllUsersApi"
+import { dummyClients, dummyCTOs, dummyStaffs, dummyWorkers } from "../../utils/dummyData"
+import RoleCard from "./RoleCard"
 
 export default function OrganizationDetails() {
   const { organizationId } = useParams<{ organizationId: string }>()
@@ -38,6 +41,11 @@ export default function OrganizationDetails() {
   console.log(organization, "isArray:", Array.isArray(organization))
 
   const updateOrganization = useUpdateOrganizationName()
+  const { data: staffList, isLoading: staffLoading } = useGetAllUsers(organizationId!, "staff");
+  const { data: ctoList, isLoading: ctoLoading } = useGetAllUsers(organizationId!, "CTO");
+  const { data: workerList, isLoading: workerLoading } = useGetAllUsers(organizationId!, "worker");
+  const { data: clientList, isLoading: clientLoading } = useGetAllUsers(organizationId!, "client");
+
 
 
   const handleUpdateName = async () => {
@@ -216,8 +224,9 @@ export default function OrganizationDetails() {
   // bg-gradient-to-br from-[#0ae12e] to-[#add8e6] for customized linear gradient output
   return (
     <div className="flex w-full h-full">
-      <div className={`min-h-full bg-gradient-to-br from-blue-50 via-white bg-blue-100`}>
-      
+      <div className={`min-h-full w-full bg-gradient-to-br from-blue-50 via-white bg-blue-100`}>
+
+        {/* header part */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10">
           <div className="max-w-full mx-auto px-4 sm:px-6 py-2 sm:py-3">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -237,7 +246,7 @@ export default function OrganizationDetails() {
                 <div className="hidden sm:block h-6 w-px bg-gray-300 flex-shrink-0" />
 
                 <div className="flex items-center space-x-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12  bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
                     {organization?.logoUrl ? (
                       <img
                         src={organization?.logoUrl || COMPANY_DETAILS.COMPANY_LOGO}
@@ -319,154 +328,164 @@ export default function OrganizationDetails() {
           </div>
         </div>
 
-        
+        {/* organiztation details */}
         <div className="max-w-full mx-auto p-4 sm:p-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          
-            <div className="lg:col-span-1 space-y-6">
-              <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-blue-900 flex items-center text-lg">
-                    <i className="fas fa-building mr-2"></i>
-                    Organization Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {
-                    <div className="p-3 bg-blue-50 rounded-xl">
-                      {editingPhone ? (
-                        <div className="space-y-3">
-                          <div className="flex items-center space-x-3">
-                            <i className="fas fa-phone text-blue-600"></i>
-                            <div className="flex-1">
-                              <Input
-                                value={tempPhone}
-                                onChange={(e) => setTempPhone(e.target.value)}
-                                placeholder="Enter phone number"
-                                className="text-sm border-blue-200 focus:border-blue-500 bg-white"
-                                onKeyPress={(e) => e.key === "Enter" && handleSavePhone()}
-                              />
-                            </div>
-                          </div>
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={handleCancelEditPhone}
-                              className="text-gray-600 border-gray-300 hover:bg-gray-50 text-xs px-3 py-1"
-                            >
-                              <i className="fas fa-times mr-1"></i>
-                              Cancel
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="primary"
-                              onClick={handleSavePhone}
-                              isLoading={updateOrganization.isPending}
-                              className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
-                            >
-                              <i className="fas fa-check mr-1"></i>
-                              Save
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between group">
-                          <div className="flex items-center space-x-3">
-                            <i className="fas fa-phone text-blue-600"></i>
-                            <span className="text-gray-700 text-sm sm:text-base">
-                              {organization?.organizationPhoneNo || "N/A"}
-                            </span>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={handleStartEditPhone}
-                            className=" text-blue-600 hover:bg-blue-100 p-1 h-auto"
-                          >
-                            <i className="fas fa-edit text-xs"></i>
-                          </Button>
-                        </div>
-                      )}
+            <div className="lg:col-span-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Phone Section */}
+                <div className="p-4 bg-blue-50 rounded-xl shadow-sm">
+                  {editingPhone ? (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <i className="fas fa-phone text-blue-600" />
+                        <Input
+                          value={tempPhone}
+                          onChange={(e) => setTempPhone(e.target.value)}
+                          placeholder="Enter phone number"
+                          className="text-sm border-blue-200 focus:border-blue-500 bg-white flex-1"
+                          onKeyPress={(e) => e.key === "Enter" && handleSavePhone()}
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2 mt-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleCancelEditPhone}
+                          className="text-gray-600 border-gray-300 hover:bg-gray-50 text-xs px-3 py-1"
+                        >
+                          <i className="fas fa-times mr-1"></i> Cancel
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={handleSavePhone}
+                          isLoading={updateOrganization.isPending}
+                          className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
+                        >
+                          <i className="fas fa-check mr-1"></i> Save
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <i className="fas fa-phone text-blue-600" />
+                        <span className="text-gray-700 text-sm sm:text-base">
+                          {organization?.organizationPhoneNo || "N/A"}
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleStartEditPhone}
+                        className="text-blue-600 hover:bg-blue-100 p-1 h-auto"
+                      >
+                        <i className="fas fa-edit text-xs"></i>
+                      </Button>
                     </div>
-                  }
-                  {
-                    <div className="p-3 bg-blue-50 rounded-xl">
-                      {editingAddress ? (
-                        <div className="space-y-3 ">
-                          <div className="flex items-start space-x-3">
-                            <i className="fas fa-map-marker-alt text-blue-600 mt-1"></i>
-                            <div className="flex-1">
-                              <textarea
-                                value={tempAddress}
-                                onChange={(e) => setTempAddress(e.target.value)}
-                                placeholder="Enter address"
-                                className="w-full text-sm border-2 border-blue-200 focus:border-blue-500 bg-white rounded-lg p-2 resize-none focus:outline-none"
-                                rows={3}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter" && !e.shiftKey) {
-                                    e.preventDefault()
-                                    handleSaveAddress()
-                                  }
-                                }}
-                              />
-                              <div className="flex items-center gap-[5px] text-blue-600">
-                                <i className="fa-solid fa-circle-info"></i>
-                                <span className=" sm:text-sm text-[12px]">Press shift + enter for next Line</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={handleCancelEditAddress}
-                              className="text-gray-600 border-gray-300 hover:bg-gray-50 text-xs px-3 py-1"
-                            >
-                              <i className="fas fa-times mr-1"></i>
-                              Cancel
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="primary"
-                              onClick={handleSaveAddress}
-                              isLoading={updateOrganization.isPending}
-                              className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
-                            >
-                              <i className="fas fa-check mr-1"></i>
-                              Save
-                            </Button>
+                  )}
+                </div>
+
+                {/* Address Section */}
+                <div className="p-4 bg-blue-50 rounded-xl shadow-sm">
+                  {editingAddress ? (
+                    <>
+                      <div className="flex items-start gap-3">
+                        <i className="fas fa-map-marker-alt text-blue-600 mt-1" />
+                        <div className="flex-1">
+                          <textarea
+                            value={tempAddress}
+                            onChange={(e) => setTempAddress(e.target.value)}
+                            placeholder="Enter address"
+                            className="w-full text-sm border-2 border-blue-200 focus:border-blue-500 bg-white rounded-lg p-2 resize-none focus:outline-none"
+                            rows={3}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault()
+                                handleSaveAddress()
+                              }
+                            }}
+                          />
+                          <div className="flex items-center gap-2 mt-1 text-blue-600">
+                            <i className="fa-solid fa-circle-info text-[13px]"></i>
+                            <span className="text-[12px] sm:text-sm">Press Shift + Enter for next line</span>
                           </div>
                         </div>
-                      ) : (
-                        <div className="flex items-start justify-between group">
-                          <div className="flex items-start space-x-3 space-y-14">
-                            <i className="fas fa-map-marker-alt text-blue-600 mt-1"></i>
-                            <span className="text-gray-700 text-sm sm:text-base flex-1 break-words whitespace-normal">{organization?.address || "N/A"}</span>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={handleStartEditAddress}
-                            className="text-blue-600 hover:bg-blue-100 p-1 h-auto flex-shrink-0"
-                          >
-                            <i className="fas fa-edit text-xs"></i>
-                          </Button>
-                        </div>
-                      )}
+                      </div>
+                      <div className="mt-3 flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleCancelEditAddress}
+                          className="text-gray-600 border-gray-300 hover:bg-gray-50 text-xs px-3 py-1"
+                        >
+                          <i className="fas fa-times mr-1"></i> Cancel
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={handleSaveAddress}
+                          isLoading={updateOrganization.isPending}
+                          className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
+                        >
+                          <i className="fas fa-check mr-1"></i> Save
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex items-start gap-3">
+                        <i className="fas fa-map-marker-alt text-blue-600 mt-1" />
+                        <span className="text-gray-700 text-sm sm:text-base break-words whitespace-pre-wrap">
+                          {organization?.address || "N/A"}
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleStartEditAddress}
+                        className="text-blue-600 hover:bg-blue-100 p-1 h-auto flex-shrink-0"
+                      >
+                        <i className="fas fa-edit text-xs"></i>
+                      </Button>
                     </div>
-                  }
-                  {/* <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-xl">
-                    <i className="fas fa-users text-blue-600"></i>
-                    <span className="text-gray-700 text-sm sm:text-base">{staffs?.length || 0} Staff Members</span>
-                  </div> */}
-                </CardContent>
-              </Card>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        <div className="px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-3  max-h-[73%]">
+          <RoleCard
+            title="Staffs"
+            icon="fa-user-tie"
+            list={dummyStaffs}
+            isLoading={staffLoading}
+          />
+          <RoleCard
+            title="CTOs"
+            icon="fa-user-cog"
+            list={dummyCTOs}
+            isLoading={ctoLoading}
+          />
+          <RoleCard
+            title="Workers"
+            icon="fa-user-hard-hat"
+            list={dummyWorkers}
+            isLoading={workerLoading}
+          />
+          <RoleCard
+            title="Clients"
+            icon="fa-user-friends"
+            list={dummyClients}
+            isLoading={clientLoading}
+          />
+        </div>
+
       </div>
     </div>
- 
+
   )
 }

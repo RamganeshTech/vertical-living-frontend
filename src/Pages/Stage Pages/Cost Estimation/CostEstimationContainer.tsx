@@ -13,6 +13,7 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import LabourEstimateContainer from "./LabourEstimate/LabourEstimateContainer";
 import SummaryCostEstimation from "./SummaryCostEstimation";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 export const CostEstimationContainer = () => {
   const { projectId } = useParams();
@@ -72,6 +73,13 @@ export const CostEstimationContainer = () => {
                 </Button>
 
                 <ResetStageButton projectId={projectId!} stageNumber={6} stagePath="costestimation" />
+
+                  <AssignStageStaff
+            stageName="CostEstimationModel"
+            projectId={projectId!}
+            organizationId={"684a57015e439b678e8f6918"}
+            currentAssignedStaff={data?.assignedTo || null}
+          />
               </div>
 
             </div>
@@ -84,6 +92,7 @@ export const CostEstimationContainer = () => {
               <StageTimerInfo
                 completedAt={data?.timer?.completedAt}
                 formId={(data as any)?._id}
+                projectId={projectId!}
                 deadLine={data?.timer?.deadLine}
                 startedAt={data?.timer?.startedAt}
                 refetchStageMutate={refetch}

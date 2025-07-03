@@ -16,8 +16,6 @@ import { Textarea } from "../../../components/ui/TextArea";
 import { Input } from "../../../components/ui/Input";
 import { Label } from "../../../components/ui/Label";
 
-
-
 const dummyUploads: ICleaningUpload[] = [
     {
         _id: "000c10101",
@@ -160,9 +158,6 @@ const dummyUploads: ICleaningUpload[] = [
         uploadedAt: new Date("2024-07-01T10:35:00Z"),
     },
 ];
-
-
-
 
 export default function CleaningRoomOverview() {
     const { projectId, roomId } = useParams() as { projectId: string, roomId: string };
@@ -472,8 +467,6 @@ export default function CleaningRoomOverview() {
                     )}
                 </Card>
             </div>
-
-
         </div>
     );
 }

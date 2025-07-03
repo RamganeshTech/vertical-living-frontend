@@ -190,13 +190,15 @@ export const useGetQualityCheckRoomItems = (projectId: string, roomName: string)
  const setQualityCheckDeadlineApi = async ({
   formId,
   deadLine,
+  projectId,
   api,
 }: {
   formId: string;
   deadLine: string;
+  projectId:string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/qualitycheck/deadline/${formId}`, { deadLine });
+  const { data } = await api.put(`/qualitycheck/deadline/${projectId}/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -226,13 +228,16 @@ export const useSetQualityCheckDeadline = () => {
     mutationFn: async ({
       formId,
       deadLine,
+      projectId
     }: {
       formId: string;
+      projectId: string;
       deadLine: string;
+
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await setQualityCheckDeadlineApi({ formId, deadLine, api });
+      return await setQualityCheckDeadlineApi({ formId, projectId, deadLine, api });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quality-checkup"] });

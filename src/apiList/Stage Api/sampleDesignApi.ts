@@ -86,8 +86,8 @@ const updateCompletionStatus = async ({ projectId, api }: { projectId: string, a
     return data.data;
 }
 
-const setDeadlineSampleDesign = async ({ formId, deadLine, api }: { formId: string, deadLine: string, api: AxiosInstance }) => {
-    const { data } = await api.put(`/sampledesign/deadline/${formId}`, { deadLine });
+const setDeadlineSampleDesign = async ({ formId,projectId,  deadLine, api }: {  projectId: string, formId: string, deadLine: string, api: AxiosInstance }) => {
+    const { data } = await api.put(`/sampledesign/deadline/${projectId}/${formId}`, { deadLine });
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
@@ -244,14 +244,14 @@ export const useSetDeadLineSampleDesign= () => {
     const { role } = useGetRole()
     const api = getApiForRole(role!)
     return useMutation({
-        mutationFn: async ({ formId, deadLine }: { formId: string, deadLine: string }) => {
+        mutationFn: async ({ formId, projectId,  deadLine, }: {  projectId: string, formId: string, deadLine: string }) => {
             if (!role) throw new Error("not authorized")
 
             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
 
             if (!api) throw new Error("api is null")
 
-            return await setDeadlineSampleDesign({ formId, deadLine, api })
+            return await setDeadlineSampleDesign({ formId, projectId, deadLine, api })
 
         }
     })

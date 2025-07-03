@@ -13,9 +13,8 @@ import {
 } from './../../../apiList/Stage Api/siteMeasurementApi';
 import { useParams } from 'react-router-dom';
 
-import type { RoomName, SiteDetails, SiteRooms } from "../../../types/types";
+import type { SiteDetails, SiteRooms } from "../../../types/types";
 import { toast } from '../../../utils/toast';
-import RoomCard from './RoomCard';
 import { Card } from '../../../components/ui/Card';
 import StageTimerInfo from '../../../shared/StagetimerInfo';
 import RequirementFileUploader from '../../../shared/StageFileUploader';
@@ -25,6 +24,7 @@ import SiteRoomInfo from './SiteRoomInfo';
 import CommonSiteForm from './CommonSiteForm';
 import { ResetStageButton } from '../../../shared/ResetStageButton';
 import MaterialOverviewLoading from '../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
+import AssignStageStaff from '../../../shared/AssignStaff';
 
 const initialSiteDetails: SiteDetails = {
   totalPlotAreaSqFt: null,
@@ -160,19 +160,14 @@ function HomeInteriorProject() {
 
 
   if (isLoading) {
-    // return (
-    //   <div className="flex items-center justify-center min-h-screen">
-    //     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    //   </div>
-    // );
     return <MaterialOverviewLoading />
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-full h-full overflow-y-scroll">
+    <div className="container mx-auto px-2 sm:px-6 lg:px-2 py-2 max-w-full h-full overflow-y-auto">
       <div className='flex justify-between items-center  mb-8'>
         <div>
-          <h2 className="text-3xl font-semibold text-blue-600 mb-3 flex items-center">
+          <h2 className="text-3xl font-semibold text-blue-600 mb-1 flex items-center">
             <i className="fa-solid fa-receipt mr-2"></i>Site Measurement
           </h2>
           <p className="text-gray-600">Plan your dream home by adding site measurements and room details</p>
@@ -185,12 +180,18 @@ function HomeInteriorProject() {
           </Button>
 
           <ResetStageButton projectId={projectId!} stageNumber={2} stagePath="sitemeasurement" />
+
+          <AssignStageStaff
+            stageName="SiteMeasurementModel"
+            projectId={projectId}
+            organizationId={"684a57015e439b678e8f6918"}
+            currentAssignedStaff={measurementData?.assignedTo || null}
+          />
         </div>
       </div>
 
 
       {getAllError &&
-
         <div className="max-w-xl mx-auto mt-12 p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
           <div className="text-red-600 text-xl font-semibold mb-2">
             ⚠️ Oops! An Error Occurred
@@ -237,6 +238,7 @@ function HomeInteriorProject() {
             onUploadComplete={refetch}
             uploadFilesMutate={uploadFilesMutate}
             uploadPending={uploadPending}
+            projectId={projectId}
           />
         </Card>
       </div>

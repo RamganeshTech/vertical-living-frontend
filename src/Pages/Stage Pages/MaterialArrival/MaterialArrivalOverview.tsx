@@ -18,6 +18,7 @@ import {
     useSetMaterialArrivalDeadline,
     useCompleteMaterialArrivalStage
 } from "../../../apiList/Stage Api/materialArrivalApi";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 const MaterialArrivalOverview = () => {
     const { projectId } = useParams();
@@ -112,6 +113,13 @@ const MaterialArrivalOverview = () => {
                             </Button>
 
                             <ResetStageButton projectId={projectId!} stageNumber={9} stagePath="materialarrival" />
+
+                              <AssignStageStaff
+            stageName="MaterialArrivalModel"
+            projectId={projectId!}
+            organizationId={"684a57015e439b678e8f6918"}
+            currentAssignedStaff={data?.assignedTo || null}
+          />
                         </div>
                     </div>
 
@@ -124,6 +132,7 @@ const MaterialArrivalOverview = () => {
                             </div>
                             <StageTimerInfo
                                 completedAt={timer?.completedAt}
+                                projectId={projectId!}
                                 formId={(data as any)?._id}
                                 deadLine={timer?.deadLine}
                                 startedAt={timer?.startedAt}

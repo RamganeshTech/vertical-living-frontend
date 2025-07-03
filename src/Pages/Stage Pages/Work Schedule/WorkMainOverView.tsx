@@ -8,6 +8,7 @@ import { ResetStageButton } from "../../../shared/ResetStageButton";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { Card } from "../../../components/ui/Card";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 const WorkMainOverview: FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -71,6 +72,13 @@ const WorkMainOverview: FC = () => {
               </Button>
 
               <ResetStageButton projectId={projectId!} stageNumber={10} stagePath="worktasks" />
+
+              <AssignStageStaff
+                stageName="WorkMainStageScheduleModel"
+                projectId={projectId!}
+                organizationId={"684a57015e439b678e8f6918"}
+                currentAssignedStaff={data?.assignedTo || null}
+              />
             </div>
           </div>
 
@@ -83,6 +91,7 @@ const WorkMainOverview: FC = () => {
 
             <StageTimerInfo
               completedAt={data?.timer?.completedAt}
+              projectId={projectId!}
               formId={(data as any)?._id}
               deadLine={data?.timer?.deadLine}
               startedAt={data?.timer?.startedAt}
@@ -133,10 +142,10 @@ const WorkMainOverview: FC = () => {
                 <span className="text-gray-700 font-medium w-24">Status:</span>
                 <span
                   className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${data?.mdApproval?.status === 'approved'
-                      ? 'bg-green-100 text-green-700'
-                      : data?.mdApproval?.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
+                    ? 'bg-green-100 text-green-700'
+                    : data?.mdApproval?.status === 'pending'
+                      ? 'bg-yellow-100 text-yellow-700'
+                      : 'bg-red-100 text-red-700'
                     }`}
                 >
                   {data?.mdApproval?.status || "Not Mentioned"}

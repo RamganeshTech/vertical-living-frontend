@@ -62,6 +62,7 @@ import QualityCheckOverview from './Pages/Stage Pages/QualityCheck Stage/Quality
 import QualityCheckRoomDetails from './Pages/Stage Pages/QualityCheck Stage/QualityCheckRoomDetails'
 import CleaningOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningOverview'
 import CleaningRoomOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningRoomOverview'
+import ProjectDelivery from './Pages/Stage Pages/Project Delivery/ProjectDelivery'
 
 function App() {
 
@@ -184,10 +185,11 @@ function App() {
             <Route path="qualitycheckroom/:roomkey" element={<QualityCheckRoomDetails />} />
           </Route>
 
-           <Route path="cleaning" element={<CleaningOverview />} >
+          <Route path="cleaning" element={<CleaningOverview />} >
             <Route path="cleaningroom/:roomId" element={<CleaningRoomOverview />} />
           </Route>
 
+          <Route path="projectdelivery" element={<ProjectDelivery />} />
         </Route>
 
 

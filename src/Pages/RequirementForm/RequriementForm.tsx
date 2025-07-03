@@ -18,6 +18,7 @@ import { ResetStageButton } from "../../shared/ResetStageButton";
 import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import ClientInfoCard from "./components/ClientInfoCard";
 import SectionCards from "./components/SectionCards";
+import AssignStageStaff from "../../shared/AssignStaff";
 
 
 export type PrivateRequriementFromProp = {
@@ -55,7 +56,7 @@ const SectionConfig = [
 ]
 
 export default function RequirementForm() {
-  const { projectId } = useParams();
+  const { projectId } = useParams() as { projectId: string };
   const { role } = useGetRole()
 
   const [inviteLink, setInviteLink] = useState("")
@@ -93,7 +94,7 @@ export default function RequirementForm() {
     if (!window.confirm("Are you sure want to mark it as completed?")) return
     try {
       if (!completePending) {
-        await completeFormMutate({ formId: formData._d })
+        await completeFormMutate({ formId: formData._id, projectId })
         toast({ title: "Success", description: "completion updated successfully" })
       }
     } catch (error: any) {
@@ -104,7 +105,7 @@ export default function RequirementForm() {
   const handleLockForm = async () => {
     try {
       if (!lockPending) {
-        await lockFormMutate({ formId: formData._id! })
+        await lockFormMutate({ formId: formData._id!, projectId })
         toast({ title: "Success", description: "form updation locked successfully" })
       }
     } catch (error: any) {
@@ -155,6 +156,9 @@ export default function RequirementForm() {
     window.open(whatsappUrl, "_blank")
   }
 
+  console.log("staff assigned", formData.assignedTo
+)
+
   return (
     <>
       {visibleSection ? (
@@ -183,20 +187,27 @@ export default function RequirementForm() {
 
 
             <div className="flex gap-3">
-              <Button onClick={handleLockForm} className="bg-yellow-100 hover:bg-yellow-100  border-yellow-400 text-yellow-800 w-full sm:w-auto">
-                <i className="fa-solid fa-lock mr-2"></i>
-                Lock Form
-              </Button>
+              {/* <Button onClick={handleLockForm} className="bg-yellow-100 hover:bg-yellow-100  border-yellow-400 text-yellow-800 w-full sm:w-auto">
+                <i className="fa-solid fa-lock"></i>
+              </Button> */}
               <Button onClick={handleFormCompletion} className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
                 <i className="fa-solid fa-circle-check mr-2"></i>
                 Mark as Complete
               </Button>
               <Button onClick={handleFormDeletion} className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto">
-                <i className="fa-solid fa-trash-can mr-2"></i>
-                Delete Form
+                <i className="fa-solid fa-trash-can"></i>
+                
               </Button>
 
               <ResetStageButton projectId={projectId!} stageNumber={1} stagePath="requirementform" />
+
+              <AssignStageStaff
+                stageName="RequirementFormModel"
+                projectId={projectId}
+                organizationId={"684a57015e439b678e8f6918"}
+                currentAssignedStaff={formData?.assignedTo || null}
+              />
+
             </div>
           </div>
 
@@ -208,13 +219,14 @@ export default function RequirementForm() {
                 <span>Stage Timings</span>
               </div>
 
-              {/* Keep content within this component, it will now handle horizontal layout */}
+              {/* Keep content within this, it will now handle horizontal layout */}
               <StageTimerInfo
-                startedAt={formData.timer.startedAt}
+                startedAt={formData?.timer?.startedAt}
+                projectId={projectId!}
                 refetchStageMutate={refetch}
-                completedAt={formData.timer.completedAt}
-                deadLine={formData.timer.deadLine}
-                formId={formData._id}
+                completedAt={formData?.timer?.completedAt}
+                deadLine={formData?.timer?.deadLine}
+                formId={formData?._id}
                 deadLineMutate={deadLineMutate}
                 isPending={deadLinePending}
               />
@@ -223,7 +235,7 @@ export default function RequirementForm() {
 
             {/* 2. Client Info & Uploads */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ClientInfoCard client={formData.clientData} />
+              <ClientInfoCard client={formData?.clientData} />
 
               <div className="">
                 <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
@@ -233,6 +245,7 @@ export default function RequirementForm() {
                     onUploadComplete={refetch}
                     uploadFilesMutate={uploadFilesMutate}
                     uploadPending={uploadPending}
+                    projectId={projectId}
                   />
                 </Card>
               </div>

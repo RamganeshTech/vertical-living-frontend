@@ -12,6 +12,7 @@ import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "./MaterailSelectionLoadings/MaterialOverviewLoading";
 import EmptyState from "../../../components/ui/EmptyState";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 
 export default function MaterialRoomOverview() {
@@ -86,6 +87,14 @@ export default function MaterialRoomOverview() {
                                 >
                                     + Add Custom Room
                                 </Button>
+
+
+                                  <AssignStageStaff
+            stageName="MaterialRoomConfirmationModel"
+            projectId={projectId!}
+            organizationId={"684a57015e439b678e8f6918"}
+            currentAssignedStaff={data?.assignedTo || null}
+          />
                             </div>
                         </div>
 
@@ -97,6 +106,7 @@ export default function MaterialRoomOverview() {
 
                             <StageTimerInfo
                                 completedAt={data?.timer?.completedAt}
+                                projectId={projectId!}
                                 formId={(data as any)?._id}
                                 deadLine={data?.timer?.deadLine}
                                 startedAt={data?.timer?.startedAt}

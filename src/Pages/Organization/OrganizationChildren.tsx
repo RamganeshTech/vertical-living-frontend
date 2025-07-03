@@ -17,7 +17,7 @@ const OrganizationChildrens:React.FC = () => {
     return (
         <div className="flex w-full h-full">
             <Sidebar path={path} labels={ORGANIZATION_LABELS} icons={ORGANIZATION_ICONS} />
-              <main className="!w-[100%] h-full p-4">
+              <main className="!w-[100%] h-full">
             <Outlet />
             </main>
         </div>

@@ -81,8 +81,8 @@ const editConsultationMessage = async ({
 
 
 // deadline and completion
-const setDeadlineTechnicalConsult = async ({ formId, deadLine, api }: { formId: string, deadLine: string, api: AxiosInstance }) => {
-    const { data } = await api.put(`/technicalconsultation/deadline/${formId}`, { deadLine });
+const setDeadlineTechnicalConsult = async ({ formId, projectId,  deadLine, api }: {  projectId: string,formId: string, deadLine: string, api: AxiosInstance }) => {
+    const { data } = await api.put(`/technicalconsultation/deadline/${projectId}/${formId}`, { deadLine });
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
@@ -96,11 +96,11 @@ const updateCompletionStatus = async ({ projectId, api }: { projectId: string, a
 // file upload api
 
 
-const uploadFiles = async ({ formId, files, api }: UploadFilePayload & { api: any }) => {
+const uploadFiles = async ({ formId, files, projectId, api }: UploadFilePayload & { api: any }) => {
     const formData = new FormData();
     files.forEach((file) => formData.append("file", file));
 
-    const response = await api.post(`/technicalconsultation/upload/multiple/${formId}`, formData,
+    const response = await api.post(`/technicalconsultation/upload/multiple/${projectId}/${formId}`, formData,
         {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -226,7 +226,7 @@ export const useUploadRequirementFiles = () => {
 
 
     return useMutation({
-        mutationFn: async ({ formId, files }: UploadFilePayload) => {
+        mutationFn: async ({ formId, files, projectId }: UploadFilePayload) => {
 
             if (!role) throw new Error("not authorized")
 
@@ -234,7 +234,7 @@ export const useUploadRequirementFiles = () => {
 
             if (!api) throw new Error("api is null")
 
-            return await uploadFiles({ formId, files, api })
+            return await uploadFiles({ formId, projectId, files, api })
         },
         onSuccess:()=>{
       queryClient.invalidateQueries({ queryKey: ["consultationMessages"] });
@@ -273,14 +273,14 @@ export const useSetDeadLineTechConsultation = () => {
     const { role } = useGetRole()
     const api = getApiForRole(role!)
     return useMutation({
-        mutationFn: async ({ formId, deadLine }: { formId: string, deadLine: string }) => {
+        mutationFn: async ({ formId,projectId,  deadLine }: {  projectId: string,formId: string, deadLine: string }) => {
             if (!role) throw new Error("not authorized")
 
             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
 
             if (!api) throw new Error("api is null")
 
-            return await setDeadlineTechnicalConsult({ formId, deadLine, api })
+            return await setDeadlineTechnicalConsult({ formId, projectId, deadLine, api })
 
         }
     })

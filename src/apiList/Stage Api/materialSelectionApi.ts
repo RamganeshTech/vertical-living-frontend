@@ -3,116 +3,9 @@ import useGetRole from "../../Hooks/useGetRole";
 import { getApiForRole } from "../../utils/roleCheck";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-// --- API FUNCTIONS ---
-
-// // ✅ 1. Get All Material Rooms
-// const getAllMaterialRooms = async (
-//   params: { projectId: string; api: AxiosInstance }
-// ) => {
-//     console.log("calling all mata api")
-//   const { projectId, api } = params;
-//   const { data } = await api.get(`/materialconfirmation/${projectId}`);
-//   console.log("data form api", data)
-
-//   if (!data.ok) throw new Error(data.message);
-
-//   return data.data;
-// };
-
-// // ✅ 2. Get Specific Room by ID
-// const getMaterialRoomById = async (
-//   params: { projectId: string; roomId: string; api: AxiosInstance }
-// ) => {
-//     console.log("calling all single api by room idingle api")
-
-//   const { projectId, roomId, api } = params;
-//   const { data } = await api.get(`/materialconfirmation/${projectId}/room/${roomId}`);
-//   if (!data.ok) throw new Error(data.message);
-//   return data.data;
-// };
-
-// // ✅ 3. Create New Room
-// const createMaterialRoom = async (
-//   params: { projectId: string; roomName: string; api: AxiosInstance }
-// ) => {
-//   const { projectId, roomName, api } = params;
-//   const { data } = await api.post(`/materialconfirmation/${projectId}/createroom`, { roomName });
-//   if (!data.ok) throw new Error(data.message);
-//   return data.data;
-// };
-
-// // ✅ 4. Create Modular Work
-//  const createModularWorkApi = async ({
-//   projectId,
-//   roomId,
-//   body,
-//   api,
-// }: {
-//   projectId: string;
-//   roomId: string;
-//   body: { workName: string; notes?: string; materials?: string[] };
-//   api: AxiosInstance;
-// }) => {
-//   const { data } = await api.post(`/materialconfirmation/${projectId}/creatematerial/${roomId}`, body);
-//   if (!data.ok) throw new Error(data.message);
-//   return data.data;
-// };
-
-// // ✅ 5. Edit Modular Work
-//  const editModularWorkApi = async ({
-//   projectId,
-//   roomId,
-//   workId,
-//   body,
-//   api,
-// }: {
-//   projectId: string;
-//   roomId: string;
-//   workId: string;
-//   body: { workName?: string; notes?: string | null; materials?: string[] };
-//   api: AxiosInstance;
-// }) => {
-//   const { data } = await api.put(`/materialconfirmation/${projectId}/editmaterial/${roomId}/${workId}`, body);
-//   if (!data.ok) throw new Error(data.message);
-//   return data.data;
-// };
-
-// // ✅ 6. Delete Modular Work
-//  const deleteModularWorkApi = async ({
-//   projectId,
-//   roomId,
-//   workId,
-//   api,
-// }: {
-//   projectId: string;
-//   roomId: string;
-//   workId: string;
-//   api: AxiosInstance;
-// }) => {
-//   const { data } = await api.put(`/materialconfirmation/${projectId}/deletematerial/${roomId}/${workId}`);
-//   if (!data.ok) throw new Error(data.message);
-//   return data.data;
-// };
-
-// // ✅ 7. Delete Room
-//  const deleteRoomApi = async ({
-//   projectId,
-//   roomId,
-//   api,
-// }: {
-//   projectId: string;
-//   roomId: string;
-//   api: AxiosInstance;
-// }) => {
-//   const { data } = await api.put(`/materialconfirmation/${projectId}/deleteroom/${roomId}`);
-//   if (!data.ok) throw new Error(data.message);
-//   return data.data;
-// };
 
 
-
-
- const getMaterialConfirmationByProjectApi = async ({
+const getMaterialConfirmationByProjectApi = async ({
   projectId,
   api,
 }: {
@@ -125,7 +18,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 };
 
 
- const getSinglePredefinedRoomApi = async ({
+const getSinglePredefinedRoomApi = async ({
   projectId,
   roomId,
   api,
@@ -140,7 +33,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 };
 
 
- const updatePredefinedRoomFieldApi = async ({
+const updatePredefinedRoomFieldApi = async ({
   projectId,
   roomId,
   fieldKey,
@@ -164,7 +57,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 
- const createCustomRoomApi = async ({
+const createCustomRoomApi = async ({
   projectId,
   name,
   api,
@@ -180,7 +73,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 
- const addItemToCustomRoomApi = async ({
+const addItemToCustomRoomApi = async ({
   projectId,
   roomId,
   item,
@@ -203,7 +96,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 
- const deleteCustomRoomFieldApi = async ({
+const deleteCustomRoomFieldApi = async ({
   projectId,
   roomId,
   fieldKey,
@@ -260,14 +153,14 @@ export const deleteFileFromRoomApi = async ({
 // ✅ 10. Set Deadline
 export const setMaterialDeadlineApi = async ({
   formId,
-  deadLine,
-  api,
-}: {
-  formId: string;
-  deadLine: string;
-  api: AxiosInstance;
-}) => {
-  const { data } = await api.put(`/materialconfirmation/deadline/${formId}`, {deadLine});
+  projectId, deadLine, api }:
+  {
+    projectId: string,
+    formId: string;
+    deadLine: string;
+    api: AxiosInstance;
+  }) => {
+  const { data } = await api.put(`/materialconfirmation/deadline/${projectId}/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -663,14 +556,15 @@ export const useSetMaterialDeadline = () => {
   return useMutation({
     mutationFn: async ({
       formId,
-      deadLine,
-    }: {
-      formId: string;
-      deadLine: string ;
-    }) => {
+      projectId, deadLine }:
+      {
+        projectId: string,
+        formId: string;
+        deadLine: string;
+      }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
       if (!api) throw new Error("API instance missing");
-      return await setMaterialDeadlineApi({ formId, deadLine, api });
+      return await setMaterialDeadlineApi({ formId, projectId, deadLine, api });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["material-rooms"] });

@@ -12,6 +12,7 @@ import { toast } from "../../../utils/toast";
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
+import AssignStageStaff from "../../../shared/AssignStaff";
 
 const TechnicalConsultant = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -201,6 +202,12 @@ const TechnicalConsultant = () => {
 
                 <ResetStageButton projectId={projectId!} stageNumber={4} stagePath="technicalconsultation" />
 
+  <AssignStageStaff
+            stageName="TechnicalConsultationModel"
+            projectId={projectId!}
+            organizationId={"684a57015e439b678e8f6918"}
+            currentAssignedStaff={techDoc?.assignedTo || null}
+          />
                </div>
             </div>
 
@@ -212,6 +219,7 @@ const TechnicalConsultant = () => {
 
                 <StageTimerInfo
                     completedAt={techDoc?.timer?.completedAt}
+                    projectId={projectId!}
                     formId={(techDoc as any)?._id}
                     deadLine={techDoc?.timer?.deadLine}
                     startedAt={techDoc?.timer?.startedAt}
