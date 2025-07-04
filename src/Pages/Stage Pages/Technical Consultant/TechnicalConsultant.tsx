@@ -194,21 +194,21 @@ const TechnicalConsultant = () => {
                     <i className="fas fa-comments mr-2"></i> Technical Consultation
                 </h2>
 
-               <div className='flex items-center gap-2 justify-between'>
-                 <Button onClick={handleCompletionStatus} className="bg-green-600 mt-2 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
-                    <i className="fa-solid fa-circle-check mr-2"></i>
-                    Mark as Complete
-                </Button>
+                <div className='flex items-center gap-2 justify-between'>
+                    <Button onClick={handleCompletionStatus} className="bg-green-600 mt-2 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
+                        <i className="fa-solid fa-circle-check mr-2"></i>
+                        Mark as Complete
+                    </Button>
 
-                <ResetStageButton projectId={projectId!} stageNumber={4} stagePath="technicalconsultation" />
+                    <ResetStageButton projectId={projectId!} stageNumber={4} stagePath="technicalconsultation" />
 
-  <AssignStageStaff
-            stageName="TechnicalConsultationModel"
-            projectId={projectId!}
-            organizationId={"684a57015e439b678e8f6918"}
-            currentAssignedStaff={techDoc?.assignedTo || null}
-          />
-               </div>
+                    <AssignStageStaff
+                        stageName="TechnicalConsultationModel"
+                        projectId={projectId!}
+                        organizationId={"684a57015e439b678e8f6918"}
+                        currentAssignedStaff={techDoc?.assignedTo || null}
+                    />
+                </div>
             </div>
 
             <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
@@ -218,6 +218,7 @@ const TechnicalConsultant = () => {
                 </div>
 
                 <StageTimerInfo
+                    stageName='technicalconsultation'
                     completedAt={techDoc?.timer?.completedAt}
                     projectId={projectId!}
                     formId={(techDoc as any)?._id}

@@ -277,6 +277,7 @@ export default function ProjectDeliveryPanel() {
 
                 <StageTimerInfo
                     completedAt={data?.timer?.completedAt}
+                    stageName="projectdelivery"
                     projectId={projectId}
                     formId={(data as any)?._id}
                     deadLine={data?.timer?.deadLine}

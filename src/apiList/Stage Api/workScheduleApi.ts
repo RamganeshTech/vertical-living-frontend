@@ -39,7 +39,8 @@ export interface IProjectWorker {
 
 export const getProjectWorkersApi = async (projectId: string, api: AxiosInstance) => {
   const res = await api.get(`/worktasks/${projectId}/getworkers`);
-  return res.data;
+  console.log("res", res)
+  return res.data.data;
 };
 
 
@@ -47,18 +48,20 @@ export const getProjectWorkersApi = async (projectId: string, api: AxiosInstance
 export const addDailyTaskApi = async (
   dailyScheduleId: string,
   data: FormData,
+  projectId:string,
   api: AxiosInstance
 ) => {
-  const res = await api.post(`/worktasks/daily-task/${dailyScheduleId}`, data);
+  const res = await api.post(`/worktasks/${projectId}/daily-task/${dailyScheduleId}`, data);
   return res.data;
 };
 
 export const addWorkPlanApi = async (
   workScheduleId: string,
   data: FormData,
+  projectId:string,
   api: AxiosInstance
 ) => {
-  const res = await api.post(`/worktasks/work-plan/${workScheduleId}`, data);
+  const res = await api.post(`/worktasks/${projectId}/work-plan/${workScheduleId}`, data);
   return res.data;
 };
 
@@ -66,20 +69,22 @@ export const addWorkPlanApi = async (
 export const updateDailyTaskApi = async (
   dailyScheduleId: string,
   taskId: string,
+  projectId:string,
   data: FormData,
   api: AxiosInstance
 ) => {
-  const res = await api.put(`/worktasks/daily-task/${dailyScheduleId}/${taskId}`, data);
+  const res = await api.put(`/worktasks/${projectId}/daily-task/${dailyScheduleId}/${taskId}`, data);
   return res.data;
 };
 
 export const updateWorkPlanApi = async (
   workScheduleId: string,
   planId: string,
+  projectId:string,
   data: FormData,
   api: AxiosInstance
 ) => {
-  const res = await api.put(`/worktasks/work-plan/${workScheduleId}/${planId}`, data);
+  const res = await api.put(`/worktasks/${projectId}/work-plan/${workScheduleId}/${planId}`, data);
   return res.data;
 };
 
@@ -87,18 +92,20 @@ export const updateWorkPlanApi = async (
 export const deleteDailyTaskApi = async (
   dailyScheduleId: string,
   taskId: string,
+  projectId: string,
   api: AxiosInstance
 ) => {
-  const res = await api.delete(`/worktasks/daily-task/${dailyScheduleId}/${taskId}`);
+  const res = await api.delete(`/worktasks/${projectId}/daily-task/${dailyScheduleId}/${taskId}`);
   return res.data;
 };
 
 export const deleteWorkPlanApi = async (
   workScheduleId: string,
   planId: string,
+  projectId: string,
   api: AxiosInstance
 ) => {
-  const res = await api.delete(`/worktasks/work-plan/${workScheduleId}/${planId}`);
+  const res = await api.delete(`/worktasks/${projectId}/work-plan/${workScheduleId}/${planId}`);
   return res.data;
 };
 
@@ -111,9 +118,10 @@ export interface IMdApprovalPayload {
 export const mdApprovalActionApi = async (
   mainStageId: string,
   payload: IMdApprovalPayload,
+  projectId: string,
   api: AxiosInstance
 ) => {
-  const res = await api.post(`/worktasks/md-approval/${mainStageId}`, payload);
+  const res = await api.post(`/worktasks/${projectId}/md-approval/${mainStageId}`, payload);
   return res.data;
 };
 
@@ -125,18 +133,20 @@ export interface IStatusPayload {
 export const updateDailyScheduleStatusApi = async (
   dailyScheduleId: string,
   payload: IStatusPayload,
+  projectId: string,
   api: AxiosInstance
 ) => {
-  const res = await api.patch(`/worktasks/daily-schedule/${dailyScheduleId}/status`, payload);
+  const res = await api.patch(`/worktasks/${projectId}/daily-schedule/${dailyScheduleId}/status`, payload);
   return res.data;
 };
 
 export const updateWorkScheduleStatusApi = async (
   workScheduleId: string,
   payload: IStatusPayload,
+  projectId: string,
   api: AxiosInstance
 ) => {
-  const res = await api.patch(`/worktasks/work-schedule/${workScheduleId}/status`, payload);
+  const res = await api.patch(`/worktasks/${projectId}/work-schedule/${workScheduleId}/status`, payload);
   return res.data;
 };
 
@@ -203,6 +213,8 @@ export const useGetProjectWorkers = (projectId: string) => {
       return getProjectWorkersApi(projectId, api);
     },
     enabled: !!projectId,
+    retry:false,
+    refetchOnMount:false
   });
 };
 
@@ -213,10 +225,10 @@ export const useAddDailyTask = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ dailyScheduleId, formData }: any) => {
+    mutationFn: async ({ dailyScheduleId, projectId, formData }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return addDailyTaskApi(dailyScheduleId, formData, api);
+      return addDailyTaskApi(dailyScheduleId, formData, projectId, api);
     },
   });
 };
@@ -226,11 +238,11 @@ export const useAddWorkPlan = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ workScheduleId, formData }: any) => {
+    mutationFn: async ({ workScheduleId, formData,  projectId }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
       console.log("workschlksdflask", workScheduleId)
-      return addWorkPlanApi(workScheduleId, formData, api);
+      return addWorkPlanApi(workScheduleId, formData, projectId, api);
     },
   });
 };
@@ -240,10 +252,10 @@ export const useUpdateDailyTask = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ dailyScheduleId, taskId, formData }: any) => {
+    mutationFn: async ({ dailyScheduleId, taskId, formData,  projectId, }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return updateDailyTaskApi(dailyScheduleId, taskId, formData, api);
+      return updateDailyTaskApi(dailyScheduleId, taskId,  projectId, formData, api);
     },
   });
 };
@@ -253,10 +265,10 @@ export const useUpdateWorkPlan = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ workScheduleId, planId, formData }: any) => {
+    mutationFn: async ({ workScheduleId, planId, formData,  projectId, }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return updateWorkPlanApi(workScheduleId, planId, formData, api);
+      return updateWorkPlanApi(workScheduleId, planId,  projectId, formData, api);
     },
   });
 };
@@ -266,10 +278,10 @@ export const useDeleteDailyTask = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ dailyScheduleId, taskId }: any) => {
+    mutationFn: async ({ dailyScheduleId, taskId ,  projectId,}: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return deleteDailyTaskApi(dailyScheduleId, taskId, api);
+      return deleteDailyTaskApi(dailyScheduleId, taskId,  projectId, api);
     },
   });
 };
@@ -279,10 +291,10 @@ export const useDeleteWorkPlan = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ workScheduleId, planId }: any) => {
+    mutationFn: async ({ workScheduleId, planId,  projectId, }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return deleteWorkPlanApi(workScheduleId, planId, api);
+      return deleteWorkPlanApi(workScheduleId, planId,  projectId, api);
     },
   });
 };
@@ -293,10 +305,10 @@ export const useMdApprovalAction = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "CTO"];
   return useMutation({
-    mutationFn: async ({ mainStageId, payload }: any) => {
+    mutationFn: async ({ mainStageId, payload ,  projectId,}: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return mdApprovalActionApi(mainStageId, payload, api);
+      return mdApprovalActionApi(mainStageId, payload,  projectId, api);
     },
   });
 };
@@ -306,10 +318,10 @@ export const useUpdateDailyScheduleStatus = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ dailyScheduleId, payload }: any) => {
+    mutationFn: async ({ dailyScheduleId, payload,  projectId, }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return updateDailyScheduleStatusApi(dailyScheduleId, payload, api);
+      return updateDailyScheduleStatusApi(dailyScheduleId, payload,  projectId, api);
     },
   });
 };
@@ -319,10 +331,10 @@ export const useUpdateWorkScheduleStatus = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ workScheduleId, payload }: any) => {
+    mutationFn: async ({ workScheduleId, payload ,  projectId,}: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return updateWorkScheduleStatusApi(workScheduleId, payload, api);
+      return updateWorkScheduleStatusApi(workScheduleId, payload,  projectId, api);
     },
   });
 };

@@ -20,6 +20,7 @@ const WorkSchedulePage: FC = () => {
   const { data: workSchedule, isLoading } = useGetWorkSchedule(projectId);
   const { data: workers } = useGetProjectWorkers(projectId);
 
+  console.log(workers)
   const addPlan = useAddWorkPlan();
   const updatePlan = useUpdateWorkPlan();
   const deletePlan = useDeleteWorkPlan();
@@ -45,6 +46,7 @@ const WorkSchedulePage: FC = () => {
     await addPlan.mutateAsync({
       workScheduleId: workScheduleId,
       formData: newPlan,
+      projectId,
     });
     setNewPlan(null);
   };
@@ -55,6 +57,7 @@ const WorkSchedulePage: FC = () => {
       workScheduleId: workSchedule._id,
       planId: editId,
       formData: editPlan,
+       projectId,
     });
     setEditId(null);
     setEditPlan(null);
@@ -64,6 +67,7 @@ const WorkSchedulePage: FC = () => {
     await deletePlan.mutateAsync({
       workScheduleId: workSchedule._id,
       planId,
+       projectId,
     });
   };
 
@@ -248,9 +252,9 @@ const WorkSchedulePage: FC = () => {
                     }
                   >
                     <option value="">Select</option>
-                    {workers?.map((w: any) => (
+                    {workers?.map((w: {_id:string, workerName:string, email:string}) => (
                       <option key={w._id} value={w._id}>
-                        {w.name}
+                        {w.workerName}
                       </option>
                     ))}
                   </select>
@@ -287,7 +291,7 @@ const WorkSchedulePage: FC = () => {
                   <div className="text-gray-700 text-center">{plan.startDate}</div>
                   <div className="text-gray-700 text-center">{plan.endDate}</div>
                   <div className="text-gray-700 text-center">
-                    {workers?.find((w: any) => w._id === plan.assignedTo)?.name || "-"}
+                    {workers?.find((w: {_id:string, workerName:string, email:string}) => w._id === (plan.assignedTo as any)._id)?.workerName || "-"}
                   </div>
                   <div className="text-gray-700 text-center">{plan.notes}</div>
                   <div className="flex justify-center gap-3 text-sm text-center">
@@ -368,9 +372,9 @@ const WorkSchedulePage: FC = () => {
               }
             >
               <option value="">Select</option>
-              {workers?.map((w: any) => (
+              {workers?.map((w: {_id:string, workerName:string, email:string}) => (
                 <option key={w._id} value={w._id}>
-                  {w.name}
+                  {w.workerName}
                 </option>
               ))}
             </select>

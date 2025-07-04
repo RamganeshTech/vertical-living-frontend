@@ -47,7 +47,6 @@ export const CostEstimationContainer = () => {
       toast({ description: 'Completion status updated successfully', title: "Success" });
     } catch (error: any) {
       toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
-
     }
   };
 
@@ -63,7 +62,7 @@ export const CostEstimationContainer = () => {
           <div className='h-full overflow-y-scroll'>
             <div className="flex justify-between w-full mb-3">
               <h2 className="text-3xl font-semibold text-blue-600 mb-3 flex items-center">
-               <i className="fa-solid fa-money-bill-1-wave mr-2"></i> Cost Estimation
+                <i className="fa-solid fa-money-bill-1-wave mr-2"></i> Cost Estimation
               </h2>
 
               <div className="flex gap-2 items-center ">
@@ -74,12 +73,12 @@ export const CostEstimationContainer = () => {
 
                 <ResetStageButton projectId={projectId!} stageNumber={6} stagePath="costestimation" />
 
-                  <AssignStageStaff
-            stageName="CostEstimationModel"
-            projectId={projectId!}
-            organizationId={"684a57015e439b678e8f6918"}
-            currentAssignedStaff={data?.assignedTo || null}
-          />
+                <AssignStageStaff
+                  stageName="CostEstimationModel"
+                  projectId={projectId!}
+                  organizationId={"684a57015e439b678e8f6918"}
+                  currentAssignedStaff={data?.assignedTo || null}
+                />
               </div>
 
             </div>
@@ -91,6 +90,8 @@ export const CostEstimationContainer = () => {
 
               <StageTimerInfo
                 completedAt={data?.timer?.completedAt}
+                stageName='costestimation'
+
                 formId={(data as any)?._id}
                 projectId={projectId!}
                 deadLine={data?.timer?.deadLine}
@@ -106,11 +107,11 @@ export const CostEstimationContainer = () => {
               <div className="flex w-full items-center justify-between  mb-4">
                 <h3 className="text-xl font-bold text-gray-800">Material Cost Estimation</h3>
 
-               
-                  <Button className="bg-blue-600 cursor-pointer rounded-lg p-5" onClick={() =>navigate(`/projectdetails/${projectId}/costestimation/roomdetails/labour`)}>
-                    Labour Cost Estimation <i className="ml-2 fa-solid fa-arrow-up-right-from-square"></i>
-                  </Button>
-                
+
+                <Button className="bg-blue-600 cursor-pointer rounded-lg p-5" onClick={() => navigate(`/projectdetails/${projectId}/costestimation/roomdetails/labour`)}>
+                  Labour Cost Estimation <i className="ml-2 fa-solid fa-arrow-up-right-from-square"></i>
+                </Button>
+
 
 
 

@@ -222,12 +222,12 @@ const SampleDesignModule: React.FC = () => {
         </div>
         {/* Keep content within this component, it will now handle horizontal layout */}
         <StageTimerInfo
-
-          completedAt={sampleDesign.timer.compltedAt}
-          formId={(sampleDesign as any)._id}
+          stageName='sampledesign'
+          completedAt={sampleDesign?.timer?.compltedAt}
+          formId={(sampleDesign as any)?._id}
           projectId={projectId}
-          deadLine={sampleDesign.timer.deadLine}
-          startedAt={sampleDesign.timer.startedAt}
+          deadLine={sampleDesign?.timer?.deadLine}
+          startedAt={sampleDesign?.timer?.startedAt}
           refetchStageMutate={refetch}
           deadLineMutate={deadLineAsync}
           isPending={deadLinePending}

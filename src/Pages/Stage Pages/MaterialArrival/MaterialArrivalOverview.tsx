@@ -131,6 +131,8 @@ const MaterialArrivalOverview = () => {
                                 <span>Stage Timings</span>
                             </div>
                             <StageTimerInfo
+          stageName='materialarrivalcheck'
+
                                 completedAt={timer?.completedAt}
                                 projectId={projectId!}
                                 formId={(data as any)?._id}

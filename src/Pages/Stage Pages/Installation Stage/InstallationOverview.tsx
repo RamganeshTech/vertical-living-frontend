@@ -106,6 +106,8 @@ export default function InstallationOverview() {
 
                     <StageTimerInfo
                         completedAt={data?.timer?.completedAt}
+          stageName='installation'
+                        
                         projectId={projectId}
                         formId={(data as any)?._id}
                         deadLine={data?.timer?.deadLine}

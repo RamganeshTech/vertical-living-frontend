@@ -21,7 +21,9 @@ const createPublicFromSubmission = async ({ projectId, payload, token }: { proje
 const getRequrimentformDetails = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
     const { data } = await api.get(`/requirementform/getrequirementform/${projectId}`);
     if (!data.ok) throw new Error(data.message);
+    // console.log(data.data)
     return data.data;
+
 }
 
 
@@ -253,7 +255,7 @@ export const useUploadRequirementFiles = () => {
 //updation part of the requriement form of custom hooks
 
 export const useKitchenFormUpdation = () => {
-    const allowedRoles = ["client"]
+    const allowedRoles = ["client", "owner"]
 
     const { role } = useGetRole()
 
@@ -274,7 +276,7 @@ export const useKitchenFormUpdation = () => {
 }
 
 export const useBedroomFormUpdation = () => {
-    const allowedRoles = ["client"]
+    const allowedRoles = ["client", "owner"]
 
     const { role } = useGetRole()
 
@@ -295,7 +297,7 @@ export const useBedroomFormUpdation = () => {
 }
 
 export const useWardrobeFormUpdation = () => {
-    const allowedRoles = ["client"]
+    const allowedRoles = ["client", "owner"]
 
     const { role } = useGetRole()
 
@@ -316,7 +318,7 @@ export const useWardrobeFormUpdation = () => {
 }
 
 export const useLivingHallFormUpdation = () => {
-    const allowedRoles = ["client"]
+    const allowedRoles = ["client", "owner"]
 
     const { role } = useGetRole()
 

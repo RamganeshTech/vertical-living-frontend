@@ -142,6 +142,7 @@ export default function CleaningOverview() {
             </div>
 
             <StageTimerInfo
+              stageName='cleaning'
               completedAt={data?.timer?.completedAt}
               projectId={projectId}
               formId={(data as any)?._id}

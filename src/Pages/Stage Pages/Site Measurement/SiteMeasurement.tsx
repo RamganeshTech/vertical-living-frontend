@@ -220,6 +220,7 @@ function HomeInteriorProject() {
         {/* Keep content within this component, it will now handle horizontal layout */}
         <StageTimerInfo
           completedAt={measurementData?.timer?.compltedAt}
+          stageName='sitemeasurement'
           formId={(measurementData as any)?._id}
           projectId={projectId}
           deadLine={measurementData?.timer?.deadLine}

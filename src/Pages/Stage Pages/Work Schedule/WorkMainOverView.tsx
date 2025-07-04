@@ -90,6 +90,7 @@ const WorkMainOverview: FC = () => {
             </div>
 
             <StageTimerInfo
+          stageName='worktasks'
               completedAt={data?.timer?.completedAt}
               projectId={projectId!}
               formId={(data as any)?._id}
@@ -104,7 +105,7 @@ const WorkMainOverview: FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Work Plans Card */}
             <Link
-              to={`workschedule/${data.workScheduleId}`}
+              to={`workschedule/${data?.workScheduleId}`}
               className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors duration-200 shadow-md px-6 py-5 flex items-center gap-4"
             >
               <i className="fas fa-list-alt text-blue-600 text-3xl" />
@@ -116,7 +117,7 @@ const WorkMainOverview: FC = () => {
 
             {/* Daily Tasks Card */}
             <Link
-              to={`dailyschedule/${data.dailyScheduleId}`}
+              to={`dailyschedule/${data?.dailyScheduleId}`}
               className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors duration-200 shadow-md px-6 py-5 flex items-center gap-4"
             >
               <i className="fas fa-calendar-check text-blue-600 text-3xl" />

@@ -243,6 +243,7 @@ const OrderMaterialOverview = () => {
             </div>
             <StageTimerInfo
               completedAt={data?.timer?.completedAt}
+              stageName="orderingmaterial"
               formId={(data as any)?._id}
               projectId={projectId!}
               deadLine={data?.timer?.deadLine}

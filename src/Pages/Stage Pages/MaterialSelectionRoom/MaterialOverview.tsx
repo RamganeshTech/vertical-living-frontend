@@ -106,6 +106,7 @@ export default function MaterialRoomOverview() {
 
                             <StageTimerInfo
                                 completedAt={data?.timer?.completedAt}
+                                stageName="materialconfirmation"
                                 projectId={projectId!}
                                 formId={(data as any)?._id}
                                 deadLine={data?.timer?.deadLine}

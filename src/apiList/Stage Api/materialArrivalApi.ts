@@ -201,7 +201,7 @@ export const useGetPublicMaterialArrival = (projectId: string, token: string) =>
   deadLine: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/orderingmaterial/deadline/${projectId}/${formId}`, { deadLine });
+  const { data } = await api.put(`/materialarrivalcheck/deadline/${projectId}/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -214,7 +214,7 @@ export const useGetPublicMaterialArrival = (projectId: string, token: string) =>
   projectId: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/orderingmaterial/completionstatus/${projectId}`);
+  const { data } = await api.put(`/materialarrivalcheck/completionstatus/${projectId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };

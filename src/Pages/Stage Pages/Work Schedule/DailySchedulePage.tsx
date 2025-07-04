@@ -10,7 +10,10 @@ const DailySchedulePage: FC = () => {
   if(!sectionId) return
 
  const { data, isLoading } = useGetDailySchedule(projectId!);
-  const { data: workers } = useGetProjectWorkers(data?.projectId || "");
+  const { data: workers, isLoading:getWorkersLoading } = useGetProjectWorkers(projectId!);
+
+
+
   const addTask = useAddDailyTask();
   const updateTask = useUpdateDailyTask();
   const deleteTask = useDeleteDailyTask();
@@ -24,6 +27,11 @@ const DailySchedulePage: FC = () => {
     assignedTo: ""
   });
 
+  
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editTask, setEditTask] = useState<any>(null);
+
+
   const handleAdd = () => {
     // console.log("newTask", newTask)
     const formData = new FormData();
@@ -36,7 +44,7 @@ const DailySchedulePage: FC = () => {
 //   console.log(pair[0], pair[1]);
 // }
     // console.log("create formData", formData)
-    addTask.mutate({ dailyScheduleId: sectionId, formData });
+    addTask.mutate({ dailyScheduleId: sectionId, formData,  projectId, });
     setAddingNew(false);
     setNewTask({
       taskName: "",
@@ -47,9 +55,6 @@ const DailySchedulePage: FC = () => {
     });
   };
 
-  const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [editTask, setEditTask] = useState<any>(null);
-
   const handleUpdate = (taskId: string) => {
     const formData = new FormData();
     formData.append("taskName", editTask.taskName);
@@ -57,13 +62,18 @@ const DailySchedulePage: FC = () => {
     formData.append("date", editTask.date);
     formData.append("status", editTask.status);
     formData.append("assignedTo", editTask.assignedTo);
-    updateTask.mutate({ dailyScheduleId: sectionId, taskId, formData });
+    updateTask.mutate({ dailyScheduleId: sectionId, taskId, formData,  projectId });
     setEditIndex(null);
     setEditTask(null);
   };
 
   if (isLoading) return <div>Loading...</div>;
+  if(getWorkersLoading){
+    return <p>getting the worksrs</p>
+  }
+console.log("workers", workers)
 
+  console.log(workers)
   return (
     <div className="max-w-full">
   <h2 className="text-2xl font-bold text-blue-700 mb-4 ">🗓️ Daily Tasks</h2>
@@ -122,8 +132,8 @@ const DailySchedulePage: FC = () => {
                 onChange={(e) => setEditTask({ ...editTask, assignedTo: e.target.value })}
               >
                 <option value="">Select</option>
-                {workers?.map((w: any) => (
-                  <option key={w._id} value={w._id}>{w.name}</option>
+                {workers?.map((w:  {_id:string, workerName:string, email:string}) => (
+                  <option key={w._id} value={w._id}>{w.workerName}</option>
                 ))}
               </select>
               <div className="flex justify-center gap-2">
@@ -150,7 +160,7 @@ const DailySchedulePage: FC = () => {
               <div>{task.description}</div>
               <div>{task.date}</div>
               <div className="capitalize">{task.status.replace('_', ' ')}</div>
-              <div>{workers?.find((w: any) => w._id === task.assignedTo)?.name || "-"}</div>
+              <div>{workers?.find((w: {_id:string, workerName: string, email:string}) => w._id === (task.assignedTo as any)._id)?.workerName || "-"}</div>
               <div className="flex justify-center gap-2">
                 <button
                   className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded"
@@ -163,7 +173,7 @@ const DailySchedulePage: FC = () => {
                 </button>
                 <button
                   className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded"
-                  onClick={() => deleteTask.mutate({ dailyScheduleId: sectionId, taskId: task._id })}
+                  onClick={() => deleteTask.mutate({ dailyScheduleId: sectionId, taskId: task._id,  projectId })}
                 >
                   Delete
                 </button>
@@ -220,8 +230,8 @@ const DailySchedulePage: FC = () => {
           onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}
         >
           <option value="">Select</option>
-          {workers?.map((w: any) => (
-            <option key={w._id} value={w._id}>{w.name}</option>
+          {workers?.map((w: {_id:string, workerName:string, email:string}) => (
+            <option key={w._id} value={w._id}>{w.workerName}</option>
           ))}
         </select>
         <div className="flex justify-center gap-2">

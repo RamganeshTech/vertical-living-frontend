@@ -63,6 +63,7 @@ import QualityCheckRoomDetails from './Pages/Stage Pages/QualityCheck Stage/Qual
 import CleaningOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningOverview'
 import CleaningRoomOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningRoomOverview'
 import ProjectDelivery from './Pages/Stage Pages/Project Delivery/ProjectDelivery'
+import PaymentConfirmationStage from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentConfirmationMain'
 
 function App() {
 
@@ -160,6 +161,11 @@ function App() {
           <Route path="costestimation" element={<CostEstimationContainer />} >
             <Route path="roomdetails/:roomId" element={<CostEstimationRoomDetails />} />
             <Route path="roomdetails/labour" element={<LabourEstimateContainer />} />
+          </Route>
+
+
+           <Route path="paymentconfirmation" element={<PaymentConfirmationStage />} >
+          
           </Route>
 
 

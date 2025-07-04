@@ -223,6 +223,7 @@ export default function RequirementForm() {
               <StageTimerInfo
                 startedAt={formData?.timer?.startedAt}
                 projectId={projectId!}
+                stageName="requirementform"
                 refetchStageMutate={refetch}
                 completedAt={formData?.timer?.completedAt}
                 deadLine={formData?.timer?.deadLine}

@@ -132,6 +132,8 @@ export default function QualityCheckOverview() {
             </div>
 
             <StageTimerInfo
+          stageName='qualitycheck'
+
               completedAt={data?.timer?.completedAt}
               projectId={projectId}
               formId={(data as any)?._id}
