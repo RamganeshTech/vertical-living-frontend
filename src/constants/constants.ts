@@ -64,7 +64,7 @@ export const PROJECTS_ICONS = {
   TECHNICALCONSULTANT: "fa-solid fa-comments text-2xl",
   MATERIALSELECTION: "fas fa-box text-2xl",
   COSTESTIMATION: "fa-solid fa-money-bill-1-wave text-2xl",
-  PAYMENTCONFIRMATION: "fa-solid fa-money-bill-1-wave text-2xl",
+  PAYMENTCONFIRMATION: "fa-solid fa-money-bill-wave text-2xl",
   ORDERMATERIALS: "fa-solid fa-shopping-cart text-2xl",
   MATERIALARRIVED: "fa-solid fa-receipt text-2xl",
   WORKSCHEDULE: "fas fa-digging text-2xl",
@@ -74,6 +74,52 @@ export const PROJECTS_ICONS = {
   PROJECTDELIVERY: "fas fa-box text-2xl",
 }
 
+
+
+export const MAIN_PATH_LABEL: Record<any, string> = {
+  labourlist: "Materials",
+  materiallist: "Labours",
+  transportationlist: "Transportation",
+  workers: "Workers",
+  inviteclient: "Invite Client",
+  requirementform: "Requirement Form",
+  sitemeasurement: "Site Measurement",
+  sampledesign: "Sample Designs",
+  technicalconsultant: "Technical consultant",
+  materialselection: "Material Selection",
+  costestimation: "Cost Estiamtion",
+  paymentconfirmation: "Payment Stage",
+  ordermaterial: "Ordering Material",
+  materialarrival: "Material Arrival",
+  workmainschedule: "Work Schedule",
+  installation: "Installation and execution",
+  qualitycheck: "Quality Check",
+  cleaning: "Cleaning & Sanitation",
+  projectdelivery: "Project Delivery",
+}
+
+
+export const MAIN_PATH_ICON: Record<any, string> = {
+  labourlist: "MATERIALS",
+  materiallist: "LABOURS",
+  transportationlist: "TRANSPORTATION",
+  workers: "WORKERS",
+  inviteclient: "INVITECLIENT",
+  requirementform: "REQUIREMENTFORM",
+  sitemeasurement: "SITEMEASUREMENT",
+  sampledesign: "SAMPLEDESIGN",
+  technicalconsultant: "TECHNICALCONSULTANT",
+  materialselection: "MATERIALSELECTION",
+  costestimation: "COSTESTIMATION",
+  paymentconfirmation: "PAYMENTCONFIRMATION",
+  ordermaterial: "ORDERMATERIALS",
+  materialarrival: "MATERIALARRIVED",
+  workmainschedule: "WORKSCHEDULE",
+  installation: "INSTALLATION",
+  qualitycheck: "QUALITYCHECK",
+  cleaning: "CLEANINGSANITATION",
+  projectdelivery: "PROJECTDELIVERY",
+}
 
 export const COMPANY_DETAILS = {
   COMPANY_NAME: "Vertical living",

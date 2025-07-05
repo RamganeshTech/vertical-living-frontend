@@ -1,13 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import useGetRole from "../../Hooks/useGetRole";
-import { getApiForRole } from "../../utils/roleCheck";
+import useGetRole from "../../../Hooks/useGetRole";
+import { getApiForRole } from "../../../utils/roleCheck";
 import type { AxiosInstance } from "axios";
 
 
 
 // GET
 export const getPaymentConfirmationApi = async (projectId: string, api: any) => {
-  const res = await api.get(`/paymentconfirmation/getpayementconfirmation/${projectId}`);
+  const res = await api.get(`/paymentconfirmation/getpaymentconfirmation/${projectId}`);
   return res.data.data;
 };
 
@@ -25,11 +25,9 @@ export const generateConsentLinkApi = async (projectId: string, api: any) => {
 
 // ACCEPT CONSENT
 export const acceptClientConsentApi = async (
-  { projectId, token, clientId , api}: { projectId: string; token: string; clientId: string, api: AxiosInstance },
+  { projectId, token , api}: { projectId: string; token: string; api: AxiosInstance },
 ) => {
-  const res = await api.post(`/paymentconfirmation/acceptconsent/${projectId}/${token}`, {
-    clientId,
-  });
+  const res = await api.post(`/paymentconfirmation/acceptconsent/${projectId}/${token}`);
   return res.data.data;
 };
 
@@ -48,6 +46,8 @@ export const useGetPaymentConfirmation = (projectId: string) => {
       if (!api) throw new Error("API instance missing");
       return await getPaymentConfirmationApi(projectId, api);
     },
+    retry:false,
+    refetchOnMount:false,
   });
 };
 
@@ -100,15 +100,15 @@ export const useAcceptClientConsent = () => {
     mutationFn: async ({
       projectId,
       token,
-      clientId,
+      // clientId,
     }: {
       projectId: string;
       token: string;
-      clientId: string;
+      // clientId: string;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
       if (!api) throw new Error("API instance missing");
-      return await acceptClientConsentApi({ projectId, token, clientId, api });
+      return await acceptClientConsentApi({ projectId, token, api });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["payment-confirmation", projectId] });

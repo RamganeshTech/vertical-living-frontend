@@ -22,7 +22,7 @@ const AddRoomModel: React.FC<AddRoomModelProps> = ({ isOpen, onClose, onSubmit, 
 
   return (
     <div onClick={onClose} className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+      <div onClick={(e)=> e.stopPropagation()} className="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 className="text-2xl font-bold text-blue-700 mb-4">Add New Room</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

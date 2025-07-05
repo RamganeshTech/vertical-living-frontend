@@ -66,7 +66,7 @@ const uploadRequirementFiles = async ({ formId, projectId, files, api }: UploadF
     files.forEach((file) => formData.append("file", file));
     console.log("getig iside 1")
 
-    const response = await api.post(`/requirementform/upload/multiple/:${projectId}/${formId}`, formData,
+    const response = await api.post(`/requirementform/upload/multiple/${projectId}/${formId}`, formData,
         {
             headers: {
                 "Content-Type": "multipart/form-data",

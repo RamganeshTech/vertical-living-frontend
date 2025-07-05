@@ -76,7 +76,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
             <h3 className="text-xl font-semibold text-blue-700">Uploads</h3>
 
             <div className="flex gap-4 items-center">
-                <Input type="file" multiple onChange={handleFileChange} accept="image/*,application/pdf" />
+                <Input type="file" multiple onChange={handleFileChange}   accept="image/jpeg,image/png,application/pdf" />
                 <Button onClick={handleUpload} isLoading={uploadPending} className="bg-blue-600 text-white">
                     Upload
                 </Button>

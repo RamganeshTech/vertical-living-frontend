@@ -1,5 +1,5 @@
-import React, { memo, useState } from 'react'
-import { COMPANY_DETAILS, } from '../constants/constants'
+import React, { memo, useEffect, useState } from 'react'
+import { COMPANY_DETAILS, MAIN_PATH_ICON, MAIN_PATH_LABEL, } from '../constants/constants'
 import useSidebarShortcut from '../Hooks/useSideBarShortcut'
 import { Link } from 'react-router-dom'
 import '../../src/App.css'
@@ -25,6 +25,19 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     }
 
     const [activeSidebar, setActiveSidebar] = useState<string>('');
+
+
+    useEffect(() => {
+        const pathArray = location.pathname.split('/')
+
+        // console.log(pathArray, "path array")
+        const mainPath = pathArray[3]
+        if (showSideBar) {
+            setActiveSidebar(() => MAIN_PATH_LABEL[mainPath] as any)
+        } else {
+            setActiveSidebar(() => MAIN_PATH_ICON[mainPath] as any)
+        }
+    }, [location.pathname, showSideBar])
 
     useSidebarShortcut(handleSideBarOpen, handleSideBarClose);
     return (

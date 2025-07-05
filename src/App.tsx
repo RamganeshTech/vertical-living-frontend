@@ -63,7 +63,11 @@ import QualityCheckRoomDetails from './Pages/Stage Pages/QualityCheck Stage/Qual
 import CleaningOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningOverview'
 import CleaningRoomOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningRoomOverview'
 import ProjectDelivery from './Pages/Stage Pages/Project Delivery/ProjectDelivery'
-import PaymentConfirmationStage from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentConfirmationMain'
+import PaymentScheduleSection from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentScheduleSection'
+import PaymentTransaction from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentTransaction'
+import PaymentConfirmationStage from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentMainPage'
+import PaymentConsentSection from './Pages/Stage Pages/PaymentConfirmation Pages/PayementConsentSection'
+import PublicClientConsentForm from './Pages/Stage Pages/PaymentConfirmation Pages/PublicClientConsentForm/PublicClientConsentForm'
 
 function App() {
 
@@ -165,7 +169,10 @@ function App() {
 
 
            <Route path="paymentconfirmation" element={<PaymentConfirmationStage />} >
-          
+            <Route path="consent" element={<PaymentConsentSection />} />
+            <Route path="schedule" element={<PaymentScheduleSection />} />
+            <Route path="transaction" element={<PaymentTransaction/>} />
+
           </Route>
 
 
@@ -227,6 +234,7 @@ function App() {
         <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
         <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderMaterial />} />
         <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
+        <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
 
 
       </Routes>
