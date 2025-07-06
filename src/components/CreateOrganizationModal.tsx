@@ -55,7 +55,7 @@ export default function CreateOrganizationModal({ isOpen, onClose }: CreateOrgan
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to create organization",
+        description: error?.response?.data?.message || "Failed to create organization",
         variant: "destructive",
       })
     }

@@ -68,6 +68,7 @@ import PaymentTransaction from './Pages/Stage Pages/PaymentConfirmation Pages/Pa
 import PaymentConfirmationStage from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentMainPage'
 import PaymentConsentSection from './Pages/Stage Pages/PaymentConfirmation Pages/PayementConsentSection'
 import PublicClientConsentForm from './Pages/Stage Pages/PaymentConfirmation Pages/PublicClientConsentForm/PublicClientConsentForm'
+import SubscriptionPlans from './Pages/Subscription Payment/SubscriptionMain'
 
 function App() {
 
@@ -85,7 +86,7 @@ function App() {
 
 
         <Route path="/" element={<Home />} />
-        <Route path="/select-model" element={<NotFound />} />
+        {/* <Route path="/select-model" element={<NotFound />} /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/unauthorized" element={<UnAuthorized />} />
 
@@ -101,6 +102,7 @@ function App() {
         <Route path='/clientlogin' element={<ClientLogin />} />
         <Route path='/clientregister' element={<ClientRegister />} />
 
+        <Route path="/subscription" element={<SubscriptionPlans />} />
 
 
         {/* commented organizaion route */}
@@ -236,6 +238,8 @@ function App() {
         <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
         <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
 
+
+          <Route path="*" element={<NotFound />} />
 
       </Routes>
 

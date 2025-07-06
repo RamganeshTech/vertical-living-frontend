@@ -9,7 +9,7 @@ import { Card, CardContent } from "../../components/ui/Card"
 export default function Organization() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   let { data: organizations, isLoading, error } = useGetMyOrganizations()
-  // organizations = []
+  // organizations = {}
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
@@ -143,15 +143,15 @@ export default function Organization() {
           </div> */}
 
           {/* Organizations Grid */}
-          {organizations && organizations?.length > 0 ? (
+          {organizations ? (
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-blue-900">Your Organizations ({totalOrganizations})</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {organizations.map((org: any) => (
-                  <OrganizationCard key={org._id} organization={org} />
-                ))}
+                {/* {organizations.map((org: any) => ( */}
+                  <OrganizationCard organization={organizations} />
+                {/* ))} */}
               </div>
 
               {/* <div className="mt-6 sm:w-3/4 mx-auto bg-white/60 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-xl border border-white/20">

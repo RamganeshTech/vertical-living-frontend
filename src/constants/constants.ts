@@ -77,8 +77,8 @@ export const PROJECTS_ICONS = {
 
 
 export const MAIN_PATH_LABEL: Record<any, string> = {
-  labourlist: "Materials",
-  materiallist: "Labours",
+  labourlist: "Labours",
+  materiallist: "Materials",
   transportationlist: "Transportation",
   workers: "Workers",
   inviteclient: "Invite Client",
@@ -100,8 +100,8 @@ export const MAIN_PATH_LABEL: Record<any, string> = {
 
 
 export const MAIN_PATH_ICON: Record<any, string> = {
-  labourlist: "MATERIALS",
-  materiallist: "LABOURS",
+  labourlist: "LABOURS",
+  materiallist: "MATERIALS",
   transportationlist: "TRANSPORTATION",
   workers: "WORKERS",
   inviteclient: "INVITECLIENT",

@@ -66,6 +66,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                                 </Link>
                                     :
                                     <div
+                                    key={value}
                                         className={`cursor-not-allowed flex justify-between max-w-[95%] py-4 px-4`}>
                                         <span className='text-lg'>{value}</span>
                                         <span><i className="fa-solid fa-chevron-right"></i></span>

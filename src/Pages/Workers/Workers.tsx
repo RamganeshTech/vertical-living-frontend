@@ -125,7 +125,7 @@ export default function Workers() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="max-h-full overflow-hidden  bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-xl border-b border-white/20 shadow-lg">
         <div className="max-w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -167,10 +167,10 @@ export default function Workers() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto p-4 sm:p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="max-w-7xl !max-h-[80%] overflow-hidden  mx-auto p-2 sm:p-4">
+        <div className="grid grid-cols-1  lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Invite Section */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 h-fit space-y-6">
             {/* Invite Workers */}
             <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-xl">
               <CardHeader>
@@ -280,8 +280,8 @@ export default function Workers() {
           </div>
 
           {/* Workers List */}
-          <div className="lg:col-span-2">
-            <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-xl">
+          <div className="lg:col-span-2 max-h-[65%] rounded-2xl overflow-y-auto">
+            <Card className="bg-white/70 backdrop-blur-sm border-0  shadow-xl">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center justify-between">
                   <div className="flex items-center">

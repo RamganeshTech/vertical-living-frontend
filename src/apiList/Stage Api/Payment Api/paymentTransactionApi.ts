@@ -52,6 +52,7 @@ export const getPaymentTransactionApi = async ({
   api: AxiosInstance;
 }) => {
   const res = await api.get(`/paymentconfirmation/gettransaction/${projectId}`);
+  console.log(res, "drjklsjklfjsldfjasdjfsdj")
   return res.data.data;
 };
 
@@ -66,7 +67,7 @@ export const getPaymentTransactionApi = async ({
 
 
 export const useCreatePaymentOrder = () => {
-  const allowedRoles = ["client"];
+  const allowedRoles = ["owner"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -92,7 +93,7 @@ export const useCreatePaymentOrder = () => {
 
 
 export const useVerifyPayment = () => {
-  const allowedRoles = ["client"];
+  const allowedRoles = ["client", "owner"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 

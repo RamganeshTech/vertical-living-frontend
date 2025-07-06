@@ -22,7 +22,7 @@ const createOrganization = async (orgData: {
 // 2) getMyOrganizations
 const fetchMyOrganizations = async () => {
   const { data } = await Api.get("/orgs/getorganizations");
-  if (!data.ok) return [];
+  if (!data.ok) return null;
   return data.data;
 };
 
