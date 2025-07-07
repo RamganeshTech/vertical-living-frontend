@@ -36,7 +36,7 @@ import { queryClient } from "../../QueryClient/queryClient";
   },
   api: AxiosInstance
 ) => {
-  const { data } = await api.delete(`/installation/item/delete`, {
+  const { data } = await api.delete(`/installation/${payload.projectId}/item/delete`, {
     data: payload,
   });
   if (!data.ok) throw new Error(data.message);

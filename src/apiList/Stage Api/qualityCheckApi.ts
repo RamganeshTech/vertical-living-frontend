@@ -157,6 +157,8 @@ export const useGetQualityCheckup = (projectId: string) => {
       return await getQualityCheckupApi(projectId, api);
     },
     enabled: !!projectId,
+    retry:false,
+    retryOnMount:false
   });
 };
 

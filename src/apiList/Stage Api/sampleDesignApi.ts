@@ -74,7 +74,7 @@ const deleteRoomFile = async ({
 };
 
 const deleteRoom = async ({ projectId, api, roomId }: { projectId: string,  roomId: string, api: AxiosInstance }) => {
-    const { data } = await api.put(`/sampledesign/${projectId}/${roomId}/deleteroom`);
+    const { data } = await api.delete(`/sampledesign/${projectId}/${roomId}/deleteroom`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }

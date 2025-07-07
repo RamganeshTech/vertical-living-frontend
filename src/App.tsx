@@ -73,7 +73,7 @@ import SubscriptionPlans from './Pages/Subscription Payment/SubscriptionMain'
 function App() {
 
   const [projectId, setProjectId] = useState<string | null>(null)
-
+  const [organizationId, setOrganizationId] = useState<string | null>(null)
   //it is used to check whether which user is now currently using the application
   useAuthCheck()
 
@@ -140,8 +140,8 @@ function App() {
           <Route index element={<ProjectLists />} />
         </Route>
 
-        <Route path='/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner", "client"]}>
-          <ProjectDetails projectId={projectId} setProjectId={setProjectId} />
+        <Route path='/:organizationId/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner", "client"]}>
+          <ProjectDetails projectId={projectId} setProjectId={setProjectId} setOrganizationId={setOrganizationId} organizationId={organizationId} />
         </ProtectedRoutes>}>
 
           <Route path="labourlist" element={<LabourList />} />

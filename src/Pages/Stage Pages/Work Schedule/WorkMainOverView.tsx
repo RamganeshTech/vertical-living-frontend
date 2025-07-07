@@ -11,7 +11,7 @@ import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionL
 import AssignStageStaff from "../../../shared/AssignStaff";
 
 const WorkMainOverview: FC = () => {
-  const { projectId } = useParams<{ projectId: string }>();
+  const { projectId, organizationId } = useParams<{ projectId: string, organizationId:string }>();
   const { data, isLoading, refetch, error: getAllError } = useGetWorkMainStage(projectId!);
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetWorkScheduleDeadline()
   const { mutateAsync: completionStatus, isPending: completePending } = useCompleteWorkSchedule()
@@ -76,7 +76,7 @@ const WorkMainOverview: FC = () => {
               <AssignStageStaff
                 stageName="WorkMainStageScheduleModel"
                 projectId={projectId!}
-                organizationId={"684a57015e439b678e8f6918"}
+                organizationId={organizationId!}
                 currentAssignedStaff={data?.assignedTo || null}
               />
             </div>

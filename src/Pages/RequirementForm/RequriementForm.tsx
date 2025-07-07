@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useDeleteRequriementForm, useFormCompletion, useGenerateShareableLink, useGetFormRequriemetn, useLockUpdationOfForm, useSetDeadLineFormRequirement, useUploadRequirementFiles } from "../../apiList/Stage Api/requirementFormApi";
+import { useDeleteRequirementUploadFile, useDeleteRequriementForm, useFormCompletion, useGenerateShareableLink, useGetFormRequriemetn, useLockUpdationOfForm, useSetDeadLineFormRequirement, useUploadRequirementFiles } from "../../apiList/Stage Api/requirementFormApi";
 import { Card } from "../../components/ui/Card";
 import { Separator } from "../../components/ui/Seperator";
 import { Button } from "../../components/ui/Button";
@@ -56,7 +56,7 @@ const SectionConfig = [
 ]
 
 export default function RequirementForm() {
-  const { projectId } = useParams() as { projectId: string };
+  const { projectId , organizationId} = useParams() as { projectId: string; organizationId:string};
   const { role } = useGetRole()
 
   const [inviteLink, setInviteLink] = useState("")
@@ -71,6 +71,7 @@ export default function RequirementForm() {
   const { mutateAsync: deadLineMutate, isPending: deadLinePending, isError: deadLineIsError, error: deadLineError, reset: deadLineReset } = useSetDeadLineFormRequirement()
   const { mutateAsync: uploadFilesMutate, isPending: uploadPending } = useUploadRequirementFiles();
   const { mutateAsync: deleteFormMutate, isPending: deleteFormPending } = useDeleteRequriementForm();
+ const { mutateAsync: deleteUploadFile, isPending: deleteUploadPending } = useDeleteRequirementUploadFile()
 
   if (isLoading) return <MaterialOverviewLoading />;
   // if (isError || !formData) return <div className="p-8">{(error as any).response?.data.message || "Failed to fetch form data."}</div>;
@@ -204,7 +205,7 @@ export default function RequirementForm() {
               <AssignStageStaff
                 stageName="RequirementFormModel"
                 projectId={projectId}
-                organizationId={"684a57015e439b678e8f6918"}
+                organizationId={organizationId}
                 currentAssignedStaff={formData?.assignedTo || null}
               />
 
@@ -247,6 +248,8 @@ export default function RequirementForm() {
                     uploadFilesMutate={uploadFilesMutate}
                     uploadPending={uploadPending}
                     projectId={projectId}
+                    onDeleteUpload={deleteUploadFile}
+                    deleteFilePending={deleteUploadPending}
                   />
                 </Card>
               </div>

@@ -9,7 +9,8 @@ import {
   useCreateRoomSiteMeasurement,
   useDeleteSiteMeasurementAndResetTimer,
   useSetDeadLineSiteMeasurement,
-  useCompletionStatusSiteMeasurement
+  useCompletionStatusSiteMeasurement,
+  useDeleteSiteRequriementFile
 } from './../../../apiList/Stage Api/siteMeasurementApi';
 import { useParams } from 'react-router-dom';
 
@@ -44,7 +45,7 @@ const initialRoomDetails: SiteRooms = {
 };
 
 function HomeInteriorProject() {
-  const { projectId } = useParams()
+  const { projectId, organizationId } = useParams()
   if (!projectId) return
 
   const [showSiteForm, setShowSiteForm] = useState<boolean>(false);
@@ -64,6 +65,7 @@ function HomeInteriorProject() {
 
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetDeadLineSiteMeasurement()
   const { mutateAsync: uploadFilesMutate, isPending: uploadPending } = useUploadRequirementFiles()
+  const { mutateAsync: deleteUploadFile, isPending: deleteUploadPending } = useDeleteSiteRequriementFile()
 
   // Handlers
 
@@ -184,7 +186,7 @@ function HomeInteriorProject() {
           <AssignStageStaff
             stageName="SiteMeasurementModel"
             projectId={projectId}
-            organizationId={"684a57015e439b678e8f6918"}
+                organizationId={organizationId!}
             currentAssignedStaff={measurementData?.assignedTo || null}
           />
         </div>
@@ -240,6 +242,8 @@ function HomeInteriorProject() {
             uploadFilesMutate={uploadFilesMutate}
             uploadPending={uploadPending}
             projectId={projectId}
+            onDeleteUpload={deleteUploadFile}
+            deleteFilePending={deleteUploadPending}
           />
         </Card>
       </div>

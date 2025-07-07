@@ -21,7 +21,7 @@ import {
 import AssignStageStaff from "../../../shared/AssignStaff";
 
 const MaterialArrivalOverview = () => {
-    const { projectId } = useParams();
+    const { projectId , organizationId} = useParams();
     const navigate = useNavigate();
     const isChildRoute = location.pathname.includes("/materialarrivalroom/");
 
@@ -99,7 +99,7 @@ const MaterialArrivalOverview = () => {
     };
 
     return (
-        <main className="p-2 h-full overflow-y-auto" >
+        <main className="p-2 h-full w-full" >
             {!isChildRoute ? (
                 <div className="space-y-6 h-full overflow-y-auto">
                     <div className="flex justify-between items-center py-3  w-full border-b-2 border-gray-200 ">
@@ -117,7 +117,7 @@ const MaterialArrivalOverview = () => {
                               <AssignStageStaff
             stageName="MaterialArrivalModel"
             projectId={projectId!}
-            organizationId={"684a57015e439b678e8f6918"}
+            organizationId={organizationId!}
             currentAssignedStaff={data?.assignedTo || null}
           />
                         </div>

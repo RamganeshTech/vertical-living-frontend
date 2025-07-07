@@ -16,7 +16,7 @@ import SummaryCostEstimation from "./SummaryCostEstimation";
 import AssignStageStaff from "../../../shared/AssignStaff";
 
 export const CostEstimationContainer = () => {
-  const { projectId } = useParams();
+  const { projectId , organizationId} = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -76,7 +76,7 @@ export const CostEstimationContainer = () => {
                 <AssignStageStaff
                   stageName="CostEstimationModel"
                   projectId={projectId!}
-                  organizationId={"684a57015e439b678e8f6918"}
+                  organizationId={organizationId!}
                   currentAssignedStaff={data?.assignedTo || null}
                 />
               </div>

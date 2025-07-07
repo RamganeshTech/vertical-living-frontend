@@ -100,7 +100,7 @@ const ProjectLists = () => {
               key={(project as any)._id}
               className="h-[262px] flex flex-col shadow-md rounded-xl overflow-hidden border-l-8 border-blue-600 bg-white"
             >
-              <SingleProject onEdit={handleEditProject} index={index} project={project} />
+              <SingleProject onEdit={handleEditProject} index={index} project={project} organizationId={organizationId!} />
             </div>
           );
         })}

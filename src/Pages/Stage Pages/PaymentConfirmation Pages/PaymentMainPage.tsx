@@ -164,7 +164,7 @@ const sectionCards = [
 ];
 
 const PaymentConfirmationStage: React.FC = () => {
-  const { projectId } = useParams<{ projectId: string }>();
+  const { projectId, organizationId } = useParams<{ projectId: string, organizationId:string }>();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -248,7 +248,7 @@ const PaymentConfirmationStage: React.FC = () => {
           <AssignStageStaff
             stageName="PaymentConfirmationModel"
             projectId={projectId!}
-            organizationId="684a57015e439b678e8f6918"
+            organizationId={organizationId!}
             currentAssignedStaff={assignedTo || null}
           />
         </div>

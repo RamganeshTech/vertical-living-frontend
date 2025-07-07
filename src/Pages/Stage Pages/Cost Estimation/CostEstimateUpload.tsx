@@ -3,21 +3,25 @@ import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { existingUploads } from "../../../utils/dummyData";
 import { useDeleteCostEstimationFile, useUploadCostEstimationFiles } from "../../../apiList/Stage Api/costEstimationApi";
+import { toast } from "../../../utils/toast";
 
 interface UploadFile {
   _id: string;
   type: "image" | "pdf";
   url: string;
   originalName: string;
+  refetch: () => Promise<any>
 }
 
 interface Props {
   projectId: string;
   roomId: string;
   initialFiles: UploadFile[];
+  refetch: () => Promise<any>
+
 }
 
-const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles }) => {
+const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles, refetch }) => {
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [pdfFiles, setPdfFiles] = useState<UploadFile[]>(initialFiles.filter(f => f.type === "pdf"));
@@ -27,7 +31,7 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles }
   const { mutateAsync: deleteFile, isPending: deletePending } = useDeleteCostEstimationFile();
 
 
-//   initialFiles=existingUploads
+  //   initialFiles=existingUploads
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -49,23 +53,35 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles }
       setPdfFiles(prev => [...prev, ...newPDFs]);
       setImageFiles(prev => [...prev, ...newImages]);
       setSelectedFiles([]);
-    } catch (err) {
-      console.error("Upload error", err);
+      toast({ title: "Success", description: "file uploaded successfully" })
+      refetch()
+    } catch (err: any) {
+      toast({ title: "error", description: err?.response?.data?.message || "failed to upload file", variant: "destructive" })
+
     }
   };
 
   const handleDelete = async (fileId: string, type: "image" | "pdf") => {
     try {
+      // console.log("fiel id from image",fileId)
+
       await deleteFile({ projectId, roomId, fileId });
       if (type === "pdf") {
         setPdfFiles(prev => prev.filter(file => file._id !== fileId));
       } else {
         setImageFiles(prev => prev.filter(file => file._id !== fileId));
       }
-    } catch (err) {
-      console.error("Delete error", err);
+      toast({ title: "Success", description: "deleted successfully" })
+      refetch()
+    } catch (err: any) {
+      toast({ title: "error", description: err?.response?.data?.message || "failed to upload file", variant: "destructive" })
+
     }
   };
+
+
+
+  console.log(imageFiles)
 
   return (
     <div className="space-y-6">
@@ -80,9 +96,11 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles }
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
         {/* PDFs */}
-        <div>
+        <div className="p-2">
           <h4 className="font-semibold text-red-700 mb-2">📄 PDF Files</h4>
-          <ul className="space-y-2">
+          <ul className="space-y-2 max-h-[180px] h-[180px] rounded-lg shadow-lg p-2 overflow-y-auto custom-scrollbar-none">
+            {pdfFiles.length === 0 && <div className="min-h-[180px] rounded-lg  flex items-center justify-center"><p className="text-sm text-gray-500">No PDFs uploaded.</p></div>}
+
             {pdfFiles.map(file => (
               <li key={file._id} className="flex justify-between items-center bg-red-50 p-2 rounded-xl">
                 <span className="text-sm">{file.originalName}</span>
@@ -101,15 +119,17 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles }
                 </div>
               </li>
             ))}
-            {pdfFiles.length === 0 && <p className="text-sm text-gray-500">No PDFs uploaded.</p>}
           </ul>
         </div>
 
         {/* Images */}
-        <div>
+        <div className="p-2">
           <h4 className="font-semibold text-green-700 mb-2">🖼️ Image Files</h4>
-          <ul className="space-y-2 max-h-[180px] overflow-y-auto">
+          <ul className="space-y-2 max-h-[180px] min-h-[180px] shadow-lg rounded-lg p-2 overflow-y-auto custom-scrollbar">
+            {imageFiles.length === 0 && <div className="min-h-[180px] rounded-lg  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
+
             {imageFiles.map(file => (
+
               <li key={file._id} className="flex justify-between items-center bg-green-50 p-2 rounded-xl">
                 <span className="text-sm truncate">{file.originalName}</span>
                 <div className="flex gap-2">
@@ -130,7 +150,6 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles }
                 </div>
               </li>
             ))}
-            {imageFiles.length === 0 && <p className="text-sm text-gray-500">No images uploaded.</p>}
           </ul>
         </div>
       </div>

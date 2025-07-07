@@ -33,7 +33,7 @@ const updateCommonSiteDetails = async ({ projectId, api, payload }: { projectId:
 }
 
 const udpateRoomDetails = async ({ projectId, api, roomId, room }: { roomId: string, projectId: string, api: AxiosInstance, room: any }) => {
-    const { data } = await api.put(`/sitemeasurement/updateroommeasurement/${projectId}/${roomId}`, {room});
+    const { data } = await api.put(`/sitemeasurement/updateroommeasurement/${projectId}/${roomId}`, { room });
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
@@ -50,14 +50,14 @@ const deleteRoomFromMeauserementStage = async ({ projectId, roomId, api }: { roo
     return data.data;
 }
 
-const deleteSiteMeauserementStage = async ({ projectId, api }: {  projectId: string, api: AxiosInstance }) => {
+const deleteSiteMeauserementStage = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
     const { data } = await api.put(`/sitemeasurement/deletesitemeasurement/${projectId}`,);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
 
 
-const setDeadlineSiteMeasurement = async ({ formId, projectId, deadLine, api }: { formId: string, projectId:string, deadLine: string, api: AxiosInstance }) => {
+const setDeadlineSiteMeasurement = async ({ formId, projectId, deadLine, api }: { formId: string, projectId: string, deadLine: string, api: AxiosInstance }) => {
     const { data } = await api.put(`/sitemeasurement/deadline/${projectId}/${formId}`, { deadLine });
     if (!data.ok) throw new Error(data.message);
     return data.data;
@@ -69,8 +69,8 @@ const uploadFiles = async ({ formId, files, api, projectId }: UploadFilePayload 
     files.forEach((file) => formData.append("file", file));
 
     for (let [key, value] of formData.entries()) {
-  console.log(key, value);
-}
+        console.log(key, value);
+    }
 
     const response = await api.post(`/sitemeasurement/upload/multiple/${projectId}/${formId}`, formData,
         {
@@ -82,6 +82,38 @@ const uploadFiles = async ({ formId, files, api, projectId }: UploadFilePayload 
     console.log("reposen", response)
     return response.data;
 }
+
+
+const deleteSiteRequriementFileApi = async (
+    projectId: string,
+    fileId: string,
+    api: AxiosInstance
+) => {
+    const { data } = await api.patch(`/sitemeasurement/${projectId}/deleteuploadedfile/${fileId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
+
+export const useDeleteSiteRequriementFile = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    const allowedRoles = ["owner", "staff", "CTO", "client"]
+
+    return useMutation({
+        mutationFn: async ({ projectId, fileId }: { projectId: string, fileId: string }) => {
+
+            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+            if (!api) throw new Error("API instance not found for role"); return await deleteSiteRequriementFileApi(projectId, fileId, api);
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
+    });
+};
 
 export const useGetSiteMeasurementDetails = ({ projectId }: { projectId: string }) => {
     const allowedRoles = ["owner", "staff", "CTO", "client"]
@@ -113,16 +145,16 @@ export const useCreateMeasurement = () => {
     const api = getApiForRole(role!)
 
     return useMutation({
-        mutationFn: async ({ projectId, siteDetails,}: { projectId: string , siteDetails: any}) => {
+        mutationFn: async ({ projectId, siteDetails, }: { projectId: string, siteDetails: any }) => {
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
             if (!api) throw new Error("API instance not found for role");
 
-            return await createmeasurement({ projectId, api, siteDetails,  });
+            return await createmeasurement({ projectId, api, siteDetails, });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
         }
     });
 };
@@ -135,16 +167,16 @@ export const useCreateRoomSiteMeasurement = () => {
     const api = getApiForRole(role!)
 
     return useMutation({
-        mutationFn: async ({ projectId, room,}: { projectId: string , room: object}) => {
+        mutationFn: async ({ projectId, room, }: { projectId: string, room: object }) => {
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
             if (!api) throw new Error("API instance not found for role");
 
-            return await createRoom({ projectId, api, room});
+            return await createRoom({ projectId, api, room });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
         }
     });
 };
@@ -157,7 +189,7 @@ export const useUpdateCommonSiteMeasurementDetails = () => {
     const api = getApiForRole(role!)
 
     return useMutation({
-        mutationFn: async ({ projectId, payload}: { projectId: string ,payload: any}) => {
+        mutationFn: async ({ projectId, payload }: { projectId: string, payload: any }) => {
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
@@ -165,8 +197,8 @@ export const useUpdateCommonSiteMeasurementDetails = () => {
 
             return await updateCommonSiteDetails({ projectId, api, payload });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
         }
     });
 };
@@ -179,7 +211,7 @@ export const useUdpateSiteMeasurmentRoomDetails = () => {
     const api = getApiForRole(role!)
 
     return useMutation({
-        mutationFn: async ({ projectId,roomId, room }: { projectId: string , room: any, roomId: string }) => {
+        mutationFn: async ({ projectId, roomId, room }: { projectId: string, room: any, roomId: string }) => {
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
@@ -187,8 +219,8 @@ export const useUdpateSiteMeasurmentRoomDetails = () => {
 
             return await udpateRoomDetails({ projectId, api, roomId, room });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
         }
     });
 };
@@ -201,7 +233,7 @@ export const useCompletionStatusSiteMeasurement = () => {
     const api = getApiForRole(role!)
 
     return useMutation({
-        mutationFn: async ({ projectId  }: { projectId: string}) => {
+        mutationFn: async ({ projectId }: { projectId: string }) => {
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
@@ -209,8 +241,8 @@ export const useCompletionStatusSiteMeasurement = () => {
 
             return await updateCompletionStatus({ projectId, api });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
         }
     });
 };
@@ -222,7 +254,7 @@ export const useDeleteRoomFromMeauserementStage = () => {
     const api = getApiForRole(role!)
 
     return useMutation({
-        mutationFn: async ({ projectId, roomId }: { projectId: string , roomId:string}) => {
+        mutationFn: async ({ projectId, roomId }: { projectId: string, roomId: string }) => {
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
@@ -230,8 +262,8 @@ export const useDeleteRoomFromMeauserementStage = () => {
 
             return await deleteRoomFromMeauserementStage({ projectId, api, roomId });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
         }
     });
 };
@@ -252,8 +284,8 @@ export const useDeleteSiteMeasurementAndResetTimer = () => {
 
             return await deleteSiteMeauserementStage({ projectId, api });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
         }
     });
 };
@@ -263,7 +295,7 @@ export const useSetDeadLineSiteMeasurement = () => {
     const { role } = useGetRole()
     const api = getApiForRole(role!)
     return useMutation({
-        mutationFn: async ({ formId, projectId, deadLine,  }: { formId: string, projectId:string, deadLine: string }) => {
+        mutationFn: async ({ formId, projectId, deadLine, }: { formId: string, projectId: string, deadLine: string }) => {
             if (!role) throw new Error("not authorized")
 
             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')

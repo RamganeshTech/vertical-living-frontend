@@ -9,6 +9,7 @@ import { useOutletContext } from "react-router-dom";
 
 type SingleProjectProp = {
     project: IProject,
+  organizationId: string;
     onEdit: (project: IProject, id:string) => void;
     index: number
 }
@@ -19,7 +20,7 @@ type ProjectsOutletContextType = {
   setProjectId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit }) => {
+const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit, organizationId }) => {
 
   const { projectId, setProjectId } = useOutletContext<ProjectsOutletContextType>();
 
@@ -122,7 +123,7 @@ const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit }) => {
             </div>
 
             <div className="flex justify-end gap-4 pt-2 text-sm text-blue-600">
-                <Link to={`/projectdetails/${(project as any)._id}/labourlist`} onClick={()=> handleSetProejctId((project as any)._id)} className="hover:underline cursor-pointer flex items-center gap-1">
+                <Link to={`/${organizationId}/projectdetails/${(project as any)._id}/requirementform`} onClick={()=> handleSetProejctId((project as any)._id)} className="hover:underline cursor-pointer flex items-center gap-1">
                     <i className="fa-solid fa-eye" />
                     View
                 </Link>

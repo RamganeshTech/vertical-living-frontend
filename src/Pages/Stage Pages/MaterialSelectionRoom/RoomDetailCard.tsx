@@ -22,7 +22,7 @@ export default function RoomDetailCard() {
     if (!projectId || !roomId) return
 
 
-    const { data: room, isLoading } = useGetSinglePredefinedRoom({ projectId: projectId!, roomId: roomId! });
+    const { data: room, isLoading, refetch } = useGetSinglePredefinedRoom({ projectId: projectId!, roomId: roomId! });
 
 
 
@@ -82,7 +82,7 @@ export default function RoomDetailCard() {
         : Object.entries(room.roomFields);
 
     return (<>
-        <div className="max-w-full h-full border-2 overflow-y-scroll mx-auto mt-0 bg-white shadow rounded p-6">
+        <div className="max-w-full h-full  overflow-y-auto custom-scrollbar mx-auto mt-0 bg-white  rounded">
             <div className="flex justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-blue-600 mb-2">{room.name}</h2>
@@ -103,7 +103,7 @@ export default function RoomDetailCard() {
                 </div>
 
                 {/* Scrollable Rows */}
-                <div className="max-h-[92%]  overflow-y-auto divide-y divide-gray-200">
+                <div className="max-h-[92%] custom-scrollbar overflow-y-auto divide-y divide-gray-200">
                     {entries.map(([key, value]: any) => (
                         <div key={key} className="grid grid-cols-5 items-center px-4 py-3 text-sm hover:bg-gray-50">
                             <div className="font-medium text-gray-700">{key}</div>
@@ -130,15 +130,15 @@ export default function RoomDetailCard() {
                                         />
                                     </div>
                                     <div className="flex gap-2">
-                                        <Button variant="primary" isLoading={updatePending} onClick={() => handleSave(key)}>✔</Button>
-                                        <Button variant="ghost" onClick={() => setEditingKey(null)}>✖</Button>
+                                        <Button variant="primary" isLoading={updatePending} onClick={() => handleSave(key)}> <i className="fas fa-check"></i> </Button>
+                                        <Button variant="secondary" onClick={() => setEditingKey(null)}> <i className="fas fa-xmark"></i> </Button>
                                     </div>
                                 </>
                             ) : (
                                 <>
                                     <div>{value.quantity ?? "N/A"}</div>
                                     <div>{value.unit || "N/A"}</div>
-                                    <div>{value.remarks || "N/A"}</div>
+                                    <div className="max-h-[70px]  overflow-y-auto custom-scrollbar cursor-grab">{value.remarks || "N/A"}</div>
                                     <div className="flex gap-2">
                                         <Button variant="primary" onClick={() => handleEdit(key, value)}>✎</Button>
                                         {isCustomRoom && (
@@ -154,7 +154,7 @@ export default function RoomDetailCard() {
 
 
             <section className="mt-4">
-                <MaterialRoomUploads projectId={projectId!} roomId={roomId!} initialFiles={room.uploads} />
+                <MaterialRoomUploads projectId={projectId!} roomId={roomId!} initialFiles={room.uploads} refetch={refetch} />
             </section>
         </div>
     </>

@@ -25,7 +25,7 @@ export const useGetAllUsers = (organizationId: string, roleToFetch: string) => {
       if (!api) throw new Error("API not found");
       return getUsersApi(organizationId, roleToFetch, api);
     },
-    enabled: !!organizationId && !!roleToFetch,
+    // enabled: !!organizationId && !!roleToFetch,
     retry:false,
     refetchOnMount:false,
   });

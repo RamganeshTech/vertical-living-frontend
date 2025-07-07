@@ -10,6 +10,7 @@ interface ResetStageButtonProps {
     stageNumber: number;
     stagePath: string;
     label?: string;
+    className?: string;
     buttonClass?: string;
     iconClass?: string;
     disabled?: boolean;
@@ -23,6 +24,7 @@ export const ResetStageButton: React.FC<ResetStageButtonProps> = ({
     buttonClass = "bg-red-600 text-white",
     iconClass = "fas fa-rotate-left",
     disabled = false,
+    className = ""
 }) => {
     const { mutateAsync, isPending, error } = useResetStage();
 
@@ -30,23 +32,25 @@ export const ResetStageButton: React.FC<ResetStageButtonProps> = ({
         try {
             mutateAsync({ projectId, stageNumber, stagePath });
             toast({ description: 'Stage Reset successfully', title: "Success" });
-
         }
         catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to Reset the stage", variant: "destructive" })
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to Reset the stage", variant: "destructive" })
 
         }
     };
 
     return (
-        <div className="space-y-1">
+        <div className={`space-y-1 w-full ${className}`}>
             <Button
                 onClick={handleReset}
+                variant="danger"
                 disabled={isPending || disabled}
-                className={`${buttonClass} flex items-center gap-2`}
+                className={`${buttonClass} flex items-center gap-2 !p-2 w-full`}
             >
                 <i className={iconClass} />
-                {isPending ? "Resetting..." : label}
+                {/* <span className="hidden sm:block">{isPending ? "Resetting..." : "Reset Stage"}</span>
+                <span className="sm:hidden">Reset</span> */}
+                <span>{isPending ? "Resetting..." : "Reset Stage"}</span>
             </Button>
 
             {error && (

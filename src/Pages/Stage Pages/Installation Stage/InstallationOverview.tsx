@@ -27,7 +27,7 @@ export const roomKeys = [
 
 export default function InstallationOverview() {
 
-    const { projectId } = useParams()
+    const { projectId, organizationId } = useParams()
 
     if (!projectId) return
 
@@ -91,7 +91,7 @@ export default function InstallationOverview() {
                         <AssignStageStaff
                             stageName="InstallationModel"
                             projectId={projectId!}
-                            organizationId={"684a57015e439b678e8f6918"}
+                            organizationId={organizationId!}
                             currentAssignedStaff={data?.assignedTo || null}
                         />
                     </div>

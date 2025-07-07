@@ -14,6 +14,10 @@ const addConsultationMessage = async ({
   formData: FormData;
   api: any;
 }) => {
+  for (const [k, v] of formData.entries()) {
+  console.log("form data", k, v);
+}
+
   const { data } = await api.post(`/technicalconsultation/createmessage/${projectId}`, formData);
   if (!data.ok) throw new Error(data.message);
   return data.data;

@@ -3,6 +3,7 @@ import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { useDeleteMaterialSelectionRoomFile, useUploadMaterialSelectionRoomFiles } from "../../../apiList/Stage Api/materialSelectionApi";
 import { existingUploads } from "../../../utils/dummyData";
+import { toast } from "../../../utils/toast";
 
 interface UploadFile {
   _id: string;
@@ -15,9 +16,11 @@ interface Props {
   projectId: string;
   roomId: string;
   initialFiles: UploadFile[];
+      refetch: ()=> Promise<any>
+
 }
 
-const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles }) => {
+const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles, refetch }) => {
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [pdfFiles, setPdfFiles] = useState<UploadFile[]>(initialFiles.filter(f => f.type === "pdf"));
@@ -48,8 +51,12 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles 
       setPdfFiles(prev => [...prev, ...newPDFs]);
       setImageFiles(prev => [...prev, ...newImages]);
       setSelectedFiles([]);
-    } catch (err) {
-      console.error("Upload error", err);
+      toast({title:"Success", description:"file uploaded successfully"})
+      refetch()
+
+    } catch (err:any) {
+      toast({title:"error", description: err?.response?.data?.message || "failed to upload file", variant:"destructive"})
+
     }
   };
 
@@ -61,13 +68,16 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles 
       } else {
         setImageFiles(prev => prev.filter(file => file._id !== fileId));
       }
-    } catch (err) {
-      console.error("Delete error", err);
+      toast({title:"Success", description:"deleted successfully"})
+      refetch()
+    } catch (err:any) {
+      toast({title:"error", description: err?.response?.data?.message || "failed to upload file", variant:"destructive"})
+
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <h3 className="text-xl font-semibold text-blue-700">Uploads</h3>
 
       <div className="flex gap-4 items-center">
@@ -79,9 +89,11 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles 
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
         {/* PDFs */}
-        <div>
+        <div className="p-2">
           <h4 className="font-semibold text-red-700 mb-2">📄 PDF Files</h4>
-          <ul className="space-y-2">
+          <ul className="space-y-2 max-h-[180px] h-[180px] rounded-lg shadow-lg p-2 overflow-y-auto custom-scrollbar-none">
+            {pdfFiles.length === 0 && <div className="min-h-[180px] rounded-lg  flex items-center justify-center"><p className="text-sm text-gray-500">No PDFs uploaded.</p></div>}
+
             {pdfFiles.map(file => (
               <li key={file._id} className="flex justify-between items-center bg-red-50 p-2 rounded-xl">
                 <span className="text-sm">{file.originalName}</span>
@@ -91,7 +103,8 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles 
                   </a>
                   <Button
                     onClick={() => handleDelete(file._id, "pdf")}
-                    disabled={deletePending}
+                    // disabled={deletePending}
+                    isLoading={deletePending}
                     variant="ghost"
                     className="text-red-500"
                   >
@@ -100,14 +113,16 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles 
                 </div>
               </li>
             ))}
-            {pdfFiles.length === 0 && <p className="text-sm text-gray-500">No PDFs uploaded.</p>}
           </ul>
         </div>
 
         {/* Images */}
-        <div>
+        <div className="p-2">
           <h4 className="font-semibold text-green-700 mb-2">🖼️ Image Files</h4>
-          <ul className="space-y-2 max-h-[180px] overflow-y-auto">
+          <ul className="space-y-2 max-h-[180px] h-[180px] shadow-lg rounded-lg p-2 overflow-y-auto custom-scrollbar">
+            {/* {imageFiles.length === 0 && <p className="text-sm text-gray-500">No images uploaded.</p>} */}
+            {imageFiles.length === 0 && <div className="min-h-[180px] rounded-lg  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
+
             {imageFiles.map(file => (
               <li key={file._id} className="flex justify-between items-center bg-green-50 p-2 rounded-xl">
                 <span className="text-sm truncate">{file.originalName}</span>
@@ -120,7 +135,8 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles 
                   </a>
                   <Button
                     onClick={() => handleDelete(file._id, "image")}
-                    disabled={deletePending}
+                    // disabled={deletePending}
+                    isLoading={deletePending}
                     variant="ghost"
                     className="text-green-600"
                   >
@@ -129,7 +145,6 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles 
                 </div>
               </li>
             ))}
-            {imageFiles.length === 0 && <p className="text-sm text-gray-500">No images uploaded.</p>}
           </ul>
         </div>
       </div>

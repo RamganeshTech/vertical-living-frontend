@@ -31,7 +31,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
         const pathArray = location.pathname.split('/')
 
         // console.log(pathArray, "path array")
-        const mainPath = pathArray[3]
+        const mainPath = pathArray[4]
         if (showSideBar) {
             setActiveSidebar(() => MAIN_PATH_LABEL[mainPath] as any)
         } else {

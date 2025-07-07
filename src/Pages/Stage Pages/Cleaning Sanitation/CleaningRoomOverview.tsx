@@ -262,23 +262,23 @@ export default function CleaningRoomOverview() {
     if (isLoading) return <MaterialOverviewLoading />;
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full max-h-full overflow-y-auto custom-scrollbar-none sm:custom-scrollbar">
             <div className="mb-4 flex justify-between items-center w-full">
 
-                <h2 className="text-2xl font-semibold mb-4 text-blue-700 flex items-center">
+                <h2 className="text-md sm:text-2xl font-semibold mb-4 text-blue-700 flex items-center">
                     <i className="fas fa-broom mr-2"></i> {data?.roomName} - Details
                 </h2>
 
                 <Button
                     isLoading={updatingStatus}
                     onClick={handleUpdateStatus}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm !p-2 lg:p-4 "
                 >
-                    {completelyCleaned ? "Mark as Not Cleaned" : "Mark as Completely Cleaned"}
+                    {completelyCleaned ? "Mark as Not Cleaned" : "Mark as Cleaned"}
                 </Button>
             </div>
 
-            <div className="mb-2 grid grid-cols-2 gap-1 items-center place-content-center">
+            <div className="mb-2 grid grid-cols-1 md:grid-cols-2 gap-1 items-center place-content-center">
                 <Card className="p-2 border-gray-100 border-2">
                     <div className="w-full justify-between flex items-center">
                         <h3 className="text-md font-semibold  text-blue-700">Notes</h3>
@@ -355,9 +355,9 @@ export default function CleaningRoomOverview() {
                 </Card>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[70%]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[95%] sm:h-[65%]">
                 {/* Images Section */}
-                <Card className="p-4  max-h-full overflow-y-auto custom-scrollbar">
+                <Card className="p-2 lg:p-4 max-h-full overflow-y-auto custom-scrollbar h-[]">
                     <h3 className="text-lg font-semibold mb-3 text-blue-700">Images</h3>
                     {dummyUploads?.filter((f: ICleaningUpload) => f.type === "image").length === 0 ? (
                         <p className="text-gray-400 text-sm">No images uploaded.</p>
@@ -381,13 +381,14 @@ export default function CleaningRoomOverview() {
                                         <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                                         {/* Delete Button (top-right) */}
-                                        <button
-                                            onClick={() => handleDelete(f.url.split("/").pop()!)}
+                                        <Button
+                                            isLoading={deleting}
+                                            onClick={() => handleDelete(f._id)}
                                             disabled={deleting}
                                             className="absolute cursor-pointer top-2 right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                         >
                                             <i className="fas fa-trash"></i>
-                                        </button>
+                                        </Button>
 
                                         {/* Bottom-right actions */}
                                         <div className="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -425,13 +426,13 @@ export default function CleaningRoomOverview() {
                                 .map((f: ICleaningUpload) => (
                                     <li
                                         key={f.url}
-                                        className="flex items-center justify-between shadow-md p-2 rounded"
+                                        className="flex items-center justify-between shadow-md p-2 rounded h-full border"
                                     >
                                         <a
                                             href={f.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-blue-600 underline"
+                                            className="text-blue-600 underline truncate max-w-[50%]" 
                                         >
                                             {f.originalName}
                                         </a>
@@ -453,13 +454,15 @@ export default function CleaningRoomOverview() {
                                             >
                                                 <i className="fas fa-download"></i>
                                             </a>
-                                            <button
-                                                onClick={() => handleDelete(f.url.split("/").pop()!)}
+                                            <Button
+                                                isLoading={deleting}
+                                                onClick={() => handleDelete(f._id)}
                                                 disabled={deleting}
+                                                variant="danger"
                                                 className="bg-red-600 text-white rounded px-2 py-1 text-xs"
                                             >
-                                                Delete
-                                            </button>
+                                                <i className="fas fa-trash-can"></i>
+                                            </Button>
                                         </div>
                                     </li>
                                 ))}

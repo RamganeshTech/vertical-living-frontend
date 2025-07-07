@@ -44,7 +44,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
 
         try {
             await onUpload(selectedFiles); // ✅ Upload only on button click
-            setSelectedFiles([]); // Optional: clear files after upload
+            // setSelectedFiles([]); // Optional: clear files after upload
             toast({ description: 'File uploaded successfully', title: "Success" });
 
         } catch (error: any) {
@@ -120,17 +120,17 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                         <h3 className="font-medium">PDF Files</h3>
                     </div>
 
-                    <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-100 scrollbar-thumb-rounded-full scrollbar-track-rounded-full">
+                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar max-w-[100%] overflow-x-hidden">
                         {pdfFiles.length === 0 ? (
                             <p className="text-gray-500 text-center py-4">No PDF files uploaded</p>
                         ) : (
-                            <div className="space-y-2 ">
+                            <div className="space-y-2 max-w-[100%]">
                                 {pdfFiles.map((file, index) => (
                                     <div
                                         key={index}
-                                        className="flex items-center justify-between py-2 px-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                                        className="flex items-center max-w-full justify-between py-2 px-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
                                     >
-                                        <span className="text-gray-700 truncate flex-1">
+                                        <span className="text-gray-700 truncate whitespace-wrap max-w-[100%] flex-1 ">
                                             {file.originalName || 'Unnamed PDF'}
                                         </span>
                                         <div className="flex items-center gap-2">
@@ -145,7 +145,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                                             <Button
                                                 isLoading={deletePending}
                                                 onClick={() => onDelete(index)}
-                                                className="text-red-600 hover:text-red-800 p-1"
+                                                // className="text-red-600 hover:text-red-800 p-1"
                                                 title="Delete"
                                             >
                                                 <i className="fas fa-trash" />
@@ -165,21 +165,21 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                         <h3 className="font-medium">Image Files</h3>
                     </div>
 
-                    <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-100 scrollbar-thumb-rounded-full scrollbar-track-rounded-full">
+                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar max-w-[100%] overflow-x-hidden">
                         {imageFiles.length === 0 ? (
                             <p className="text-gray-500 text-center py-4">No image files uploaded</p>
                         ) : (
-                            <div className="space-y-2">
+                            <div className="space-y-2 max-w-[100%] ">
                                 {imageFiles.map((file, index) => (
                                     <div
                                         key={index}
-                                        className="flex items-center justify-between py-2 px-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                                        className="flex items-center max-w-full justify-between py-2 px-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
                                     >
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <span className="text-gray-700 truncate">
+                                        {/* <div className="flex items-center gap-2 flex-1"> */}
+                                            <span className="text-gray-700 truncate whitespace-wrap max-w-[80%] ">
                                                 {file.originalName || 'Unnamed Image'}
                                             </span>
-                                        </div>
+                                        {/* </div> */}
                                         <div className="flex items-center gap-2">
                                             <button
                                                 onClick={() => window.open(file.url, '_blank')}
@@ -199,7 +199,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                                             <Button
                                                 isLoading={deletePending}
                                                 onClick={() => onDelete(index)}
-                                                className="text-red-600 hover:text-red-800 p-1"
+                                                // className="text-red-600 hover:text-red-800 p-1"
                                                 title="Delete"
                                             >
                                                 <i className="fas fa-trash" />

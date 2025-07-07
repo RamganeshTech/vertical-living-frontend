@@ -13,7 +13,7 @@ import AssignStageStaff from "../../../shared/AssignStaff";
 // Main component
 const SampleDesignModule: React.FC = () => {
 
-  const { projectId } = useParams()
+  const { projectId , organizationId} = useParams()
 
   if (!projectId) return;
 
@@ -157,7 +157,7 @@ const SampleDesignModule: React.FC = () => {
     try {
       await uploadFiles.mutateAsync({ projectId, roomName, files });
       toast({ description: 'File uploaded successfully', title: "Success" });
-
+      refetch()
     } catch (error:any) {
       toast({ title: "Error"
         , description: error?.response?.data?.message || error.message || " Failed to upload the files", variant: "destructive" })
@@ -169,6 +169,7 @@ const SampleDesignModule: React.FC = () => {
     try {
       await deleteFile.mutateAsync({ projectId, roomName, fileIndex });
       toast({ description: 'File deleted successfully', title: "Success" });
+      refetch()
     } catch (error:any) {
       toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to delete the files", variant: "destructive" })
     }
@@ -209,7 +210,7 @@ const SampleDesignModule: React.FC = () => {
           <AssignStageStaff
                     stageName="SampleDesignModel"
                     projectId={projectId}
-                    organizationId={"684a57015e439b678e8f6918"}
+                    organizationId={organizationId!}
                     currentAssignedStaff={sampleDesign?.assignedTo || null}
                   />
         </div>

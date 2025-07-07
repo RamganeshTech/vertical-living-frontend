@@ -15,7 +15,7 @@ export default function CostEstimationRoomDetails() {
 
   if (!projectId || !roomId) return null;
 
-  const { data: room, isLoading } = useGetSingleRoomEstimation(projectId, roomId);
+  const { data: room, isLoading, refetch } = useGetSingleRoomEstimation(projectId, roomId);
   const { mutateAsync: updateMaterialItem, isPending: updatePending } = useUpdateMaterialEstimationItem();
 
 
@@ -49,7 +49,7 @@ export default function CostEstimationRoomDetails() {
   };
 
   return (
-    <div className="max-w-full h-full overflow-y-scroll scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-100 scrollbar-thumb-rounded-none scrollbar-track-rounded-full mx-auto mt-0 bg-white shadow rounded p-6">
+    <div className="max-w-full h-full overflow-y-scroll custom-scrollbar mx-auto mt-0 bg-white shadow rounded p-6">
       <div className="flex justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">{room.name}</h2>
@@ -81,7 +81,7 @@ export default function CostEstimationRoomDetails() {
         </div>
 
         {/* Table body */}
-        <div className="divide-y divide-gray-100 max-h-[70vh] overflow-y-auto bg-white">
+        <div className="divide-y divide-gray-100 max-h-[70vh] overflow-y-auto custom-scrollbar bg-white">
           {room.materials.map((item: any) => (
             <div key={item.key} className={`grid grid-cols-6 items-center px-6 py-4 text-sm ${editingKey === item.key ? "": "hover:bg-[#f7fbff]"}`}>
               <div className="font-medium text-gray-800">{item.key}</div>
@@ -157,7 +157,7 @@ export default function CostEstimationRoomDetails() {
 
 
       <section className="mt-4">
-        <CostEstimateUpload projectId={projectId!} roomId={roomId!} initialFiles={room.uploads} />
+        <CostEstimateUpload projectId={projectId!} roomId={roomId!} initialFiles={room.uploads} refetch={refetch} />
       </section>
     </div>
   );

@@ -11,3 +11,13 @@
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
+
+.custom-scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+
+.webkit-scrollbar{
+  border: 2px solid red;
+}

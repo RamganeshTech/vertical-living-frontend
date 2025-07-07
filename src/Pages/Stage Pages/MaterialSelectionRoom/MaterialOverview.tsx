@@ -16,7 +16,7 @@ import AssignStageStaff from "../../../shared/AssignStaff";
 
 
 export default function MaterialRoomOverview() {
-    const { projectId } = useParams()
+    const { projectId, organizationId } = useParams()
     const location = useLocation();
     const { data, isLoading, error: getRoomsError, refetch } = useGetMaterialConfirmationByProject(projectId!);
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetMaterialDeadline()
@@ -27,8 +27,8 @@ export default function MaterialRoomOverview() {
 
     console.log(data)
 
-    if (!data?.customRooms?.length && !data?.rooms?.length) return <EmptyState message="No Rooms Available" icon="custom" customIconClass="fas fa-room" color="primary" />;
-
+    // if (!data?.customRooms?.length && !data?.rooms?.length) return <EmptyState message="No Rooms Available" icon="custom" customIconClass="fas fa-room" color="primary" />;
+const isroomsAvailable = !data?.customRooms?.length && !data?.rooms?.length
     if (getRoomsError) return <div className="max-w-xl mx-auto mt-12 p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
         <div className="text-red-600 text-xl font-semibold mb-2">
             ⚠️ Oops! An Error Occurred
@@ -89,12 +89,12 @@ export default function MaterialRoomOverview() {
                                 </Button>
 
 
-                                  <AssignStageStaff
-            stageName="MaterialRoomConfirmationModel"
-            projectId={projectId!}
-            organizationId={"684a57015e439b678e8f6918"}
-            currentAssignedStaff={data?.assignedTo || null}
-          />
+                                <AssignStageStaff
+                                    stageName="MaterialRoomConfirmationModel"
+                                    projectId={projectId!}
+                                    organizationId={organizationId!}
+                                    currentAssignedStaff={data?.assignedTo || null}
+                                />
                             </div>
                         </div>
 
@@ -124,6 +124,8 @@ export default function MaterialRoomOverview() {
 
                         {/* {showCreateRoomForm && <CreateRoomForm projectId={projectId!} onClose={() => setShowCreateForm(false)} />} */}
 
+
+
                         {showCreateForm && <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
                             <div className="bg-white rounded-xl shadow-lg p-6">
                                 <h2 className="text-xl font-semibold mb-4 text-blue-700">Create New Room</h2>
@@ -131,14 +133,14 @@ export default function MaterialRoomOverview() {
                             </div>
                         </Dialog>}
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  h-[72%] overflow-y-scroll">
+                        {!isroomsAvailable && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  h-[70%] py-2 overflow-y-auto custom-scrollbar">
                             {rooms?.map((room: any) => (
                                 <RoomCard key={room._id} room={room} projectId={projectId!} />
                             ))}
                             {customRooms?.map((room: any) => (
                                 <RoomCard key={room._id} room={room} projectId={projectId!} />
                             ))}
-                        </div>
+                        </div>}
                     </> :
                     <Outlet />
                 }

@@ -68,10 +68,10 @@ export const PROJECTS_ICONS = {
   ORDERMATERIALS: "fa-solid fa-shopping-cart text-2xl",
   MATERIALARRIVED: "fa-solid fa-receipt text-2xl",
   WORKSCHEDULE: "fas fa-digging text-2xl",
-  INSTALLATION: "fas fa-fit text-2xl",
-  QUALITYCHECK: "fas fa-fit text-2xl",
-  CLEANINGSANITATION: "fas fa-map text-2xl",
-  PROJECTDELIVERY: "fas fa-box text-2xl",
+  INSTALLATION: "fas fa-comments text-2xl",
+  QUALITYCHECK: "fas fa-check-double text-2xl",
+  CLEANINGSANITATION: "fas fa-broom text-2xl",
+  PROJECTDELIVERY: "fas fa-handshake text-2xl",
 }
 
 

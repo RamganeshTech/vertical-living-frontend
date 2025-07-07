@@ -3,6 +3,7 @@ import { getApiForRole } from "../../utils/roleCheck";
 import useGetRole from "../../Hooks/useGetRole";
 import type { AxiosInstance } from "axios";
 import clientApi from "../../apiService/clientService";
+import { queryClient } from "../../QueryClient/queryClient";
 
 export interface UploadFilePayload {
     formId: string;
@@ -33,21 +34,21 @@ const generateRequirementFormLink = async ({ projectId, api }: { projectId: stri
     return data.data; //it has the link
 };
 
-const lockUpdationOfForm = async ({ formId, projectId, api }: { formId: string, projectId: string,  api: AxiosInstance }) => {
+const lockUpdationOfForm = async ({ formId, projectId, api }: { formId: string, projectId: string, api: AxiosInstance }) => {
 
     const { data } = await api.patch(`/requirementform/lockupdation/${projectId}/${formId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
 
-const formCompletion = async ({ formId, projectId, api }: { formId: string, projectId: string,api: AxiosInstance }) => {
+const formCompletion = async ({ formId, projectId, api }: { formId: string, projectId: string, api: AxiosInstance }) => {
     console.log("formId", formId)
     const { data } = await api.patch(`/requirementform/formcompleted/${projectId}/${formId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
 
-const setDeadlineFormRequirement = async ({ formId, projectId,  deadLine, api }: {  projectId: string,formId: string, deadLine: string, api: AxiosInstance }) => {
+const setDeadlineFormRequirement = async ({ formId, projectId, deadLine, api }: { projectId: string, formId: string, deadLine: string, api: AxiosInstance }) => {
     const { data } = await api.patch(`/requirementform/deadline/${projectId}/${formId}`, { deadLine });
     if (!data.ok) throw new Error(data.message);
     return data.data;
@@ -76,6 +77,39 @@ const uploadRequirementFiles = async ({ formId, projectId, files, api }: UploadF
     console.log("reposen", response)
     return response.data;
 }
+
+
+// DELETE file
+const deleteRequirementUploadFileApi = async (
+    projectId: string,
+    fileId: string,
+    api: AxiosInstance
+) => {
+    const { data } = await api.patch(`/requirementform/${projectId}/deleteuploadedfile/${fileId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
+
+export const useDeleteRequirementUploadFile = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    const allowedRoles = ["owner", "staff", "CTO"]
+
+    return useMutation({
+        mutationFn: async ({ projectId, fileId }: {projectId:string, fileId:string}) => {
+
+            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+            if (!api) throw new Error("API instance not found for role"); return await deleteRequirementUploadFileApi(projectId, fileId, api);
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
+        },
+    });
+};
 
 //updation part of the requriement form
 
@@ -178,7 +212,7 @@ export const useLockUpdationOfForm = () => {
     const api = getApiForRole(role!)
 
     return useMutation({
-        mutationFn: async ({ formId , projectId }: { formId: string, projectId:string }) => {
+        mutationFn: async ({ formId, projectId }: { formId: string, projectId: string }) => {
             if (!role) throw new Error("not authorized")
             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
             if (!api) throw new Error("api is null")
@@ -195,14 +229,14 @@ export const useFormCompletion = () => {
     const { role } = useGetRole()
     const api = getApiForRole(role!)
     return useMutation({
-        mutationFn: async ({ formId,  projectId }: { formId: string, projectId:string }) => {
+        mutationFn: async ({ formId, projectId }: { formId: string, projectId: string }) => {
             if (!role) throw new Error("not authorized")
 
             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
 
             if (!api) throw new Error("api is null")
 
-            return await formCompletion({ formId, projectId,api })
+            return await formCompletion({ formId, projectId, api })
 
         }
     })
@@ -213,7 +247,7 @@ export const useSetDeadLineFormRequirement = () => {
     const { role } = useGetRole()
     const api = getApiForRole(role!)
     return useMutation({
-        mutationFn: async ({ formId, deadLine, projectId }: { formId: string, projectId:string, deadLine: string }) => {
+        mutationFn: async ({ formId, deadLine, projectId }: { formId: string, projectId: string, deadLine: string }) => {
             if (!role) throw new Error("not authorized")
 
             if (!allowedRoles.includes(role)) throw new Error('you dont have the access to make this api')

@@ -15,7 +15,7 @@ import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
 
 const TechnicalConsultant = () => {
-    const { projectId } = useParams<{ projectId: string }>();
+    const { projectId , organizationId} = useParams<{ projectId: string, organizationId:string }>();
     const { role, _id: userId } = useGetRole();
 
 
@@ -25,7 +25,7 @@ const TechnicalConsultant = () => {
     const [editText, setEditText] = useState("");
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
-
+    const [imageLoading, setImageLoading] = useState(false);
 
     let { data: techDoc, isLoading: getMessageLoading, error: getMessageError, isError: getMessageIsError, refetch } = useGetConsultationMessages(projectId!);
     const { mutate: sendMessage, isPending: sendMessagePending } = useAddConsultationMessage();
@@ -57,7 +57,6 @@ const TechnicalConsultant = () => {
             if (text) formData.append("message", text);
             if (role) formData.append("senderRole", role);
             formData.append("sender", userId!);
-
             attachments.forEach(file => formData.append("attachments", file));
 
             sendMessage({ projectId: projectId!, formData });
@@ -205,7 +204,7 @@ const TechnicalConsultant = () => {
                     <AssignStageStaff
                         stageName="TechnicalConsultationModel"
                         projectId={projectId!}
-                        organizationId={"684a57015e439b678e8f6918"}
+                        organizationId={organizationId!}
                         currentAssignedStaff={techDoc?.assignedTo || null}
                     />
                 </div>
@@ -230,7 +229,7 @@ const TechnicalConsultant = () => {
                 />
             </Card>
 
-            <div className="space-y-4 border-2 border-[#0a0a0a18] h-[41%]">
+            <div className="space-y-4 border-2 border-[#0a0a0a18] h-[47%]">
                 <div className="flex flex-col-reverse overflow-y-auto h-full px-2 py-1 space-y-reverse space-y-4">
                     {(getMessageIsError || getMessageError) && <div className="text-center flex h-full items-center justify-center py-10">
                         <div>
@@ -288,7 +287,7 @@ const TechnicalConsultant = () => {
                                                 <p className="text-gray-900 text-sm ">{msg.message}</p>
                                             )}
 
-                                            <div className="flex flex-wrap max-w-[80%] gap-3">
+                                            <div className="flex flex-wrap max-w-[80%] gap-3 mt-2">
                                                 {msg.attachments?.map((att: any, index: number) => (
                                                     // {attachemnts?.map((att: any, index: number) => (
                                                     <div key={index} className="flex items-center gap-2 bg-white border px-3 py-2 rounded shadow-sm">
@@ -297,7 +296,12 @@ const TechnicalConsultant = () => {
 
                                                         {att.type === "image" && (
                                                             <button
-                                                                onClick={() => setPreviewImage(att.url)}
+                                                                // onClick={() => setPreviewImage(att.url)}
+                                                                onClick={() => {
+                                                                    setPreviewImage(att.url);
+                                                                    setImageLoading(true); // Show loading state!
+                                                                }}
+
                                                                 className="text-blue-600 hover:underline text-xs"
                                                             >
                                                                 View
@@ -306,6 +310,7 @@ const TechnicalConsultant = () => {
 
                                                         <a
                                                             href={att.url}
+                                                            target="_blank"
                                                             download
                                                             className="text-green-600 hover:underline text-xs"
                                                         >
@@ -354,7 +359,7 @@ const TechnicalConsultant = () => {
 
             </div>
 
-            {previewImage && (
+            {/* {previewImage && (
                 <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
                     <div className="bg-white p-4 rounded-lg shadow-lg max-w-[90%] max-h-[90%] overflow-auto">
                         <div className="flex justify-end mb-2">
@@ -365,10 +370,44 @@ const TechnicalConsultant = () => {
                                 <i className="fas fa-times"></i>
                             </button>
                         </div>
-                        <img src={previewImage} alt="Preview" className="max-h-[80vh] rounded" />
+                        <img src={previewImage} loading="lazy" alt="Preview" className="max-h-[80vh] rounded" />
+                    </div>
+                </div>
+            )} */}
+
+
+            {previewImage && (
+                <div onClick={()=> setPreviewImage(null)}  className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
+                    <div  onClick={(e)=> e.stopPropagation()}   className="bg-white p-4 rounded-lg shadow-lg max-w-[90%] max-h-[90%] overflow-auto relative">
+                        <div className="flex justify-end mb-2">
+                            <button
+                                onClick={() => setPreviewImage(null)}
+                                className="text-red-500 text-xl"
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div className="relative min-w-80 min-h-90">
+                            {imageLoading && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+                                    <i className="fas fa-spinner fa-spin text-3xl text-gray-600"></i>
+                                </div>
+                            )}
+
+                            <img
+                                src={previewImage}
+                                onLoad={() => setImageLoading(false)}
+                                loading="lazy"
+                                alt="Preview"
+                                className={`max-h-[80vh] rounded transition duration-500 ${imageLoading ? 'blur-sm scale-105' : ''
+                                    }`}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
+
         </div>
     );
 };

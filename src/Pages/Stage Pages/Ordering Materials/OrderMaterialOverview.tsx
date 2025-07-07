@@ -135,7 +135,7 @@ import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
 
 const OrderMaterialOverview = () => {
-  const { projectId } = useParams();
+  const { projectId, organizationId } = useParams();
   const navigate = useNavigate();
 
   const isChildRoute = location.pathname.includes("/ordermaterialroom");
@@ -229,7 +229,7 @@ const OrderMaterialOverview = () => {
               <AssignStageStaff
             stageName="OrderingMaterialModel"
             projectId={projectId!}
-            organizationId={"684a57015e439b678e8f6918"}
+            organizationId={organizationId!}
             currentAssignedStaff={data?.assignedTo || null}
           />
           </div>

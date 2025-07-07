@@ -15,12 +15,15 @@ interface UploadSectionProps {
         uploadedAt: string;
     }[];
     onUploadComplete?: () => void;
-    uploadFilesMutate: ({ formId, files ,projectId}: { formId: string,projectId: string, files: any }) => Promise<any>,
+    uploadFilesMutate: ({ formId, files, projectId }: { formId: string, projectId: string, files: any }) => Promise<any>,
     uploadPending: boolean
-    projectId:string
+    projectId: string,
+    onDeleteUpload?: ({ fileId, projectId }: { fileId: string, projectId: string, }) => Promise<any>,
+    deleteFilePending?: boolean
+
 }
 
-const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, projectId, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending }) => {
+const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, projectId, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending, onDeleteUpload, deleteFilePending }) => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
 
@@ -37,6 +40,17 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
             toast({ title: "Success", description: "Files uploaded successfully." });
             setSelectedFiles([]);
             onUploadComplete?.();
+        } catch (err: any) {
+            toast({ title: "Upload Failed", description: err?.response?.data?.message || "Try again later.", variant: "destructive" });
+        }
+    };
+
+
+
+    const handleDeleteFile = async (fileId: string) => {
+        try {
+            await onDeleteUpload?.({ fileId, projectId });
+            toast({ title: "Success", description: "Files Deleted successfully." });
         } catch (err: any) {
             toast({ title: "Upload Failed", description: err?.response?.data?.message || "Try again later.", variant: "destructive" });
         }
@@ -65,7 +79,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
     };
 
 
-   
+
 
 
     const pdfFiles = existingUploads.filter((file) => file.type === "pdf");
@@ -76,22 +90,32 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
             <h3 className="text-xl font-semibold text-blue-700">Uploads</h3>
 
             <div className="flex gap-4 items-center">
-                <Input type="file" multiple onChange={handleFileChange}   accept="image/jpeg,image/png,application/pdf" />
+                <Input type="file" multiple onChange={handleFileChange} accept="image/jpeg,image/png,application/pdf" />
                 <Button onClick={handleUpload} isLoading={uploadPending} className="bg-blue-600 text-white">
                     Upload
                 </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <div className="">
+                <div>
                     <h4 className="font-semibold text-blue-800 mb-2">📄 PDF Files</h4>
-                    <ul className="space-y-2">
+                    <ul className="space-y-2  max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto max-h-[150px]">
                         {pdfFiles.map((file, i) => (
-                            <li key={i} className="flex justify-between items-center bg-blue-50 p-2 rounded-xl">
-                                <span>{file.originalName}</span>
-                                <a href={file.url} target="_blank" download className="text-blue-600 underline">
-                                    <i className="fa-solid fa-download"></i>
-                                </a>
+                            <li key={i} className="flex justify-between items-center  bg-blue-50 p-2 rounded-xl">
+                                <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
+                                <div className="space-x-2">
+                                    {/* <a href={file.url} target="_blank" download className="text-blue-600 underline">
+                                        <i className="fa-solid fa-download"></i>
+                                    </a> */}
+
+                                    <Button onClick={() => handleDownload(file.url, file.originalName)} className="text-sm">
+                                        <i className="fa-solid fa-download"></i>
+                                    </Button>
+
+                                    <Button isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-green-600 text-sm">
+                                        <i className="fa-solid fa-trash-can"></i>
+                                    </Button>
+                                </div>
                             </li>
                         ))}
                         {pdfFiles.length === 0 && <p className="text-sm text-gray-500">No PDFs uploaded.</p>}
@@ -102,20 +126,21 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
 
                 <div className="overflow-y-auto">
                     <h4 className="font-semibold text-blue-800 mb-2">🖼️ Image Files</h4>
-                    <ul className="space-y-2 overflow-y-auto max-h-[150px]">
+                    <ul className="space-y-2  max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto max-h-[150px] custom-scrollbar">
                         {imageFiles.map((file, i) => (
                             <li key={i} className="flex justify-between items-center bg-green-50 p-2 rounded-xl">
-                                <span>{file.originalName}</span>
-                                <div className="flex gap-2">
-                                    <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-green-600 underline">
+                                <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
+                                <div className="flex gap-2 items-center">
+                                    <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
                                         <i className="fa-solid fa-eye"></i>
                                     </a>
-                                    <a href={file.url} target="_blank" download className="text-green-600 underline">
-                                        <i className="fa-solid fa-download"></i>
-                                    </a>
 
-                                    <Button onClick={() => handleDownload(file.url, file.originalName)} className="text-green-600 text-sm">
+                                    <Button onClick={() => handleDownload(file.url, file.originalName)} className="text-sm">
                                         <i className="fa-solid fa-download"></i>
+                                    </Button>
+
+                                    <Button isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-blue-600 text-sm">
+                                        <i className="fa-solid fa-trash-can"></i>
                                     </Button>
 
                                 </div>

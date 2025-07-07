@@ -24,7 +24,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
       <div className="flex w-full h-full">
         <Sidebar path={path} labels={SIDEBAR_LABELS} icons={SIDEBAR_ICONS} />
         <main className="!w-[100%] h-full p-4">
-          <Outlet context={{ projectId, setProjectId }} />
+          <Outlet context={{ projectId, setProjectId , organizationId}} />
         </main>
       </div>
     </>
