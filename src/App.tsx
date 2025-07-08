@@ -170,10 +170,10 @@ function App() {
           </Route>
 
 
-           <Route path="paymentconfirmation" element={<PaymentConfirmationStage />} >
+          <Route path="paymentconfirmation" element={<PaymentConfirmationStage />} >
             <Route path="consent" element={<PaymentConsentSection />} />
             <Route path="schedule" element={<PaymentScheduleSection />} />
-            <Route path="transaction" element={<PaymentTransaction/>} />
+            <Route path="transaction" element={<PaymentTransaction />} />
 
           </Route>
 
@@ -239,7 +239,7 @@ function App() {
         <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
 
 
-          <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
 
       </Routes>
 

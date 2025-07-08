@@ -8,7 +8,7 @@ import { Card, CardContent } from "../../components/ui/Card"
 
 export default function Organization() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  let { data: organizations, isLoading, error } = useGetMyOrganizations()
+  let { data: organizations, isLoading, error, refetch } = useGetMyOrganizations()
   // organizations = {}
   if (isLoading) {
     return (
@@ -45,7 +45,7 @@ export default function Organization() {
     )
   }
 
-  if (error) {
+  if (error as any) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
         <div className="text-center bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full">
@@ -53,8 +53,8 @@ export default function Organization() {
             <i className="fas fa-exclamation-triangle text-white text-2xl"></i>
           </div>
           <h2 className="text-2xl font-bold text-red-600 mb-2">Error Loading Organizations</h2>
-          <p className="text-gray-600 mb-4">{error.message}</p>
-          <Button onClick={() => window.location.reload()} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <p className="text-gray-600 mb-4">{(error as any)?.response?.data?.message || error?.message || "Something happened try again please"}</p>
+          <Button onClick={() => refetch()} className="bg-blue-600 hover:bg-blue-700 text-white">
             <i className="fas fa-redo mr-2"></i>
             Try Again
           </Button>
@@ -73,9 +73,9 @@ export default function Organization() {
 
 
   return (
-    <>
+    <main className="w-screen h-screen">
     {/* HEADER */}
-        <div className="m-w-full bg-white/90 backdrop-blur-sm border-b border-blue-200 sticky top-0 z-10">
+        <div className="max-w-full min-h-[10%] bg-white/90 backdrop-blur-sm border-b border-blue-200">
           <div className="max-w-full mx-auto px-4 sm:px-6 py-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6">
 
@@ -93,20 +93,20 @@ export default function Organization() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
 
                 {/* Org Count Pill */}
-                <div className="bg-blue-600 text-white text-xs sm:text-sm px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2">
+                {/* <div className="bg-blue-600 text-white text-xs sm:text-sm px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2">
                   <i className="fas fa-layer-group text-white text-sm"></i>
                   <span className="font-medium">
                     {totalOrganizations} {totalOrganizations === 1 ? "Organization" : "Organizations"}
                   </span>
-                </div>
+                </div> */}
 
                 {/* Action Button */}
-                <Button
+                {/* <Button
                   className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md shadow-sm transition-transform duration-150 hover:scale-105"
                 >
                   <i className="fas fa-user-group mr-1.5"></i>
                   <span className="inline">staffs</span>
-                </Button>
+                </Button> */}
 
 
                   <Button
@@ -123,7 +123,7 @@ export default function Organization() {
           </div>
         </div>
 
-      <div className="min-h-full bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      <div className="min-h-[calc(100%-10%)] bg-gradient-to-br from-blue-50 via-white to-blue-100">
         <div className="max-w-full mx-auto px-4 sm:px-6 py-6 relative">
           {/* Statistics Cards */}
           {/* <div className="mb-8">
@@ -146,7 +146,7 @@ export default function Organization() {
           {organizations ? (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-blue-900">Your Organizations ({totalOrganizations})</h2>
+                <h2 className="text-xl font-semibold text-blue-900">Your Organization</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {/* {organizations.map((org: any) => ( */}
@@ -228,6 +228,6 @@ export default function Organization() {
         </div>
       </div>
 
-    </>
+    </main>
   )
 }

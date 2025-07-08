@@ -1,11 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ORGANIZATION_ICONS, ORGANIZATION_LABELS } from '../../constants/constants'
 import Sidebar from '../../shared/Sidebar'
 import { Outlet, useParams } from 'react-router-dom'
+import MobileSidebar from '../../shared/MobileSidebar'
 
-const OrganizationChildrens:React.FC = () => {
+
+
+export type OrganizationOutletTypeProps = {
+    isMobile: boolean,
+    isMobileSidebarOpen: boolean;
+    openMobileSidebar: () => void;
+    closeMobileSidebar: () => void;
+}
+
+const OrganizationChildrens: React.FC = () => {
 
     const { organizationId } = useParams<{ organizationId: string }>()
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
+
 
     const path = {
         PROJECTS: `/organizations/${organizationId}/projects`,
@@ -14,11 +27,43 @@ const OrganizationChildrens:React.FC = () => {
         INVITESTAFFS: `/organizations/${organizationId}/invitestaff`,
     }
 
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 470);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <div className="flex w-full h-full">
-            <Sidebar path={path} labels={ORGANIZATION_LABELS} icons={ORGANIZATION_ICONS} />
-              <main className="!w-[100%] h-full">
-            <Outlet />
+            {/* <Sidebar path={path} labels={ORGANIZATION_LABELS} icons={ORGANIZATION_ICONS} /> */}
+
+            {isMobile ? (
+                <MobileSidebar
+                    labels={ORGANIZATION_LABELS}
+                    path={path}
+                    isOpen={isMobileSidebarOpen}
+                    onClose={() => setIsMobileSidebarOpen(false)}
+                />
+            ) : (
+                <Sidebar
+                    path={path}
+                    labels={ORGANIZATION_LABELS}
+                    icons={ORGANIZATION_ICONS}
+                />
+            )}
+            <main className="!w-[100%] h-full">
+                <Outlet context={{
+                    isMobile,
+                    isMobileSidebarOpen,
+                    openMobileSidebar: () => setIsMobileSidebarOpen(true),
+                    closeMobileSidebar: () => setIsMobileSidebarOpen(false),
+                }} />
             </main>
         </div>
     )

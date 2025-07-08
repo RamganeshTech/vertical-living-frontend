@@ -1,3 +1,63 @@
+
+// <>
+//                                 <div
+//                                     className={`transition-all duration-300 overflow-hidden ${expandedRoom === roomKey ? "max-h-[1000px] p-4" : "max-h-0"
+//                                         }`}
+//                                 >
+//                                     {items.length === 0 ? (
+//                                         <div className="py-10 text-center text-gray-500 bg-gray-50 rounded-md shadow-inner">
+//                                             <i className="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
+//                                             <h3 className="text-lg font-semibold text-gray-700">No Items Found</h3>
+//                                             <p className="text-sm text-gray-500 mb-4">no items needed for this section.</p>
+//                                         </div>
+//                                     ) : (
+//                                         <div className="w-full overflow-x-auto mt-3">
+//                                             <div className="min-w-[600px]">
+//                                                 {/* Header Row */}
+//                                                 <div className="grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] bg-blue-50 text-xs text-blue-900 font-semibold border-b border-blue-200 py-2 px-2">
+//                                                     {Object.keys(items[0])
+//                                                         .filter(key => key !== "_id")
+//                                                         .map(key => (
+//                                                             <div key={key} className="text-center capitalize">
+//                                                                 {key === "upload" ? "Image" : key.replace(/([A-Z])/g, " $1")}
+//                                                             </div>
+//                                                         ))}
+//                                                 </div>
+
+//                                                 {/* Data Rows */}
+//                                                 {items.map((item, index) => (
+//                                                     <div
+//                                                         key={index}
+//                                                         className="grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] text-xs text-gray-800 border-b border-gray-100 py-2 px-2 hover:bg-gray-50"
+//                                                     >
+//                                                         {Object.entries(item)
+//                                                             .filter(([key]) => key !== "_id")
+//                                                             .map(([key, val], idx) => (
+//                                                                 <div key={idx} className="text-center break-words">
+//                                                                     {typeof val === "boolean" ? (
+//                                                                         val ? "✔️" : "❌"
+//                                                                     ) : typeof val === "string" || typeof val === "number" ? (
+//                                                                         val
+//                                                                     ) : (
+//                                                                         "-"
+//                                                                     )}
+//                                                                 </div>
+//                                                             ))}
+//                                                     </div>
+//                                                 ))}
+//                                             </div>
+//                                         </div>
+//                                     )}
+//                                 </div>
+//                                 </>
+
+
+
+
+
+
+
+
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { useGetOrderingMaterialPublicDetails } from "../../../apiList/Stage Api/orderingMaterialApi";
@@ -94,6 +154,7 @@ const PublicOrderMaterial = () => {
                                     <i className={`fas fa-chevron-${expandedRoom === roomKey ? "up" : "down"}`}></i>
                                 </button>
 
+
                                 <div
                                     className={`transition-all duration-300 overflow-hidden ${expandedRoom === roomKey ? "max-h-[1000px] p-4" : "max-h-0"
                                         }`}
@@ -102,13 +163,13 @@ const PublicOrderMaterial = () => {
                                         <div className="py-10 text-center text-gray-500 bg-gray-50 rounded-md shadow-inner">
                                             <i className="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
                                             <h3 className="text-lg font-semibold text-gray-700">No Items Found</h3>
-                                            <p className="text-sm text-gray-500 mb-4">no items needed for this section.</p>
+                                            <p className="text-sm text-gray-500 mb-4">No items needed for this section.</p>
                                         </div>
                                     ) : (
-                                        <div className="w-full overflow-x-auto mt-3">
-                                            <div className="min-w-[600px]">
+                                        <div className="w-full overflow-x-auto">
+                                            <div className="min-w-[900px] max-h-[400px] overflow-y-auto custom-scrollbar rounded border border-gray-200">
                                                 {/* Header Row */}
-                                                <div className="grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] bg-blue-50 text-xs text-blue-900 font-semibold border-b border-blue-200 py-2 px-2">
+                                                <div className="grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] bg-blue-50 text-xs text-blue-900 font-semibold border-b border-blue-200 py-2 px-2 sticky top-0">
                                                     {Object.keys(items[0])
                                                         .filter(key => key !== "_id")
                                                         .map(key => (
@@ -143,6 +204,7 @@ const PublicOrderMaterial = () => {
                                         </div>
                                     )}
                                 </div>
+
                             </div>
                         ))
                     )}

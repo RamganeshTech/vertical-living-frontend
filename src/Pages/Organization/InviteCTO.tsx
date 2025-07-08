@@ -6,16 +6,19 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { useGetCTOByOrganization, useInviteCTOToOrganization, useRemoveCTOFromOrganization } from '../../apiList/orgApi'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { toast } from '../../utils/toast'
 import { Label } from '../../components/ui/Label'
 import { Input } from '../../components/ui/Input'
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar'
 import { COMPANY_DETAILS } from '../../constants/constants'
+import type { OrganizationOutletTypeProps } from './OrganizationChildren'
 
 const InviteCTO: React.FC = () => {
   const { organizationId } = useParams()
   const navigate = useNavigate()
+  const { openMobileSidebar, isMobile } = useOutletContext<OrganizationOutletTypeProps>()
+
 
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
@@ -115,11 +118,42 @@ const InviteCTO: React.FC = () => {
 
   return (
    
-     <div className="min-h-full min-w-full flex bg-gradient-to-br from-blue-50 to-white gap-6 p-6">
+     <div className="min-h-full max-h-full overflow-y-auto  min-w-full bg-gradient-to-br from-blue-50 to-white gap-6">
+
+        <header>
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
+             
+            <div className="flex items-center justify-between">
+              
+              <div className="flex items-center space-x-4">
+                 {isMobile &&
+                <button
+                  onClick={openMobileSidebar}
+                  className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                  title="Open Menu"
+                >
+                  <i className="fa-solid fa-bars"></i>
+                </button>
+}
+                <h1 className="text-xl sm:text-3xl font-bold text-gray-900">CTO Management</h1>
+                <div className="hidden sm:block h-8 w-px bg-gray-300" />
+                <div className="bg-blue-100 p-2 rounded-xl">
+                  <i className="fas fa-user-tie text-blue-600 text-xl"></i>
+                </div>
+              </div>
+              <div className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-lg">
+                <i className="fas fa-users mr-2"></i>
+                {CTOs?.length} Members
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
       
-       <div className="max-w-full mx-auto grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-6">
+       <div className="w-full flex flex-col md:flex-row p-4 gap-6 h-full">
      {/* invitiation link */}
-      <div className="bg-white p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
+      <div className="bg-white max-h-full w-full  md:w-1/2  p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
         <div>
           <h2 className="text-2xl font-bold text-blue-900 mb-2 flex items-center">
             <i className="fas fa-user-plus mr-2" /> Invite CTOs
@@ -176,7 +210,7 @@ const InviteCTO: React.FC = () => {
 
      {/*invited memebers */}
      
-      <div className="bg-white p-6 rounded-2xl shadow-lg overflow-y-auto max-h-full">
+      <div className="bg-white p-6 py-2 w-full  md:w-1/2  rounded-2xl shadow-lg overflow-y-auto  max-h-[90%] custom-scrollbar">
         <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
           <i className="fas fa-users mr-2" /> CTO Members ({CTOs.length})
         </h2>
@@ -239,3 +273,10 @@ const InviteCTO: React.FC = () => {
 }
 
 export default InviteCTO
+
+
+// above is orginal
+
+
+
+

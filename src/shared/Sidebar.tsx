@@ -32,6 +32,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
         // console.log(pathArray, "path array")
         const mainPath = pathArray[4]
+        console.log(mainPath, pathArray)
         if (showSideBar) {
             setActiveSidebar(() => MAIN_PATH_LABEL[mainPath] as any)
         } else {
@@ -92,9 +93,9 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                                     <Link to={path[key]} className={`${path[key] ? "" : "cursor-not-allowed"}`}>
                                         <div
                                             onClick={() => setActiveSidebar(key)}
-                                            className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar.toLowerCase() === key.toLowerCase() ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
+                                            className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar?.toLowerCase() === key.toLowerCase() ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
                                                 } `}>
-                                            <i className={`${value} ${activeSidebar.toLowerCase() === key.toLowerCase() ? 'text-[#4a86f7]' : 'text-[#9ca3af]'} `}></i>
+                                            <i className={`${value} ${activeSidebar?.toLowerCase() === key.toLowerCase() ? 'text-[#4a86f7]' : 'text-[#9ca3af]'} `}></i>
                                         </div>
                                     </Link>
                                     :

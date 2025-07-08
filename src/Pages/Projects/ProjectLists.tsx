@@ -6,14 +6,16 @@ import { useGetProjects } from "../../apiList/projectApi";
 import type { IProject } from "../../types/types";
 import { mapProjectToProjectInput } from "../../utils/editProjectRequiredFields";
 import ProjectCardLoading from "../../LoadingUI/ProjectCartLoading";
-import { useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
+import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren";
 
 
 const ProjectLists = () => {
 
-  const {organizationId} = useParams() 
-    
-   const [showForm, setShowForm] = useState<boolean>(false);
+  const { organizationId } = useParams()
+  const { openMobileSidebar, isMobile } = useOutletContext<OrganizationOutletTypeProps>()
+
+  const [showForm, setShowForm] = useState<boolean>(false);
   const [isEditing, setisEditing] = useState<boolean>(false);
 
   const [editForm, setEditForm] = useState<ProjectInput>({
@@ -57,16 +59,27 @@ const ProjectLists = () => {
     <div className="w-[100%] flex flex-col h-full min-h-0 ">
 
       <div className="flex py-2 justify-between items-center">
+       <div className="flex gap-2">
+         {isMobile &&
+          <button
+            onClick={openMobileSidebar}
+            className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+            title="Open Menu"
+          >
+            <i className="fa-solid fa-bars"></i>
+          </button>
+        }
         <h2 className="text-3xl font-bold text-[#1f2d3d] flex items-center gap-2">
           <i className="fa-solid fa-diagram-project text-blue-600 text-2xl"></i>
           <p>{SIDEBAR_LABELS.PROJECTS}</p>
         </h2>
+       </div>
 
         <div
           onClick={() => {
             setShowForm(!showForm)
           }}
-          className="bg-blue-600 w-[3.5%] cursor-pointer !h-[40px] flex justify-center items-center rounded-full"
+          className="bg-blue-600  cursor-pointer !h-[40px] !w-[40px] sm:!h-[40px] sm:!w-[40px] flex justify-center items-center rounded-full"
         >
           <i
             className={`fa-solid fa-plus text-white transition-transform duration-300 ${showForm ? "rotate-135" : "rotate-0"

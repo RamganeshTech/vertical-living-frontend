@@ -13,6 +13,7 @@ import { requiredFieldsByRoomArrival } from "../../../constants/constants";
 import { Footer, Header } from "../Ordering Materials/PublicOrderMaterial";
 import { Skeleton } from "../../../components/ui/Skeleton";
 import { Textarea } from "../../../components/ui/TextArea";
+import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
 // const RoomSection = ({
 //     projectId,
@@ -311,10 +312,25 @@ import { Textarea } from "../../../components/ui/TextArea";
 
 export default function MaterialArrivalPublic() {
     const { projectId, token } = useParams();
-    const { data, isLoading, isError, refetch } = useGetPublicMaterialArrival(projectId!, token!);
+    const { data, isLoading, isError, error, refetch } = useGetPublicMaterialArrival(projectId!, token!);
 
-    if (isLoading) return <p>Loading...</p>;
-    if (isError || !data) return <p>Error loading materials.</p>;
+    if (isLoading) return <MaterialOverviewLoading />;
+    if (isError || !data) return <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
+              <div className="text-red-600 font-semibold mb-2">
+                ⚠️ Error Occurred
+              </div>
+              <p className="text-red-500 text-sm mb-4">
+                {(error as any)?.response?.data?.message || 
+                 (error as any)?.message || 
+                 "Failed to load cost estimation data"}
+              </p>
+              <Button
+                onClick={() => refetch()}
+                className="bg-red-600 text-white px-4 py-2"
+              >
+                Retry
+              </Button>
+            </div>;
 
     const rooms = Object.entries(data.materialArrivalList || {});
 

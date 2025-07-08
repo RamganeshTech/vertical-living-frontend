@@ -180,7 +180,7 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, organizationId, i
 
   return (
     <>
-      <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-2xl mx-auto rounded-2xl shadow-2xl p-8 border  border-gray-200 relative">
+      {/* <div onClick={(e) => e.stopPropagation()} className="bg-white w-full max-w-2xl mx-auto rounded-2xl shadow-2xl p-8 border  border-gray-200 relative">
 
         {!isPending && isError && <ErrorComponent message={(error as any)?.response?.data?.message || error?.message || "Something went wrong"} onClick={() => reset()} />}
         {!updatePending && updateIsError && <ErrorComponent message={(updateError as any)?.response?.data?.message || updateError?.message || "Something went wrong"} onClick={() => updateReset()} />}
@@ -290,7 +290,203 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, organizationId, i
             </button>
           </div>
         </form>
+      </div> */}
+
+
+      <div 
+  onClick={(e) => e.stopPropagation()} 
+  className="bg-white w-full h-full overflow-y-auto custom-scrollbar max-w-3xl mx-auto rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 border border-gray-200 relative"
+>
+  {!isPending && isError && (
+    <ErrorComponent 
+      message={(error as any)?.response?.data?.message || error?.message || "Something went wrong"} 
+      onClick={() => reset()} 
+    />
+  )}
+  {!updatePending && updateIsError && (
+    <ErrorComponent 
+      message={(updateError as any)?.response?.data?.message || updateError?.message || "Something went wrong"} 
+      onClick={() => updateReset()} 
+    />
+  )}
+
+  {toast && (
+    <CustomAlert 
+      onClose={() => setToast(null)} 
+      message={toast} 
+      type="success" 
+    />
+  )}
+
+  <div className="flex justify-between items-center mb-4 sm:mb-6">
+    <h2 className="text-xl sm:text-2xl font-bold text-blue-700 flex items-center gap-2">
+      {isEditing ? (
+        <>
+          <i className="fa-solid fa-edit"></i> Edit Project
+        </>
+      ) : (
+        <>
+          <i className="fa-solid fa-plus"></i> Create Project
+        </>
+      )}
+    </h2>
+    <button 
+      onClick={onClose} 
+      className="text-gray-500 hover:text-red-500 text-xl"
+    >
+      <i className="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+        <input 
+          autoFocus 
+          name="projectName" 
+          value={isEditing ? editForm.projectName : formData.projectName} 
+          onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)} 
+          type="text" 
+          placeholder="Enter name" 
+          className="input outline-none w-full border border-gray-300 rounded-md px-3 py-2"
+        />
+        {errors.projectName && (
+          <p className="text-red-600 text-xs mt-1">{errors.projectName}</p>
+        )}
       </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Duration (days)</label>
+        <input 
+          disabled 
+          type="number" 
+          name="duration" 
+          onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)} 
+          value={isEditing ? editForm.duration : formData.duration} 
+          placeholder="Ex: 15" 
+          className="input outline-none w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 cursor-not-allowed"
+        />
+      </div>
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+      <textarea 
+        rows={3} 
+        name="description" 
+        onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)} 
+        value={isEditing ? editForm.description : formData.description} 
+        placeholder="Brief project overview" 
+        className="input outline-none w-full border border-gray-300 rounded-md px-3 py-2 resize-none"
+      />
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+      <TagInput 
+        tags={isEditing ? editForm.tags : formData.tags} 
+        setState={isEditing ? setEditForm : setFormData} 
+      />
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+        <input 
+          type="date" 
+          onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)}
+          value={isEditing 
+            ? editForm.startDate ? editForm.startDate.toISOString().split('T')[0] : "" 
+            : formData.startDate ? formData.startDate.toISOString().split('T')[0] : ""
+          }
+          name="startDate" 
+          className="input outline-none w-full border border-gray-300 rounded-md px-3 py-2"
+        />
+        {errors.startDate && (
+          <p className="text-red-600 text-xs mt-1">{errors.startDate}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+        <input 
+          type="date" 
+          name="endDate" 
+          onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)}
+          value={isEditing 
+            ? editForm.endDate ? editForm.endDate.toISOString().split('T')[0] : "" 
+            : formData.endDate ? formData.endDate.toISOString().split('T')[0] : ""
+          }
+          className="input outline-none w-full border border-gray-300 rounded-md px-3 py-2"
+        />
+        {errors.endDate && (
+          <p className="text-red-600 text-xs mt-1">{errors.endDate}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+        <input 
+          type="date" 
+          name="dueDate"
+          onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)}
+          value={isEditing 
+            ? editForm.dueDate ? editForm.dueDate.toISOString().split('T')[0] : "" 
+            : formData.dueDate ? formData.dueDate.toISOString().split('T')[0] : ""
+          }
+          className="input outline-none w-full border border-gray-300 rounded-md px-3 py-2"
+        />
+        {errors.dueDate && (
+          <p className="text-red-600 text-xs mt-1">{errors.dueDate}</p>
+        )}
+      </div>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+        <select 
+          name="priority" 
+          onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)} 
+          value={isEditing ? editForm.priority : formData.priority} 
+          className="input w-full border border-gray-300 rounded-md px-3 py-2"
+        >
+          {priorities.map(priority => (
+            <option key={priority} value={priority}>{priority}</option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <select 
+          name="status" 
+          onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)} 
+          value={isEditing ? editForm.status : formData.status} 
+          className="input w-full border border-gray-300 rounded-md px-3 py-2"
+        >
+          {statuses.map(status => (
+            <option key={status} value={status}>{status}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    <div className="text-end">
+      <button 
+        type="submit" 
+        disabled={isPending || updatePending} 
+        className="bg-blue-600 text-white px-6 w-full sm:w-40 py-2 rounded-xl hover:bg-blue-700 transition-all"
+      >
+        {isPending || updatePending ? (
+          <div className="mx-auto w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        ) : isEditing ? "Edit Project" : "Create Project"}
+      </button>
+    </div>
+  </form>
+</div>
+
     </>
   );
 };

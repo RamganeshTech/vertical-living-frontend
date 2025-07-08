@@ -245,7 +245,7 @@ const RequirementFormPublic: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-blue-100 !p-6 h-full w-full">
+    <div className="space-y-8  max-h-[100vh] overflow-y-auto custom-scrollbar bg-gradient-to-br from-blue-50 via-white to-blue-100 !p-6 h-full w-full">
       <div className="max-w-5xl max-h-full mx-auto space-y-5">
         <h1 className="text-3xl font-bold text-center text-blue-800">House Requirements Form</h1>
 

@@ -1,22 +1,24 @@
 export const SIDEBAR_LABELS = {
   //   DASHBOARD: "Dashboard",
   PROJECTS: "Projects",
-  ISSUES: "Issues",
-  COLLABORATION: "Collaboration",
-  TASKS: "Tasks",
-  PHASES: "Phases",
+  ORGANIZATION: "Organization"
+  // ISSUES: "Issues",
+  // COLLABORATION: "Collaboration",
+  // TASKS: "Tasks",
+  // PHASES: "Phases",
 };
 
 export const SIDEBAR_ICONS = {
-  PROJECTS: "fa-solid fa-bars-progress text-2xl",
-  ISSUES: "fa-solid fa-bug text-2xl",
-  COLLABORATION: "fa-solid fa-user-group text-2xl",
-  TASKS: "fa-solid fa-list text-2xl",
-  PHASES: "fa-solid fa-briefcase text-2xl",
+  PROJECTS: "fa-solid fa-diagram-project text-2xl",
+  ORGANIZATION: "fa-solid fa-house text-2xl",
+  // ISSUES: "fa-solid fa-bug text-2xl",
+  // COLLABORATION: "fa-solid fa-user-group text-2xl",
+  // TASKS: "fa-solid fa-list text-2xl",
+  // PHASES: "fa-solid fa-briefcase text-2xl",
 }
 
 export const ORGANIZATION_ICONS = {
-  PROJECTS: "fa-solid fa-bars-progress text-2xl",
+  PROJECTS: "fa-solid fa-share text-2xl",
   INVITECTO: "fa-solid fa-bars-progress text-2xl",
   INVITESTAFFS: "fa-solid fa-bars-progress text-2xl",
   DETAILS: "fa-solid fa-bars-progress text-2xl",
