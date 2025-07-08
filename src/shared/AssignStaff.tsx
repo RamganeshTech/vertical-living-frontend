@@ -6,7 +6,7 @@ import { Button } from "../components/ui/Button";
 
 interface AssignStageStaffProps {
   stageName: "RequirementFormModel" | "SiteMeasurementModel" | "SampleDesignModel" | "TechnicalConsultationModel" | 
-"MaterialRoomConfirmationModel" | "CostEstimationModel" | "PaymentConfirmationModel" | "OrderingMaterialModel" |
+"MaterialRoomConfirmationModel" | "CostEstimation" | "PaymentConfirmationModel" | "OrderingMaterialModel" |
  "MaterialArrivalModel" | "WorkMainStageScheduleModel" | "InstallationModel" | 
 "QualityCheckupModel" | "CleaningAndSanitationModel" | "ProjectDeliveryModel" 
   projectId: string;
@@ -65,7 +65,7 @@ export default function AssignStageStaff({
   
 
   return (
-    <div className={`relative inline-flex items-center px-2 py-1 rounded-lg text-sm shadow-sm border-[#92abc4] sm:border-none ${className} `}>
+    <div className={`relative inline-flex items-center px-2 py-2 sm:py-1 rounded-lg text-sm shadow-sm border-[#92abc4] sm:border-none ${className} `}>
       <div className="flex items-center gap-2">
         <span className="text-gray-700 whitespace-nowrap">
           <span className="font-medium hidden sm:inline text-blue-800">Staff:</span>{" "}

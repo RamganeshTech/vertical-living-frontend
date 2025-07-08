@@ -53,7 +53,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
     };
 
     return (
-        <div className="bg-white h-auto rounded-lg p-6">
+        <div className="bg-white h-auto rounded-lg p-2 sm:p-6">
             {/* File Upload Section */}
             <div className="flex items-center gap-4 mb-6">
                 <div className="w-full space-x-2">
@@ -69,7 +69,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                         type="file"
                         accept=".pdf,image/*"
                         multiple
-                        className=" w-[80%] h-full py-2 border-1 px-2 rounded-lg"
+                        className="mb-1 sm:mb-0 w-[55%] sm:w-[80%] h-full py-2 border-1 px-2 rounded-lg"
                         onChange={handleFileChange}
 
                     />
@@ -79,12 +79,13 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                         onClick={() => fileInputRef.current?.click()}
                         className=""
                     >
-                        Select Files
+                       <span className="hidden sm:block"> Select Files</span>
+                       <span className="block sm:hidden"> Select</span>
                     </Button>
                     <Button
                         isLoading={uploadPending}
                         onClick={handleUpload}
-                        className={`px-6 py-2 rounded-lg`}
+                        className={`px-2 sm:px-4 py-2 rounded-lg`}
                         variant="primary"
                     >
                         upload

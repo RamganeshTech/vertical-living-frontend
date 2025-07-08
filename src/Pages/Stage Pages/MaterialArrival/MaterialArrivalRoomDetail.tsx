@@ -323,7 +323,7 @@ import { requiredFieldsByRoomArrival } from "../../../constants/constants";
 import { Textarea } from "../../../components/ui/TextArea";
 
 const MaterialArrivalRoomDetail = () => {
-  const { projectId, roomKey } = useParams();
+  const { projectId, roomKey, organizationId } = useParams();
   const navigate = useNavigate();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -410,7 +410,7 @@ const MaterialArrivalRoomDetail = () => {
         <Button
           variant="primary"
           className="h-10"
-          onClick={() => navigate(`/projectdetails/${projectId}/materialarrival`)}
+          onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/materialarrival`)}
         >
           Go Back
         </Button>

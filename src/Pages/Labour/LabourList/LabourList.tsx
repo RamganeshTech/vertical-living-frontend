@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import {
   useGetLabourLists,
   useCreateLabourList,
@@ -33,6 +33,7 @@ import CreateLabourItem from "../LabourItem/CreateLabourItem";
 
 const LabourList: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>()
+  // const {openMobileSidebar, closeMobileSidebar} = useOutletContext<>()
 
   if (!projectId) return;
 

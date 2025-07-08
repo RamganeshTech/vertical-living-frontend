@@ -78,7 +78,7 @@ const WardrobeSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditabl
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-blue-800">Wardrobe Requirements</h2>
         <button onClick={() => setVisibleSection(null)} className="text-blue-500 text-sm underline">
-          <i className="fa-solid fa-arrow-left mr-1"></i>Back to Sections
+          <i className="fa-solid fa-arrow-left mr-1"></i><span>Back</span>
         </button>
       </div>
 

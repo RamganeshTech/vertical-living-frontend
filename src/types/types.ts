@@ -1,3 +1,13 @@
+export type ProjectDetailsOutlet = {
+  projectId: string | null;
+  setProjectId: React.Dispatch<React.SetStateAction<string | null>>
+  isMobile:boolean,
+  isMobileSidebarOpen: boolean;
+  openMobileSidebar: () => void;
+  closeMobileSidebar: () => void;
+}
+
+
 export interface ProjectType {
   projectName: string | null,
   description: string | null,

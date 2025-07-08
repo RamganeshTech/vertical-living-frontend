@@ -1,9 +1,10 @@
-import React, { useEffect, useLayoutEffect } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 
 import { PROJECTS_ICONS, PROJECTS_LABELS, } from "../../constants/constants";
 
 import Sidebar from '../../shared/Sidebar';
 import { Outlet, useLocation } from 'react-router-dom';
+import MobileSidebar from '../../shared/MobileSidebar';
 
 
 type ProjectType = {
@@ -16,6 +17,10 @@ type ProjectType = {
 const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organizationId, setOrganizationId }) => {
 
   const location = useLocation()
+  // ProjectDetails.tsx (your layout)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
+
 
   useLayoutEffect(() => {
     const pathname = location.pathname.split('/')
@@ -23,6 +28,18 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     setProjectId(pathname[3])
     setOrganizationId(pathname[1])
   }, [location.pathname])
+
+
+  useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth < 470);
+  };
+
+  window.addEventListener('resize', handleResize);
+
+  // Cleanup
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
 
   const path = {
     LABOURS: projectId ? `/${organizationId}/projectdetails/${projectId}/labourlist` : "",
@@ -48,10 +65,32 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
 
   return (
     <>
-      <div className="flex w-full h-full">
-        <Sidebar path={path} labels={PROJECTS_LABELS} icons={PROJECTS_ICONS} />
-        <main className="!w-[100%] h-full p-4">
-          <Outlet context={{ projectId, setProjectId }} />
+      <div className="flex w-screen h-screen">
+        {/* <Sidebar path={path} labels={PROJECTS_LABELS} icons={PROJECTS_ICONS} /> */}
+
+        {isMobile ? (
+          <MobileSidebar
+            labels={PROJECTS_LABELS}
+            path={path}
+            isOpen={isMobileSidebarOpen}
+            onClose={() => setIsMobileSidebarOpen(false)}
+          />
+        ) : (
+          <Sidebar
+            path={path}
+            labels={PROJECTS_LABELS}
+            icons={PROJECTS_ICONS}
+          />
+        )}
+
+        <main className="!w-[100%] h-full p-2 sm:p-4">
+          <Outlet context={{
+            projectId, setProjectId,
+            isMobile,
+            isMobileSidebarOpen,
+            openMobileSidebar: () => setIsMobileSidebarOpen(true),
+            closeMobileSidebar: () => setIsMobileSidebarOpen(false),
+          }} />
         </main>
       </div>
     </>

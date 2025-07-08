@@ -10,7 +10,7 @@ import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadin
 import CostEstimateUpload from "./CostEstimateUpload";
 
 export default function CostEstimationRoomDetails() {
-  const { projectId, roomId } = useParams();
+  const { projectId, roomId, organizationId } = useParams();
   const navigate = useNavigate();
 
   if (!projectId || !roomId) return null;
@@ -49,35 +49,40 @@ export default function CostEstimationRoomDetails() {
   };
 
   return (
-    <div className="max-w-full h-full overflow-y-scroll custom-scrollbar mx-auto mt-0 bg-white shadow rounded p-6">
+    <div className="max-w-full h-full overflow-y-scroll custom-scrollbar mx-auto mt-0 bg-white  rounded py-2 px-0">
       <div className="flex justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">{room.name}</h2>
           <p className="text-gray-500 mb-6">Room Material Items</p>
         </div>
-        <Button variant="primary" className="h-10" onClick={() => navigate(`/projectdetails/${projectId}/costestimation`)}>
+        <Button variant="primary" className="h-10" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/costestimation`)}>
           Go Back
         </Button>
       </div>
 
+               
+
       <section className="border border-gray-200 rounded-lg overflow-hidden">
 
         <section>
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+          <div className="mb-4 p-2 bg-blue-50 rounded-lg">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-blue-900">Total Material Cost:</span>
               <span className={`text-lg font-bold  text-blue-900`}>₹{room?.totalCost?.toLocaleString()}</span>
             </div>
           </div>
         </section>
+
         {/* Table header */}
-        <div className="grid grid-cols-6 bg-blue-50 text-sm font-semibold text-gray-600 px-6 py-3 ">
-          <div className="text-left px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Item</div>
-          <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Area Sq.Ft</div>
-          <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Predefined Rate</div>
-          <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Overridden Rate</div>
-          <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</div>
-          <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</div>
+         <div className="w-full overflow-x-auto h-[95%]  custom-scrollbar">
+                    <div className="min-w-[1000px]">
+        <div className="grid grid-cols-6 bg-blue-50 text-sm font-semibold text-gray-600 px-6 py-1 sm:py-3 ">
+          <div className="text-left px-3 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">Item</div>
+          <div className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">Area Sq.Ft</div>
+          <div className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">Predefined Rate</div>
+          <div className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">Overridden Rate</div>
+          <div className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</div>
+          <div className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</div>
         </div>
 
         {/* Table body */}
@@ -153,6 +158,7 @@ export default function CostEstimationRoomDetails() {
             </div>
           ))}
         </div>
+        </div></div>
       </section>
 
 

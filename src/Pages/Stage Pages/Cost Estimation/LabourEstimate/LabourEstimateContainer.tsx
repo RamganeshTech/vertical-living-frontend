@@ -18,7 +18,7 @@ export interface EditLabourType {
 };
 
 const LabourEstimateContainer = () => {
-    const { projectId } = useParams()
+    const { projectId, organizationId } = useParams()
     const navigate = useNavigate()
 
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -212,7 +212,7 @@ const LabourEstimateContainer = () => {
             <div className='w-full flex justify-between '>
                 <h2 className="text-xl font-bold text-blue-600 mb-5">Labour Estimation</h2>
 
-                <Button variant="primary" className="h-10" onClick={() => navigate(`/projectdetails/${projectId}/costestimation`)}>Go Back</Button>
+                <Button variant="primary" className="h-10" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/costestimation`)}>Go Back</Button>
             </div>
 
 
@@ -252,11 +252,13 @@ const LabourEstimateContainer = () => {
                     <div className="mb-4 p-4 bg-blue-50 rounded-lg">
                         <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-blue-900">Total Labour Cost:</span>
-                            <span className={`text-lg font-bold  text-blue-900`}>₹{!totalLabourCost?.toLocaleString() ||  <span>5,32,850</span>}</span>
+                            <span className={`text-lg font-bold  text-blue-900`}>₹{totalLabourCost?.toLocaleString() ||  <span>0</span>}</span>
                         </div>
                     </div>
                 </section>
 
+ <div className="w-full overflow-x-auto h-[95%]  custom-scrollbar">
+                    <div className="min-w-[1000px]">
                 <section className='shadow-lg !rounded-lg'>
                     <div className="grid grid-cols-7 bg-blue-50 px-6 py-3 font-semibold text-gray-700 text-sm">
                         <div className="text-left px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Work Type</div>
@@ -341,7 +343,7 @@ const LabourEstimateContainer = () => {
                         <Button variant="primary" onClick={() => setShowAddRow(true)}>+ Add Labour Estimation</Button>
                     </div>
                 </section>
-
+</div></div>
             </div>}
         </main>
     );

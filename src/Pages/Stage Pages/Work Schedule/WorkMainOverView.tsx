@@ -1,7 +1,188 @@
-// WorkMainOverview.tsx
-import type { FC } from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
-import { useCompleteWorkSchedule, useGetWorkMainStage, useSetWorkScheduleDeadline } from "../../../apiList/Stage Api/workScheduleApi";
+// // WorkMainOverview.tsx
+// import type { FC } from "react";
+// import { Link, Outlet, useParams } from "react-router-dom";
+// import { useCompleteWorkSchedule, useGetWorkMainStage, useSetWorkScheduleDeadline } from "../../../apiList/Stage Api/workScheduleApi";
+// import { toast } from "../../../utils/toast";
+// import { Button } from "../../../components/ui/Button";
+// import { ResetStageButton } from "../../../shared/ResetStageButton";
+// import StageTimerInfo from "../../../shared/StagetimerInfo";
+// import { Card } from "../../../components/ui/Card";
+// import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+// import AssignStageStaff from "../../../shared/AssignStaff";
+
+// const WorkMainOverview: FC = () => {
+//   const { projectId, organizationId } = useParams<{ projectId: string, organizationId:string }>();
+//   const { data, isLoading, refetch, error: getAllError } = useGetWorkMainStage(projectId!);
+//   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetWorkScheduleDeadline()
+//   const { mutateAsync: completionStatus, isPending: completePending } = useCompleteWorkSchedule()
+
+
+
+//   if (isLoading) return <MaterialOverviewLoading />;
+
+//   if (getAllError) return <div className="max-w-xl mx-auto mt-12 p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+//     <div className="text-red-600 text-xl font-semibold mb-2">
+//       ⚠️ Oops! An Error Occurred
+//     </div>
+//     <p className="text-red-500 text-sm mb-4">{(getAllError as any)?.response?.data?.message || (getAllError as any)?.message || "Failed to load , please try again"}</p>
+
+//     <Button
+//       isLoading={isLoading}
+//       onClick={() => refetch()}
+//       className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition"
+//     >
+//       Retry
+//     </Button>
+//   </div>;
+
+
+//   console.log("data", data)
+
+//   const handleCompletionStatus = async () => {
+//     try {
+//       await completionStatus({ projectId: projectId! });
+//       toast({ description: 'Completion status updated successfully', title: "Success" });
+//     } catch (error: any) {
+//       toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
+
+//     }
+//   };
+
+
+//   const isChildRoute = location.pathname.includes("/workschedule") || location.pathname.includes("/dailyschedule")
+
+
+//   console.log("isChildReoutes", isChildRoute)
+
+
+//   return (
+//     <main className="h-full w-full">
+//       {!isChildRoute ?
+//         <div className="p-6 space-y-4">
+
+//           <div className="flex justify-between items-center">
+//             <h2 className="text-3xl font-semibold text-blue-600 flex items-center">
+//               <i className="fas fa-digging mr-2"></i> WorkStage overview
+//             </h2>
+
+//             <div className="flex gap-2 items-center ">
+//               <Button isLoading={completePending} onClick={handleCompletionStatus} className="bg-green-600 mt-0 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
+//                 <i className="fa-solid fa-circle-check mr-2"></i>
+//                 Mark as Complete
+//               </Button>
+
+//               <ResetStageButton projectId={projectId!} stageNumber={10} stagePath="worktasks" />
+
+//               <AssignStageStaff
+//                 stageName="WorkMainStageScheduleModel"
+//                 projectId={projectId!}
+//                 organizationId={organizationId!}
+//                 currentAssignedStaff={data?.assignedTo || null}
+//               />
+//             </div>
+//           </div>
+
+
+//           <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
+//             <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
+//               <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+//               <span>Stage Timings</span>
+//             </div>
+
+//             <StageTimerInfo
+//           stageName='worktasks'
+//               completedAt={data?.timer?.completedAt}
+//               projectId={projectId!}
+//               formId={(data as any)?._id}
+//               deadLine={data?.timer?.deadLine}
+//               startedAt={data?.timer?.startedAt}
+//               refetchStageMutate={refetch}
+//               deadLineMutate={deadLineAsync}
+//               isPending={deadLinePending}
+//             />
+//           </Card>
+
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//             {/* Work Plans Card */}
+//             <Link
+//               to={`workschedule/${data?.workScheduleId}`}
+//               className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors duration-200 shadow-md px-6 py-5 flex items-center gap-4"
+//             >
+//               <i className="fas fa-list-alt text-blue-600 text-3xl" />
+//               <div>
+//                 <h3 className="text-xl font-bold text-blue-800 mb-1">Work Plans</h3>
+//                 <p className="text-sm text-blue-700">View and manage detailed work plans for this project.</p>
+//               </div>
+//             </Link>
+
+//             {/* Daily Tasks Card */}
+//             <Link
+//               to={`dailyschedule/${data?.dailyScheduleId}`}
+//               className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors duration-200 shadow-md px-6 py-5 flex items-center gap-4"
+//             >
+//               <i className="fas fa-calendar-check text-blue-600 text-3xl" />
+//               <div>
+//                 <h3 className="text-xl font-bold text-blue-800 mb-1">Daily Tasks</h3>
+//                 <p className="text-sm text-blue-700">View and manage daily tasks and updates.</p>
+//               </div>
+//             </Link>
+//           </div>
+
+//           {/* MD Approval Section */}
+//           <div className="mt-8 rounded-xl border border-blue-200 bg-white shadow-md">
+//             <div className="bg-blue-600 text-white px-6 py-4 rounded-t-xl flex items-center justify-between">
+//               <h2 className="text-xl font-semibold flex items-center gap-2">
+//                 <i className="fas fa-user-shield text-white" />
+//                 MD Approval
+//               </h2>
+//             </div>
+
+//             <div className="px-6 py-5 space-y-3">
+//               {/* Status */}
+//               <div className="flex items-center gap-4">
+//                 <span className="text-gray-700 font-medium w-24">Status:</span>
+//                 <span
+//                   className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${data?.mdApproval?.status === 'approved'
+//                     ? 'bg-green-100 text-green-700'
+//                     : data?.mdApproval?.status === 'pending'
+//                       ? 'bg-yellow-100 text-yellow-700'
+//                       : 'bg-red-100 text-red-700'
+//                     }`}
+//                 >
+//                   {data?.mdApproval?.status || "Not Mentioned"}
+//                 </span>
+//               </div>
+
+//               {/* Remarks */}
+//               <div className="flex items-start gap-4">
+//                 <span className="text-gray-700 font-medium w-24 mt-1">Remarks:</span>
+//                 <p className="text-sm text-gray-600">
+//                   {data?.mdApproval?.remarks || "No remarks provided."}
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+
+//         </div> : <Outlet />}
+//     </main>
+//   );
+// };
+
+// export default WorkMainOverview;
+
+
+
+
+
+
+
+import React from "react";
+import { Link, Outlet, useParams, useLocation, useOutletContext } from "react-router-dom";
+import {
+  useCompleteWorkSchedule,
+  useGetWorkMainStage,
+  useSetWorkScheduleDeadline,
+} from "../../../apiList/Stage Api/workScheduleApi";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
@@ -10,87 +191,126 @@ import { Card } from "../../../components/ui/Card";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import AssignStageStaff from "../../../shared/AssignStaff";
 
-const WorkMainOverview: FC = () => {
-  const { projectId, organizationId } = useParams<{ projectId: string, organizationId:string }>();
-  const { data, isLoading, refetch, error: getAllError } = useGetWorkMainStage(projectId!);
-  const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetWorkScheduleDeadline()
-  const { mutateAsync: completionStatus, isPending: completePending } = useCompleteWorkSchedule()
+type ProjectDetailsOutlet = {
+  isMobile: boolean;
+  openMobileSidebar: () => void;
+};
 
+const WorkMainOverview = () => {
+  const { projectId, organizationId } = useParams<{ projectId: string; organizationId: string }>();
+  const location = useLocation();
+  const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
 
+  const {
+    data,
+    isLoading,
+    refetch,
+    error: getAllError,
+  } = useGetWorkMainStage(projectId!);
 
-  if (isLoading) return <MaterialOverviewLoading />;
+  const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetWorkScheduleDeadline();
+  const { mutateAsync: completionStatus, isPending: completePending } = useCompleteWorkSchedule();
 
-  if (getAllError) return <div className="max-w-xl mx-auto mt-12 p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-    <div className="text-red-600 text-xl font-semibold mb-2">
-      ⚠️ Oops! An Error Occurred
-    </div>
-    <p className="text-red-500 text-sm mb-4">{(getAllError as any)?.response?.data?.message || (getAllError as any)?.message || "Failed to load , please try again"}</p>
-
-    <Button
-      isLoading={isLoading}
-      onClick={() => refetch()}
-      className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition"
-    >
-      Retry
-    </Button>
-  </div>;
-
-
-  console.log("data", data)
+  const isChildRoute = location.pathname.includes("/workschedule") || location.pathname.includes("/dailyschedule");
 
   const handleCompletionStatus = async () => {
     try {
       await completionStatus({ projectId: projectId! });
-      toast({ description: 'Completion status updated successfully', title: "Success" });
+      toast({
+        description: "Completion status updated successfully.",
+        title: "Success",
+      });
+      refetch();
     } catch (error: any) {
-      toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
-
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || error.message || "Failed to update completion.",
+        variant: "destructive",
+      });
     }
   };
 
+  // ✅ Only render <Outlet /> content if it's a child route
+  if (isChildRoute) {
+    return <Outlet />;
+  }
 
-  const isChildRoute = location.pathname.includes("/workschedule") || location.pathname.includes("/dailyschedule")
-
-
-  console.log("isChildReoutes", isChildRoute)
-
+  // Loading
+  if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <main className="h-full w-full">
-      {!isChildRoute ?
-        <div className="p-6 space-y-4">
+    <main className="w-full h-full px-2 sm:px-4 lg:px-6 py-4">
+      {/* Header Always Visible */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+        <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
+          {isMobile && (
+            <button
+              onClick={openMobileSidebar}
+              className="mr-3 p-2 rounded-md border border-gray-200 hover:bg-gray-100"
+              title="Open menu"
+            >
+              <i className="fa-solid fa-bars" />
+            </button>
+          )}
+          <i className="fas fa-digging mr-2"></i> Work Schedule Overview
+        </h2>
 
-          <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-semibold text-blue-600 flex items-center">
-              <i className="fas fa-digging mr-2"></i> WorkStage overview
-            </h2>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            isLoading={completePending}
+            onClick={handleCompletionStatus}
+            className="bg-green-600 h-10 hover:bg-green-700 text-white w-full sm:w-auto"
+          >
+            <i className="fa-solid fa-circle-check mr-2" />
+            Mark as Complete
+          </Button>
 
-            <div className="flex gap-2 items-center ">
-              <Button isLoading={completePending} onClick={handleCompletionStatus} className="bg-green-600 mt-0 h-10 hover:bg-green-700 text-white w-full sm:w-auto">
-                <i className="fa-solid fa-circle-check mr-2"></i>
-                Mark as Complete
-              </Button>
+          <ResetStageButton
+            projectId={projectId!}
+            stageNumber={10}
+            stagePath="worktasks"
+            className="w-full sm:w-auto"
+          />
 
-              <ResetStageButton projectId={projectId!} stageNumber={10} stagePath="worktasks" />
+          <AssignStageStaff
+            className="w-full sm:w-auto"
+            stageName="WorkMainStageScheduleModel"
+            projectId={projectId!}
+            organizationId={organizationId!}
+            currentAssignedStaff={data?.assignedTo || null}
+          />
+        </div>
+      </div>
 
-              <AssignStageStaff
-                stageName="WorkMainStageScheduleModel"
-                projectId={projectId!}
-                organizationId={organizationId!}
-                currentAssignedStaff={data?.assignedTo || null}
-              />
-            </div>
+      {/* ❌ Error Message - Hide other content */}
+      {getAllError ? (
+        <div className="max-w-xl mx-auto p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+          <div className="text-red-600 text-xl font-semibold mb-2">
+            ⚠️ An Error Occurred
           </div>
-
-
-          <Card className="p-4 mb-4 w-full shadow-[1px] border-l-4 border-blue-600 bg-white">
+          <p className="text-red-500 text-sm mb-4">
+            {(getAllError as any)?.response?.data?.message ||
+              (getAllError as any)?.message ||
+              "Couldn't load data."}
+          </p>
+          <Button
+            isLoading={isLoading}
+            onClick={() => refetch()}
+            className="bg-red-600 text-white hover:bg-red-700 px-4 py-2"
+          >
+            Retry
+          </Button>
+        </div>
+      ) : (
+        // ✅ Main Stage Content
+        <>
+          <Card className="p-4 mb-6 w-full border-l-4 border-blue-600 shadow bg-white">
             <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
-              <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+              <i className="fa-solid fa-clock text-blue-500 text-lg" />
               <span>Stage Timings</span>
             </div>
-
             <StageTimerInfo
-          stageName='worktasks'
+              stageName="worktasks"
               completedAt={data?.timer?.completedAt}
               projectId={projectId!}
               formId={(data as any)?._id}
@@ -102,68 +322,64 @@ const WorkMainOverview: FC = () => {
             />
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Work Plans Card */}
+          {/* Grid: Work Plans & Daily Schedule */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <Link
               to={`workschedule/${data?.workScheduleId}`}
-              className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors duration-200 shadow-md px-6 py-5 flex items-center gap-4"
+              className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors shadow-md px-6 py-5 flex items-center gap-4"
             >
               <i className="fas fa-list-alt text-blue-600 text-3xl" />
               <div>
-                <h3 className="text-xl font-bold text-blue-800 mb-1">Work Plans</h3>
-                <p className="text-sm text-blue-700">View and manage detailed work plans for this project.</p>
+                <h3 className="text-lg font-bold text-blue-800">Work Plans</h3>
+                <p className="text-sm text-blue-700">Manage detailed work plans for the project.</p>
               </div>
             </Link>
 
-            {/* Daily Tasks Card */}
             <Link
               to={`dailyschedule/${data?.dailyScheduleId}`}
-              className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors duration-200 shadow-md px-6 py-5 flex items-center gap-4"
+              className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors shadow-md px-6 py-5 flex items-center gap-4"
             >
               <i className="fas fa-calendar-check text-blue-600 text-3xl" />
               <div>
-                <h3 className="text-xl font-bold text-blue-800 mb-1">Daily Tasks</h3>
-                <p className="text-sm text-blue-700">View and manage daily tasks and updates.</p>
+                <h3 className="text-lg font-bold text-blue-800">Daily Tasks</h3>
+                <p className="text-sm text-blue-700">Track daily activities and progress reports.</p>
               </div>
             </Link>
           </div>
 
-          {/* MD Approval Section */}
-          <div className="mt-8 rounded-xl border border-blue-200 bg-white shadow-md">
-            <div className="bg-blue-600 text-white px-6 py-4 rounded-t-xl flex items-center justify-between">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <i className="fas fa-user-shield text-white" />
-                MD Approval
-              </h2>
+          {/* MD Approval Details */}
+          <Card className="p-6 bg-white border border-blue-200 shadow-md rounded-xl">
+            <div className="bg-blue-600 text-white px-4 py-3 rounded-t flex items-center gap-2 mb-4">
+              <i className="fas fa-user-shield" />
+              <h2 className="text-lg font-semibold">MD Approval</h2>
             </div>
 
-            <div className="px-6 py-5 space-y-3">
-              {/* Status */}
+            <div className="space-y-3">
               <div className="flex items-center gap-4">
-                <span className="text-gray-700 font-medium w-24">Status:</span>
+                <span className="text-gray-700 font-medium w-28">Status:</span>
                 <span
-                  className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${data?.mdApproval?.status === 'approved'
-                    ? 'bg-green-100 text-green-700'
-                    : data?.mdApproval?.status === 'pending'
-                      ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-red-100 text-red-700'
-                    }`}
+                  className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                    data?.mdApproval?.status === "approved"
+                      ? "bg-green-200 text-green-700"
+                      : data?.mdApproval?.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-red-200 text-red-700"
+                  }`}
                 >
-                  {data?.mdApproval?.status || "Not Mentioned"}
+                  {data?.mdApproval?.status || "N/A"}
                 </span>
               </div>
 
-              {/* Remarks */}
               <div className="flex items-start gap-4">
-                <span className="text-gray-700 font-medium w-24 mt-1">Remarks:</span>
+                <span className="text-gray-700 font-medium w-28">Remarks:</span>
                 <p className="text-sm text-gray-600">
-                  {data?.mdApproval?.remarks || "No remarks provided."}
+                  {data?.mdApproval?.remarks || "No remarks provided"}
                 </p>
               </div>
             </div>
-          </div>
-
-        </div> : <Outlet />}
+          </Card>
+        </>
+      )}
     </main>
   );
 };

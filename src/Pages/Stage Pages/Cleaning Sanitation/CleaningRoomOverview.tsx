@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     useGetSingleCleaningRoom,
     useUploadCleaningRoomFiles,
@@ -160,7 +160,8 @@ const dummyUploads: ICleaningUpload[] = [
 ];
 
 export default function CleaningRoomOverview() {
-    const { projectId, roomId } = useParams() as { projectId: string, roomId: string };
+    const { projectId, roomId, organizationId } = useParams() as { projectId: string, roomId: string ,organizationId:string};
+    const navigate = useNavigate()
 
     const { data, isLoading, refetch } = useGetSingleCleaningRoom(
         projectId as string,
@@ -269,13 +270,20 @@ export default function CleaningRoomOverview() {
                     <i className="fas fa-broom mr-2"></i> {data?.roomName} - Details
                 </h2>
 
-                <Button
+              <div className="flex gap-1 items-center">
+                  <Button
                     isLoading={updatingStatus}
                     onClick={handleUpdateStatus}
                     className="bg-blue-600 hover:bg-blue-700 text-white text-sm !p-2 lg:p-4 "
                 >
                     {completelyCleaned ? "Mark as Not Cleaned" : "Mark as Cleaned"}
                 </Button>
+
+
+                <Button variant="primary" className="" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/cleaning`)}>
+                    Go Back
+                </Button>
+              </div>
             </div>
 
             <div className="mb-2 grid grid-cols-1 md:grid-cols-2 gap-1 items-center place-content-center">
@@ -432,7 +440,7 @@ export default function CleaningRoomOverview() {
                                             href={f.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-blue-600 underline truncate max-w-[50%]" 
+                                            className="text-blue-600 underline truncate max-w-[50%]"
                                         >
                                             {f.originalName}
                                         </a>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     useGetPaymentSchedule,
     useUpdateClientApprovalStatus,
@@ -17,8 +17,8 @@ import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionL
 const statusOptions = ["pending", "approved", "rejected"] as const;
 
 const PaymentScheduleSection: React.FC = () => {
-    const { projectId } = useParams<{ projectId: string }>();
-
+    const { projectId, organizationId } = useParams<{ projectId: string, organizationId: string }>();
+    const navigate = useNavigate()
     const { data, isLoading, error: getAllError, refetch } = useGetPaymentSchedule(projectId!);
     const clientStatusMutation = useUpdateClientApprovalStatus();
     const clientNotesMutation = useUpdateClientNotes();
@@ -139,10 +139,20 @@ const PaymentScheduleSection: React.FC = () => {
     console.log(dueDate)
     return (
         <div className="w-full max-w-full max-h-full overflow-y-auto custom-scrollbar mx-auto space-y-6 px-4 py-6">
-            <h2 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
-                <i className="fa-regular fa-calendar-check text-blue-600" />
-                Step 2: Payment Schedule Approval
-            </h2>
+            <div className="w-full justify-between flex">
+
+                <h2 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
+                    <i className="fa-regular fa-calendar-check text-blue-600" />
+                  <span className="hidden sm:inline">  Step 2: Payment Schedule Approval</span>
+                  <span className="inline sm:hidden">  Payment Schedule</span>
+                </h2>
+
+
+
+                <Button variant="primary" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/paymentconfirmation`)}>
+                    Back
+                </Button>
+            </div>
 
             <Card className="p-4 border border-gray-200 shadow-sm rounded mb-6">
                 <div className="flex justify-between items-center flex-wrap gap-4">
@@ -203,7 +213,7 @@ const PaymentScheduleSection: React.FC = () => {
 
             {/* Client Box */}
             <Card className="p-5 space-y-4 shadow-md border border-gray-200">
-                <div className="flex justify-between items-center">
+                <div className="flex sm:justify-between sm:items-center sm:flex-row flex-col sm:mb-0  mb-1 items-start">
                     <h3 className="text-lg font-semibold text-blue-700 flex items-center gap-2">
                         <i className="fa-solid fa-user" /> Client Approval
                     </h3>
@@ -266,7 +276,7 @@ const PaymentScheduleSection: React.FC = () => {
 
             {/* MD Box */}
             <Card className="p-5 space-y-4 shadow-md border border-gray-200">
-                <div className="flex justify-between items-center">
+                <div className="flex sm:justify-between sm:items-center sm:flex-row flex-col sm:mb-0  mb-1 items-start">
                     <h3 className="text-lg font-semibold text-blue-700 flex items-center gap-2">
                         <i className="fa-solid fa-user-tie" /> MD Approval
                     </h3>

@@ -1,8 +1,9 @@
 // WorkSchedulePage.tsx
 import { useState, type FC } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetWorkSchedule, useAddWorkPlan, useUpdateWorkPlan, useDeleteWorkPlan, useGetProjectWorkers } from "../../../apiList/Stage Api/workScheduleApi";
 import type { AddWorkPlanPayload } from "../../../types/types";
+import { Button } from "../../../components/ui/Button";
 
 interface WorkPlanItem {
   _id?: string;
@@ -14,7 +15,9 @@ interface WorkPlanItem {
 }
 
 const WorkSchedulePage: FC = () => {
-  const { sectionId: workScheduleId, projectId } = useParams<{ sectionId: string; projectId: string }>();
+  const { sectionId: workScheduleId, projectId, organizationId } = useParams<{ sectionId: string; projectId: string, organizationId: string }>();
+  const navigate = useNavigate()
+
   if (!projectId) return;
 
   const { data: workSchedule, isLoading } = useGetWorkSchedule(projectId);
@@ -420,7 +423,16 @@ const WorkSchedulePage: FC = () => {
 
 
     <div className="w-full h-full overflow-y-auto">
-      <h2 className="text-2xl font-bold text-blue-800 mb-6 px-4">📋 Work Plans</h2>
+      <div className="flex justify-between w-full items-center">
+
+        <h2 className="text-2xl font-bold text-blue-800 mb-6 px-4">📋 Work Plans</h2>
+        <Button variant="primary" className="h-10" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/workmainschedule`)}>
+          Go Back
+        </Button>
+
+      </div>
+
+
 
       {/* Scrollable Container */}
       <div className="overflow-x-auto">

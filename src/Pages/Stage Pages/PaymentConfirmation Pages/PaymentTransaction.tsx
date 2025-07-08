@@ -1,13 +1,13 @@
 
-// TEST 1 CARD NUMBER
-// Card Number: 4111 1111 1111 1111
-// Expiry: Any future date (e.g. 12/28)
-// CVV: Any 3 digits (e.g. 123)
-// Name: Any name
+// // TEST 1 CARD NUMBER
+// // Card Number: 4111 1111 1111 1111
+// // Expiry: Any future date (e.g. 12/28)
+// // CVV: Any 3 digits (e.g. 123)
+// // Name: Any name
 
-// for upi
-// success@razorpay
-// failure@razorpay
+// // for upi
+// // success@razorpay
+// // failure@razorpay
 
 // import React from "react";
 // import { useParams } from "react-router-dom";
@@ -57,115 +57,125 @@
 //         description: "Project Payment",
 //         order_id: orderData.orderId,
 //         handler: async function (response: any) {
-//           console.log("response", response)
-//          const verify =  await verifyPayment({
+//           await verifyPayment({
 //             projectId: projectId!,
 //             razorpay_order_id: response.razorpay_order_id,
 //             razorpay_payment_id: response.razorpay_payment_id,
 //             razorpay_signature: response.razorpay_signature,
 //           });
-//           console.log("verify paymnt hadnler", verify)
+
 //           toast({
 //             title: "Success",
 //             description: "Payment successful!",
 //           });
 //         },
-
 //         prefill: {
 //           name: client.clientName || "",
 //           email: client.email || "",
 //           contact: client.phoneNo || "",
 //         },
 //         theme: {
-//           color: "#007bff",
+//           color: "#0050b3",
 //         },
 //       };
 
 //       const rzp = new (window as any).Razorpay(options);
 //       rzp.open();
-//     } catch (err: any) {
-//       console.error(err);
+//     } catch (error: any) {
 //       toast({
 //         title: "Error",
-//         description: err.message || "Payment failed. Please try again.",
+//         description: error.message || "Payment failed. Please try again.",
 //         variant: "destructive",
 //       });
 //     }
 //   };
 
 //   return (
-//     <div className="w-full min-h-[80vh] py-10 px-4 bg-gray-50 flex justify-center">
-//       <div className="w-full max-w-xl space-y-6 bg-white p-6 rounded-lg shadow-lg border">
-
-//         <h2 className="text-2xl font-bold text-blue-700 flex items-center gap-2 mb-4">
-//           <i className="fa-solid fa-credit-card" />
-//           Make a Payment
-//         </h2>
-
-//         <div className="text-center bg-blue-50 p-5 rounded-lg border border-blue-200">
-//           <p className="text-gray-600 mb-2">Amount Payable</p>
-//           <h3 className="text-3xl font-bold text-blue-800">₹ {totalAmount}</h3>
+//     <div className="w-full min-h-full bg-gray-50 py-10 px-4 flex justify-center">
+//       <div className="bg-white w-full h-full max-w-2xl rounded-xl shadow-lg border border-gray-200 p-6 space-y-6">
+        
+//         {/* Header */}
+//         <div className="text-center">
+//           <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 flex items-center justify-center gap-2">
+//             <i className="fa-solid fa-money-check-dollar" />
+//             Payment Gateway
+//           </h1>
+//           <p className="text-sm text-gray-500 mt-1">
+//             Securely make your payment to proceed with the project.
+//           </p>
 //         </div>
 
-//         <button
-//           onClick={handlePayment}
-//           disabled={isCreating || isVerifying}
-//           className="w-full py-3 text-white font-medium text-lg bg-blue-600 hover:bg-blue-700 rounded transition disabled:opacity-50"
-//         >
-//           {isCreating || isVerifying ? (
-//             <>
-//               <i className="fa-solid fa-circle-notch fa-spin mr-2" />
-//               Processing...
-//             </>
-//           ) : (
-//             <>
-//               <i className="fa-brands fa-cc-visa mr-2" />
-//               Pay Now
-//             </>
-//           )}
-//         </button>
+//         {/* Amount Display */}
+//         <div className="border border-blue-200 rounded-lg p-5 bg-blue-50 text-center shadow-sm">
+//           <p className="text-gray-700 text-sm mb-1">Amount Payable</p>
+//           <div className="text-3xl font-bold text-blue-800">₹ {totalAmount}</div>
+//         </div>
 
+//         {/* Status */}
 //         {paymentTransaction?.status && (
-//           <div className="bg-gray-100 border border-gray-200 rounded p-4 mt-6">
-//             <h3 className="text-lg font-semibold mb-2 text-gray-700 flex items-center gap-2">
+//           <div className="bg-gray-100 p-4 rounded-lg border border-gray-300 space-y-1 text-sm">
+//             <p className="font-medium flex items-center gap-2">
 //               <i
 //                 className={`fa-solid ${
 //                   paymentTransaction.status === "successful"
 //                     ? "fa-circle-check text-green-600"
-//                     : "fa-circle-exclamation text-red-500"
+//                     : "fa-circle-xmark text-red-600"
 //                 }`}
 //               />
-//               Payment Status:{" "}
+//               Status:
 //               <span
 //                 className={`ml-1 font-semibold ${
-//                   paymentTransaction.status === "successful" ? "text-green-700" : "text-red-700"
+//                   paymentTransaction.status === "successful"
+//                     ? "text-green-700"
+//                     : "text-red-700"
 //                 }`}
 //               >
 //                 {paymentTransaction.status.toUpperCase()}
 //               </span>
-//             </h3>
+//             </p>
 
 //             {paymentTransaction.status === "successful" && (
-//               <p className="text-sm text-green-700">
+//               <p className="text-green-700">
 //                 Paid At: {new Date(paymentTransaction.paidAt!).toLocaleString()}
 //               </p>
 //             )}
 
-//             <p className="text-sm text-gray-500 mt-2">
-//               Gateway Order ID:{" "}
-//               <span className="font-mono text-gray-700">{paymentTransaction.gatewayOrderId}</span>
+//             <p className="text-gray-600">
+//               Order ID: <span className="text-gray-800">{paymentTransaction.gatewayOrderId}</span>
 //             </p>
-
 //             {paymentTransaction.gatewayPaymentId && (
-//               <p className="text-sm text-gray-500">
+//               <p className="text-gray-600">
 //                 Payment ID:{" "}
-//                 <span className="font-mono text-gray-700">
-//                   {paymentTransaction.gatewayPaymentId}
-//                 </span>
+//                 <span className="text-gray-800">{paymentTransaction.gatewayPaymentId}</span>
 //               </p>
 //             )}
 //           </div>
 //         )}
+
+//         {/* Pay Button */}
+//         <div>
+//           <button
+//             onClick={handlePayment}
+//             disabled={isCreating || isVerifying}
+//             className={`w-full py-3 rounded-md text-white text-lg font-medium transition ${
+//               isCreating || isVerifying
+//                 ? "bg-blue-400 cursor-not-allowed"
+//                 : "bg-blue-600 hover:bg-blue-700"
+//             }`}
+//           >
+//             {isCreating || isVerifying ? (
+//               <span className="flex items-center justify-center gap-2">
+//                 <i className="fa-solid fa-circle-notch fa-spin" />
+//                 Processing Payment...
+//               </span>
+//             ) : (
+//               <span className="flex items-center justify-center gap-2">
+//                 <i className="fa-solid fa-wallet" />
+//                 Pay Now
+//               </span>
+//             )}
+//           </button>
+//         </div>
 //       </div>
 //     </div>
 //   );
@@ -175,9 +185,8 @@
 
 
 
-
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { loadScript } from "../../../utils/loadScript";
 import { toast } from "../../../utils/toast";
 import { useSelector } from "react-redux";
@@ -187,9 +196,12 @@ import {
   useGetPaymentTransaction,
   useVerifyPayment,
 } from "../../../apiList/Stage Api/Payment Api/paymentTransactionApi";
+import { Button } from "../../../components/ui/Button";
+
 
 const PaymentTransaction = () => {
-  const { projectId } = useParams<{ projectId: string }>();
+  const { projectId , organizationId} = useParams<{ projectId: string , organizationId:string}>();
+  const navigate = useNavigate();
   const { data } = useGetPaymentTransaction(projectId!);
   const paymentTransaction = data?.paymentTransaction;
   const totalAmount = data?.totalAmount;
@@ -258,90 +270,136 @@ const PaymentTransaction = () => {
   };
 
   return (
-    <div className="w-full min-h-full bg-gray-50 py-10 px-4 flex justify-center">
-      <div className="bg-white w-full h-full max-w-2xl rounded-xl shadow-lg border border-gray-200 p-6 space-y-6">
-        
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 flex items-center justify-center gap-2">
+    <div className="w-full h-full flex flex-col bg-gray-50 p-2 sm:p-4">
+      {/* Header Section */}
+      <div className="flex-shrink-0 flex justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
+        <div className="flex items-center gap-3 justify-between">
+       
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700 flex items-center gap-2">
             <i className="fa-solid fa-money-check-dollar" />
-            Payment Gateway
+            <span className="hidden sm:inline">Payment Transaction</span>
+            <span className="sm:hidden">Payment</span>
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Securely make your payment to proceed with the project.
-          </p>
         </div>
 
-        {/* Amount Display */}
-        <div className="border border-blue-200 rounded-lg p-5 bg-blue-50 text-center shadow-sm">
-          <p className="text-gray-700 text-sm mb-1">Amount Payable</p>
-          <div className="text-3xl font-bold text-blue-800">₹ {totalAmount}</div>
-        </div>
+        <Button
+          onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/paymentconfirmation`)}
+          variant="primary"
+        >
+          <i className="fa-solid fa-arrow-left mr-1" />
+          Go Back
+        </Button>
+      </div>
 
-        {/* Status */}
-        {paymentTransaction?.status && (
-          <div className="bg-gray-100 p-4 rounded-lg border border-gray-300 space-y-1 text-sm">
-            <p className="font-medium flex items-center gap-2">
-              <i
-                className={`fa-solid ${
-                  paymentTransaction.status === "successful"
-                    ? "fa-circle-check text-green-600"
-                    : "fa-circle-xmark text-red-600"
-                }`}
-              />
-              Status:
-              <span
-                className={`ml-1 font-semibold ${
-                  paymentTransaction.status === "successful"
-                    ? "text-green-700"
-                    : "text-red-700"
-                }`}
-              >
-                {paymentTransaction.status.toUpperCase()}
-              </span>
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center min-h-0">
+        <div className="bg-white w-full max-w-lg rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 space-y-4 sm:space-y-6">
+          {/* Gateway Header */}
+          <div className="text-center">
+            <h2 className="text-lg sm:text-xl font-semibold text-blue-700 flex items-center justify-center gap-2">
+              <i className="fa-solid fa-shield-halved text-blue-600" />
+              Secure Payment Gateway
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+              Securely make your payment to proceed with the project.
             </p>
-
-            {paymentTransaction.status === "successful" && (
-              <p className="text-green-700">
-                Paid At: {new Date(paymentTransaction.paidAt!).toLocaleString()}
-              </p>
-            )}
-
-            <p className="text-gray-600">
-              Order ID: <span className="text-gray-800">{paymentTransaction.gatewayOrderId}</span>
-            </p>
-            {paymentTransaction.gatewayPaymentId && (
-              <p className="text-gray-600">
-                Payment ID:{" "}
-                <span className="text-gray-800">{paymentTransaction.gatewayPaymentId}</span>
-              </p>
-            )}
           </div>
-        )}
 
-        {/* Pay Button */}
-        <div>
-          <button
-            onClick={handlePayment}
-            disabled={isCreating || isVerifying}
-            className={`w-full py-3 rounded-md text-white text-lg font-medium transition ${
-              isCreating || isVerifying
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
-          >
-            {isCreating || isVerifying ? (
-              <span className="flex items-center justify-center gap-2">
-                <i className="fa-solid fa-circle-notch fa-spin" />
-                Processing Payment...
-              </span>
-            ) : (
-              <span className="flex items-center justify-center gap-2">
-                <i className="fa-solid fa-wallet" />
-                Pay Now
-              </span>
-            )}
-          </button>
+          {/* Amount Display */}
+          <div className="border border-blue-200 rounded-lg p-4 sm:p-5 bg-blue-50 text-center shadow-sm">
+            <p className="text-gray-700 text-xs sm:text-sm mb-1">Amount Payable</p>
+            <div className="text-2xl sm:text-3xl font-bold text-blue-800">
+              ₹ {totalAmount?.toLocaleString('en-IN') || '0'}
+            </div>
+          </div>
+
+          {/* Status */}
+          {paymentTransaction?.status && (
+            <div className="bg-gray-100 p-3 sm:p-4 rounded-lg border border-gray-300 space-y-2 text-xs sm:text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <div className="flex items-center gap-2">
+                  <i
+                    className={`fa-solid ${
+                      paymentTransaction.status === "successful"
+                        ? "fa-circle-check text-green-600"
+                        : "fa-circle-xmark text-red-600"
+                    }`}
+                  />
+                  <span className="font-medium">Status:</span>
+                </div>
+                <span
+                  className={`font-semibold ${
+                    paymentTransaction.status === "successful"
+                      ? "text-green-700"
+                      : "text-red-700"
+                  }`}
+                >
+                  {paymentTransaction.status.toUpperCase()}
+                </span>
+              </div>
+
+              {paymentTransaction.status === "successful" && (
+                <p className="text-green-700 break-words">
+                  <span className="font-medium">Paid At:</span>{" "}
+                  {new Date(paymentTransaction.paidAt!).toLocaleString()}
+                </p>
+              )}
+
+              <div className="space-y-1">
+                <p className="text-gray-600 break-words">
+                  <span className="font-medium">Order ID:</span>{" "}
+                  <span className="text-gray-800 text-xs">{paymentTransaction.gatewayOrderId}</span>
+                </p>
+                {paymentTransaction.gatewayPaymentId && (
+                  <p className="text-gray-600 break-words">
+                    <span className="font-medium">Payment ID:</span>{" "}
+                    <span className="text-gray-800 text-xs">{paymentTransaction.gatewayPaymentId}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Pay Button */}
+          <div className="pt-2">
+            <button
+              onClick={handlePayment}
+              disabled={isCreating || isVerifying || paymentTransaction?.status === "successful"}
+              className={`w-full py-3 sm:py-4 rounded-md text-white text-base sm:text-lg font-medium transition ${
+                isCreating || isVerifying
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : paymentTransaction?.status === "successful"
+                  ? "bg-green-600 cursor-default"
+                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
+              }`}
+            >
+              {paymentTransaction?.status === "successful" ? (
+                <span className="flex items-center justify-center gap-2">
+                  <i className="fa-solid fa-circle-check" />
+                  Payment Completed
+                </span>
+              ) : isCreating || isVerifying ? (
+                <span className="flex items-center justify-center gap-2">
+                  <i className="fa-solid fa-circle-notch fa-spin" />
+                  <span className="hidden sm:inline">Processing Payment...</span>
+                  <span className="sm:hidden">Processing...</span>
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <i className="fa-solid fa-wallet" />
+                  Pay Now
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Security Notice */}
+          <div className="text-center pt-2">
+            <p className="text-xs text-gray-500 flex items-center justify-center gap-1">
+              <i className="fa-solid fa-shield-halved text-green-600"></i>
+              Secured by Razorpay
+            </p>
+          </div>
         </div>
       </div>
     </div>

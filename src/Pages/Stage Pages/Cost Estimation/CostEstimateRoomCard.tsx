@@ -8,15 +8,16 @@ interface CostEstimateRoomCardProps{
     materials: any[];
   };
   projectId: string;
+  organizationId: string;
 }
 
-const CostEstimateRoomCard:React.FC<CostEstimateRoomCardProps> = ({room,projectId,})  => {
+const CostEstimateRoomCard:React.FC<CostEstimateRoomCardProps> = ({room,projectId, organizationId})  => {
    const navigate = useNavigate();
 
   return (
     <div
       onClick={() =>
-        navigate(`/projectdetails/${projectId}/costestimation/roomdetails/${room._id}`)
+        navigate(`/${organizationId}/projectdetails/${projectId}/costestimation/roomdetails/${room._id}`)
       }
       className="cursor-pointer border-l-6 border-blue-600 shadow-md hover:border-blue-400 transition-all duration-200 rounded-lg p-5 bg-white hover:shadow-lg flex items-center gap-4"
     >

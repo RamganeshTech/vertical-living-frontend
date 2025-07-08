@@ -1,17 +1,18 @@
 // DailySchedulePage.tsx
 import { type FC, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAddDailyTask, useDeleteDailyTask, useGetDailySchedule, useGetProjectWorkers, useUpdateDailyTask } from "../../../apiList/Stage Api/workScheduleApi";
 import type { AddDailyTaskPayload } from "../../../types/types";
+import { Button } from "../../../components/ui/Button";
 
 const DailySchedulePage: FC = () => {
-  const { sectionId, projectId } = useParams<{ sectionId: string; projectId: string }>();
+  const { sectionId, projectId , organizationId} = useParams<{ sectionId: string; projectId: string, organizationId:string }>();
+  const navigate = useNavigate()
 
   if (!sectionId) return
 
   const { data, isLoading } = useGetDailySchedule(projectId!);
   const { data: workers, isLoading: getWorkersLoading } = useGetProjectWorkers(projectId!);
-
 
 
   const addTask = useAddDailyTask();
@@ -269,7 +270,13 @@ const DailySchedulePage: FC = () => {
 
 
   <div className="max-w-full">
-    <h2 className="text-2xl font-bold text-blue-700 mb-4 px-4">🗓️ Daily Tasks</h2>
+  <div className="flex justify-between items-center">
+      <h2 className="text-2xl font-bold text-blue-700 mb-4 px-4">🗓️ Daily Tasks</h2>
+
+         <Button variant="primary" className="h-10" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/workmainschedule`)}>
+            Go Back
+          </Button>
+  </div>
 
     {/* Horizontal Scrollable Table Container */}
     <div className="rounded-lg overflow-x-auto shadow-sm">

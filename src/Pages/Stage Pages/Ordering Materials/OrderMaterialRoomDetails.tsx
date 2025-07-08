@@ -216,7 +216,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 
 const OrderMaterialRoomDetails = () => {
-  const { projectId, roomKey } = useParams();
+  const { projectId, roomKey, organizationId } = useParams();
   const navigate = useNavigate();
 
 
@@ -358,32 +358,35 @@ const OrderMaterialRoomDetails = () => {
     },
   ]
   return (
-    <div className="mt-4">
+    <div className="w-full h-full">
       <div className="w-full flex justify-between items-center mb-2">
         <h2 className="text-xl font-bold text-blue-800 capitalize ">{roomKey}</h2>
 
         <div className=" py-2 px-6 flex gap-2">
           {/* {!showNewRow && <Button onClick={() => setShowNewRow(() => (true))}> */}
-          { <Button onClick={() => setShowNewRow(() => (true))}>
-             Add Item
+          {<Button onClick={() => setShowNewRow(() => (true))}>
+            Add Item
           </Button>}
 
-        <Button variant="primary" className="h-10" onClick={() => navigate(`/projectdetails/${projectId}/ordermaterial`)}>
-          Go Back
-        </Button>
+          <Button variant="primary" className="h-10" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/ordermaterial`)}>
+            Go Back
+          </Button>
         </div>
       </div>
 
-      <div className="!min-h-[85vh] rounded-lg ">
-        <div className="flex justify-around items-center px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold">
-          {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, idx) => (
-            <div key={idx} className="text-center text-xs font-medium uppercase tracking-wider">{field}</div>
-          ))}
-          <div className="text-center text-xs font-medium uppercase tracking-wider">Actions</div>
-        </div>
+      <div className="w-full !min-h-[85vh] rounded-lg ">
+        <div className="overflow-x-auto min-w-full flex-grow min-h-0">
+          <div className="min-w-[700px] w-full flex flex-col border-2 border-gray-100 rounded-lg">
 
-        <div className="text-sm text-blue-900 divide-y  !h-[75vh] overflow-y-auto divide-blue-100">
-          {/* {showAddRow && (
+            <div className="flex justify-around items-center px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold">
+              {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, idx) => (
+                <div key={idx} className="text-center text-xs font-medium uppercase tracking-wider">{field}</div>
+              ))}
+              <div className="text-center text-xs font-medium uppercase tracking-wider">Actions</div>
+            </div>
+
+            <div className="text-sm text-blue-900 divide-y  !h-[75vh] overflow-y-auto divide-blue-100">
+              {/* {showAddRow && (
             <div className="flex justify-around items-center px-6 py-3 gap-2 bg-blue-50">
               {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, i) => {
                 const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
@@ -450,174 +453,176 @@ const OrderMaterialRoomDetails = () => {
               </div>
             </div>
           )} */}
-          {!showNewRow && items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500 bg-gray-50">
-              <i className="fas fa-users text-4xl text-gray-300 mb-4"></i>
-              <h3 className="text-lg font-semibold text-gray-700">No {roomKey.replace(/([A-Z])/g, ' $1')} Items</h3>
-              <p className="text-sm text-gray-500 mb-4">Add your first {roomKey.replace(/([A-Z])/g, ' $1').toLowerCase()} item to start tracking</p>
-              <button
-                onClick={() => setShowNewRow(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded font-medium"
-              >
-                Add {roomKey.replace(/([A-Z])/g, ' $1')} Item
-              </button>
-            </div>
-          )
-            :
-            <>
-              <div>
-                {items?.map((item: any, index: number) => (
-                  // {carpentryDummyData?.map((item: any, index: number) => (
-
-                  <div
-                    key={item._id}
-                    className="grid grid-cols-7 px-6  py-3 gap-2 border-b-1 border-gray-200 hover:bg-gray-50 transition-colors"
+              {!showNewRow && items.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500 bg-gray-50">
+                  <i className="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                  <h3 className="text-lg font-semibold text-gray-700">No {roomKey.replace(/([A-Z])/g, ' $1')} Items</h3>
+                  <p className="text-sm text-gray-500 mb-4">Add your first {roomKey.replace(/([A-Z])/g, ' $1').toLowerCase()} item to start tracking</p>
+                  <button
+                    onClick={() => setShowNewRow(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded font-medium"
                   >
-                    {requiredFieldsByRoomOrderMaterials[roomKey].map((field, i) => {
-                      const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
-                      const isFabricField = field === "fabric" && roomKey === "upholsteryCurtains";
+                    Add {roomKey.replace(/([A-Z])/g, ' $1')} Item
+                  </button>
+                </div>
+              )
+                :
+                <>
+                  <div>
+                    {items?.map((item: any, index: number) => (
+                      // {carpentryDummyData?.map((item: any, index: number) => (
 
-                      return (
-                        <div
-                          key={i}
-                          className="text-center px-6 py-3 gap-4 hover:bg-gray-50 transition-colors text-sm min-w-[120px]"
-                        >
-                          {editingIndex === index ? (
-                            isBrandField || isFabricField ? (
-                              <Select
-                                value={editData[field] || ""}
-                                onValueChange={(val) => handleChange(field, val)}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue
-                                    selectedValue={editData[field]}
-                                    placeholder={`Select ${field}`}
+                      <div
+                        key={item._id}
+                        className="grid grid-cols-7 px-6  py-3 gap-2 border-b-1 border-gray-200 hover:bg-gray-50 transition-colors"
+                      >
+                        {requiredFieldsByRoomOrderMaterials[roomKey].map((field, i) => {
+                          const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
+                          const isFabricField = field === "fabric" && roomKey === "upholsteryCurtains";
+
+                          return (
+                            <div
+                              key={i}
+                              className="text-center px-6 py-3 gap-4 hover:bg-gray-50 transition-colors text-sm min-w-[120px]"
+                            >
+                              {editingIndex === index ? (
+                                isBrandField || isFabricField ? (
+                                  <Select
+                                    value={editData[field] || ""}
+                                    onValueChange={(val) => handleChange(field, val)}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue
+                                        selectedValue={editData[field]}
+                                        placeholder={`Select ${field}`}
+                                      />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {(isBrandField
+                                        ? predefinedOptionsRooms.brandName[roomKey]
+                                        : predefinedOptionsRooms.fabric[roomKey]
+                                      ).map((opt: string) => (
+                                        <SelectItem key={opt} value={opt}>
+                                          {opt}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <Input
+                                    className="text-xs"
+                                    value={editData[field] || ""}
+                                    onChange={(e) => handleChange(field, e.target.value)}
                                   />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {(isBrandField
-                                    ? predefinedOptionsRooms.brandName[roomKey]
-                                    : predefinedOptionsRooms.fabric[roomKey]
-                                  ).map((opt: string) => (
-                                    <SelectItem key={opt} value={opt}>
-                                      {opt}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            ) : (
-                              <Input
-                                className="text-xs"
-                                value={editData[field] || ""}
-                                onChange={(e) => handleChange(field, e.target.value)}
-                              />
-                            )
+                                )
+                              ) : (
+                                item[field] || "-"
+                              )}
+                            </div>
+                          );
+                        })}
+                        <div className="flex justify-center gap-2 items-center">
+                          {editingIndex === index ? (
+                            <>
+                              <Button size="sm" onClick={handleSave}>Save</Button>
+                              <Button size="sm" variant="ghost" onClick={() => setEditingIndex(null)}>Cancel</Button>
+                            </>
                           ) : (
-                            item[field] || "-"
+                            <>
+                              <i
+                                className="fas fa-pen text-blue-600 cursor-pointer"
+                                onClick={() => {
+                                  setEditData(item);
+                                  setEditingIndex(index);
+                                }}
+                              />
+                              <i
+                                className="fas fa-trash text-red-500 cursor-pointer"
+                                onClick={() => handleDelete(item._id)}
+                              />
+                            </>
                           )}
                         </div>
-                      );
-                    })}
-                    <div className="flex justify-center gap-2 items-center">
-                      {editingIndex === index ? (
-                        <>
-                          <Button size="sm" onClick={handleSave}>Save</Button>
-                          <Button size="sm" variant="ghost" onClick={() => setEditingIndex(null)}>Cancel</Button>
-                        </>
-                      ) : (
-                        <>
-                          <i
-                            className="fas fa-pen text-blue-600 cursor-pointer"
-                            onClick={() => {
-                              setEditData(item);
-                              setEditingIndex(index);
-                            }}
-                          />
-                          <i
-                            className="fas fa-trash text-red-500 cursor-pointer"
-                            onClick={() => handleDelete(item._id)}
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))
-                }
+                      </div>
+                    ))
+                    }
 
 
-                {/* 🆕 Input Row for New Item */}
+                    {/* 🆕 Input Row for New Item */}
 
-                {showNewRow && (
-                  <div className="flex justify-around items-center px-6 py-3 gap-2 bg-white mt-2">
-                    {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, i) => {
-                      const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
-                      const isFabricField = field === "fabric" && roomKey === "upholsteryCurtains";
+                    {showNewRow && (
+                      <div className="flex justify-around items-center px-6 py-3 gap-2 bg-white mt-2">
+                        {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, i) => {
+                          const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
+                          const isFabricField = field === "fabric" && roomKey === "upholsteryCurtains";
 
-                      if (isBrandField || isFabricField) {
-                        const options = isBrandField
-                          ? predefinedOptionsRooms.brandName[roomKey]
-                          : predefinedOptionsRooms.fabric[roomKey];
+                          if (isBrandField || isFabricField) {
+                            const options = isBrandField
+                              ? predefinedOptionsRooms.brandName[roomKey]
+                              : predefinedOptionsRooms.fabric[roomKey];
 
-                        return (
-                          <div key={i} className="text-center min-w-[120px]">
-                            <Select
-                              // className={}
-                              // value={}
-                              onValueChange={(val) =>
-                                setNewItemData((prev: any) => ({ ...prev, [field]: val }))
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue
-                                  selectedValue={newItemData[field]}
-                                  placeholder={`Select ${field}`}
-                                />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {options.map((opt: any) => (
-                                  <SelectItem key={opt} value={opt}>
-                                    {opt}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        );
-                      }
+                            return (
+                              <div key={i} className="text-center min-w-[120px]">
+                                <Select
+                                  // className={}
+                                  // value={}
+                                  onValueChange={(val) =>
+                                    setNewItemData((prev: any) => ({ ...prev, [field]: val }))
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      selectedValue={newItemData[field]}
+                                      placeholder={`Select ${field}`}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {options.map((opt: any) => (
+                                      <SelectItem key={opt} value={opt}>
+                                        {opt}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            );
+                          }
 
-                      return (
-                        <div key={i} className="text-center min-w-[120px]">
-                          <Input
-                            className="text-xs text-center"
-                            placeholder={field}
-                            value={newItemData[field] || ""}
-                            onChange={(e) =>
-                              setNewItemData((prev: any) => ({ ...prev, [field]: e.target.value }))
-                            }
-                          />
+                          return (
+                            <div key={i} className="text-center min-w-[120px]">
+                              <Input
+                                className="text-xs text-center"
+                                placeholder={field}
+                                value={newItemData[field] || ""}
+                                onChange={(e) =>
+                                  setNewItemData((prev: any) => ({ ...prev, [field]: e.target.value }))
+                                }
+                              />
+                            </div>
+                          );
+                        })}
+
+                        <div className="space-x-2 ">
+                          <Button onClick={handleAddNew}>
+                            ✅ Add
+                          </Button>
+                          <Button onClick={() => setShowNewRow(() => (false))}>
+                            {/* <i className="fas fa-xmark"></i> */}
+                            cancel
+                          </Button>
                         </div>
-                      );
-                    })}
-
-                    <div className="space-x-2 ">
-                      <Button onClick={handleAddNew}>
-                        ✅ Add
-                      </Button>
-                      <Button onClick={() => setShowNewRow(() => (false))}>
-                        {/* <i className="fas fa-xmark"></i> */}
-                        cancel
-                      </Button>
-                    </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </>
-          }
+                </>
+              }
 
+            </div>
+             </div> 
+             </div>
+          </div>
         </div>
-      </div>
-    </div>
-  );
+        );
 };
 
-export default OrderMaterialRoomDetails;
+        export default OrderMaterialRoomDetails;

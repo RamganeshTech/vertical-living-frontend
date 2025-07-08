@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     useGetInstallationDetails, useCreateInstallationItem,
     useEditInstallationItem,
@@ -123,7 +123,8 @@ const dummyInstallationWorkItems: (InstallationWorkItem & { _id: string })[] = [
 
 
 export default function InstallationRoomDetail() {
-    const { roomkey, projectId } = useParams() as { roomkey: string; projectId: string };
+    const { roomkey, projectId, organizationId } = useParams() as { roomkey: string; projectId: string, organizationId: string };
+    const navigate = useNavigate()
 
     const [popupImage, setPopupImage] = useState<string | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null); // for upload preview
@@ -218,7 +219,12 @@ export default function InstallationRoomDetail() {
 
     return (
         <div className="w-full h-full">
-            <h1 className="text-xl font-bold mb-4">Room: {roomkey}</h1>
+            <div className="flex justify-between items-center">
+                <h1 className="text-xl font-bold mb-4">Room: {roomkey}</h1>
+                <Button variant="primary" className="" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/installation`)}>
+                    Go Back
+                </Button>
+            </div>
 
             {items.length === 0 && !adding ? (
                 <>
@@ -242,6 +248,7 @@ export default function InstallationRoomDetail() {
                     </div>
                 </>
             ) : (
+
                 // <>
                 //     <div className="grid grid-cols-5 text-blue-900 gap-2 font-semibold bg-blue-100 p-2 rounded">
                 //         <div className="text-center">Work Name</div>
@@ -405,6 +412,7 @@ export default function InstallationRoomDetail() {
                 //         </Button>
                 //     )}
                 // </>
+
                 <div className="w-full overflow-x-auto h-[95%]  custom-scrollbar">
                     <div className="min-w-[1000px]">
                         {/* Headers */}
@@ -588,6 +596,15 @@ export default function InstallationRoomDetail() {
                                     </div>
                                 </div>
                             )}
+
+
+                            <Button
+                                onClick={() => setAdding(true)}
+                                variant="primary"
+                                className=""
+                            >
+                                <i className="fas fa-plus mr-2"></i> Add Work
+                            </Button>
                         </section>
                     </div>
                 </div>

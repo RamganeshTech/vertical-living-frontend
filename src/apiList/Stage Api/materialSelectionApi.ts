@@ -14,6 +14,7 @@ const getMaterialConfirmationByProjectApi = async ({
 }) => {
   const { data } = await api.get(`/materialconfirmation/${projectId}`);
   if (!data.ok) throw new Error(data.message);
+  console.log(data)
   return data.data;
 };
 
@@ -361,7 +362,7 @@ export const useGetMaterialConfirmationByProject = (projectId: string) => {
     },
     enabled: !!projectId,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5,
+    retry: false,
   });
 };
 
@@ -386,7 +387,6 @@ export const useGetSinglePredefinedRoom = ({
     enabled: !!projectId && !!roomId,
     retry: false,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5,
   });
 };
 

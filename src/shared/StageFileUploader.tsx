@@ -99,8 +99,10 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                 <div>
                     <h4 className="font-semibold text-blue-800 mb-2">📄 PDF Files</h4>
-                    <ul className="space-y-2  max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto max-h-[150px]">
+                    <ul className="space-y-2 max-h-[180px]  rounded-lg  border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto ">
+                        {pdfFiles.length === 0 && <div className="min-h-[145px]   flex items-center justify-center"><p className="text-sm text-gray-500">No PDFs uploaded.</p></div>}
                         {pdfFiles.map((file, i) => (
+
                             <li key={i} className="flex justify-between items-center  bg-blue-50 p-2 rounded-xl">
                                 <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
                                 <div className="space-x-2">
@@ -118,7 +120,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                                 </div>
                             </li>
                         ))}
-                        {pdfFiles.length === 0 && <p className="text-sm text-gray-500">No PDFs uploaded.</p>}
+                        {/* {pdfFiles.length === 0 && <p className="text-sm text-gray-500">No PDFs uploaded.</p>} */}
                     </ul>
                 </div>
 
@@ -126,7 +128,9 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
 
                 <div className="overflow-y-auto">
                     <h4 className="font-semibold text-blue-800 mb-2">🖼️ Image Files</h4>
-                    <ul className="space-y-2  max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto max-h-[150px] custom-scrollbar">
+                    <ul className="space-y-2  max-h-[180px] rounded-lg border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto custom-scrollbar">
+            {imageFiles.length === 0 && <div className="min-h-[145px]  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
+
                         {imageFiles.map((file, i) => (
                             <li key={i} className="flex justify-between items-center bg-green-50 p-2 rounded-xl">
                                 <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
@@ -146,7 +150,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                                 </div>
                             </li>
                         ))}
-                        {imageFiles.length === 0 && <p className="text-sm text-gray-500">No images uploaded.</p>}
+                        {/* {imageFiles.length === 0 && <p className="text-sm text-gray-500">No images uploaded.</p>} */}
                     </ul>
                 </div>
             </div>

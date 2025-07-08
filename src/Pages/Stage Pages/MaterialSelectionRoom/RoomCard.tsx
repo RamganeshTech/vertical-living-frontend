@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
-export default function RoomCard({ room, projectId }: { room: any, projectId: string }) {
+export default function RoomCard({ room, projectId, organizationId}: { room: any, projectId: string , organizationId:string}) {
   const navigate = useNavigate();
 
   return (
       <div
       onClick={() =>
-        navigate(`/projectdetails/${projectId}/materialselection/materialroom/${room._id}`)
+        navigate(`/${organizationId}/projectdetails/${projectId}/materialselection/materialroom/${room._id}`)
       }
       className="cursor-pointer border-l-6 border-blue-600 shadow-md hover:border-blue-400 transition-all duration-200 rounded-lg p-5 bg-white hover:shadow-lg flex items-center gap-4"
     >
