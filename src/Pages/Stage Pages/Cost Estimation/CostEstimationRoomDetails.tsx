@@ -141,7 +141,7 @@ export default function CostEstimationRoomDetails() {
                   </div>
                   <div className="flex items-center justify-center gap-2">
                     <Button variant="primary" isLoading={updatePending} onClick={() => handleSave(item.key)}> <i className="fas fa-check"></i> </Button>
-                    <Button variant="ghost" onClick={() => setEditingKey(null)}>✖</Button>
+                    <Button variant="secondary" onClick={() => setEditingKey(null)}><i className="fas fa-xmark"></i></Button>
                   </div>
                 </>
               ) : (

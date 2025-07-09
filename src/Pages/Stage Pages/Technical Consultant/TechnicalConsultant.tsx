@@ -488,7 +488,8 @@ const TechnicalConsultant = () => {
             toast({ description: "message sent successfully", title: "Success" })
         }
         catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || "Failed to send the message", variant: "destructive" })
+            console.log("err", error)
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to send the message", variant: "destructive" })
         }
     };
 
@@ -585,7 +586,7 @@ const TechnicalConsultant = () => {
             </Card>
 
             {/* Messages Section */}
-            <div className=" flex flex-col bg-white rounded-xl p-2 shadow-md border custom-scrollbar min-h-[200px] sm:min-h-[170px] md:min-h-[190px] lg:min-h-[300px] xl:min-h-[360px] border-gray-200 mb-2 flex-grow max-h-[70vh] sm:!max-h-[30vh] md:!max-h-[30vh] lg:!max-h-[42vh] xl:!max-h-[49vh] overflow-y-auto ">
+            <div className=" flex flex-col bg-white rounded-xl p-2 shadow-md border custom-scrollbar min-h-[200px] sm:min-h-[170px] md:min-h-[190px] lg:min-h-[300px] border-gray-200 mb-2 flex-grow max-h-[70vh] sm:!max-h-[30vh] md:!max-h-[30vh] lg:!max-h-[42vh] xl:!max-h-[49vh] overflow-y-auto ">
                 <div className="flex flex-col-reverse overflow-y-auto custom-scrollbar  flex-grow p-2  md:!max-h-full space-y-reverse space-y-4">
                     {(getMessageIsError || getMessageError) && (
                         <div className="flex h-full items-center justify-center py-10">

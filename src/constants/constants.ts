@@ -158,6 +158,103 @@ export const requiredFieldsByRoomOrderMaterials: Record<string, string[]> = {
 };
 
 
+export const brandNamesByRoomKey: Record<string, string[]> = {
+  carpentry: [
+    "Greenply",
+    "CenturyPly",
+    "Kitply",
+    "Archidply",
+    "Merino Laminates",
+    "Action TESA",
+    "Austin Plywood"
+  ],
+
+  hardware: [
+    "Hettich",
+    "Hafele",
+    "Ebco",
+    "Godrej Locks",
+    "Dorset",
+    "Ozone",
+    "Blum",
+    "Yale"
+  ],
+
+  electricalFittings: [
+    "Havells",
+    "Anchor by Panasonic",
+    "Legrand",
+    "Schneider Electric",
+    "GM Modular",
+    "Wipro",
+    "Philips",
+    "Syska"
+  ],
+
+  tiles: [
+    "Kajaria",
+    "Somany",
+    "Nitco",
+    "Orientbell",
+    "Johnson Tiles",
+    "Varmora",
+    "Asian Granito"
+  ],
+
+  ceramicSanitaryware: [
+    "Hindware",
+    "Jaquar",
+    "CERA",
+    "Parryware",
+    "Kohler India",
+    "Roca India"
+  ],
+
+  paintsCoatings: [
+    "Asian Paints",
+    "Berger Paints",
+    "Nerolac Paints",
+    "Dulux Paints",
+    "Indigo Paints",
+    "Shalimar Paints"
+  ],
+
+  lightsFixtures: [
+    "Philips Lighting",
+    "Syska LED",
+    "Wipro Lighting",
+    "Havells",
+    "Crompton",
+    "Bajaj Electricals"
+  ],
+
+  glassMirrors: [
+    "Saint-Gobain",
+    "Modiguard",
+    "AIS Glass",
+    "HNG Float Glass",
+    "Gold Plus Glass"
+  ],
+
+  upholsteryCurtains: [
+    "D’Decor",
+    "Fabindia",
+    "Bombay Dyeing",
+    "Raymond Furnishings",
+    "Spaces Home & Beyond"
+  ],
+
+  falseCeilingMaterials: [
+    "Gyproc by Saint-Gobain",
+    "Armstrong Ceilings",
+    "USG Boral",
+    "Everest Industries",
+    "Shera"
+  ]
+};
+
+
+
 
 export const requiredFieldsByRoomArrival: Record<string, string[]> = {
   carpentry: ["material", "brandName", "specification", "quantity", "unit", "remarks", "image", "verifiedByAccountant"],

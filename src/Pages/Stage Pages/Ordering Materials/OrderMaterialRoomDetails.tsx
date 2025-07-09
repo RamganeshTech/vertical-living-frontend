@@ -210,7 +210,7 @@ import { toast } from "../../../utils/toast";
 import { useGetRoomDetailsOrderMaterials, useUpdateRoomMaterials, useDeleteRoomMaterialItem } from "../../../apiList/Stage Api/orderingMaterialApi";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
-import { predefinedOptionsRooms, requiredFieldsByRoomOrderMaterials } from "../../../constants/constants";
+import { brandNamesByRoomKey, predefinedOptionsRooms, requiredFieldsByRoomOrderMaterials } from "../../../constants/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
 
 
@@ -231,9 +231,9 @@ const OrderMaterialRoomDetails = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editData, setEditData] = useState<any>({});
 
-  const { data, isLoading, isError } = useGetRoomDetailsOrderMaterials(projectId!, roomKey!);
-  const { mutateAsync: updateRoom } = useUpdateRoomMaterials();
-  const { mutateAsync: deleteItem } = useDeleteRoomMaterialItem();
+  const { data, isLoading, isError, refetch } = useGetRoomDetailsOrderMaterials(projectId!, roomKey!);
+  const { mutateAsync: updateRoom, isPending: updatePending } = useUpdateRoomMaterials();
+  const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteRoomMaterialItem();
 
 
 
@@ -248,6 +248,32 @@ const OrderMaterialRoomDetails = () => {
 
   const handleSave = async () => {
     try {
+
+      // Get required fields for the room type
+      const requiredFields = requiredFieldsByRoomOrderMaterials[roomKey];
+
+      if (!requiredFields || requiredFields.length === 0) {
+        throw new Error("Invalid room type or no fields defined.");
+      }
+
+      // Validate: first field must be filled
+      const firstFieldKey = requiredFields[0];
+      const firstFieldValue = editData[firstFieldKey];
+
+      if (!firstFieldValue || firstFieldValue.toString().trim() === "") {
+        throw new Error(`The field "${firstFieldKey}" is required.`);
+      }
+
+      // Optionally: you can enforce at least one non-empty field overall
+      const isAllEmpty = Object.values(editData).every(
+        (val) => !val || val.toString().trim() === ""
+      );
+
+      if (isAllEmpty) {
+        throw new Error("At least one field must be filled.");
+      }
+
+
       const payload = editData;
       console.log("payload", payload)
       await updateRoom({
@@ -255,9 +281,11 @@ const OrderMaterialRoomDetails = () => {
         roomKey,
         updates: [payload],
       });
-      toast({ title: "Saved", description: "Item updated." });
+      toast({ title: "Success", description: "Item updated." });
       setEditingIndex(null);
       setEditData({});
+      setShowNewRow(false)
+      refetch()
     } catch (err: any) {
       toast({ title: "Error", description: err?.message || "Failed", variant: "destructive" });
     }
@@ -266,6 +294,34 @@ const OrderMaterialRoomDetails = () => {
 
   const handleAddNew = async () => {
     try {
+
+
+      // Get required fields for the room type
+      const requiredFields = requiredFieldsByRoomOrderMaterials[roomKey];
+
+      if (!requiredFields || requiredFields.length === 0) {
+        throw new Error("Invalid room type or no fields defined.");
+      }
+
+      // Validate: first field must be filled
+      const firstFieldKey = requiredFields[0];
+      const firstFieldValue = newItemData[firstFieldKey];
+
+      if (!firstFieldValue || firstFieldValue.toString().trim() === "") {
+        throw new Error(`The field "${firstFieldKey}" is required.`);
+      }
+
+      // Optionally: you can enforce at least one non-empty field overall
+      const isAllEmpty = Object.values(newItemData).every(
+        (val) => !val || val.toString().trim() === ""
+      );
+
+      if (isAllEmpty) {
+        throw new Error("At least one field must be filled.");
+      }
+
+
+
       const payload = newItemData;
       console.log("payload", payload)
       await updateRoom({
@@ -273,11 +329,13 @@ const OrderMaterialRoomDetails = () => {
         roomKey,
         updates: [payload],
       });
-      toast({ title: "Saved", description: "Item updated." });
+      toast({ title: "Success", description: "Item updated." });
       setEditingIndex(null);
       setEditData({});
+      refetch()
+
     } catch (err: any) {
-      toast({ title: "Error", description: err?.message || "Failed", variant: "destructive" });
+      toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed", variant: "destructive" });
     }
   };
 
@@ -285,8 +343,10 @@ const OrderMaterialRoomDetails = () => {
     try {
       await deleteItem({ projectId: projectId!, roomKey, itemId });
       toast({ title: "Deleted", description: "Item removed" });
+      refetch()
+
     } catch (err: any) {
-      toast({ title: "Error", description: err?.message || "Failed", variant: "destructive" });
+      toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed", variant: "destructive" });
     }
   };
 
@@ -378,81 +438,31 @@ const OrderMaterialRoomDetails = () => {
         <div className="overflow-x-auto min-w-full flex-grow min-h-0">
           <div className="min-w-[700px] w-full flex flex-col border-2 border-gray-100 rounded-lg">
 
-            <div className="flex justify-around items-center px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold">
+            {/* <div className="flex justify-around items-center px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold">
               {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, idx) => (
                 <div key={idx} className="text-center text-xs font-medium uppercase tracking-wider">{field}</div>
               ))}
               <div className="text-center text-xs font-medium uppercase tracking-wider">Actions</div>
+            </div> */}
+
+
+            <div
+              className={`grid grid-cols-${requiredFieldsByRoomOrderMaterials[roomKey].length + 1} 
+              items-center px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold`}
+            >
+              {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, idx) => (
+                <div
+                  key={idx}
+                  className="text-center text-xs font-medium uppercase tracking-wider"
+                >
+                  {field}
+                </div>
+              ))}
+              <div className="text-center text-xs font-medium uppercase tracking-wider">Actions</div>
             </div>
+
 
             <div className="text-sm text-blue-900 divide-y  !h-[75vh] overflow-y-auto divide-blue-100">
-              {/* {showAddRow && (
-            <div className="flex justify-around items-center px-6 py-3 gap-2 bg-blue-50">
-              {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, i) => {
-                const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
-                const isFabricField = field === "fabric" && roomKey === "upholsteryCurtains";
-
-                if (isBrandField || isFabricField) {
-                  const options = isBrandField
-                    ? predefinedOptionsRooms.brandName[roomKey]
-                    : predefinedOptionsRooms.fabric[roomKey];
-
-                  return (
-                    <div key={i} className="text-center min-w-[120px]">
-                      <Select
-                        value={newItemData[field] || ""}
-                        onValueChange={(val) =>
-                          setNewItemData((prev: any) => ({ ...prev, [field]: val }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue
-                            selectedValue={newItemData[field]}
-                            placeholder={`Select ${field}`}
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {options.map((opt: string) => (
-                            <SelectItem key={opt} value={opt}>
-                              {opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div key={i} className="text-center min-w-[120px]">
-                    <Input
-                      className="text-xs text-center"
-                      placeholder={field}
-                      value={newItemData[field] || ""}
-                      onChange={(e) =>
-                        setNewItemData((prev: any) => ({ ...prev, [field]: e.target.value }))
-                      }
-                    />
-                  </div>
-                );
-              })}
-
-              <div className="flex justify-center gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    handleAddNew(); // ⬅ you write this handler
-                    setShowAddRow(false);
-                  }}
-                >
-                  Add
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => setShowAddRow(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )} */}
               {!showNewRow && items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500 bg-gray-50">
                   <i className="fas fa-users text-4xl text-gray-300 mb-4"></i>
@@ -472,9 +482,15 @@ const OrderMaterialRoomDetails = () => {
                     {items?.map((item: any, index: number) => (
                       // {carpentryDummyData?.map((item: any, index: number) => (
 
+                      // <div
+                      //   key={item._id}
+                      //   className="grid grid-cols-7 border text-center px-6  py-3 gap-2 border-b-1 border-gray-200 hover:bg-gray-50 transition-colors"
+                      // >
+
                       <div
                         key={item._id}
-                        className="grid grid-cols-7 px-6  py-3 gap-2 border-b-1 border-gray-200 hover:bg-gray-50 transition-colors"
+                        className={`grid grid-cols-${requiredFieldsByRoomOrderMaterials[roomKey].length + 1} 
+                        border text-center px-6 py-3 gap-2 border-b border-gray-200 hover:bg-gray-50 transition-colors`}
                       >
                         {requiredFieldsByRoomOrderMaterials[roomKey].map((field, i) => {
                           const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
@@ -494,12 +510,13 @@ const OrderMaterialRoomDetails = () => {
                                     <SelectTrigger>
                                       <SelectValue
                                         selectedValue={editData[field]}
-                                        placeholder={`Select ${field}`}
+                                        placeholder={`Select ${field === "brandName" ? "brand" : "fabric"}`}
                                       />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {(isBrandField
-                                        ? predefinedOptionsRooms.brandName[roomKey]
+                                        // ? predefinedOptionsRooms.brandName[roomKey]
+                                        ? brandNamesByRoomKey[roomKey]
                                         : predefinedOptionsRooms.fabric[roomKey]
                                       ).map((opt: string) => (
                                         <SelectItem key={opt} value={opt}>
@@ -521,25 +538,30 @@ const OrderMaterialRoomDetails = () => {
                             </div>
                           );
                         })}
-                        <div className="flex justify-center gap-2 items-center">
+                        <div className="flex justify-center gap-2 items-start">
                           {editingIndex === index ? (
                             <>
-                              <Button size="sm" onClick={handleSave}>Save</Button>
-                              <Button size="sm" variant="ghost" onClick={() => setEditingIndex(null)}>Cancel</Button>
+                              <Button size="sm" isLoading={updatePending} onClick={handleSave}><i className="fas fa-check"></i></Button>
+                              <Button size="sm" variant="ghost" onClick={() => setEditingIndex(null)}><i className="fas fa-xmark text-red-600"></i></Button>
                             </>
                           ) : (
                             <>
-                              <i
-                                className="fas fa-pen text-blue-600 cursor-pointer"
-                                onClick={() => {
-                                  setEditData(item);
-                                  setEditingIndex(index);
-                                }}
-                              />
-                              <i
-                                className="fas fa-trash text-red-500 cursor-pointer"
-                                onClick={() => handleDelete(item._id)}
-                              />
+                              <Button variant="primary">
+                                <i
+                                  className="fas fa-pen"
+                                  onClick={() => {
+                                    setEditData(item);
+                                    setEditingIndex(index);
+                                  }}
+                                />
+                              </Button>
+                              <Button isLoading={deletePending} variant="ghost">
+                                <i
+                                  className="fas fa-trash text-red-500 cursor-pointer"
+                                  onClick={() => handleDelete(item._id)}
+                                />
+                              </Button>
+
                             </>
                           )}
                         </div>
@@ -558,7 +580,8 @@ const OrderMaterialRoomDetails = () => {
 
                           if (isBrandField || isFabricField) {
                             const options = isBrandField
-                              ? predefinedOptionsRooms.brandName[roomKey]
+                              // ? predefinedOptionsRooms.brandName[roomKey]
+                              ? brandNamesByRoomKey[roomKey]
                               : predefinedOptionsRooms.fabric[roomKey];
 
                             return (
@@ -573,7 +596,7 @@ const OrderMaterialRoomDetails = () => {
                                   <SelectTrigger>
                                     <SelectValue
                                       selectedValue={newItemData[field]}
-                                      placeholder={`Select ${field}`}
+                                      placeholder={`Select ${field === "brandName" ? "brand" : "fabric"}`}
                                     />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -602,13 +625,13 @@ const OrderMaterialRoomDetails = () => {
                           );
                         })}
 
-                        <div className="space-x-2 ">
-                          <Button onClick={handleAddNew}>
-                            ✅ Add
+                        <div className="space-x-2 flex">
+                          <Button isLoading={updatePending} onClick={handleAddNew}>
+                            <i className="fas fa-check"></i>
                           </Button>
                           <Button onClick={() => setShowNewRow(() => (false))}>
                             {/* <i className="fas fa-xmark"></i> */}
-                            cancel
+                            <i className="fas fa-xmark"></i>
                           </Button>
                         </div>
                       </div>
@@ -618,11 +641,11 @@ const OrderMaterialRoomDetails = () => {
               }
 
             </div>
-             </div> 
-             </div>
           </div>
         </div>
-        );
+      </div>
+    </div>
+  );
 };
 
-        export default OrderMaterialRoomDetails;
+export default OrderMaterialRoomDetails;

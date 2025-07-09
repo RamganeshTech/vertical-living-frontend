@@ -214,6 +214,7 @@ export default function RoomDetailCard() {
             });
             setEditingKey(null);
             toast({ description: 'Field updated successfully', title: "Success" });
+            refetch()
         } catch (error: any) {
             toast({ 
                 title: "Error", 
@@ -229,6 +230,7 @@ export default function RoomDetailCard() {
                 await deleteField({ projectId, roomId, fieldKey: key });
             }
             toast({ description: 'Field deleted successfully', title: "Success" });
+            refetch()
         } catch (error: any) {
             toast({ 
                 title: "Error", 
@@ -262,19 +264,19 @@ export default function RoomDetailCard() {
             {/* <div className="w-max min-w-[10px] flex-grow  min-h-[100%] flex flex-col border-2 border-gray-100 rounded-lg"> */}
                 {/* Table Header - Sticky top */}
                 <div className="rounded-md grid grid-cols-5 bg-gray-100 text-sm font-semibold text-gray-700 px-2 sm:px-4 py-3 sticky top-0 z-10">
-                    <div className="truncate">Item</div>
-                    <div className="truncate">Quantity</div>
-                    <div className="truncate">Unit</div>
-                    <div className="truncate">Remarks</div>
-                    <div className="truncate">Actions</div>
+                    <div className="truncate text-center">Item</div>
+                    <div className="truncate text-center">Quantity</div>
+                    <div className="truncate text-center">Unit</div>
+                    <div className="truncate text-center">Remarks</div>
+                    <div className="truncate text-center">Actions</div>
                 </div>
 
                 {/* Table Body - Scrollable */}
-                <div className="flex-grow min-h-0 overflow-y-auto">
+                <div className="flex-grow min-h-0 overflow-y-auto custom-scrollbar">
                     {entries.map(([key, value]: any) => (
                         <div 
                             key={key} 
-                            className="grid grid-cols-5 items-center px-2 sm:px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+                            className="grid text-center mx-auto grid-cols-5 items-center px-2 sm:px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
                         >
                             <div className="font-medium text-gray-700 truncate pr-2">{key}</div>
 
@@ -302,7 +304,7 @@ export default function RoomDetailCard() {
                                             className="w-full text-sm"
                                         />
                                     </div>
-                                    <div className="flex gap-1 sm:gap-2">
+                                    <div className="flex gap-1 sm:gap-2 mx-auto">
                                         <Button 
                                             variant="primary" 
                                             isLoading={updatePending} 
@@ -327,13 +329,13 @@ export default function RoomDetailCard() {
                                     <div className="max-h-[70px] overflow-y-auto custom-scrollbar cursor-grab pr-2">
                                         {value.remarks || "N/A"}
                                     </div>
-                                    <div className="flex gap-1 sm:gap-2">
+                                    <div className="flex gap-1 sm:gap-2 mx-auto">
                                         <Button 
                                             variant="primary" 
                                             onClick={() => handleEdit(key, value)}
                                             className="text-xs sm:text-sm p-1 sm:p-2"
                                         >
-                                            ✎
+                                            <i className="fas fa-pencil "></i>
                                         </Button>
                                         {isCustomRoom && (
                                             <Button 
@@ -342,7 +344,7 @@ export default function RoomDetailCard() {
                                                 onClick={() => handleDelete(key)}
                                                 className="text-xs sm:text-sm p-1 sm:p-2"
                                             >
-                                                🗑
+                                                <i className="fas fa-trash-can"></i>
                                             </Button>
                                         )}
                                     </div>
