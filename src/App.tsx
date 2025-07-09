@@ -75,8 +75,9 @@ function App() {
   const [projectId, setProjectId] = useState<string | null>(null)
   const [organizationId, setOrganizationId] = useState<string | null>(null)
   //it is used to check whether which user is now currently using the application
-  useAuthCheck()
-
+  const { loading } = useAuthCheck()
+  if (loading) return;
+  console.log("is im execute d outlsid eof routes")
   return (
     <>
 
@@ -86,7 +87,6 @@ function App() {
 
 
         <Route path="/" element={<Home />} />
-        {/* <Route path="/select-model" element={<NotFound />} /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/unauthorized" element={<UnAuthorized />} />
 
@@ -144,9 +144,9 @@ function App() {
           <ProjectDetails projectId={projectId} setProjectId={setProjectId} setOrganizationId={setOrganizationId} organizationId={organizationId} />
         </ProtectedRoutes>}>
 
-          <Route path="labourlist" element={<LabourList />} />
+          {/* <Route path="labourlist" element={<LabourList />} />
           <Route path="materiallist" element={<MaterialList />} />
-          <Route path="transportationlist" element={<Transportationlist />} />
+          <Route path="transportationlist" element={<Transportationlist />} /> */}
           <Route path="workers" element={<Workers />} />
           <Route path="inviteclient" element={<InviteClient />} />
           <Route path="requirementform" element={<RequriementForm />} />

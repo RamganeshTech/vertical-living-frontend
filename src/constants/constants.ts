@@ -17,11 +17,26 @@ export const SIDEBAR_ICONS = {
   // PHASES: "fa-solid fa-briefcase text-2xl",
 }
 
-export const ORGANIZATION_ICONS = {
-  PROJECTS: "fa-solid fa-share text-2xl",
+export const LOGIN_ICONS = {
+  PROJECTS: "fa-solid fa-user text-2xl",
   INVITECTO: "fa-solid fa-bars-progress text-2xl",
   INVITESTAFFS: "fa-solid fa-bars-progress text-2xl",
   DETAILS: "fa-solid fa-bars-progress text-2xl",
+}
+
+export const LOGIN_LABELS = {
+   ADMIN: `Admin Login`,
+        STAFF: `STaff Login`,
+        CTO: `CTO Login`,
+        WORKER: `Worker Login`,
+        CLIENT: `Client Login`
+}
+
+export const ORGANIZATION_ICONS = {
+  INVITECTO: "fa-solid fa-user-tie text-2xl",
+  INVITESTAFFS: "fa-solid fa-user text-2xl",
+  DETAILS: "fa-solid fa-building text-2xl",
+  PROJECTS: "fa-solid fa-diagram-project  text-2xl",
 }
 
 export const ORGANIZATION_LABELS = {
@@ -32,10 +47,10 @@ export const ORGANIZATION_LABELS = {
 }
 
 export const PROJECTS_LABELS = {
-  MATERIALS: "Materials",
-  LABOURS: "Labours",
-  TRANSPORTATION: "Transportation",
-  WORKERS: "Workers",
+  // MATERIALS: "Materials",
+  // LABOURS: "Labours",
+  // TRANSPORTATION: "Transportation",
+  WORKERS: "Invite Workers",
   INVITECLIENT: "Invite Client",
   REQUIREMENTFORM: "Requirement Form",
   SITEMEASUREMENT: "Site Measurement",
@@ -55,9 +70,9 @@ export const PROJECTS_LABELS = {
 
 
 export const PROJECTS_ICONS = {
-  MATERIALS: "fa-solid fa-cubes-stacked text-2xl",
-  LABOURS: "fa-solid fa-users text-2xl",
-  TRANSPORTATION: "fa-solid fa-road text-2xl",
+  // MATERIALS: "fa-solid fa-cubes-stacked text-2xl",
+  // LABOURS: "fa-solid fa-users text-2xl",
+  // TRANSPORTATION: "fa-solid fa-road text-2xl",
   WORKERS: "fa-solid fa-circle-info text-2xl",
   INVITECLIENT: "fa-solid fa-user-group text-2xl",
   REQUIREMENTFORM: "fa-solid fa-pencil text-2xl",
@@ -172,3 +187,23 @@ export const predefinedOptionsRooms: any = {
     upholsteryCurtains: ["Cotton", "Linen", "Velvet", "Polyester", "Silk"],
   },
 };
+
+
+
+
+
+export const PREDEFINED_ROOMS = [
+  "Living Room",
+  "Bedroom",
+  "Kitchen",
+  "Dining Room",
+  "Balcony",
+  "Foyer Area",
+  "Terrace",
+  "Study Room",
+  "Car Parking",
+  "Garden",
+  "Storage Room",
+  "Entertainment Room",
+  "Home Gym"
+];

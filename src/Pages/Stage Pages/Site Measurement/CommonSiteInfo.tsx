@@ -9,10 +9,11 @@ type CommonSiteInfoProps = {
     handleEditRoom: (room: SiteRooms)=> void
     handleDeleteRoom:(roomId: string)=> Promise<any>
     setShowSiteForm:React.Dispatch<React.SetStateAction<boolean>>,
-    handleDeleteSiteMeasurement:()=> Promise<any>
+    handleDeleteSiteMeasurement:()=> Promise<any>,
+    deleteRoomLoading:boolean
 }
 
-const CommonSiteInfo:React.FC<CommonSiteInfoProps> = ({measurementData,handleDeleteSiteMeasurement,  setShowSiteForm,setShowRoomForm, handleEditRoom , handleDeleteRoom}) => {
+const CommonSiteInfo:React.FC<CommonSiteInfoProps> = ({measurementData,handleDeleteSiteMeasurement, deleteRoomLoading, setShowSiteForm,setShowRoomForm, handleEditRoom , handleDeleteRoom}) => {
   return (
      <>
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
@@ -114,6 +115,7 @@ const CommonSiteInfo:React.FC<CommonSiteInfoProps> = ({measurementData,handleDel
                     room={room}
                     onEdit={() => handleEditRoom(room)}
                     onDelete={() => handleDeleteRoom((room as any)._id)}
+                    deleteRoomLoading={deleteRoomLoading}
                   />
                 ))}
               </div>

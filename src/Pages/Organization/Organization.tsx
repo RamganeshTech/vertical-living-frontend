@@ -1,15 +1,59 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "../../components/ui/Button"
 import { useGetMyOrganizations } from "../../apiList/orgApi"
 import OrganizationCard from "../../components/OrganizationCard"
 import CreateOrganizationModal from "../../components/CreateOrganizationModal"
 import { Skeleton } from "../../components/ui/Skeleton"
 import { Card, CardContent } from "../../components/ui/Card"
+import Sidebar from "../../shared/Sidebar"
+import { LOGIN_ICONS, LOGIN_LABELS } from "../../constants/constants"
+import MobileSidebar from "../../shared/MobileSidebar"
+import { useLogoutCTO } from "../../apiList/CTOApi"
+import { useLogoutClient } from "../../apiList/clientApi"
+import { useLogoutWorker } from "../../apiList/workerApi"
+import { useLogoutUser } from "../../apiList/userApi"
+import { useLogoutStaff } from "../../apiList/staffApi"
 
 export default function Organization() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
+
+  console.log("im inside  of the organizaton compo")
   let { data: organizations, isLoading, error, refetch } = useGetMyOrganizations()
   // organizations = {}
+
+
+
+  const path = {
+    ADMIN: `/login`,
+    STAFF: `/stafflogin`,
+    CTO: `/ctologin`,
+    WORKER: `/workerlogin`,
+    CLIENT: `/clientlogin`
+  }
+
+
+  const openMobileSidebar = () => {
+    setIsMobileSidebarOpen(true)
+  }
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 470);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+
+
+ 
+
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
@@ -46,6 +90,7 @@ export default function Organization() {
   }
 
   if (error as any) {
+    console.log(error, "slkdfjlskjl;l;")
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
         <div className="text-center bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full">
@@ -64,6 +109,8 @@ export default function Organization() {
   }
 
 
+
+
   // Calculate stats
   const totalOrganizations = organizations?.length || 0
   // const totalStaff = Array.isArray(organizations) ? (organizations?.reduce((sum: number, org: any) => sum + (org.staffCount || 0), 0) || 0) : 0
@@ -73,60 +120,73 @@ export default function Organization() {
 
 
   return (
-    <main className="w-screen h-screen">
-    {/* HEADER */}
+    <main className="w-screen h-screen flex flex:1">
+
+      {/* <Sidebar labels={LOGIN_LABELS} path={path} icons={LOGIN_ICONS} /> */}
+
+      {isMobile ? (
+        <MobileSidebar
+          labels={LOGIN_LABELS}
+          path={path}
+          isOpen={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
+        />
+      ) : (
+        <Sidebar
+          path={path}
+          labels={LOGIN_LABELS}
+          icons={LOGIN_ICONS}
+        />
+      )}
+
+      {/* HEADER */}
+      <section className="w-full h-full">
         <div className="max-w-full min-h-[10%] bg-white/90 backdrop-blur-sm border-b border-blue-200">
-          <div className="max-w-full mx-auto px-4 sm:px-6 py-3">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6">
+          <div className="max-w-full mx-auto px-2 sm:px-6 py-3">
+            <div className="flex  sm:flex-row items-center sm:items-center justify-between gap-3 sm:gap-6">
 
               {/* Title + Description */}
-              <div className="flex flex-col gap-1">
-                <h1 className="text-xl sm:text-2xl font-semibold text-blue-800">
-                  <i className="fas fa-building mr-2 text-blue-600"></i>Organizations
-                </h1>
-                <p className="text-sm text-blue-500">
-                  Manage your organizations and teams
-                </p>
+              <div className="flex flex:1 items-center">
+                {isMobile &&
+                  <button
+                    onClick={openMobileSidebar}
+                    className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                    title="Open Menu"
+                  >
+                    <i className="fa-solid fa-bars"></i>
+                  </button>
+                }
+                <div className="flex flex-col gap-1 w-[50vw]">
+                  <h1 className="text-xl sm:text-2xl font-semibold text-blue-800">
+                    <i className="fas fa-building mr-2 text-blue-600"></i>Organizations
+                  </h1>
+                  <p className="text-sm sm:inline hidden text-blue-500">
+                    Manage your organizations and teams
+                  </p>
+                </div>
               </div>
 
               {/* Stats + Button */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
-
-                {/* Org Count Pill */}
-                {/* <div className="bg-blue-600 text-white text-xs sm:text-sm px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2">
-                  <i className="fas fa-layer-group text-white text-sm"></i>
-                  <span className="font-medium">
-                    {totalOrganizations} {totalOrganizations === 1 ? "Organization" : "Organizations"}
-                  </span>
-                </div> */}
-
-                {/* Action Button */}
-                {/* <Button
-                  className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md shadow-sm transition-transform duration-150 hover:scale-105"
-                >
-                  <i className="fas fa-user-group mr-1.5"></i>
-                  <span className="inline">staffs</span>
-                </Button> */}
-
-
-                  <Button
+              <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                <Button
                   onClick={() => setIsCreateModalOpen(true)}
-                  className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md shadow-sm transition-transform duration-150 hover:scale-105"
+                  variant="primary"
+                  className=""
                 >
                   <i className="fas fa-plus mr-1.5"></i>
                   <span className="hidden sm:inline">Create Organization</span>
                   <span className="inline sm:hidden">Create</span>
                 </Button>
-                
+
               </div>
             </div>
           </div>
         </div>
 
-      <div className="min-h-[calc(100%-10%)] bg-gradient-to-br from-blue-50 via-white to-blue-100">
-        <div className="max-w-full mx-auto px-4 sm:px-6 py-6 relative">
-          {/* Statistics Cards */}
-          {/* <div className="mb-8">
+        <div className="min-h-[calc(100%-10%)] bg-gradient-to-br from-blue-50 via-white to-blue-100">
+          <div className="max-w-full mx-auto px-4 sm:px-6 py-6 relative">
+            {/* Statistics Cards */}
+            {/* <div className="mb-8">
             <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-200">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
@@ -142,19 +202,19 @@ export default function Organization() {
             </Card>
           </div> */}
 
-          {/* Organizations Grid */}
-          {organizations ? (
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-blue-900">Your Organization</h2>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {/* {organizations.map((org: any) => ( */}
+            {/* Organizations Grid */}
+            {organizations ? (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-semibold text-blue-900">Your Organization</h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {/* {organizations.map((org: any) => ( */}
                   <OrganizationCard organization={organizations} />
-                {/* ))} */}
-              </div>
+                  {/* ))} */}
+                </div>
 
-              {/* <div className="mt-6 sm:w-3/4 mx-auto bg-white/60 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-xl border border-white/20">
+                {/* <div className="mt-6 sm:w-3/4 mx-auto bg-white/60 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-xl border border-white/20">
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                     <i className="fas fa-plus text-white text-2xl"></i>
@@ -173,61 +233,61 @@ export default function Organization() {
                   </Button>
                 </div>
               </div> */}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div className="max-w-md mx-auto">
-                <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <i className="fas fa-building text-blue-500 text-4xl"></i>
-                </div>
-                <h3 className="text-2xl font-bold text-blue-900 mb-3">No Organizations Yet</h3>
-                <p className="text-blue-600 mb-6 text-sm sm:text-base">
-                  Create your first organization to start managing your teams and projects effectively
-                </p>
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="max-w-md mx-auto">
+                  <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <i className="fas fa-building text-blue-500 text-4xl"></i>
+                  </div>
+                  <h3 className="text-2xl font-bold text-blue-900 mb-3">No Organizations Yet</h3>
+                  <p className="text-blue-600 mb-6 text-sm sm:text-base">
+                    Create your first organization to start managing your teams and projects effectively
+                  </p>
 
-                {/* Getting Started Steps */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 mb-6 text-left">
-                  <h4 className="font-semibold text-blue-900 mb-4 text-center">
-                    <i className="fas fa-rocket mr-2"></i>
-                    Getting Started
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                        1
+                  {/* Getting Started Steps */}
+                  <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 mb-6 text-left">
+                    <h4 className="font-semibold text-blue-900 mb-4 text-center">
+                      <i className="fas fa-rocket mr-2"></i>
+                      Getting Started
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                          1
+                        </div>
+                        <p className="text-sm text-gray-700">Create your organization with basic details</p>
                       </div>
-                      <p className="text-sm text-gray-700">Create your organization with basic details</p>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                        2
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                          2
+                        </div>
+                        <p className="text-sm text-gray-700">Invite team members to join your organization</p>
                       </div>
-                      <p className="text-sm text-gray-700">Invite team members to join your organization</p>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                        3
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                          3
+                        </div>
+                        <p className="text-sm text-gray-700">Start managing tasks and projects together</p>
                       </div>
-                      <p className="text-sm text-gray-700">Start managing tasks and projects together</p>
                     </div>
                   </div>
+
+                  <Button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                  >
+                    <i className="fas fa-plus mr-2"></i>
+                    Create Your First Organization
+                  </Button>
                 </div>
-
-                <Button
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                >
-                  <i className="fas fa-plus mr-2"></i>
-                  Create Your First Organization
-                </Button>
               </div>
-            </div>
-          )}
+            )}
 
-          <CreateOrganizationModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+            <CreateOrganizationModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+          </div>
         </div>
-      </div>
-
+      </section>
     </main>
   )
 }

@@ -11,6 +11,9 @@ import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
 import { useLoginWorker } from "../../apiList/workerApi" 
 import { toast } from "../../utils/toast"
+import { setRole } from "../../features/authSlice"
+import { setWorkerProfileData } from "../../features/workerSlice"
+import { useDispatch } from "react-redux"
 
 export default function WorkerLogin() {
   const navigate = useNavigate()
@@ -18,6 +21,8 @@ export default function WorkerLogin() {
     email: "",
     password: "",
   })
+const dispatch = useDispatch()
+
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -65,17 +70,37 @@ export default function WorkerLogin() {
     }
 
     try {
-      await loginWorker.mutateAsync(formData)
+      const data = await loginWorker.mutateAsync(formData)
       toast({
         title: "Success",
         description: "Login successful! Welcome back.",
       })
       // Redirect to worker dashboard or projects page
-      navigate("/worker/dashboard")
+
+       const workerData = data.data;
+
+    // ✅ 1) Update authSlice
+    dispatch(setRole({
+      role: workerData.role,
+      isauthenticated: true,
+      _id: workerData._id
+    }));
+
+    // ✅ 2) Update workerSlice
+    dispatch(setWorkerProfileData({
+      workerId: workerData._id,
+      workerName: workerData.workerName,
+      email: workerData.email,
+      phoneNo: workerData.phoneNo,
+      role: workerData.role,
+      isauthenticated: true
+    }));
+
+      navigate("/")
     } catch (error: any) {
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials. Please try again.",
+        description: error?.response?.data?.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       })
     }
@@ -84,6 +109,9 @@ export default function WorkerLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
     
+     <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] z-[10] right-[5%] sm:right-[10%]">
+            Go Back
+          </Button>
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
@@ -187,7 +215,7 @@ export default function WorkerLogin() {
             </div>
 
             {/* Help Section */}
-            <div className="bg-blue-50 rounded-xl p-4 text-center">
+            {/* <div className="bg-blue-50 rounded-xl p-4 text-center">
               <p className="text-xs text-blue-600 mb-2">
                 <i className="fas fa-info-circle mr-1"></i>
                 Need help?
@@ -195,7 +223,7 @@ export default function WorkerLogin() {
               <p className="text-xs text-gray-600">
                 Contact your project manager or supervisor for assistance with your login credentials.
               </p>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </div>

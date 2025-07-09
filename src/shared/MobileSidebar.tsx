@@ -1,5 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useLogoutCTO } from '../apiList/CTOApi'
+import { useLogoutClient } from '../apiList/clientApi'
+import { useLogoutStaff } from '../apiList/staffApi'
+import { useLogoutUser } from '../apiList/userApi'
+import { useLogoutWorker } from '../apiList/workerApi'
+import { Button } from '../components/ui/Button'
+import { useDispatch } from "react-redux";
+import { resetOwnerProfile } from "../features/userSlices";
+import { logout } from "../features/authSlice";
+import { resetClientProfile } from "../features/clientSlice";
+import { resetWorkerProfile } from "../features/workerSlice";
+import { resetCTOProfile } from "../features/CTOSlice";
+import { resetStaffProfile } from "../features/staffSlices";
+
+export const COMPANY_DETAILS = {
+  COMPANY_NAME: "Vertical Living",
+  COMPANY_LOGO: "https://th.bing.com/th/id/OIP.Uparc9uI63RDb82OupdPvwAAAA?w=80&h=80&c=1&bgcl=c77779&r=0&o=6&dpr=1.3&pid=ImgRC"
+};
 
 type MobileSidebarProps = {
   isOpen: boolean;
@@ -9,6 +27,35 @@ type MobileSidebarProps = {
 };
 
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, path }) => {
+
+  const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending } = useLogoutCTO();
+  const { mutateAsync: ClientLogoutAsync, isPending: isClientPending } = useLogoutClient();
+  const { mutateAsync: StaffLogoutAsync, isPending: isStaffPending } = useLogoutStaff();
+  const { mutateAsync: LogoutLogoutAsync, isPending: isUserPending } = useLogoutUser();
+  const { mutateAsync: WorkerLogoutAsync, isPending: isWorkerPending } = useLogoutWorker();
+
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    try {
+      await CTOLogoutAsync();
+      await ClientLogoutAsync();
+      await StaffLogoutAsync();
+      await LogoutLogoutAsync();
+      await WorkerLogoutAsync();
+      dispatch(resetOwnerProfile());
+      dispatch(resetClientProfile());
+      dispatch(resetWorkerProfile());
+      dispatch(resetCTOProfile());
+      dispatch(resetStaffProfile());
+      dispatch(logout());
+    } catch (error: any) {
+      console.log("Error occurred during logout", error);
+    }
+  };
+
+  const labelEntries = Object.entries(labels);
+
   return (
     <>
       {/* Backdrop */}
@@ -21,38 +68,60 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-screen bg-white w-[75%] overflow-y-auto transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 z-50 h-screen bg-white w-[75%] flex flex-col transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold">Menu</h2>
+        {/* ✅ Top logo + company name */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-3">
+            <img src={COMPANY_DETAILS.COMPANY_LOGO} alt="Logo" className="w-10 h-10 rounded-full object-cover" />
+            <span className="text-lg font-semibold">{COMPANY_DETAILS.COMPANY_NAME}</span>
+          </div>
           <button onClick={onClose} className="text-xl text-gray-700">
             <i className="fas fa-times"></i>
           </button>
         </div>
 
-        <nav className="flex flex-col p-4 space-y-2">
-          {Object.entries(labels).map(([key, value]) => (
-            path[key] ? (
-              <Link
-                key={key}
-                to={path[key]}
-                className="text-gray-800 hover:bg-gray-100 p-3 rounded"
-                onClick={onClose}
-              >
-                {value}
-              </Link>
-            ) : (
-              <span
-                key={key}
-                className="text-gray-400 p-3 rounded cursor-not-allowed"
-              >
-                {value}
-              </span>
-            )
+        {/* ✅ Scrollable links with separators */}
+        <nav className="flex flex-col flex-grow overflow-y-auto p-4">
+          {labelEntries.map(([key, value], index) => (
+            <React.Fragment key={key}>
+              {path[key] ? (
+                <Link
+                  to={path[key]}
+                  onClick={onClose}
+                  className="text-gray-800 hover:bg-gray-100 p-3 rounded block"
+                >
+                  {value}
+                </Link>
+              ) : (
+                <span className="text-gray-400 p-3 rounded cursor-not-allowed block">{value}</span>
+              )}
+
+              {/* ✅ Separator except after last */}
+              {index < labelEntries.length - 1 && (
+                <hr className="border-t border-gray-200 my-1" />
+              )}
+            </React.Fragment>
           ))}
         </nav>
+
+        {/* ✅ Static logout at the bottom */}
+        <div className="border-t border-gray-200 p-4">
+          <Button
+            className="w-full flex items-center justify-center gap-2"
+            isLoading={
+              isCTOPending ||
+              isClientPending ||
+              isStaffPending ||
+              isUserPending ||
+              isWorkerPending
+            }
+            onClick={handleLogout}
+          >
+            <i className="fas fa-sign-out-alt"></i> Logout
+          </Button>
+        </div>
       </aside>
     </>
   );

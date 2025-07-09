@@ -56,7 +56,7 @@ export const useLogoutStaff = () => {
 
 
 
-const inviteWorkerByStaff = async (payload: { projectId: string; specificRole: string , role:string}) => {
+const inviteWorkerByStaff = async (payload: { projectId: string; specificRole: string , role:string, organizationId:string}) => {
   console.log("payload", payload)
   const { data } = await staffApi.post("/staff/inviteworker", payload);
   if (!data.ok) throw new Error(data.message);
@@ -86,6 +86,7 @@ export const useGetWorkersAsStaff = (projectId: string) =>
     enabled: !!projectId,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    retry:false
   });
 
 export const useRemoveWorkerAsStaff = () =>

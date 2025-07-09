@@ -499,7 +499,7 @@ function HomeInteriorProject() {
         </div>
       )}
 
-      <Card className="p-4 mb-4 shadow border-l-4 border-blue-600 bg-white">
+    {!getAllError &&  <Card className="p-4 mb-4 shadow border-l-4 border-blue-600 bg-white">
         <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
           <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
           <span>Stage Timings</span>
@@ -516,8 +516,8 @@ function HomeInteriorProject() {
           isPending={deadLinePending}
         />
       </Card>
-
-      <div className="mb-6">
+}
+     {!getAllError && <div className="mb-6">
         <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
           <RequirementFileUploader
             formId={measurementData?._id}
@@ -531,7 +531,9 @@ function HomeInteriorProject() {
           />
         </Card>
       </div>
-
+}
+      {!getAllError && 
+      <>
       {!Object.values(measurementData?.siteDetails || {}).some((ele: any) => ele !== null) && !showSiteForm ? (
         <div className="bg-white rounded-lg shadow-sm p-6 text-center">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -548,13 +550,14 @@ function HomeInteriorProject() {
           </button>
         </div>
       ) : (
-        <CommonSiteInfo
+        <CommonSiteInfo   // this has teh room cards also 
           measurementData={measurementData}
           handleDeleteSiteMeasurement={handleDeleteSiteMeasurement}
           setShowSiteForm={setShowSiteForm}
           setShowRoomForm={setShowRoomForm}
           handleEditRoom={handleEditRoom}
           handleDeleteRoom={handleDeleteRoom}
+          deleteRoomLoading={deleteRoom.isPending}
         />
       )}
 
@@ -573,8 +576,13 @@ function HomeInteriorProject() {
           setShowRoomForm={setShowRoomForm}
           roomDetails={roomDetails}
           setRoomDetails={setRoomDetails}
+          updateRoomLoading={updateRoomDetails.isPending}
+          createRoomLoading={createRoom.isPending}
+          editingRoomId={editingRoomId}
         />
       )}
+      </>
+      }
     </div>
   );
 }

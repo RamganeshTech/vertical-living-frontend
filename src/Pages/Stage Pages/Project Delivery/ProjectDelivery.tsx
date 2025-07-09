@@ -858,7 +858,7 @@ export default function ProjectDeliveryPanel() {
   return (
     <div className="w-full min-h-screen p-2  space-y-6">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4pb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start lg:items-center gap-4pb-4">
         <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
           {isMobile && (
             <button

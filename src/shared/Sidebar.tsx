@@ -4,6 +4,19 @@ import useSidebarShortcut from '../Hooks/useSideBarShortcut'
 import { Link } from 'react-router-dom'
 import '../../src/App.css'
 import SidebarIcons from '../components/SidebarIcons'
+import { useLogoutCTO } from '../apiList/CTOApi'
+import { useLogoutClient } from '../apiList/clientApi'
+import { useLogoutStaff } from '../apiList/staffApi'
+import { useLogoutUser } from '../apiList/userApi'
+import { useLogoutWorker } from '../apiList/workerApi'
+import { Button } from '../components/ui/Button'
+import { useDispatch } from 'react-redux'
+import { resetOwnerProfile } from '../features/userSlices'
+import { resetClientProfile } from '../features/clientSlice'
+import { resetWorkerProfile } from '../features/workerSlice'
+import { resetCTOProfile } from '../features/CTOSlice'
+import { resetStaffProfile } from '../features/staffSlices'
+import { logout } from '../features/authSlice'
 
 
 type SidebarProp = {
@@ -15,6 +28,16 @@ type SidebarProp = {
 
 const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     const [showSideBar, setShowSideBar] = useState(true)
+
+    const dispatch = useDispatch()
+
+    const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending, } = useLogoutCTO()
+    const { mutateAsync: ClientLogoutAsync, isPending: isClientPending, } = useLogoutClient()
+    const { mutateAsync: StaffLogoutAsync, isPending: isStaffPending, } = useLogoutStaff()
+    const { mutateAsync: LogoutLogoutAsync, isPending: isUserPending, } = useLogoutUser()
+    const { mutateAsync: WorkerLogoutAsync, isPending: isWorkerPending, } = useLogoutWorker()
+
+
 
     const handleSideBarClose = () => {
         setShowSideBar(false)
@@ -41,6 +64,28 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     }, [location.pathname, showSideBar])
 
     useSidebarShortcut(handleSideBarOpen, handleSideBarClose);
+
+
+
+    const handleLogout = async () => {
+        try {
+            await CTOLogoutAsync()
+            await ClientLogoutAsync()
+            await StaffLogoutAsync()
+            await LogoutLogoutAsync()
+            await WorkerLogoutAsync()
+            dispatch(resetOwnerProfile())
+            dispatch(resetClientProfile())
+            dispatch(resetWorkerProfile())
+            dispatch(resetCTOProfile())
+            dispatch(resetStaffProfile())
+            dispatch(logout())
+
+        }
+        catch (error: any) {
+            console.log("error occured in logout", error)
+        }
+    }
     return (
         <>
             {showSideBar ?
@@ -56,7 +101,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                         <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
                             {Object.entries(labels).map(([key, value]) =>
                                 // <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
-                                path[key] ? <Link key={value} to={path[key]} className='outline-none'>
+                                path[key] && <Link key={value} to={path[key]} className='outline-none'>
                                     <div
                                         onClick={() => setActiveSidebar(value)}
                                         className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar === value ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
@@ -65,22 +110,45 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                                         <span><i className="fa-solid fa-chevron-right"></i></span>
                                     </div>
                                 </Link>
-                                    :
-                                    <div
-                                    key={value}
-                                        className={`cursor-not-allowed flex justify-between max-w-[95%] py-4 px-4`}>
-                                        <span className='text-lg'>{value}</span>
-                                        <span><i className="fa-solid fa-chevron-right"></i></span>
-                                    </div>
+                                // :
+                                // <div
+                                // key={value}
+                                //     className={`cursor-not-allowed flex justify-between max-w-[95%] py-4 px-4`}>
+                                //     <span className='text-lg'>{value}</span>
+                                //     <span><i className="fa-solid fa-chevron-right"></i></span>
+                                // </div>
                             )}
                         </section>
+
                     </div>
 
-                    <button
+
+                    {/* original sidebar close */}
+                    {/* <button
                         title=" Ctrl+] to close"
                         onClick={handleSideBarClose} className='absolute flex items-center justify-center outline-none bg-[#2f303a] right-[-5%] bottom-[0%] cursor-pointer w-[40px] h-[40px] border-2 border-blue-600'>
                         <i className="fa-solid fa-chevron-left"></i>
-                    </button>
+                    </button> */}
+
+
+
+                    <div className="flex flex-col p-2 border-t border-[#3a3b45]">
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-4 py-3 rounded-lg bg-[#3a3b45] text-[#9ca3af] hover:bg-[#464751] hover:text-white transition">
+                            <i className="fa-solid fa-right-from-bracket"></i>
+                            <span>Logout</span>
+                        </button>
+
+                        <button
+                            title="Ctrl+] to close"
+                            onClick={handleSideBarClose}
+                            className="mt-2 flex items-center justify-center outline-none border border-blue-600 text-blue-500 hover:bg-[#3a3b45] rounded-lg w-full py-2">
+                            <i className="fa-solid fa-chevron-left"></i>
+                        </button>
+                    </div>
+
+
                 </aside>
                 :
                 <aside className="flex flex-col relative justify-between bg-[#2f303a] w-[6%]  max-h-full  text-[#9ca3af] transition-all duration-300 ">
@@ -108,11 +176,31 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                         </div>
 
                     </div>
-                    <button
+
+
+                    {/* original sidebar close */}
+                    {/* <button
                         title=" Ctrl+[ to open"
                         onClick={handleSideBarOpen} className='cursor-pointer outline-none border-[#9ca3af]  h-[5%] !w-[82%]'>
                         <i className={` fa-solid fa-chevron-right text-[#4a86f7]`}></i>
-                    </button>
+                    </button> */}
+
+
+                    <div className="flex flex-col items-center p-2 border-t border-[#3a3b45]">
+                        <button
+                            title='logout'
+                            onClick={handleLogout}
+                            className="w-[40px] h-[40px] flex items-center justify-center text-[#9ca3af] hover:text-red-500 transition">
+                            <i className="fa-solid fa-right-from-bracket"></i>
+                        </button>
+
+                        <button
+                            title="Ctrl+[ to open"
+                            onClick={handleSideBarOpen}
+                            className="mt-2 cursor-pointer outline-none border-[#9ca3af] h-[40px] w-[40px] flex items-center justify-center border rounded-lg">
+                            <i className="fa-solid fa-chevron-right text-[#4a86f7]"></i>
+                        </button>
+                    </div>
                 </aside>
             }
         </>

@@ -483,7 +483,7 @@ export default function RequirementForm() {
   }
 
   return (
-    <div className="h-full w-full overflow-y-auto p-0 sm:p-4">
+    <div className="h-full w-full overflow-y-auto ">
       {visibleSection ? (
         <div className="min-h-screen">
           {SectionConfig.map(({ Component, key }) => (
@@ -528,12 +528,12 @@ export default function RequirementForm() {
                 Mark as Complete
               </Button>
 
-              <Button
+              {/* <Button
                 onClick={handleFormDeletion}
                 className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
               >
                 <i className="fa-solid fa-trash-can"></i>
-              </Button>
+              </Button> */}
 
               <ResetStageButton
                 projectId={projectId!}
@@ -552,7 +552,7 @@ export default function RequirementForm() {
             </div>
           </div>
 
-          <main className="h-[calc(100vh-120px)] overflow-y-auto custom-scrollbar space-y-6">
+          <main className="h-[calc(100vh-90px)] overflow-y-auto custom-scrollbar space-y-6">
             {/* Timer Section */}
             <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
               <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">

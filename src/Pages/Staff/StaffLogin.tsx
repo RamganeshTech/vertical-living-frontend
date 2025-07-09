@@ -9,6 +9,9 @@ import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
 import { useLoginStaff } from "../../apiList/staffApi"
 import { toast } from "../../utils/toast"
+import { useDispatch } from "react-redux"
+import { setRole } from "../../features/authSlice"
+import { setStaffProfileData } from "../../features/staffSlices"
 
 export default function StaffLogin() {
   const navigate = useNavigate()
@@ -16,9 +19,11 @@ export default function StaffLogin() {
     email: "",
     password: "",
   })
+
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  const dispatch = useDispatch()
   const loginStaff = useLoginStaff()
 
   const validateForm = () => {
@@ -63,16 +68,32 @@ export default function StaffLogin() {
     }
 
     try {
-      await loginStaff.mutateAsync(formData)
+      const data = await loginStaff.mutateAsync(formData)
       toast({
         title: "Success",
         description: "Login successful! Welcome back.",
       })
       navigate("/")
+      const staffData = data.data;
+
+      dispatch(setRole({
+        _id: staffData.staffId,
+        role: staffData.role,
+        isauthenticated: true
+      }));
+      dispatch(setStaffProfileData({
+        staffId: staffData.staffId,
+        staffName: staffData.staffName,
+        email: staffData.email,
+        phoneNo: staffData.phoneNo,
+        role: staffData.role,
+        isauthenticated: true
+      }));
+
     } catch (error: any) {
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials. Please try again.",
+        description: error?.response?.data?.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       })
     }
@@ -86,6 +107,10 @@ export default function StaffLogin() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute top-40 left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div> */}
+
+      <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
+        Go Back
+      </Button>
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
@@ -119,9 +144,8 @@ export default function StaffLogin() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email address"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.email}
                   />
                 </div>
@@ -143,9 +167,8 @@ export default function StaffLogin() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Enter your password"
-                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${
-                      errors.password ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.password ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
                   <button

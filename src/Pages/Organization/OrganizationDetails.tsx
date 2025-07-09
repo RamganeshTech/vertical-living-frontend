@@ -106,6 +106,17 @@ export default function OrganizationDetails() {
       return
     }
 
+
+if (!/^\d{10}$/.test(tempPhone)) {
+      toast({
+        title: "Error",
+        description: "Phone number should contain 10 digits number",
+        variant: "destructive",
+      })
+      return
+      
+    }
+
     try {
       await updateOrganization.mutateAsync({
         orgsId: organizationId!,
@@ -130,6 +141,17 @@ export default function OrganizationDetails() {
       toast({
         title: "Error",
         description: "Address cannot be empty",
+        variant: "destructive",
+      })
+      return
+    }
+
+
+
+      if (tempAddress.length > 150) {
+      toast({
+        title: "Error",
+        description: "Address cannot be more than 150 characters",
         variant: "destructive",
       })
       return
@@ -335,8 +357,6 @@ export default function OrganizationDetails() {
         </div> */}
 
 
-
-
         <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10 w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-row sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
             {/* Left section */}
@@ -431,20 +451,20 @@ export default function OrganizationDetails() {
 
 
 
-               {/* Right section */}
-            {!isEditing && (
-              <div className="flex justify-end sm:justify-start  w-fit flex-shrink-0">
-                <Button
-                  variant="outline"
-                  onClick={handleStartEdit}
-                  className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl bg-white/80 backdrop-blur-sm"
-                >
-                  <i className="fas fa-edit mr-2"></i>
-                  <span className="hidden sm:inline">Edit Name</span>
-                  <span className="sm:hidden">Edit</span>
-                </Button>
-              </div>
-            )}
+              {/* Right section */}
+              {!isEditing && (
+                <div className="flex justify-end sm:justify-start  w-fit flex-shrink-0">
+                  <Button
+                    variant="outline"
+                    onClick={handleStartEdit}
+                    className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl bg-white/80 backdrop-blur-sm"
+                  >
+                    <i className="fas fa-edit mr-2"></i>
+                    <span className="hidden sm:inline">Edit Name</span>
+                    <span className="sm:hidden">Edit</span>
+                  </Button>
+                </div>
+              )}
 
 
             </div>
@@ -466,6 +486,7 @@ export default function OrganizationDetails() {
                         <i className="fas fa-phone text-blue-600" />
                         <Input
                           value={tempPhone}
+                          type="tel"
                           onChange={(e) => setTempPhone(e.target.value)}
                           placeholder="Enter phone number"
                           className="text-sm border-blue-200 focus:border-blue-500 bg-white flex-1"
@@ -513,7 +534,7 @@ export default function OrganizationDetails() {
                 </div>
 
                 {/* Address Section */}
-                <div className="p-4 bg-blue-50 rounded-xl shadow-sm">
+                <div className="p-4 bg-blue-50 rounded-xl shadow-sm ">
                   {editingAddress ? (
                     <>
                       <div className="flex items-start gap-3">
@@ -559,12 +580,15 @@ export default function OrganizationDetails() {
                       </div>
                     </>
                   ) : (
-                    <div className="flex justify-between items-start gap-3">
-                      <div className="flex items-start gap-3">
+                    <div className="flex justify-between items-start gap-3  w-full">
+                      <div className="flex items-start gap-3 ">
                         <i className="fas fa-map-marker-alt text-blue-600 mt-1" />
-                        <span className="text-gray-700 text-sm sm:text-base break-words whitespace-pre-wrap">
+                        <div className="max-w-[90%] overflow-h-auto !max-h-[150px] ">
+                          <span className="text-gray-700 text-sm sm:text-base break-words whitespace-pre-wrap">
                           {organization?.address || "N/A"}
                         </span>
+                        </div>
+                        
                       </div>
                       <Button
                         size="sm"

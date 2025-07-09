@@ -8,13 +8,17 @@ import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
-import { useRegisterWorker } from "../../apiList/workerApi" 
+import { useRegisterWorker } from "../../apiList/workerApi"
 import { toast } from "../../utils/toast"
+import { useDispatch } from "react-redux"
+import { setRole } from "../../features/authSlice"
+import { setWorkerProfileData } from "../../features/workerSlice"
 
 export default function WorkerRegister() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const invite = searchParams.get("invite")
+  const dispatch = useDispatch()
 
   const [formData, setFormData] = useState({
     email: "",
@@ -76,7 +80,7 @@ export default function WorkerRegister() {
 
     if (!formData.phoneNo.trim()) {
       newErrors.phoneNo = "Phone number is required"
-    } else if (!/^[+]?[1-9][\d]{0,15}$/.test(formData.phoneNo.replace(/\s/g, ""))) {
+    } else if (!/^\d{10}$/.test(formData.phoneNo.trim())) {
       newErrors.phoneNo = "Please enter a valid phone number"
     }
 
@@ -128,15 +132,35 @@ export default function WorkerRegister() {
     }
 
     try {
-      await registerWorker.mutateAsync({
+      const data = await registerWorker.mutateAsync({
         invite,
         payload: {
-        email: formData.email,
-        password: formData.password,
-        phoneNo: formData.phoneNo,
-        workerName: formData.workerName,
+          email: formData.email,
+          password: formData.password,
+          phoneNo: formData.phoneNo,
+          workerName: formData.workerName,
         }
-})
+      })
+
+
+      const workerData = data.data;
+
+      // ✅ If you want auto-login immediately after register:
+      dispatch(setRole({
+        role: workerData.role,
+        isauthenticated: true,
+        _id: workerData._id
+      }));
+
+      dispatch(setWorkerProfileData({
+        workerId: workerData._id,
+        workerName: workerData.workerName,
+        email: workerData.email,
+        phoneNo: workerData.phoneNo,
+        role: workerData.role,
+        isauthenticated: true
+      }));
+
 
       toast({
         title: "Success",
@@ -145,12 +169,12 @@ export default function WorkerRegister() {
 
       // Redirect to worker login page
       setTimeout(() => {
-        navigate("/workerlogin")
+        navigate("/")
       }, 2000)
     } catch (error: any) {
       toast({
         title: "Registration Failed",
-        description: error.message || "Failed to register. Please try again.",
+        description: error?.response?.data?.message || "Failed to register. Please try again.",
         variant: "destructive",
       })
     }
@@ -179,7 +203,13 @@ export default function WorkerRegister() {
 
   return (
     <div className="min-h-full bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center p-4">
-     
+
+
+      <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[5%] sm:top-[2%] z-10 right-[5%] sm:right-[10%]">
+        <i className="fas fa-arrow-left"></i>
+      </Button>
+
+
       <div className="relative w-full max-w-lg">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
           <CardHeader className="text-center pb-6">
@@ -218,11 +248,10 @@ export default function WorkerRegister() {
                     value={formData.workerName}
                     onChange={handleChange}
                     placeholder="Enter your workerName"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.workerName
-                        ? "border-red-300 focus:border-red-500"
-                        : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.workerName
+                      ? "border-red-300 focus:border-red-500"
+                      : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.workerName}
                   />
                 </div>
@@ -244,9 +273,8 @@ export default function WorkerRegister() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email address"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.email}
                   />
                 </div>
@@ -265,14 +293,14 @@ export default function WorkerRegister() {
                     id="phoneNo"
                     name="phoneNo"
                     type="tel"
+                    maxLength={10}
                     value={formData.phoneNo}
                     onChange={handleChange}
                     placeholder="Enter your phone number"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.phoneNo
-                        ? "border-red-300 focus:border-red-500"
-                        : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.phoneNo
+                      ? "border-red-300 focus:border-red-500"
+                      : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.phoneNo}
                   />
                 </div>
@@ -294,11 +322,10 @@ export default function WorkerRegister() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Create a password"
-                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${
-                      errors.password
-                        ? "border-red-300 focus:border-red-500"
-                        : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.password
+                      ? "border-red-300 focus:border-red-500"
+                      : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
                   <button
@@ -327,11 +354,10 @@ export default function WorkerRegister() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="Confirm your password"
-                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${
-                      errors.confirmPassword
-                        ? "border-red-300 focus:border-red-500"
-                        : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.confirmPassword
+                      ? "border-red-300 focus:border-red-500"
+                      : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.confirmPassword}
                   />
                   <button

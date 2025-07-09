@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom"
+import { useOutletContext, useParams } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
 import { Badge } from "../../components/ui/Badge"
@@ -10,15 +10,19 @@ import { Skeleton } from "../../components/ui/Skeleton"
 
 import { toast } from "../../utils/toast" 
 import { useGetWorkersAsStaff, useInviteWorkerByStaff, useRemoveWorkerAsStaff } from "../../apiList/staffApi"
+import type { ProjectDetailsOutlet } from "../../types/types"
 
 export default function Workers() {
-  const { projectId } = useParams<{ projectId: string }>()
+  const { projectId , organizationId} = useParams<{ projectId: string , organizationId: string}>()
+  const {openMobileSidebar , isMobile} = useOutletContext<ProjectDetailsOutlet>()
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
   const [workerRole, setWorkerRole] = useState("")
 
   // Fetch workers data using the provided hook
   const { data: workers, isLoading: workersLoading } = useGetWorkersAsStaff(projectId || "")
+
+  console.log("workers")
 
   // Mutations using the provided hooks
   const inviteWorker = useInviteWorkerByStaff()
@@ -38,9 +42,10 @@ export default function Workers() {
       const response = await inviteWorker.mutateAsync({
         projectId: projectId || "",
         specificRole: workerRole,
-        role:"worker"
+        role:"worker",
+        organizationId: organizationId!
       })
-      setInviteLink(response.inviteLink || response)
+      setInviteLink(response?.inviteLink || response)
       toast({
         title: "Success",
         description: "Worker invitation link generated successfully",
@@ -125,40 +130,30 @@ export default function Workers() {
   }
 
   return (
-    <div className="max-h-full overflow-hidden  bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="max-h-full overflow-y-auto custom-scrollbar">
       {/* Header */}
-      <div className="bg-white/90 backdrop-blur-xl border-b border-white/20 shadow-lg">
-        <div className="max-w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="bg-white ">
+        <div className="max-w-full mx-auto  py-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Left Section */}
             <div className="flex items-center space-x-4 min-w-0 flex-1">
-              {/* <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.history.back()}
-                className="text-blue-600 hover:bg-blue-50 rounded-xl flex-shrink-0"
-              >
-                <i className="fas fa-arrow-left mr-2"></i>
-                <span className="hidden sm:inline">Back to Projects</span>
-                <span className="sm:hidden">Back</span>
-              </Button> */}
+               {isMobile && (
+                  <button
+                    onClick={openMobileSidebar}
+                    className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                    title="Open Menu"
+                  >
+                    <i className="fa-solid fa-bars "></i>
+                  </button>
+                )} 
 
-              <div className="hidden sm:block h-6 w-px bg-gray-300 flex-shrink-0" />
+              <div className="hidden sm:block w-px bg-gray-300 flex-shrink-0" />
 
               <div className="flex items-center space-x-3 min-w-0 flex-1">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                  <i className="fas fa-project-diagram text-white text-xl"></i>
-                </div>
-
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-800 truncate">Project Details</h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs">
-                      Project ID: {projectId?.substring(0, 8)}...
-                    </Badge>
-                    <span className="text-gray-500 text-sm">•</span>
-                    <span className="text-gray-600 text-sm">{workers?.length || 0} Workers</span>
-                  </div>
+                  <h1 className="text-xl sm:text-2xl font-bold text-blue-600 truncate">
+                      <i className="fas fa-user-plus mr-1"></i>
+                    Invite Workers</h1>
                 </div>
               </div>
             </div>
@@ -167,12 +162,12 @@ export default function Workers() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl !max-h-[80%] overflow-hidden  mx-auto p-2 sm:p-4">
-        <div className="grid grid-cols-1  lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="max-w-full !max-h-[100%] overflow-y-auto custom-scrollbar mx-auto p-2 sm:p-4">
+        <div className="grid grid-cols-1 max-h-full lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Invite Section */}
           <div className="lg:col-span-1 h-fit space-y-6">
             {/* Invite Workers */}
-            <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-xl">
+            <Card className="bg-white backdrop-blur-sm rounded-2xl shadow-md border-l-4 border-green-600 ">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center text-lg">
                   <i className="fas fa-user-plus mr-2 text-green-600"></i>
@@ -254,7 +249,7 @@ export default function Workers() {
             </Card>
 
             {/* Role Suggestions */}
-            <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-xl">
+            <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-md border-l-4 border-blue-600 ">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center text-lg">
                   <i className="fas fa-tools mr-2 text-blue-600"></i>
@@ -280,7 +275,7 @@ export default function Workers() {
           </div>
 
           {/* Workers List */}
-          <div className="lg:col-span-2 max-h-[65%] rounded-2xl overflow-y-auto">
+          <div className="lg:col-span-2 sm:max-h-[95%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto shadow-md custom-scrollbar">
             <Card className="bg-white/70 backdrop-blur-sm border-0  shadow-xl">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center justify-between">
@@ -313,9 +308,9 @@ export default function Workers() {
                       >
                         <div className="flex items-center space-x-4 min-w-0 flex-1">
                           <Avatar className="w-12 h-12 border-2 border-blue-200 flex-shrink-0">
-                            <AvatarImage src={worker?.avatarUrl || "/placeholder.svg"} />
+                            {/* <AvatarImage src={worker?.avatarUrl || "/placeholder.svg"} /> */}
                             <AvatarFallback className="bg-gradient-to-br from-orange-500 to-red-600 text-white font-semibold">
-                              {getInitials(worker?.workerName || worker?.name)}
+                              {getInitials(worker?.workerName)}
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
@@ -394,6 +389,7 @@ export default function Workers() {
               </CardContent>
             </Card>
           </div>
+      
         </div>
       </div>
     </div>

@@ -122,11 +122,10 @@ const InviteCTO: React.FC = () => {
 
         <header>
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="max-w-full mx-auto px-2 sm:px-4 py-4">
              
             <div className="flex items-center justify-between">
-              
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
                  {isMobile &&
                 <button
                   onClick={openMobileSidebar}
@@ -136,7 +135,7 @@ const InviteCTO: React.FC = () => {
                   <i className="fa-solid fa-bars"></i>
                 </button>
 }
-                <h1 className="text-xl sm:text-3xl font-bold text-gray-900">CTO Management</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-blue-900">CTO Management</h1>
                 <div className="hidden sm:block h-8 w-px bg-gray-300" />
                 <div className="bg-blue-100 p-2 rounded-xl">
                   <i className="fas fa-user-tie text-blue-600 text-xl"></i>
@@ -144,7 +143,7 @@ const InviteCTO: React.FC = () => {
               </div>
               <div className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-lg">
                 <i className="fas fa-users mr-2"></i>
-                {CTOs?.length} Members
+                {CTOs?.length} {CTOs?.length > 1 ? "Members" : "Member"}
               </div>
             </div>
           </div>

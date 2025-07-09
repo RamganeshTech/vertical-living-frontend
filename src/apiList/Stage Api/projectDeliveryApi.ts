@@ -156,6 +156,8 @@ export const useGetProjectDeliveryDetails = (projectId: string) => {
       return await getProjectDeliveryDetailsApi(projectId, api);
     },
     enabled: !!projectId && !!role,
+    retry:false,
+    refetchOnMount:false
   });
 };
 

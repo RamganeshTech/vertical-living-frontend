@@ -30,11 +30,11 @@ export const ResetStageButton: React.FC<ResetStageButtonProps> = ({
 
     const handleReset = async () => {
         try {
-            mutateAsync({ projectId, stageNumber, stagePath });
+            await mutateAsync({ projectId, stageNumber, stagePath });
             toast({ description: 'Stage Reset successfully', title: "Success" });
         }
         catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to Reset the stage", variant: "destructive" })
+            toast({ title: "Error", description: error?.response?.data?.message || "Failed to Reset the stage", variant: "destructive" })
 
         }
     };
@@ -53,11 +53,11 @@ export const ResetStageButton: React.FC<ResetStageButtonProps> = ({
                 <span>{isPending ? "Resetting..." : "Reset Stage"}</span>
             </Button>
 
-            {error && (
+            {/* {error && (
                 <p className="text-sm text-red-500">
-                    {(error as Error).message}
+                    {(error as any)?.response?.data?.message || "failed to reset all stages"}
                 </p>
-            )}
+            )} */}
         </div>
     );
 };

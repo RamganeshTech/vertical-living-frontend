@@ -8,11 +8,15 @@ import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
 import { toast } from "../../utils/toast"
 import { useRegisterClient } from "../../apiList/clientApi"
+import { useDispatch } from "react-redux"
+import { setRole } from "../../features/authSlice"
+import { setClientProfileData } from "../../features/clientSlice"
 
 export default function ClientRegister() {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
     const invite = searchParams.get("invite")
+    const dispatch = useDispatch()
 
     const [formData, setFormData] = useState({
         email: "",
@@ -58,8 +62,8 @@ export default function ClientRegister() {
 
         if (!formData.phoneNo.trim()) {
             newErrors.phoneNo = "Phone number is required"
-        } else if (!/^[+]?[1-9][\d]{0,15}$/.test(formData.phoneNo.replace(/\s/g, ""))) {
-            newErrors.phoneNo = "Please enter a valid phone number"
+        } else if (!/^\d{10}$/.test(formData.phoneNo.trim())) {
+            newErrors.phoneNo = "Please enter a valid phone number with 10 digits"
         }
 
         if (!formData.password.trim()) {
@@ -110,14 +114,35 @@ export default function ClientRegister() {
         }
 
         try {
-            await registerClient.mutateAsync({
+            const data = await registerClient.mutateAsync({
                 token: invite,
-                payload:{email: formData.email,
-                password: formData.password,
-                phoneNo: formData.phoneNo,
-                clientName: formData.clientName,
+                payload: {
+                    email: formData.email,
+                    password: formData.password,
+                    phoneNo: formData.phoneNo,
+                    clientName: formData.clientName,
                 }
             })
+
+
+
+            const clientData = data.data;
+
+            dispatch(setRole({
+                role: clientData.role,
+                isauthenticated: true,
+                _id: clientData._id
+            }));
+
+            dispatch(setClientProfileData({
+                clientId: clientData._id,
+                clientName: clientData.clientName,
+                email: clientData.email,
+                phoneNo: clientData.phoneNo,
+                role: clientData.role,
+                isauthenticated: true
+            }));
+
 
             toast({
                 title: "Success",
@@ -160,6 +185,10 @@ export default function ClientRegister() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+
+            <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[5%] sm:top-[2%] z-10 right-[5%] sm:right-[10%]">
+                <i className="fas fa-arrow-left"></i>
+            </Button>
 
             <div className="relative w-full sm:max-w-lg max-w-full">
                 <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
@@ -294,8 +323,8 @@ export default function ClientRegister() {
                                         onChange={handleChange}
                                         placeholder="Confirm your password"
                                         className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.confirmPassword
-                                                ? "border-red-300 focus:border-red-500"
-                                                : "border-blue-200 focus:border-blue-500"
+                                            ? "border-red-300 focus:border-red-500"
+                                            : "border-blue-200 focus:border-blue-500"
                                             } bg-white/70 backdrop-blur-sm`}
                                         error={errors.confirmPassword}
                                     />

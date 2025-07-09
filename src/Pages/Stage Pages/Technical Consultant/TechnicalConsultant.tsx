@@ -454,9 +454,9 @@ const TechnicalConsultant = () => {
     const [imageLoading, setImageLoading] = useState(false);
 
     let { data: techDoc, isLoading: getMessageLoading, error: getMessageError, isError: getMessageIsError, refetch } = useGetConsultationMessages(projectId!);
-    const { mutate: sendMessage, isPending: sendMessagePending } = useAddConsultationMessage();
-    const { mutate: deleteMessage, isPending: deletePending } = useDeleteConsultationMessage();
-    const { mutate: editMessage, isPending: editPending } = useEditConsultationMessage();
+    const { mutateAsync: sendMessage, isPending: sendMessagePending } = useAddConsultationMessage();
+    const { mutateAsync: deleteMessage, isPending: deletePending } = useDeleteConsultationMessage();
+    const { mutateAsync: editMessage, isPending: editPending } = useEditConsultationMessage();
 
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetDeadLineTechConsultation()
     const updateCompletionStatus = useCompletionStatusTechConsultation();
@@ -470,7 +470,7 @@ const TechnicalConsultant = () => {
         }
     };
 
-    const handleSend = () => {
+    const handleSend = async () => {
         try {
             if (!text && attachments.length === 0) {
                 throw new Error("please write anything")
@@ -482,18 +482,18 @@ const TechnicalConsultant = () => {
             formData.append("sender", userId!);
             attachments.forEach(file => formData.append("attachments", file));
 
-            sendMessage({ projectId: projectId!, formData });
+            await sendMessage({ projectId: projectId!, formData });
             setText("");
             setAttachments([]);
             toast({ description: "message sent successfully", title: "Success" })
         }
         catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to send the message", variant: "destructive" })
+            toast({ title: "Error", description: error?.response?.data?.message || "Failed to send the message", variant: "destructive" })
         }
     };
 
-    const handleDelete = (id: string) => {
-        deleteMessage({ projectId: projectId!, messageId: id, senderId: userId! });
+    const handleDelete = async (id: string) => {
+        await deleteMessage({ projectId: projectId!, messageId: id, senderId: userId! });
     };
 
     const handleEdit = (id: string, originalText: string) => {
@@ -506,9 +506,9 @@ const TechnicalConsultant = () => {
         setEditText("");
     };
 
-    const handleEditSubmit = () => {
+    const handleEditSubmit = async () => {
         if (!editingId || !editText) return;
-        editMessage({ projectId: projectId!, messageId: editingId, message: editText, senderId: userId! });
+        await editMessage({ projectId: projectId!, messageId: editingId, message: editText, senderId: userId! });
         setEditingId(null);
         setEditText("");
     };

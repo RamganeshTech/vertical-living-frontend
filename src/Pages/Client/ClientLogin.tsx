@@ -9,6 +9,9 @@ import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
 import { toast } from "../../utils/toast"
 import { useLoginClient } from "../../apiList/clientApi"
+import { setClientProfileData } from "../../features/clientSlice"
+import { useDispatch } from "react-redux"
+import { setRole } from "../../features/authSlice"
 
 export default function ClientLogin() {
   const navigate = useNavigate()
@@ -16,6 +19,7 @@ export default function ClientLogin() {
     email: "",
     password: "",
   })
+  const dispatch = useDispatch()
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -63,7 +67,26 @@ export default function ClientLogin() {
     }
 
     try {
-      await loginClient.mutateAsync(formData)
+      const data = await loginClient.mutateAsync(formData)
+
+         const clientData = data.data;
+
+    dispatch(setRole({
+      role: clientData.role,
+      isauthenticated: true,
+      _id: clientData.clientId // or _id
+    }));
+
+    dispatch(setClientProfileData({
+      clientId: clientData.clientId,
+      clientName: clientData.clientName,
+      email: clientData.email,
+      phoneNo: clientData.phoneNo,
+      role: clientData.role,
+      isauthenticated: true
+    }));
+
+
       toast({
         title: "Success",
         description: "Login successful! Welcome back.",
@@ -72,7 +95,7 @@ export default function ClientLogin() {
     } catch (error: any) {
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials. Please try again.",
+        description: error?.response?.data?.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       })
     }
@@ -80,7 +103,11 @@ export default function ClientLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
-    
+
+      <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
+        Go Back
+      </Button>
+
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
           <CardHeader className="text-center pb-6">
@@ -113,9 +140,8 @@ export default function ClientLogin() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email address"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.email}
                   />
                 </div>
@@ -137,9 +163,8 @@ export default function ClientLogin() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Enter your password"
-                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${
-                      errors.password ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.password ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
                   <button

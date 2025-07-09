@@ -10,6 +10,9 @@ import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
 import { useRegisterStaff} from "../../apiList/staffApi"
 import { toast } from "../../utils/toast"
+import { useDispatch } from "react-redux"
+import { setStaffProfileData } from "../../features/staffSlices"
+import { setRole } from "../../features/authSlice"
 
 export default function StaffRegister() {
   const navigate = useNavigate()
@@ -28,6 +31,7 @@ export default function StaffRegister() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const registerStaff = useRegisterStaff()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (!invite) {
@@ -60,7 +64,7 @@ export default function StaffRegister() {
 
     if (!formData.phoneNo.trim()) {
       newErrors.phoneNo = "Phone number is required"
-    } else if (!/^[+]?[1-9][\d]{0,15}$/.test(formData.phoneNo.replace(/\s/g, ""))) {
+} else if (!/^\d{10}$/.test(formData.phoneNo.trim())) {
       newErrors.phoneNo = "Please enter a valid phone number"
     }
 
@@ -112,7 +116,7 @@ export default function StaffRegister() {
     }
 
     try {
-      await registerStaff.mutateAsync({
+      const data = await registerStaff.mutateAsync({
         invite,
         email: formData.email,
         password: formData.password,
@@ -125,9 +129,27 @@ export default function StaffRegister() {
         description: "Registration successful! You can now login with your credentials.",
       })
 
+
+       const staffData = data.data;
+
+    dispatch(setRole({
+      _id: staffData._id,
+      role: staffData.role,
+      isauthenticated: true
+    }));
+
+    dispatch(setStaffProfileData({
+      staffId: staffData._id,   // staffId comes as _id in register
+      staffName: staffData.staffName,
+      email: staffData.email,
+      phoneNo: staffData.phoneNo,
+      role: staffData.role,
+      isauthenticated: true
+    }));
+
       // Redirect to login page
       setTimeout(() => {
-        navigate("/stafflogin")
+        navigate("/")
       }, 2000)
     } catch (error: any) {
       toast({
@@ -161,6 +183,10 @@ export default function StaffRegister() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+
+        <Button variant="primary" onClick={() => navigate(-1)} className="!absolute z-[10] top-[5%]  right-[5%] sm:right-[10%]">
+              <i className="fas fa-arrow-left"></i>
+            </Button>
       
       <div className="relative w-full sm:max-w-lg max-w-full">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
@@ -239,6 +265,7 @@ export default function StaffRegister() {
                     id="phoneNo"
                     name="phoneNo"
                     type="tel"
+                    maxLength={10}
                     value={formData.phoneNo}
                     onChange={handleChange}
                     placeholder="Enter your phone number"

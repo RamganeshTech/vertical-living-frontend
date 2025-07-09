@@ -42,9 +42,9 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
 }, []);
 
   const path = {
-    LABOURS: projectId ? `/${organizationId}/projectdetails/${projectId}/labourlist` : "",
-    MATERIALS: projectId ? `/${organizationId}/projectdetails/${projectId}/materiallist` : "",
-    TRANSPORTATION: projectId ? `/${organizationId}/projectdetails/${projectId}/transportationlist` : "",
+    // LABOURS: projectId ? `/${organizationId}/projectdetails/${projectId}/labourlist` : "",
+    // MATERIALS: projectId ? `/${organizationId}/projectdetails/${projectId}/materiallist` : "",
+    // TRANSPORTATION: projectId ? `/${organizationId}/projectdetails/${projectId}/transportationlist` : "",
     WORKERS: projectId ? `/${organizationId}/projectdetails/${projectId}/workers` : "",
     INVITECLIENT: projectId ? `/${organizationId}/projectdetails/${projectId}/inviteclient` : "",
     REQUIREMENTFORM: projectId ? `/${organizationId}/projectdetails/${projectId}/requirementform` : "",

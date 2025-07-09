@@ -73,7 +73,7 @@ const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit, organiza
                 </span>
             </div>
 
-            <div className="text-sm text-gray-700 grid grid-cols-3 sm:grid-cols-2 gap-y-1 sm:gap-y-2 gap-x-4">
+            <div className="text-sm text-gray-700 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-y-1 sm:gap-y-2 gap-x-4">
                 {/* <div className="flex items-center gap-1">
                     <i className="fa-solid fa-hashtag text-gray-500" />
                     <strong>ID:</strong> {index}

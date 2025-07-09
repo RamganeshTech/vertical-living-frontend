@@ -9,6 +9,9 @@ import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
 import { toast } from "../../utils/toast"
 import { useLoginCTO } from "../../apiList/CTOApi"
+import { useDispatch } from "react-redux"
+import { setRole } from "../../features/authSlice"
+import { setCTOProfileData } from "../../features/CTOSlice"
 
 export default function CTOLogin() {
   const navigate = useNavigate()
@@ -20,6 +23,7 @@ export default function CTOLogin() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const loginCTO = useLoginCTO()
+  const dispatch = useDispatch()
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -63,7 +67,29 @@ export default function CTOLogin() {
     }
 
     try {
-      await loginCTO.mutateAsync(formData)
+      const data = await loginCTO.mutateAsync(formData)
+
+
+        const CTOData = data.data;
+
+    // ✅ 1) Set authSlice
+    dispatch(setRole({
+      role: CTOData.role,
+      isauthenticated: true,
+      _id: CTOData.CTOId // map _id
+    }));
+
+    // ✅ 2) Set CTOSlice
+    dispatch(setCTOProfileData({
+      CTOId: CTOData.CTOId,
+      CTOName: CTOData.CTOName,
+      email: CTOData.email,
+      phoneNo: CTOData.phoneNo,
+      role: CTOData.role,
+      isauthenticated: true
+    }));
+
+
       toast({
         title: "Success",
         description: "Login successful! Welcome back.",
@@ -72,7 +98,7 @@ export default function CTOLogin() {
     } catch (error: any) {
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials. Please try again.",
+        description: error?.response?.data?.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       })
     }
@@ -86,6 +112,11 @@ export default function CTOLogin() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute top-40 left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div> */}
+
+
+        <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
+              Go Back
+            </Button>
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
