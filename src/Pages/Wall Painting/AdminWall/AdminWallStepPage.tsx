@@ -5,17 +5,15 @@ import { useState } from "react";
 import { useApproveAdminStep, useGetAdminSOP, useGetAdminStepDetails, useUploadAdminCorrectionRound } from "../../../apiList/WallPainting Api/adminWallPaintingApi";
 
 export default function AdminWallStepPage() {
-  const { projectId, stepNumber } = useParams<{ projectId: string; stepNumber: string }>();
+  const { projectId, stepId, stepNumber } = useParams<{ projectId: string; stepNumber: string, stepId: string }>();
 
   const [note, setNote] = useState<string>("");
   const [files, setFiles] = useState<FileList | null>(null);
 
-
-
   const { mutate: approveStep } = useApproveAdminStep();
 
   const { mutate: uploadCorrection } = useUploadAdminCorrectionRound();  
-  const { data: stepData } = useGetAdminStepDetails(projectId!, stepNumber!);
+  const { data: stepData, isLoading } = useGetAdminStepDetails(projectId!, stepId!);
 
 
     const step = ADMIN_WALL_PAINTING_STEPS.find(
@@ -24,8 +22,8 @@ export default function AdminWallStepPage() {
 
 
     const handleSubmit = () => {
-    if (!files || files.length === 0) {
-      alert("Please select files.");
+    if ((!files || files?.length === 0) || !note) {
+      alert("Please select files or write something in notes");
       return;
     }
 
@@ -38,13 +36,15 @@ export default function AdminWallStepPage() {
 
     uploadCorrection({
       projectId:projectId!,
-      stepId:stepData._id!,
+      stepNumber:stepNumber!,
       formData,
     });
   };
 
   if (!step) return <div>Step not found</div>;
+if (isLoading) return <div>Loading step...</div>;
 
+console.log("stepdata form admin",stepData)
   return (
     <div className="p-4 border mt-4">
       <h3 className="text-lg font-bold mb-2">{step.label}</h3>
@@ -60,17 +60,20 @@ export default function AdminWallStepPage() {
   <h4 className="font-bold mb-2">Worker Initial Uploads:</h4>
   {stepData?.step?.workerInitialUploads?.length ? (
     <div className="grid grid-cols-3 gap-4">
-      {stepData.step.workerInitialUploads.map((file: any, idx: number) => (
+      {stepData?.step?.workerInitialUploads?.map((file: any, idx: number) => {
+        console.log(file)
+        return (
         <div key={idx} className="border p-2">
           {file.type === "image" ? (
-            <img src={file.url} alt={file.originalName} className="w-full" />
+            <img src={file?.url} alt={file?.originalName} className="w-full" />
           ) : (
             <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
               {file.originalName}
             </a>
           )}
         </div>
-      ))}
+      )
+})}
     </div>
   ) : (
     <p>No initial uploads found.</p>
@@ -83,7 +86,7 @@ export default function AdminWallStepPage() {
           onClick={() =>
             approveStep({
               projectId: projectId!,
-              stepId: stepData?.step?._id!,
+              stepId:stepId!,
               payload:{status: "approved"}
             })
           }
@@ -95,7 +98,7 @@ export default function AdminWallStepPage() {
           onClick={() =>
             approveStep({
               projectId: projectId!,
-              stepId: stepData?.step?._id!,
+              stepId: stepId!,
               payload:{status: "approved"}
             })
           }

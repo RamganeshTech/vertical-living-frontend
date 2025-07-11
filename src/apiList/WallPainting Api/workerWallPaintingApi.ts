@@ -12,7 +12,7 @@ import { getApiForRole } from "../../utils/roleCheck";
 // -------------------------------
 export const getWorkerSOPApi = async (projectId: string, api: AxiosInstance) => {
   const res = await api.get(`/workerwall/${projectId}`);
-  return res.data;
+  return res.data?.data;
 };
 
 // -------------------------------
@@ -24,6 +24,7 @@ export const getWorkerStepDetailsApi = async (
   api: AxiosInstance
 ) => {
   const res = await api.get(`/workerwall/${projectId}/step/${stepId}`);
+  console.log("res form getsworkerdetialapi",res)
   return res.data;
 };
 
@@ -32,12 +33,12 @@ export const getWorkerStepDetailsApi = async (
 // -------------------------------
 export const uploadWorkerInitialFilesApi = async (
   projectId: string,
-  stepId: string,
+  stepNumber: string,
   formData: FormData,
   api: AxiosInstance
 ) => {
   const res = await api.post(
-    `/workerwall/${projectId}/step/${stepId}/initial`,
+    `/workerwall/${projectId}/step/${stepNumber}/initial`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
   );
@@ -49,12 +50,13 @@ export const uploadWorkerInitialFilesApi = async (
 // -------------------------------
 export const uploadWorkerCorrectionFilesApi = async (
   projectId: string,
-  stepId: string,
+  stepNumber: string,
+  correctionRound: string,
   formData: FormData,
   api: AxiosInstance
 ) => {
   const res = await api.post(
-    `/workerwall/${projectId}/step/${stepId}/correction`,
+    `/workerwall/${projectId}/step/${stepNumber}/correction/${correctionRound}`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
   );
@@ -72,7 +74,7 @@ export const uploadWorkerCorrectionFilesApi = async (
 export const useGetWorkerSOP = (projectId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowed = ["worker"];
+  const allowed = ["worker", "staff"];
   return useQuery({
     queryKey: ["workerSOP", projectId],
     queryFn: () => {
@@ -89,7 +91,7 @@ export const useGetWorkerSOP = (projectId: string) => {
 export const useGetWorkerStepDetails = (projectId: string, stepId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowed = ["worker"];
+  const allowed = ["worker", "staff"];
   return useQuery({
     queryKey: ["workerStep", projectId, stepId],
     queryFn: () => {
@@ -106,20 +108,20 @@ export const useGetWorkerStepDetails = (projectId: string, stepId: string) => {
 export const useUploadWorkerInitialFiles = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowed = ["worker"];
+  const allowed = ["worker", "staff"];
   return useMutation({
     mutationFn: async ({
       projectId,
-      stepId,
+      stepNumber,
       formData,
     }: {
       projectId: string;
-      stepId: string;
+      stepNumber: string;
       formData: FormData;
     }) => {
       if (!role || !allowed.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return uploadWorkerInitialFilesApi(projectId, stepId, formData, api);
+      return uploadWorkerInitialFilesApi(projectId, stepNumber, formData, api);
     },
   });
 };
@@ -130,20 +132,22 @@ export const useUploadWorkerInitialFiles = () => {
 export const useUploadWorkerCorrectionFiles = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowed = ["worker"];
+  const allowed = ["worker", "staff"];
   return useMutation({
     mutationFn: async ({
       projectId,
-      stepId,
+      stepNumber,
+      correctionRound,
       formData,
     }: {
       projectId: string;
-      stepId: string;
+      stepNumber: string;
+      correctionRound: string;
       formData: FormData;
     }) => {
       if (!role || !allowed.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return uploadWorkerCorrectionFilesApi(projectId, stepId, formData, api);
+      return uploadWorkerCorrectionFilesApi(projectId, stepNumber, correctionRound, formData, api);
     },
   });
 };

@@ -12,7 +12,7 @@ import { getApiForRole } from "../../utils/roleCheck";
 // -------------------------------
 export const getAdminSOPApi = async (projectId: string, api: AxiosInstance) => {
   const res = await api.get(`/adminwall/${projectId}`);
-  return res.data;
+  return res?.data?.data;
 };
 
 // -------------------------------
@@ -32,12 +32,12 @@ export const getAdminStepDetailsApi = async (
 // -------------------------------
 export const uploadAdminCorrectionRoundApi = async (
   projectId: string,
-  stepId: string,
+  stepNumber: string,
   formData: FormData,
   api: AxiosInstance
 ) => {
   const res = await api.post(
-    `/adminwall/${projectId}/step/${stepId}/correction`,
+    `/adminwall/${projectId}/step/${stepNumber}/correction`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
   );
@@ -106,16 +106,16 @@ export const useUploadAdminCorrectionRound = () => {
   return useMutation({
     mutationFn: async ({
       projectId,
-      stepId,
+      stepNumber,
       formData,
     }: {
       projectId: string;
-      stepId: string;
+      stepNumber: string;
       formData: FormData;
     }) => {
       if (!role || !allowed.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return uploadAdminCorrectionRoundApi(projectId, stepId, formData, api);
+      return uploadAdminCorrectionRoundApi(projectId, stepNumber, formData, api);
     },
   });
 };

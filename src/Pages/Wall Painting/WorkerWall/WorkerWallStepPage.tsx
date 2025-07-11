@@ -1,18 +1,20 @@
 import { useParams } from "react-router-dom";
 import { WORKER_WALL_PAINTING_STEPS } from "../../../constants/constants";
 import { useState } from "react";
-import { useGetWorkerStepDetails,
-useUploadWorkerInitialFiles,
-useUploadWorkerCorrectionFiles, } from "../../../apiList/WallPainting Api/workerWallPaintingApi";
+import {
+  useGetWorkerStepDetails,
+  useUploadWorkerInitialFiles,
+  useUploadWorkerCorrectionFiles,
+} from "../../../apiList/WallPainting Api/workerWallPaintingApi";
 
 export default function WorkerWallStepPage() {
-  const { projectId, stepNumber } = useParams<{ projectId: string; stepNumber: string }>();
+  const { projectId, stepId, stepNumber } = useParams<{ projectId: string; stepNumber: string, stepId: string }>();
 
   const [initialFiles, setInitialFiles] = useState<FileList | null>(null);
   const [correctionFiles, setCorrectionFiles] = useState<FileList | null>(null);
 
-  const { data: stepData, isLoading } = useGetWorkerStepDetails(projectId!, stepNumber!);
-
+  const { data: stepData, isLoading } = useGetWorkerStepDetails(projectId!, stepId!);
+  // console.log("stepdata", stepData)
   const { mutate: uploadInitial } = useUploadWorkerInitialFiles();
   const { mutate: uploadCorrection } = useUploadWorkerCorrectionFiles();
 
@@ -32,14 +34,15 @@ export default function WorkerWallStepPage() {
     for (let i = 0; i < initialFiles.length; i++) {
       formData.append("files", initialFiles[i]);
     }
+    // console.log("step id", stepId)
     uploadInitial({
       projectId: projectId!,
-      stepId: stepData?.step?._id!,
+      stepNumber: stepNumber!,
       formData,
     });
   };
 
-  const handleCorrectionUpload = () => {
+  const handleCorrectionUpload = (correctionRound:string) => {
     if (!correctionFiles || correctionFiles.length === 0) {
       alert("Please select files for correction upload.");
       return;
@@ -50,11 +53,14 @@ export default function WorkerWallStepPage() {
     }
     uploadCorrection({
       projectId: projectId!,
-      stepId: stepData?.step?._id!,
+      stepNumber: stepNumber!,
+      correctionRound:correctionRound,
       formData,
     });
   };
 
+
+  console.log("uploads data ", stepData.data.correctionRounds)
   return (
     <div className="p-4 border mt-4">
       <h3 className="text-lg font-bold mb-2">{step.label}</h3>
@@ -67,11 +73,12 @@ export default function WorkerWallStepPage() {
 
       <div className="mb-6">
         <h4 className="font-semibold mb-2">Your Initial Uploads</h4>
-        {stepData?.step?.initialUploads?.length ? (
+        {stepData?.data?.initialUploads?.length ? (
           <div className="flex flex-wrap gap-4">
-            {stepData.step.initialUploads.map((file: any, idx: number) => (
-              <img key={idx} src={file.url} alt="Initial Upload" className="w-32 h-32 object-cover border" />
-            ))}
+            {stepData?.data?.initialUploads?.map((file: any, idx: number) => {
+              console.log(file, "file")
+              return <img key={idx} src={file?.url} alt="Initial Upload" className="w-32 h-32 object-cover border" />
+            })}
           </div>
         ) : (
           <p>No initial uploads yet.</p>
@@ -93,10 +100,10 @@ export default function WorkerWallStepPage() {
 
       <div>
         <h4 className="font-semibold mb-2">Correction Rounds</h4>
-        {stepData?.step?.correctionRounds?.length ? (
-          stepData.step.correctionRounds.map((round: any) => (
+        {stepData?.data?.correctionRounds?.length ? (
+          stepData.data.correctionRounds.map((round: any) => (
             <div key={round.roundNumber} className="border p-3 mb-4">
-              <p className="font-bold">Round {round.roundNumber}</p>
+              <p className="font-bold">Round {round?.roundNumber}</p>
               <p className="text-sm mb-2">Admin Note: {round.adminNote}</p>
               <div className="flex flex-wrap gap-4 mb-2">
                 {round.adminUploads.map((file: any, idx: number) => (
@@ -124,13 +131,30 @@ export default function WorkerWallStepPage() {
                   </div>
                 </div>
               )}
+
+
+               <div>
+            <label className="block mt-4 mb-2">Upload Correction Files:</label>
+            <input
+              type="file"
+              multiple
+              onChange={(e) => setCorrectionFiles(e.target.files)}
+            />
+            <button
+              onClick={()=> handleCorrectionUpload(round?.roundNumber)}
+              className="mt-2 px-4 py-2 bg-blue-600 text-white"
+            >
+              Upload Correction Files
+            </button>
+          </div>
+
             </div>
           ))
         ) : (
           <p>No corrections requested yet.</p>
         )}
 
-        {stepData?.step?.correctionRounds?.length ? (
+        {/* {stepData?.data?.correctionRounds?.length ? (
           <div>
             <label className="block mt-4 mb-2">Upload Correction Files:</label>
             <input
@@ -145,7 +169,7 @@ export default function WorkerWallStepPage() {
               Upload Correction Files
             </button>
           </div>
-        ) : null}
+        ) : null} */}
       </div>
     </div>
   );

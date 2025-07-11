@@ -72,6 +72,10 @@ import SubscriptionPlans from './Pages/Subscription Payment/SubscriptionMain'
 import LoginGroup from './Pages/LoginGroups/LoginGroup'
 import { useSelector } from 'react-redux'
 import type { RootState } from './store/store'
+import AdminWallMainContainer from './Pages/Wall Painting/AdminWall/AdminWallMainContainer'
+import AdminWallStepPage from './Pages/Wall Painting/AdminWall/AdminWallStepPage'
+import WorkerWallMainContainer from './Pages/Wall Painting/WorkerWall/WorkerWallMainContainer'
+import WorkerWallStepPage from './Pages/Wall Painting/WorkerWall/WorkerWallStepPage'
 
 function App() {
 
@@ -124,6 +128,15 @@ function App() {
         {/* <Route path="/organizations" element={<ProtectedRoutes allowedRoles={["owner"]} >
           <Organization />
         </ProtectedRoutes>} /> */}
+
+
+        <Route path={`/:projectId/adminwall`} element={<AdminWallMainContainer />} >
+          <Route path={`step/:stepId/:stepNumber`} element={<AdminWallStepPage />} />
+        </Route>
+
+         <Route path="/:projectId/workerwall" element={<WorkerWallMainContainer />} >
+          <Route path='step/:stepId/:stepNumber' element={<WorkerWallStepPage />} />
+        </Route>
 
         <Route path="/organizations" element={
           <Organization />
@@ -235,162 +248,162 @@ function App() {
                 <LabourEstimateContainer />
               </ProtectedRoutes>
             } />
-        </Route>
+          </Route>
 
 
-        <Route path="paymentconfirmation" element={
-          <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
-            <PaymentConfirmationStage />
-          </ProtectedRoutes>
-
-        } >
-          <Route path="consent" element={
+          <Route path="paymentconfirmation" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
-              <PaymentConsentSection />
+              <PaymentConfirmationStage />
             </ProtectedRoutes>
 
-          } />
-          <Route path="schedule" element={
-            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
-              <PaymentScheduleSection />
-            </ProtectedRoutes>
+          } >
+            <Route path="consent" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+                <PaymentConsentSection />
+              </ProtectedRoutes>
 
-          } />
-          <Route path="transaction" element={
-            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
-              <PaymentTransaction />
-            </ProtectedRoutes>
+            } />
+            <Route path="schedule" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+                <PaymentScheduleSection />
+              </ProtectedRoutes>
 
-          } />
+            } />
+            <Route path="transaction" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+                <PaymentTransaction />
+              </ProtectedRoutes>
 
-        </Route>
+            } />
+
+          </Route>
 
 
-        <Route path="ordermaterial" element={
-          <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
-
-            <OrderMaterialOverview />
-          </ProtectedRoutes>
-
-        } >
-          <Route path="ordermaterialroom/:roomKey" element={
+          <Route path="ordermaterial" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
-              <OrderMaterialRoomDetails />
+              <OrderMaterialOverview />
             </ProtectedRoutes>
 
-          } />
-        </Route>
+          } >
+            <Route path="ordermaterialroom/:roomKey" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+
+                <OrderMaterialRoomDetails />
+              </ProtectedRoutes>
+
+            } />
+          </Route>
 
 
-        <Route path="materialarrival" element={
-          <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
-
-            <MaterialArrivalOverview />
-          </ProtectedRoutes>
-
-        } >
-          <Route path="materialarrivalroom/:roomKey" element={
+          <Route path="materialarrival" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
-              <MaterialArrivalRoomDetail />
+              <MaterialArrivalOverview />
             </ProtectedRoutes>
 
-          } />
-        </Route>
+          } >
+            <Route path="materialarrivalroom/:roomKey" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
-        <Route path="workmainschedule" element={
-          <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
-            <WorkMainOverview />
-          </ProtectedRoutes>
-        } >
-          <Route path="workschedule/:sectionId" element={
+                <MaterialArrivalRoomDetail />
+              </ProtectedRoutes>
+
+            } />
+          </Route>
+
+          <Route path="workmainschedule" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
-              <WorkSchedulePage />
+              <WorkMainOverview />
             </ProtectedRoutes>
-          } />
-          <Route path="dailyschedule/:sectionId" element={
+          } >
+            <Route path="workschedule/:sectionId" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+                <WorkSchedulePage />
+              </ProtectedRoutes>
+            } />
+            <Route path="dailyschedule/:sectionId" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+                <DailySchedulePage />
+              </ProtectedRoutes>
+            } />
+          </Route>
+
+          <Route path="installation" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
-              <DailySchedulePage />
+              <InstallationOverview />
             </ProtectedRoutes>
-          } />
-        </Route>
+          } >
+            <Route path="installationroom/:roomkey" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+                <InstallationRoomDetail />
+              </ProtectedRoutes>
 
-        <Route path="installation" element={
-          <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
-            <InstallationOverview />
-          </ProtectedRoutes>
-        } >
-          <Route path="installationroom/:roomkey" element={
-            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
-              <InstallationRoomDetail />
-            </ProtectedRoutes>
+            } />
+          </Route>
 
-          } />
-        </Route>
-
-        <Route path="qualitycheck" element={
-          <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
-            <QualityCheckOverview />
-          </ProtectedRoutes>
-        } >
-          <Route path="qualitycheckroom/:roomkey" element={
+          <Route path="qualitycheck" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
-              <QualityCheckRoomDetails />
+              <QualityCheckOverview />
+            </ProtectedRoutes>
+          } >
+            <Route path="qualitycheckroom/:roomkey" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+                <QualityCheckRoomDetails />
+              </ProtectedRoutes>
+            } />
+          </Route>
+
+          <Route path="cleaning" element={<CleaningOverview />} >
+            <Route path="cleaningroom/:roomId" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+                <CleaningRoomOverview />
+              </ProtectedRoutes>
+            } />
+          </Route>
+
+          <Route path="projectdelivery" element={
+            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+              <ProjectDelivery />
             </ProtectedRoutes>
           } />
         </Route>
 
-        <Route path="cleaning" element={<CleaningOverview />} >
-          <Route path="cleaningroom/:roomId" element={
-            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
-              <CleaningRoomOverview />
-            </ProtectedRoutes>
-          } />
-        </Route>
-
-        <Route path="projectdelivery" element={
-          <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
-            <ProjectDelivery />
-          </ProtectedRoutes>
-        } />
-      </Route>
 
 
+        {
+          <>
+            <Route path="/phase" element={<ProtectedRoutes allowedRoles={["owner"]}>
+              <Phase />
+            </ProtectedRoutes>} />
 
-      {
-        <>
-          <Route path="/phase" element={<ProtectedRoutes allowedRoles={["owner"]}>
-            <Phase />
-          </ProtectedRoutes>} />
+            <Route path="/issues" element={<ProtectedRoutes allowedRoles={["owner"]}>
+              <Issues />
+            </ProtectedRoutes>} />
 
-          <Route path="/issues" element={<ProtectedRoutes allowedRoles={["owner"]}>
-            <Issues />
-          </ProtectedRoutes>} />
-
-          <Route path="/tasks" element={<ProtectedRoutes allowedRoles={["owner"]}>
-            <Tasks />
-          </ProtectedRoutes>} />
-        </>
-      }
-
-
-      <Route path="/workers" element={<ProtectedRoutes allowedRoles={["staff"]} >
-        <Workers />
-      </ProtectedRoutes>} />
+            <Route path="/tasks" element={<ProtectedRoutes allowedRoles={["owner"]}>
+              <Tasks />
+            </ProtectedRoutes>} />
+          </>
+        }
 
 
-      {/* REQUIREMENT FORM LINK */}
-
-      <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
-      <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderMaterial />} />
-      <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
-      <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
+        <Route path="/workers" element={<ProtectedRoutes allowedRoles={["staff"]} >
+          <Workers />
+        </ProtectedRoutes>} />
 
 
-      <Route path="*" element={<NotFound />} />
+        {/* REQUIREMENT FORM LINK */}
 
-    </Routes >
+        <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
+        <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderMaterial />} />
+        <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
+        <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
+
+
+        <Route path="*" element={<NotFound />} />
+
+      </Routes >
 
     </>
   )
