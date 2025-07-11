@@ -17,7 +17,7 @@ interface AddLabourEstimateProp {
 const AddLabourEstimate: React.FC<AddLabourEstimateProp> = ({ handleAdd, newData, setNewData, addPending, setShowForm }) => {
 
     return (
-        <div className='space-y-3 bg-white px-6 py-3 w-[40%] rounded-2xl'>
+        <div className='space-y-3 bg-white px-6 py-3 sm:w-[40%] w-[80%] rounded-2xl'>
             <h2 className='font-medium text-gray-700 text-center'>Add Labour</h2>
             <div>
                 <Label>Work Type</Label>

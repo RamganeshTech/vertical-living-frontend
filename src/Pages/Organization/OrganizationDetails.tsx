@@ -40,7 +40,6 @@ export default function OrganizationDetails() {
   if (Array.isArray(organization)) {
     organization = organization[0]
   }
-  console.log(organization, "isArray:", Array.isArray(organization))
 
   const updateOrganization = useUpdateOrganizationName()
   const { data: staffList, isLoading: staffLoading } = useGetAllUsers(organizationId!, "staff");
@@ -130,7 +129,7 @@ if (!/^\d{10}$/.test(tempPhone)) {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to update phone number",
+        description: error?.response?.data?.message || error?.message || "Failed to update phone number",
         variant: "destructive",
       })
     }
@@ -170,7 +169,7 @@ if (!/^\d{10}$/.test(tempPhone)) {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to update address",
+        description: error?.response?.data?.message || error?.message || "Failed to update address",
         variant: "destructive",
       })
     }
@@ -251,112 +250,6 @@ if (!/^\d{10}$/.test(tempPhone)) {
       <div className={`min-h-full w-full max-h-[100vh] overflow-y-auto custom-scrollbar bg-gradient-to-br from-blue-50 via-white bg-blue-100`}>
 
         {/* header part */}
-        {/* <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10">
-          <div className="max-w-full mx-auto px-4 sm:px-6 py-2 sm:py-3">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-
-
-               <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/organizations")}
-                  className="text-blue-600 hover:bg-blue-50 rounded-xl flex-shrink-0"
-                >
-                  <i className="fas fa-arrow-left mr-2"></i>
-                  <span className="hidden sm:inline">Back to Organizations</span>
-                  <span className="sm:hidden">Back</span>
-                </Button>
-
-                <div className="hidden sm:block h-6 w-px bg-gray-300 flex-shrink-0" />
-
-                <div className="flex items-center space-x-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12  bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                    {organization?.logoUrl ? (
-                      <img
-                        src={organization?.logoUrl || COMPANY_DETAILS.COMPANY_LOGO}
-                        alt={organization?.organizationName}
-                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <img
-                        src={COMPANY_DETAILS.COMPANY_LOGO || "/placeholder.svg"}
-                        alt="Company Logo"
-                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg object-cover"
-                      />
-                    )}
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    {isEditing ? (
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <div className="relative flex-1">
-                          <Input
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className="text-lg sm:text-xl font-bold border-2 border-blue-300 focus:border-blue-500 rounded-xl bg-white/90 backdrop-blur-sm"
-                            onKeyPress={(e) => e.key === "Enter" && handleUpdateName()}
-                            placeholder="Organization name"
-                          />
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={handleUpdateName}
-                            isLoading={updateOrganization.isPending}
-                            className="bg-green-600 hover:bg-green-700 text-white rounded-xl"
-                          >
-                            <i className="fas fa-check mr-1"></i>
-                            Save
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={handleCancelEdit}
-                            className="border-gray-300 text-gray-600 hover:bg-gray-50 rounded-xl"
-                          >
-                            <i className="fas fa-times mr-1"></i>
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <h1 className="text-lg sm:text-2xl font-bold text-blue-900 truncate">
-                          {organization?.organizationName || "N/A"}
-                        </h1>
-                        {organization?.type && (
-                          <Badge className="mt-1 bg-blue-100 text-blue-700 text-xs">{organization?.type}</Badge>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-
-              
-
-            
-              {!isEditing && (
-                <div className="flex justify-end sm:justify-start">
-                  <Button
-                    variant="outline"
-                    onClick={handleStartEdit}
-                    className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl bg-white/80 backdrop-blur-sm"
-                  >
-                    <i className="fas fa-edit mr-2"></i>
-                    <span className="hidden sm:inline">Edit Name</span>
-                    <span className="sm:hidden">Edit</span>
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div> */}
-
-
         <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10 w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-row sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
             {/* Left section */}
@@ -606,29 +499,29 @@ if (!/^\d{10}$/.test(tempPhone)) {
           </div>
         </div>
 
-        <div className="px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-3  max-h-[73%]">
+        <div className="px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-3  sm:min-h-[65vh] sm:max-h-[100%]">
           <RoleCard
             title="Staffs"
             icon="fa-user-tie"
-            list={dummyStaffs}
+            list={staffList}
             isLoading={staffLoading}
           />
           <RoleCard
             title="CTOs"
             icon="fa-user-cog"
-            list={dummyCTOs}
+            list={ctoList}
             isLoading={ctoLoading}
           />
           <RoleCard
             title="Workers"
             icon="fa-user-hard-hat"
-            list={dummyWorkers}
+            list={workerList}
             isLoading={workerLoading}
           />
           <RoleCard
             title="Clients"
             icon="fa-user-friends"
-            list={dummyClients}
+            list={clientList}
             isLoading={clientLoading}
           />
         </div>

@@ -3,6 +3,7 @@ import type { AxiosInstance } from "axios";
 import useGetRole from "../../Hooks/useGetRole";
 import { getApiForRole } from "../../utils/roleCheck";
 import axios from "axios";
+import { queryClient } from "../../QueryClient/queryClient";
 
 const allowedRoles = ["owner", "staff", "CTO"]
 
@@ -67,10 +68,11 @@ export const useUpdateDeliveryLocation = () => {
 const updateRoomMaterialsApi = async (
   projectId: string,
   roomKey: string,
+  itemId:string,
   updates: any,
   api: AxiosInstance
 ) => {
-  const { data } = await api.put(`/orderingmaterial/${projectId}/room/${roomKey}`, {items:updates});
+  const { data } = await api.put(`/orderingmaterial/${projectId}/room/${itemId}/${roomKey}`, {items:updates});
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -81,16 +83,46 @@ export const useUpdateRoomMaterials = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ projectId, roomKey, updates }: any) => {
+    mutationFn: async ({ projectId, roomKey, itemId, updates }:{ projectId: string, roomKey: string, itemId: string, updates:any }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to update room materials");
       if (!api) throw new Error("API instance not available");
-      return await updateRoomMaterialsApi(projectId, roomKey, updates, api);
+      return await updateRoomMaterialsApi(projectId, roomKey, itemId, updates, api);
     },
     onSuccess: (_, { projectId, roomKey }) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material", projectId, roomKey] });
     },
   });
 };
+
+
+// ========== ADD SINGLE ROOM MATERIAL ITEM ==========
+const addRoomMaterialItemApi = async (
+  projectId: string,
+  roomKey: string,
+  newItem: any,
+  api: AxiosInstance
+) => {
+  const { data } = await api.post(`/orderingmaterial/${projectId}/room/${roomKey}/add`, newItem);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useAddRoomMaterialItem = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId, roomKey, newItem }: any) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to add item");
+      if (!api) throw new Error("API instance not available");
+      return await addRoomMaterialItemApi(projectId, roomKey, newItem, api);
+    },
+    onSuccess: (_, { projectId, roomKey }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material", projectId, roomKey] });
+    },
+  });
+};
+
 
 // ========== 4. DELETE ROOM MATERIAL ITEM ==========
 const deleteRoomMaterialItemApi = async (
@@ -132,6 +164,7 @@ const getAllOrderingMaterialApi = async (
 };
 
 export const useGetAllOrderingMaterial = (projectId: string) => {
+  const allowedRoles = ["owner", "staff", "CTO" , "worker", "client"]
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -160,6 +193,7 @@ const getRoomDetailsOrderMaterialsApi = async (
 };
 
 export const useGetRoomDetailsOrderMaterials = (projectId: string, roomKey: string) => {
+  const allowedRoles = ["owner", "staff", "CTO" , "worker", "client"]
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 

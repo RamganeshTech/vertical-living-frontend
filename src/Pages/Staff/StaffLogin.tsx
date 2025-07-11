@@ -2,7 +2,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
@@ -22,6 +22,7 @@ export default function StaffLogin() {
 
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const { isMobile, openMobileSidebar } = useOutletContext<any>()
 
   const dispatch = useDispatch()
   const loginStaff = useLoginStaff()
@@ -69,11 +70,7 @@ export default function StaffLogin() {
 
     try {
       const data = await loginStaff.mutateAsync(formData)
-      toast({
-        title: "Success",
-        description: "Login successful! Welcome back.",
-      })
-      navigate("/")
+     
       const staffData = data.data;
 
       dispatch(setRole({
@@ -89,6 +86,13 @@ export default function StaffLogin() {
         role: staffData.role,
         isauthenticated: true
       }));
+
+      toast({
+        title: "Success",
+        description: "Registration successful",
+      })
+
+      navigate("/organizations")
 
     } catch (error: any) {
       toast({
@@ -108,9 +112,21 @@ export default function StaffLogin() {
         <div className="absolute top-40 left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div> */}
 
-      <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
+      {/* <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
         Go Back
-      </Button>
+      </Button> */}
+
+      <div className="absolute top-2 left-2">
+        {isMobile && (
+          <button
+            onClick={openMobileSidebar}
+            className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+            title="Open Menu"
+          >
+            <i className="fa-solid fa-bars"></i>
+          </button>
+        )}
+      </div>
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">

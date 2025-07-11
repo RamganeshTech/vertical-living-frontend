@@ -195,7 +195,7 @@ const InviteStaffs: React.FC = () => {
 
       <div className="w-full flex flex-col md:flex-row p-4 gap-6 h-full">
         {/* invitiation link */}
-        <div className="bg-white max-h-full w-full  md:w-1/2  p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
+        <div className="bg-white sm:max-h-[60vh] lg:max-h-[45vh] w-full  md:w-1/2  p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
           <div>
             <h2 className="text-2xl font-bold text-blue-900 mb-2 flex items-center">
               <i className="fas fa-user-plus mr-2" /> Invite Staffs
@@ -252,9 +252,9 @@ const InviteStaffs: React.FC = () => {
 
         {/*invited memebers */}
 
-        <div className="bg-white p-6 py-2 w-full  md:w-1/2 rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
+        <div className="bg-white p-6 py-2 w-full  !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] md:w-1/2 rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
           <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
-            <i className="fas fa-users mr-2" /> Staff Members ({staffs.length})
+            <i className="fas fa-users mr-2" /> Staff Members ({staffs?.length})
           </h2>
           {staffs.length === 0 ? (
             <div className="text-center text-blue-700 p-8">
@@ -264,7 +264,7 @@ const InviteStaffs: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {staffs.map((staff: any) => (
+              {staffs?.map((staff: any) => (
                 <div
                   key={staff._id}
                   className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100 hover:shadow-md transition"
@@ -279,7 +279,7 @@ const InviteStaffs: React.FC = () => {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className="text-blue-900 font-semibold">{staff.staffName}</h4>
+                      <h4 className="text-blue-900 font-semibold">{staff?.staffName}</h4>
                       <p className="text-sm text-gray-600">
                         <i className="fas fa-envelope mr-1" />
                         {staff.email}

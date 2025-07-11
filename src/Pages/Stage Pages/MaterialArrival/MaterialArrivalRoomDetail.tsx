@@ -321,6 +321,7 @@ import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { requiredFieldsByRoomArrival } from "../../../constants/constants";
 import { Textarea } from "../../../components/ui/TextArea";
+import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
 
 const MaterialArrivalRoomDetail = () => {
   const { projectId, roomKey, organizationId } = useParams();
@@ -334,13 +335,26 @@ const MaterialArrivalRoomDetail = () => {
   const [showAddRow, setShowAddRow] = useState(false);
   const [popupImage, setPopupImage] = useState<string | null>(null);
 
-  const { data, isLoading, isError } = useGetSingleRoomMaterialArrival(projectId!, roomKey!);
+  const { data, isLoading, isError, error, refetch } = useGetSingleRoomMaterialArrival(projectId!, roomKey!);
   const { mutateAsync: updateItem } = useUpdateMaterialArrivalRoomItem();
   const { mutateAsync: deleteItem } = useDeleteMaterialArrivalItem();
 
   if (!roomKey) return;
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Failed to load room materials</p>;
+  if (isLoading) return <RoomDetailsLoading />;
+  if (isError) return <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+    <div className="text-red-600 font-semibold mb-2">
+      ⚠️ Error Occurred
+    </div>
+    <p className="text-red-500 text-sm mb-4">
+      {(error as any)?.response?.data?.message || "Failed to load data"}
+    </p>
+    <Button
+      onClick={() => refetch()}
+      className="bg-red-600 text-white px-4 py-2"
+    >
+      Retry
+    </Button>
+  </div>;
 
   const items = data || [];
 
@@ -349,16 +363,40 @@ const MaterialArrivalRoomDetail = () => {
   };
 
   const handleSave = async () => {
-    const formData = new FormData();
-    formData.append("itemData", JSON.stringify(editData));
-    if (editFile) formData.append("upload", editFile);
-
     try {
+
+      const requiredFields = requiredFieldsByRoomArrival[roomKey!];
+      if (!requiredFields || requiredFields.length === 0) {
+        throw new Error("No required fields defined for this section.");
+      }
+
+      const firstField = requiredFields[0];
+      const firstValue = editData[firstField];
+
+      if (!firstValue || firstValue.toString().trim() === "") {
+        throw new Error(`The field "${firstField}" is required.`);
+      }
+
+      const isAllEmpty = requiredFields.every((field) => {
+        const val = editData[field];
+        return !val || val.toString().trim() === "";
+      });
+
+      if (isAllEmpty) {
+        throw new Error("At least one field must be filled.");
+      }
+
+
+      const formData = new FormData();
+      formData.append("itemData", JSON.stringify(editData));
+      if (editFile) formData.append("upload", editFile);
+
       await updateItem({ projectId: projectId!, roomKey: roomKey!, formData });
       toast({ title: "Success", description: "Item updated successfully" });
       setEditingIndex(null);
       setEditData({});
       setEditFile(null);
+      refetch()
     } catch (err: any) {
       toast({
         title: "Error",
@@ -369,15 +407,38 @@ const MaterialArrivalRoomDetail = () => {
   };
 
   const handleAddNew = async () => {
-    const formData = new FormData();
-    formData.append("itemData", JSON.stringify(newItemData));
-    if (selectedFile) formData.append("upload", selectedFile);
-
     try {
+
+      const requiredFields = requiredFieldsByRoomArrival[roomKey!];
+      if (!requiredFields || requiredFields.length === 0) {
+        throw new Error("No required fields defined for this section.");
+      }
+
+      const firstField = requiredFields[0];
+      const firstValue = newItemData[firstField];
+
+      if (!firstValue || firstValue.toString().trim() === "") {
+        throw new Error(`The field "${firstField}" is required.`);
+      }
+
+      const isAllEmpty = requiredFields.every((field) => {
+        const val = newItemData[field];
+        return !val || val.toString().trim() === "";
+      });
+
+      if (isAllEmpty) {
+        throw new Error("At least one field must be filled.");
+      }
+
+      const formData = new FormData();
+      formData.append("itemData", JSON.stringify(newItemData));
+      if (selectedFile) formData.append("upload", selectedFile);
+
       await updateItem({ projectId: projectId!, roomKey: roomKey!, formData });
       toast({ title: "Success", description: "Item added successfully" });
       setShowAddRow(false);
       setNewItemData({});
+      refetch()
       setSelectedFile(null);
     } catch (err: any) {
       toast({
@@ -392,6 +453,7 @@ const MaterialArrivalRoomDetail = () => {
     try {
       await deleteItem({ projectId: projectId!, roomKey: roomKey!, itemId });
       toast({ title: "Deleted", description: "Item removed" });
+      refetch()
     } catch (err: any) {
       toast({
         title: "Error",
@@ -400,6 +462,9 @@ const MaterialArrivalRoomDetail = () => {
       });
     }
   };
+
+
+  // const minWidth = `min-w-[${(requiredFieldsByRoomArrival[roomKey]?.length + 1) * 200}px]`
 
   return (
     <div className="w-full h-full">
@@ -417,11 +482,26 @@ const MaterialArrivalRoomDetail = () => {
       </div>
 
       {/* Scrollable Container */}
-      <div className="w-full overflow-x-auto roundex-lg mt-2">
+      <div className="w-full overflow-x-auto roundex-lg mt-2 custom-scrollbar">
         {/* Table Content Container with fixed min width */}
-        <div className="min-w-[1000px]">
+        {/* below original  */}
+        {/* <div className="min-w-[1000px]"> */}
+        <div
+          style={{
+            minWidth: `${(requiredFieldsByRoomArrival[roomKey]?.length + 1) * 190
+              }px`,
+          }}
+        >
           {/* Table Headings */}
-          <div className="grid grid-cols-9 gap-2 bg-blue-100 text-blue-800 text-xs font-semibold uppercase px-4 py-2">
+          {/* below original  */}
+          {/* <div className="grid grid-cols-9 gap-2 bg-blue-100 text-blue-800 text-xs font-semibold uppercase px-4 py-2"> */}
+          <div
+            className={`grid gap-2 bg-blue-100 text-blue-800 text-xs font-semibold uppercase px-4 py-2`}
+            style={{
+              gridTemplateColumns: `repeat(${requiredFieldsByRoomArrival[roomKey]?.length + 1
+                }, minmax(120px, 1fr))`,
+            }}
+          >
             {requiredFieldsByRoomArrival[roomKey]?.map((field, idx) => (
               <div key={idx} className="text-center">{field === "verifiedByAccountant" ? "Verified" : field}</div>
             ))}
@@ -430,9 +510,19 @@ const MaterialArrivalRoomDetail = () => {
 
           {/* Table Rows */}
           {items?.map((item: any, index: number) => (
+            // below original 
+            // <div
+            //   key={item._id}
+            //   className="grid grid-cols-9 gap-2 px-4 py-2 border-b items-center hover:bg-gray-50"
+            // >
+
             <div
               key={item._id}
-              className="grid grid-cols-9 gap-2 px-4 py-2 border-b items-center hover:bg-gray-50"
+              className={`grid gap-2 px-4 py-2 items-center hover:bg-gray-50`}
+              style={{
+                gridTemplateColumns: `repeat(${requiredFieldsByRoomArrival[roomKey]?.length + 1
+                  }, minmax(120px, 1fr))`,
+              }}
             >
               {requiredFieldsByRoomArrival[roomKey]?.map((field, i) => {
                 if (field === "image") {
@@ -549,7 +639,14 @@ const MaterialArrivalRoomDetail = () => {
 
           {/* Add New Row */}
           {showAddRow && (
-            <div className="grid grid-cols-9 gap-2 px-4 py-2 border-t bg-blue-50 items-center">
+            // <div className="grid grid-cols-9 gap-2 px-4 py-2 border-t bg-blue-50 items-center">
+
+            <div className={`grid gap-2 px-4 py-2  bg-blue-50 items-center`}
+              style={{
+                gridTemplateColumns: `repeat(${requiredFieldsByRoomArrival[roomKey]?.length + 1
+                  }, minmax(120px, 1fr))`,
+              }}
+            >
               {requiredFieldsByRoomArrival[roomKey]?.map((field, i) => {
                 if (field === "image") {
                   return (
@@ -607,16 +704,16 @@ const MaterialArrivalRoomDetail = () => {
 
       {/* Popup Image Viewer */}
       {popupImage && (
-        <div onClick={()=> setPopupImage(null)} className="fixed inset-0 bg-black/70 bg-opacity-60 z-50 flex items-center justify-center">
-          <div onClick={(e)=> e.stopPropagation }  className="relative bg-white rounded p-4 sm:p-8 shadow-lg max-w-[90vw] max-h-[80vh]">
+        <div onClick={() => setPopupImage(null)} className="fixed inset-0 bg-black/70 bg-opacity-60 z-50 flex items-center justify-center">
+          <div onClick={(e) => e.stopPropagation} className="relative bg-white rounded p-4 sm:p-8 shadow-lg max-w-[90vw] max-h-[80vh]">
             <i
-              className="fas fa-times absolute top-2 right-3 text-2xl cursor-pointer text-gray-700 hover:text-red-500"
+              className="fas fa-times absolute top-[0px] right-1 sm:top-2 sm:right-3 text-xl sm:text-2xl cursor-pointer text-gray-700 hover:text-red-500"
               onClick={() => setPopupImage(null)}
             ></i>
             <img
               src={popupImage}
               alt="Full View"
-              className="max-h-[70vh] max-w-full object-contain rounded"
+              className="max-h-[70vh] max-w-[100%] sm:max-w-full object-contain rounded"
             />
           </div>
         </div>

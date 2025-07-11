@@ -141,11 +141,8 @@ export default function CTORegister() {
 
             toast({
                 title: "Success",
-                description: "Registration successful! You can now login with your credentials.",
+                description: "Registration successful",
             })
-
-
-
 
             // Redirect to login page
             setTimeout(() => {
@@ -154,7 +151,7 @@ export default function CTORegister() {
         } catch (error: any) {
             toast({
                 title: "Registration Failed",
-                description: error?.response?.data?.message || error?.message || "Failed to register. Please try again.",
+                description: error?.response?.data?.message  || "Failed to register. Please try again.",
                 variant: "destructive",
             })
         }

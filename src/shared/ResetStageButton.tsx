@@ -26,7 +26,7 @@ export const ResetStageButton: React.FC<ResetStageButtonProps> = ({
     disabled = false,
     className = ""
 }) => {
-    const { mutateAsync, isPending, error } = useResetStage();
+    const { mutateAsync, isPending } = useResetStage();
 
     const handleReset = async () => {
         try {

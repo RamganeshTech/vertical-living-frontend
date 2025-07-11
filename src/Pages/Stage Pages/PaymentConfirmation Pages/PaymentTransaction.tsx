@@ -1,190 +1,3 @@
-
-// // TEST 1 CARD NUMBER
-// // Card Number: 4111 1111 1111 1111
-// // Expiry: Any future date (e.g. 12/28)
-// // CVV: Any 3 digits (e.g. 123)
-// // Name: Any name
-
-// // for upi
-// // success@razorpay
-// // failure@razorpay
-
-// import React from "react";
-// import { useParams } from "react-router-dom";
-// import { loadScript } from "../../../utils/loadScript";
-// import { toast } from "../../../utils/toast";
-// import { useSelector } from "react-redux";
-// import type { RootState } from "../../../store/store";
-// import {
-//   useCreatePaymentOrder,
-//   useGetPaymentTransaction,
-//   useVerifyPayment,
-// } from "../../../apiList/Stage Api/Payment Api/paymentTransactionApi";
-
-// const PaymentTransaction = () => {
-//   const { projectId } = useParams<{ projectId: string }>();
-//   const { data } = useGetPaymentTransaction(projectId!);
-//   const paymentTransaction = data?.paymentTransaction;
-//   const totalAmount = data?.totalAmount;
-
-//   const { mutateAsync: createPaymentOrder, isPending: isCreating } = useCreatePaymentOrder();
-//   const { mutateAsync: verifyPayment, isPending: isVerifying } = useVerifyPayment();
-
-//   const client = useSelector((state: RootState) => state.clientProfileStore);
-
-//   const handlePayment = async () => {
-//     try {
-//       const orderData = await createPaymentOrder({
-//         projectId: projectId!,
-//         clientId: client.clientId,
-//       });
-
-//       const razorpayLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-//       if (!razorpayLoaded) {
-//         toast({
-//           title: "Error",
-//           description: "Failed to load Razorpay SDK.",
-//           variant: "destructive",
-//         });
-//         return;
-//       }
-
-//       const options = {
-//         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-//         amount: orderData.amount,
-//         currency: "INR",
-//         name: "Vertical Living",
-//         description: "Project Payment",
-//         order_id: orderData.orderId,
-//         handler: async function (response: any) {
-//           await verifyPayment({
-//             projectId: projectId!,
-//             razorpay_order_id: response.razorpay_order_id,
-//             razorpay_payment_id: response.razorpay_payment_id,
-//             razorpay_signature: response.razorpay_signature,
-//           });
-
-//           toast({
-//             title: "Success",
-//             description: "Payment successful!",
-//           });
-//         },
-//         prefill: {
-//           name: client.clientName || "",
-//           email: client.email || "",
-//           contact: client.phoneNo || "",
-//         },
-//         theme: {
-//           color: "#0050b3",
-//         },
-//       };
-
-//       const rzp = new (window as any).Razorpay(options);
-//       rzp.open();
-//     } catch (error: any) {
-//       toast({
-//         title: "Error",
-//         description: error.message || "Payment failed. Please try again.",
-//         variant: "destructive",
-//       });
-//     }
-//   };
-
-//   return (
-//     <div className="w-full min-h-full bg-gray-50 py-10 px-4 flex justify-center">
-//       <div className="bg-white w-full h-full max-w-2xl rounded-xl shadow-lg border border-gray-200 p-6 space-y-6">
-        
-//         {/* Header */}
-//         <div className="text-center">
-//           <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 flex items-center justify-center gap-2">
-//             <i className="fa-solid fa-money-check-dollar" />
-//             Payment Gateway
-//           </h1>
-//           <p className="text-sm text-gray-500 mt-1">
-//             Securely make your payment to proceed with the project.
-//           </p>
-//         </div>
-
-//         {/* Amount Display */}
-//         <div className="border border-blue-200 rounded-lg p-5 bg-blue-50 text-center shadow-sm">
-//           <p className="text-gray-700 text-sm mb-1">Amount Payable</p>
-//           <div className="text-3xl font-bold text-blue-800">₹ {totalAmount}</div>
-//         </div>
-
-//         {/* Status */}
-//         {paymentTransaction?.status && (
-//           <div className="bg-gray-100 p-4 rounded-lg border border-gray-300 space-y-1 text-sm">
-//             <p className="font-medium flex items-center gap-2">
-//               <i
-//                 className={`fa-solid ${
-//                   paymentTransaction.status === "successful"
-//                     ? "fa-circle-check text-green-600"
-//                     : "fa-circle-xmark text-red-600"
-//                 }`}
-//               />
-//               Status:
-//               <span
-//                 className={`ml-1 font-semibold ${
-//                   paymentTransaction.status === "successful"
-//                     ? "text-green-700"
-//                     : "text-red-700"
-//                 }`}
-//               >
-//                 {paymentTransaction.status.toUpperCase()}
-//               </span>
-//             </p>
-
-//             {paymentTransaction.status === "successful" && (
-//               <p className="text-green-700">
-//                 Paid At: {new Date(paymentTransaction.paidAt!).toLocaleString()}
-//               </p>
-//             )}
-
-//             <p className="text-gray-600">
-//               Order ID: <span className="text-gray-800">{paymentTransaction.gatewayOrderId}</span>
-//             </p>
-//             {paymentTransaction.gatewayPaymentId && (
-//               <p className="text-gray-600">
-//                 Payment ID:{" "}
-//                 <span className="text-gray-800">{paymentTransaction.gatewayPaymentId}</span>
-//               </p>
-//             )}
-//           </div>
-//         )}
-
-//         {/* Pay Button */}
-//         <div>
-//           <button
-//             onClick={handlePayment}
-//             disabled={isCreating || isVerifying}
-//             className={`w-full py-3 rounded-md text-white text-lg font-medium transition ${
-//               isCreating || isVerifying
-//                 ? "bg-blue-400 cursor-not-allowed"
-//                 : "bg-blue-600 hover:bg-blue-700"
-//             }`}
-//           >
-//             {isCreating || isVerifying ? (
-//               <span className="flex items-center justify-center gap-2">
-//                 <i className="fa-solid fa-circle-notch fa-spin" />
-//                 Processing Payment...
-//               </span>
-//             ) : (
-//               <span className="flex items-center justify-center gap-2">
-//                 <i className="fa-solid fa-wallet" />
-//                 Pay Now
-//               </span>
-//             )}
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default PaymentTransaction;
-
-
-
 import React from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { loadScript } from "../../../utils/loadScript";
@@ -197,12 +10,13 @@ import {
   useVerifyPayment,
 } from "../../../apiList/Stage Api/Payment Api/paymentTransactionApi";
 import { Button } from "../../../components/ui/Button";
+import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
 
 const PaymentTransaction = () => {
   const { projectId , organizationId} = useParams<{ projectId: string , organizationId:string}>();
   const navigate = useNavigate();
-  const { data } = useGetPaymentTransaction(projectId!);
+  const { data, refetch , isError, error :getAllError, isLoading} = useGetPaymentTransaction(projectId!);
   const paymentTransaction = data?.paymentTransaction;
   const totalAmount = data?.totalAmount;
 
@@ -210,6 +24,25 @@ const PaymentTransaction = () => {
   const { mutateAsync: verifyPayment, isPending: isVerifying } = useVerifyPayment();
 
   const client = useSelector((state: RootState) => state.clientProfileStore);
+
+
+   if (isLoading) return <MaterialOverviewLoading />;
+    if (isError || !data) return  <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
+              <div className="text-red-600 font-semibold mb-2">
+                ⚠️ Error Occurred
+              </div>
+              <p className="text-red-500 text-sm mb-4">
+                {(getAllError as any)?.response?.data?.message || 
+                 (getAllError as any)?.message || 
+                 "Failed to load cost estimation data"}
+              </p>
+              <Button
+                onClick={() => refetch()}
+                className="bg-red-600 text-white px-4 py-2"
+              >
+                Retry
+              </Button>
+            </div> 
 
   const handlePayment = async () => {
     try {

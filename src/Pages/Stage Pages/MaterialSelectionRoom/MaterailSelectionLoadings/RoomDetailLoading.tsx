@@ -4,7 +4,7 @@ const RoomDetailsLoading = () => {
   const rows = Array.from({ length: 11 });
 
   return (
-    <div className="max-w-full mx-auto mt-4 bg-white shadow rounded p-6">
+    <div className="w-full max-h-full overflow-hidden mx-auto mt-4 bg-white shadow rounded p-6">
       <Skeleton className="h-6 w-40 mb-2" />
       <Skeleton className="h-4 w-32 mb-6" />
 

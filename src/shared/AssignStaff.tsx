@@ -56,7 +56,7 @@ export default function AssignStageStaff({
     } catch (err: any) {
       toast({
         title: "Error",
-        description: err?.message || "Failed to assign staff",
+        description: err?.response?.data?.message || err?.message || "Failed to assign staff",
         variant: "destructive",
       });
     }

@@ -16,7 +16,7 @@ interface Props {
   projectId: string;
   roomId: string;
   initialFiles: UploadFile[];
-      refetch: ()=> Promise<any>
+  refetch: () => Promise<any>
 
 }
 
@@ -25,11 +25,12 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [pdfFiles, setPdfFiles] = useState<UploadFile[]>(initialFiles.filter(f => f.type === "pdf"));
   const [imageFiles, setImageFiles] = useState<UploadFile[]>(initialFiles.filter(f => f.type === "image"));
+  const [popupImage, setPopupImage] = useState<string | null>(null);
 
   const { mutateAsync: uploadFiles, isPending: uploadPending } = useUploadMaterialSelectionRoomFiles();
   const { mutateAsync: deleteFile, isPending: deletePending } = useDeleteMaterialSelectionRoomFile();
 
-//   initialFiles=existingUploads
+  //   initialFiles=existingUploads
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -51,11 +52,11 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
       setPdfFiles(prev => [...prev, ...newPDFs]);
       setImageFiles(prev => [...prev, ...newImages]);
       setSelectedFiles([]);
-      toast({title:"Success", description:"file uploaded successfully"})
+      toast({ title: "Success", description: "file uploaded successfully" })
       refetch()
 
-    } catch (err:any) {
-      toast({title:"error", description: err?.response?.data?.message || "failed to upload file", variant:"destructive"})
+    } catch (err: any) {
+      toast({ title: "error", description: err?.response?.data?.message || "failed to upload file", variant: "destructive" })
 
     }
   };
@@ -68,10 +69,10 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
       } else {
         setImageFiles(prev => prev.filter(file => file._id !== fileId));
       }
-      toast({title:"Success", description:"deleted successfully"})
+      toast({ title: "Success", description: "deleted successfully" })
       refetch()
-    } catch (err:any) {
-      toast({title:"error", description: err?.response?.data?.message || "failed to upload file", variant:"destructive"})
+    } catch (err: any) {
+      toast({ title: "error", description: err?.response?.data?.message || "failed to upload file", variant: "destructive" })
 
     }
   };
@@ -98,15 +99,21 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
               <li key={file._id} className="flex justify-between items-center bg-red-50 p-2 rounded-xl">
                 <span className="text-sm">{file.originalName}</span>
                 <div className="flex gap-2">
-                  <a href={file.url} target="_blank" download className="text-red-600 hover:underline">
+                  {/* <a href={file.url} target="_blank" download className="text-red-600 hover:underline">
                     <i className="fa-solid fa-download"></i>
-                  </a>
+                  </a> */}
+                  <Button size="sm"
+                    variant="primary"
+                  >
+                    <a href={file.url} target="_blank" download >
+                      <i className="fa-solid fa-download"></i>
+                    </a>
+                  </Button>
                   <Button
                     onClick={() => handleDelete(file._id, "pdf")}
-                    // disabled={deletePending}
+                    size="sm"
                     isLoading={deletePending}
-                    variant="ghost"
-                    className="text-red-500"
+                    variant="primary"
                   >
                     <i className="fa-solid fa-trash"></i>
                   </Button>
@@ -127,18 +134,33 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
               <li key={file._id} className="flex justify-between items-center bg-green-50 p-2 rounded-xl">
                 <span className="text-sm truncate">{file.originalName}</span>
                 <div className="flex gap-2">
-                  <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">
-                    <i className="fa-solid fa-eye"></i>
-                  </a>
-                  <a href={file.url} target="_blank" download className="text-green-600 hover:underline">
+                  <Button size="sm"
+                    variant="primary"
+                    onClick={() => setPopupImage(file?.url)}
+                  >
+                    <i className="fas fa-eye"></i>
+                  </Button>
+
+                  {/* <a href={file.url} target="_blank" download className="text-green-600 hover:underline">
                     <i className="fa-solid fa-download"></i>
-                  </a>
+                  </a> */}
+
+                  <Button size="sm"
+                    variant="primary"
+                  >
+                    <a href={file.url} target="_blank" download>
+                      <i className="fa-solid fa-download"></i>
+                    </a>
+                  </Button>
+
+
                   <Button
                     onClick={() => handleDelete(file._id, "image")}
                     // disabled={deletePending}
+                    size="sm"
                     isLoading={deletePending}
-                    variant="ghost"
-                    className="text-green-600"
+                    variant="primary"
+                  // className="text-green-600"
                   >
                     <i className="fa-solid fa-trash"></i>
                   </Button>
@@ -148,6 +170,28 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
           </ul>
         </div>
       </div>
+
+      {popupImage && (
+        <div
+          onClick={() => setPopupImage(null)}
+          className="fixed inset-0 bg-black/70 z-50 p-8 bg-opacity-60 flex items-center justify-center"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative bg-white rounded py-8 px-4 max-w-[90vw] max-h-[80vh] shadow-lg"
+          >
+            <i
+              className="fas fa-times absolute top-2 right-3 text-xl text-gray-700 hover:text-red-500 cursor-pointer"
+              onClick={() => setPopupImage(null)}
+            ></i>
+            <img
+              src={popupImage}
+              alt="Full View"
+              className="max-h-[70vh] w-auto object-contain rounded"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

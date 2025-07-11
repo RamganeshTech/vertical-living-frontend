@@ -151,6 +151,7 @@ import { useAcceptClientConsent } from "../../../../apiList/Stage Api/Payment Ap
 import { toast } from "../../../../utils/toast";
 import { Button } from "../../../../components/ui/Button";
 import { COMPANY_DETAILS } from "../../../../constants/constants";
+import MaterialOverviewLoading from "../../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
 const PublicClientConsentForm: React.FC = () => {
     const { projectId, token } = useParams<{ projectId: string; token: string }>();
@@ -159,7 +160,25 @@ const PublicClientConsentForm: React.FC = () => {
     const [isAccepted, setIsAccepted] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const { mutateAsync: acceptConsent, isPending } = useAcceptClientConsent();
+    const { mutateAsync: acceptConsent, isPending, isError, error:getAllError } = useAcceptClientConsent();
+
+
+    if (isError) return  <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
+              <div className="text-red-600 font-semibold mb-2">
+                ⚠️ Error Occurred
+              </div>
+              <p className="text-red-500 text-sm mb-4">
+                {(getAllError as any)?.response?.data?.message || 
+                 (getAllError as any)?.message || 
+                 "Failed to load cost estimation data"}
+              </p>
+              <Button
+                onClick={() => window.location.reload()}
+                className="bg-red-600 text-white px-4 py-2"
+              >
+                Retry
+              </Button>
+            </div> 
 
     const fetchConsentContent = async () => {
         try {

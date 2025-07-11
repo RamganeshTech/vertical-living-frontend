@@ -77,7 +77,7 @@ export const updateClientConfirmationApi = async (
 export const useUpdateClientConfirmation = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowedRoles = ["owner", "client"];
+  const allowedRoles = ["client"];
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -146,7 +146,7 @@ export const getProjectDeliveryDetailsApi = async (
 export const useGetProjectDeliveryDetails = (projectId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowedRoles = ["owner", "CTO", "client"];
+  const allowedRoles = ["owner", "CTO", "client", "staff"];
 
   return useQuery({
     queryKey: ["project-delivery", projectId],

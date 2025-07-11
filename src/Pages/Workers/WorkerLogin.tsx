@@ -3,13 +3,13 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useOutletContext } from "react-router-dom"
 
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
-import { useLoginWorker } from "../../apiList/workerApi" 
+import { useLoginWorker } from "../../apiList/workerApi"
 import { toast } from "../../utils/toast"
 import { setRole } from "../../features/authSlice"
 import { setWorkerProfileData } from "../../features/workerSlice"
@@ -21,7 +21,9 @@ export default function WorkerLogin() {
     email: "",
     password: "",
   })
-const dispatch = useDispatch()
+  const dispatch = useDispatch()
+  const { isMobile, openMobileSidebar } = useOutletContext<any>()
+
 
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -71,32 +73,29 @@ const dispatch = useDispatch()
 
     try {
       const data = await loginWorker.mutateAsync(formData)
-      toast({
-        title: "Success",
-        description: "Login successful! Welcome back.",
-      })
-      // Redirect to worker dashboard or projects page
+    
+      const workerData = data?.data;
 
-       const workerData = data.data;
+      // ✅ 1) Update authSlice
+      dispatch(setRole({
+        role: workerData.role,
+        isauthenticated: true,
+        _id: workerData._id
+      }));
 
-    // ✅ 1) Update authSlice
-    dispatch(setRole({
-      role: workerData.role,
-      isauthenticated: true,
-      _id: workerData._id
-    }));
+      // ✅ 2) Update workerSlice
+      dispatch(setWorkerProfileData({
+        workerId: workerData._id,
+        workerName: workerData.workerName,
+        email: workerData.email,
+        phoneNo: workerData.phoneNo,
+        role: workerData.role,
+        isauthenticated: true
+      }));
 
-    // ✅ 2) Update workerSlice
-    dispatch(setWorkerProfileData({
-      workerId: workerData._id,
-      workerName: workerData.workerName,
-      email: workerData.email,
-      phoneNo: workerData.phoneNo,
-      role: workerData.role,
-      isauthenticated: true
-    }));
+      navigate("/organizations")
+      toast({ title: "Success", description: "Login successfull" })
 
-      navigate("/")
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -108,10 +107,22 @@ const dispatch = useDispatch()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
-    
-     <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] z-[10] right-[5%] sm:right-[10%]">
+
+      {/* <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] z-[10] right-[5%] sm:right-[10%]">
             Go Back
-          </Button>
+          </Button> */}
+
+      <div className="absolute top-2 left-2">
+        {isMobile && (
+          <button
+            onClick={openMobileSidebar}
+            className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+            title="Open Menu"
+          >
+            <i className="fa-solid fa-bars"></i>
+          </button>
+        )}
+      </div>
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
@@ -145,9 +156,8 @@ const dispatch = useDispatch()
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email address"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.email}
                   />
                 </div>
@@ -169,11 +179,10 @@ const dispatch = useDispatch()
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Enter your password"
-                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${
-                      errors.password
+                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.password
                         ? "border-red-300 focus:border-red-500"
                         : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
                   <button

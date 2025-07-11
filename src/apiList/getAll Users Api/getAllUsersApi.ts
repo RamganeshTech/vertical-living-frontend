@@ -3,7 +3,7 @@ import useGetRole from "../../Hooks/useGetRole";
 import { getApiForRole } from "../../utils/roleCheck";
 import type { AxiosInstance } from "axios";
 
-export const getUsersApi = async (
+export const getUsersApi  = async (
   organizationId: string,
   role: string,
   api: AxiosInstance
@@ -20,10 +20,10 @@ export const useGetAllUsers = (organizationId: string, roleToFetch: string) => {
 
   return useQuery({
     queryKey: ["get-users", organizationId, roleToFetch],
-    queryFn: () => {
+    queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return getUsersApi(organizationId, roleToFetch, api);
+      return await getUsersApi(organizationId, roleToFetch, api);
     },
     // enabled: !!organizationId && !!roleToFetch,
     retry:false,

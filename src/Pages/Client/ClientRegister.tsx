@@ -156,7 +156,7 @@ export default function ClientRegister() {
         } catch (error: any) {
             toast({
                 title: "Registration Failed",
-                description: error?.response?.data?.message || error?.message || "Failed to register. Please try again.",
+                description: error?.response?.data?.message || "Failed to register. Please try again.",
                 variant: "destructive",
             })
         }

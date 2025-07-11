@@ -100,6 +100,7 @@ const allowedRoles = ["owner", "staff", "CTO"]
   fileId: string,
   api: AxiosInstance
 ) => {
+  console.log(fileId)
   const { data } = await api.patch(`/costestimation/${projectId}/deleteuploadedfile/${roomId}/${fileId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
@@ -163,7 +164,7 @@ export const useGetSingleRoomEstimation = (projectId: string, roomId: string) =>
   const api = getApiForRole(role!);
 
   return useQuery({
-    queryKey: ["cost-estimation", projectId, roomId],
+    queryKey: ["cost-estimation-room", projectId, roomId],
     queryFn: async () => {
 
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
@@ -192,7 +193,7 @@ export const useUpdateMaterialEstimationItem = () => {
       return await updateMaterialEstimationItemApi(projectId, materialKey, updates, api);
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["cost-estimation", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["cost-estimation-room", projectId] });
     },
   });
 };
@@ -289,7 +290,7 @@ export const useUploadCostEstimationFiles = () => {
       if (!api) throw new Error("API instance not found for role"); return await uploadCostEstimationFilesApi(projectId, roomId, formData, api);
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["cost-estimation", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["cost-estimation-room", projectId] });
     },
   });
 };
@@ -304,10 +305,11 @@ export const useDeleteCostEstimationFile = () => {
 
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
-      if (!api) throw new Error("API instance not found for role"); return await deleteCostEstimationFileApi(projectId, roomId, fileId, api);
+      if (!api) throw new Error("API instance not found for role"); 
+      return await deleteCostEstimationFileApi(projectId, roomId, fileId, api);
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["cost-estimation", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["cost-estimation-room", projectId] });
     },
   });
 };

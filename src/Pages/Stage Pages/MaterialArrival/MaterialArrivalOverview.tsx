@@ -288,33 +288,52 @@ const MaterialArrivalOverview = () => {
 
     if (isLoading) return <MaterialOverviewLoading />;
 
+    
+
     const { shopDetails, deliveryLocationDetails, materialArrivalList, timer, isEditable, generatedLink } = data || {};
     const roomKeys = Object.keys(materialArrivalList || {});
 
     const handleUpdateShop = async () => {
         try {
+
+
+            if (shopForm.phoneNumber) {
+                if (!/^\d{10}$/.test(shopForm.phoneNumber.trim())) {
+                    throw new Error("Phone number should contain exactly 10 digit numbers")
+                }
+            }
+
             await updateShop({ projectId: projectId!, updates: shopForm });
             toast({ title: "Success", description: "Shop details updated" });
             setEditShop(false);
+            refetch()
         } catch (error: any) {
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: error?.response?.data?.message || "Update failed",
+                description: error?.response?.data?.message || error?.message || "Update failed",
             });
         }
     };
 
     const handleUpdateDelivery = async () => {
         try {
+
+            if (deliveryForm.phoneNumber) {
+                if (!/^\d{10}$/.test(deliveryForm.phoneNumber.trim())) {
+                    throw new Error("Phone number should contain exactly 10 digit numbers")
+                }
+            }
+
             await updateDelivery({ projectId: projectId!, updates: deliveryForm });
             toast({ title: "Success", description: "Delivery location updated" });
             setEditDelivery(false);
+            refetch()
         } catch (error: any) {
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: error?.response?.data?.message || "Update failed",
+                description: error?.response?.data?.message || error?.message || "Update failed",
             });
         }
     };
@@ -324,12 +343,12 @@ const MaterialArrivalOverview = () => {
             await completionStatus({ projectId: projectId! });
             toast({ description: 'Completion status updated successfully', title: "Success" });
         } catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to update completion status", variant: "destructive" })
         }
     };
 
     return (
-        <div className="w-full h-full flex flex-col p-2 sm:p-4">
+        <div className="w-full h-full flex flex-col p-2 ">
             {isChildRoute ? (
                 /* Child Route Content */
                 <Outlet />
@@ -337,7 +356,7 @@ const MaterialArrivalOverview = () => {
                 /* Parent Component Content */
                 <>
                     {/* Header Section - Always visible */}
-                    <div className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 pb-3 border-b-2 border-gray-200">
+                    <div className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 pb-3 ">
                         <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
                             {isMobile && (
                                 <button
@@ -354,19 +373,19 @@ const MaterialArrivalOverview = () => {
                         </h2>
 
                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                            <Button 
-                                isLoading={completePending} 
-                                onClick={handleCompletionStatus} 
+                            <Button
+                                isLoading={completePending}
+                                onClick={handleCompletionStatus}
                                 className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
                             >
                                 <i className="fa-solid fa-circle-check mr-2"></i>
                                 Mark as Complete
                             </Button>
 
-                            <ResetStageButton 
-                                projectId={projectId!} 
-                                stageNumber={9} 
-                                stagePath="materialarrival" 
+                            <ResetStageButton
+                                projectId={projectId!}
+                                stageNumber={9}
+                                stagePath="materialarrival"
                             />
 
                             <AssignStageStaff
@@ -388,8 +407,8 @@ const MaterialArrivalOverview = () => {
                                 <p className="text-red-500 text-sm mb-4">
                                     {(error as any)?.response?.data?.message || "Failed to load material arrival data"}
                                 </p>
-                                <Button 
-                                    onClick={() => refetch()} 
+                                <Button
+                                    onClick={() => refetch()}
                                     className="bg-red-600 text-white hover:bg-red-700"
                                 >
                                     Retry
@@ -421,44 +440,46 @@ const MaterialArrivalOverview = () => {
                             </Card>
 
                             {/* Shop Details */}
-                            <div className="border rounded-lg p-4 shadow-sm relative bg-white">
+                            <div className="border-l-4 border-blue-600  rounded-lg p-4 shadow-sm relative bg-white">
                                 <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
                                     <i className="fa-solid fa-store"></i>
                                     Shop Details
                                 </h2>
                                 {editShop ? (
                                     <div className="space-y-3">
-                                        <Input 
-                                            placeholder="Shop Name" 
-                                            value={shopForm.shopName || ""} 
-                                            onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })} 
+                                        <Input
+                                            placeholder="Shop Name"
+                                            value={shopForm.shopName || ""}
+                                            onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
                                             className="w-full"
                                         />
-                                        <Input 
-                                            placeholder="Contact Person" 
-                                            value={shopForm.contactPerson || ""} 
-                                            onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })} 
+                                        <Input
+                                            placeholder="Contact Person"
+                                            value={shopForm.contactPerson || ""}
+                                            onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
                                             className="w-full"
                                         />
-                                        <Input 
-                                            placeholder="Phone Number" 
-                                            value={shopForm.phoneNumber || ""} 
-                                            onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })} 
+                                        <Input
+                                            placeholder="Phone Number"
+                                            type="tel"
+                                            maxLength={10}
+                                            value={shopForm.phoneNumber || ""}
+                                            onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })}
                                             className="w-full"
                                         />
-                                        <Input 
-                                            placeholder="Address" 
-                                            value={shopForm.address || ""} 
-                                            onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })} 
+                                        <Input
+                                            placeholder="Address"
+                                            value={shopForm.address || ""}
+                                            onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
                                             className="w-full"
                                         />
                                         <div className="flex flex-col sm:flex-row gap-2 mt-3">
                                             <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
                                                 <i className="fa-solid fa-save mr-2"></i>Save
                                             </Button>
-                                            <Button 
-                                                variant="outline" 
-                                                onClick={() => setEditShop(false)} 
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setEditShop(false)}
                                                 className="w-full sm:w-auto"
                                             >
                                                 <i className="fa-solid fa-times mr-2"></i>Cancel
@@ -471,9 +492,9 @@ const MaterialArrivalOverview = () => {
                                         <p><strong>Contact Person:</strong> {shopDetails?.contactPerson || "-"}</p>
                                         <p><strong>Phone:</strong> {shopDetails?.phoneNumber || "-"}</p>
                                         <p><strong>Address:</strong> {shopDetails?.address || "-"}</p>
-                                        {isEditable && (
-                                            <button 
-                                                onClick={() => { setShopForm(shopDetails); setEditShop(true); }} 
+                                        {data?.status !== "completed" && (
+                                            <button
+                                                onClick={() => { setShopForm(shopDetails); setEditShop(true); }}
                                                 className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
                                             >
                                                 <i className="fa-solid fa-edit mr-1"></i>Edit
@@ -484,44 +505,46 @@ const MaterialArrivalOverview = () => {
                             </div>
 
                             {/* Delivery Location */}
-                            <div className="border rounded-lg p-4 shadow-sm relative bg-white">
+                            <div className="border-l-4 border-blue-600  rounded-lg p-4 shadow-sm relative bg-white">
                                 <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
                                     <i className="fa-solid fa-truck"></i>
                                     Delivery Location
                                 </h2>
                                 {editDelivery ? (
                                     <div className="space-y-3">
-                                        <Input 
-                                            placeholder="Site Name" 
-                                            value={deliveryForm.siteName || ""} 
-                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })} 
+                                        <Input
+                                            placeholder="Site Name"
+                                            value={deliveryForm.siteName || ""}
+                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })}
                                             className="w-full"
                                         />
-                                        <Input 
-                                            placeholder="Site Supervisor" 
-                                            value={deliveryForm.siteSupervisor || ""} 
-                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })} 
+                                        <Input
+                                            placeholder="Site Supervisor"
+                                            value={deliveryForm.siteSupervisor || ""}
+                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })}
                                             className="w-full"
                                         />
-                                        <Input 
-                                            placeholder="Phone Number" 
-                                            value={deliveryForm.phoneNumber || ""} 
-                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })} 
+                                        <Input
+                                            placeholder="Phone Number"
+                                             type="tel"
+                                            maxLength={10}
+                                            value={deliveryForm.phoneNumber || ""}
+                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })}
                                             className="w-full"
                                         />
-                                        <Input 
-                                            placeholder="Address" 
-                                            value={deliveryForm.address || ""} 
-                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })} 
+                                        <Input
+                                            placeholder="Address"
+                                            value={deliveryForm.address || ""}
+                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
                                             className="w-full"
                                         />
                                         <div className="flex flex-col sm:flex-row gap-2 mt-3">
                                             <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
                                                 <i className="fa-solid fa-save mr-2"></i>Save
                                             </Button>
-                                            <Button 
-                                                variant="outline" 
-                                                onClick={() => setEditDelivery(false)} 
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setEditDelivery(false)}
                                                 className="w-full sm:w-auto"
                                             >
                                                 <i className="fa-solid fa-times mr-2"></i>Cancel
@@ -534,9 +557,9 @@ const MaterialArrivalOverview = () => {
                                         <p><strong>Supervisor:</strong> {deliveryLocationDetails?.siteSupervisor || "-"}</p>
                                         <p><strong>Phone:</strong> {deliveryLocationDetails?.phoneNumber || "-"}</p>
                                         <p><strong>Address:</strong> {deliveryLocationDetails?.address || "-"}</p>
-                                        {isEditable && (
-                                            <button 
-                                                onClick={() => { setDeliveryForm(deliveryLocationDetails); setEditDelivery(true); }} 
+                                        {data?.status !== "completed" && (
+                                            <button
+                                                onClick={() => { setDeliveryForm(deliveryLocationDetails); setEditDelivery(true); }}
                                                 className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
                                             >
                                                 <i className="fa-solid fa-edit mr-1"></i>Edit
@@ -554,34 +577,35 @@ const MaterialArrivalOverview = () => {
                                         <div
                                             key={roomKey}
                                             className="border-l-4 border-blue-600 p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer bg-white"
-                                    onClick={() => navigate(`materialarrivalroom/${roomKey}`)}
-                                >
-                                    <h3 className="text-md font-semibold capitalize text-blue-800">
-                                        {roomKey.replace(/([A-Z])/g, " $1")}
-                                    </h3>
-                                    <p className="text-sm text-gray-600">Items: {roomItems.length}</p>
-                                    <p className="text-xs text-gray-400">Click to view details</p>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                            onClick={() => navigate(`materialarrivalroom/${roomKey}`)}
+                                        >
+                                            <h3 className="text-md font-semibold capitalize text-blue-800">
+                                                {roomKey.replace(/([A-Z])/g, " $1")}
+                                            </h3>
+                                            <p className="text-sm text-gray-600">Items: {roomItems.length}</p>
+                                            <p className="text-xs text-gray-400">Click to view details</p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
 
-                    {/* 🔗 Shareable Link */}
-                    <section className="mt-4">
-                        <GenerateWhatsappLink
-                            projectId={projectId!}
-                            context="Material"
-                            stage="materialarrival"
-                            data={generatedLink}
-                            isPending={linkPending}
-                            generateLink={generateLink}
-                        />
-                    </section>
-                </div>
+                            {/* 🔗 Shareable Link */}
+                            <section className="mt-4">
+                                <GenerateWhatsappLink
+                                    projectId={projectId!}
+                                    context="Material"
+                                    stage="materialarrival"
+                                    data={generatedLink}
+                                    isPending={linkPending}
+                                    generateLink={generateLink}
+                                />
+                            </section>
+                        </div>
                     )}
-                    </>
+                </>
             )}
-                    </div>
-    )}
+        </div>
+    )
+}
 
-    export default MaterialArrivalOverview;
+export default MaterialArrivalOverview;

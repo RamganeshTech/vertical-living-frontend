@@ -5,14 +5,6 @@ import useGetRole from './../../Hooks/useGetRole';
 import type { AxiosInstance } from "axios";
 
 
-
-import type {
-  IWorkMainStageSchedule,
-  IWorkSchedule,
-  IDailySchedule,
-  IWorkPlan,
-  IDailyTask,
-} from '../../types/types'
 import { queryClient } from "../../QueryClient/queryClient";
 
 // 🗂️ GET APIs
@@ -111,8 +103,8 @@ export const deleteWorkPlanApi = async (
 
 // 🗂️ MD APPROVAL
 export interface IMdApprovalPayload {
-  action: "approved" | "rejected";
-  remarks: string;
+  action: "approved" | "rejected" | "pending";
+  // remarks: string;
 }
 
 export const mdApprovalActionApi = async (
@@ -159,7 +151,7 @@ export const updateWorkScheduleStatusApi = async (
 export const useGetWorkMainStage = (projectId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker", "client"];
   return useQuery({
     queryKey: ["work-main-stage", projectId],
     queryFn: () => {
@@ -168,13 +160,15 @@ export const useGetWorkMainStage = (projectId: string) => {
       return getWorkMainStageApi(projectId, api);
     },
     enabled: !!projectId,
+        retry:false,
+    refetchOnMount:false
   });
 };
 
 export const useGetWorkSchedule = (projectId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker", "client"];
   return useQuery({
     queryKey: ["work-schedule", projectId],
     queryFn: () => {
@@ -183,13 +177,15 @@ export const useGetWorkSchedule = (projectId: string) => {
       return getWorkScheduleApi(projectId, api);
     },
     enabled: !!projectId,
+        retry:false,
+    refetchOnMount:false
   });
 };
 
 export const useGetDailySchedule = (projectId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker", "client"];
   return useQuery({
     queryKey: ["daily-schedule", projectId],
     queryFn: () => {
@@ -198,6 +194,8 @@ export const useGetDailySchedule = (projectId: string) => {
       return getDailyScheduleApi(projectId, api);
     },
     enabled: !!projectId,
+        retry:false,
+    refetchOnMount:false
   });
 };
 
@@ -303,9 +301,9 @@ export const useDeleteWorkPlan = () => {
 export const useMdApprovalAction = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner"];
   return useMutation({
-    mutationFn: async ({ mainStageId, payload ,  projectId,}: any) => {
+    mutationFn: async ({ mainStageId, payload ,  projectId,}: {payload:IMdApprovalPayload, mainStageId:string, projectId:string}) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
       return mdApprovalActionApi(mainStageId, payload,  projectId, api);
@@ -313,12 +311,21 @@ export const useMdApprovalAction = () => {
   });
 };
 
+
+export interface ISubStageStatusPayload {
+  status: "pending" | "completed";
+}
+
 export const useUpdateDailyScheduleStatus = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ dailyScheduleId, payload,  projectId, }: any) => {
+    mutationFn: async ({ dailyScheduleId, payload,  projectId, }:  {
+      dailyScheduleId: string;
+      payload: ISubStageStatusPayload;
+      projectId: string;
+    }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
       return updateDailyScheduleStatusApi(dailyScheduleId, payload,  projectId, api);
@@ -331,7 +338,11 @@ export const useUpdateWorkScheduleStatus = () => {
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useMutation({
-    mutationFn: async ({ workScheduleId, payload ,  projectId,}: any) => {
+    mutationFn: async ({ workScheduleId, payload ,  projectId,}: {
+      workScheduleId: string;
+      payload: ISubStageStatusPayload;
+      projectId: string;
+    }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
       return updateWorkScheduleStatusApi(workScheduleId, payload,  projectId, api);

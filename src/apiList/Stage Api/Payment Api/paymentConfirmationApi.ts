@@ -53,7 +53,7 @@ export const useGetPaymentConfirmation = (projectId: string) => {
 
 // ✅ TOGGLE consent required
 export const useToggleConsentRequired = () => {
-  const allowedRoles = ["CTO", "owner", "staff", "client"];
+  const allowedRoles = ["CTO", "owner", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
@@ -72,7 +72,7 @@ export const useToggleConsentRequired = () => {
 
 // ✅ GENERATE consent link
 export const useGenerateConsentLink = () => {
-  const allowedRoles = ["CTO", "owner", "staff", "client"];
+  const allowedRoles = ["CTO", "owner", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
@@ -91,7 +91,7 @@ export const useGenerateConsentLink = () => {
 
 // ✅ ACCEPT consent
 export const useAcceptClientConsent = () => {
-  const allowedRoles = ["CTO", "owner", "staff", "client"];
+  const allowedRoles = ["CTO", "owner", "client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();

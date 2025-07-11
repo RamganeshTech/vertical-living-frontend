@@ -67,7 +67,7 @@ export const getPaymentTransactionApi = async ({
 
 
 export const useCreatePaymentOrder = () => {
-  const allowedRoles = ["owner"];
+  const allowedRoles = ["client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -93,7 +93,7 @@ export const useCreatePaymentOrder = () => {
 
 
 export const useVerifyPayment = () => {
-  const allowedRoles = ["client", "owner"];
+  const allowedRoles = ["client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 

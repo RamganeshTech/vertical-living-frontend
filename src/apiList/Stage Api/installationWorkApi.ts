@@ -124,7 +124,7 @@ export const useDeleteInstallationItem = () => {
 };
 
 export const useGetInstallationDetails = (projectId: string) => {
-  const allowedRoles = ["CTO", "owner", "staff", "worker"];
+  const allowedRoles = ["CTO", "owner", "staff", "worker", "client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -143,7 +143,7 @@ export const useGetInstallationDetails = (projectId: string) => {
 };
 
 export const useGetInstallationRoomDetails = (projectId: string, roomName: string) => {
-  const allowedRoles = ["CTO", "owner", "staff", "worker"];
+  const allowedRoles = ["CTO", "owner", "staff", "worker", "client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 

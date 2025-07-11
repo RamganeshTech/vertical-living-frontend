@@ -10,26 +10,28 @@ export const SIDEBAR_LABELS = {
 
 export const SIDEBAR_ICONS = {
   PROJECTS: "fa-solid fa-diagram-project text-2xl",
-  ORGANIZATION: "fa-solid fa-house text-2xl",
+  ORGANIZATION: "fa-solid fa-building text-2xl",
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",
   // TASKS: "fa-solid fa-list text-2xl",
   // PHASES: "fa-solid fa-briefcase text-2xl",
 }
 
-export const LOGIN_ICONS = {
-  PROJECTS: "fa-solid fa-user text-2xl",
-  INVITECTO: "fa-solid fa-bars-progress text-2xl",
-  INVITESTAFFS: "fa-solid fa-bars-progress text-2xl",
-  DETAILS: "fa-solid fa-bars-progress text-2xl",
+
+export const LOGIN_ICONS_LOGIN_GROUP = {
+  ADMIN: "fas fa-user-tie text-2xl",
+  STAFF: "fas fa-user-gear text-2xl",
+  CTO:   "fas fa-users-gear text-2xl",
+  WORKER:"fas fa-hard-hat text-2xl",
+  CLIENT:"fas fa-user text-2xl" 
 }
 
 export const LOGIN_LABELS = {
-   ADMIN: `Admin Login`,
-        STAFF: `STaff Login`,
-        CTO: `CTO Login`,
-        WORKER: `Worker Login`,
-        CLIENT: `Client Login`
+  ADMIN: `Admin Login`,
+  STAFF: `STaff Login`,
+  CTO: `CTO Login`,
+  WORKER: `Worker Login`,
+  CLIENT: `Client Login`
 }
 
 export const ORGANIZATION_ICONS = {
@@ -303,4 +305,206 @@ export const PREDEFINED_ROOMS = [
   "Storage Room",
   "Entertainment Room",
   "Home Gym"
+];
+
+
+
+
+
+
+
+
+
+
+// FOR WORKER LABLES
+// ✅ STEP LABELS AND INSTRUCTIONS for Workers Wall Painting SOP
+
+export const WORKER_WALL_PAINTING_STEPS = [
+  {
+    stepNumber: 1,
+    label: "Identify Painting Area",
+    rules: [
+      "Measure and record room dimensions (length, width, height) in feet and inches using a measuring tape or laser tool.",
+      "Take high-resolution photos of all walls, corners, and ceiling edges for supervisor reference.",
+      "Highlight and document any cracks, dampness, or surface irregularities that need attention.",
+      "Upload details of the paint brand and colour code selected for approval before proceeding.",
+    ],
+  },
+  {
+    stepNumber: 2,
+    label: "Protect Flooring and Items",
+    rules: [
+      "Cover the floor using durable plastic sheets or canvas drop cloths to prevent paint spillage.",
+      "Move all movable furniture to the center of the room and cover them securely with protective sheets.",
+      "Apply masking tape to skirting boards, switches, sockets, and window trims for protection.",
+    ],
+  },
+  {
+    stepNumber: 3,
+    label: "Surface Preparation",
+    rules: [
+      "Clean all walls thoroughly to remove dust, dirt, and grease spots.",
+      "Scrape off any old loose paint using a putty knife.",
+      "Fill cracks and holes with quality wall putty and allow it to dry.",
+      "Sand the surface to ensure a smooth and even base for putty application.",
+    ],
+  },
+  {
+    stepNumber: 4,
+    label: "First Coat of Putty",
+    rules: [
+      "Apply the first coat of wall putty using a broad putty knife for even application.",
+      "Allow sufficient drying time as per the manufacturer’s guidelines.",
+      "Lightly sand the surface to remove any excess material and achieve a smooth finish.",
+    ],
+  },
+  {
+    stepNumber: 5,
+    label: "Second Coat of Putty",
+    rules: [
+      "Apply a second coat of wall putty for a fine, uniform surface.",
+      "After drying, sand the surface again to ensure it is perfectly smooth and ready for scrubbing.",
+      "Clean all dust particles with a dry cloth before proceeding.",
+    ],
+  },
+  {
+    stepNumber: 6,
+    label: "Scrubbing the Wall",
+    rules: [
+      "After applying two coats of putty, scrub the wall surface to eliminate any rough patches.",
+      "Choose between manual scrubbing (using sandpaper for small areas and edges) or machine scrubbing (for large walls, ensuring consistency and time-saving).",
+      "Scrub in circular motions and clean off all dust after scrubbing.",
+    ],
+  },
+  {
+    stepNumber: 6,
+    label: "Primer Application",
+    rules: [
+      "Apply one uniform coat of primer using a roller or brush.",
+      "Allow the primer to dry completely before moving to paint application.",
+    ],
+  },
+  {
+    stepNumber: 7,
+    label: "First Coat of Paint",
+    rules: [
+      "Apply the first coat of approved paint using consistent strokes to avoid streaks.",
+      "Allow sufficient drying time before applying the second coat.",
+    ],
+  },
+  {
+    stepNumber: 8,
+    label: "Second Coat of Paint",
+    rules: [
+      "Apply the second coat of paint for a smooth, uniform finish.",
+      "Inspect walls for any missed spots and touch up as required.",
+    ],
+  },
+  {
+    stepNumber: 9,
+    label: "Final Finishing and Cleanup",
+    rules: [
+      "Conduct a final inspection of all painted surfaces for uniformity.",
+      "Carefully remove all masking tape to avoid peeling paint.",
+      "Clean up the workspace, remove protective sheets, and reset furniture.",
+    ],
+  },
+];
+
+
+
+
+// ✅ ADMIN WALL PAINTING SOP STEPS
+
+export const ADMIN_WALL_PAINTING_STEPS = [
+  {
+    stepNumber: 1,
+    label: "Identify Painting Area",
+    rules: [
+      "Review worker-uploaded images and details for Step 1.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 2,
+    label: "Protect Flooring and Items",
+    rules: [
+      "Review worker-uploaded images and details for Step 2.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 3,
+    label: "Surface Preparation",
+    rules: [
+      "Review worker-uploaded images and details for Step 3.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 4,
+    label: "First Coat of Putty",
+    rules: [
+      "Review worker-uploaded images and details for Step 4.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 5,
+    label: "Second Coat of Putty",
+    rules: [
+      "Review worker-uploaded images and details for Step 5.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 6,
+    label: "Scrubbing the Wall",
+    rules: [
+      "Review worker-uploaded images and details for Step 6.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 7,
+    label: "Primer Application",
+    rules: [
+      "Review worker-uploaded images and details for Step 7.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 8,
+    label: "First Coat of Paint",
+    rules: [
+      "Review worker-uploaded images and details for Step 8.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 9,
+    label: "Second Coat of Paint",
+    rules: [
+      "Review worker-uploaded images and details for Step 9.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
+  {
+    stepNumber: 10,
+    label: "Final Finishing and Cleanup",
+    rules: [
+      "Review worker-uploaded images and details for Step 10.",
+      "Verify if all tasks were completed as per standard operating procedures.",
+      "Approve if satisfactory, or add notes and upload correction images if changes are required.",
+    ],
+  },
 ];

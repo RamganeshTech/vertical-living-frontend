@@ -21,7 +21,7 @@ const RoleCard: React.FC<RoleType> = ({ title, icon, list, isLoading }) => {
   }, [list, searchTerm])
 
   return (
-    <div className="bg-white border rounded-xl !max-h-[93%] overflow-hidden border-blue-100 shadow-sm px-4 py-5 flex flex-col gap-3">
+    <div className="bg-white border rounded-xl !min-h-[50%] !max-h-[93%] overflow-hidden border-blue-100 shadow-sm px-4 py-5 flex flex-col gap-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="text-blue-800 font-semibold flex items-center gap-2 text-base">

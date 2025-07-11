@@ -1,23 +1,23 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useLogoutCTO } from '../apiList/CTOApi'
 import { useLogoutClient } from '../apiList/clientApi'
 import { useLogoutStaff } from '../apiList/staffApi'
 import { useLogoutUser } from '../apiList/userApi'
 import { useLogoutWorker } from '../apiList/workerApi'
 import { Button } from '../components/ui/Button'
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { resetOwnerProfile } from "../features/userSlices";
 import { logout } from "../features/authSlice";
 import { resetClientProfile } from "../features/clientSlice";
 import { resetWorkerProfile } from "../features/workerSlice";
 import { resetCTOProfile } from "../features/CTOSlice";
 import { resetStaffProfile } from "../features/staffSlices";
+import { COMPANY_DETAILS } from "../constants/constants";
+import type { RootState } from "../store/store";
+import { toast } from "../utils/toast";
 
-export const COMPANY_DETAILS = {
-  COMPANY_NAME: "Vertical Living",
-  COMPANY_LOGO: "https://th.bing.com/th/id/OIP.Uparc9uI63RDb82OupdPvwAAAA?w=80&h=80&c=1&bgcl=c77779&r=0&o=6&dpr=1.3&pid=ImgRC"
-};
+
 
 type MobileSidebarProps = {
   isOpen: boolean;
@@ -27,6 +27,10 @@ type MobileSidebarProps = {
 };
 
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, path }) => {
+  const navigate = useNavigate()
+  const { organizationId } = useParams() as { organizationId: string }
+  const dispatch = useDispatch();
+    const { role } = useSelector((state: RootState) => state.authStore)
 
   const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending } = useLogoutCTO();
   const { mutateAsync: ClientLogoutAsync, isPending: isClientPending } = useLogoutClient();
@@ -34,27 +38,54 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
   const { mutateAsync: LogoutLogoutAsync, isPending: isUserPending } = useLogoutUser();
   const { mutateAsync: WorkerLogoutAsync, isPending: isWorkerPending } = useLogoutWorker();
 
-  const dispatch = useDispatch();
+
+
 
   const handleLogout = async () => {
-    try {
-      await CTOLogoutAsync();
-      await ClientLogoutAsync();
-      await StaffLogoutAsync();
-      await LogoutLogoutAsync();
-      await WorkerLogoutAsync();
-      dispatch(resetOwnerProfile());
-      dispatch(resetClientProfile());
-      dispatch(resetWorkerProfile());
-      dispatch(resetCTOProfile());
-      dispatch(resetStaffProfile());
-      dispatch(logout());
-    } catch (error: any) {
-      console.log("Error occurred during logout", error);
-    }
-  };
+         try {
+             if (role === "CTO") {
+                 await CTOLogoutAsync();
+             } else if (role === "client") {
+                 await ClientLogoutAsync();
+             } else if (role === "staff") {
+                 await StaffLogoutAsync();
+             } else if (role === "owner") {
+                 await LogoutLogoutAsync();
+             } else if (role === "worker") {
+                 await WorkerLogoutAsync();
+             }
+ 
+             // Clear all slices, just in case
+             dispatch(resetOwnerProfile());
+             dispatch(resetClientProfile());
+             dispatch(resetWorkerProfile());
+             dispatch(resetCTOProfile());
+             dispatch(resetStaffProfile());
+             dispatch(logout());
+                         toast({ title: "Success", description: "logout successfull",  })
+             if (!isCTOPending ||
+                !isClientPending ||
+                !isStaffPending ||
+                !isUserPending ||
+                !isWorkerPending) {
+                navigate('/')
+            }
+         } catch (error:any) {
+            toast({title:"Error", description:error?.response?.data?.message || "Failed to logout", variant:"destructive"})
+         }
+     };
 
   const labelEntries = Object.entries(labels);
+
+
+    const pathArray = location.pathname.split('/')
+    const isInStageNavBar = pathArray[2] === "projectdetails"
+    
+    const handleNav = () => {
+        if (isInStageNavBar) {
+            navigate(`/organizations/${organizationId}/projects`)
+        }
+    }
 
   return (
     <>
@@ -73,7 +104,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
       >
         {/* ✅ Top logo + company name */}
         <div className="flex items-center justify-between p-4 border-b">
-          <div className="flex items-center gap-3">
+          <div onClick={handleNav} className={`flex items-center gap-3 ${isInStageNavBar ? "cursor-pointer" : ""}`}>
             <img src={COMPANY_DETAILS.COMPANY_LOGO} alt="Logo" className="w-10 h-10 rounded-full object-cover" />
             <span className="text-lg font-semibold">{COMPANY_DETAILS.COMPANY_NAME}</span>
           </div>

@@ -3,45 +3,43 @@ import { useOutletContext, useParams } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
 import { Badge } from "../../components/ui/Badge"
-import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/Avatar"
+import { Avatar, AvatarFallback } from "../../components/ui/Avatar"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Skeleton } from "../../components/ui/Skeleton"
 
 import { toast } from "../../utils/toast" 
-import { useGetWorkersAsStaff, useInviteWorkerByStaff, useRemoveWorkerAsStaff } from "../../apiList/staffApi"
 import type { ProjectDetailsOutlet } from "../../types/types"
+import { useGetWorkersAsStaff, useInviteWorkerByStaff, useRemoveWorkerAsStaff } from "../../apiList/orgApi"
 
 export default function Workers() {
   const { projectId , organizationId} = useParams<{ projectId: string , organizationId: string}>()
   const {openMobileSidebar , isMobile} = useOutletContext<ProjectDetailsOutlet>()
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
-  const [workerRole, setWorkerRole] = useState("")
+  // const [workerRole, setWorkerRole] = useState("")
 
   // Fetch workers data using the provided hook
   const { data: workers, isLoading: workersLoading } = useGetWorkersAsStaff(projectId || "")
-
-  console.log("workers")
 
   // Mutations using the provided hooks
   const inviteWorker = useInviteWorkerByStaff()
   const removeWorker = useRemoveWorkerAsStaff()
 
   const handleGenerateInviteLink = async () => {
-    if (!workerRole.trim()) {
-      toast({
-        title: "Error",
-        description: "Please specify the worker role (e.g., Carpenter, Plumber, Electrician)",
-        variant: "destructive",
-      })
-      return
-    }
+    // if (!workerRole.trim()) {
+    //   toast({
+    //     title: "Error",
+    //     description: "Please specify the worker role (e.g., Carpenter, Plumber, Electrician)",
+    //     variant: "destructive",
+    //   })
+    //   return
+    // }
 
     try {
       const response = await inviteWorker.mutateAsync({
         projectId: projectId || "",
-        specificRole: workerRole,
+        // specificRole: workerRole,
         role:"worker",
         organizationId: organizationId!
       })
@@ -53,7 +51,7 @@ export default function Workers() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to generate invitation link",
+        description: error?.response?.data?.message || error?.message || "Failed to generate invitation link",
         variant: "destructive",
       })
     }
@@ -79,8 +77,7 @@ export default function Workers() {
 
   const handleShareWhatsApp = () => {
     // We'll use the project name from the page if available, or a generic message
-    const projectName = document.title || "our project"
-    const message = `You're invited to work on ${projectName}! Click this link to join: ${inviteLink}`
+    const message = `You're invited to work with us Click this link to join: ${inviteLink}`
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
   }
@@ -130,7 +127,7 @@ export default function Workers() {
   }
 
   return (
-    <div className="max-h-full overflow-y-auto custom-scrollbar">
+    <div className="max-h-full sm:overflow-y-hidden custom-scrollbar">
       {/* Header */}
       <div className="bg-white ">
         <div className="max-w-full mx-auto  py-2">
@@ -162,7 +159,7 @@ export default function Workers() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-full !max-h-[100%] overflow-y-auto custom-scrollbar mx-auto p-2 sm:p-4">
+      <div className="max-w-full !max-h-[100%] overflow-y-auto custom-scrollbar mx-auto p-2">
         <div className="grid grid-cols-1 max-h-full lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Invite Section */}
           <div className="lg:col-span-1 h-fit space-y-6">
@@ -175,7 +172,7 @@ export default function Workers() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label className="text-gray-700 font-medium">Worker Role/Specialty</Label>
                   <Input
                     value={workerRole}
@@ -184,7 +181,7 @@ export default function Workers() {
                     className="border-blue-200 focus:border-blue-500 bg-white/80"
                   />
                   <p className="text-xs text-gray-500">Specify the type of worker needed for this project</p>
-                </div>
+                </div> */}
 
                 {!inviteLink ? (
                   <Button
@@ -234,7 +231,7 @@ export default function Workers() {
                       <Button
                         onClick={() => {
                           setInviteLink("")
-                          setWorkerRole("")
+                          // setWorkerRole("")
                         }}
                         variant="outline"
                         className="w-full border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl"
@@ -249,7 +246,7 @@ export default function Workers() {
             </Card>
 
             {/* Role Suggestions */}
-            <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-md border-l-4 border-blue-600 ">
+            {/* <Card className="bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-md border-l-4 border-blue-600 ">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center text-lg">
                   <i className="fas fa-tools mr-2 text-blue-600"></i>
@@ -271,11 +268,11 @@ export default function Workers() {
                   ))}
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
           {/* Workers List */}
-          <div className="lg:col-span-2 sm:max-h-[95%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto shadow-md custom-scrollbar">
+          <div className="lg:col-span-2 sm:max-h-[43%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto shadow-md custom-scrollbar">
             <Card className="bg-white/70 backdrop-blur-sm border-0  shadow-xl">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center justify-between">
@@ -364,19 +361,19 @@ export default function Workers() {
                       Start building your team by inviting skilled workers to this project
                     </p>
                     <div className="flex flex-wrap gap-2 justify-center mb-6">
-                      {["Carpenter", "Plumber", "Electrician", "Painter", "Mason"].map((role) => (
-                        <button
-                          key={role}
-                          onClick={() => setWorkerRole(role)}
-                          className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
-                        >
-                          {role}
-                        </button>
-                      ))}
+                      {/* {["Carpenter", "Plumber", "Electrician", "Painter", "Mason"].map((role) => (
+                         <button
+                           key={role}
+                           onClick={() => setWorkerRole(role)}
+                           className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                         >
+                           {role}
+                         </button>
+                      ))} */}
                     </div>
                     <Button
                       onClick={() => {
-                        if (!workerRole) setWorkerRole("Worker")
+                        // if (!workerRole) setWorkerRole("Worker")
                         handleGenerateInviteLink()
                       }}
                       className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white rounded-xl"

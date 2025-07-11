@@ -83,7 +83,7 @@ export const getSingleCleaningRoomApi = async (
 
 
 // Allowed roles
-const allowedRoles = ["owner", "CTO", "staff", "worker"];
+const allowedRoles = ["owner", "CTO", "staff"];
 
 // === UPLOAD FILES ===
 export const useUploadCleaningRoomFiles = () => {
@@ -194,6 +194,8 @@ export const useUpdateCleaningRoomStatus = () => {
 export const useGetCleaningAndSanitation = (projectId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
+const allowedRoles = ["owner", "CTO", "staff", "worker"];
+
 
   return useQuery({
     queryKey: ["cleaning-and-sanitation", projectId],
@@ -212,6 +214,7 @@ export const useGetCleaningAndSanitation = (projectId: string) => {
 export const useGetSingleCleaningRoom = (projectId: string, roomId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
+const allowedRoles = ["owner", "CTO", "staff", "worker"];
 
   return useQuery({
     queryKey: ["cleaning-and-sanitation", projectId, roomId],

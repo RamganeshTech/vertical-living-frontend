@@ -176,11 +176,12 @@
 
 
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, Outlet, useParams, useLocation, useOutletContext } from "react-router-dom";
 import {
   useCompleteWorkSchedule,
   useGetWorkMainStage,
+  useMdApprovalAction,
   useSetWorkScheduleDeadline,
 } from "../../../apiList/Stage Api/workScheduleApi";
 import { toast } from "../../../utils/toast";
@@ -190,6 +191,7 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { Card } from "../../../components/ui/Card";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import AssignStageStaff from "../../../shared/AssignStaff";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
 
 type ProjectDetailsOutlet = {
   isMobile: boolean;
@@ -210,8 +212,16 @@ const WorkMainOverview = () => {
 
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetWorkScheduleDeadline();
   const { mutateAsync: completionStatus, isPending: completePending } = useCompleteWorkSchedule();
+  const {mutateAsync: mdActionAsync, isPending: mdActionPending} = useMdApprovalAction()
+
+  const [mdActionEdit, setMdActionEdit] = useState<boolean>(false)
+  const [mdActionStatus, setMdActionStatus] = useState<"pending" | "approved" | "rejected">("pending")
 
   const isChildRoute = location.pathname.includes("/workschedule") || location.pathname.includes("/dailyschedule");
+
+  const handleStartEdit = ()=>{
+    setMdActionEdit(true)
+  }
 
   const handleCompletionStatus = async () => {
     try {
@@ -230,6 +240,25 @@ const WorkMainOverview = () => {
     }
   };
 
+
+  const handleMDAction = async () => {
+    try {
+      await mdActionAsync({ projectId: projectId! , mainStageId:data?._id,  payload: { action: mdActionStatus },});
+      toast({
+        description: "MD Approval updated successfully.",
+        title: "Success",
+      });
+      setMdActionEdit(false)
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || error.message || "Failed to update Approval.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // ✅ Only render <Outlet /> content if it's a child route
   if (isChildRoute) {
     return <Outlet />;
@@ -239,7 +268,7 @@ const WorkMainOverview = () => {
   if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <main className="w-full h-full px-2 sm:px-4 lg:px-6 py-4">
+    <main className="w-full h-full">
       {/* Header Always Visible */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
@@ -322,6 +351,77 @@ const WorkMainOverview = () => {
             />
           </Card>
 
+          {/* MD status */}
+            <Card className="p-2 mb-4 border-l-4 border-blue-600 bg-white border shadow-md rounded-xl">
+  <div className="text-blue-600 rounded-t flex items-center gap-2 mb-4">
+    <i className="fas fa-user-shield" />
+    <h2 className="text-lg font-semibold">MD Approval</h2>
+  </div>
+
+  <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-gray-700 font-medium ">Status:</span>
+      {mdActionEdit ? (
+        <Select
+          value={mdActionStatus}
+          onValueChange={(val) =>
+            setMdActionStatus(val as "pending" | "approved" | "rejected")
+          }
+        >
+          <SelectTrigger>
+            <SelectValue
+              selectedValue={mdActionStatus}
+              placeholder="Select status"
+            />
+          </SelectTrigger>
+          <SelectContent>
+            {["pending", "approved", "rejected"].map((opt) => (
+              <SelectItem key={opt} value={opt}>
+                {opt.charAt(0).toUpperCase() + opt.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <span
+          className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+            data?.mdApproval?.status === "approved"
+              ? "bg-green-200 text-green-700"
+              : data?.mdApproval?.status === "pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-red-200 text-red-700"
+          }`}
+        >
+          {data?.mdApproval?.status || "N/A"}
+        </span>
+      )}
+      {mdActionEdit ? (
+        <div className="flex gap-2">
+
+        <Button size="sm" variant="primary" isLoading={mdActionPending} onClick={handleMDAction}>
+          <i className="fas fa-check"></i>
+        </Button>
+
+        <Button size="sm" variant="secondary"  onClick={()=> setMdActionEdit(false)}>
+          <i className="fas fa-xmark"></i>
+        </Button>
+        </div>
+      ) : (
+        <Button size="md" onClick={handleStartEdit}>
+          <i className="fas fa-pencil"></i>
+        </Button>
+      )}
+    </div>
+
+    {/* <div className="flex items-start gap-4">
+      <span className="text-gray-700 font-medium w-28">Remarks:</span>
+      <p className="text-sm text-gray-600">
+        {data?.mdApproval?.remarks || "No remarks provided"}
+      </p>
+    </div> */}
+  </div>
+</Card>
+
           {/* Grid: Work Plans & Daily Schedule */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <Link
@@ -348,8 +448,8 @@ const WorkMainOverview = () => {
           </div>
 
           {/* MD Approval Details */}
-          <Card className="p-6 bg-white border border-blue-200 shadow-md rounded-xl">
-            <div className="bg-blue-600 text-white px-4 py-3 rounded-t flex items-center gap-2 mb-4">
+          {/* <Card className="p-2 border-l-4 border-blue-600 bg-white border  shadow-md rounded-xl">
+            <div className="text-blue-600 rounded-t flex items-center gap-2 mb-4">
               <i className="fas fa-user-shield" />
               <h2 className="text-lg font-semibold">MD Approval</h2>
             </div>
@@ -357,7 +457,27 @@ const WorkMainOverview = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-4">
                 <span className="text-gray-700 font-medium w-28">Status:</span>
-                <span
+               {mdActionEdit ? 
+              //  <Select
+              //                                    value={mdActionStatus}
+              //                                   //  onValueChange={(val) => handleChange(val)}
+              //                                  >
+              //                                    <SelectTrigger>
+              //                                      <SelectValue
+              //                                        selectedValue={}
+              //                                        placeholder={`Select ${field === "brandName" ? "brand" : "fabric"}`}
+              //                                      />
+              //                                    </SelectTrigger>
+              //                                    <SelectContent>
+              //                                      {["pending", "approved", "rejected"].map((opt: string) => (
+              //                                        <SelectItem key={opt} value={opt}>
+              //                                          {opt}
+              //                                        </SelectItem>
+              //                                      ))}
+              //                                    </SelectContent>
+              //                                  </Select>
+              <></>
+               :<span
                   className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
                     data?.mdApproval?.status === "approved"
                       ? "bg-green-200 text-green-700"
@@ -367,7 +487,10 @@ const WorkMainOverview = () => {
                   }`}
                 >
                   {data?.mdApproval?.status || "N/A"}
-                </span>
+                </span>}
+                <Button size="md" onClick={handleStartEdit}>
+                  <i className="fas fa-pencil"></i>
+                </Button>
               </div>
 
               <div className="flex items-start gap-4">
@@ -377,7 +500,9 @@ const WorkMainOverview = () => {
                 </p>
               </div>
             </div>
-          </Card>
+          </Card> */}
+
+        
         </>
       )}
     </main>
@@ -385,3 +510,4 @@ const WorkMainOverview = () => {
 };
 
 export default WorkMainOverview;
+

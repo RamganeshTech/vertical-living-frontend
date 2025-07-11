@@ -31,7 +31,7 @@ interface OrganizationCardProps {
 
 export default function OrganizationCard({ organization }: OrganizationCardProps) {
   const deleteOrganization = useDeleteOrganization()
-
+console.log("organization", organization)
   const navigate = useNavigate()
 
   const handleDelete = async () => {
@@ -58,7 +58,7 @@ export default function OrganizationCard({ organization }: OrganizationCardProps
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              {organization.logoUrl ? (
+              {organization?.logoUrl ? (
                 <img
                   src={organization.logoUrl || "/placeholder.svg"}
                   alt={organization.organizationName}
@@ -69,7 +69,7 @@ export default function OrganizationCard({ organization }: OrganizationCardProps
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-blue-900 text-lg truncate">{organization.organizationName}</h3>
+              <h3 className="font-bold text-blue-900 text-lg truncate">{organization?.organizationName}</h3>
               {organization.type && (
                 <Badge variant="default" className="mt-1">
                   {organization.type}
@@ -106,7 +106,7 @@ export default function OrganizationCard({ organization }: OrganizationCardProps
               <MapPin className="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0" />
               {organization?.address || "N/A"}
             </p>
-          {organization.organizationPhoneNo && (
+          {organization?.organizationPhoneNo && (
             <p className="text-sm text-gray-600 flex items-center">
               <Phone className="w-4 h-4 mr-2 text-blue-500" />
               {organization.organizationPhoneNo}

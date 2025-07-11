@@ -2,7 +2,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
@@ -22,6 +22,7 @@ export default function ClientLogin() {
   const dispatch = useDispatch()
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const { isMobile, openMobileSidebar } = useOutletContext<any>()
 
   const loginClient = useLoginClient()
 
@@ -91,7 +92,7 @@ export default function ClientLogin() {
         title: "Success",
         description: "Login successful! Welcome back.",
       })
-      navigate("/")
+      navigate("/organizations")
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -104,9 +105,22 @@ export default function ClientLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
 
-      <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
+      {/* <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
         Go Back
-      </Button>
+      </Button> */}
+
+
+       <div className="absolute top-2 left-2">
+              {isMobile && (
+                  <button
+                    onClick={openMobileSidebar}
+                    className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                    title="Open Menu"
+                  >
+                    <i className="fa-solid fa-bars"></i>
+                  </button>
+                )}
+           </div>
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">

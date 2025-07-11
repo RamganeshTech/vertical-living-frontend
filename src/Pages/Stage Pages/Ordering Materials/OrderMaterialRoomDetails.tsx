@@ -207,13 +207,79 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "../../../utils/toast";
-import { useGetRoomDetailsOrderMaterials, useUpdateRoomMaterials, useDeleteRoomMaterialItem } from "../../../apiList/Stage Api/orderingMaterialApi";
+import { useGetRoomDetailsOrderMaterials, useUpdateRoomMaterials, useDeleteRoomMaterialItem, useAddRoomMaterialItem } from "../../../apiList/Stage Api/orderingMaterialApi";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { brandNamesByRoomKey, predefinedOptionsRooms, requiredFieldsByRoomOrderMaterials } from "../../../constants/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
+import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
 
-
+const carpentryDummyData: any = [
+  {
+    material: "Plywood",
+    brandName: "CenturyPly",
+    specification: "BWR Grade, 18mm",
+    quantity: 15,
+    unit: "nos",
+    remarks: "Use for base cabinets"
+  },
+  {
+    material: "MDF Board",
+    brandName: "Greenpanel",
+    specification: "Pre-laminated, 12mm",
+    quantity: 10,
+    unit: "nos",
+    remarks: "For wardrobes inside partition"
+  },
+  {
+    material: "Laminates",
+    brandName: "Merino",
+    specification: "Glossy finish, 1mm",
+    quantity: 20,
+    unit: "sheets",
+    remarks: "Apply on wardrobe exteriors"
+  },
+  {
+    material: "Edge Banding",
+    brandName: "Rehau",
+    specification: "0.8mm matching edge band",
+    quantity: 50,
+    unit: "meters",
+    remarks: "Match laminate color"
+  },
+  {
+    material: "Drawer Channels",
+    brandName: "Hettich",
+    specification: "Soft-close, 18-inch",
+    quantity: 6,
+    unit: "pairs",
+    remarks: "Use for kitchen drawers"
+  },
+  {
+    material: "Handles",
+    brandName: "Hafele",
+    specification: "Aluminium, 6-inch",
+    quantity: 12,
+    unit: "pcs",
+    remarks: "Matte black finish preferred"
+  },
+  {
+    material: "Wood Screws",
+    brandName: "Anchor",
+    specification: "Steel, 1.5 inch",
+    quantity: 200,
+    unit: "pcs",
+    remarks: "For panel fixing"
+  },
+  {
+    material: "Fevicol",
+    brandName: "Pidilite",
+    specification: "MR Grade Adhesive, 5kg",
+    quantity: 2,
+    unit: "tins",
+    remarks: "Use for board bonding"
+  },
+]
 
 const OrderMaterialRoomDetails = () => {
   const { projectId, roomKey, organizationId } = useParams();
@@ -231,14 +297,29 @@ const OrderMaterialRoomDetails = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editData, setEditData] = useState<any>({});
 
-  const { data, isLoading, isError, refetch } = useGetRoomDetailsOrderMaterials(projectId!, roomKey!);
+  const { data, isLoading, isError, refetch, error } = useGetRoomDetailsOrderMaterials(projectId!, roomKey!);
+
+  const { mutateAsync: addRoom, isPending: addPending } = useAddRoomMaterialItem();
   const { mutateAsync: updateRoom, isPending: updatePending } = useUpdateRoomMaterials();
   const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteRoomMaterialItem();
 
 
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Failed to load materials</p>;
+  if (isLoading) return <RoomDetailsLoading />;
+  if (isError) return <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+    <div className="text-red-600 font-semibold mb-2">
+      ⚠️ Error Occurred
+    </div>
+    <p className="text-red-500 text-sm mb-4">
+      {(error as any)?.response?.data?.message || "Failed to load data"}
+    </p>
+    <Button
+      onClick={() => refetch()}
+      className="bg-red-600 text-white px-4 py-2"
+    >
+      Retry
+    </Button>
+  </div>;
 
   const items = data || [];
 
@@ -246,7 +327,7 @@ const OrderMaterialRoomDetails = () => {
     setEditData((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (itemId:string) => {
     try {
 
       // Get required fields for the room type
@@ -277,6 +358,7 @@ const OrderMaterialRoomDetails = () => {
       const payload = editData;
       console.log("payload", payload)
       await updateRoom({
+        itemId,
         projectId: projectId!,
         roomKey,
         updates: [payload],
@@ -320,20 +402,27 @@ const OrderMaterialRoomDetails = () => {
         throw new Error("At least one field must be filled.");
       }
 
+      const firstFieldExists = items?.some(
+        (item: any) =>
+          item[firstFieldKey]?.toString().trim().toLowerCase() ===
+          firstFieldValue.toString().trim().toLowerCase()
+      );
 
+      if (firstFieldExists) {
+        throw new Error(`"${firstFieldValue}" already exists. Please use a unique value.`);
+      }
 
       const payload = newItemData;
       console.log("payload", payload)
-      await updateRoom({
+      await addRoom({
         projectId: projectId!,
         roomKey,
-        updates: [payload],
+        newItem: payload,
       });
-      toast({ title: "Success", description: "Item updated." });
-      setEditingIndex(null);
-      setEditData({});
+      toast({ title: "Success", description: "Item added." });
+      setNewItemData({})
+      setShowNewRow(false)
       refetch()
-
     } catch (err: any) {
       toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed", variant: "destructive" });
     }
@@ -346,83 +435,18 @@ const OrderMaterialRoomDetails = () => {
       refetch()
 
     } catch (err: any) {
-      toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed", variant: "destructive" });
+      toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to delete", variant: "destructive" });
     }
   };
 
 
-  const carpentryDummyData: any = [
-    {
-      material: "Plywood",
-      brandName: "CenturyPly",
-      specification: "BWR Grade, 18mm",
-      quantity: 15,
-      unit: "nos",
-      remarks: "Use for base cabinets"
-    },
-    {
-      material: "MDF Board",
-      brandName: "Greenpanel",
-      specification: "Pre-laminated, 12mm",
-      quantity: 10,
-      unit: "nos",
-      remarks: "For wardrobes inside partition"
-    },
-    {
-      material: "Laminates",
-      brandName: "Merino",
-      specification: "Glossy finish, 1mm",
-      quantity: 20,
-      unit: "sheets",
-      remarks: "Apply on wardrobe exteriors"
-    },
-    {
-      material: "Edge Banding",
-      brandName: "Rehau",
-      specification: "0.8mm matching edge band",
-      quantity: 50,
-      unit: "meters",
-      remarks: "Match laminate color"
-    },
-    {
-      material: "Drawer Channels",
-      brandName: "Hettich",
-      specification: "Soft-close, 18-inch",
-      quantity: 6,
-      unit: "pairs",
-      remarks: "Use for kitchen drawers"
-    },
-    {
-      material: "Handles",
-      brandName: "Hafele",
-      specification: "Aluminium, 6-inch",
-      quantity: 12,
-      unit: "pcs",
-      remarks: "Matte black finish preferred"
-    },
-    {
-      material: "Wood Screws",
-      brandName: "Anchor",
-      specification: "Steel, 1.5 inch",
-      quantity: 200,
-      unit: "pcs",
-      remarks: "For panel fixing"
-    },
-    {
-      material: "Fevicol",
-      brandName: "Pidilite",
-      specification: "MR Grade Adhesive, 5kg",
-      quantity: 2,
-      unit: "tins",
-      remarks: "Use for board bonding"
-    },
-  ]
+
   return (
     <div className="w-full h-full">
       <div className="w-full flex justify-between items-center mb-2">
         <h2 className="text-xl font-bold text-blue-800 capitalize ">{roomKey}</h2>
 
-        <div className=" py-2 px-6 flex gap-2">
+        <div className=" px-6 flex gap-2">
           {/* {!showNewRow && <Button onClick={() => setShowNewRow(() => (true))}> */}
           {<Button onClick={() => setShowNewRow(() => (true))}>
             Add Item
@@ -435,8 +459,17 @@ const OrderMaterialRoomDetails = () => {
       </div>
 
       <div className="w-full !min-h-[85vh] rounded-lg ">
-        <div className="overflow-x-auto min-w-full flex-grow min-h-0">
-          <div className="min-w-[700px] w-full flex flex-col border-2 border-gray-100 rounded-lg">
+        <div className="overflow-x-auto custom-scrollbar min-w-full flex-grow min-h-0">
+          {/* <div className="min-w-[700px] w-full flex flex-col border-2 border-gray-100 rounded-lg"> */}
+
+          <div
+            className=" w-full flex flex-col border-2 border-gray-100 rounded-lg"
+            style={{
+              minWidth: `${(requiredFieldsByRoomOrderMaterials[roomKey]?.length + 1) * 190
+                }px`,
+            }}
+          >
+
 
             {/* <div className="flex justify-around items-center px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold">
               {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, idx) => (
@@ -447,8 +480,11 @@ const OrderMaterialRoomDetails = () => {
 
 
             <div
-              className={`grid grid-cols-${requiredFieldsByRoomOrderMaterials[roomKey].length + 1} 
-              items-center px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold`}
+              className={`grid items-center px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold`}
+              style={{
+                gridTemplateColumns: `repeat(${requiredFieldsByRoomOrderMaterials[roomKey].length + 1
+                  }, minmax(120px, 1fr))`,
+              }}
             >
               {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, idx) => (
                 <div
@@ -489,8 +525,11 @@ const OrderMaterialRoomDetails = () => {
 
                       <div
                         key={item._id}
-                        className={`grid grid-cols-${requiredFieldsByRoomOrderMaterials[roomKey].length + 1} 
-                        border text-center px-6 py-3 gap-2 border-b border-gray-200 hover:bg-gray-50 transition-colors`}
+                        className={`grid border text-center px-6 py-3 gap-2 border-b border-gray-200 hover:bg-gray-50 transition-colors`}
+                        style={{
+                          gridTemplateColumns: `repeat(${requiredFieldsByRoomOrderMaterials[roomKey].length + 1
+                            }, minmax(120px, 1fr))`,
+                        }}
                       >
                         {requiredFieldsByRoomOrderMaterials[roomKey].map((field, i) => {
                           const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
@@ -538,10 +577,10 @@ const OrderMaterialRoomDetails = () => {
                             </div>
                           );
                         })}
-                        <div className="flex justify-center gap-2 items-start">
+                        <div className="flex justify-center gap-2 items-center">
                           {editingIndex === index ? (
                             <>
-                              <Button size="sm" isLoading={updatePending} onClick={handleSave}><i className="fas fa-check"></i></Button>
+                              <Button size="sm" isLoading={updatePending} onClick={()=> handleSave(item._id)}><i className="fas fa-check"></i></Button>
                               <Button size="sm" variant="ghost" onClick={() => setEditingIndex(null)}><i className="fas fa-xmark text-red-600"></i></Button>
                             </>
                           ) : (
@@ -573,7 +612,14 @@ const OrderMaterialRoomDetails = () => {
                     {/* 🆕 Input Row for New Item */}
 
                     {showNewRow && (
-                      <div className="flex justify-around items-center px-6 py-3 gap-2 bg-white mt-2">
+                      // <div className="flex justify-around items-center px-6 py-3 gap-2 bg-white mt-2">
+                      <div
+                        className={`grid items-center px-6 py-3 gap-2 bg-white mt-2`}
+                        style={{
+                          gridTemplateColumns: `repeat(${requiredFieldsByRoomOrderMaterials[roomKey].length + 1
+                            }, minmax(120px, 1fr))`,
+                        }}
+                      >
                         {requiredFieldsByRoomOrderMaterials[roomKey]?.map((field, i) => {
                           const isBrandField = field === "brandName" && predefinedOptionsRooms.brandName[roomKey];
                           const isFabricField = field === "fabric" && roomKey === "upholsteryCurtains";
@@ -625,8 +671,8 @@ const OrderMaterialRoomDetails = () => {
                           );
                         })}
 
-                        <div className="space-x-2 flex">
-                          <Button isLoading={updatePending} onClick={handleAddNew}>
+                        <div className="flex justify-center gap-2">
+                          <Button isLoading={addPending} onClick={handleAddNew}>
                             <i className="fas fa-check"></i>
                           </Button>
                           <Button onClick={() => setShowNewRow(() => (false))}>

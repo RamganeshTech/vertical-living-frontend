@@ -22,13 +22,13 @@ const CommonSiteInfo:React.FC<CommonSiteInfoProps> = ({measurementData,handleDel
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowSiteForm(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-2 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  Edit Details
+                  Edit 
                 </button>
                 <button
                   onClick={() => handleDeleteSiteMeasurement()}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="px-2 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   Delete
                 </button>

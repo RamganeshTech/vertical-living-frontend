@@ -113,7 +113,7 @@ export const useGetPaymentSchedule = (projectId: string) => {
 
 
 export const useUpdatePaymentScheduleDueDate = () => {
-  const allowedRoles = ["CTO", "owner", "staff", "client"];
+  const allowedRoles = ["CTO", "owner", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
@@ -138,7 +138,7 @@ export const useUpdatePaymentScheduleDueDate = () => {
 
 // UPDATE Client Approval Status
 export const useUpdateClientApprovalStatus = () => {
-  const allowedRoles = ["owner", "staff", "CTO", "client"];
+  const allowedRoles = ["client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
@@ -157,7 +157,7 @@ export const useUpdateClientApprovalStatus = () => {
 
 // UPDATE Client Notes
 export const useUpdateClientNotes = () => {
-  const allowedRoles = ["owner", "staff", "CTO", "client"];
+  const allowedRoles = ["client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
@@ -176,7 +176,7 @@ export const useUpdateClientNotes = () => {
 
 // UPDATE MD Approval Status
 export const useUpdateMdApprovalStatus = () => {
-  const allowedRoles = ["owner", "staff", "CTO", "client"];
+  const allowedRoles = ["owner"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
@@ -195,7 +195,7 @@ export const useUpdateMdApprovalStatus = () => {
 
 // UPDATE MD Notes
 export const useUpdateMdNotes = () => {
-  const allowedRoles = ["owner", "staff", "CTO", "client"];
+  const allowedRoles = ["owner"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();

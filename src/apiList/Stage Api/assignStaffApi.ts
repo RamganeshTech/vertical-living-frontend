@@ -19,7 +19,7 @@ export const assignStaffToStageApi = async (
 export const useAssignStaffToStage = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner", "CTO", "staff"];
 
   return useMutation({
     mutationFn: async ({
@@ -31,7 +31,8 @@ export const useAssignStaffToStage = () => {
       staffId: string;
       stageName: string;
     }) => {
-      if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+      if(!role) throw new Error("Not Authorized")
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to Access this api");
       if (!api) throw new Error("API not found");
       return assignStaffToStageApi(projectId, staffId, stageName, api);
     },

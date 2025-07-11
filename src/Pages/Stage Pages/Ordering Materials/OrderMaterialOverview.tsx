@@ -278,6 +278,7 @@ const OrderMaterialOverview = () => {
         await updateShop({ projectId: projectId!, updates: shopForm });
         toast({ title: "Success", description: "Shop Details Updated" });
         setEditShop(false);
+        refetch()
       } catch (error: any) {
         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "Update failed" });
       }
@@ -293,8 +294,10 @@ const OrderMaterialOverview = () => {
         }
 
         await updateDelivery({ projectId: projectId!, updates: deliveryForm });
-        toast({ title: "Success", description: "Delivery Details Updated" });
         setEditDelivery(false);
+        toast({ title: "Success", description: "Delivery Details Updated" });
+        refetch()
+        
       } catch (error: any) {
         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message  || error?.message|| "Update failed" });
       }
@@ -315,7 +318,7 @@ const OrderMaterialOverview = () => {
     const { shopDetails, deliveryLocationDetails, generatedLink, materialOrderingList } = data || {};
 
     return (
-      <div className="w-full h-full flex flex-col p-2 sm:p-4">
+      <div className="w-full h-full flex flex-col">
         {isChildRoute ? (
           /* Child Route Content */
           <Outlet />
@@ -460,7 +463,7 @@ const OrderMaterialOverview = () => {
                       <p><strong>Contact Person:</strong> {shopDetails?.contactPerson || "-"}</p>
                       <p><strong>Phone:</strong> {shopDetails?.phoneNumber || "-"}</p>
                       <p><strong>Address:</strong> {shopDetails?.address || "-"}</p>
-                      {data.status !== "completed" && (
+                      {data?.status !== "completed" && (
                         <button
                           onClick={() => { setShopForm(shopDetails); setEditShop(true); }}
                           className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
@@ -525,7 +528,7 @@ const OrderMaterialOverview = () => {
                       <p><strong>Supervisor:</strong> {deliveryLocationDetails?.siteSupervisor || "-"}</p>
                       <p><strong>Phone:</strong> {deliveryLocationDetails?.phoneNumber || "-"}</p>
                       <p><strong>Address:</strong> {deliveryLocationDetails?.address || "-"}</p>
-                      {data.status !== "completed" && (
+                      {data?.status !== "completed" && (
                         <button
                           onClick={() => { setDeliveryForm(deliveryLocationDetails); setEditDelivery(true); }}
                           className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"

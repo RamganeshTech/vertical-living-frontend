@@ -1,158 +1,140 @@
-import { useState } from 'react'
-import ErrorComponent from '../../components/ErrorComponent'
+import React from "react";
+import type { RootState } from "../../store/store";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import CommonSiteInfo from "../Stage Pages/Site Measurement/CommonSiteInfo";
+import { COMPANY_DETAILS } from "../../constants/constants";
 
-const Home = () => {
+const HomePage = () => {
 
-  const [error, setError] = useState(false)
-
-  
+  const auth = useSelector((state: RootState) => state.authStore);
 
   return (
-    <main className="bg-[#f5f7fa] min-w-full font-sans text-[13px] text-[#1f2937]">
-     {error &&  <ErrorComponent message='sorry not logged in' onClick={()=> setError(false)} />}
-      <div className="flex min-h-screen">
-        <main className="flex-grow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <i className="fas fa-home text-[#374151]"></i>
-              <h1 className="font-semibold text-[#111827] text-[14px]">Welcome!</h1>
-              <p className="text-[#6b7280] text-[12px]">The sky is blue everywhere.</p>
+    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800">
+      {/* Navbar */}
+      <header className="flex items-center justify-between px-6 py-4 bg-white shadow">
+        {/* ✅ Logo */}
+        <div className="flex items-center space-x-2">
+          <i className="fa-solid fa-house text-blue-600 text-2xl"></i>
+          <h1 className="text-xl font-bold text-blue-600">{COMPANY_DETAILS.COMPANY_NAME}</h1>
+        </div>
+
+        {/* ✅ Right side: only show if NOT authenticated */}
+        {!auth.isauthenticated ? (
+          <nav>
+            <Link
+              to="/login"
+              className="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
+            >
+              <i className="fa-solid fa-right-to-bracket mr-2"></i>
+              Login / Register
+            </Link>
+          </nav>
+        )
+          :
+          <>
+            <nav>
+              <Link
+                to="/organizations"
+                className="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
+              >
+                <i className="fa-solid fa-right-to-bracket mr-2"></i>
+              </Link>
+            </nav>
+          </>
+        }
+      </header>
+
+      {/* Hero Section */}
+      <section className="pt-28 pb-20 px-6 flex flex-col md:flex-row items-center justify-between gap-12 bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+        <div className="flex-1">
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-4 animate-slide-in">
+            Build Your Dream Home With Confidence
+          </h2>
+          <p className="text-lg mb-6 max-w-xl">
+            From requirements gathering to final delivery, Vertical Living handles every stage of your construction project.
+          </p>
+          <a href="/login" className="inline-block bg-yellow-400 text-blue-900 font-bold px-6 py-3 rounded-full hover:bg-yellow-300 transition">
+            <i className="fas fa-arrow-right mr-2"></i> Get Started
+          </a>
+        </div>
+        <div className="flex-1">
+          <img
+            src="/images/hero-house.png"
+            alt="House Illustration"
+            className="w-full rounded-xl shadow-lg animate-fade-in"
+          />
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="px-6 py-16">
+        <h3 className="text-3xl font-bold mb-10 text-center text-blue-600">Our Features</h3>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: "fas fa-file-alt",
+              title: "Requirement Forms",
+              desc: "Collect detailed client requirements for every room."
+            },
+            {
+              icon: "fas fa-ruler-combined",
+              title: "Site Measurement",
+              desc: "Track on-site measurements with live progress."
+            },
+            {
+              icon: "fas fa-tasks",
+              title: "Project Workflow",
+              desc: "14-step workflow from planning to delivery."
+            },
+            {
+              icon: "fas fa-file-invoice-dollar",
+              title: "Cost Estimation",
+              desc: "Automate material & labor cost breakdowns."
+            },
+            {
+              icon: "fas fa-box-open",
+              title: "Material Ordering",
+              desc: "Manage material orders, uploads, and shop details."
+            },
+            {
+              icon: "fas fa-users-cog",
+              title: "Role-based Access",
+              desc: "Clients, Staff, CTOs & Owners work together securely."
+            }
+          ].map((feature, idx) => (
+            <div
+              key={idx}
+              className="p-6 rounded-xl bg-white shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-2 animate-fade-up"
+            >
+              <i className={`${feature.icon} text-blue-600 text-3xl mb-4`}></i>
+              <h4 className="text-xl font-semibold mb-2">{feature.title}</h4>
+              <p className="text-gray-600">{feature.desc}</p>
             </div>
-            <div className="flex items-center space-x-4 text-[12px] text-[#6b7280] select-none">
-              <button className="flex items-center space-x-1 hover:text-[#374151]">
-                <i className="fas fa-sliders-h"></i>
-                <span>Customize</span>
-              </button>
-              <button className="bg-[#2563eb] hover:bg-[#1e40af] text-white rounded px-3 py-1 text-[12px] font-semibold">
-                Manage System
-              </button>
-              <button className="bg-[#4b9440] hover:bg-[#3a6d30] text-white rounded px-3 py-1 text-[12px] font-semibold flex items-center space-x-1">
-                <i className="fas fa-plus"></i>
-                <span>Add Project</span>
-              </button>
-            </div>
-          </div>
+          ))}
+        </div>
+      </section>
 
-          <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
-            <section className="bg-white rounded shadow w-full md:w-1/2">
-              <header className="flex items-center justify-between px-4 py-3 border-b border-[#e5e7eb]">
-                <div className="flex items-center space-x-2 text-[13px] font-semibold text-[#111827]">
-                  <span>Work</span>
-                  <button aria-label="Full Recap" className="flex items-center space-x-1 text-[#6b7280] hover:text-[#374151]">
-                    <i className="fas fa-clock text-[12px]"></i>
-                    <span className="text-[12px]">Full Recap</span>
-                  </button>
-                </div>
-                <div className="flex items-center space-x-3 text-[#6b7280] text-[12px] select-none">
-                  <button aria-label="Add" className="hover:text-[#374151]">
-                    <i className="fas fa-plus"></i>
-                  </button>
-                  <button aria-label="Filter" className="hover:text-[#374151]">
-                    <i className="fas fa-filter"></i>
-                  </button>
-                </div>
-              </header>
-              <ul className="divide-y divide-[#e5e7eb]">
-                <li className="flex items-center justify-between px-4 py-2">
-                  <div className="flex items-center space-x-2 text-[13px] text-[#374151]">
-                    <i className="far fa-calendar-alt text-[#9ca3af]"></i>
-                    <span>meeting with senior devops</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-[12px]">
-                    <span className="inline-block w-4 h-4 rounded-full bg-[#fbbf24] text-[#92400e] text-center text-xs font-bold leading-none">A</span>
-                    <span className="text-[#3b82f6] hover:underline cursor-pointer">Due Jun 3</span>
-                  </div>
-                </li>
-                <li className="flex items-center justify-between px-4 py-2">
-                  <div className="flex items-center space-x-2 text-[13px] text-[#374151]">
-                    <i className="far fa-calendar-alt text-[#fbbf24]"></i>
-                    <span>onboarding ceremony</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-[12px]">
-                    <span className="inline-block w-4 h-4 rounded-full bg-[#fbbf24] text-[#92400e] text-center text-xs font-bold leading-none">A</span>
-                    <span className="text-[#3b82f6] hover:underline cursor-pointer">Due Jun 5</span>
-                  </div>
-                </li>
-                <li className="flex items-center justify-between px-4 py-2">
-                  <div className="flex items-center space-x-2 text-[13px] text-[#374151]">
-                    <i className="far fa-calendar-alt text-[#fbbf24]"></i>
-                    <span>inviteing memebers</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-[12px]">
-                    <span className="inline-block w-4 h-4 rounded-full bg-[#fbbf24] text-[#92400e] text-center text-xs font-bold leading-none">A</span>
-                  </div>
-                </li>
-              </ul>
-            </section>
+      {/* How It Works */}
+      <section id="how-it-works" className="bg-gradient-to-br from-purple-600 to-blue-600 text-white px-6 py-20">
+        <h3 className="text-3xl font-bold mb-10 text-center">How It Works</h3>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <p><i className="fas fa-check-circle mr-2"></i> Register as an owner and invite your team.</p>
+          <p><i className="fas fa-check-circle mr-2"></i> Collect client requirements and track approvals.</p>
+          <p><i className="fas fa-check-circle mr-2"></i> Handle material orders, uploads, payments and delivery.</p>
+        </div>
+      </section>
 
-            <section className="bg-white rounded shadow w-full md:w-1/2">
-              <header className="flex items-center justify-between px-4 py-3 border-b border-[#e5e7eb] text-[13px] font-semibold text-[#111827] select-none">
-                <div className="flex items-center space-x-2">
-                  <button aria-label="Previous Week" className="hover:text-[#374151]">
-                    <i className="fas fa-angle-double-left"></i>
-                  </button>
-                  <button aria-label="Previous Day" className="hover:text-[#374151]">
-                    <i className="fas fa-angle-left"></i>
-                  </button>
-                  <span>June</span>
-                  <button aria-label="Next Day" className="hover:text-[#374151]">
-                    <i className="fas fa-angle-right"></i>
-                  </button>
-                  <button aria-label="Next Week" className="hover:text-[#374151]">
-                    <i className="fas fa-angle-double-right"></i>
-                  </button>
-                </div>
-                <div className="flex items-center space-x-4 text-[#6b7280] text-[12px]">
-                  <button className="hover:text-[#374151]">Day</button>
-                  <button className="hover:text-[#374151]">Week</button>
-                  <button aria-label="Filter" className="hover:text-[#374151]">
-                    <i className="fas fa-filter"></i>
-                  </button>
-                  <button aria-label="More options" className="hover:text-[#374151]">
-                    <i className="fas fa-ellipsis-h"></i>
-                  </button>
-                </div>
-              </header>
-              <div className="grid grid-cols-7 text-[10px] text-[#6b7280] border-b border-[#e5e7eb] select-none">
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">SUN</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">MON</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">TUE</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">WED</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">THU</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">FRI</div>
-                <div className="py-1 px-2">SAT</div>
-              </div>
-              <div className="grid grid-cols-7 text-[10px] text-[#6b7280] border-b border-[#e5e7eb] select-none">
-                <div className="py-1 px-2 border-r border-[#e5e7eb] bg-[#f9fafb]">1</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb] bg-[#f9fafb] relative">
-                  <span className="inline-block w-5 h-5 rounded-full bg-[#3b82f6] text-white text-[10px] font-semibold leading-none text-center absolute -top-1 -left-1 select-none">2</span>
-                </div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">3</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">4</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">5</div>
-                <div className="py-1 px-2 border-r border-[#e5e7eb]">6</div>
-                <div className="py-1 px-2">7</div>
-              </div>
-              <ul className="divide-y divide-[#e5e7eb] text-[13px] text-[#374151]">
-                <li className="flex items-center space-x-2 px-4 py-2">
-                  <i className="far fa-calendar-alt text-[#9ca3af]"></i>
-                  <span>meeting with senior devops</span>
-                  <span className="inline-block w-4 h-4 rounded-full bg-[#fbbf24] text-[#92400e] text-center text-xs font-bold leading-none">A</span>
-                  <span className="text-[#3b82f6] hover:underline cursor-pointer text-[12px]">Due Jun 3</span>
-                </li>
-                <li className="flex items-center space-x-2 px-4 py-2">
-                  <i className="far fa-calendar-alt text-[#fbbf24]"></i>
-                  <span>onboarding ceremony</span>
-                  <span className="inline-block w-4 h-4 rounded-full bg-[#fbbf24] text-[#92400e] text-center text-xs font-bold leading-none">A</span>
-                  <span className="text-[#3b82f6] hover:underline cursor-pointer text-[12px]">Due Jun 5</span>
-                </li>
-              </ul>
-            </section>
-          </div>
-        </main>
-      </div>
-    </main>
-  )
-}
+      {/* Contact / Footer */}
+      <footer id="contact" className="px-6 py-10 bg-gray-800 text-white text-center">
+        <p className="mb-2">Ready to get started?</p>
+        <a href="/login" className="inline-block bg-yellow-400 text-blue-900 font-bold px-6 py-3 rounded-full hover:bg-yellow-300 transition">
+          <i className="fas fa-user-plus mr-2"></i> Register Now
+        </a>
+        <p className="mt-4 text-sm">&copy; {new Date().getFullYear()} Vertical Living. All rights reserved.</p>
+      </footer>
+    </div>
+  );
+};
 
-export default Home
+export default HomePage;

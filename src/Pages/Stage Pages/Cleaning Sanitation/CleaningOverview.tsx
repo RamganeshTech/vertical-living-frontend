@@ -488,7 +488,7 @@ export default function CleaningOverview() {
   if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <main className="w-full h-full max-h-full overflow-y-auto px-1 py-4">
+    <main className="w-full h-full max-h-full overflow-y-auto custom-scrollbar">
       {/* ✅ Header Area: Always visible */}
     {isChildRoute ? (
         <Outlet />
@@ -506,8 +506,8 @@ export default function CleaningOverview() {
             </button>
           )}
           <i className="fas fa-broom" />
-         <span className="hidden sm:inline"> Cleaning & Sanitation Overview</span>
-         <span className="inline sm:hidden"> Cleaning Stage</span>
+         <span className="hidden sm:inline text-2xl"> Cleaning & Sanitation Overview</span>
+         <span className="inline sm:hidden text-2xl"> Cleaning Stage</span>
         </h2>
 
         {/* Toolbar */}
@@ -519,7 +519,7 @@ export default function CleaningOverview() {
           >
             <i className="fa-solid fa-circle-check mr-2"></i>
             <span className="hidden sm:inline-block">Mark as Completed</span>
-            <span className="inline sm:hidden">Complete</span>
+            <span className="inline sm:hidden">Mark as Completed</span>
           </Button>
 
           <div className="flex items-center justify-between w-full sm:gap-2">

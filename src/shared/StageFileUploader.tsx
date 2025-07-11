@@ -20,11 +20,13 @@ interface UploadSectionProps {
     projectId: string,
     onDeleteUpload?: ({ fileId, projectId }: { fileId: string, projectId: string, }) => Promise<any>,
     deleteFilePending?: boolean
-
+    refetch:()=> Promise<any>
 }
 
-const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, projectId, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending, onDeleteUpload, deleteFilePending }) => {
+const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, projectId, refetch, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending, onDeleteUpload, deleteFilePending }) => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [popupImage, setPopupImage] = useState<string | null>(null);
+
 
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +53,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
         try {
             await onDeleteUpload?.({ fileId, projectId });
             toast({ title: "Success", description: "Files Deleted successfully." });
+            refetch()
         } catch (err: any) {
             toast({ title: "Upload Failed", description: err?.response?.data?.message || "Try again later.", variant: "destructive" });
         }
@@ -105,16 +108,16 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
 
                             <li key={i} className="flex justify-between items-center  bg-blue-50 p-2 rounded-xl">
                                 <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
-                                <div className="space-x-2">
+                                <div className="flex gap-2 items-center">
                                     {/* <a href={file.url} target="_blank" download className="text-blue-600 underline">
                                         <i className="fa-solid fa-download"></i>
                                     </a> */}
 
-                                    <Button onClick={() => handleDownload(file.url, file.originalName)} className="text-sm">
+                                    <Button  onClick={() => handleDownload(file.url, file.originalName)} size="sm" className="text-sm">
                                         <i className="fa-solid fa-download"></i>
                                     </Button>
 
-                                    <Button isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-green-600 text-sm">
+                                    <Button size="sm" isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-green-600 text-sm">
                                         <i className="fa-solid fa-trash-can"></i>
                                     </Button>
                                 </div>
@@ -129,21 +132,28 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                 <div className="overflow-y-auto">
                     <h4 className="font-semibold text-blue-800 mb-2">🖼️ Image Files</h4>
                     <ul className="space-y-2  max-h-[180px] rounded-lg border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto custom-scrollbar">
-            {imageFiles.length === 0 && <div className="min-h-[145px]  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
+                        {imageFiles.length === 0 && <div className="min-h-[145px]  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
 
                         {imageFiles.map((file, i) => (
-                            <li key={i} className="flex justify-between items-center bg-green-50 p-2 rounded-xl">
+                            <li key={i} className="flex justify-between items-center bg-green-50 sm:p-2 p-1 rounded-xl">
                                 <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
                                 <div className="flex gap-2 items-center">
-                                    <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                                    {/* <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
                                         <i className="fa-solid fa-eye"></i>
-                                    </a>
+                                    </a> */}
 
-                                    <Button onClick={() => handleDownload(file.url, file.originalName)} className="text-sm">
+                                    <Button size="sm"
+                                        variant="primary"
+                                        onClick={() => setPopupImage(file?.url)}
+                                    >
+                                        <i className="fas fa-eye"></i>
+                                    </Button>
+
+                                    <Button size="sm" onClick={() => handleDownload(file.url, file.originalName)} className="text-sm">
                                         <i className="fa-solid fa-download"></i>
                                     </Button>
 
-                                    <Button isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-blue-600 text-sm">
+                                    <Button size="sm" isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-blue-600 text-sm">
                                         <i className="fa-solid fa-trash-can"></i>
                                     </Button>
 
@@ -154,6 +164,29 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                     </ul>
                 </div>
             </div>
+
+
+            {popupImage && (
+                <div
+                    onClick={() => setPopupImage(null)}
+                    className="fixed inset-0 z-50 p-8 bg-opacity-60 flex items-center justify-center"
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="relative bg-white rounded py-8 px-4 max-w-[90vw] max-h-[80vh] shadow-lg"
+                    >
+                        <i
+                            className="fas fa-times absolute top-2 right-3 text-xl text-gray-700 hover:text-red-500 cursor-pointer"
+                            onClick={() => setPopupImage(null)}
+                        ></i>
+                        <img
+                            src={popupImage}
+                            alt="Full View"
+                            className="max-h-[70vh] w-auto object-contain rounded"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

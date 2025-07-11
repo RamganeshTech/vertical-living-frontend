@@ -67,7 +67,7 @@ import { queryClient } from "../../QueryClient/queryClient";
 
 // === CREATE ===
 export const useCreateQualityCheckItem = () => {
-  const allowedRoles = ["owner", "CTO", "staff", "worker"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
@@ -86,7 +86,7 @@ export const useCreateQualityCheckItem = () => {
 
 // === EDIT ===
 export const useEditQualityCheckItem = () => {
-  const allowedRoles = ["owner", "CTO", "staff", "worker"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
@@ -116,7 +116,7 @@ export const useEditQualityCheckItem = () => {
 
 // === DELETE ===
 export const useDeleteQualityCheckItem = () => {
-  const allowedRoles = ["owner", "CTO", "staff", "worker"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();

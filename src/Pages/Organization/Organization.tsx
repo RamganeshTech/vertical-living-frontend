@@ -4,33 +4,26 @@ import { useGetMyOrganizations } from "../../apiList/orgApi"
 import OrganizationCard from "../../components/OrganizationCard"
 import CreateOrganizationModal from "../../components/CreateOrganizationModal"
 import { Skeleton } from "../../components/ui/Skeleton"
-import { Card, CardContent } from "../../components/ui/Card"
 import Sidebar from "../../shared/Sidebar"
-import { LOGIN_ICONS, LOGIN_LABELS } from "../../constants/constants"
+import {LOGIN_ICONS_LOGIN_GROUP, LOGIN_LABELS } from "../../constants/constants"
 import MobileSidebar from "../../shared/MobileSidebar"
-import { useLogoutCTO } from "../../apiList/CTOApi"
-import { useLogoutClient } from "../../apiList/clientApi"
-import { useLogoutWorker } from "../../apiList/workerApi"
-import { useLogoutUser } from "../../apiList/userApi"
-import { useLogoutStaff } from "../../apiList/staffApi"
+
 
 export default function Organization() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
 
-  console.log("im inside  of the organizaton compo")
   let { data: organizations, isLoading, error, refetch } = useGetMyOrganizations()
   // organizations = {}
 
 
-
   const path = {
     ADMIN: `/login`,
-    STAFF: `/stafflogin`,
-    CTO: `/ctologin`,
-    WORKER: `/workerlogin`,
-    CLIENT: `/clientlogin`
+    STAFF: `/login/staff`,
+    CTO: `/login/cto`,
+    WORKER: `/login/worker`,
+    CLIENT: `/login/client`
   }
 
 
@@ -99,7 +92,7 @@ export default function Organization() {
           </div>
           <h2 className="text-2xl font-bold text-red-600 mb-2">Error Loading Organizations</h2>
           <p className="text-gray-600 mb-4">{(error as any)?.response?.data?.message || error?.message || "Something happened try again please"}</p>
-          <Button onClick={() => refetch()} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button onClick={() => refetch()} className="bg-blue-600 hover:bg-blue-700 text-white active:scale-95">
             <i className="fas fa-redo mr-2"></i>
             Try Again
           </Button>
@@ -108,13 +101,6 @@ export default function Organization() {
     )
   }
 
-
-
-
-  // Calculate stats
-  const totalOrganizations = organizations?.length || 0
-  // const totalStaff = Array.isArray(organizations) ? (organizations?.reduce((sum: number, org: any) => sum + (org.staffCount || 0), 0) || 0) : 0
-  // const avgStaffPerOrg = totalOrganizations > 0 ? Math.round(totalStaff / totalOrganizations) : 0
 
   // organizations = []
 
@@ -135,7 +121,7 @@ export default function Organization() {
         <Sidebar
           path={path}
           labels={LOGIN_LABELS}
-          icons={LOGIN_ICONS}
+          icons={LOGIN_ICONS_LOGIN_GROUP}
         />
       )}
 
@@ -158,16 +144,17 @@ export default function Organization() {
                 }
                 <div className="flex flex-col gap-1 w-[50vw]">
                   <h1 className="text-xl sm:text-2xl font-semibold text-blue-800">
-                    <i className="fas fa-building mr-2 text-blue-600"></i>Organizations
+                    <i className="fas fa-building mr-2 text-blue-600"></i>Organization
                   </h1>
                   <p className="text-sm sm:inline hidden text-blue-500">
-                    Manage your organizations and teams
+                    Manage your organization and teams
                   </p>
                 </div>
               </div>
 
               {/* Stats + Button */}
-              <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+
+             { !organizations && <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                 <Button
                   onClick={() => setIsCreateModalOpen(true)}
                   variant="primary"
@@ -178,7 +165,7 @@ export default function Organization() {
                   <span className="inline sm:hidden">Create</span>
                 </Button>
 
-              </div>
+              </div>}
             </div>
           </div>
         </div>
@@ -208,34 +195,14 @@ export default function Organization() {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-semibold text-blue-900">Your Organization</h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className=" xl:!w-[30%] lg:w-[50%] sm:w-[60%] w-[100%]">
                   {/* {organizations.map((org: any) => ( */}
                   <OrganizationCard organization={organizations} />
                   {/* ))} */}
                 </div>
-
-                {/* <div className="mt-6 sm:w-3/4 mx-auto bg-white/60 backdrop-blur-sm rounded-3xl p-8 sm:p-12 shadow-xl border border-white/20">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <i className="fas fa-plus text-white text-2xl"></i>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">Ready to expand?</h3>
-                  <p className="text-gray-600 mb-8 text-lg leading-relaxed max-w-md mx-auto">
-                    Create another organization to manage different teams or projects
-                  </p>
-                  <Button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    variant="outline"
-                    className="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 px-8 py-3 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105"
-                  >
-                    <i className="fas fa-plus mr-3"></i>
-                    Add Another Organization
-                  </Button>
-                </div>
-              </div> */}
               </div>
             ) : (
-              <div className="text-center py-16">
+              <div className="text-center py-16 overflow-y-auto max-h-[90%]">
                 <div className="max-w-md mx-auto">
                   <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                     <i className="fas fa-building text-blue-500 text-4xl"></i>

@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import type { SiteDetails } from '../../../types/types'
+import { Button } from '../../../components/ui/Button'
 
 
 type CommonSiteFormProps = {
@@ -7,10 +8,11 @@ type CommonSiteFormProps = {
     setSiteDetails:React.Dispatch<React.SetStateAction<SiteDetails>>,
     handleSiteSubmit: ()=> Promise<any>,
     setShowSiteForm:React.Dispatch<React.SetStateAction<boolean>>,
+    updatePending:boolean
 }
 
 
-const CommonSiteForm:React.FC<CommonSiteFormProps> = ({siteDetails, setSiteDetails, handleSiteSubmit, setShowSiteForm}) => {
+const CommonSiteForm:React.FC<CommonSiteFormProps> = ({siteDetails, updatePending, setSiteDetails, handleSiteSubmit, setShowSiteForm}) => {
   return (
     <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center p-4 z-50">
               <div className="bg-white rounded-lg w-full max-w-2xl p-6">
@@ -85,18 +87,20 @@ const CommonSiteForm:React.FC<CommonSiteFormProps> = ({siteDetails, setSiteDetai
                   rows={4}
                 />
                 <div className="flex justify-end gap-4">
-                  <button
+                  <Button
+                  variant='secondary'
                     onClick={() => setShowSiteForm(false)}
                     className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                  variant='primary'
                     onClick={handleSiteSubmit}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  isLoading={updatePending}
                   >
                     Save Details
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

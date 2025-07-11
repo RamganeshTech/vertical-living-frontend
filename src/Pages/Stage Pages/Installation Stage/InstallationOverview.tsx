@@ -217,7 +217,7 @@ export default function InstallationOverview() {
   if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <main className="w-full h-full px-2 py-4">
+    <main className="w-full h-full">
       {/* Header Section – Always Visible */}
       {isChildRoute ? (
         <Outlet />

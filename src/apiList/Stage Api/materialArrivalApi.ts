@@ -1,6 +1,6 @@
 // 🔁 Imports
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getApiForRole } from "../../utils/roleCheck"; 
+import { getApiForRole } from "../../utils/roleCheck";
 import useGetRole from './../../Hooks/useGetRole';
 import type { AxiosInstance } from "axios";
 import axios from "axios";
@@ -51,7 +51,7 @@ export const getMaterialArrivalRoomDetailsApi = async (
   api: any
 ) => {
   const res = await api.get(`/materialarrivalcheck/${projectId}/room/${roomKey}`);
-  console.log("data form the get mateiralarrival room details",res.data.data)
+  console.log("data form the get mateiralarrival room details", res.data.data)
   return res.data.data;
 };
 
@@ -71,22 +71,28 @@ const getPublicMaterialArrivalApi = async (
 // ✅ Custom Hooks
 
 export const useGetMaterialArrivalDetails = (projectId: string) => {
+  const allowedRoles = ["owner", "staff", "CTO", "worker", "client"]
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   return useQuery({
     queryKey: ["material-arrival", projectId],
     queryFn: () => getAllMaterialArrivalApi(projectId, api),
     enabled: !!projectId && !!role && allowedRoles.includes(role),
+    retry: false,
+    refetchOnMount: false
   });
 };
 
 export const useGetSingleRoomMaterialArrival = (projectId: string, roomKey: string) => {
+  const allowedRoles = ["owner", "staff", "CTO", "worker", "client"]
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   return useQuery({
     queryKey: ["material-arrival-room", projectId, roomKey],
     queryFn: () => getMaterialArrivalRoomDetailsApi(projectId, roomKey, api),
     enabled: !!projectId && !!roomKey && !!role && allowedRoles.includes(role),
+    retry: false,
+    refetchOnMount: false
   });
 };
 
@@ -181,7 +187,7 @@ export const useGetPublicMaterialArrival = (projectId: string, token: string) =>
   return useQuery({
     queryKey: ["material-arrival-public", projectId, token],
     queryFn: async () => {
-     return await getPublicMaterialArrivalApi(projectId, token)
+      return await getPublicMaterialArrivalApi(projectId, token)
     },
     enabled: !!projectId && !!token,
   });
@@ -193,21 +199,22 @@ export const useGetPublicMaterialArrival = (projectId: string, token: string) =>
 
 
 // COMMON API 
- const setMaterialArrivalDeadlineApi = async ({
+const setMaterialArrivalDeadlineApi = async ({
   formId,
- projectId,  deadLine, api }:
-  {  projectId: string,
-  formId: string;
-  deadLine: string;
-  api: AxiosInstance;
-}) => {
+  projectId, deadLine, api }:
+  {
+    projectId: string,
+    formId: string;
+    deadLine: string;
+    api: AxiosInstance;
+  }) => {
   const { data } = await api.put(`/materialarrivalcheck/deadline/${projectId}/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
 // ✅ 11. Complete Stage
- const completeMaterialArrivalStageApi = async ({
+const completeMaterialArrivalStageApi = async ({
   projectId,
   api,
 }: {
@@ -228,17 +235,18 @@ export const useSetMaterialArrivalDeadline = () => {
   return useMutation({
     mutationFn: async ({
       formId,
-     projectId,  deadLine,  }:
-     {  projectId: string,
-      formId: string;
-      deadLine: string;
-    }) => {
+      projectId, deadLine, }:
+      {
+        projectId: string,
+        formId: string;
+        deadLine: string;
+      }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await setMaterialArrivalDeadlineApi({ formId, projectId,  deadLine, api });
+      return await setMaterialArrivalDeadlineApi({ formId, projectId, deadLine, api });
     },
     onSuccess: (_, vars) => {
-      queryClient.invalidateQueries({queryKey: ["ordering-material", vars.formId] });
+      queryClient.invalidateQueries({ queryKey: ["ordering-material", vars.formId] });
     },
   });
 };
@@ -256,7 +264,7 @@ export const useCompleteMaterialArrivalStage = () => {
       return await completeMaterialArrivalStageApi({ projectId, api });
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({queryKey: ["ordering-material", projectId]});
+      queryClient.invalidateQueries({ queryKey: ["ordering-material", projectId] });
     },
   });
 };

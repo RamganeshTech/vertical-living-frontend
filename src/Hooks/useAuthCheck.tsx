@@ -1,7 +1,7 @@
 // hooks/useAuthCheck.ts
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setRole } from "../features/authSlice";
+import { logout, setRole } from "../features/authSlice";
 import Api from "../apiService/apiService";
 import staffApi from "../apiService/staffApiservice";
 import workerApi from "../apiService/workerApiService";
@@ -24,6 +24,7 @@ export const useAuthCheck = () => {
     isauthenticated: false,
     _id:null
   });
+
 
   useEffect(() => {
     const checkAllRoles = async () => {
@@ -90,6 +91,7 @@ export const useAuthCheck = () => {
         dispatch(resetWorkerProfile())
         dispatch(resetCTOProfile())
         dispatch(resetClientProfile())
+        dispatch(logout())
 
         setLoading(false);
       } catch (error) {
@@ -103,6 +105,7 @@ export const useAuthCheck = () => {
         dispatch(resetWorkerProfile())
         dispatch(resetCTOProfile())
         dispatch(resetClientProfile())
+        dispatch(logout())
 
        
         setLoading(false);

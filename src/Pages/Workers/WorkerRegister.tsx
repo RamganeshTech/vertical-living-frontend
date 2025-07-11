@@ -116,6 +116,8 @@ export default function WorkerRegister() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+   
+    try {
     e.preventDefault()
 
     if (!invite) {
@@ -131,7 +133,7 @@ export default function WorkerRegister() {
       return
     }
 
-    try {
+      
       const data = await registerWorker.mutateAsync({
         invite,
         payload: {
@@ -143,21 +145,22 @@ export default function WorkerRegister() {
       })
 
 
-      const workerData = data.data;
+      const workerData = data?.data;
 
       // ✅ If you want auto-login immediately after register:
+
       dispatch(setRole({
-        role: workerData.role,
+        role: workerData?.role,
         isauthenticated: true,
-        _id: workerData._id
+        _id: workerData?._id
       }));
 
       dispatch(setWorkerProfileData({
-        workerId: workerData._id,
-        workerName: workerData.workerName,
-        email: workerData.email,
-        phoneNo: workerData.phoneNo,
-        role: workerData.role,
+        workerId: workerData?._id,
+        workerName: workerData?.workerName,
+        email: workerData?.email,
+        phoneNo: workerData?.phoneNo,
+        role: workerData?.role,
         isauthenticated: true
       }));
 
@@ -169,7 +172,7 @@ export default function WorkerRegister() {
 
       // Redirect to worker login page
       setTimeout(() => {
-        navigate("/")
+        navigate("/organizations")
       }, 2000)
     } catch (error: any) {
       toast({
@@ -178,6 +181,7 @@ export default function WorkerRegister() {
         variant: "destructive",
       })
     }
+
   }
 
   if (!invite) {

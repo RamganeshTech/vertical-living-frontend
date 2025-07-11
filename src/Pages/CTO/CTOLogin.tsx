@@ -2,7 +2,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
@@ -21,6 +21,7 @@ export default function CTOLogin() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const { isMobile, openMobileSidebar } = useOutletContext<any>()
 
   const loginCTO = useLoginCTO()
   const dispatch = useDispatch()
@@ -70,24 +71,24 @@ export default function CTOLogin() {
       const data = await loginCTO.mutateAsync(formData)
 
 
-        const CTOData = data.data;
+      const CTOData = data.data;
 
-    // ✅ 1) Set authSlice
-    dispatch(setRole({
-      role: CTOData.role,
-      isauthenticated: true,
-      _id: CTOData.CTOId // map _id
-    }));
+      // ✅ 1) Set authSlice
+      dispatch(setRole({
+        role: CTOData.role,
+        isauthenticated: true,
+        _id: CTOData.CTOId // map _id
+      }));
 
-    // ✅ 2) Set CTOSlice
-    dispatch(setCTOProfileData({
-      CTOId: CTOData.CTOId,
-      CTOName: CTOData.CTOName,
-      email: CTOData.email,
-      phoneNo: CTOData.phoneNo,
-      role: CTOData.role,
-      isauthenticated: true
-    }));
+      // ✅ 2) Set CTOSlice
+      dispatch(setCTOProfileData({
+        CTOId: CTOData.CTOId,
+        CTOName: CTOData.CTOName,
+        email: CTOData.email,
+        phoneNo: CTOData.phoneNo,
+        role: CTOData.role,
+        isauthenticated: true
+      }));
 
 
       toast({
@@ -114,9 +115,23 @@ export default function CTOLogin() {
       </div> */}
 
 
-        <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
+      {/* <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[2%] right-[5%] sm:right-[10%]">
               Go Back
-            </Button>
+            </Button> */}
+
+
+      <div className="absolute top-2 left-2">
+        {isMobile && (
+          <button
+            onClick={openMobileSidebar}
+            className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+            title="Open Menu"
+          >
+            <i className="fa-solid fa-bars"></i>
+          </button>
+        )}
+      </div>
+
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
@@ -150,9 +165,8 @@ export default function CTOLogin() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email address"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.email}
                   />
                 </div>
@@ -174,9 +188,8 @@ export default function CTOLogin() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Enter your password"
-                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${
-                      errors.password ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.password ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
                   <button

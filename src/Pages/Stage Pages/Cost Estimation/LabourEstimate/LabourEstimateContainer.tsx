@@ -77,6 +77,7 @@ const LabourEstimateContainer = () => {
         try {
             await deleteLabour({ projectId: projectId!, labourId: labourId });
             toast({ description: 'Deleted successfully', title: "Success" });
+            refetch()
         } catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
 
@@ -87,12 +88,13 @@ const LabourEstimateContainer = () => {
 
     const handleEditLabour = async (labourId: string) => {
         try {
+            if (!editData.workType) {
+                throw new Error("workType is mandatory")
+            }
             await editLabour({ projectId: projectId!, labourId: labourId, updates: editData });
             toast({ description: 'edited successfully', title: "Success" });
             resetEditData()
             refetch()
-            refetch()
-
         } catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
 
@@ -102,7 +104,7 @@ const LabourEstimateContainer = () => {
 
     const handleAdd = async () => {
         try {
-            if(newData.workType) {
+            if (!newData.workType) {
                 throw new Error("Please Enter the workType")
             }
             await addLabour({ projectId: projectId!, labourData: newData });
@@ -116,95 +118,94 @@ const LabourEstimateContainer = () => {
             setShowForm(false)
             toast({ title: "Success", description: "Labour estimation added" });
             refetch()
-
         } catch (err: any) {
             toast({ title: "Error", description: err.message, variant: "destructive" });
         }
     };
 
 
-//     const llabourList = [
-//   {
-//     workType: "Carpenter",
-//     noofPeople: 4,
-//     daysPlanned: 30,
-//     perdaySalary: 800,
-//     weeklySalary: 22400,
-//     totalCost: 96000
-//   },
-//   {
-//     workType: "Electrician",
-//     noofPeople: 3,
-//     daysPlanned: 28,
-//     perdaySalary: 700,
-//     weeklySalary: 14700,
-//     totalCost: 58800
-//   },
-//   {
-//     workType: "Painter",
-//     noofPeople: 5,
-//     daysPlanned: 21,
-//     perdaySalary: 600,
-//     weeklySalary: 21000,
-//     totalCost: 63000
-//   },
-//   {
-//     workType: "Plumber",
-//     noofPeople: 2,
-//     daysPlanned: 14,
-//     perdaySalary: 800,
-//     weeklySalary: 11200,
-//     totalCost: 22400
-//   },
-//   {
-//     workType: "Welder",
-//     noofPeople: 3,
-//     daysPlanned: 35,
-//     perdaySalary: 750,
-//     weeklySalary: 15750,
-//     totalCost: 78750
-//   },
-//   {
-//     workType: "Mason",
-//     noofPeople: 6,
-//     daysPlanned: 25,
-//     perdaySalary: 650,
-//     weeklySalary: 27300,
-//     totalCost: 97500
-//   },
-//   {
-//     workType: "Tile Worker",
-//     noofPeople: 2,
-//     daysPlanned: 20,
-//     perdaySalary: 800,
-//     weeklySalary: 11200,
-//     totalCost: 32000
-//   },
-//   {
-//     workType: "Supervisor",
-//     noofPeople: 1,
-//     daysPlanned: 40,
-//     perdaySalary: 1000,
-//     weeklySalary: 7000,
-//     totalCost: 40000
-//   },
-//   {
-//     workType: "Fabricator",
-//     noofPeople: 2,
-//     daysPlanned: 18,
-//     perdaySalary: 900,
-//     weeklySalary: 12600,
-//     totalCost: 32400
-//   },
-//   {
-//     workType: "Cleaner",
-//     noofPeople: 2,
-//     daysPlanned: 15,
-//     perdaySalary: 400,
-//     weeklySalary: 5600,
-//     totalCost: 12000
-//   }
-// ];
+    //     const llabourList = [
+    //   {
+    //     workType: "Carpenter",
+    //     noofPeople: 4,
+    //     daysPlanned: 30,
+    //     perdaySalary: 800,
+    //     weeklySalary: 22400,
+    //     totalCost: 96000
+    //   },
+    //   {
+    //     workType: "Electrician",
+    //     noofPeople: 3,
+    //     daysPlanned: 28,
+    //     perdaySalary: 700,
+    //     weeklySalary: 14700,
+    //     totalCost: 58800
+    //   },
+    //   {
+    //     workType: "Painter",
+    //     noofPeople: 5,
+    //     daysPlanned: 21,
+    //     perdaySalary: 600,
+    //     weeklySalary: 21000,
+    //     totalCost: 63000
+    //   },
+    //   {
+    //     workType: "Plumber",
+    //     noofPeople: 2,
+    //     daysPlanned: 14,
+    //     perdaySalary: 800,
+    //     weeklySalary: 11200,
+    //     totalCost: 22400
+    //   },
+    //   {
+    //     workType: "Welder",
+    //     noofPeople: 3,
+    //     daysPlanned: 35,
+    //     perdaySalary: 750,
+    //     weeklySalary: 15750,
+    //     totalCost: 78750
+    //   },
+    //   {
+    //     workType: "Mason",
+    //     noofPeople: 6,
+    //     daysPlanned: 25,
+    //     perdaySalary: 650,
+    //     weeklySalary: 27300,
+    //     totalCost: 97500
+    //   },
+    //   {
+    //     workType: "Tile Worker",
+    //     noofPeople: 2,
+    //     daysPlanned: 20,
+    //     perdaySalary: 800,
+    //     weeklySalary: 11200,
+    //     totalCost: 32000
+    //   },
+    //   {
+    //     workType: "Supervisor",
+    //     noofPeople: 1,
+    //     daysPlanned: 40,
+    //     perdaySalary: 1000,
+    //     weeklySalary: 7000,
+    //     totalCost: 40000
+    //   },
+    //   {
+    //     workType: "Fabricator",
+    //     noofPeople: 2,
+    //     daysPlanned: 18,
+    //     perdaySalary: 900,
+    //     weeklySalary: 12600,
+    //     totalCost: 32400
+    //   },
+    //   {
+    //     workType: "Cleaner",
+    //     noofPeople: 2,
+    //     daysPlanned: 15,
+    //     perdaySalary: 400,
+    //     weeklySalary: 5600,
+    //     totalCost: 12000
+    //   }
+    // ];
 
 
     return (
@@ -246,104 +247,104 @@ const LabourEstimateContainer = () => {
                 }
             </section>
 
-           { labourList?.length > 0 && <div className="bg-white rounded  overflow-hidden">
+            {labourList?.length > 0 && <div className="bg-white rounded  overflow-hidden">
 
                 <section>
                     <div className="mb-4 p-4 bg-blue-50 rounded-lg">
                         <div className="flex justify-between items-center">
                             <span className="text-sm font-medium text-blue-900">Total Labour Cost:</span>
-                            <span className={`text-lg font-bold  text-blue-900`}>₹{totalLabourCost?.toLocaleString() ||  <span>0</span>}</span>
+                            <span className={`text-lg font-bold  text-blue-900`}>₹{totalLabourCost?.toLocaleString() || <span>0</span>}</span>
                         </div>
                     </div>
                 </section>
 
- <div className="w-full overflow-x-auto h-[95%]  custom-scrollbar">
+                <div className="w-full overflow-x-auto h-[95%]  custom-scrollbar">
                     <div className="min-w-[1000px]">
-                <section className='shadow-lg !rounded-lg'>
-                    <div className="grid grid-cols-7 bg-blue-50 px-6 py-3 font-semibold text-gray-700 text-sm">
-                        <div className="text-left px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Work Type</div>
-                        <div className="text-center px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No.Of People</div>
-                        <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Days Planned</div>
-                        <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Per Day Salary</div>
-                        <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Weekly Salary</div>
-                        <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</div>
-                        <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</div>
-                    </div>
-
-                    <div className="divide-y divide-gray-100 shadow-md  rounded-lg max-h-[65vh] overflow-y-auto bg-white">
-                        {labourList?.map((labour: any) => (
-                            <div key={labour._id} className={`grid grid-cols-7 rounded-lg items-center gap-2 px-6 py-4 text-sm ${editingId === labour._id ? "" : "hover:bg-[#f7fbff]"}`}>
-                                {editingId === labour._id ? (
-                                    <>
-                                        <Input required={true} value={editData.workType} onChange={(e) => setEditData({ ...editData, workType: e.target.value })} />
-                                        <Input type="number" value={editData.noOfPeople} onChange={(e) => setEditData({ ...editData, noOfPeople: +e.target.value })} />
-                                        <Input type="number" value={editData.daysPlanned} onChange={(e) => setEditData({ ...editData, daysPlanned: +e.target.value })} />
-                                        <Input type="number" value={editData.perdaySalary} onChange={(e) => setEditData({ ...editData, perdaySalary: +e.target.value })} />
-                                        <div className="text-gray-700">₹{(editData.perdaySalary * 7) || 0}</div>
-                                        <div className="text-gray-700">₹{editData.daysPlanned * editData.perdaySalary || 0}</div>
-                                        <div className="flex items-center justify-center gap-2">
-                                            <Button onClick={() => handleEditLabour(labour._id)} isLoading={editPending}><i className="fas fa-check"></i></Button>
-                                            <Button variant="ghost" onClick={() => setEditingId(null)}>✖</Button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className='font-medium text-left    text-gray-700'>{labour.workType}</div>
-                                        <div className='font-medium text-center  text-gray-700'>{labour?.noOfPeople}</div>
-                                        <div className='font-medium text-center  text-gray-700'>{labour.daysPlanned}</div>
-                                        <div className='font-medium text-center  text-gray-700'>₹{labour.perdaySalary}</div>
-                                        <div className='font-medium text-center  text-gray-700'>₹{labour.weeklySalary}</div>
-                                        <div className="text-gray-800 font-medium text-center">₹{labour.totalCost || 0}</div>
-                                        <div className="flex items-center justify-center gap-2">
-                                            <Button onClick={() => handleEdit(labour)}>✎</Button>
-                                            <Button variant="danger" className='bg-red-500 text-white' isLoading={deletePending} onClick={() => handleDeleteLabour(labour._id)}> <i className='fas fa-trash-can'></i> </Button>
-                                        </div>
-                                    </>
-                                )}
+                        <section className='shadow-lg !rounded-lg'>
+                            <div className="grid grid-cols-7 bg-blue-50 px-6 py-3 font-semibold text-gray-700 text-sm">
+                                <div className="text-left px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Work Type</div>
+                                <div className="text-center px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No.Of People</div>
+                                <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Days Planned</div>
+                                <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Per Day Salary</div>
+                                <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Weekly Salary</div>
+                                <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost</div>
+                                <div className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</div>
                             </div>
-                        ))}
 
-                        {showAddRow &&
-                            <div className="grid grid-cols-7 gap-2  px-6 py-4 text-sm  !bg-none">
-                                <Input
-                                required={true}
-                                    placeholder="Work Type"
-                                    value={newData.workType}
-                                    onChange={(e) => setNewData({ ...newData, workType: e.target.value })}
-                                />
-                                <Input
-                                    placeholder="No of people"
-                                    value={newData.workType}
-                                    onChange={(e) => setNewData({ ...newData, noOfPeople: +e.target.value })}
-                                />
-                                <Input
-                                    placeholder="Days"
-                                    type="number"
-                                    value={newData.daysPlanned}
-                                    onChange={(e) => setNewData({ ...newData, daysPlanned: +e.target.value })}
-                                />
-                                <Input
-                                    placeholder="Per Day Salary"
-                                    type="number"
-                                    value={newData.perdaySalary}
-                                    onChange={(e) => setNewData({ ...newData, perdaySalary: +e.target.value })}
-                                />
-                                <p className="font-medium text-center  text-gray-700 leading-10 ">₹{(newData.perdaySalary * newData.noOfPeople) * 7 || 0}</p>
-                                <div className="font-medium text-center  text-gray-700 leading-10">₹{(newData.daysPlanned * newData.perdaySalary) * newData.noOfPeople || 0}</div>
-                                <div className="flex  items-center justify-center gap-2">
-                                    <Button onClick={handleAdd} isLoading={addPending}>Add</Button>
-                                    <Button variant="outline" onClick={() => setShowAddRow(false)}>Cancel</Button>
-                                </div>
+                            <div className="divide-y divide-gray-100 shadow-md  rounded-lg max-h-[65vh] overflow-y-auto bg-white">
+                                {labourList?.map((labour: any) => (
+                                    <div key={labour._id} className={`grid grid-cols-7 rounded-lg items-center gap-2 px-6 py-4 text-sm ${editingId === labour._id ? "" : "hover:bg-[#f7fbff]"}`}>
+                                        {editingId === labour._id ? (
+                                            <>
+                                                <Input required={true} value={editData.workType} onChange={(e) => setEditData({ ...editData, workType: e.target.value })} />
+                                                <Input type="number" value={editData.noOfPeople} onChange={(e) => setEditData({ ...editData, noOfPeople: +e.target.value })} />
+                                                <Input type="number" value={editData.daysPlanned} onChange={(e) => setEditData({ ...editData, daysPlanned: +e.target.value })} />
+                                                <Input type="number" value={editData.perdaySalary} onChange={(e) => setEditData({ ...editData, perdaySalary: +e.target.value })} />
+                                                <div className="text-gray-700">₹{(editData.perdaySalary * 7) || 0}</div>
+                                                <div className="text-gray-700">₹{editData.daysPlanned * editData.perdaySalary || 0}</div>
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <Button onClick={() => handleEditLabour(labour._id)} isLoading={editPending}><i className="fas fa-check"></i></Button>
+                                                    <Button variant="ghost" onClick={() => setEditingId(null)}>✖</Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className='font-medium text-left   text-gray-700'>{labour.workType || "N/A"}</div>
+                                                <div className='font-medium text-center text-gray-700'>{labour?.noOfPeople || "N/A"}</div>
+                                                <div className='font-medium text-center text-gray-700'>{labour.daysPlanned || "N/A"}</div>
+                                                <div className='font-medium text-center text-gray-700'>{`₹${labour.perdaySalary}` || "N/A"}</div>
+                                                <div className='font-medium text-center text-gray-700'>{`₹${labour.weeklySalary}` || "N/A"}</div>
+                                                <div className="text-gray-800 font-medium text-center">₹{labour.totalCost || 0}</div>
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <Button onClick={() => handleEdit(labour)}> <i className='fas fa-pen'></i></Button>
+                                                    <Button variant="danger" className='bg-red-500 text-white' isLoading={deletePending} onClick={() => handleDeleteLabour(labour._id)}> <i className='fas fa-trash-can'></i> </Button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {showAddRow &&
+                                    <div className="grid grid-cols-7 gap-2  px-6 py-4 text-sm  !bg-none">
+                                        <Input
+                                            required={true}
+                                            placeholder="Work Type"
+                                            value={newData.workType}
+                                            onChange={(e) => setNewData({ ...newData, workType: e.target.value })}
+                                        />
+                                        <Input
+                                            placeholder="No of people"
+                                            value={newData.noOfPeople}
+                                            onChange={(e) => setNewData({ ...newData, noOfPeople: +e.target.value })}
+                                        />
+                                        <Input
+                                            placeholder="Days"
+                                            type="number"
+                                            value={newData.daysPlanned}
+                                            onChange={(e) => setNewData({ ...newData, daysPlanned: +e.target.value })}
+                                        />
+                                        <Input
+                                            placeholder="Per Day Salary"
+                                            type="number"
+                                            value={newData.perdaySalary}
+                                            onChange={(e) => setNewData({ ...newData, perdaySalary: +e.target.value })}
+                                        />
+                                        <p className="font-medium text-center  text-gray-700 leading-10 ">₹{(newData.perdaySalary * newData.noOfPeople) * 7 || 0}</p>
+                                        <div className="font-medium text-center  text-gray-700 leading-10">₹{(newData.daysPlanned * newData.perdaySalary) * newData.noOfPeople || 0}</div>
+                                        <div className="flex  items-center justify-center gap-2">
+                                            <Button onClick={handleAdd} isLoading={addPending}>Add</Button>
+                                            <Button variant="outline" onClick={() => setShowAddRow(false)}>Cancel</Button>
+                                        </div>
+                                    </div>
+                                }
                             </div>
-                        }
-                    </div>
 
 
-                    <div className="mt-2">
-                        <Button variant="primary" onClick={() => setShowAddRow(true)}>+ Add Labour Estimation</Button>
-                    </div>
-                </section>
-</div></div>
+                            <div className="mt-2">
+                                <Button variant="primary" onClick={() => setShowAddRow(true)}>+ Add Labour Estimation</Button>
+                            </div>
+                        </section>
+                    </div></div>
             </div>}
         </main>
     );

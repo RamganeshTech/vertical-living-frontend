@@ -6,109 +6,110 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
+import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
 
-const dummyQualityCheckRooms: QualityCheckRoom[] = [
-  {
-    workName: "Electrical Wiring",
-    status: "Pending",
-    remarks: "Awaiting inspection",
-    upload: {
-      type: "image",
-      url: "https://example.com/uploads/electrical-wiring.jpg",
-      originalName: "wiring.jpg",
-    },
-  },
-  {
-    workName: "Plumbing",
-    status: "Completed",
-    remarks: "Checked by supervisor",
-    upload: {
-      type: "pdf",
-      url: "https://example.com/uploads/plumbing-report.pdf",
-      originalName: "plumbing-report.pdf",
-    },
-  },
-  {
-    workName: "Tile Flooring",
-    status: "In Progress",
-    remarks: "50% done, minor alignment issue",
-    upload: {
-      type: "image",
-      url: "https://example.com/uploads/tile-flooring.jpg",
-      originalName: "tile-flooring.jpg",
-    },
-  },
-  {
-    workName: "False Ceiling",
-    status: "Pending",
-    remarks: "Materials delivered, work yet to start",
-    upload: {
-      type: "image",
-      url: "https://example.com/uploads/false-ceiling.jpg",
-      originalName: "false-ceiling.jpg",
-    },
-  },
-  {
-    workName: "Wooden Doors",
-    status: "Completed",
-    remarks: "Installed, polish pending",
-    upload: {
-      type: "pdf",
-      url: "https://example.com/uploads/wooden-doors.pdf",
-      originalName: "wooden-doors.pdf",
-    },
-  },
-  {
-    workName: "Window Fittings",
-    status: "In Progress",
-    remarks: "2 windows left for fitting",
-    upload: {
-      type: "image",
-      url: "https://example.com/uploads/window-fittings.jpg",
-      originalName: "window-fittings.jpg",
-    },
-  },
-  {
-    workName: "Painting",
-    status: "Pending",
-    remarks: "Paint samples approved",
-    upload: {
-      type: "image",
-      url: "https://example.com/uploads/painting.jpg",
-      originalName: "painting.jpg",
-    },
-  },
-  {
-    workName: "Modular Kitchen",
-    status: "In Progress",
-    remarks: "Carcass fitting done",
-    upload: {
-      type: "pdf",
-      url: "https://example.com/uploads/modular-kitchen.pdf",
-      originalName: "modular-kitchen.pdf",
-    },
-  },
-  {
-    workName: "Wardrobe Assembly",
-    status: "Completed",
-    remarks: "Final polish done",
-    upload: {
-      type: "image",
-      url: "https://example.com/uploads/wardrobe.jpg",
-      originalName: "wardrobe.jpg",
-    },
-  },
-  {
-    workName: "Exterior Cladding",
-    status: "Pending",
-    remarks: "Material supply delayed",
-    upload: {
-      type: "image",
-      url: "https://example.com/uploads/exterior-cladding.jpg",
-      originalName: "exterior-cladding.jpg",
-    },
-  },
-];
+// const dummyQualityCheckRooms: QualityCheckRoom[] = [
+//   {
+//     workName: "Electrical Wiring",
+//     status: "Pending",
+//     remarks: "Awaiting inspection",
+//     upload: {
+//       type: "image",
+//       url: "https://example.com/uploads/electrical-wiring.jpg",
+//       originalName: "wiring.jpg",
+//     },
+//   },
+//   {
+//     workName: "Plumbing",
+//     status: "Completed",
+//     remarks: "Checked by supervisor",
+//     upload: {
+//       type: "pdf",
+//       url: "https://example.com/uploads/plumbing-report.pdf",
+//       originalName: "plumbing-report.pdf",
+//     },
+//   },
+//   {
+//     workName: "Tile Flooring",
+//     status: "In Progress",
+//     remarks: "50% done, minor alignment issue",
+//     upload: {
+//       type: "image",
+//       url: "https://example.com/uploads/tile-flooring.jpg",
+//       originalName: "tile-flooring.jpg",
+//     },
+//   },
+//   {
+//     workName: "False Ceiling",
+//     status: "Pending",
+//     remarks: "Materials delivered, work yet to start",
+//     upload: {
+//       type: "image",
+//       url: "https://example.com/uploads/false-ceiling.jpg",
+//       originalName: "false-ceiling.jpg",
+//     },
+//   },
+//   {
+//     workName: "Wooden Doors",
+//     status: "Completed",
+//     remarks: "Installed, polish pending",
+//     upload: {
+//       type: "pdf",
+//       url: "https://example.com/uploads/wooden-doors.pdf",
+//       originalName: "wooden-doors.pdf",
+//     },
+//   },
+//   {
+//     workName: "Window Fittings",
+//     status: "In Progress",
+//     remarks: "2 windows left for fitting",
+//     upload: {
+//       type: "image",
+//       url: "https://example.com/uploads/window-fittings.jpg",
+//       originalName: "window-fittings.jpg",
+//     },
+//   },
+//   {
+//     workName: "Painting",
+//     status: "Pending",
+//     remarks: "Paint samples approved",
+//     upload: {
+//       type: "image",
+//       url: "https://example.com/uploads/painting.jpg",
+//       originalName: "painting.jpg",
+//     },
+//   },
+//   {
+//     workName: "Modular Kitchen",
+//     status: "In Progress",
+//     remarks: "Carcass fitting done",
+//     upload: {
+//       type: "pdf",
+//       url: "https://example.com/uploads/modular-kitchen.pdf",
+//       originalName: "modular-kitchen.pdf",
+//     },
+//   },
+//   {
+//     workName: "Wardrobe Assembly",
+//     status: "Completed",
+//     remarks: "Final polish done",
+//     upload: {
+//       type: "image",
+//       url: "https://example.com/uploads/wardrobe.jpg",
+//       originalName: "wardrobe.jpg",
+//     },
+//   },
+//   {
+//     workName: "Exterior Cladding",
+//     status: "Pending",
+//     remarks: "Material supply delayed",
+//     upload: {
+//       type: "image",
+//       url: "https://example.com/uploads/exterior-cladding.jpg",
+//       originalName: "exterior-cladding.jpg",
+//     },
+//   },
+// ];
 
 
 interface QualityCheckRoom {
@@ -127,12 +128,11 @@ export default function QualityCheckRoomDetails() {
   const navigate = useNavigate();
 
   const [popupImage, setPopupImage] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const { data, isLoading } = useGetQualityCheckup(projectId);
-  const { mutateAsync: createItem } = useCreateQualityCheckItem();
-  const { mutateAsync: editItem } = useEditQualityCheckItem();
-  const { mutateAsync: deleteItem } = useDeleteQualityCheckItem();
+  const { data, isLoading, error, isError, refetch } = useGetQualityCheckup(projectId);
+  const { mutateAsync: createItem, isPending: createPending } = useCreateQualityCheckItem();
+  const { mutateAsync: editItem, isPending: editPending } = useEditQualityCheckItem();
+  const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteQualityCheckItem();
 
   const [form, setForm] = useState({
     workName: "",
@@ -144,12 +144,17 @@ export default function QualityCheckRoomDetails() {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  if (isLoading) return <MaterialOverviewLoading />;
+  // if (isLoading) return <MaterialOverviewLoading />;
 
   const items: any[] = data?.[roomkey] || [];
 
   const handleAdd = async () => {
     try {
+
+      if(!form.workName.trim()){
+        throw new Error("Work name is mandatory")
+      }
+
       const formData = new FormData();
       formData.append("workName", form.workName);
       formData.append("status", form.status);
@@ -159,11 +164,12 @@ export default function QualityCheckRoomDetails() {
       await createItem({ projectId, roomName: roomkey, formData });
       toast({ description: "Created successfully", title: "Success" });
       resetForm();
+      refetch()
     } catch (error: any) {
       toast({
         title: "Error",
         description:
-          error?.response?.data?.message || error.message || "Failed to create item",
+          error?.response?.data?.message || error?.message || "Failed to create item",
         variant: "destructive",
       });
     }
@@ -172,6 +178,11 @@ export default function QualityCheckRoomDetails() {
   const handleEdit = async (itemId: string) => {
     try {
       if (!editingId) return;
+
+        if(!form.workName.trim()){
+        throw new Error("Work name is mandatory")
+      }
+
       const formData = new FormData();
       formData.append("itemId", editingId);
       if (form.workName) formData.append("workName", form.workName);
@@ -188,11 +199,13 @@ export default function QualityCheckRoomDetails() {
         }
       );
       toast({ description: "Edited successfully", title: "Success" });
+      refetch()
+
     } catch (error: any) {
       toast({
         title: "Error",
         description:
-          error?.response?.data?.message || error.message || "Failed to edit item",
+          error?.response?.data?.message || error?.message || "Failed to edit item",
         variant: "destructive",
       });
     }
@@ -202,6 +215,7 @@ export default function QualityCheckRoomDetails() {
     try {
       await deleteItem({ projectId, roomName: roomkey, itemId });
       toast({ description: "Deleted successfully", title: "Success" });
+      refetch()
     } catch (error: any) {
       toast({
         title: "Error",
@@ -217,6 +231,29 @@ export default function QualityCheckRoomDetails() {
     setAdding(false);
     setEditingId(null);
   };
+
+
+  if (isLoading) return <RoomDetailsLoading />;
+
+  if (isError) {
+    <div className="flex-1 flex items-center justify-center">
+      <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+        <div className="text-red-600 font-semibold mb-2">
+          ⚠️ Error Occurred
+        </div>
+        <p className="text-red-500 text-sm mb-4">
+          {(error as any)?.response?.data?.message || "Failed to load material arrival data"}
+        </p>
+        <Button
+          onClick={() => refetch()}
+          className="bg-red-600 text-white hover:bg-red-700"
+        >
+          Retry
+        </Button>
+      </div>
+    </div>
+  }
+
 
   return (
     //     <div className="w-full h-full">
@@ -498,8 +535,8 @@ export default function QualityCheckRoomDetails() {
               </div>
 
               {/* 🧠 Responsive Adaptive Vertical Scroll */}
-              <div className="overflow-y-auto max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[45vh] xl:max-h-[77vh]">
-                {dummyQualityCheckRooms.map((item, index) =>
+              <div className="overflow-y-auto relative z-[-10] max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[45vh] xl:max-h-[77vh]">
+                {items.map((item, index) =>
                   editingId === (item as any)._id ? (
                     <div
                       key={(item as any)._id + index}
@@ -512,7 +549,8 @@ export default function QualityCheckRoomDetails() {
                           setForm({ ...form, workName: e.target.value })
                         }
                       />
-                      <Select
+                    <div className="relative z-50">
+                        <Select
                         value={form.status}
                         onValueChange={(val) =>
                           setForm({ ...form, status: val })
@@ -532,6 +570,7 @@ export default function QualityCheckRoomDetails() {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
                       <Input
                         value={form.remarks}
                         placeholder="Remarks"
@@ -551,18 +590,21 @@ export default function QualityCheckRoomDetails() {
                         />
                       </div>
                       <div className="flex gap-2 justify-center">
-                        <button
+                        <Button
+                          variant="primary"
+                          isLoading={editPending}
                           onClick={() => handleEdit((item as any)._id)}
                           className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
                         >
                           <i className="fas fa-save mr-1"></i> Save
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="secondary"
                           onClick={resetForm}
                           className="bg-gray-400 text-white px-3 py-1 rounded"
                         >
                           <i className="fas fa-times mr-1"></i> Cancel
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ) : (
@@ -570,9 +612,9 @@ export default function QualityCheckRoomDetails() {
                       key={(item as any)._id + index}
                       className="grid grid-cols-5 gap-2 px-4 py-3 border-b border-gray-200 items-center bg-white"
                     >
-                      <div className="text-center">{item.workName}</div>
-                      <div className="text-center">{item.status}</div>
-                      <div className="text-center">{item.remarks}</div>
+                      <div className="text-center">{item.workName || "N/A"}</div>
+                      <div className="text-center">{item.status || "N/A"}</div>
+                      <div className="text-center">{item.remarks || "N/A"}</div>
                       <div className="text-center">
                         {item.upload?.type === "image" ? (
                           <img
@@ -591,7 +633,7 @@ export default function QualityCheckRoomDetails() {
                             View PDF
                           </a>
                         ) : (
-                          "-"
+                          "No Image"
                         )}
                       </div>
                       <div className="flex gap-2 justify-center">
@@ -610,12 +652,14 @@ export default function QualityCheckRoomDetails() {
                         >
                           <i className="fas fa-edit mr-1"></i> Edit
                         </button>
-                        <button
+                        <Button
+                          variant="primary"
+                          isLoading={deletePending}
                           onClick={() => handleDelete((item as any)._id)}
                           className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                         >
                           <i className="fas fa-trash mr-1"></i> Delete
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )
@@ -692,6 +736,7 @@ export default function QualityCheckRoomDetails() {
           {!adding && items.length > 0 && (
             <div className="mt-4">
               <Button
+                isLoading={createPending}
                 variant="primary"
                 onClick={() => {
                   setAdding(true);

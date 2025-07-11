@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState } from 'react'
 import { COMPANY_DETAILS, MAIN_PATH_ICON, MAIN_PATH_LABEL, } from '../constants/constants'
 import useSidebarShortcut from '../Hooks/useSideBarShortcut'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import '../../src/App.css'
 import SidebarIcons from '../components/SidebarIcons'
 import { useLogoutCTO } from '../apiList/CTOApi'
@@ -10,13 +10,15 @@ import { useLogoutStaff } from '../apiList/staffApi'
 import { useLogoutUser } from '../apiList/userApi'
 import { useLogoutWorker } from '../apiList/workerApi'
 import { Button } from '../components/ui/Button'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { resetOwnerProfile } from '../features/userSlices'
 import { resetClientProfile } from '../features/clientSlice'
 import { resetWorkerProfile } from '../features/workerSlice'
 import { resetCTOProfile } from '../features/CTOSlice'
 import { resetStaffProfile } from '../features/staffSlices'
 import { logout } from '../features/authSlice'
+import type { RootState } from '../store/store'
+import { toast } from '../utils/toast'
 
 
 type SidebarProp = {
@@ -28,8 +30,11 @@ type SidebarProp = {
 
 const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     const [showSideBar, setShowSideBar] = useState(true)
+    const navigate = useNavigate()
+    const { organizationId } = useParams() as { organizationId: string }
 
     const dispatch = useDispatch()
+    const { role } = useSelector((state: RootState) => state.authStore)
 
     const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending, } = useLogoutCTO()
     const { mutateAsync: ClientLogoutAsync, isPending: isClientPending, } = useLogoutClient()
@@ -45,6 +50,15 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     const handleSideBarOpen = () => {
         setShowSideBar(true)
+    }
+
+    //  to make the navbar navigate to project list page because there is no navigation for back 
+    const pathArray = location.pathname.split('/')
+    const isInStageNavBar = pathArray[2] === "projectdetails"
+    const handleNav = () => {
+        if (isInStageNavBar) {
+            navigate(`/organizations/${organizationId}/projects`)
+        }
     }
 
     const [activeSidebar, setActiveSidebar] = useState<string>('');
@@ -69,29 +83,44 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     const handleLogout = async () => {
         try {
-            await CTOLogoutAsync()
-            await ClientLogoutAsync()
-            await StaffLogoutAsync()
-            await LogoutLogoutAsync()
-            await WorkerLogoutAsync()
-            dispatch(resetOwnerProfile())
-            dispatch(resetClientProfile())
-            dispatch(resetWorkerProfile())
-            dispatch(resetCTOProfile())
-            dispatch(resetStaffProfile())
-            dispatch(logout())
+            if (role === "CTO") {
+                await CTOLogoutAsync();
+            } else if (role === "client") {
+                await ClientLogoutAsync();
+            } else if (role === "staff") {
+                await StaffLogoutAsync();
+            } else if (role === "owner") {
+                await LogoutLogoutAsync();
+            } else if (role === "worker") {
+                await WorkerLogoutAsync();
+            }
 
+            // Clear all slices, just in case
+            dispatch(resetOwnerProfile());
+            dispatch(resetClientProfile());
+            dispatch(resetWorkerProfile());
+            dispatch(resetCTOProfile());
+            dispatch(resetStaffProfile());
+            dispatch(logout());
+            toast({ title: "Success", description: "logout successfull"})
+            if (!isCTOPending ||
+                !isClientPending ||
+                !isStaffPending ||
+                !isUserPending ||
+                !isWorkerPending) {
+                navigate('/')
+            }
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || "Failed to logout", variant: "destructive" })
         }
-        catch (error: any) {
-            console.log("error occured in logout", error)
-        }
-    }
+    };
+
     return (
         <>
             {showSideBar ?
                 <aside className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
                     <div className="flex flex-col flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar p-2">
-                        <div className='flex justify-between items-center border-b-1 py-2'>
+                        <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b-1 py-2`}>
                             <span className='text-xl'>{COMPANY_DETAILS.COMPANY_NAME}</span>
                             <div className='w-[30px] h-[30px]' >
                                 <img className='w-full h-full' src={COMPANY_DETAILS.COMPANY_LOGO} alt="LOGO" />
@@ -133,12 +162,19 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
 
                     <div className="flex flex-col p-2 border-t border-[#3a3b45]">
-                        <button
+                        <Button
+                            isLoading={
+                                isCTOPending ||
+                                isClientPending ||
+                                isStaffPending ||
+                                isUserPending ||
+                                isWorkerPending
+                            }
                             onClick={handleLogout}
-                            className="flex items-center gap-2 px-4 py-3 rounded-lg bg-[#3a3b45] text-[#9ca3af] hover:bg-[#464751] hover:text-white transition">
+                            className="flex items-center gap-2 px-4 py-3 rounded-lg !bg-[#3a3b45] !text-[#9ca3af] hover:!bg-[#464751] hover:!text-white transition">
                             <i className="fa-solid fa-right-from-bracket"></i>
                             <span>Logout</span>
-                        </button>
+                        </Button>
 
                         <button
                             title="Ctrl+] to close"
@@ -187,12 +223,19 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
 
                     <div className="flex flex-col items-center p-2 border-t border-[#3a3b45]">
-                        <button
+                        <Button
+                            isLoading={
+                                isCTOPending ||
+                                isClientPending ||
+                                isStaffPending ||
+                                isUserPending ||
+                                isWorkerPending
+                            }
                             title='logout'
                             onClick={handleLogout}
-                            className="w-[40px] h-[40px] flex items-center justify-center text-[#9ca3af] hover:text-red-500 transition">
+                            className="w-[40px] h-[40px] flex items-center justify-center !bg-[#3a3b45] !text-[#9ca3af] hover:!text-red-500 transition">
                             <i className="fa-solid fa-right-from-bracket"></i>
-                        </button>
+                        </Button>
 
                         <button
                             title="Ctrl+[ to open"

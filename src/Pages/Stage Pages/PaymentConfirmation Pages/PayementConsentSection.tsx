@@ -9,13 +9,14 @@ import {
 import { toast } from "../../../utils/toast";
 import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
+import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
 
 const PaymentConsentSection: React.FC = () => {
     const { projectId , organizationId} = useParams<{ projectId: string, organizationId:string }>();
 
     const navigate = useNavigate()
-    const { data, isLoading, isError, refetch } = useGetPaymentConfirmation(projectId!);
+    const { data, isLoading, isError, refetch , error:getAllError} = useGetPaymentConfirmation(projectId!);
     const toggleConsent = useToggleConsentRequired();
     const generateConsent = useGenerateConsentLink();
 
@@ -61,8 +62,23 @@ const PaymentConsentSection: React.FC = () => {
         }
     };
 
-    if (isLoading) return <p>Loading consent details...</p>;
-    if (isError || !data) return <p>Something went wrong.</p>;
+    if (isLoading) return <MaterialOverviewLoading />;
+    if (isError || !data) return  <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
+              <div className="text-red-600 font-semibold mb-2">
+                ⚠️ Error Occurred
+              </div>
+              <p className="text-red-500 text-sm mb-4">
+                {(getAllError as any)?.response?.data?.message || 
+                 (getAllError as any)?.message || 
+                 "Failed to load cost estimation data"}
+              </p>
+              <Button
+                onClick={() => refetch()}
+                className="bg-red-600 text-white px-4 py-2"
+              >
+                Retry
+              </Button>
+            </div> 
 
     const {
         isConsentRequired,
@@ -83,6 +99,7 @@ const PaymentConsentSection: React.FC = () => {
 
               <div className="space-x-1">
                   <Button
+                  isLoading={toggleConsent.isPending}
                     size="sm"
                     onClick={handleToggleConsent}
                     className={`text-sm text-white px-2 py-2 rounded ${isConsentRequired ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}`}
@@ -118,17 +135,17 @@ const PaymentConsentSection: React.FC = () => {
                 <div className="p-4">
                     {agreedAt ? (
                         <div className="bg-green-50 p-4 rounded text-green-800 text-sm border border-green-200 shadow-sm">
-                            <i className="fa-solid fa-circle-check text-green-600 mr-2" />
-                            <strong className="mr-2">Client Agreed</strong>
+                            
+                            <span className="mr-2">Client Status:</span>
 
-                            <span className="mr-2">{isAgreed ? "Agreed" : (isAgreed === null ? "Not Agreed Yet" : "Not Agreed")}</span>
-                            {/* <br /> */}
-                            <span>Agreed At: {new Date(agreedAt).toLocaleString()}</span>
+                            <strong className="mr-2">{isAgreed ? <>Agreed <i className="fa-solid fa-circle-check text-green-600 mr-2" /></> : (isAgreed === null ? "Not Agreed Yet" : <>Not Agreed <i className="fa-solid fa-circle-xmark text-red-600 mr-2" /></>)}</strong>
+                            <br />
+                            <span>Agreed on: <strong>{new Date(agreedAt).toLocaleDateString()}</strong></span>
                         </div>
                     ) : !agreementToken ? (
                         <div className="bg-red-50 p-4 rounded text-red-700 border border-red-200 text-sm">
                             <i className="fa-solid fa-times-circle mr-2" />
-                            Client has <strong>not yet agreed</strong>.<br />
+                            Client has <strong>Not yet agreed</strong>.<br />
                             No consent link generated.
                         </div>
                     ) : (

@@ -27,30 +27,30 @@ const fetchMyOrganizations = async (api: AxiosInstance) => {
 };
 
 
-const fetchSingleOrganization = async (organizationId: string, api:AxiosInstance) => {
+const fetchSingleOrganization = async (organizationId: string, api: AxiosInstance) => {
   const { data } = await api.get(`/orgs/getsingleorganization/${organizationId}`);
   if (!data.ok) return {};
-  console.log("from single orgs api", data)
   return data.data;
 };
 
 
 // 3) updateOrganizationName
 const updateOrganizationName = async ({
-  updateField, orgsId
+  updateField, orgsId, api
 }: {
   updateField: Record<string, string>;
-  orgsId: string
+  orgsId: string,
+  api: AxiosInstance
 }) => {
-  const { data } = await Api.put(`/orgs/updateorganization/${orgsId}`, updateField);
+  const { data } = await api.put(`/orgs/updateorganization/${orgsId}`, updateField);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
 
 // 4) deleteOrganization
-const deleteOrganization = async (orgId: string) => {
-  const { data } = await Api.put(`/orgs/deleteorganization/${orgId}`);
+const deleteOrganization = async (orgId: string, api: AxiosInstance) => {
+  const { data } = await api.put(`/orgs/deleteorganization/${orgId}`);
   if (!data.ok) throw new Error(data.message);
   return data;
 };
@@ -60,9 +60,7 @@ const deleteOrganization = async (orgId: string) => {
 
 export const useGetMyOrganizations = () => {
   const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
-  console.log("im inside the getmy orgs custom hook")
   const { role } = useGetRole();
-  console.log("got the role form custom hook", role)
 
   const api = getApiForRole(role!);
 
@@ -71,8 +69,8 @@ export const useGetMyOrganizations = () => {
   return useQuery({
     queryKey: ["myOrgs"],
     queryFn: async () => {
-      console.log("my role is what you get", role)
-      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if(!role) throw new Error("Not Authorized");
+      if (!allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance not found for role");
 
       return await fetchMyOrganizations(api)
@@ -85,17 +83,18 @@ export const useGetMyOrganizations = () => {
 
 
 export const useGetSingleOrganization = (organizationId: string) => {
-    const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
   return useQuery({
     queryKey: ["myOrgs"],
     queryFn: async () => {
-        if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance not found for role");
 
-      return await fetchSingleOrganization(organizationId, api)},
+      return await fetchSingleOrganization(organizationId, api)
+    },
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: false,
@@ -105,8 +104,28 @@ export const useGetSingleOrganization = (organizationId: string) => {
 
 
 export const useCreateOrganization = () => {
+  const allowedRoles = ["owner"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
+
   return useMutation({
-    mutationFn: createOrganization,
+    mutationFn: async (orgData: {
+      organizationName: string;
+      type?: string;
+      address?: string;
+      logoUrl?: string;
+      organizationPhoneNo?: string;
+    }) => {
+
+      if (!role) throw new Error("Not authorized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+      return await createOrganization(orgData)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myOrgs"] });
     },
@@ -114,8 +133,28 @@ export const useCreateOrganization = () => {
 };
 
 export const useUpdateOrganizationName = () => {
+  const allowedRoles = ["owner"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
+
+
   return useMutation({
-    mutationFn: updateOrganizationName,
+    mutationFn: async ({
+      updateField, orgsId,
+    }: {
+      updateField: Record<string, string>;
+      orgsId: string,
+    }) => {
+
+      if (!role) throw new Error("Not authorized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+      return await updateOrganizationName({ updateField, orgsId, api })
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myOrgs"] });
     },
@@ -123,8 +162,24 @@ export const useUpdateOrganizationName = () => {
 };
 
 export const useDeleteOrganization = () => {
+  const allowedRoles = ["owner"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
+
+
   return useMutation({
-    mutationFn: deleteOrganization,
+    mutationFn: async (orgId: string) => {
+
+      if (!role) throw new Error("Not authorized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+
+      return await deleteOrganization(orgId, api)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myOrgs"] });
     },
@@ -134,8 +189,8 @@ export const useDeleteOrganization = () => {
 
 
 // STAFFS API BY OWNER
-const fetchStaffsByOrganization = async (orgId: string) => {
-  const { data } = await Api.get(`/orgs/getstaffsoforganization/${orgId}`);
+const fetchStaffsByOrganization = async (orgId: string, api: AxiosInstance) => {
+  const { data } = await api.get(`/orgs/getstaffsoforganization/${orgId}`);
   if (!data.ok) [];
   return data.data;
 };
@@ -143,8 +198,8 @@ const fetchStaffsByOrganization = async (orgId: string) => {
 const inviteStaffToOrganization = async (payload: {
   organizationId: string;
   role: string;
-}) => {
-  const { data } = await Api.post("/orgs/invitestafftoorganization", payload);
+}, api: AxiosInstance) => {
+  const { data } = await api.post("/orgs/invitestafftoorganization", payload);
   if (!data.ok) throw new Error(data.message);
   return data.data; // invitation link
 };
@@ -152,11 +207,13 @@ const inviteStaffToOrganization = async (payload: {
 const removeStaffFromOrganization = async ({
   staffId,
   orgId,
+  api
 }: {
   staffId: string;
   orgId: string;
+  api: AxiosInstance
 }) => {
-  const { data } = await Api.patch(
+  const { data } = await api.patch(
     `/orgs/removestafffromorganziation?staffId=${staffId}&orgId=${orgId}`
   );
   if (!data.ok) throw new Error(data.message);
@@ -165,26 +222,70 @@ const removeStaffFromOrganization = async ({
 
 
 export const useGetStaffsByOrganization = (orgId: string) => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
   return useQuery({
     queryKey: ["staffs", orgId],
-    queryFn: () => fetchStaffsByOrganization(orgId),
+    queryFn: async () => {
+      if (!role) throw new Error("Not authrized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+      return await fetchStaffsByOrganization(orgId, api)
+    },
     enabled: !!orgId,
-    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    retry: false
   });
 };
 
 
 export const useInviteStaffToOrganization = () => {
+  const allowedRoles = ["owner"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
   return useMutation({
-    mutationFn: inviteStaffToOrganization,
+    mutationFn: async (payload: {
+      organizationId: string;
+      role: string;
+    }) => {
+
+      if (!role) throw new Error("Not authrized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+      return await inviteStaffToOrganization(payload, api)
+    }
+
 
   });
 };
 
 export const useRemoveStaffFromOrganization = () => {
+  const allowedRoles = ["owner"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
+
   return useMutation({
-    mutationFn: removeStaffFromOrganization,
+    mutationFn: async ({ staffId, orgId }: { staffId: string, orgId: string }) => {
+
+      if (!role) throw new Error("Not authrized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+
+      return await removeStaffFromOrganization({ staffId, orgId, api })
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["staffs", variables.orgId] });
     },
@@ -196,8 +297,8 @@ export const useRemoveStaffFromOrganization = () => {
 
 // CTO ROUTES
 
-const fetchCTOByOrganization = async (orgId: string) => {
-  const { data } = await Api.get(`/orgs/getctooforganization/${orgId}`);
+const fetchCTOByOrganization = async (orgId: string, api: AxiosInstance) => {
+  const { data } = await api.get(`/orgs/getctooforganization/${orgId}`);
   if (!data.ok) [];
   return data.data;
 };
@@ -205,8 +306,8 @@ const fetchCTOByOrganization = async (orgId: string) => {
 const inviteCTOToOrganization = async (payload: {
   organizationId: string;
   role: string;
-}) => {
-  const { data } = await Api.post("/orgs/invitectotoorganization", payload);
+}, api: AxiosInstance) => {
+  const { data } = await api.post("/orgs/invitectotoorganization", payload);
   if (!data.ok) throw new Error(data.message);
   return data.data; // invitation link
 };
@@ -214,11 +315,13 @@ const inviteCTOToOrganization = async (payload: {
 const removeCTOFromOrganization = async ({
   CTOId,
   orgId,
+  api
 }: {
   CTOId: string;
   orgId: string;
+  api: AxiosInstance
 }) => {
-  const { data } = await Api.patch(
+  const { data } = await api.patch(
     `/orgs/removectofromorganziation?CTOId=${CTOId}&orgId=${orgId}`
   );
   if (!data.ok) throw new Error(data.message);
@@ -227,26 +330,68 @@ const removeCTOFromOrganization = async ({
 
 
 export const useGetCTOByOrganization = (orgId: string) => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
   return useQuery({
     queryKey: ["CTO", orgId],
-    queryFn: () => fetchCTOByOrganization(orgId),
+    queryFn: async () => {
+      if (!role) throw new Error("Not authrized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+      return await fetchCTOByOrganization(orgId, api)
+    },
     enabled: !!orgId,
-    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    retry: false
   });
 };
 
 
 export const useInviteCTOToOrganization = () => {
+  const allowedRoles = ["owner"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
   return useMutation({
-    mutationFn: inviteCTOToOrganization,
+    mutationFn: async (payload: {
+      organizationId: string;
+      role: string;
+    }) => {
+
+      if (!role) throw new Error("Not authrized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+      return await inviteCTOToOrganization(payload, api)
+    }
 
   });
 };
 
 export const useRemoveCTOFromOrganization = () => {
+  const allowedRoles = ["owner"];
+  const { role } = useGetRole();
+
+  const api = getApiForRole(role!);
   return useMutation({
-    mutationFn: removeCTOFromOrganization,
+    mutationFn: async ({ CTOId, orgId }: { CTOId: string, orgId: string }) => {
+
+      if (!role) throw new Error("Not authrized")
+
+      if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
+
+      if (!api) throw new Error("api is null")
+
+
+      return await removeCTOFromOrganization({ CTOId, orgId, api })
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["CTO", variables.orgId] });
     },
@@ -255,8 +400,8 @@ export const useRemoveCTOFromOrganization = () => {
 
 
 // client routes
-const inviteClient = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
-  const { data } = await api.post('orgs/inviteclienttoproject', { projectId })
+const inviteClient = async ({ projectId, api , organizationId}: { projectId: string, organizationId:string,api: AxiosInstance }) => {
+  const { data } = await api.post('orgs/inviteclienttoproject', { projectId, organizationId })
   if (!data.ok) throw new Error(data.message);
   return data.data;
 }
@@ -269,14 +414,14 @@ export const useInviteClientToProject = () => {
   const api = getApiForRole(role!)
 
   return useMutation({
-    mutationFn: async ({ projectId }: { projectId: string }) => {
+    mutationFn: async ({ projectId , organizationId}: { projectId: string, organizationId:string }) => {
       if (!role) throw new Error("not authrized")
 
       if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
 
       if (!api) throw new Error("api is null")
 
-      return await inviteClient({ projectId, api })
+      return await inviteClient({ projectId, api, organizationId })
     }
   })
 }
@@ -285,16 +430,16 @@ export const useInviteClientToProject = () => {
 
 
 
-const fetchClientByOrgsAndProject = async (orgId: string, projectId:string) => {
+const fetchClientByOrgsAndProject = async (orgId: string, projectId: string) => {
   const { data } = await Api.get(`/orgs/getclientsofproject/${orgId}/${projectId}`);
   if (!data.ok) [];
   console.log("data", data)
   return data.data;
 };
 
-export const useGetClientByOrgsAndProject = (orgId: string, projectId:string) => {
-  
-   const allowedRoles = ["owner", "staff", "CTO"];
+export const useGetClientByOrgsAndProject = (orgId: string, projectId: string) => {
+
+  const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
 
   const api = getApiForRole(role!);
@@ -308,6 +453,91 @@ export const useGetClientByOrgsAndProject = (orgId: string, projectId:string) =>
     },
     enabled: !!orgId,
     refetchOnWindowFocus: false,
-    retry:false
+    retry: false
   });
 };
+
+
+
+
+
+
+
+// WORKER INVITATION
+
+const inviteWorkerByStaff = async ({ payload, api }: { payload: { projectId: string; role: string, organizationId: string }, api: AxiosInstance }) => {
+  console.log("payload", payload)
+  const { data } = await api.post("orgs/inviteworker", payload);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+const getWorkersByProjectAsStaff = async (projectId: string, api: AxiosInstance) => {
+  const { data } = await api.get(`orgs/getworker/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+const removeWorkerAsStaff = async ({ workerId, projectId, api }: { workerId: string; projectId: string, api: AxiosInstance }) => {
+  const { data } = await api.put(`orgs/removeworker/${workerId}/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+export const useInviteWorkerByStaff = () => {
+  const allowedRoles = ["owner", "staff", "CTO"]
+
+  const { role } = useGetRole()
+  const api = getApiForRole(role!)
+  return useMutation({
+    mutationFn: async (payload: { projectId: string; role: string, organizationId: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role");
+
+      return await inviteWorkerByStaff({ api, payload })
+    }
+  })
+}
+
+export const useGetWorkersAsStaff = (projectId: string) => {
+  const allowedRoles = ["owner", "staff", "CTO"]
+
+  const { role } = useGetRole()
+  const api = getApiForRole(role!)
+
+  return useQuery({
+    queryKey: ["workers", projectId],
+    queryFn: async () => {
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not Allowed to Make this api Call");
+
+      if (!api) throw new Error("API instance not found for role");
+
+      return await getWorkersByProjectAsStaff(projectId, api)
+    },
+    enabled: !!projectId,
+    refetchOnWindowFocus: false,
+    retry: false
+  })
+}
+
+export const useRemoveWorkerAsStaff = () => {
+  const allowedRoles = ["owner", "staff", "CTO"]
+
+  const { role } = useGetRole()
+  const api = getApiForRole(role!)
+
+  return useMutation({
+    mutationFn: async ({ workerId, projectId }: { workerId: string; projectId: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+      if (!api) throw new Error("API instance not found for role");
+
+      return await removeWorkerAsStaff({ workerId, projectId, api })
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workers"] }),
+  })
+}

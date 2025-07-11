@@ -35,6 +35,7 @@ const PaymentScheduleSection: React.FC = () => {
     const handleDueDateSave = async () => {
         try {
             await dueDateMutation.mutateAsync({ projectId: projectId!, dueDate });
+            refetch()
             toast({
                 title: "Success",
                 description: "Due date updated successfully.",
