@@ -15,6 +15,7 @@ import type { ICleaningUpload } from "./CleaningOverview";
 import { Textarea } from "../../../components/ui/TextArea";
 import { Input } from "../../../components/ui/Input";
 import { Label } from "../../../components/ui/Label";
+import { downloadImage } from "../../../utils/downloadFile";
 
 // const dummyUploads: ICleaningUpload[] = [
 //     {
@@ -167,7 +168,7 @@ export default function CleaningRoomOverview() {
         projectId as string,
         roomId as string
     );
-  const [popupImage, setPopupImage] = useState<string | null>(null);
+    const [popupImage, setPopupImage] = useState<string | null>(null);
 
     const { mutateAsync: uploadFiles, isPending: uploading } = useUploadCleaningRoomFiles();
     const { mutateAsync: deleteFile, isPending: deleting } = useDeleteCleaningRoomFile();
@@ -231,7 +232,7 @@ export default function CleaningRoomOverview() {
 
     const handleSaveNotes = async () => {
         try {
-            if(!noteText.trim()){
+            if (!noteText.trim()) {
                 throw new Error("please enter some notes")
             }
             await updateNotes({ projectId, roomId, notes: noteText });
@@ -315,7 +316,7 @@ export default function CleaningRoomOverview() {
                     <div className="w-full justify-between flex items-center">
                         <h3 className="text-md font-semibold  text-blue-700">Notes</h3>
                         {!editing && <Button
-                            onClick={() => {setNoteText(data?.notes); setEditing(true)}}
+                            onClick={() => { setNoteText(data?.notes); setEditing(true) }}
                             className="bg-blue-600 text-white hover:bg-blue-700"
                         >
                             Edit <i className="fas fa-pencil ml-2 "></i>
@@ -414,10 +415,12 @@ export default function CleaningRoomOverview() {
 
                                         {/* Delete Button (top-right) */}
                                         <Button
+                                        size="sm"
+                                        variant="danger"
                                             isLoading={deleting}
                                             onClick={() => handleDelete(f._id)}
                                             disabled={deleting}
-                                            className="absolute cursor-pointer top-2 right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                            className="absolute  top-2 right-2 bg-red-600 text-white border-none rounded-full w-7 h-7 flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                         >
                                             <i className="fas fa-trash"></i>
                                         </Button>
@@ -425,18 +428,19 @@ export default function CleaningRoomOverview() {
                                         {/* Bottom-right actions */}
                                         <div className="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                             <Button
-                                            variant="primary"
-                                              onClick={() => setPopupImage(f.url)}
-                                                 >
+                                            size="sm"
+                                                variant="primary"
+                                                onClick={() => setPopupImage(f.url)}
+                                            >
                                                 <i className="fas fa-eye"></i>
                                             </Button>
-                                            <a
-                                                href={f.url}
-                                                download={f.originalName}
-                                                className="bg-green-600 text-white rounded px-2 py-1 text-xs hover:bg-green-700"
+                                            <Button size="sm"
+                                                variant="primary"
+                                                onClick={() => downloadImage({ src: f?.url, alt: f?.originalName || "file.pdf" })}
                                             >
-                                                <i className="fas fa-download"></i>
-                                            </a>
+                                                <i className="fa-solid fa-download"></i>
+                                            </Button>
+
                                         </div>
                                     </div>
                                 ))}
@@ -469,22 +473,23 @@ export default function CleaningRoomOverview() {
 
 
                                         <div className="space-x-1">
-                                            <a
+                                            {/* <a
                                                 href={f.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="bg-blue-600 text-white rounded px-2 py-1 text-xs hover:bg-blue-700"
                                             >
                                                 <i className="fas fa-eye"></i>
-                                            </a>
-                                            <a
-                                                href={f.url}
-                                                download={f.originalName}
-                                                className="bg-green-600 text-white rounded px-2 py-1 text-xs hover:bg-green-700"
+                                            </a> */}
+                                            <Button size="sm"
+                                                variant="primary"
+                                                onClick={() => downloadImage({ src: f?.url, alt: f?.originalName || "file.pdf" })}
                                             >
-                                                <i className="fas fa-download"></i>
-                                            </a>
+                                                <i className="fa-solid fa-download"></i>
+                                            </Button>
+
                                             <Button
+                                            size="sm"
                                                 isLoading={deleting}
                                                 onClick={() => handleDelete(f._id)}
                                                 disabled={deleting}
@@ -502,28 +507,28 @@ export default function CleaningRoomOverview() {
             </div>
 
 
-             {/* Popup Image Viewer */}
-      {popupImage && (
-        <div
-          onClick={() => setPopupImage(null)}
-          className="fixed inset-0 z-50 bg-black/70 bg-opacity-60 flex items-center justify-center"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative bg-white rounded py-8 px-4 max-w-[90vw] max-h-[80vh] shadow-lg"
-          >
-            <i
-              className="fas fa-times absolute top-2 right-3 text-xl text-gray-700 hover:text-red-500 cursor-pointer"
-              onClick={() => setPopupImage(null)}
-            ></i>
-            <img
-              src={popupImage}
-              alt="Full View"
-              className="max-h-[70vh] w-auto object-contain rounded"
-            />
-          </div>
-        </div>
-      )}
+            {/* Popup Image Viewer */}
+            {popupImage && (
+                <div
+                    onClick={() => setPopupImage(null)}
+                    className="fixed inset-0 z-50 bg-black/70 bg-opacity-60 flex items-center justify-center"
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="relative bg-white rounded py-8 px-4 max-w-[90vw] max-h-[80vh] shadow-lg"
+                    >
+                        <i
+                            className="fas fa-times absolute top-2 right-3 text-xl text-gray-700 hover:text-red-500 cursor-pointer"
+                            onClick={() => setPopupImage(null)}
+                        ></i>
+                        <img
+                            src={popupImage}
+                            alt="Full View"
+                            className="max-h-[70vh] w-auto object-contain rounded"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

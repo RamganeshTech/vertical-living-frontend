@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { loadScript } from "../../utils/loadScript";
 import { toast } from "../../utils/toast";
 import { useChooseSubscriptionMode, useVerifySubscriptionPayment } from "../../apiList/subscriptionApi";
+import { useLocation } from "react-router-dom";
+import { Button } from "../../components/ui/Button";
 
 // ✅ App Plan List & Styling Config
 // const plans = [
@@ -43,7 +45,8 @@ const plans = [
     color: "border-blue-500",
     btnColor: "bg-blue-600 hover:bg-blue-700",
     planNameColor: "text-blue-700",
-    features: ["✔ 1 User Access", "✔ Email Support", "✘ No Analytics"],
+    features: ["✔ 5 Roles Allowed", "✔ Email Notification", "✔ Timer Functionality", "✔ Image Upload","✔ PDF Upload", "✔ Assign Staffs", "✔ Cost Estimation"],
+    // features: ["✔ 5 Roles Allowed", "✔ Email Notification", "✔ Timer Functionality", "✔ Image Upload","✔ PDF Upload",  "✘ No Analytics", ],
     available: true,
   },
   {
@@ -68,12 +71,22 @@ const plans = [
   },
 ];
 
-const SubscriptionPlans: React.FC = () => {
+
+type SubscriptionPlansProp = {
+  openMobileSidebar?: () => void
+  isMobile?: boolean
+}
+
+const SubscriptionPlans: React.FC<SubscriptionPlansProp> = ({ openMobileSidebar, isMobile }) => {
+  const location = useLocation()
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const showMobileMenuIcon = location.pathname.split('/').includes("organizations")
+
+
+
+
   const { mutateAsync: choosePlan, isPending: isCreating } = useChooseSubscriptionMode();
   const { mutateAsync: verifyPayment, isPending: isVerifying } = useVerifySubscriptionPayment();
-
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-
   const handleSelectPlan = async (planKey: string) => {
     try {
       setLoadingPlan(planKey);
@@ -125,75 +138,97 @@ const SubscriptionPlans: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 px-4 py-10 flex flex-col items-center">
+    <div className="min-h-full bg-gray-100  flex flex-col items-center">
       {/* Title */}
-      <div className="max-w-4xl w-full text-center mb-10">
-        <h1 className="text-4xl font-extrabold text-gray-800 mb-2">Switch Your Plan</h1>
-        <p className="text-md text-gray-500">Choose a subscription plan to match your needs</p>
-      </div>
+      <>
+        {showMobileMenuIcon && isMobile ?
+          <div className="w-full flex items-center justify-center mb-2 py-2 px-2 bg-white">
+            <button
+              onClick={openMobileSidebar}
+              className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+              title="Open Menu"
+            >
+              <i className="fa-solid fa-bars"></i>
+            </button>
+
+            <div className="w-full">
+              <h1 className="text-2xl md:text-4xl font-extrabold text-gray-800">Upgrade Plan</h1>
+              {/* <p className="text-md text-gray-500">Choose a subscription plan to match your needs</p> */}
+            </div>
+          </div>
+
+          :
+          <>
+            <div className="max-w-4xl w-full text-center py-5">
+              <h1 className="text-4xl font-extrabold text-[#2f303a] mb-2">{showMobileMenuIcon ? "Upgrade your Plan" : "Choose Plan"}</h1>
+              <p className="text-md text-gray-500">Choose a subscription plan to match your needs</p>
+            </div>
+          </>
+        }
+      </>
+
 
       {/* Plan Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
-       {plans.map((plan) => (
-  <div
-    key={plan.key}
-    className={`group border-t-[6px] ${plan.color} rounded-xl bg-white shadow-md p-6 flex flex-col justify-between transition hover:shadow-xl`}
-  >
-    {/* Title */}
-    <div className="text-center">
-      <h2 className={`text-2xl font-bold ${plan.planNameColor}`}>{plan.name}</h2>
-      <p className="text-gray-500 text-sm">Billed every 30 days</p>
-    </div>
+      <div className=" px-4 py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+        {plans.map((plan) => (
+          <div
+            key={plan.key}
+            className={`group border-t-[6px] ${plan.color} rounded-xl bg-white shadow-md p-6 flex flex-col justify-between transition hover:shadow-xl`}
+          >
+            {/* Title */}
+            <div className="text-center">
+              <h2 className={`text-2xl font-bold ${plan.planNameColor}`}>{plan.name}</h2>
+              <p className="text-gray-500 text-sm">Billed every 30 days</p>
+            </div>
 
-    {/* Price */}
-    <div className="text-center my-5">
-      <h3 className={`${plan.price ? "text-3xl" : "text-xl"} font-extrabold text-gray-800`}>
-        {plan.price ? `₹ ${plan.price}` : "Coming Soon"}
-      </h3>
-      <p className="text-sm text-gray-400">/ month</p>
-    </div>
+            {/* Price */}
+            <div className="text-center my-5">
+              <h3 className={`${plan.price ? "text-3xl" : "text-xl"} font-extrabold text-gray-800`}>
+                {plan.price ? `₹ ${plan.price}` : "Coming Soon"}
+              </h3>
+              <p className="text-sm text-gray-400">/ month</p>
+            </div>
 
-    {/* Features */}
-    <ul className="text-sm text-gray-700 mt-2 mb-5 space-y-2">
-      {plan.features.length > 0 ? (
-        plan.features.map((feature, idx) => (
-          <li key={idx} className="flex items-start gap-2">
-            <i
-              className={`fa-solid ${
-                feature.includes("✔") ? "fa-check text-green-600 mt-1" : "fa-xmark text-red-400 mt-1"
-              }`}
-            />
-            <span>{feature.replace("✔", "").replace("✘", "")}</span>
-          </li>
-        ))
-      ) : (
-        <div className="text-sm text-gray-500 text-center">Features Coming Soon</div>
-      )}
-    </ul>
+            {/* Features */}
+            <ul className="text-sm text-gray-700 mt-2 mb-5 space-y-2">
+              {plan.features.length > 0 ? (
+                plan.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <i
+                      className={`fa-solid ${feature.includes("✔") ? "fa-check text-green-600 mt-1" : "fa-xmark text-red-400 mt-1"
+                        }`}
+                    />
+                    <span>{feature.replace("✔", "").replace("✘", "")}</span>
+                  </li>
+                ))
+              ) : (
+                <div className="text-sm text-gray-500 text-center">Features Coming Soon</div>
+              )}
+            </ul>
 
-    {/* Button */}
-    {plan.price ? (
-      <button
-        onClick={() => handleSelectPlan(plan.key)}
-        disabled={loadingPlan === plan.key || isVerifying}
-        className={`w-full py-2 mt-auto text-white rounded-md font-medium ${
-          loadingPlan === plan.key || isVerifying
-            ? "bg-gray-400 cursor-not-allowed"
-            : plan.btnColor
-        } transition`}
-      >
-        {loadingPlan === plan.key || isVerifying ? "Processing..." : "Choose Plan"}
-      </button>
-    ) : (
-      <button
-        disabled
-        className="w-full py-2 mt-auto text-white rounded-md font-medium bg-gray-400 cursor-not-allowed"
-      >
-        Coming Soon
-      </button>
-    )}
-  </div>
-))}
+            {/* Button */}
+            {plan.price ? (
+              <Button
+              isLoading={isVerifying || isCreating}
+                onClick={() => handleSelectPlan(plan.key)}
+                disabled={loadingPlan === plan.key || isVerifying}
+                className={`w-full py-2 mt-auto text-white rounded-md font-medium ${loadingPlan === plan.key || isVerifying
+                  ? "bg-gray-400 !cursor-not-allowed"
+                  : plan.btnColor
+                  } transition`}
+              >
+                {loadingPlan === plan.key || isVerifying ? "Processing..." : "Choose Plan"}
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="w-full py-2 mt-auto text-white rounded-md font-medium bg-gray-400 hover:!bg-gray-400 !cursor-not-allowed"
+              >
+                Coming Soon
+              </Button>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

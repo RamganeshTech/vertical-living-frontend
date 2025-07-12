@@ -1,34 +1,37 @@
 import React, { memo, useMemo } from 'react'
-import { statusColors, type ProjectInput } from '../components/CreateProject'
+import { statusColors } from '../components/CreateProject'
 import type { IProject } from '../types/types';
 import { dateFormate } from '../utils/dateFormator';
 import { Link } from 'react-router-dom';
 
 import { useOutletContext } from "react-router-dom";
+import { useDeleteProject } from '../apiList/projectApi';
+import { toast } from '../utils/toast';
+import { Button } from '../components/ui/Button';
 
 
 type SingleProjectProp = {
-    project: IProject,
-  organizationId: string;
-    onEdit: (project: IProject, id:string) => void;
+    project: IProject & { _id: string },
+    organizationId: string;
+    onEdit: (project: IProject, id: string) => void;
     index: number
 }
 
 
 type ProjectsOutletContextType = {
-  projectId: string;
-  setProjectId: React.Dispatch<React.SetStateAction<string>>;
+    projectId: string;
+    setProjectId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit, organizationId }) => {
+const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizationId }) => {
 
-  const { projectId, setProjectId } = useOutletContext<ProjectsOutletContextType>();
+    const { setProjectId } = useOutletContext<ProjectsOutletContextType>();
+    const { mutateAsync: deleteAsync, isPending } = useDeleteProject()
 
+    const handleSetProejctId = (id: string) => {
+        setProjectId(id)
+    }
 
-          const handleSetProejctId = (id:string)=>{
-            setProjectId(id)
-          }
-    
 
     const getPriorityColor = (priority: string) => {
         switch (priority) {
@@ -43,24 +46,34 @@ const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit, organiza
         }
     };
 
-    const startDate = useMemo(()=> project.projectInformation?.startDate
-  ? dateFormate(project.projectInformation.startDate)
-  : null, []);
+    const startDate = useMemo(() => project.projectInformation?.startDate
+        ? dateFormate(project.projectInformation.startDate)
+        : null, []);
 
-  const endDate = useMemo(()=> project.projectInformation?.endDate
-  ? dateFormate(project.projectInformation.endDate)
-  : null, []);
+    const endDate = useMemo(() => project.projectInformation?.endDate
+        ? dateFormate(project.projectInformation.endDate)
+        : null, []);
 
-  const dueDate = useMemo(()=> project.projectInformation?.dueDate
-  ? dateFormate(project.projectInformation.dueDate)
-  : null, []);
+    const dueDate = useMemo(() => project.projectInformation?.dueDate
+        ? dateFormate(project.projectInformation.dueDate)
+        : null, []);
 
+
+    const handleDeleteProject = async () => {
+        try {
+            await deleteAsync(project._id)
+            toast({ title: "Success", description: "Project Deleted Successfully" })
+        }
+        catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message  || error?.message || "Failed to Delete", variant: "destructive" })
+        }
+    }
 
     return (
-        <div className="p-5 space-y-3">
+        <div className="p-2 sm:p-5 space-y-3">
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2 text-xl font-semibold text-[#1f2d3d]">
-                    
+
                     <i className="fa-solid fa-folder-open text-blue-600"></i>
                     {project.projectName}
                 </div>
@@ -99,7 +112,7 @@ const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit, organiza
                     <i className="fa-solid fa-hourglass-half text-gray-500" />
                     <strong>Duration: {project.projectInformation.duration} days</strong>
                 </div>
-                 <div className={`flex items-center gap-1`}>
+                <div className={`flex items-center gap-1`}>
                     <i className="fa-solid fa-hourglass-half text-gray-500" />
                     <strong>Status: <span className={`${statusColors[project.projectInformation.status]} !bg-transparent`}>{project.projectInformation.status}</span> </strong>
                 </div>
@@ -123,14 +136,14 @@ const SingleProject: React.FC<SingleProjectProp> = ({  project, onEdit, organiza
             </div>
 
             <div className="flex justify-end gap-4 pt-2 text-sm text-blue-600">
-                <Link to={`/${organizationId}/projectdetails/${(project as any)._id}/requirementform`} onClick={()=> handleSetProejctId((project as any)._id)} className="hover:underline cursor-pointer flex items-center gap-1">
+                <Link to={`/${organizationId}/projectdetails/${(project as any)._id}/requirementform`} onClick={() => handleSetProejctId((project as any)._id)} className="hover:underline cursor-pointer flex items-center gap-1">
                     <i className="fa-solid fa-eye" />
                     View
                 </Link>
-                <button className="hover:underline cursor-pointer flex items-center gap-1 text-red-500">
+                <Button isLoading={isPending} variant='outline' onClick={handleDeleteProject} className="hover:underline cursor-pointer flex items-center gap-1 text-red-500 !border-0">
                     <i className="fa-solid fa-trash" />
                     Delete
-                </button>
+                </Button>
                 <button onClick={() => onEdit(project, (project as any)._id)} className="hover:underline cursor-pointer flex items-center gap-1 text-amber-500">
                     <i className="fa-solid fa-pencil" />
                     edit

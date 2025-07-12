@@ -14,11 +14,12 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { downloadImage } from "../../../utils/downloadFile";
 
 // Define context type
 type ProjectDetailsOutlet = {
-  isMobile: boolean;
-  openMobileSidebar: () => void;
+    isMobile: boolean;
+    openMobileSidebar: () => void;
 };
 
 const TechnicalConsultant = () => {
@@ -81,7 +82,7 @@ const TechnicalConsultant = () => {
         setEditingId(id);
         setEditText(originalText);
     };
-    
+
     const handleCancelEdit = () => {
         setEditingId(null);
         setEditText("");
@@ -97,8 +98,8 @@ const TechnicalConsultant = () => {
     console.log(techDoc)
 
 
-    if(getMessageLoading) return <MaterialOverviewLoading />
-    
+    if (getMessageLoading) return <MaterialOverviewLoading />
+
     return (
         <div className="container mx-auto  max-w-full max-h-full">
             {/* Responsive Header with Mobile Sidebar Toggle */}
@@ -115,27 +116,27 @@ const TechnicalConsultant = () => {
                     )}
                     <i className="fas fa-comments mr-2"></i> Technical Consultation
                 </h2>
-                
+
                 <div className="w-full lg:w-[60%] flex flex-col sm:flex-row gap-3 justify-end">
                     {/* <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-end"> */}
-                        <Button 
+                    <Button
                         isLoading={updateCompletionStatus.isPending}
-                            onClick={handleCompletionStatus} 
-                            className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
-                        >
-                            <i className="fa-solid fa-circle-check mr-2"></i>
-                            Mark Complete
-                        </Button>
+                        onClick={handleCompletionStatus}
+                        className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
+                    >
+                        <i className="fa-solid fa-circle-check mr-2"></i>
+                        Mark Complete
+                    </Button>
                     {/* </div> */}
-                    
+
                     <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-end">
-                        <ResetStageButton 
-                            projectId={projectId!} 
-                            stageNumber={4} 
-                            stagePath="technicalconsultation" 
+                        <ResetStageButton
+                            projectId={projectId!}
+                            stageNumber={4}
+                            stagePath="technicalconsultation"
                             className="flex-1 sm:flex-initial min-w-max"
                         />
-                        
+
                         <AssignStageStaff
                             stageName="TechnicalConsultationModel"
                             projectId={projectId!}
@@ -174,12 +175,12 @@ const TechnicalConsultant = () => {
                             <div className="text-center">
                                 <i className="fas fa-ban text-6xl text-blue-300 mb-4"></i>
                                 <p className="text-lg text-gray-700">
-                                    {(getMessageError as any)?.response?.data?.message || 
-                                     (getMessageError as any)?.message || 
-                                     "Failed to load messages, please try again"}
+                                    {(getMessageError as any)?.response?.data?.message ||
+                                        (getMessageError as any)?.message ||
+                                        "Failed to load messages, please try again"}
                                 </p>
-                                <Button 
-                                    onClick={() => refetch()} 
+                                <Button
+                                    onClick={() => refetch()}
                                     className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
                                 >
                                     <i className="fas fa-redo mr-2"></i> Retry
@@ -187,7 +188,7 @@ const TechnicalConsultant = () => {
                             </div>
                         </div>
                     )}
-                    
+
                     {getMessageLoading ? (
                         <div className="flex h-full items-center justify-center py-10">
                             <i className="fas fa-spinner fa-spin text-blue-600 text-2xl"></i>
@@ -228,9 +229,9 @@ const TechnicalConsultant = () => {
 
                                         {editingId === msg._id ? (
                                             <div className="flex flex-col sm:flex-row gap-2 items-center mt-2">
-                                                <Input 
-                                                    value={editText} 
-                                                    onChange={(e) => setEditText(e.target.value)} 
+                                                <Input
+                                                    value={editText}
+                                                    onChange={(e) => setEditText(e.target.value)}
                                                     className="flex-grow"
                                                 />
                                                 <div className="flex gap-2 w-full sm:w-auto">
@@ -253,25 +254,23 @@ const TechnicalConsultant = () => {
                                                     </span>
 
                                                     {att.type === "image" && (
-                                                        <button
+
+
+                                                        <Button size="sm"
+                                                            variant="primary"
                                                             onClick={() => {
                                                                 setPreviewImage(att.url);
                                                                 setImageLoading(true);
                                                             }}
-                                                            className="text-blue-600 hover:underline text-xs whitespace-nowrap"
                                                         >
-                                                            View
-                                                        </button>
+                                                            <i className="fas fa-eye"></i>
+                                                        </Button>
                                                     )}
 
-                                                    <a
-                                                        href={att.url}
-                                                        target="_blank"
-                                                        download
-                                                        className="text-green-600 hover:underline text-xs whitespace-nowrap"
-                                                    >
-                                                        Download
-                                                    </a>
+                                                    <Button onClick={() => downloadImage({ src: att?.url, alt: att?.originalName || "file.pdf" })} size="sm" className="text-sm">
+                                                        <i className="fa-solid fa-download"></i>
+                                                    </Button>
+
                                                 </div>
                                             ))}
                                         </div>
@@ -299,9 +298,9 @@ const TechnicalConsultant = () => {
                         }}
                         className="flex-grow"
                     />
-                    <Button 
-                        isLoading={sendMessagePending} 
-                        onClick={handleSend} 
+                    <Button
+                        isLoading={sendMessagePending}
+                        onClick={handleSend}
                         className="w-full sm:w-auto"
                     >
                         Send <i className="ml-2 fa-solid fa-paper-plane"></i>
@@ -320,12 +319,12 @@ const TechnicalConsultant = () => {
 
             {/* Image Preview Modal */}
             {previewImage && (
-                <div 
-                    onClick={() => setPreviewImage(null)}  
+                <div
+                    onClick={() => setPreviewImage(null)}
                     className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center"
                 >
-                    <div  
-                        onClick={(e) => e.stopPropagation()}   
+                    <div
+                        onClick={(e) => e.stopPropagation()}
                         className="bg-white p-2 sm:p-4 rounded-lg shadow-lg max-w-[90%] max-h-[90%] overflow-auto relative"
                     >
                         <div className="flex justify-end mb-2">

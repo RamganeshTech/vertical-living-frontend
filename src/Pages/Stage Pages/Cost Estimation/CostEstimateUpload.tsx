@@ -4,6 +4,7 @@ import { Button } from "../../../components/ui/Button";
 import { existingUploads } from "../../../utils/dummyData";
 import { useDeleteCostEstimationFile, useUploadCostEstimationFiles } from "../../../apiList/Stage Api/costEstimationApi";
 import { toast } from "../../../utils/toast";
+import { downloadImage } from "../../../utils/downloadFile";
 
 interface UploadFile {
   _id: string;
@@ -103,16 +104,13 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles, 
                 <li key={file._id} className="flex justify-between items-center bg-red-50 p-2 rounded-xl">
                   <span className="text-sm">{file.originalName}</span>
                   <div className="flex gap-2">
-                    {/* <a href={file.url} target="_blank" download className="text-red-600 hover:underline">
-                    <i className="fa-solid fa-download"></i>
-                  </a> */}
+
 
                     <Button size="sm"
                       variant="primary"
+                      onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
                     >
-                      <a href={file.url} target="_blank" download >
-                        <i className="fa-solid fa-download"></i>
-                      </a>
+                      <i className="fa-solid fa-download"></i>
                     </Button>
 
                     <Button
@@ -141,9 +139,7 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles, 
               <li key={file._id} className="flex justify-between items-center bg-green-50 p-2 rounded-xl">
                 <span className="text-sm truncate">{file.originalName}</span>
                 <div className="flex gap-2">
-                  {/* <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">
-                    <i className="fa-solid fa-eye"></i>
-                  </a> */}
+
                   <Button size="sm"
                     variant="primary"
                     onClick={() => setPopupImage(file?.url)}
@@ -154,15 +150,11 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles, 
 
                   <Button size="sm"
                     variant="primary"
+                    onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
                   >
-                    <a href={file.url} target="_blank" download >
-                      <i className="fa-solid fa-download"></i>
-                    </a>
+                    <i className="fa-solid fa-download"></i>
                   </Button>
 
-                  {/* <a href={file.url} target="_blank" download className="">
-                    <i className="fa-solid fa-download"></i>
-                  </a> */}
                   <Button
                     size="sm"
                     onClick={() => handleDelete(file._id, "image")}

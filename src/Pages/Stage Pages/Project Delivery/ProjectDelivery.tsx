@@ -16,6 +16,7 @@ import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { downloadImage } from "../../../utils/downloadFile";
 
 type ProjectDetailsOutlet = {
   isMobile: boolean;
@@ -363,10 +364,15 @@ export default function ProjectDeliveryPanel() {
                       >
                         <span className="truncate text-sm">{file.originalName}</span>
                         <div className="flex gap-3 items-center text-blue-600">
-                          <a href={file.url} download>
-                            <i className="fas fa-download" />
-                          </a>
+                          <Button size="sm"
+                            variant="primary"
+                            onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
+                          >
+                            <i className="fa-solid fa-download"></i>
+                          </Button>
+
                           <Button
+                          size="sm"
                             isLoading={variables?.fileId === file._id && deletePending}
                             onClick={() => handleDelete(file._id)}
                             className="text-red-600"
@@ -402,15 +408,21 @@ export default function ProjectDeliveryPanel() {
                         <span className="truncate text-sm">{file.originalName}</span>
                         <div className="flex gap-3 items-center text-blue-600">
                           <Button
+                          size="sm"
                             variant="primary"
                             onClick={() => setPopupImage(file?.url)}
                           >
                             <i className="fas fa-eye"></i>
                           </Button>
-                          <a href={file.url} download>
-                            <i className="fas fa-download" />
-                          </a>
+                           <Button size="sm"
+                                            variant="primary"
+                                            onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
+                                          >
+                                            <i className="fa-solid fa-download"></i>
+                                          </Button>
+                        
                           <Button
+                          size="sm"
                             isLoading={variables?.fileId === file._id && deletePending}
                             onClick={() => handleDelete(file._id)}
                             className="text-red-600"

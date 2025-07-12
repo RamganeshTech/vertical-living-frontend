@@ -76,6 +76,8 @@ import AdminWallMainContainer from './Pages/Wall Painting/AdminWall/AdminWallMai
 import AdminWallStepPage from './Pages/Wall Painting/AdminWall/AdminWallStepPage'
 import WorkerWallMainContainer from './Pages/Wall Painting/WorkerWall/WorkerWallMainContainer'
 import WorkerWallStepPage from './Pages/Wall Painting/WorkerWall/WorkerWallStepPage'
+import SubscriptionParent from './Pages/Subscription Payment/SubscriptionParent'
+import MaterialOverviewLoading from './Pages/Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
 
 function App() {
 
@@ -86,8 +88,7 @@ function App() {
   //it is used to check whether which user is now currently using the application
   const { loading } = useAuthCheck()
 
-  console.log("isAtuthnitcated", isauthenticated)
-  if (loading) return;
+  if (loading) <MaterialOverviewLoading />;
   return (
     <>
 
@@ -134,7 +135,7 @@ function App() {
           <Route path={`step/:stepId/:stepNumber`} element={<AdminWallStepPage />} />
         </Route>
 
-         <Route path="/:projectId/workerwall" element={<WorkerWallMainContainer />} >
+        <Route path="/:projectId/workerwall" element={<WorkerWallMainContainer />} >
           <Route path='step/:stepId/:stepNumber' element={<WorkerWallStepPage />} />
         </Route>
 
@@ -159,6 +160,11 @@ function App() {
           <Route path='invitecto'
             element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <InviteCTO />
+            </ProtectedRoutes>} />
+
+          <Route path='subscriptionplan'
+            element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <SubscriptionParent />
             </ProtectedRoutes>} />
 
         </Route>

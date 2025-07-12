@@ -39,13 +39,15 @@ export const ORGANIZATION_ICONS = {
   INVITESTAFFS: "fa-solid fa-user text-2xl",
   DETAILS: "fa-solid fa-building text-2xl",
   PROJECTS: "fa-solid fa-diagram-project  text-2xl",
+  PLAN: "fa-solid fa-cash  text-2xl",
 }
 
 export const ORGANIZATION_LABELS = {
   INVITECTO: "Invite CTO",
   INVITESTAFFS: "Invite Staffs",
   DETAILS: "Org Details",
-  PROJECTS: "Projects"
+  PROJECTS: "Projects",
+  PLAN: "Upgrade Plan"
 }
 
 export const PROJECTS_LABELS = {

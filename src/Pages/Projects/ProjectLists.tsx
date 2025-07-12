@@ -8,13 +8,15 @@ import { mapProjectToProjectInput } from "../../utils/editProjectRequiredFields"
 import ProjectCardLoading from "../../LoadingUI/ProjectCartLoading";
 import { useOutletContext, useParams } from "react-router-dom";
 import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
 
 
 const ProjectLists = () => {
 
   const { organizationId } = useParams()
   const { openMobileSidebar, isMobile } = useOutletContext<OrganizationOutletTypeProps>()
-
+  const {role } = useSelector((state:RootState)=> state.authStore)
   const [showForm, setShowForm] = useState<boolean>(false);
   const [isEditing, setisEditing] = useState<boolean>(false);
 
@@ -33,7 +35,7 @@ const ProjectLists = () => {
 
   let { data: getProjects, isError, isPending, error } = useGetProjects(organizationId!)
 
-
+const allowedRoles = ["owner", "CTO", "staff"]
   const handleEdit = useCallback((project: IProject, id: string) => {
     const projectInput = mapProjectToProjectInput(project);
     setEditForm(projectInput);
@@ -59,7 +61,7 @@ const ProjectLists = () => {
     <div className="w-[100%] flex flex-col h-full min-h-0 ">
 
       <div className="flex py-2 justify-between items-center">
-       <div className="flex gap-2">
+       <div className="flex ">
          {isMobile &&
           <button
             onClick={openMobileSidebar}
@@ -69,23 +71,23 @@ const ProjectLists = () => {
             <i className="fa-solid fa-bars"></i>
           </button>
         }
-        <h2 className="text-3xl font-bold text-[#1f2d3d] flex items-center gap-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#1f2d3d] flex items-center gap-2">
           <i className="fa-solid fa-diagram-project text-blue-600 text-2xl"></i>
           <p>{SIDEBAR_LABELS.PROJECTS}</p>
         </h2>
        </div>
 
-        <div
+       {allowedRoles.includes(role!) && <div
           onClick={() => {
             setShowForm(!showForm)
           }}
-          className="bg-blue-600  cursor-pointer !h-[40px] !w-[40px] sm:!h-[40px] sm:!w-[40px] flex justify-center items-center rounded-full"
+          className="bg-blue-600  cursor-pointer !h-[40px] !w-[40px] flex justify-center items-center rounded-full"
         >
           <i
             className={`fa-solid fa-plus text-white transition-transform duration-300 ${showForm ? "rotate-135" : "rotate-0"
               }`}
           ></i>
-        </div>
+        </div>}
       </div>
 
       {!isPending && (getProjects?.length ?? 0) === 0 && <div className="flex h-full flex-col items-center justify-center w-full py-16 text-center text-gray-500">
@@ -102,26 +104,28 @@ const ProjectLists = () => {
       </div>
       }
 
-      <div className="h-full flex-1 !overflow-y-scroll  grid md:grid-cols-2 gap-6">
+      <div className="h-full flex-1 !overflow-y-auto custom-scrollbar grid md:grid-cols-2 gap-6">
 
         {isPending && [...Array(6)].map((_, i) => <Fragment key={i}><ProjectCardLoading /></Fragment>)}
 
-        {!isPending && getProjects?.length > 0 && getProjects?.map((project: IProject, index: number) => {
+        {!isPending && getProjects?.length > 0 && getProjects?.map((project: IProject & {_id:string}, index: number) => {
 
           return (
+            <>
             <div
               key={(project as any)._id}
-              className="h-[262px] flex flex-col shadow-md rounded-xl overflow-hidden border-l-8 border-blue-600 bg-white"
+              className="h-[256px] sm:!h-[270px] md:!h-[330px] lg:!h-[282px] flex flex-col shadow-md rounded-xl overflow-hidden border-l-8 border-blue-600 bg-white"
             >
               <SingleProject onEdit={handleEditProject} index={index} project={project} organizationId={organizationId!} />
             </div>
+            </>
           );
         })}
       </div>
 
       {showForm && (
         <div onClick={handleClose} className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <CreateProject onClose={handleClose} organizationId={organizationId!} isEditing={isEditing} setEditForm={setEditForm} editForm={editForm} editProjectId={editProjectId} />
+          <CreateProject onClose={handleClose} setShowForm={setShowForm} organizationId={organizationId!} isEditing={isEditing} setEditForm={setEditForm} editForm={editForm} editProjectId={editProjectId} />
         </div>
       )}
 

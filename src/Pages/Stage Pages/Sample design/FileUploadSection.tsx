@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import type { IFileItem } from "../../../types/types";
 import { Button } from "../../../components/ui/Button";
 import { toast } from "../../../utils/toast";
+import { downloadImage } from "../../../utils/downloadFile";
 
 interface FileUploadSectionProps {
 
@@ -137,15 +138,12 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                                             {file.originalName || 'Unnamed PDF'}
                                         </span>
                                         <div className="flex items-center gap-2">
-                                            <a
-                                                href={file.url}
-                                                download
-                                                className="text-blue-600 hover:text-blue-800 p-1"
-                                                title="Download"
-                                            >
-                                                <i className="fas fa-download" />
-                                            </a>
+                                            <Button onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })} size="sm" className="text-sm">
+                                                <i className="fa-solid fa-download"></i>
+                                            </Button>
+
                                             <Button
+                                            size="sm"
                                                 isLoading={deletePending}
                                                 onClick={() => onDelete(index)}
                                                 // className="text-red-600 hover:text-red-800 p-1"
@@ -199,16 +197,12 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                                                 <i className="fas fa-eye"></i>
                                             </Button>
 
-                                            <a
-                                                href={file.url}
-                                                download
-                                                className="text-blue-600 cursor-pointer hover:text-blue-800 p-1"
-                                                title="Download"
-                                            >
-                                                <i className="fas fa-download" />
-                                            </a>
+                                             <Button  onClick={() => downloadImage({src:file?.url, alt:file?.originalName || "file.pdf"})} size="sm" className="text-sm">
+                                                                                   <i className="fa-solid fa-download"></i>
+                                                                               </Button>
+                                           
                                             <Button
-                                            size="sm"
+                                                size="sm"
                                                 isLoading={deletePending}
                                                 onClick={() => onDelete(index)}
                                                 // className="text-red-600 hover:text-red-800 p-1"

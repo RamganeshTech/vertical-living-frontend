@@ -169,15 +169,15 @@ const InviteStaffs: React.FC = () => {
           <div className="max-w-full mx-auto px-2 lg:px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                 {isMobile &&
-                <button
-                  onClick={openMobileSidebar}
-                  className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
-                  title="Open Menu"
-                >
-                  <i className="fa-solid fa-bars"></i>
-                </button>
-}
+                {isMobile &&
+                  <button
+                    onClick={openMobileSidebar}
+                    className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                    title="Open Menu"
+                  >
+                    <i className="fa-solid fa-bars"></i>
+                  </button>
+                }
                 <h1 className="text-xl sm:text-2xl font-bold text-blue-900">Staff Management</h1>
                 <div className="hidden sm:block h-8 w-px bg-gray-300" />
                 <div className="bg-blue-100 p-2 rounded-xl">

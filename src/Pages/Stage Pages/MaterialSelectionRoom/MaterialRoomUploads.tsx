@@ -4,6 +4,7 @@ import { Button } from "../../../components/ui/Button";
 import { useDeleteMaterialSelectionRoomFile, useUploadMaterialSelectionRoomFiles } from "../../../apiList/Stage Api/materialSelectionApi";
 import { existingUploads } from "../../../utils/dummyData";
 import { toast } from "../../../utils/toast";
+import { downloadImage } from "../../../utils/downloadFile";
 
 interface UploadFile {
   _id: string;
@@ -99,15 +100,11 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
               <li key={file._id} className="flex justify-between items-center bg-red-50 p-2 rounded-xl">
                 <span className="text-sm">{file.originalName}</span>
                 <div className="flex gap-2">
-                  {/* <a href={file.url} target="_blank" download className="text-red-600 hover:underline">
-                    <i className="fa-solid fa-download"></i>
-                  </a> */}
                   <Button size="sm"
                     variant="primary"
+                    onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
                   >
-                    <a href={file.url} target="_blank" download >
                       <i className="fa-solid fa-download"></i>
-                    </a>
                   </Button>
                   <Button
                     onClick={() => handleDelete(file._id, "pdf")}
@@ -141,16 +138,11 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
                     <i className="fas fa-eye"></i>
                   </Button>
 
-                  {/* <a href={file.url} target="_blank" download className="text-green-600 hover:underline">
-                    <i className="fa-solid fa-download"></i>
-                  </a> */}
-
                   <Button size="sm"
                     variant="primary"
+                    onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
                   >
-                    <a href={file.url} target="_blank" download>
-                      <i className="fa-solid fa-download"></i>
-                    </a>
+                    <i className="fa-solid fa-download"></i>
                   </Button>
 
 

@@ -5,6 +5,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { toast } from "../utils/toast";
 import { Separator } from "../components/ui/Seperator";
+import { downloadImage } from "../utils/downloadFile";
 
 interface UploadSectionProps {
     formId: string;
@@ -61,25 +62,25 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
 
 
 
-    const handleDownload = async (url: string, filename: string) => {
-        try {
-            console.log("url", url)
-            const res = await fetch(url, { mode: "no-cors" });
-            const blob = await res.blob();
-            const blobUrl = window.URL.createObjectURL(blob);
+    // const handleDownload = async (url: string, filename: string) => {
+    //     try {
+    //         console.log("url", url)
+    //         const res = await fetch(url, { mode: "no-cors" });
+    //         const blob = await res.blob();
+    //         const blobUrl = window.URL.createObjectURL(blob);
 
-            const link = document.createElement("a");
-            link.href = blobUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(blobUrl);
-        } catch (err) {
-            console.error("Download failed", err);
-            alert("Failed to download file");
-        }
-    };
+    //         const link = document.createElement("a");
+    //         link.href = blobUrl;
+    //         link.download = filename;
+    //         document.body.appendChild(link);
+    //         link.click();
+    //         link.remove();
+    //         window.URL.revokeObjectURL(blobUrl);
+    //     } catch (err) {
+    //         console.error("Download failed", err);
+    //         alert("Failed to download file");
+    //     }
+    // };
 
 
 
@@ -104,7 +105,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                     <h4 className="font-semibold text-blue-800 mb-2">📄 PDF Files</h4>
                     <ul className="space-y-2 max-h-[180px]  rounded-lg  border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto ">
                         {pdfFiles.length === 0 && <div className="min-h-[145px]   flex items-center justify-center"><p className="text-sm text-gray-500">No PDFs uploaded.</p></div>}
-                        {pdfFiles.map((file, i) => (
+                        {pdfFiles?.map((file, i) => (
 
                             <li key={i} className="flex justify-between items-center  bg-blue-50 p-2 rounded-xl">
                                 <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
@@ -113,7 +114,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                                         <i className="fa-solid fa-download"></i>
                                     </a> */}
 
-                                    <Button  onClick={() => handleDownload(file.url, file.originalName)} size="sm" className="text-sm">
+                                    <Button  onClick={() => downloadImage({src:file?.url, alt:file?.originalName || "file.pdf"})} size="sm" className="text-sm">
                                         <i className="fa-solid fa-download"></i>
                                     </Button>
 
@@ -149,7 +150,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                                         <i className="fas fa-eye"></i>
                                     </Button>
 
-                                    <Button size="sm" onClick={() => handleDownload(file.url, file.originalName)} className="text-sm">
+                                    <Button size="sm" onClick={() => downloadImage({src:file.url, alt:file.originalName || "file.pdf"})} className="text-sm">
                                         <i className="fa-solid fa-download"></i>
                                     </Button>
 
