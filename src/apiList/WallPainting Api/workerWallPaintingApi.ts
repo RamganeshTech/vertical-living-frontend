@@ -74,7 +74,7 @@ export const uploadWorkerCorrectionFilesApi = async (
 export const useGetWorkerSOP = (projectId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowed = ["worker", "staff"];
+  const allowed = ["worker", "staff", "owner", "CTO"];
   return useQuery({
     queryKey: ["workerSOP", projectId],
     queryFn: () => {
@@ -91,7 +91,7 @@ export const useGetWorkerSOP = (projectId: string) => {
 export const useGetWorkerStepDetails = (projectId: string, stepId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowed = ["worker", "staff"];
+  const allowed = ["worker", "staff", "owner", "CTO"];
   return useQuery({
     queryKey: ["workerStep", projectId, stepId],
     queryFn: () => {

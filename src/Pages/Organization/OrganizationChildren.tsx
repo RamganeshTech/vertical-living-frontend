@@ -26,6 +26,7 @@ const OrganizationChildrens: React.FC = () => {
         INVITECTO: `/organizations/${organizationId}/invitecto`,
         INVITESTAFFS: `/organizations/${organizationId}/invitestaff`,
         PLAN: `/organizations/${organizationId}/subscriptionplan`,
+        PROFILE: `/organizations/${organizationId}/userprofile`,
     }
 
 

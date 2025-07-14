@@ -7,12 +7,14 @@ import { Skeleton } from "../../components/ui/Skeleton"
 import Sidebar from "../../shared/Sidebar"
 import {LOGIN_ICONS_LOGIN_GROUP, LOGIN_LABELS } from "../../constants/constants"
 import MobileSidebar from "../../shared/MobileSidebar"
+import { useNavigate } from "react-router-dom"
 
 
 export default function Organization() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
+  const navigate = useNavigate()
 
   let { data: organizations, isLoading, error, refetch } = useGetMyOrganizations()
   // organizations = {}
@@ -92,10 +94,16 @@ export default function Organization() {
           </div>
           <h2 className="text-2xl font-bold text-red-600 mb-2">Error Loading Organizations</h2>
           <p className="text-gray-600 mb-4">{(error as any)?.response?.data?.message || error?.message || "Something happened try again please"}</p>
-          <Button onClick={() => refetch()} className="bg-blue-600 hover:bg-blue-700 text-white active:scale-95">
+        <div className="flex gap-2 justify-center items-center">
+            <Button onClick={() => refetch()} className="bg-blue-600 hover:bg-blue-700 text-white active:scale-95">
             <i className="fas fa-redo mr-2"></i>
             Try Again
           </Button>
+           <Button onClick={() => navigate('/login/staff')} className="bg-blue-600 hover:bg-blue-700 text-white active:scale-95">
+            <i className="fas fa-user mr-2"></i>
+            Login
+          </Button>
+        </div>
         </div>
       </div>
     )
@@ -170,7 +178,7 @@ export default function Organization() {
           </div>
         </div>
 
-        <div className="min-h-[calc(100%-10%)] bg-gradient-to-br from-blue-50 via-white to-blue-100">
+        <div className=" min-h-[calc(100vh-10%)] sm:min-h-[calc(100vh-11%)] bg-gradient-to-br from-blue-50 via-white to-blue-100">
           <div className="max-w-full mx-auto px-4 sm:px-6 py-6 relative">
             {/* Statistics Cards */}
             {/* <div className="mb-8">

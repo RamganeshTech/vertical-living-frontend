@@ -14,7 +14,8 @@ type SingleProjectProp = {
     project: IProject & { _id: string },
     organizationId: string;
     onEdit: (project: IProject, id: string) => void;
-    index: number
+    index: number,
+    refetch: ()=> Promise<any>
 }
 
 
@@ -23,7 +24,7 @@ type ProjectsOutletContextType = {
     setProjectId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizationId }) => {
+const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizationId, refetch }) => {
 
     const { setProjectId } = useOutletContext<ProjectsOutletContextType>();
     const { mutateAsync: deleteAsync, isPending } = useDeleteProject()
@@ -61,8 +62,10 @@ const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizat
 
     const handleDeleteProject = async () => {
         try {
+            if(!window.confirm("Are you sure you want to delete this project?")) return
             await deleteAsync(project._id)
             toast({ title: "Success", description: "Project Deleted Successfully" })
+            refetch()
         }
         catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message  || error?.message || "Failed to Delete", variant: "destructive" })

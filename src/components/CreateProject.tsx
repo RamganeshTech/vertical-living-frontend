@@ -49,6 +49,7 @@ export interface ProjectInput {
 
 type CreateProjectProp = {
   onClose: () => void,
+  refetch: () => Promise<any>,
   setEditForm: React.Dispatch<React.SetStateAction<ProjectInput>>,
   setShowForm: React.Dispatch<React.SetStateAction<boolean>>,
   editForm: ProjectInput,
@@ -57,7 +58,7 @@ type CreateProjectProp = {
   organizationId: string
 }
 
-const CreateProject: React.FC<CreateProjectProp> = ({ onClose, setShowForm, organizationId, isEditing, setEditForm, editForm, editProjectId }) => {
+const CreateProject: React.FC<CreateProjectProp> = ({ onClose, refetch, setShowForm, organizationId, isEditing, setEditForm, editForm, editProjectId }) => {
 
   const [formData, setFormData] = useState<ProjectInput>({
     projectName: "",
@@ -139,6 +140,7 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, setShowForm, orga
             toast({ title: "Success", description: "Project Created Successfully" })
           }
         }
+        refetch()
         setShowForm(false)
       }
     }
@@ -340,7 +342,7 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, setShowForm, orga
               className="bg-blue-600 text-white px-6 w-full sm:w-40 py-2 rounded-xl hover:bg-blue-700 transition-all"
             >
               {isPending || updatePending ? (
-                <div className="mx-auto w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="mx-auto w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
               ) : isEditing ? "Edit Project" : "Create Project"}
             </Button>
           </div>

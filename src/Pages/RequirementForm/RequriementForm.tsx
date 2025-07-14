@@ -225,7 +225,25 @@ export default function RequirementForm() {
             </div>
           </div>
 
-          <main className="h-[calc(100vh-90px)] overflow-y-auto custom-scrollbar space-y-6">
+          {error && (
+        <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+          <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+            ⚠️ Error Occurred
+          </div>
+          <p className="text-red-500  mb-4 text-lg sm:text-xl">
+            {(error as any)?.response?.data?.message || "Failed to load data"}
+          </p>
+          <Button
+            onClick={() => refetch()}
+            className="bg-red-600 text-white px-4 py-2"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
+
+
+          {!error && <main className="h-[calc(100vh-90px)] overflow-y-auto custom-scrollbar space-y-6">
             {/* Timer Section */}
             <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
               <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
@@ -340,7 +358,7 @@ export default function RequirementForm() {
                 </div>
               )}
             </div>
-          </main>
+          </main>}
         </div>
       )}
     </div>

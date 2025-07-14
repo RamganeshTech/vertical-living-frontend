@@ -139,7 +139,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
 
         {/* ✅ Static logout at the bottom */}
         <div className="border-t border-gray-200 p-4">
-          <Button
+        {pathArray[1] !== "login" &&  <Button
             className="w-full flex items-center justify-center gap-2"
             isLoading={
               isCTOPending ||
@@ -152,6 +152,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
           >
             <i className="fas fa-sign-out-alt"></i> Logout
           </Button>
+}
         </div>
       </aside>
     </>

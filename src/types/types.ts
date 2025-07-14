@@ -1,3 +1,5 @@
+import type { currentAssignedStaffType } from "../shared/AssignStaff";
+
 export type ProjectDetailsOutlet = {
   projectId: string | null;
   setProjectId: React.Dispatch<React.SetStateAction<string | null>>
@@ -307,7 +309,7 @@ export interface IConsultationAttachment {
 
 
 export interface IConsultationMessage {
-    // _id?: string;
+    _id: string;
     sender: string; // the persons id who sent the message
     senderModel: string,
     senderRole: "owner" | "staff" | "CTO" | "worker";
@@ -315,25 +317,23 @@ export interface IConsultationMessage {
     section?: string; // Optional tag like "Kitchen"
     attachments?: IConsultationAttachment[];
     createdAt: Date;
+    isEdited:boolean
 }
 
 export interface IConsultationTimer {
-    startedAt: Date | null;
-    completedAt: Date | null;
-    deadLine: Date | null;
+    startedAt: string | null;
+    completedAt: string | null;
+    deadLine: string | null;
 }
 
 export interface ITechnicalConsultation {
     projectId: string;
+    assignedTo: currentAssignedStaffType
     messages: IConsultationMessage[];
     timer: IConsultationTimer;
     status: "pending" | "completed";
     isEditable: boolean;
 }
-
-
-
-
 
 
 // MATERIAL SELECTION STAGE 5 

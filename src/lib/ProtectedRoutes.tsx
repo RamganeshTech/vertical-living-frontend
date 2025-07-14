@@ -16,7 +16,12 @@ const ProtectedRoutes = ({ allowedRoles, children }: ProtectedRoutesProps) => {
 
     // console.log("first entering")
     // While waiting for the role
-    if (loading || role === undefined || role === null) {
+
+     if (!isauthenticated && loading === false) {
+        return <Navigate to={`${role === "owner" ? "/login" : role === null ? `/login`: `/login/${role}`}`} state={{ from: location }} replace />;
+    }
+
+    if (loading || role === undefined || role === null ) {
         // console.log("2nd entering")
 
         return <div className="p-6 text-center">🔐 Loading...</div>;

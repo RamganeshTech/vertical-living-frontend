@@ -78,6 +78,7 @@ import WorkerWallMainContainer from './Pages/Wall Painting/WorkerWall/WorkerWall
 import WorkerWallStepPage from './Pages/Wall Painting/WorkerWall/WorkerWallStepPage'
 import SubscriptionParent from './Pages/Subscription Payment/SubscriptionParent'
 import MaterialOverviewLoading from './Pages/Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
+import UserProfileDetails from './Pages/UserProfile/UserProfileDetails'
 
 function App() {
 
@@ -107,19 +108,17 @@ function App() {
         </Route>
 
         <Route path="/home" element={<Home />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/unauthorized" element={<UnAuthorized />} />
 
         <Route path='/stafflogin' element={<StaffLogin />} />
-        <Route path='/staffregister' element={<StaffRegister />} />
-
+        <Route path="/login" element={<Login />} />
         <Route path='/workerlogin' element={<WorkerLogin />} />
-        <Route path='/workerregister' element={<WorkerRegister />} />
-
         <Route path='/ctologin' element={<CTOLogin />} />
-        <Route path='/ctoregister' element={<CTORegister />} />
-
         <Route path='/clientlogin' element={<ClientLogin />} />
+
+        <Route path='/staffregister' element={<StaffRegister />} />
+        <Route path='/workerregister' element={<WorkerRegister />} />
+        <Route path='/ctoregister' element={<CTORegister />} />
         <Route path='/clientregister' element={<ClientRegister />} />
 
         <Route path="/subscription" element={<SubscriptionPlans />} />
@@ -131,16 +130,12 @@ function App() {
         </ProtectedRoutes>} /> */}
 
 
-        <Route path={`/:projectId/adminwall`} element={<AdminWallMainContainer />} >
-          <Route path={`step/:stepId/:stepNumber`} element={<AdminWallStepPage />} />
-        </Route>
-
-        <Route path="/:projectId/workerwall" element={<WorkerWallMainContainer />} >
-          <Route path='step/:stepId/:stepNumber' element={<WorkerWallStepPage />} />
-        </Route>
+       
 
         <Route path="/organizations" element={
-          <Organization />
+          <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+            <Organization />
+          </ProtectedRoutes>
         } />
 
         <Route path="/organizations/:organizationId" element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
@@ -166,6 +161,14 @@ function App() {
             element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <SubscriptionParent />
             </ProtectedRoutes>} />
+
+
+             <Route path="userprofile" element={
+          <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+            <UserProfileDetails />
+          </ProtectedRoutes>
+        } />
+
 
         </Route>
 
@@ -344,12 +347,11 @@ function App() {
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
                 <InstallationRoomDetail />
               </ProtectedRoutes>
-
             } />
           </Route>
 
           <Route path="qualitycheck" element={
-            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff",]}>
               <QualityCheckOverview />
             </ProtectedRoutes>
           } >
@@ -358,6 +360,15 @@ function App() {
                 <QualityCheckRoomDetails />
               </ProtectedRoutes>
             } />
+
+            <Route path={`qualitycheckroom/adminwall`} element={<AdminWallMainContainer />} >
+              <Route path={`step/:stepId/:stepNumber`} element={<AdminWallStepPage />} />
+            </Route>
+
+            <Route path="qualitycheckroom/workerwall" element={<WorkerWallMainContainer />} >
+              <Route path='step/:stepId/:stepNumber' element={<WorkerWallStepPage />} />
+            </Route>
+
           </Route>
 
           <Route path="cleaning" element={<CleaningOverview />} >

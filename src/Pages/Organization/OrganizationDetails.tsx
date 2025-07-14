@@ -372,7 +372,7 @@ if (!/^\d{10}$/.test(tempPhone)) {
             <div className="lg:col-span-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Phone Section */}
-                <div className="p-4 bg-blue-50 rounded-xl shadow-sm">
+                <div className="p-4 bg-blue-50 rounded-xl shadow-sm h-fit">
                   {editingPhone ? (
                     <>
                       <div className="flex items-center gap-3">

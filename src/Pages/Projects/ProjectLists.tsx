@@ -10,13 +10,15 @@ import { useOutletContext, useParams } from "react-router-dom";
 import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
+import ErrorComponent from "../../components/ErrorComponent";
+import { Button } from "../../components/ui/Button";
 
 
 const ProjectLists = () => {
 
   const { organizationId } = useParams()
   const { openMobileSidebar, isMobile } = useOutletContext<OrganizationOutletTypeProps>()
-  const {role } = useSelector((state:RootState)=> state.authStore)
+  const { role } = useSelector((state: RootState) => state.authStore)
   const [showForm, setShowForm] = useState<boolean>(false);
   const [isEditing, setisEditing] = useState<boolean>(false);
 
@@ -33,9 +35,9 @@ const ProjectLists = () => {
   });
   const [editProjectId, setEditProjectId] = useState<string | null>(null);
 
-  let { data: getProjects, isError, isPending, error } = useGetProjects(organizationId!)
+  let { data: getProjects, refetch, isError, isPending, error, isLoading } = useGetProjects(organizationId!)
 
-const allowedRoles = ["owner", "CTO", "staff"]
+  const allowedRoles = ["owner", "CTO", "staff"]
   const handleEdit = useCallback((project: IProject, id: string) => {
     const projectInput = mapProjectToProjectInput(project);
     setEditForm(projectInput);
@@ -54,30 +56,40 @@ const allowedRoles = ["owner", "CTO", "staff"]
     handleEdit(project, id);
   }, [handleEdit]);
 
+  if (isLoading) return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    {[1, 2, 3, 4].map((n) => {
+      return (
+        <ProjectCardLoading key={n} />
+      )
+    })}
+  </div>
+
+
+
 
   // console.log("getProjects", getProjects)
   // getProjects = []
   return (
     <div className="w-[100%] flex flex-col h-full min-h-0 ">
 
-      <div className="flex py-2 justify-between items-center">
-       <div className="flex ">
-         {isMobile &&
-          <button
-            onClick={openMobileSidebar}
-            className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
-            title="Open Menu"
-          >
-            <i className="fa-solid fa-bars"></i>
-          </button>
-        }
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#1f2d3d] flex items-center gap-2">
-          <i className="fa-solid fa-diagram-project text-blue-600 text-2xl"></i>
-          <p>{SIDEBAR_LABELS.PROJECTS}</p>
-        </h2>
-       </div>
+      <header className="flex justify-between items-center">
+        <div className="flex ">
+          {isMobile &&
+            <button
+              onClick={openMobileSidebar}
+              className="mr-3 p-2 rounded-md border-none border-gray-300 hover:bg-gray-100"
+              title="Open Menu"
+            >
+              <i className="fa-solid fa-bars"></i>
+            </button>
+          }
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#1f2d3d] flex items-center gap-2">
+            <i className="fa-solid fa-diagram-project text-blue-600 text-2xl"></i>
+            <p>{SIDEBAR_LABELS.PROJECTS}</p>
+          </h2>
+        </div>
 
-       {allowedRoles.includes(role!) && <div
+        {allowedRoles.includes(role!) && <div
           onClick={() => {
             setShowForm(!showForm)
           }}
@@ -88,7 +100,10 @@ const allowedRoles = ["owner", "CTO", "staff"]
               }`}
           ></i>
         </div>}
-      </div>
+
+        
+      </header>
+      <hr className="my-2 border-b-1 border-gray-300" />
 
       {!isPending && (getProjects?.length ?? 0) === 0 && <div className="flex h-full flex-col items-center justify-center w-full py-16 text-center text-gray-500">
         <div className="text-6xl mb-4">
@@ -104,28 +119,48 @@ const allowedRoles = ["owner", "CTO", "staff"]
       </div>
       }
 
-      <div className="h-full flex-1 !overflow-y-auto custom-scrollbar grid md:grid-cols-2 gap-6">
+
+
+      {error && (
+        <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+          <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+            ⚠️ Error Occurred
+          </div>
+          <p className="text-red-500  mb-4 text-lg sm:text-xl">
+            {(error as any)?.response?.data?.message || "Failed to load the projects"}
+          </p>
+          <Button
+            onClick={() => refetch()}
+            className="bg-red-600 text-white px-4 py-2"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
+
+
+      {!error && <div className="h-full flex-1 !overflow-y-auto custom-scrollbar grid md:grid-cols-2 gap-6">
 
         {isPending && [...Array(6)].map((_, i) => <Fragment key={i}><ProjectCardLoading /></Fragment>)}
 
-        {!isPending && getProjects?.length > 0 && getProjects?.map((project: IProject & {_id:string}, index: number) => {
+        {!isPending && getProjects?.length > 0 && getProjects?.map((project: IProject & { _id: string }, index: number) => {
 
           return (
             <>
-            <div
-              key={(project as any)._id}
-              className="h-[256px] sm:!h-[270px] md:!h-[330px] lg:!h-[282px] flex flex-col shadow-md rounded-xl overflow-hidden border-l-8 border-blue-600 bg-white"
-            >
-              <SingleProject onEdit={handleEditProject} index={index} project={project} organizationId={organizationId!} />
-            </div>
+              <div
+                key={(project as any)._id}
+                className="h-[256px] sm:!h-[270px] md:!h-[330px] lg:!h-[282px] flex flex-col shadow-md rounded-xl overflow-hidden border-l-8 border-blue-600 bg-white"
+              >
+                <SingleProject refetch={refetch} onEdit={handleEditProject} index={index} project={project} organizationId={organizationId!} />
+              </div>
             </>
           );
         })}
-      </div>
+      </div>}
 
       {showForm && (
         <div onClick={handleClose} className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <CreateProject onClose={handleClose} setShowForm={setShowForm} organizationId={organizationId!} isEditing={isEditing} setEditForm={setEditForm} editForm={editForm} editProjectId={editProjectId} />
+          <CreateProject onClose={handleClose} refetch={refetch} setShowForm={setShowForm} organizationId={organizationId!} isEditing={isEditing} setEditForm={setEditForm} editForm={editForm} editProjectId={editProjectId} />
         </div>
       )}
 

@@ -4,6 +4,7 @@ import { getApiForRole } from "../../utils/roleCheck";
 import { queryClient } from "../../QueryClient/queryClient";
 import type { UploadFilePayload } from "./requirementFormApi";
 import type { AxiosInstance } from "axios";
+import type { ITechnicalConsultation } from "../../types/types";
 
 const addConsultationMessage = async ({
   projectId,

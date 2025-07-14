@@ -87,6 +87,9 @@ function HomeInteriorProject() {
 
   const handleRoomSubmit = async () => {
     try {
+
+      if(!roomDetails.name) throw new Error("please select the name")
+
       const calculatedArea = roomDetails.length && roomDetails.breadth
         ? (Number(roomDetails.length) * Number(roomDetails.breadth)).toFixed(2)
         : null;
@@ -107,7 +110,7 @@ function HomeInteriorProject() {
       setRoomDetails(initialRoomDetails);
       toast({ description: editingRoomId ? 'Room updated' : 'Room added', title: "Success" });
     } catch (error: any) {
-      toast({ title: "Error", description: error?.response?.data?.message || "Operation failed", variant: "destructive" });
+      toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Operation failed", variant: "destructive" });
     }
   };
 
@@ -147,7 +150,7 @@ function HomeInteriorProject() {
   if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-2 max-w-full h-full w-full overflow-y-auto">
+    <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-2 max-w-full h-full w-full overflow-y-auto custom-scrollbar">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <div className="w-full sm:w-auto">
           <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">

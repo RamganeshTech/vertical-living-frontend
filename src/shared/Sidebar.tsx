@@ -54,6 +54,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     //  to make the navbar navigate to project list page because there is no navigation for back 
     const pathArray = location.pathname.split('/')
+    console.log("patharrray ", pathArray)
     const isInStageNavBar = pathArray[2] === "projectdetails"
     const handleNav = () => {
         if (isInStageNavBar) {
@@ -162,7 +163,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
 
                     <div className="flex flex-col p-2 border-t border-[#3a3b45]">
-                        <Button
+                        {pathArray[1] !== "login" &&  <Button
                             isLoading={
                                 isCTOPending ||
                                 isClientPending ||
@@ -175,6 +176,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                             <i className="fa-solid fa-right-from-bracket"></i>
                             <span>Logout</span>
                         </Button>
+}
 
                         <button
                             title="Ctrl+] to close"
@@ -223,6 +225,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
 
                     <div className="flex flex-col items-center p-2 border-t border-[#3a3b45]">
+                      {pathArray[1] !== "login" && 
                         <Button
                             isLoading={
                                 isCTOPending ||
@@ -236,6 +239,9 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                             className="w-[40px] h-[40px] flex items-center justify-center !bg-[#3a3b45] !text-[#9ca3af] hover:!text-red-500 transition">
                             <i className="fa-solid fa-right-from-bracket"></i>
                         </Button>
+
+
+                       }
 
                         <button
                             title="Ctrl+[ to open"

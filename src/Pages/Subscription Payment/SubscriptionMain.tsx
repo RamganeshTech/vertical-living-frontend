@@ -4,6 +4,7 @@ import { toast } from "../../utils/toast";
 import { useChooseSubscriptionMode, useVerifySubscriptionPayment } from "../../apiList/subscriptionApi";
 import { useLocation } from "react-router-dom";
 import { Button } from "../../components/ui/Button";
+import { plans } from "../../constants/constants";
 
 // ✅ App Plan List & Styling Config
 // const plans = [
@@ -37,39 +38,6 @@ import { Button } from "../../components/ui/Button";
 // ];
 
 
-const plans = [
-  {
-    key: "basic",
-    name: "Basic",
-    price: 1000,
-    color: "border-blue-500",
-    btnColor: "bg-blue-600 hover:bg-blue-700",
-    planNameColor: "text-blue-700",
-    features: ["✔ 5 Roles Allowed", "✔ Email Notification", "✔ Timer Functionality", "✔ Image Upload","✔ PDF Upload", "✔ Assign Staffs", "✔ Cost Estimation"],
-    // features: ["✔ 5 Roles Allowed", "✔ Email Notification", "✔ Timer Functionality", "✔ Image Upload","✔ PDF Upload",  "✘ No Analytics", ],
-    available: true,
-  },
-  {
-    key: "advanced",
-    name: "Advanced",
-    price: 0,
-    color: "border-purple-500",
-    btnColor: "bg-purple-600 hover:bg-purple-700",
-    planNameColor: "text-purple-700",
-    features: [],
-    available: false,
-  },
-  {
-    key: "enterprise",
-    name: "Enterprise",
-    price: 0,
-    color: "border-rose-500",
-    btnColor: "bg-rose-600 hover:bg-rose-700",
-    planNameColor: "text-rose-700",
-    features: [],
-    available: false,
-  },
-];
 
 
 type SubscriptionPlansProp = {

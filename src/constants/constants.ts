@@ -21,9 +21,9 @@ export const SIDEBAR_ICONS = {
 export const LOGIN_ICONS_LOGIN_GROUP = {
   ADMIN: "fas fa-user-tie text-2xl",
   STAFF: "fas fa-user-gear text-2xl",
-  CTO:   "fas fa-users-gear text-2xl",
-  WORKER:"fas fa-hard-hat text-2xl",
-  CLIENT:"fas fa-user text-2xl" 
+  CTO: "fas fa-users-gear text-2xl",
+  WORKER: "fas fa-hard-hat text-2xl",
+  CLIENT: "fas fa-user text-2xl"
 }
 
 export const LOGIN_LABELS = {
@@ -40,6 +40,8 @@ export const ORGANIZATION_ICONS = {
   DETAILS: "fa-solid fa-building text-2xl",
   PROJECTS: "fa-solid fa-diagram-project  text-2xl",
   PLAN: "fa-solid fa-cash  text-2xl",
+  // PROFILE: "fa-solid fa-user-gear  text-2xl"
+
 }
 
 export const ORGANIZATION_LABELS = {
@@ -47,7 +49,9 @@ export const ORGANIZATION_LABELS = {
   INVITESTAFFS: "Invite Staffs",
   DETAILS: "Org Details",
   PROJECTS: "Projects",
-  PLAN: "Upgrade Plan"
+  PLAN: "Upgrade Plan",
+  PROFILE: "User Profile"
+
 }
 
 export const PROJECTS_LABELS = {
@@ -147,6 +151,43 @@ export const COMPANY_DETAILS = {
   COMPANY_LOGO: "https://th.bing.com/th/id/OIP.Uparc9uI63RDb82OupdPvwAAAA?w=80&h=80&c=1&bgcl=c77779&r=0&o=6&dpr=1.3&pid=ImgRC"
 }
 
+
+// SUBSCRIPTION PLANS
+
+
+export const plans = [
+  {
+    key: "basic",
+    name: "Basic",
+    price: 1000,
+    color: "border-blue-500",
+    btnColor: "bg-blue-600 hover:bg-blue-700",
+    planNameColor: "text-blue-700",
+    features: ["✔ 5 Roles Allowed", "✔ Email Notification", "✔ Timer Functionality", "✔ Image Upload", "✔ PDF Upload", "✔ Assign Staffs", "✔ Cost Estimation"],
+    // features: ["✔ 5 Roles Allowed", "✔ Email Notification", "✔ Timer Functionality", "✔ Image Upload","✔ PDF Upload",  "✘ No Analytics", ],
+    available: true,
+  },
+  {
+    key: "advanced",
+    name: "Advanced",
+    price: 0,
+    color: "border-purple-500",
+    btnColor: "bg-purple-600 hover:bg-purple-700",
+    planNameColor: "text-purple-700",
+    features: [],
+    available: false,
+  },
+  {
+    key: "enterprise",
+    name: "Enterprise",
+    price: 0,
+    color: "border-rose-500",
+    btnColor: "bg-rose-600 hover:bg-rose-700",
+    planNameColor: "text-rose-700",
+    features: [],
+    available: false,
+  },
+];
 
 export const requiredFieldsByRoomOrderMaterials: Record<string, string[]> = {
   carpentry: ["material", "brandName", "specification", "quantity", "unit", "remarks"],

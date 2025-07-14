@@ -1,13 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, {  useState } from "react";
 import { useParams, useOutletContext } from "react-router-dom";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { Label } from "../../../components/ui/Label";
-import { Separator } from "../../../components/ui/Seperator";
-import { useAddConsultationMessage, useGetConsultationMessages, useDeleteConsultationMessage, useEditConsultationMessage, useSetDeadLineTechConsultation, useCompletionStatusTechConsultation } from "../../../apiList/Stage Api/technicalConsultationApi";
+import { useAddConsultationMessage, useGetConsultationMessages, 
+    // useDeleteConsultationMessage, 
+    useEditConsultationMessage, useSetDeadLineTechConsultation, useCompletionStatusTechConsultation } from "../../../apiList/Stage Api/technicalConsultationApi";
 import useGetRole from './../../../Hooks/useGetRole';
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../store/store";
 import { toast } from "../../../utils/toast";
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
@@ -15,6 +14,8 @@ import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { downloadImage } from "../../../utils/downloadFile";
+import type { IConsultationMessage, ITechnicalConsultation } from "../../../types/types";
+import { Badge } from "../../../components/ui/Badge";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -22,7 +23,7 @@ type ProjectDetailsOutlet = {
     openMobileSidebar: () => void;
 };
 
-const TechnicalConsultant = () => {
+const TechnicalConsultant:React.FC = () => {
     const { projectId, organizationId } = useParams<{ projectId: string, organizationId: string }>();
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
     const { role, _id: userId } = useGetRole();
@@ -34,9 +35,10 @@ const TechnicalConsultant = () => {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
 
-    let { data: techDoc, isLoading: getMessageLoading, error: getMessageError, isError: getMessageIsError, refetch } = useGetConsultationMessages(projectId!);
+    let { data, isLoading: getMessageLoading, error: getMessageError, isError: getMessageIsError, refetch } = useGetConsultationMessages(projectId!);
+    const techDoc = data as ITechnicalConsultation;
     const { mutateAsync: sendMessage, isPending: sendMessagePending } = useAddConsultationMessage();
-    const { mutateAsync: deleteMessage, isPending: deletePending } = useDeleteConsultationMessage();
+    // const { mutateAsync: deleteMessage, isPending: deletePending } = useDeleteConsultationMessage();
     const { mutateAsync: editMessage, isPending: editPending } = useEditConsultationMessage();
 
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetDeadLineTechConsultation()
@@ -74,9 +76,9 @@ const TechnicalConsultant = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        await deleteMessage({ projectId: projectId!, messageId: id, senderId: userId! });
-    };
+    // const handleDelete = async (id: string) => {
+    //     await deleteMessage({ projectId: projectId!, messageId: id, senderId: userId! });
+    // };
 
     const handleEdit = (id: string, originalText: string) => {
         setEditingId(id);
@@ -89,10 +91,19 @@ const TechnicalConsultant = () => {
     };
 
     const handleEditSubmit = async () => {
-        if (!editingId || !editText) return;
+        try {
+        if (!editingId || !editText) {
+                throw new Error("please write anything")
+            };
         await editMessage({ projectId: projectId!, messageId: editingId, message: editText, senderId: userId! });
         setEditingId(null);
         setEditText("");
+           toast({ description: "message edited successfully", title: "Success" })
+        }
+        catch (error: any) {
+            console.log("err", error)
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to edit the message", variant: "destructive" })
+        }
     };
 
     console.log(techDoc)
@@ -207,11 +218,13 @@ const TechnicalConsultant = () => {
                             {techDoc?.messages
                                 ?.slice()
                                 .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                                .map((msg: any) => (
-                                    <div key={msg._id} className="bg-blue-50 w-full group px-4 py-[5px] rounded-lg shadow flex flex-col">
+                                .map((msg: IConsultationMessage ) => (
+                                    <div key={(msg)._id} className="bg-blue-50 w-full group px-4 py-[5px] rounded-lg shadow flex flex-col">
                                         <div className="flex justify-between items-center">
                                             <p className="text-xs sm:text-[10px] text-gray-600">
-                                                {msg.senderRole.toUpperCase()} - {new Date(msg.createdAt).toLocaleString()}
+                                                {msg.senderRole.toUpperCase()} - {new Date(msg.createdAt).toLocaleString()} 
+                                                
+                                               {msg.isEdited && <Badge className="sm:ml-2 my-1 sm:my-0"> <p className="hidden sm:inline-block">message is  {" "} </p> &nbsp; edited by {msg.senderRole}</Badge> }
                                             </p>
                                             <div className="opacity-0 scale-95 group-hover:opacity-100 transition-all duration-300">
                                                 {(msg.sender === userId || role === "owner" || role === "CTO") && (
@@ -219,9 +232,9 @@ const TechnicalConsultant = () => {
                                                         <Button variant="secondary" onClick={() => handleEdit(msg._id, msg.message)} className="text-blue-600 text-sm">
                                                             <i className="fas fa-edit"></i>
                                                         </Button>
-                                                        <Button variant="danger" isLoading={deletePending} onClick={() => handleDelete(msg._id)} className="text-white bg-red-600 text-sm">
+                                                        {/* <Button variant="danger" isLoading={deletePending} onClick={() => handleDelete(msg._id)} className="text-white bg-red-600 text-sm">
                                                             <i className="fas fa-trash"></i>
-                                                        </Button>
+                                                        </Button> */}
                                                     </div>
                                                 )}
                                             </div>

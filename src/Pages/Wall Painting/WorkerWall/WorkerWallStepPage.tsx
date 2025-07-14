@@ -36,7 +36,6 @@ export default function WorkerWallStepPage() {
   }
 
   const openImagePreview = (url: string, alt: string) => {
-    console.log("url gett envondered", url)
     setPreviewImage({ url, alt })
   }
 

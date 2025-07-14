@@ -4,6 +4,11 @@ import { useAssignStaffToStage } from "../apiList/Stage Api/assignStaffApi";
 import { toast } from "../utils/toast";
 import { Button } from "../components/ui/Button";
 
+export type currentAssignedStaffType ={
+   _id: string;
+    staffName: string;
+     email: string }
+
 interface AssignStageStaffProps {
   stageName: "RequirementFormModel" | "SiteMeasurementModel" | "SampleDesignModel" | "TechnicalConsultationModel" | 
 "MaterialRoomConfirmationModel" | "CostEstimation" | "PaymentConfirmationModel" | "OrderingMaterialModel" |
@@ -11,7 +16,7 @@ interface AssignStageStaffProps {
 "QualityCheckupModel" | "CleaningAndSanitationModel" | "ProjectDeliveryModel" 
   projectId: string;
   organizationId: string;
-  currentAssignedStaff: { _id: string; staffName: string; email: string } | null;
+  currentAssignedStaff: currentAssignedStaffType  | null;
   className?: string
 }
 

@@ -1,6 +1,6 @@
 import type React from "react"
 
-import { useParams } from "react-router-dom"
+import { useOutletContext, useParams } from "react-router-dom"
 import { ADMIN_WALL_PAINTING_STEPS } from "../../../constants/constants"
 import { useState } from "react"
 import {
@@ -10,6 +10,7 @@ import {
 } from "../../../apiList/WallPainting Api/adminWallPaintingApi"
 import axios from "axios"
 import { downloadImage } from "../../../utils/downloadFile"
+import type { ProjectDetailsOutlet } from "../../../types/types"
 
 export default function AdminWallStepPage() {
   const { projectId, stepId, stepNumber } = useParams<{ projectId: string; stepNumber: string; stepId: string }>()
@@ -17,6 +18,7 @@ export default function AdminWallStepPage() {
   const [files, setFiles] = useState<FileList | null>(null)
   const [loadingImages, setLoadingImages] = useState<boolean>(false)
   const [previewImage, setPreviewImage] = useState<{ url: string; alt: string } | null>(null)
+  // const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
 
   const { mutate: approveStep } = useApproveAdminStep()
   const { mutate: uploadCorrection } = useUploadAdminCorrectionRound()
@@ -153,6 +155,15 @@ export default function AdminWallStepPage() {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {/* Header */}
           <div className="bg-white px-2 py-3 sm:px-6 sm:py-4">
+             {/* {isMobile && (
+                <button
+                  onClick={openMobileSidebar}
+                  className="mr-2 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                  title="Open Menu"
+                >
+                  <i className="fa-solid fa-bars"></i>
+                </button>
+              )} */}
             <h1 className="text-2xl sm:text-3xl font-semibold text-blue-600 mb-2"> {`${stepNumber})`} {" "}{step.label}</h1>
             {/* <p className="text-blue-600">
               Admin Review - Step {stepNumber}

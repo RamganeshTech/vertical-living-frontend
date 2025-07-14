@@ -195,7 +195,7 @@ const InviteStaffs: React.FC = () => {
 
       <div className="w-full flex flex-col md:flex-row p-4 gap-6 h-full">
         {/* invitiation link */}
-        <div className="bg-white sm:max-h-[60vh] lg:max-h-[45vh] w-full  md:w-1/2  p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
+        <div className="bg-white sm:max-h-[60vh] lg:max-h-[45vh] h-fit w-full  md:w-1/2  p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
           <div>
             <h2 className="text-2xl font-bold text-blue-900 mb-2 flex items-center">
               <i className="fas fa-user-plus mr-2" /> Invite Staffs
