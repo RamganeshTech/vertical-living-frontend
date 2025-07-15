@@ -47,6 +47,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     // TRANSPORTATION: projectId ? `/${organizationId}/projectdetails/${projectId}/transportationlist` : "",
     WORKERS: projectId ? `/${organizationId}/projectdetails/${projectId}/workers` : "",
     INVITECLIENT: projectId ? `/${organizationId}/projectdetails/${projectId}/inviteclient` : "",
+    PREREQUIRETIES: projectId ? `/${organizationId}/projectdetails/${projectId}/prerequireties` : "",
     REQUIREMENTFORM: projectId ? `/${organizationId}/projectdetails/${projectId}/requirementform` : "",
     SITEMEASUREMENT: projectId ? `/${organizationId}/projectdetails/${projectId}/sitemeasurement` : "",
     SAMPLEDESIGN: projectId ? `/${organizationId}/projectdetails/${projectId}/sampledesign` : "",

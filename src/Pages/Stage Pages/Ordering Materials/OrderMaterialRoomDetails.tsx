@@ -1,209 +1,3 @@
-// // File: OrderMaterialRoomDetails.tsx
-// import { useParams, useNavigate } from "react-router-dom";
-// import { useGetSingleOrderingRoom, useUpdateIsOrderedStatus, useUpdateOrderingMaterialItem } from "../../../apiList/Stage Api/orderingMaterialApi";
-// import { Skeleton } from "../../../components/ui/Skeleton";
-// import { Button } from "../../../components/ui/Button";
-// import { toast } from "../../../utils/toast";
-// import UploadOrderMaterial from "./UploadOrderMaterial";
-// import { useState } from "react";
-
-// interface EditOrderingMaterial {
-//   sellerName: string;
-//   sellerPhoneNo: string;
-//   notes: string;
-// }
-
-// const OrderMaterialRoomDetails = () => {
-//   const { projectId, roomId } = useParams();
-//   const navigate = useNavigate();
-//   const { data, isLoading, isError, error } = useGetSingleOrderingRoom({
-//     projectId: projectId!,
-//     roomId: roomId!
-//   });
-
-
-//   const [editingKey, setEditingKey] = useState<string | null>(null);
-//   const [editValues, setEditValues] = useState<EditOrderingMaterial>({
-//     sellerName: "",
-//     sellerPhoneNo: "",
-//     notes: ""
-//   });
-
-
-//   const { mutateAsync: updateIsOrdered, isPending: isOrderedPending } = useUpdateIsOrderedStatus()
-//   const { mutateAsync: updateOrderMaterial, isPending: updatePending } = useUpdateOrderingMaterialItem()
-
-
-
-//   if (isLoading) return <Skeleton className="w-full h-60" />;
-//   if (isError) return <p>(error as Error)</p>
-
-
-//   const handleUpdateFields = async (materialName: string) => {
-//     try {
-//       await updateOrderMaterial({ projectId: projectId!, roomId: roomId!, materialName, payload: editValues });
-//       setEditingKey(null);
-//       toast({ description: "Field updated successfully", title: "Success" });
-//     } catch (error: any) {
-//       toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update field", variant: "destructive" });
-//     }
-//   };
-
-
-//   const handleUpdateIsOrdered = async (materialName: string, isOrdered: boolean) => {
-//     try {
-//       await updateIsOrdered({ projectId: projectId!, materialName, roomId: roomId!, isOrdered });
-//       setEditingKey(null);
-//       toast({ description: "Field ordered updated successfully", title: "Success" });
-//     } catch (error: any) {
-//       toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update field", variant: "destructive" });
-//     }
-//   };
-
-
-//   const handleCancelUpdate = async () => {
-//     setEditingKey(null);
-//     setEditValues({
-//       sellerName: "",
-//       sellerPhoneNo: "",
-//       notes: ""
-//     });
-//   };
-
-//   return (
-//     <div className="p-4">
-//       <Button className="mb-4 bg-blue-600 hover:bg-blue-700" onClick={() => navigate(-1)}>
-//         ← Back to Rooms
-//       </Button>
-
-//       <h2 className="text-2xl font-semibold text-blue-800 mb-4">
-//         Room: {data.roomName}
-//       </h2>
-
-//       <div className=" max-h-[60vh] border border-blue-200 rounded-lg">
-//         <div className="grid grid-cols-9 px-6 py-3 bg-blue-100 text-blue-800 text-sm font-semibold">
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Material Name</div>
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</div>
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</div>
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</div>
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Seller Name</div>
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Seller Phone</div>
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</div>
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Is Ordered</div>
-//           <div className="text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</div>
-//         </div>
-
-//         <div className="text-sm text-blue-900 divide-y max-h-[70vh] overflow-y-auto divide-blue-100">
-//           {data?.materials?.map((item: any, index: number) => (
-//             <div
-//               key={index}
-//               className="grid grid-cols-9 items-center px-6 py-3 gap-4 hover:bg-gray-50 transition-colors"
-//             >
-//               <div className="  text-center font-medium">{item?.name}</div>
-//               <div className="  text-center">{item.brand ?? "-"}</div>
-
-//               <div className="  text-center">{item.quantity ?? "-"}</div>
-//               <div className="  text-center">{item?.unit ?? "-"}</div>
-
-//               {editingKey === item.name ? (
-//                 <>
-//                   <input
-//                     type="text"
-//                     className="text-sm border p-1"
-//                     value={editValues.sellerName || ""}
-//                     onChange={(e) => setEditValues({ ...editValues, sellerName: e.target.value })}
-//                   />
-//                   <input
-//                     type="text"
-//                     className="text-sm border p-1"
-//                     value={editValues.sellerPhoneNo || ""}
-//                     onChange={(e) => setEditValues({ ...editValues, sellerPhoneNo: e.target.value })}
-//                   />
-//                   <input
-//                     type="text"
-//                     className="text-sm border p-1"
-//                     value={editValues.notes || ""}
-//                     onChange={(e) => setEditValues({ ...editValues, notes: e.target.value })}
-//                   />
-//                   <div className="text-center">
-//                     <span
-//                       onClick={() => handleUpdateIsOrdered(item.name, item.isOrdered)}
-//                       className={`cursor-pointer px-2 py-1 rounded text-white text-xs ${item.isOrdered ? "bg-green-500" : "bg-red-400"}`}
-//                     >
-//                       {item.isOrdered ? "Yes" : "No"}
-//                     </span>
-//                   </div>
-//                   <div className="flex items-center gap-2">
-//                     <Button
-//                       className="bg-green-500 hover:bg-green-600 text-xs"
-//                       onClick={() => handleUpdateFields(item.name)}
-//                     >
-//                       Save
-//                     </Button>
-//                     <Button
-//                       className="bg-red-500 hover:bg-red-600 text-xs"
-//                       onClick={handleCancelUpdate}
-//                     >
-//                       Cancel
-//                     </Button>
-//                   </div>
-//                 </>
-//               ) : (
-//                 <>
-//                   <div className="text-center">{item.sellerName ?? "-"}</div>
-//                   <div className="text-center">{item.sellerPhoneNo ?? "-"}</div>
-//                   <div className="text-center">{item.notes ?? "-"}</div>
-//                   <div className="text-center">
-//                     <span
-//                       onClick={() => handleUpdateIsOrdered(item.name, item.isOrdered)}
-//                       className={`cursor-pointer px-2 py-1 rounded text-white text-xs ${item.isOrdered ? "bg-green-500" : "bg-red-400"}`}
-//                     >
-//                       {item.isOrdered ? "Yes" : "No"}
-//                     </span>
-//                   </div>
-//                 </>
-//               )}
-
-//               {editingKey !== item.name && (
-//                 <div className="text-center">
-//                   <Button
-//                     className="bg-blue-500 hover:bg-blue-600 text-xs"
-//                     onClick={() => {
-//                       setEditingKey(item.name);
-//                       setEditValues({
-//                         sellerName: item.sellerName || "",
-//                         sellerPhoneNo: item.sellerPhoneNo || "",
-//                         notes: item.notes || ""
-//                       });
-//                     }}
-//                   >
-//                    <i className="fas fa-pencil mr-2"></i> Edit
-//                   </Button>
-//                 </div>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-
-
-//       <section className="w-full my-2">
-//         <div className="text-sm font-medium text-gray-700">
-//           {data.additionalNotes || "No notes"}
-//         </div>
-//       </section>
-
-//       <section className="w-full my-2">
-//         <UploadOrderMaterial projectId={projectId!} roomId={roomId!} initialFiles={data.uploads} />
-//       </section>
-//     </div>
-//   );
-// };
-
-// export default OrderMaterialRoomDetails;
-
-
-
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "../../../utils/toast";
@@ -213,6 +7,7 @@ import { Button } from "../../../components/ui/Button";
 import { brandNamesByRoomKey, predefinedOptionsRooms, requiredFieldsByRoomOrderMaterials } from "../../../constants/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
 import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
+import { useBrandsByCategory } from "../../../apiList/Util Api/utilApi";
 
 const carpentryDummyData: any = [
   {
@@ -304,6 +99,8 @@ const OrderMaterialRoomDetails = () => {
   const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteRoomMaterialItem();
 
 
+  // ai routes electricalFittings, ceramicSanitaryware, upholsteryCurtains, falseCeilingMaterials
+  const { data: brands, isLoading: brandLoading, isError: brandError } = useBrandsByCategory(roomKey);
 
   if (isLoading) return <RoomDetailsLoading />;
   if (isError) return <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
@@ -327,7 +124,7 @@ const OrderMaterialRoomDetails = () => {
     setEditData((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async (itemId:string) => {
+  const handleSave = async (itemId: string) => {
     try {
 
       // Get required fields for the room type
@@ -553,13 +350,20 @@ const OrderMaterialRoomDetails = () => {
                                       />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      {(isBrandField
+                                      {/* {(isBrandField
                                         // ? predefinedOptionsRooms.brandName[roomKey]
                                         ? brandNamesByRoomKey[roomKey]
                                         : predefinedOptionsRooms.fabric[roomKey]
                                       ).map((opt: string) => (
                                         <SelectItem key={opt} value={opt}>
                                           {opt}
+                                        </SelectItem>
+                                      ))} */}
+
+
+                                      {brands?.map((brand: string) => (
+                                        <SelectItem key={brand} value={brand}>
+                                          {brand}
                                         </SelectItem>
                                       ))}
                                     </SelectContent>
@@ -580,7 +384,7 @@ const OrderMaterialRoomDetails = () => {
                         <div className="flex justify-center gap-2 items-center">
                           {editingIndex === index ? (
                             <>
-                              <Button size="sm" isLoading={updatePending} onClick={()=> handleSave(item._id)}><i className="fas fa-check"></i></Button>
+                              <Button size="sm" isLoading={updatePending} onClick={() => handleSave(item._id)}><i className="fas fa-check"></i></Button>
                               <Button size="sm" variant="ghost" onClick={() => setEditingIndex(null)}><i className="fas fa-xmark text-red-600"></i></Button>
                             </>
                           ) : (

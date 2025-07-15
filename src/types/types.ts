@@ -147,6 +147,23 @@ export interface IStaff {
 }
 
 
+// PreRequireties Types
+export interface IPreRequiretiesSiteItem {
+  isRequired: boolean;
+  notes: string;
+}
+
+export interface IProjectPreRequireties {
+  modularWork: IPreRequiretiesSiteItem;
+  electricalWork: IPreRequiretiesSiteItem;
+  plumbingWork: IPreRequiretiesSiteItem;
+  civilWork: IPreRequiretiesSiteItem;
+  decorationWork: IPreRequiretiesSiteItem;
+  projectId: string
+}
+
+
+
 
 // REQUIREMENT FORM TYPE STAGE 1
 export interface IRequirementFormSchema {

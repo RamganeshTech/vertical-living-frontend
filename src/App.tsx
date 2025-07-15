@@ -79,6 +79,7 @@ import WorkerWallStepPage from './Pages/Wall Painting/WorkerWall/WorkerWallStepP
 import SubscriptionParent from './Pages/Subscription Payment/SubscriptionParent'
 import MaterialOverviewLoading from './Pages/Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
 import UserProfileDetails from './Pages/UserProfile/UserProfileDetails'
+import PrerequisitesPage from './Pages/PreRequireties Pages/PreRequiretiesMain'
 
 function App() {
 
@@ -130,7 +131,7 @@ function App() {
         </ProtectedRoutes>} /> */}
 
 
-       
+
 
         <Route path="/organizations" element={
           <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
@@ -163,11 +164,11 @@ function App() {
             </ProtectedRoutes>} />
 
 
-             <Route path="userprofile" element={
-          <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
-            <UserProfileDetails />
-          </ProtectedRoutes>
-        } />
+          <Route path="userprofile" element={
+            <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+              <UserProfileDetails />
+            </ProtectedRoutes>
+          } />
 
 
         </Route>
@@ -186,6 +187,13 @@ function App() {
           {/* <Route path="labourlist" element={<LabourList />} />
           <Route path="materiallist" element={<MaterialList />} />
           <Route path="transportationlist" element={<Transportationlist />} /> */}
+
+          <Route path="prerequireties" element={
+            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <PrerequisitesPage />
+            </ProtectedRoutes>
+          } />
+
           <Route path="workers" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <Workers />
