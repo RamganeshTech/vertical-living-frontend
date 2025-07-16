@@ -160,7 +160,7 @@ export default function Workers() {
 
       {/* Main Content */}
       <div className="max-w-full !max-h-[100%] overflow-y-auto custom-scrollbar mx-auto p-2">
-        <div className="grid grid-cols-1 max-h-full lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 max-h-full lg:grid-cols-3 gap-6 lg:gap-8 w-full">
           {/* Invite Section */}
           <div className="lg:col-span-1 h-fit space-y-6">
             {/* Invite Workers */}
@@ -272,7 +272,7 @@ export default function Workers() {
           </div>
 
           {/* Workers List */}
-          <div className="lg:col-span-2 sm:max-h-[43%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto shadow-md custom-scrollbar">
+          <div className={`lg:col-span-2 sm:max-h-[43%] lg:!max-h-[48%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto shadow-md custom-scrollbar`}>
             <Card className="bg-white/70 backdrop-blur-sm border-0  shadow-xl">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center justify-between">
@@ -297,7 +297,7 @@ export default function Workers() {
                     ))}
                   </div>
                 ) : workers && workers.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-4 overflow-hidden">
                     {workers.map((worker: any) => (
                       <div
                         key={worker._id}
@@ -352,7 +352,7 @@ export default function Workers() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
+                  <div className="text-center py-12 min-h-[100vh]">
                     <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <i className="fas fa-hard-hat text-orange-500 text-2xl"></i>
                     </div>

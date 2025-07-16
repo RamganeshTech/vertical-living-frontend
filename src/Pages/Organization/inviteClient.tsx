@@ -134,7 +134,7 @@ const InviteClient: React.FC = () => {
 
       <div className="flex flex-col lg:flex-row gap-6 w-full ">
         {/* Invitation box */}
-        <div className="flex-1 border-l-4 border-blue-600  bg-white p-4 max-h-[45vh] overflow-y-auto rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
+        <div className="flex-1 border-l-4 border-blue-600  bg-white p-4 max-h-[45vh]  h-fit overflow-y-auto rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
           <div>
             <h2 className="text-2xl font-bold text-blue-600 mb-2 flex items-center">
               Generate Client

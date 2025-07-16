@@ -209,7 +209,7 @@ export default function Organization() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-16 overflow-y-auto max-h-[90%]">
+              <div className="text-center py-2 overflow-y-auto max-h-[calc(100vh-15vh)]">
                 <div className="max-w-md mx-auto">
                   <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                     <i className="fas fa-building text-blue-500 text-4xl"></i>

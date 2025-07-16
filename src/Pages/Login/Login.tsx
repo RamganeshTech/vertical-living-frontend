@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useCreateUser, useLoginUser } from "../../apiList/userApi";
 import { handleLoginValidation, handleRegistrationValidation } from "../../utils/validation";
 // import ErrorComponent from "../../components/ErrorComponent";
-import {  useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { CardDescription, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 import { Label } from "../../components/ui/Label";
@@ -39,7 +39,7 @@ const LoginPage = () => {
 
 
     const { mutateAsync: loginUser, isPending } = useLoginUser();
-    const { mutateAsync: registerUser, isPending: registerPending} = useCreateUser();
+    const { mutateAsync: registerUser, isPending: registerPending } = useCreateUser();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -52,6 +52,7 @@ const LoginPage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+
             setErrors({});
 
             const validationErrors = handleLoginValidation(formData);
@@ -131,13 +132,13 @@ const LoginPage = () => {
                 }
             }
         }
-        catch (error:any) {
+        catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || "Failed to Register", variant: "destructive" })
         }
     };
 
     return (
-        <div className="min-h-screen relative bg-gradient-to-br from-blue-50 p-4 via-white to-blue-100 flex items-center justify-center">
+        <div className="min-h-screen overflow-y-auto relative bg-gradient-to-br from-blue-50 p-4 via-white to-blue-100 flex items-center justify-center">
             {/* {toast && <CustomAlert onClose={() => setToast(null)} message={toast} type="success" />} */}
             {/* {!isPending && isError && (
                 <ErrorComponent
@@ -327,8 +328,8 @@ const LoginPage = () => {
                                         <i className="fas fa-user text-blue-400"></i>
                                     </div>
                                     <Input
-                                        id="staffName"
-                                        name="staffName"
+                                        id="userName"
+                                        name="userName"
                                         type="text"
                                         value={registerData.userName}
                                         onChange={handleRegisterChange}
