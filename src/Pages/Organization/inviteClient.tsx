@@ -4,61 +4,61 @@ import { Label } from '../../components/ui/Label';
 import { Input } from '../../components/ui/Input';
 import { Avatar, AvatarFallback } from '../../components/ui/Avatar';
 import { toast } from '../../utils/toast';
-import { useOutletContext, useParams } from 'react-router-dom';
+import {  useOutletContext, useParams } from 'react-router-dom';
 import { useGetClientByOrgsAndProject, useInviteClientToProject } from '../../apiList/orgApi';
 import type { ProjectDetailsOutlet } from '../../types/types';
 
-  const dummyClients = [
-  {
-    "clientName": "Arun Kumar",
-    "email": "arun.kumar@example.com",
-    "phoneNo": "9876543210",
-    "projectId": "project123",
-    "ownerId": "ownerA"
-  },
-  {
-    "clientName": "Priya Raj",
-    "email": "priya.raj@example.com",
-    "phoneNo": "9876543211",
-    "projectId": "project123",
-    "ownerId": "ownerA"
-  },
-  {
-    "clientName": "Suresh",
-    "email": "arun.kumar@example.com",
-    "phoneNo": "9876543210",
-    "projectId": "project456",
-    "ownerId": "ownerA"
-  },
-  {
-    "clientName": "Meena",
-    "email": "meena@example.com",
-    "phoneNo": "9998887777",
-    "projectId": "project456",
-    "ownerId": "ownerA"
-  },
-   {
-    "clientName": "Priya Raj",
-    "email": "priya.raj@example.com",
-    "phoneNo": "9876543211",
-    "projectId": "project123",
-    "ownerId": "ownerA"
-  },
-  {
-    "clientName": "Suresh",
-    "email": "arun.kumar@example.com",
-    "phoneNo": "9876543210",
-    "projectId": "project456",
-    "ownerId": "ownerA"
-  },
-  {
-    "clientName": "Meena",
-    "email": "meena@example.com",
-    "phoneNo": "9998887777",
-    "projectId": "project456",
-    "ownerId": "ownerA"
-  }
-]
+//   const dummyClients = [
+//   {
+//     "clientName": "Arun Kumar",
+//     "email": "arun.kumar@example.com",
+//     "phoneNo": "9876543210",
+//     "projectId": "project123",
+//     "ownerId": "ownerA"
+//   },
+//   {
+//     "clientName": "Priya Raj",
+//     "email": "priya.raj@example.com",
+//     "phoneNo": "9876543211",
+//     "projectId": "project123",
+//     "ownerId": "ownerA"
+//   },
+//   {
+//     "clientName": "Suresh",
+//     "email": "arun.kumar@example.com",
+//     "phoneNo": "9876543210",
+//     "projectId": "project456",
+//     "ownerId": "ownerA"
+//   },
+//   {
+//     "clientName": "Meena",
+//     "email": "meena@example.com",
+//     "phoneNo": "9998887777",
+//     "projectId": "project456",
+//     "ownerId": "ownerA"
+//   },
+//    {
+//     "clientName": "Priya Raj",
+//     "email": "priya.raj@example.com",
+//     "phoneNo": "9876543211",
+//     "projectId": "project123",
+//     "ownerId": "ownerA"
+//   },
+//   {
+//     "clientName": "Suresh",
+//     "email": "arun.kumar@example.com",
+//     "phoneNo": "9876543210",
+//     "projectId": "project456",
+//     "ownerId": "ownerA"
+//   },
+//   {
+//     "clientName": "Meena",
+//     "email": "meena@example.com",
+//     "phoneNo": "9998887777",
+//     "projectId": "project456",
+//     "ownerId": "ownerA"
+//   }
+// ]
 
 const InviteClient: React.FC = () => {
   const { projectId, organizationId } = useParams<{ projectId: string; organizationId: string }>();
@@ -192,7 +192,7 @@ const InviteClient: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-4 h-[85%]">
-              {dummyClients?.map((client: any) => (
+              {clients?.map((client: any) => (
                 <div
                   key={client._id}
                   className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100 hover:shadow-md transition"
