@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Label } from '../../components/ui/Label';
 import { Input } from '../../components/ui/Input';
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar';
-import { COMPANY_DETAILS } from '../../constants/constants';
+import { Avatar, AvatarFallback } from '../../components/ui/Avatar';
 import { toast } from '../../utils/toast';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { useGetClientByOrgsAndProject, useInviteClientToProject } from '../../apiList/orgApi';
@@ -68,7 +67,7 @@ const InviteClient: React.FC = () => {
   const {openMobileSidebar , isMobile} = useOutletContext<ProjectDetailsOutlet>()
 
   const inviteClient = useInviteClientToProject();
-  const { data: clients, isLoading, isError, error } = useGetClientByOrgsAndProject(organizationId!, projectId!);
+  const { data: clients, isLoading, isError } = useGetClientByOrgsAndProject(organizationId!, projectId!);
 
   const handleGenerateInviteLink = async () => {
     try {

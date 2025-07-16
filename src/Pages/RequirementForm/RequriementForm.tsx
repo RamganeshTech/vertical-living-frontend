@@ -1,8 +1,7 @@
 // RequirementForm.tsx
 import { useOutletContext, useParams } from "react-router-dom";
-import { useDeleteRequirementUploadFile, useDeleteRequriementForm, useFormCompletion, useGenerateShareableLink, useGetFormRequriemetn, useLockUpdationOfForm, useSetDeadLineFormRequirement, useUploadRequirementFiles } from "../../apiList/Stage Api/requirementFormApi";
+import { useDeleteRequirementUploadFile, useFormCompletion, useGenerateShareableLink, useGetFormRequriemetn, useSetDeadLineFormRequirement, useUploadRequirementFiles } from "../../apiList/Stage Api/requirementFormApi";
 import { Card } from "../../components/ui/Card";
-import { Separator } from "../../components/ui/Seperator";
 import { Button } from "../../components/ui/Button";
 import KitchenSection from './PrivateRequrirementComponents/KitchenSection';
 import LivingHallSection from './PrivateRequrirementComponents/LivingHallSection';
@@ -64,31 +63,31 @@ export default function RequirementForm() {
   const [copied, setCopied] = useState(false)
   const [visibleSection, setVisibleSection] = useState<string | null>(null);
 
-  const { data: formData, isLoading, isError, error, refetch } = useGetFormRequriemetn({ projectId: projectId! });
-  const { mutateAsync: linkgenerate, isPending: linkPending, isError: linkIsError, error: linkError, reset: linkReset } = useGenerateShareableLink()
-  const { mutateAsync: completeFormMutate, isPending: completePending, isError: completeIsError, error: completeError, reset: completeReset } = useFormCompletion()
-  const { mutateAsync: lockFormMutate, isPending: lockPending, isError: lockIsError, error: lockError, reset: lockReset } = useLockUpdationOfForm()
+  const { data: formData, isLoading, error, refetch } = useGetFormRequriemetn({ projectId: projectId! });
+  const { mutateAsync: linkgenerate, isPending: linkPending,  } = useGenerateShareableLink()
+  const { mutateAsync: completeFormMutate, isPending: completePending,  } = useFormCompletion()
+  // const { mutateAsync: lockFormMutate, isPending: lockPending,  } = useLockUpdationOfForm()
 
-  const { mutateAsync: deadLineMutate, isPending: deadLinePending, isError: deadLineIsError, error: deadLineError, reset: deadLineReset } = useSetDeadLineFormRequirement()
+  const { mutateAsync: deadLineMutate, isPending: deadLinePending,  } = useSetDeadLineFormRequirement()
   const { mutateAsync: uploadFilesMutate, isPending: uploadPending } = useUploadRequirementFiles();
-  const { mutateAsync: deleteFormMutate, isPending: deleteFormPending } = useDeleteRequriementForm();
+  // const { mutateAsync: deleteFormMutate, isPending: deleteFormPending } = useDeleteRequriementForm();
   const { mutateAsync: deleteUploadFile, isPending: deleteUploadPending } = useDeleteRequirementUploadFile()
 
   if (isLoading) return <MaterialOverviewLoading />;
 
-  const client = formData?.clientData;
+  // const client = formData?.clientData;
 
-  const handleFormDeletion = async () => {
-    if (!window.confirm(`Are you sure you want to delete this form?`)) return
-    try {
-      if (!deleteFormPending) {
-        await deleteFormMutate({ projectId: projectId! })
-        toast({ title: "Success", description: "Form deleted  successfully" })
-      }
-    } catch (error: any) {
-      toast({ title: "Error", description: error?.response?.data?.message || "Failed to delete the form", variant: "destructive" })
-    }
-  }
+  // const handleFormDeletion = async () => {
+  //   if (!window.confirm(`Are you sure you want to delete this form?`)) return
+  //   try {
+  //     if (!deleteFormPending) {
+  //       await deleteFormMutate({ projectId: projectId! })
+  //       toast({ title: "Success", description: "Form deleted  successfully" })
+  //     }
+  //   } catch (error: any) {
+  //     toast({ title: "Error", description: error?.response?.data?.message || "Failed to delete the form", variant: "destructive" })
+  //   }
+  // }
 
   const handleFormCompletion = async () => {
     if (!window.confirm("Are you sure want to mark it as completed?")) return
@@ -102,16 +101,16 @@ export default function RequirementForm() {
     }
   }
 
-  const handleLockForm = async () => {
-    try {
-      if (!lockPending) {
-        await lockFormMutate({ formId: formData._id!, projectId })
-        toast({ title: "Success", description: "form updation locked successfully" })
-      }
-    } catch (error: any) {
-      toast({ title: "Error", description: error?.response?.data?.message || "Failed to lock the updation", variant: "destructive" })
-    }
-  }
+  // const handleLockForm = async () => {
+  //   try {
+  //     if (!lockPending) {
+  //       await lockFormMutate({ formId: formData._id!, projectId })
+  //       toast({ title: "Success", description: "form updation locked successfully" })
+  //     }
+  //   } catch (error: any) {
+  //     toast({ title: "Error", description: error?.response?.data?.message || "Failed to lock the updation", variant: "destructive" })
+  //   }
+  // }
 
   const handleCopyStaticLink = async (link: string) => {
     try {

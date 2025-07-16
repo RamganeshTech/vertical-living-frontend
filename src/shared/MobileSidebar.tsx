@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useLogoutCTO } from '../apiList/CTOApi'
 import { useLogoutClient } from '../apiList/clientApi'

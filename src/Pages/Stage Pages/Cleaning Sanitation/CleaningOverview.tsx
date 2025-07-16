@@ -396,7 +396,6 @@
 
 
 
-import React from "react";
 import { Link, Outlet, useParams, useLocation, useOutletContext } from "react-router-dom";
 
 import { toast } from "../../../utils/toast";

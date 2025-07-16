@@ -8,7 +8,6 @@ import {
   SelectContent,
   SelectItem,
 } from "../../../components/ui/Select";
-import { Separator } from "../../../components/ui/Seperator";
 import { Textarea } from "../../../components/ui/TextArea";
 import { Button } from "../../../components/ui/Button";
 

@@ -20,7 +20,6 @@ export const ResetStageButton: React.FC<ResetStageButtonProps> = ({
     projectId,
     stageNumber,
     stagePath,
-    label = "Reset Stage",
     buttonClass = "bg-red-600 text-white",
     iconClass = "fas fa-rotate-left",
     disabled = false,

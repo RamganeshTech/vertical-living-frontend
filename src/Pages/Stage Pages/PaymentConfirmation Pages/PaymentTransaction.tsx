@@ -1,5 +1,4 @@
-import React from "react";
-import { useParams, useOutletContext, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { loadScript } from "../../../utils/loadScript";
 import { toast } from "../../../utils/toast";
 import { useSelector } from "react-redux";

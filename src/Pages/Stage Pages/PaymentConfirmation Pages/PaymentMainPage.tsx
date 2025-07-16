@@ -261,7 +261,7 @@ const PaymentConfirmationStage: React.FC = () => {
   // Show loading state
   if (isLoading) return <MaterialOverviewLoading />;
 
-  const { assignedTo, timer, totalAmount, status, _id: formId } = data || {};
+  const { assignedTo, timer, totalAmount, _id: formId } = data || {};
 
   return (
     <div className="container mx-auto p-2 max-w-full max-h-full overflow-y-auto">

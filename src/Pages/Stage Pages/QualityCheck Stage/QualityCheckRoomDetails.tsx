@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetQualityCheckup, useCreateQualityCheckItem, useEditQualityCheckItem, useDeleteQualityCheckItem, } from "../../../apiList/Stage Api/qualityCheckApi";
 import { Input } from "../../../components/ui/Input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "../../../components/ui/Select";
-import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
@@ -112,16 +111,16 @@ import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadin
 // ];
 
 
-interface QualityCheckRoom {
-  workName: string
-  status: string,
-  remarks: string,
-  upload: {
-    type: string,
-    url: string,
-    originalName: string,
-  }
-}
+// interface QualityCheckRoom {
+//   workName: string
+//   status: string,
+//   remarks: string,
+//   upload: {
+//     type: string,
+//     url: string,
+//     originalName: string,
+//   }
+// }
 
 export default function QualityCheckRoomDetails() {
   const { roomkey, projectId, organizationId } = useParams() as { roomkey: string; projectId: string, organizationId: string };

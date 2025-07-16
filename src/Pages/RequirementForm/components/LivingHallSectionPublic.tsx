@@ -9,7 +9,6 @@ import {
   SelectContent,
   SelectItem,
 } from "../../../components/ui/Select";
-import { Separator } from "../../../components/ui/Seperator";
 import { Button } from "../../../components/ui/Button";
 
 interface LivingHallSectionProps {

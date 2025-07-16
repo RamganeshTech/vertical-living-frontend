@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { useDeleteMaterialSelectionRoomFile, useUploadMaterialSelectionRoomFiles } from "../../../apiList/Stage Api/materialSelectionApi";
-import { existingUploads } from "../../../utils/dummyData";
 import { toast } from "../../../utils/toast";
 import { downloadImage } from "../../../utils/downloadFile";
 

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import  { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../../shared/Sidebar";
 import MobileSidebar from "../../shared/MobileSidebar";
 import {  LOGIN_ICONS_LOGIN_GROUP, LOGIN_LABELS } from "../../constants/constants";

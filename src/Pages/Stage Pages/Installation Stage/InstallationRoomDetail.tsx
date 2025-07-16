@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     useGetInstallationDetails, useCreateInstallationItem,
     useEditInstallationItem,
     useDeleteInstallationItem
 } from "../../../apiList/Stage Api/installationWorkApi";
-import { Input } from "../../../components/ui/Input";
-import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import type { InstallationWorkItem } from "../../../types/types";
@@ -129,7 +127,6 @@ export default function InstallationRoomDetail() {
     const navigate = useNavigate()
 
     const [popupImage, setPopupImage] = useState<string | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null); // for upload preview
 
     const { data, isLoading, refetch, error, isError } = useGetInstallationDetails(projectId);
     const { mutateAsync: createItem,  isPending: createPending } = useCreateInstallationItem();

@@ -26,6 +26,7 @@ export default function EditOrganizationModal({ isOpen, onClose, organization }:
   const [organizationName, setOrganizationName] = useState("")
   const updateOrganization = useUpdateOrganizationName()
 
+
   useEffect(() => {
     if (isOpen) {
       setOrganizationName(organization.organizationName)
@@ -45,7 +46,7 @@ export default function EditOrganizationModal({ isOpen, onClose, organization }:
     }
 
     try {
-      await updateOrganization.mutateAsync({ organizationName })
+      await updateOrganization.mutateAsync({ orgsId:organization._id, updateField:organization })
       toast({
         title: "Success",
         description: "Organization updated successfully",

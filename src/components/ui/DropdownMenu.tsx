@@ -56,7 +56,7 @@ interface DropdownMenuTriggerProps {
 
 export const DropdownMenuTrigger: React.FC<DropdownMenuTriggerProps> = ({ asChild = false, children, onClick }) => {
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    return React.cloneElement(children as React.ReactElement<any>, {
     //   onClick: (e: React.MouseEvent) => {
     //     e.stopPropagation()
     //     onClick?.()
@@ -64,7 +64,7 @@ export const DropdownMenuTrigger: React.FC<DropdownMenuTriggerProps> = ({ asChil
     //       children.props.onClick(e)
     //     }
     //   },
-onClick: (e: React.MouseEvent) => {
+onClick:(e: any) => {
   e.stopPropagation();
   onClick?.();
 
