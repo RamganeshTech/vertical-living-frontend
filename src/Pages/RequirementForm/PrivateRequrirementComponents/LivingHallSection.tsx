@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { useLivingHallFormUpdation } from "../../../apiList/Stage Api/requirementFormApi";
 import { toast } from "../../../utils/toast";
 
-const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable, setVisibleSection }) => {
+const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<ILivingHallRequirement>({
     seatingStyle: data?.seatingStyle || "Sofa Set",
@@ -63,8 +63,7 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, isEdita
  const handleSubmit = async () => {
      try{
      if (!projectId) return;
-     const data = await mutateAsync({ projectId, updateData: formData });
-     console.log(data)
+     await mutateAsync({ projectId, updateData: formData });
      toast({ title: "Success", description: "Living Hall data updated successfully" })
      }
      catch(error:any){

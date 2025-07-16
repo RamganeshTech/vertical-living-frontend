@@ -5,18 +5,17 @@ import Issues from './Pages/Issues/Issues'
 import Phase from './Pages/Phases/Phase'
 import Tasks from './Pages/Tasks/Tasks'
 import Projects from './Pages/Projects/Projects'
-import Dashboard from './Pages/Dashboard/Dashboard'
 import Login from './Pages/Login/Login'
 // import MaterialList from './Pages/Material/MaterialList/MaterialList'
-import MaterialList from './Pages/Material/MaterialList/MaterialList'
+// import MaterialList from './Pages/Material/MaterialList/MaterialList'
 
-import MaterialItem from './Pages/Material/MaterialItem/MaterialItem'
-import LabourList from './Pages/Labour/LabourList/LabourList'
-import LabourItem from './Pages/Labour/LabourItem/LabourItem'
+// import MaterialItem from './Pages/Material/MaterialItem/MaterialItem'
+// import LabourList from './Pages/Labour/LabourList/LabourList'
+// import LabourItem from './Pages/Labour/LabourItem/LabourItem'
 import ProjectDetails from './Pages/Projects/ProjectDetails'
 import ProjectLists from './Pages/Projects/ProjectLists'
 import { useState } from 'react'
-import Transportationlist from './Pages/Transportation/Transportationlist'
+// import Transportationlist from './Pages/Transportation/Transportationlist'
 import NotFound from './Pages/Not Found/NotFound'
 import Organization from './Pages/Organization/Organization'
 import OrganizationDetails from './Pages/Organization/OrganizationDetails'
@@ -48,7 +47,7 @@ import CostEstimationRoomDetails from './Pages/Stage Pages/Cost Estimation/CostE
 import LabourEstimateContainer from './Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer'
 import OrderMaterialOverview from './Pages/Stage Pages/Ordering Materials/OrderMaterialOverview'
 import OrderMaterialRoomDetails from './Pages/Stage Pages/Ordering Materials/OrderMaterialRoomDetails'
-import FormOrderMaterial from './Pages/Stage Pages/Ordering Materials/FormOrderMaterial'
+// import FormOrderMaterial from './Pages/Stage Pages/Ordering Materials/FormOrderMaterial'
 import MaterialArrivalOverview from './Pages/Stage Pages/MaterialArrival/MaterialArrivalOverview'
 import MaterialArrivalRoomDetail from './Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail'
 import PublicMaterialArrival from './Pages/Stage Pages/MaterialArrival/PublicMaterialArrival'
@@ -80,6 +79,9 @@ import SubscriptionParent from './Pages/Subscription Payment/SubscriptionParent'
 import MaterialOverviewLoading from './Pages/Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
 import UserProfileDetails from './Pages/UserProfile/UserProfileDetails'
 import PrerequisitesPage from './Pages/PreRequireties Pages/PreRequiretiesMain'
+// import ModularUnitMain from './Pages/Modular Units/ModularUnitMain'
+// import AddModularUnit from './Pages/Modular Units/AddModularUnit'
+// import ModularUnitCategoryPage from './Pages/Modular Units/ModularUnitCategoryPage'
 
 function App() {
 
@@ -169,6 +171,25 @@ function App() {
               <UserProfileDetails />
             </ProtectedRoutes>
           } />
+
+
+          {/* <Route path="modularunits" element={
+            <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+              <ModularUnitMain />
+            </ProtectedRoutes>
+          } >
+
+            <Route path="add" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                <AddModularUnit />
+              </ProtectedRoutes>} />
+
+            <Route path=":unitType" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
+                <ModularUnitCategoryPage />
+              </ProtectedRoutes>} />
+
+          </Route> */}
 
 
         </Route>

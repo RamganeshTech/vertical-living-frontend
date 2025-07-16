@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import KitchenSectionPublic from "./KitchenSectionPublic";
 import LivingHallSectionPublic from "./LivingHallSectionPublic";
@@ -129,7 +129,6 @@ const RequirementFormPublic: React.FC = () => {
 
       const errors = handleValidate(formData)
 
-      console.log(errors)
 
       if (Object.keys(errors).length) {
         setErrors(errors)

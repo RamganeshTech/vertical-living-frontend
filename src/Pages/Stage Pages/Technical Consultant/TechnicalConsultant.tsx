@@ -71,7 +71,6 @@ const TechnicalConsultant:React.FC = () => {
             toast({ description: "message sent successfully", title: "Success" })
         }
         catch (error: any) {
-            console.log("err", error)
             toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to send the message", variant: "destructive" })
         }
     };
@@ -101,12 +100,10 @@ const TechnicalConsultant:React.FC = () => {
            toast({ description: "message edited successfully", title: "Success" })
         }
         catch (error: any) {
-            console.log("err", error)
             toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to edit the message", variant: "destructive" })
         }
     };
 
-    console.log(techDoc)
 
 
     if (getMessageLoading) return <MaterialOverviewLoading />

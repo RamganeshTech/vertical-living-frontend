@@ -85,7 +85,6 @@ export default function Organization() {
   }
 
   if (error as any) {
-    console.log(error, "slkdfjlskjl;l;")
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
         <div className="text-center bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-md w-full">

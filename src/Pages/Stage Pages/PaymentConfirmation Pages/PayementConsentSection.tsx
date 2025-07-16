@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     useGetPaymentConfirmation,
@@ -7,7 +7,6 @@ import {
 } from "../../../apiList/Stage Api/Payment Api/paymentConfirmationApi";
 
 import { toast } from "../../../utils/toast";
-import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
@@ -20,7 +19,7 @@ const PaymentConsentSection: React.FC = () => {
     const toggleConsent = useToggleConsentRequired();
     const generateConsent = useGenerateConsentLink();
 
-    const [link, setLink] = useState<string | null>(null);
+    // const [link, setLink] = useState<string | null>(null);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -49,8 +48,8 @@ const PaymentConsentSection: React.FC = () => {
 
     const handleGenerate = async () => {
         try {
-            const generated = await generateConsent.mutateAsync({ projectId: projectId! });
-            setLink(generated);
+            await generateConsent.mutateAsync({ projectId: projectId! });
+            // setLink(generated);
             toast({ title: "Success", description: "Consent link generated." });
             refetch();
         } catch (err: any) {
@@ -86,8 +85,7 @@ const PaymentConsentSection: React.FC = () => {
     } = data;
 
 
-    // console.log("agreement", agreementToken, consentURL)
-    // console.log(consentURL === "", "coentsent URL")
+  
     return (
         <div className="space-y-6 w-full max-w-full max-h-full sm:overflow-y-auto mx-auto custom-scrollbar">
 

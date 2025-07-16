@@ -44,7 +44,6 @@ type LabourItemProp = {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to delete labour item:", error)
     }
   }
 
@@ -90,7 +89,6 @@ type LabourItemProp = {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to update labour item:", error)
     }
   }
 

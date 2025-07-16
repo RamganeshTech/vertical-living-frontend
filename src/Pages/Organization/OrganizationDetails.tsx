@@ -3,7 +3,6 @@ import { Button } from "../../components/ui/Button"
 import { Badge } from "../../components/ui/Badge"
 import { toast } from "../../utils/toast"
 import { Skeleton } from "../../components/ui/Skeleton"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card"
 import { Input } from "../../components/ui/Input"
 import {
   // useGetStaffsByOrganization,
@@ -13,7 +12,6 @@ import {
 import { COMPANY_DETAILS, } from "../../constants/constants"
 import { useState } from "react"
 import { useGetAllUsers } from "../../apiList/getAll Users Api/getAllUsersApi"
-import { dummyClients, dummyCTOs, dummyStaffs, dummyWorkers } from "../../utils/dummyData"
 import RoleCard from "./RoleCard"
 import type { OrganizationOutletTypeProps } from "./OrganizationChildren"
 

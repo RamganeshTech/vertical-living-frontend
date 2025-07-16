@@ -206,7 +206,6 @@ export default function CleaningRoomOverview() {
             setSelectedFiles(null); // clear selection
             refetch();
         } catch (error: any) {
-            console.log(error.message)
             toast({
                 title: "Error",
                 description: error?.response?.data?.message || error.message,

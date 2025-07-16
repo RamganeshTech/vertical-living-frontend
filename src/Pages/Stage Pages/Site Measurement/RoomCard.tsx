@@ -10,7 +10,6 @@ interface RoomCardProps {
 
 const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete , deleteRoomLoading}) => {
   const area = room.length && room.breadth ? (room.length * room.breadth).toFixed(2) : null;
-console.log(room)
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
       <div className="flex justify-between items-start mb-4">

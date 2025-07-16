@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
-import { existingUploads } from "../../../utils/dummyData";
 import { useDeleteCostEstimationFile, useUploadCostEstimationFiles } from "../../../apiList/Stage Api/costEstimationApi";
 import { toast } from "../../../utils/toast";
 import { downloadImage } from "../../../utils/downloadFile";
@@ -99,7 +98,6 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles, 
             {pdfFiles.length === 0 && <div className="min-h-[180px] rounded-lg  flex items-center justify-center"><p className="text-sm text-gray-500">No PDFs uploaded.</p></div>}
 
             {pdfFiles.map(file => {
-              console.log(file)
               return (
                 <li key={file._id} className="flex justify-between items-center bg-red-50 p-2 rounded-xl">
                   <span className="text-sm">{file.originalName}</span>

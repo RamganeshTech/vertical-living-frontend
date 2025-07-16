@@ -213,7 +213,6 @@ const PrerequisitesPage: React.FC = () => {
     //   const { toast } = useToast()
     const { data, isLoading, error, refetch } = useGetAllPreRequireties(projectId)
 
-    console.log(data)
     const workTypes = [
         { key: "modularWork", title: "Modular Work", description: "Prefabricated components and modular construction", _id: data?.data?._id },
         { key: "electricalWork", title: "Electrical Work", description: "Wiring, fixtures, and electrical installations", _id: data?.data?._id },
@@ -320,7 +319,6 @@ const PrerequisitesPage: React.FC = () => {
                         {workTypes.map((workType) => {
 
                             const sectionData = prerequisites[workType.key as keyof typeof prerequisites]
-                            console.log(workType)
                             return (
                                 <PrerequisitesSection
                                     key={workType.key}

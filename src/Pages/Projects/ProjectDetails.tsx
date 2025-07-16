@@ -24,7 +24,6 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
 
   useLayoutEffect(() => {
     const pathname = location.pathname.split('/')
-    //  console.log(pathname)
     setProjectId(pathname[3])
     setOrganizationId(pathname[1])
   }, [location.pathname])

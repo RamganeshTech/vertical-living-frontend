@@ -6,7 +6,6 @@ import {
   useUploadWorkerInitialFiles,
   useUploadWorkerCorrectionFiles,
 } from "../../../apiList/WallPainting Api/workerWallPaintingApi"
-import { Badge } from "../../../components/ui/Badge"
 import { downloadImage } from "../../../utils/downloadFile"
 
 export default function WorkerWallStepPage() {
@@ -27,11 +26,11 @@ export default function WorkerWallStepPage() {
 
   const step = WORKER_WALL_PAINTING_STEPS.find((s) => s.stepNumber === Number(stepNumber))
 
-  const handleImageLoad = (imageId: string) => {
+  const handleImageLoad = () => {
     setLoadingImages(false)
   }
 
-  const handleImageError = (imageId: string) => {
+  const handleImageError = () => {
     setLoadingImages(false)
   }
 
@@ -99,7 +98,7 @@ export default function WorkerWallStepPage() {
     })
   }
 
-  const ImageWithBlur = ({ src, alt, imageId }: { src: string; alt: string; imageId: string }) => {
+  const ImageWithBlur = ({ src, alt }: { src: string; alt: string;  }) => {
     return (
       <div className="relative group cursor-pointer" onClick={() => openImagePreview(src, alt)}>
         {loadingImages && (
@@ -113,8 +112,8 @@ export default function WorkerWallStepPage() {
           loading="lazy"
           className="w-full h-32 sm:h-40 md:h-48 object-cover rounded-lg border-2 border-blue-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-blue-400"
           onLoadStart={() => setLoadingImages(true)}
-          onLoad={() => handleImageLoad(imageId)}
-          onError={() => handleImageError(imageId)}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
         />
 
         <button
@@ -134,7 +133,6 @@ export default function WorkerWallStepPage() {
     )
   }
 
-  // console.log("uploads data ", stepData.data.correctionRounds)
 
   return (
     <div className="min-h-[80%] bg-gray-50 rounded-xl">
@@ -211,7 +209,6 @@ export default function WorkerWallStepPage() {
                             key={idx}
                             src={file?.url || "/placeholder.svg"}
                             alt={`Initial Upload ${idx + 1}`}
-                            imageId={`initial-${idx}`}
                           />
 
                         </>
@@ -289,7 +286,6 @@ export default function WorkerWallStepPage() {
                                       key={idx}
                                       src={file.url || "/placeholder.svg"}
                                       alt={`Admin Upload ${idx + 1}`}
-                                      imageId={`admin-${round.roundNumber}-${idx}`}
                                     />
 
                                   </>
@@ -312,7 +308,6 @@ export default function WorkerWallStepPage() {
                                       key={idx}
                                       src={file.url || "/placeholder.svg"}
                                       alt={`Worker Correction ${idx + 1}`}
-                                      imageId={`worker-${round.roundNumber}-${idx}`}
                                     />
 
                                   </>

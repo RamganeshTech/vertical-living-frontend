@@ -41,13 +41,10 @@ export const useAuthCheck = () => {
         ]);
 
         if (ownerRes.status === "fulfilled" && ownerRes.value.data.ok) {
-          console.log(ownerRes.value)
           const info = { role: "owner", isauthenticated: true, _id:ownerRes.value.data.data.userId };
           dispatch(setRole(info));
-          console.log(ownerRes)
           dispatch(setOwnerProfileData(ownerRes.value.data.data))
           setAuthInfo({...info, _id:ownerRes.value.data.data.userId});
-          console.log("im shoduld get executed fierst")
           return setLoading(false);;
         }
 

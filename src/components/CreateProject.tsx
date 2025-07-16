@@ -3,7 +3,6 @@ import TagInput from "../shared/TagInput";
 import { useCreateProject, useUpdateProject } from "../apiList/projectApi";
 import ErrorComponent from "./ErrorComponent";
 import { handleProjectValidate } from "../utils/validation";
-import CustomAlert from "./CustomAlert";
 import { toast } from "../utils/toast";
 import { Button } from "./ui/Button";
 
@@ -111,7 +110,6 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, refetch, setShowF
   const { mutateAsync: createProject, isPending, error, isError, reset } = useCreateProject()
   const { mutateAsync: updateProject, isPending: updatePending, error: updateError, isError: updateIsError, reset: updateReset } = useUpdateProject()
 
-  // console.log("error of creating", error)
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -121,13 +119,11 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, refetch, setShowF
       const validationErrors = isEditing ? handleProjectValidate(editForm) : handleProjectValidate(formData)
       setErrors(validationErrors);
 
-      // console.log("validationErrors", validationErrors)
 
       if (Object.keys(validationErrors).length === 0) {
 
         if (isEditing && editProjectId) {
           if (!updatePending) {
-            console.log("editForm", editForm)
             await updateProject({ projectId: editProjectId, formData: editForm })
             toast({ title: "Success", description: "Project Edited Successfully" })
 
@@ -135,7 +131,6 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, refetch, setShowF
         }
         else {
           if (!isPending) {
-            // console.log("formData", formData)
             await createProject({ projectData: formData, orgsId: organizationId })
             toast({ title: "Success", description: "Project Created Successfully" })
           }

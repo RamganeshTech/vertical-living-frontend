@@ -3,7 +3,6 @@ import { COMPANY_DETAILS, MAIN_PATH_ICON, MAIN_PATH_LABEL, } from '../constants/
 import useSidebarShortcut from '../Hooks/useSideBarShortcut'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import '../../src/App.css'
-import SidebarIcons from '../components/SidebarIcons'
 import { useLogoutCTO } from '../apiList/CTOApi'
 import { useLogoutClient } from '../apiList/clientApi'
 import { useLogoutStaff } from '../apiList/staffApi'
@@ -54,7 +53,6 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     //  to make the navbar navigate to project list page because there is no navigation for back 
     const pathArray = location.pathname.split('/')
-    console.log("patharrray ", pathArray)
     const isInStageNavBar = pathArray[2] === "projectdetails"
     const handleNav = () => {
         if (isInStageNavBar) {
@@ -68,9 +66,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     useEffect(() => {
         const pathArray = location.pathname.split('/')
 
-        // console.log(pathArray, "path array")
         const mainPath = pathArray[4]
-        console.log(mainPath, pathArray)
         if (showSideBar) {
             setActiveSidebar(() => MAIN_PATH_LABEL[mainPath] as any)
         } else {

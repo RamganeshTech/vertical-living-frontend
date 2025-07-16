@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { useBedroomFormUpdation } from "../../../apiList/Stage Api/requirementFormApi";
 import { toast } from "../../../utils/toast";
 
-const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable, setVisibleSection }) => {
+const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<IBedroomRequirement>({
     numberOfBedrooms: data?.numberOfBedrooms || 1,
@@ -55,8 +55,7 @@ const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable
   const handleSubmit = async () => {
     try{
     if (!projectId) return;
-    const data = await mutateAsync({ projectId, updateData: formData });
-    console.log(data)
+     await mutateAsync({ projectId, updateData: formData });
     toast({ title: "Success", description: "bedroom data updated successfully" })
     }
     catch(error:any){

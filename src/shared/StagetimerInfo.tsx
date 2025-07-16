@@ -39,7 +39,6 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
 
     const { mutateAsync: startTimerMutate, isPending: isStarting } = useStartStageTimer();
 
-    // console.log("completed date form teech", completedAt)
     useEffect(() => {
         const interval = setInterval(() => {
             setNow(new Date());

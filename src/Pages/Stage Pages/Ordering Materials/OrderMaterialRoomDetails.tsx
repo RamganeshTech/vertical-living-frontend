@@ -9,72 +9,72 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
 import { useBrandsByCategory } from "../../../apiList/Util Api/utilApi";
 
-const carpentryDummyData: any = [
-  {
-    material: "Plywood",
-    brandName: "CenturyPly",
-    specification: "BWR Grade, 18mm",
-    quantity: 15,
-    unit: "nos",
-    remarks: "Use for base cabinets"
-  },
-  {
-    material: "MDF Board",
-    brandName: "Greenpanel",
-    specification: "Pre-laminated, 12mm",
-    quantity: 10,
-    unit: "nos",
-    remarks: "For wardrobes inside partition"
-  },
-  {
-    material: "Laminates",
-    brandName: "Merino",
-    specification: "Glossy finish, 1mm",
-    quantity: 20,
-    unit: "sheets",
-    remarks: "Apply on wardrobe exteriors"
-  },
-  {
-    material: "Edge Banding",
-    brandName: "Rehau",
-    specification: "0.8mm matching edge band",
-    quantity: 50,
-    unit: "meters",
-    remarks: "Match laminate color"
-  },
-  {
-    material: "Drawer Channels",
-    brandName: "Hettich",
-    specification: "Soft-close, 18-inch",
-    quantity: 6,
-    unit: "pairs",
-    remarks: "Use for kitchen drawers"
-  },
-  {
-    material: "Handles",
-    brandName: "Hafele",
-    specification: "Aluminium, 6-inch",
-    quantity: 12,
-    unit: "pcs",
-    remarks: "Matte black finish preferred"
-  },
-  {
-    material: "Wood Screws",
-    brandName: "Anchor",
-    specification: "Steel, 1.5 inch",
-    quantity: 200,
-    unit: "pcs",
-    remarks: "For panel fixing"
-  },
-  {
-    material: "Fevicol",
-    brandName: "Pidilite",
-    specification: "MR Grade Adhesive, 5kg",
-    quantity: 2,
-    unit: "tins",
-    remarks: "Use for board bonding"
-  },
-]
+// const carpentryDummyData: any = [
+//   {
+//     material: "Plywood",
+//     brandName: "CenturyPly",
+//     specification: "BWR Grade, 18mm",
+//     quantity: 15,
+//     unit: "nos",
+//     remarks: "Use for base cabinets"
+//   },
+//   {
+//     material: "MDF Board",
+//     brandName: "Greenpanel",
+//     specification: "Pre-laminated, 12mm",
+//     quantity: 10,
+//     unit: "nos",
+//     remarks: "For wardrobes inside partition"
+//   },
+//   {
+//     material: "Laminates",
+//     brandName: "Merino",
+//     specification: "Glossy finish, 1mm",
+//     quantity: 20,
+//     unit: "sheets",
+//     remarks: "Apply on wardrobe exteriors"
+//   },
+//   {
+//     material: "Edge Banding",
+//     brandName: "Rehau",
+//     specification: "0.8mm matching edge band",
+//     quantity: 50,
+//     unit: "meters",
+//     remarks: "Match laminate color"
+//   },
+//   {
+//     material: "Drawer Channels",
+//     brandName: "Hettich",
+//     specification: "Soft-close, 18-inch",
+//     quantity: 6,
+//     unit: "pairs",
+//     remarks: "Use for kitchen drawers"
+//   },
+//   {
+//     material: "Handles",
+//     brandName: "Hafele",
+//     specification: "Aluminium, 6-inch",
+//     quantity: 12,
+//     unit: "pcs",
+//     remarks: "Matte black finish preferred"
+//   },
+//   {
+//     material: "Wood Screws",
+//     brandName: "Anchor",
+//     specification: "Steel, 1.5 inch",
+//     quantity: 200,
+//     unit: "pcs",
+//     remarks: "For panel fixing"
+//   },
+//   {
+//     material: "Fevicol",
+//     brandName: "Pidilite",
+//     specification: "MR Grade Adhesive, 5kg",
+//     quantity: 2,
+//     unit: "tins",
+//     remarks: "Use for board bonding"
+//   },
+// ]
 
 const OrderMaterialRoomDetails = () => {
   const { projectId, roomKey, organizationId } = useParams();
@@ -83,7 +83,6 @@ const OrderMaterialRoomDetails = () => {
 
   if (!roomKey) return;
 
-  const [showAddRow, setShowAddRow] = useState(false);
   const [newItemData, setNewItemData] = useState<any>({});
 
   const [showNewRow, setShowNewRow] = useState(false);
@@ -100,7 +99,7 @@ const OrderMaterialRoomDetails = () => {
 
 
   // ai routes electricalFittings, ceramicSanitaryware, upholsteryCurtains, falseCeilingMaterials
-  const { data: brands, isLoading: brandLoading, isError: brandError } = useBrandsByCategory(roomKey);
+  const { data: brands } = useBrandsByCategory(roomKey);
 
   if (isLoading) return <RoomDetailsLoading />;
   if (isError) return <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
@@ -153,7 +152,6 @@ const OrderMaterialRoomDetails = () => {
 
 
       const payload = editData;
-      console.log("payload", payload)
       await updateRoom({
         itemId,
         projectId: projectId!,
@@ -210,7 +208,6 @@ const OrderMaterialRoomDetails = () => {
       }
 
       const payload = newItemData;
-      console.log("payload", payload)
       await addRoom({
         projectId: projectId!,
         roomKey,

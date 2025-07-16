@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { useKitchenFormUpdation } from "../../../apiList/Stage Api/requirementFormApi";
 import { toast } from "../../../utils/toast";
 
-const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable, setVisibleSection }) => {
+const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<IKitchenRequirement>({
     layoutType: data?.layoutType || "L-shaped",
@@ -64,8 +64,7 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, isEditable
   const handleSubmit = async () => {
       try{
       if (!projectId) return;
-      const data = await mutateAsync({ projectId, updateData: formData });
-      console.log(data)
+       await mutateAsync({ projectId, updateData: formData });
       toast({ title: "Success", description: "Kitchen data updated successfully" })
       }
       catch(error:any){

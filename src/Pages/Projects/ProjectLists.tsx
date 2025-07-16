@@ -10,7 +10,6 @@ import { useOutletContext, useParams } from "react-router-dom";
 import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
-import ErrorComponent from "../../components/ErrorComponent";
 import { Button } from "../../components/ui/Button";
 
 
@@ -35,7 +34,7 @@ const ProjectLists = () => {
   });
   const [editProjectId, setEditProjectId] = useState<string | null>(null);
 
-  let { data: getProjects, refetch, isError, isPending, error, isLoading } = useGetProjects(organizationId!)
+  let { data: getProjects, refetch, isPending, error, isLoading } = useGetProjects(organizationId!)
 
   const allowedRoles = ["owner", "CTO", "staff"]
   const handleEdit = useCallback((project: IProject, id: string) => {
@@ -67,7 +66,6 @@ const ProjectLists = () => {
 
 
 
-  // console.log("getProjects", getProjects)
   // getProjects = []
   return (
     <div className="w-[100%] flex flex-col h-full min-h-0 ">

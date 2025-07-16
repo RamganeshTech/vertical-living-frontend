@@ -1,6 +1,5 @@
-import type React from "react"
 
-import { useOutletContext, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { ADMIN_WALL_PAINTING_STEPS } from "../../../constants/constants"
 import { useState } from "react"
 import {
@@ -8,9 +7,7 @@ import {
   useGetAdminStepDetails,
   useUploadAdminCorrectionRound,
 } from "../../../apiList/WallPainting Api/adminWallPaintingApi"
-import axios from "axios"
 import { downloadImage } from "../../../utils/downloadFile"
-import type { ProjectDetailsOutlet } from "../../../types/types"
 
 export default function AdminWallStepPage() {
   const { projectId, stepId, stepNumber } = useParams<{ projectId: string; stepNumber: string; stepId: string }>()
@@ -26,16 +23,15 @@ export default function AdminWallStepPage() {
 
   const step = ADMIN_WALL_PAINTING_STEPS.find((s) => s.stepNumber === Number(stepNumber))
 
-  const handleImageLoad = (imageId: string) => {
+  const handleImageLoad = () => {
     setLoadingImages(false)
   }
 
-  const handleImageError = (imageId: string) => {
+  const handleImageError = () => {
     setLoadingImages(false)
   }
 
   const openImagePreview = (url: string, alt: string) => {
-    console.log("Opening image preview:", url, alt)
     setPreviewImage({ url, alt })
   }
 
@@ -86,7 +82,7 @@ export default function AdminWallStepPage() {
     )
   }
 
-  const ImageWithBlur = ({ src, alt, imageId }: { src: string; alt: string; imageId: string }) => {
+  const ImageWithBlur = ({ src, alt }: { src: string; alt: string }) => {
 
 
     return (
@@ -102,8 +98,8 @@ export default function AdminWallStepPage() {
           loading="lazy"
           className="w-full h-32 sm:h-40 md:h-48 object-cover rounded-lg border-2 border-blue-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-blue-400 cursor-pointer"
           onLoadStart={() => setLoadingImages(true)}
-          onLoad={() => handleImageLoad(imageId)}
-          onError={() => handleImageError(imageId)}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
 
         />
 
@@ -124,7 +120,6 @@ export default function AdminWallStepPage() {
     )
   }
 
-  // console.log("stepdata form admin", stepData)
 
   return (
     <div className="min-h-[80%] bg-gray-50 rounded-xl">
@@ -205,7 +200,6 @@ export default function AdminWallStepPage() {
                             <ImageWithBlur
                               src={file?.url}
                               alt={file?.originalName || `Upload ${idx + 1}`}
-                              imageId={`worker-upload-${idx}`}
                             />
                           ) : (
                             <div className="flex flex-col items-center justify-center h-32 sm:h-40 md:h-48 bg-blue-50 rounded-lg border-2 border-dashed border-blue-300">

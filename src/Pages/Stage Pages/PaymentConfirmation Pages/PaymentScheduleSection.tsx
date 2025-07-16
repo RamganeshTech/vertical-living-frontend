@@ -27,7 +27,6 @@ const PaymentScheduleSection: React.FC = () => {
 
     const [clientNotes, setClientNotes] = useState("");
     const [mdNotes, setMdNotes] = useState("");
-    console.log("due date is the ", data?.dueDate)
     const [dueDate, setDueDate] = useState(data?.dueDate);
     const [isEditingDueDate, setIsEditingDueDate] = useState(false);
     const dueDateMutation = useUpdatePaymentScheduleDueDate();
@@ -137,7 +136,6 @@ const PaymentScheduleSection: React.FC = () => {
             </div>
         );
 
-    console.log(dueDate)
     return (
         <div className="w-full max-w-full max-h-full overflow-y-auto custom-scrollbar mx-auto space-y-6 px-4 py-6">
             <div className="w-full justify-between flex">

@@ -9,12 +9,13 @@ import { toast } from './../utils/toast';
 import {
   FiUsers as Users,
   FiMoreVertical as MoreVertical,
-  FiEdit as Edit,
+ 
   FiTrash2 as Trash2,
-  FiUserPlus as UserPlus,
+  
   FiMapPin as MapPin,
   FiPhone as Phone,
 } from "react-icons/fi"
+
 import { useNavigate } from "react-router-dom";
 
 interface OrganizationCardProps {
@@ -31,7 +32,6 @@ interface OrganizationCardProps {
 
 export default function OrganizationCard({ organization }: OrganizationCardProps) {
   const deleteOrganization = useDeleteOrganization()
-console.log("organization", organization)
   const navigate = useNavigate()
 
   const handleDelete = async () => {

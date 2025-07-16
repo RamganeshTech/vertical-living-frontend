@@ -1,10 +1,8 @@
 // components/common/RequirementFileUploader.tsx
 import React, { useState } from "react";
-import { useUploadRequirementFiles } from "../apiList/Stage Api/requirementFormApi";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { toast } from "../utils/toast";
-import { Separator } from "../components/ui/Seperator";
 import { downloadImage } from "../utils/downloadFile";
 
 interface UploadSectionProps {
@@ -59,32 +57,6 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
             toast({ title: "Upload Failed", description: err?.response?.data?.message || "Try again later.", variant: "destructive" });
         }
     };
-
-
-
-    // const handleDownload = async (url: string, filename: string) => {
-    //     try {
-    //         console.log("url", url)
-    //         const res = await fetch(url, { mode: "no-cors" });
-    //         const blob = await res.blob();
-    //         const blobUrl = window.URL.createObjectURL(blob);
-
-    //         const link = document.createElement("a");
-    //         link.href = blobUrl;
-    //         link.download = filename;
-    //         document.body.appendChild(link);
-    //         link.click();
-    //         link.remove();
-    //         window.URL.revokeObjectURL(blobUrl);
-    //     } catch (err) {
-    //         console.error("Download failed", err);
-    //         alert("Failed to download file");
-    //     }
-    // };
-
-
-
-
 
     const pdfFiles = existingUploads.filter((file) => file.type === "pdf");
     const imageFiles = existingUploads.filter((file) => file.type === "image");

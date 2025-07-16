@@ -148,7 +148,6 @@ const MaterialList: React.FC = () => {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to create material list:", error)
     }
   }
 
@@ -184,7 +183,6 @@ const MaterialList: React.FC = () => {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to update material list:", error)
     }
   }
 
@@ -203,7 +201,6 @@ const MaterialList: React.FC = () => {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to delete material list:", error)
     }
   }
 
@@ -213,7 +210,6 @@ const MaterialList: React.FC = () => {
 
     const singleMaterialCost = calculateTotalCost(itemForm.unitPrice, itemForm.materialQuantity)
 
-    console.log("currentlistid", currentListId)
     try {
       await createItem({
         materialListId: currentListId,
@@ -244,7 +240,6 @@ const MaterialList: React.FC = () => {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to create material item:", error)
     }
   }
 
@@ -258,7 +253,6 @@ const MaterialList: React.FC = () => {
 
 
   const openItemModal = (listId?: string) => {
-    console.log("list id from open model funtion ", listId)
     if (listId) {
       setCurrentListId(listId)
     }
@@ -291,7 +285,6 @@ const MaterialList: React.FC = () => {
   }
 
   if (isListsError) {
-    console.log("listsError", listsError)
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">

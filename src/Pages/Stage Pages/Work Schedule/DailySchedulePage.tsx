@@ -2,7 +2,6 @@
 import { type FC, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAddDailyTask, useDeleteDailyTask, useGetDailySchedule, useGetProjectWorkers, useUpdateDailyScheduleStatus, useUpdateDailyTask } from "../../../apiList/Stage Api/workScheduleApi";
-import type { AddDailyTaskPayload } from "../../../types/types";
 import { Button } from "../../../components/ui/Button";
 import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
 import { toast } from "../../../utils/toast";
@@ -71,17 +70,13 @@ const DailySchedulePage: FC = () => {
       if (!newTask.taskName?.trim()) {
         throw new Error("task Name field is mandatory")
       }
-      // console.log("newTask", newTask)
       const formData = new FormData();
       formData.append("taskName", newTask.taskName);
       formData.append("description", newTask.description);
       formData.append("date", newTask.date);
       formData.append("status", newTask.status);
       formData.append("assignedTo", newTask.assignedTo);
-      //     for (let pair of formData.entries()) {
-      //   console.log(pair[0], pair[1]);
-      // }
-      // console.log("create formData", formData)
+
       await addTask.mutateAsync({ dailyScheduleId: sectionId, formData, projectId, });
       setAddingNew(false);
       setNewTask({

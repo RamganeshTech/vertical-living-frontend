@@ -93,7 +93,6 @@ const MaterialItem: React.FC<MaterialItemProps> = ({
       resetUpdateItem()
       await refetchLists()
     } catch (error) {
-      console.error("Failed to update material item:", error)
     }
   }
 
@@ -113,7 +112,6 @@ const MaterialItem: React.FC<MaterialItemProps> = ({
       resetDeleteItem()
       await refetchLists()
     } catch (error) {
-      console.error("Failed to delete material item:", error)
     }
   }
 

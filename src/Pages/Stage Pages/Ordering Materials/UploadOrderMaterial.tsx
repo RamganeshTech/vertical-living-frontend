@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
-import { existingUploads } from "../../../utils/dummyData";
 import { useDeleteOrderMaterialFile, useUploadOrderMaterialFiles } from "../../../apiList/Stage Api/orderingMaterialApi";
 
 interface UploadFile {
@@ -50,7 +49,6 @@ const UploadOrderMaterial: React.FC<Props> = ({ projectId, roomId, initialFiles 
       setImageFiles(prev => [...prev, ...newImages]);
       setSelectedFiles([]);
     } catch (err) {
-      console.error("Upload error", err);
     }
   };
 
@@ -63,7 +61,6 @@ const UploadOrderMaterial: React.FC<Props> = ({ projectId, roomId, initialFiles 
         setImageFiles(prev => prev.filter(file => file._id !== fileId));
       }
     } catch (err) {
-      console.error("Delete error", err);
     }
   };
 

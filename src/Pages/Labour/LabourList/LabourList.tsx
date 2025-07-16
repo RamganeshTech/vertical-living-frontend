@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useOutletContext, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import {
   useGetLabourLists,
   useCreateLabourList,
@@ -9,7 +9,7 @@ import {
   useUpdateLabourItem,
   useDeleteLabourItem,
 } from "../../../apiList/labourApi";
-import type { ILabourList, LabourItemType } from "../../../types/types";
+import type { ILabourList } from "../../../types/types";
 import ErrorComponent from "../../../components/ErrorComponent";
 import LabourItem from "../LabourItem/LabourItem";
 import CreateLabourList from "./CreateLabourList";
@@ -154,7 +154,6 @@ const LabourList: React.FC = () => {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to create labour list:", error)
     }
   }
 
@@ -195,7 +194,6 @@ const LabourList: React.FC = () => {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to update labour list:", error)
     }
   }
 
@@ -213,7 +211,6 @@ const LabourList: React.FC = () => {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to delete labour list:", error)
     }
   }
 
@@ -251,7 +248,6 @@ const LabourList: React.FC = () => {
       // Refetch the lists to get updated data
       await refetchLists()
     } catch (error) {
-      console.error("Failed to create labour item:", error)
     }
   }
 

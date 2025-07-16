@@ -2,7 +2,6 @@
 import { useState, type FC } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetWorkSchedule, useAddWorkPlan, useUpdateWorkPlan, useDeleteWorkPlan, useGetProjectWorkers, useUpdateWorkScheduleStatus } from "../../../apiList/Stage Api/workScheduleApi";
-import type { AddWorkPlanPayload } from "../../../types/types";
 import { Button } from "../../../components/ui/Button";
 import { toast } from "../../../utils/toast";
 import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
@@ -26,7 +25,6 @@ const WorkSchedulePage: FC = () => {
   const { data: workSchedule, isLoading, refetch, error } = useGetWorkSchedule(projectId);
   const { data: workers } = useGetProjectWorkers(projectId);
 
-  // console.log(workers)
   const { mutateAsync: updateWorkStatus, isPending: updateStatusPending } = useUpdateWorkScheduleStatus()
   const addPlan = useAddWorkPlan();
   const updatePlan = useUpdateWorkPlan();
@@ -160,126 +158,125 @@ const handleStartEditStatus = () => setIsEditingStatus(true);
   };
 
 
-  { console.log("workSchedule?.plans?.length", workSchedule?.plans) }
 
 
-  const workSchedules = {
-    _id: "6655c2ef1345abcf22ee1200",
-    projectId: "PROJECT123",
-    plans: [
-      {
-        _id: "plan1",
-        workType: "Electrical Wiring",
-        startDate: "2025-07-01",
-        endDate: "2025-07-05",
-        assignedTo: "worker123",
-        upload: {
-          type: "pdf",
-          url: "https://example.com/wiring-plan.pdf",
-          originalName: "WiringPlan.pdf",
-          uploadedAt: new Date(),
-        },
-        notes: "Check conduit layout before final fix."
-      },
-      {
-        _id: "plan2",
-        workType: "Plumbing",
-        startDate: "2025-07-06",
-        endDate: "2025-07-10",
-        assignedTo: "worker456",
-        upload: {
-          type: "image",
-          url: "https://example.com/plumbing-diagram.jpg",
-          originalName: "PlumbingDiagram.jpg",
-          uploadedAt: new Date(),
-        },
-        notes: "Install pipelines for kitchen & bathrooms."
-      },
-      {
-        _id: "plan3",
-        workType: "Interior Painting",
-        startDate: "2025-07-11",
-        endDate: "2025-07-15",
-        assignedTo: "worker789",
-        upload: null, // This plan has no upload attached.
-        notes: "Use low-VOC paint for bedrooms."
-      },
-      {
-        _id: "plan1",
-        workType: "Electrical Wiring",
-        startDate: "2025-07-01",
-        endDate: "2025-07-05",
-        assignedTo: "worker123",
-        upload: {
-          type: "pdf",
-          url: "https://example.com/wiring-plan.pdf",
-          originalName: "WiringPlan.pdf",
-          uploadedAt: new Date(),
-        },
-        notes: "Check conduit layout before final fix."
-      },
-      {
-        _id: "plan2",
-        workType: "Plumbing",
-        startDate: "2025-07-06",
-        endDate: "2025-07-10",
-        assignedTo: "worker456",
-        upload: {
-          type: "image",
-          url: "https://example.com/plumbing-diagram.jpg",
-          originalName: "PlumbingDiagram.jpg",
-          uploadedAt: new Date(),
-        },
-        notes: "Install pipelines for kitchen & bathrooms."
-      },
-      {
-        _id: "plan3",
-        workType: "Interior Painting",
-        startDate: "2025-07-11",
-        endDate: "2025-07-15",
-        assignedTo: "worker789",
-        upload: null, // This plan has no upload attached.
-        notes: "Use low-VOC paint for bedrooms."
-      },
-      {
-        _id: "plan1",
-        workType: "Electrical Wiring",
-        startDate: "2025-07-01",
-        endDate: "2025-07-05",
-        assignedTo: "worker123",
-        upload: {
-          type: "pdf",
-          url: "https://example.com/wiring-plan.pdf",
-          originalName: "WiringPlan.pdf",
-          uploadedAt: new Date(),
-        },
-        notes: "Check conduit layout before final fix."
-      },
-      {
-        _id: "plan2",
-        workType: "Plumbing",
-        startDate: "2025-07-06",
-        endDate: "2025-07-10",
-        assignedTo: "worker456",
-        upload: {
-          type: "image",
-          url: "https://example.com/plumbing-diagram.jpg",
-          originalName: "PlumbingDiagram.jpg",
-          uploadedAt: new Date(),
-        },
-        notes: "Install pipelines for kitchen & bathrooms."
-      },
-      {
-        _id: "plan3",
-        workType: "Interior Painting",
-        startDate: "2025-07-11",
-        endDate: "2025-07-15",
-        assignedTo: "worker789",
-        upload: null, // This plan has no upload attached.
-        notes: "Use low-VOC paint for bedrooms."
-      }
-    ]
-  };
+  // const workSchedules = {
+  //   _id: "6655c2ef1345abcf22ee1200",
+  //   projectId: "PROJECT123",
+  //   plans: [
+  //     {
+  //       _id: "plan1",
+  //       workType: "Electrical Wiring",
+  //       startDate: "2025-07-01",
+  //       endDate: "2025-07-05",
+  //       assignedTo: "worker123",
+  //       upload: {
+  //         type: "pdf",
+  //         url: "https://example.com/wiring-plan.pdf",
+  //         originalName: "WiringPlan.pdf",
+  //         uploadedAt: new Date(),
+  //       },
+  //       notes: "Check conduit layout before final fix."
+  //     },
+  //     {
+  //       _id: "plan2",
+  //       workType: "Plumbing",
+  //       startDate: "2025-07-06",
+  //       endDate: "2025-07-10",
+  //       assignedTo: "worker456",
+  //       upload: {
+  //         type: "image",
+  //         url: "https://example.com/plumbing-diagram.jpg",
+  //         originalName: "PlumbingDiagram.jpg",
+  //         uploadedAt: new Date(),
+  //       },
+  //       notes: "Install pipelines for kitchen & bathrooms."
+  //     },
+  //     {
+  //       _id: "plan3",
+  //       workType: "Interior Painting",
+  //       startDate: "2025-07-11",
+  //       endDate: "2025-07-15",
+  //       assignedTo: "worker789",
+  //       upload: null, // This plan has no upload attached.
+  //       notes: "Use low-VOC paint for bedrooms."
+  //     },
+  //     {
+  //       _id: "plan1",
+  //       workType: "Electrical Wiring",
+  //       startDate: "2025-07-01",
+  //       endDate: "2025-07-05",
+  //       assignedTo: "worker123",
+  //       upload: {
+  //         type: "pdf",
+  //         url: "https://example.com/wiring-plan.pdf",
+  //         originalName: "WiringPlan.pdf",
+  //         uploadedAt: new Date(),
+  //       },
+  //       notes: "Check conduit layout before final fix."
+  //     },
+  //     {
+  //       _id: "plan2",
+  //       workType: "Plumbing",
+  //       startDate: "2025-07-06",
+  //       endDate: "2025-07-10",
+  //       assignedTo: "worker456",
+  //       upload: {
+  //         type: "image",
+  //         url: "https://example.com/plumbing-diagram.jpg",
+  //         originalName: "PlumbingDiagram.jpg",
+  //         uploadedAt: new Date(),
+  //       },
+  //       notes: "Install pipelines for kitchen & bathrooms."
+  //     },
+  //     {
+  //       _id: "plan3",
+  //       workType: "Interior Painting",
+  //       startDate: "2025-07-11",
+  //       endDate: "2025-07-15",
+  //       assignedTo: "worker789",
+  //       upload: null, // This plan has no upload attached.
+  //       notes: "Use low-VOC paint for bedrooms."
+  //     },
+  //     {
+  //       _id: "plan1",
+  //       workType: "Electrical Wiring",
+  //       startDate: "2025-07-01",
+  //       endDate: "2025-07-05",
+  //       assignedTo: "worker123",
+  //       upload: {
+  //         type: "pdf",
+  //         url: "https://example.com/wiring-plan.pdf",
+  //         originalName: "WiringPlan.pdf",
+  //         uploadedAt: new Date(),
+  //       },
+  //       notes: "Check conduit layout before final fix."
+  //     },
+  //     {
+  //       _id: "plan2",
+  //       workType: "Plumbing",
+  //       startDate: "2025-07-06",
+  //       endDate: "2025-07-10",
+  //       assignedTo: "worker456",
+  //       upload: {
+  //         type: "image",
+  //         url: "https://example.com/plumbing-diagram.jpg",
+  //         originalName: "PlumbingDiagram.jpg",
+  //         uploadedAt: new Date(),
+  //       },
+  //       notes: "Install pipelines for kitchen & bathrooms."
+  //     },
+  //     {
+  //       _id: "plan3",
+  //       workType: "Interior Painting",
+  //       startDate: "2025-07-11",
+  //       endDate: "2025-07-15",
+  //       assignedTo: "worker789",
+  //       upload: null, // This plan has no upload attached.
+  //       notes: "Use low-VOC paint for bedrooms."
+  //     }
+  //   ]
+  // };
 
 
   return (

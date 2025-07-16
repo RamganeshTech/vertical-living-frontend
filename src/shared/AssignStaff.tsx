@@ -45,7 +45,6 @@ export default function AssignStageStaff({
   const staffList =  realStaffList 
 
   const handleAssign = async (staff: { _id: string; staffName: string; email: string }) => {
-    console.log("staff detials", staff)
     try {
       await assignStaff({
         projectId,

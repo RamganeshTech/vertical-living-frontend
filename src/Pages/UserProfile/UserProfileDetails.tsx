@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useUpdateProfile } from "../../apiList/Stage Api/profile Edit Api/profileEditApi";
 import { Button } from "../../components/ui/Button";
-import { Label } from "../../components/ui/Label";
-import { Input } from "../../components/ui/Input";
+
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import { useOutletContext } from "react-router-dom";
@@ -15,15 +14,14 @@ import { setClientProfileData } from "../../features/clientSlice";
 import { setCTOProfileData } from "../../features/CTOSlice"; 
 import { setStaffProfileData } from "../../features/staffSlices"; 
 import { setWorkerProfileData } from "../../features/workerSlice";
-import { Badge } from "../../components/ui/Badge";
 
 
-type ProfileUnion =
-    | RootState["userProfileStore"]
-    | RootState["staffProfileStore"]
-    | RootState["CTOProfileStore"]
-    | RootState["workerProfileStore"]
-    | RootState["clientProfileStore"];
+// type ProfileUnion =
+//     | RootState["userProfileStore"]
+//     | RootState["staffProfileStore"]
+//     | RootState["CTOProfileStore"]
+//     | RootState["workerProfileStore"]
+//     | RootState["clientProfileStore"];
 
 const roleConfig = {
     owner: {
@@ -107,7 +105,6 @@ const dispatch = useDispatch()
             })
             toast({ title: "Success", description: "Completion status updated successfully" });
 
-            console.log("data", data)
 
              const payload = {
       email: form.email,
