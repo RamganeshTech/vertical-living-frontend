@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useCreateUser, useLoginUser } from "../../apiList/userApi";
 import { handleLoginValidation, handleRegistrationValidation } from "../../utils/validation";
-import ErrorComponent from "../../components/ErrorComponent";
+// import ErrorComponent from "../../components/ErrorComponent";
 import {  useNavigate, useOutletContext } from "react-router-dom";
 import { CardDescription, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
@@ -38,8 +38,8 @@ const LoginPage = () => {
 
 
 
-    const { mutateAsync: loginUser, isPending, isError, error, reset } = useLoginUser();
-    const { mutateAsync: registerUser, isPending: registerPending, isError: registerIsError, error: registerError, reset: registerReset } = useCreateUser();
+    const { mutateAsync: loginUser, isPending } = useLoginUser();
+    const { mutateAsync: registerUser, isPending: registerPending} = useCreateUser();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -139,7 +139,7 @@ const LoginPage = () => {
     return (
         <div className="min-h-screen relative bg-gradient-to-br from-blue-50 p-4 via-white to-blue-100 flex items-center justify-center">
             {/* {toast && <CustomAlert onClose={() => setToast(null)} message={toast} type="success" />} */}
-            {!isPending && isError && (
+            {/* {!isPending && isError && (
                 <ErrorComponent
                     message={(error as any)?.response?.data?.message || error?.message || "Something went wrong"}
                     onClick={() => reset()}
@@ -150,7 +150,7 @@ const LoginPage = () => {
                     message={(registerError as any)?.response?.data?.message || registerError?.message || "Something went wrong"}
                     onClick={() => registerReset()}
                 />
-            )}
+            )} */}
             {/* 
             <Button variant="primary" onClick={() => navigate(-1)} className="!absolute top-[5%] right-[10%]">
                 Go Back
