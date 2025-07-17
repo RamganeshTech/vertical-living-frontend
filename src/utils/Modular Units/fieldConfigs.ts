@@ -140,7 +140,7 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
         "Puja Showcase",
       ],
     },
-    addons: {
+    addOns: {
       label: "Add-ons",
       type: "checkbox",
       options: [
@@ -187,6 +187,7 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
         "₹50,000+",
       ],
     },
+    price: { label: "Price", type: "number", required:true },
   },
 
 
@@ -207,6 +208,7 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
     modularType: { label: "Modular Type", type: "select", options: ["Factory Modular", "Carpenter-Made"] },
     installationComplexity: { label: "Installation Complexity", type: "select", options: ["Low", "Medium", "High"] },
     budgetRange: { label: "Budget Range", type: "select", options: ["₹5,000–₹10,000", "₹10,000–₹25,000", "₹25,000+"] },
+    price: { label: "Price", type: "number", required:true },
   },
 
 
@@ -229,6 +231,8 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
     edges: { label: "Edges", type: "select", options: ["Rounded", "Sharp"] },
     modularType: { label: "Modular Type", type: "select", options: ["Factory Modular", "Carpenter-Made"] },
     priceRange: { label: "Price Range", type: "select", options: ["₹5,000–₹10,000", "₹10,000–₹25,000", "₹25,000+"] },
+    price: { label: "Price", type: "number", required:true },
+
   },
 
   // ✅ Wardrobe
@@ -250,6 +254,8 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
     installationType: { label: "Installation Type", type: "select", options: ["Floor Standing", "Wall Mounted"] },
     modularType: { label: "Modular Type", type: "select", options: ["Factory Modular", "Carpenter-Made"] },
     priceRange: { label: "Price Range", type: "select", options: ["₹10,000–₹25,000", "₹25,000–₹50,000"] },
+    price: { label: "Price", type: "number", required:true },
+
   },
 
 
@@ -270,6 +276,8 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
     installationType: { label: "Installation Type", type: "select", options: ["Floor Standing", "Wall Mounted"] },
     modularType: { label: "Modular Type", type: "select", options: ["Factory Modular", "Carpenter-Made"] },
     priceRange: { label: "Price Range", type: "select", options: ["₹10,000–₹25,000", "₹25,000–₹50,000"] },
+    price: { label: "Price", type: "number", required:true },
+
   },
 
   // ✅ Bed Cot
@@ -288,6 +296,8 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
     installationType: { label: "Installation Type", type: "select", options: ["Knock Down", "Pre-assembled"] },
     modularType: { label: "Modular Type", type: "select", options: ["Factory Modular", "Carpenter-Made"] },
     priceRange: { label: "Price Range", type: "select", options: ["₹10,000–₹25,000", "₹25,000–₹50,000", "₹50,000+"] },
+    price: { label: "Price", type: "number", required:true },
+
   },
 
   // ✅ Kitchen Cabinet
@@ -308,6 +318,8 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
     designCollection: { label: "Design Collection", type: "select", options: ["Modern", "Classic", "Contemporary"] },
     modularType: { label: "Modular Type", type: "select", options: ["Factory Modular", "Carpenter-Made"] },
     priceRange: { label: "Price Range", type: "select", options: ["₹25,000–₹50,000", "₹50,000+"] },
+    price: { label: "Price", type: "number", required:true },
+
   },
 
   // ✅ Study Table
@@ -326,6 +338,8 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
     installationType: { label: "Installation Type", type: "select", options: ["Knock Down", "Pre-assembled"] },
     modularType: { label: "Modular Type", type: "select", options: ["Factory Modular", "Carpenter-Made"] },
     priceRange: { label: "Price Range", type: "select", options: ["₹5,000–₹10,000", "₹10,000–₹25,000"] },
+    price: { label: "Price", type: "number", required:true },
+
   },
 
   // ✅ Crockery Unit
@@ -347,5 +361,7 @@ export const modularUnitFieldConfig:Record<string, Record<string, FieldConfig>> 
     installationType: { label: "Installation Type", type: "select", options: ["Floor Standing", "Wall Mounted"] },
     modularType: { label: "Modular Type", type: "select", options: ["Factory Modular", "Carpenter-Made"] },
     priceRange: { label: "Price Range", type: "select", options: ["₹10,000–₹25,000", "₹25,000–₹50,000"] },
+    price: { label: "Price", type: "number", required:true },
+
   },
 };

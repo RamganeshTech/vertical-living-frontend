@@ -41,7 +41,7 @@ export const ORGANIZATION_ICONS = {
   PROJECTS: "fa-solid fa-diagram-project  text-2xl",
   PLAN: "fa-solid fa-cash  text-2xl",
   PROFILE: "fa-solid fa-user-gear  text-2xl",
-  // MODULAR: "fa-solid fa-box  text-2xl"
+  MODULAR: "fa-solid fa-box  text-2xl"
 }
 
 export const ORGANIZATION_LABELS = {
@@ -51,7 +51,7 @@ export const ORGANIZATION_LABELS = {
   PROJECTS: "Projects",
   PLAN: "Upgrade Plan",
   PROFILE: "User Profile",
-  // MODULAR: "Modular Units"
+  MODULAR: "Modular Units"
 }
 
 export const PROJECTS_LABELS = {

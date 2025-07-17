@@ -72,12 +72,31 @@ const deleteModularUnitApi = async (
 };
 
 const getModularUnitsApi = async (
-    unitType: string,
-    api: AxiosInstance
+     unitType: string,
+  organizationId: string,
+  api: AxiosInstance,
+  filters: Record<string, string[]> = {},
+  searchQuery: string = ""
 ) => {
-    const { data } = await api.get(`/modularunit/getunits/${unitType}`);
-    if (!data.ok) throw new Error(data.message);
-    return data.data;
+    const params = new URLSearchParams();
+
+  // Filters like: doorType=hinged,sliding
+  Object.entries(filters).forEach(([key, values]) => {
+    if (values.length > 0) {
+      params.append(key, values.join(","));
+    }
+  });
+
+  if (searchQuery) {
+    params.append("searchQuery", searchQuery);
+  }
+
+  const queryStr = params.toString();
+  const url = `/modularunit/getunits/${organizationId}/${unitType}${queryStr ? "?" + queryStr : ""}`;
+
+  const { data } = await api.get(url);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
 };
 
 
@@ -88,7 +107,7 @@ const getAllMixedUnitsApi = async (
   organizationId: string,
   api: AxiosInstance
 ) => {
-  const { data } = await api.get(`/modular/getallunits/${organizationId}`);
+  const { data } = await api.get(`/modularunit/getallunits/${organizationId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data; // This will be your mixed units
 };
@@ -185,25 +204,28 @@ export const useDeleteModularUnit = () => {
     });
 };
 
-export const useGetModularUnits = (unitType: string) => {
-    const { role } = useGetRole();
-    const api = getApiForRole(role!);
-    const allowedRoles = ["owner", "staff", "CTO", "client"]
+export const useGetModularUnits = (
+  unitType: string,
+  organizationId: string,
+  filters: Record<string, string[]> = {},
+  searchQuery: string = ""
+) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const allowedRoles = ["owner", "staff", "CTO", "client"];
 
-    return useQuery({
-        queryKey: ["modularUnits", unitType],
-        queryFn: async () => {
-            if (!role) throw new Error("Role missing");
+  return useQuery({
+    queryKey: ["modularUnits", unitType, organizationId, filters, searchQuery],
+    queryFn: async () => {
+      if (!role) throw new Error("Role missing");
+      if (!allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+      if (!api) throw new Error("API instance not found for role");
 
-            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
-
-            if (!api) throw new Error("API instance not found for role");
-
-            return await getModularUnitsApi(unitType, api);
-        },
-         retry:false,
-    refetchOnMount:false
-    });
+      return await getModularUnitsApi(unitType, organizationId, api, filters, searchQuery);
+    },
+    retry: false,
+    refetchOnMount: false,
+  });
 };
 
 

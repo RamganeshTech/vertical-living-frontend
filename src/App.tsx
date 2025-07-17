@@ -79,6 +79,9 @@ import SubscriptionParent from './Pages/Subscription Payment/SubscriptionParent'
 import MaterialOverviewLoading from './Pages/Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
 import UserProfileDetails from './Pages/UserProfile/UserProfileDetails'
 import PrerequisitesPage from './Pages/PreRequireties Pages/PreRequiretiesMain'
+import ModularUnitMain from './Pages/Modular Units/Modular Units Dummy/ModularUnitMain'
+import AddModularUnit from './Pages/Modular Units/Modular Units Dummy/AddModularUnit'
+import ModularUnitCategoryPage from './Pages/Modular Units/Modular Units Dummy/ModularUnitCategoryPage'
 // import ModularUnitMain from './Pages/Modular Units/ModularUnitMain'
 // import AddModularUnit from './Pages/Modular Units/AddModularUnit'
 // import ModularUnitCategoryPage from './Pages/Modular Units/ModularUnitCategoryPage'
@@ -184,12 +187,33 @@ function App() {
                 <AddModularUnit />
               </ProtectedRoutes>} />
 
-            <Route path=":unitType" element={
+            <Route path="category/:unitType" element={
               <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
                 <ModularUnitCategoryPage />
               </ProtectedRoutes>} />
 
           </Route> */}
+
+
+
+
+           <Route path="modularunits" element={
+            <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+              <ModularUnitMain />
+            </ProtectedRoutes>
+          } >
+
+            <Route path="add" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                <AddModularUnit />
+              </ProtectedRoutes>} />
+
+            <Route path="category/:unitType" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
+                <ModularUnitCategoryPage />
+              </ProtectedRoutes>} />
+
+          </Route>
 
 
         </Route>
