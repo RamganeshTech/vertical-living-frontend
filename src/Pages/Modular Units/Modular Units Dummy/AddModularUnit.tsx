@@ -2,23 +2,25 @@
 
 import type React from "react"
 import { useState } from "react"
-import { useParams } from "react-router-dom"
-import { modularUnitFieldConfig } from "../../../utils/Modular Units/fieldConfigs" 
-import { Button } from "../../../components/ui/Button" 
-import { Input } from "../../../components/ui/Input" 
-import { Label } from "../../../components/ui/Label" 
-import { Select ,  SelectContent, SelectItem, SelectTrigger, SelectValue } from './../../../components/ui/Select';
+import { useNavigate, useParams } from "react-router-dom"
+import { modularUnitFieldConfig } from "../../../utils/Modular Units/fieldConfigs"
+import { Button } from "../../../components/ui/Button"
+import { Input } from "../../../components/ui/Input"
+import { Label } from "../../../components/ui/Label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './../../../components/ui/Select';
 
-import { toast } from "../../../utils/toast" 
-import { useUpdateModularUnit, useCreateModularUnit } from "../../../apiList/Modular Unit Api/ModularUnitApi" 
+import { toast } from "../../../utils/toast"
+import { useUpdateModularUnit, useCreateModularUnit } from "../../../apiList/Modular Unit Api/ModularUnitApi"
 
 type AddModularUnitProps = {
   unitToEdit?: any
+  setUnitToEdit?: React.Dispatch<React.SetStateAction<null>>
 }
 
 const disallowedKeysForEdit = ["_id", "organizationId", "customId", "images", "createdAt", "updatedAt", "__v"]
 
-export default function AddModularUnit({ unitToEdit }: AddModularUnitProps) {
+export default function AddModularUnit({ unitToEdit, setUnitToEdit }: AddModularUnitProps) {
+  const navigate = useNavigate()
   const { organizationId } = useParams() as { organizationId: string }
   const [category, setCategory] = useState<string>(unitToEdit?.category || "showcase")
   const config = modularUnitFieldConfig[category]
@@ -62,8 +64,9 @@ export default function AddModularUnit({ unitToEdit }: AddModularUnitProps) {
       if (!formValues.price || formValues.price < 0) {
         throw new Error("Enter valid price")
       }
-
+      console.log("formValues", formValues)
       const updatedFormValues = { ...formValues, category }
+      console.log("formValues after updated", updatedFormValues)
 
       if (unitToEdit) {
         const sanitized = sanitizeFormValues(updatedFormValues)
@@ -93,21 +96,31 @@ export default function AddModularUnit({ unitToEdit }: AddModularUnitProps) {
     setFiles([])
   }
 
+  const handleCancelUpdate = () => {
+    if (setUnitToEdit) {
+      setUnitToEdit(null)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {/* Header */}
       <div className="bg-white shadow-lg border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl">
+        <div className="max-w-full mx-auto px-2 sm:px-6 lg:px-8 sm:py-6 py-3">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between sm:gap-4 gap-2">
+            <div className="flex items-center sm:gap-4 gap-2">
+              <div onClick={() => navigate(-1)} className="flex gap-2 items-center cursor-pointer rounded-full hover:bg-gray-100 p-2">
+                <i className="fas fa-arrow-left"></i>
+                <p className="">Back</p>
+              </div>
+              <div className="bg-gradient-to-r  from-blue-600 to-purple-600 p-3 rounded-xl">
                 <i className={`fas ${unitToEdit ? "fa-edit" : "fa-plus"} text-white text-xl`}></i>
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {unitToEdit ? "Edit" : "Add New"} {category} Unit
+                <h1 className="text-xl sm:text-3xl font-bold text-gray-900">
+                  {unitToEdit ? "Edit" : "Add New"} {category} <span className="hidden sm:inline">Unit</span>
                 </h1>
-                <p className="text-gray-600 mt-1">
+                <p className="text-gray-600 mt-1 hidden sm:block">
                   {unitToEdit ? "Update product information" : "Create a new product in your catalog"}
                 </p>
               </div>
@@ -251,7 +264,7 @@ export default function AddModularUnit({ unitToEdit }: AddModularUnitProps) {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-center pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 pt-6 border-t border-gray-200">
               <Button
                 type="submit"
                 disabled={isCreating || isUpdating}
@@ -269,6 +282,14 @@ export default function AddModularUnit({ unitToEdit }: AddModularUnitProps) {
                   </>
                 )}
               </Button>
+
+
+              {unitToEdit && <Button
+                variant="secondary"
+                className=" px-12 py-4 rounded-xl text-lg "
+                onClick={handleCancelUpdate}>
+                Cancel
+              </Button>}
             </div>
           </form>
         </div>

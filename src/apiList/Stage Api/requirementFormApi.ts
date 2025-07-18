@@ -301,7 +301,7 @@ export const useUploadRequirementFiles = () => {
 //updation part of the requriement form of custom hooks
 
 export const useKitchenFormUpdation = () => {
-    const allowedRoles = ["client", "owner"]
+    const allowedRoles = ["client", "owner", "staff"]
 
     const { role } = useGetRole()
 
@@ -322,7 +322,7 @@ export const useKitchenFormUpdation = () => {
 }
 
 export const useBedroomFormUpdation = () => {
-    const allowedRoles = ["client", "owner"]
+    const allowedRoles = ["client", "owner", "staff"]
 
     const { role } = useGetRole()
 
@@ -343,7 +343,7 @@ export const useBedroomFormUpdation = () => {
 }
 
 export const useWardrobeFormUpdation = () => {
-    const allowedRoles = ["client", "owner"]
+    const allowedRoles = ["client", "owner", "staff"]
 
     const { role } = useGetRole()
 
@@ -364,7 +364,7 @@ export const useWardrobeFormUpdation = () => {
 }
 
 export const useLivingHallFormUpdation = () => {
-    const allowedRoles = ["client", "owner"]
+    const allowedRoles = ["client", "owner", "staff"]
 
     const { role } = useGetRole()
 

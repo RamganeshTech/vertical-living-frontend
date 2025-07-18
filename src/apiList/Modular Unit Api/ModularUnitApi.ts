@@ -15,9 +15,15 @@ const createModularUnitApi = async (
 
     // Add fields
     Object.keys(formValues).forEach((key) => {
-        if (formValues[key] !== undefined) {
-            formData.append(key, formValues[key]);
+        const value = formValues[key];
+
+    if (value !== undefined) {
+        if (Array.isArray(value)) {
+            value.forEach((item) => formData.append(key, item)); // 👈 Fix: send array as multiple entries
+        } else {
+            formData.append(key, value);
         }
+    }
     });
 
     // Add multiple images
@@ -43,14 +49,21 @@ const updateModularUnitApi = async (
     const formData = new FormData();
 
     Object.keys(formValues).forEach((key) => {
-        if (formValues[key] !== undefined) {
-            formData.append(key, formValues[key]);
-        }
-    });
+        const value = formValues[key];
 
+    if (value !== undefined) {
+        if (Array.isArray(value)) {
+            value.forEach((item) => formData.append(key, item)); // 👈 Fix: send array as multiple entries
+        } else {
+            formData.append(key, value);
+        }
+    }
+    });
+    
     files.forEach((file) => {
         formData.append("images", file);
     });
+            console.log("formvalues form api", formData)
 
     const { data } = await api.put(`/modularunit/update/${unitType}/${unitId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -66,6 +79,7 @@ const deleteModularUnitApi = async (
     unitId: string,
     api: AxiosInstance
 ) => {
+    console.log(unitType)
     const { data } = await api.delete(`/modularunit/delete/${organizationId}/${unitType}/${unitId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
@@ -139,6 +153,7 @@ export const useCreateModularUnit = () => {
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
             if (!api) throw new Error("API instance not found for role");
+            console.log("formvalues form hooks", formValues)
             return await createModularUnitApi(organizationId, unitType, formValues, files, api);
         },
         onSuccess: (_, { unitType }) => {
@@ -196,7 +211,9 @@ export const useDeleteModularUnit = () => {
 
             if (!api) throw new Error("API instance not found for role");
 
-            return await deleteModularUnitApi(unitType, organizationId, unitId, api);
+
+
+            return await deleteModularUnitApi(organizationId, unitType,  unitId, api);
         },
         onSuccess: (_, { unitType }) => {
             queryClient.invalidateQueries({ queryKey: ["modularUnits", unitType] });

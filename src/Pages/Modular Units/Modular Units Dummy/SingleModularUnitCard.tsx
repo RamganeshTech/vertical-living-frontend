@@ -14,13 +14,13 @@ type SingleModularUnitCardProp = {
 const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEdit }) => {
   const [imageError, setImageError] = useState(false)
   const { mutateAsync: deleteUnit, isPending: isDeleting } = useDeleteModularUnit()
-
+console.log("unit form deelete", unit)
   const handleDelete = async () => {
     try {
       if (!window.confirm("Are you sure you want to delete this unit?")) return
       await deleteUnit({
         unitId: unit._id,
-        unitType: unit.unitType,
+        unitType: unit.category,
         organizationId: unit.organizationId,
       })
       toast({ title: "Success", description: "Product deleted successfully" })
@@ -115,7 +115,7 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
               <i className="fas fa-tag text-blue-500 text-xs"></i>
               Category
             </span>
-            <span className="font-medium text-gray-900 capitalize truncate ml-2">{unit.unitType || "N/A"}</span>
+            <span className="font-medium text-gray-900 capitalize truncate ml-2">{unit?.category || "N/A"}</span>
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -139,9 +139,10 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
             </Button>
           )}
           <Button
+          variant="danger"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 hover:border-red-300 py-2 px-3 rounded-lg transition-all disabled:opacity-50 text-sm"
+            className="flex-1 bg-red-600 text-white  py-2 px-3 rounded-lg transition-all disabled:opacity-50 text-sm"
           >
             <i className={`fas ${isDeleting ? "fa-spinner fa-spin" : "fa-trash"} mr-1`}></i>
             {isDeleting ? "Deleting..." : "Delete"}

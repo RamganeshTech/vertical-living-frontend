@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom"
+import { Outlet, useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom"
 import { useGetAllMixedUnits } from "../../../apiList/Modular Unit Api/ModularUnitApi"
 import { modularUnitFieldConfig } from "../../../utils/Modular Units/fieldConfigs"
 import { Button } from "../../../components/ui/Button"
 import SingleModularUnitCard from "./SingleModularUnitCard"
+import type { OrganizationOutletTypeProps } from "../../Organization/OrganizationChildren"
 
 type SingleUnitType = {
   _id: string
@@ -18,7 +19,12 @@ type SingleUnitType = {
 }
 
 export default function ModularUnitMain() {
+
+  const { isMobile, openMobileSidebar } = useOutletContext<OrganizationOutletTypeProps>()
   const { organizationId } = useParams() as { organizationId: string }
+
+
+
   const [selectedCategory, setSelectedCategory] = useState<string>("")
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -48,61 +54,71 @@ export default function ModularUnitMain() {
     <>
       {isChildRoute ? (
         <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50 overflow-y-auto">
-          <Outlet />
+          <Outlet context={{isMobile, openMobileSidebar}} />
         </div>
       ) : (
-        <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col overflow-hidden">
+        <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col overflow-hidden ">
           {/* Header - Fixed */}
-          <div className="bg-white shadow-lg border-b z-50 flex-shrink-0">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white shadow-lg border-b z-40 flex-shrink-0">
+            <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
                 <div className="flex items-center gap-3">
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-2 rounded-lg">
-                    <i className="fas fa-cube text-white text-xl"></i>
+                  <div className="flex ">
+                    {isMobile &&
+                      <button
+                        onClick={openMobileSidebar}
+                        className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                        title="Open Menu"
+                      >
+                        <i className="fa-solid fa-bars"></i>
+                      </button>
+                    }
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-2 rounded-lg">
+                      <i className="fas fa-cube text-white text-xl"></i>
+                    </div>
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                    <h1 className="text-xl sm:text-2xl  font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                       Product Catalog
                     </h1>
-                    <p className="text-sm text-gray-500">Manage your modular units</p>
+                    <p className="text-sm text-gray-500 sm:block hidden">Manage your modular units</p>
                   </div>
                 </div>
 
                 {/* Mobile menu button */}
-                <button
-                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                  className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-                >
-                  <i className="fas fa-bars text-lg"></i>
-                </button>
+                <div className="flex sm:none">
 
-                {/* Desktop Add Button */}
-                <Button
-                  onClick={() => navigate("add")}
-                  className="hidden md:flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  <i className="fas fa-plus"></i>
-                  Add New Product
-                </Button>
+
+                  {/* Desktop Add Button */}
+                  <Button
+                    onClick={() => navigate("add")}
+                    className="hidden md:flex  sm:px-4 py-2  items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    <i className="fas fa-plus"></i>
+                    Add <span className="hidden sm:inline">New Product</span>
+                  </Button>
+
+                  <button
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    className="md:hidden border-2 border-gray-300  ml-1 cursor-pointer p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                  >
+                    <i className="fas fa-box text-lg text-blue-600"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Main Content Container */}
-          <div className="flex-1 flex overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex gap-6 w-full overflow-hidden">
+          <div className="flex-1 flex overflow-hidden ">
+            <div onClick={()=>setIsSidebarOpen(false) } className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex gap-6 w-full overflow-hidden">
               {/* Mobile Sidebar Overlay */}
-              {isSidebarOpen && (
-                <div
-                  className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-                  onClick={() => setIsSidebarOpen(false)}
-                />
-              )}
-
+             
               {/* Sidebar - Fixed width with internal scroll */}
+              
               <aside
                 className={`
-                  fixed md:static inset-y-0 left-0 z-30 w-80 md:w-72 bg-white md:bg-white/90 md:backdrop-blur-sm
+                  fixed md:static inset-y-0 left-0 !z-50 w-80 md:w-72 bg-white md:bg-white/90 md:backdrop-blur-sm
                   transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0
                   transition-transform duration-300 ease-in-out md:transition-none
                   shadow-2xl md:shadow-lg rounded-r-2xl md:rounded-2xl border-r md:border
@@ -145,11 +161,10 @@ export default function ModularUnitMain() {
 
                     {/* All Products Option */}
                     <button
-                      className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${
-                        selectedCategory === ""
+                      className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${selectedCategory === ""
                           ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
                           : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                      }`}
+                        }`}
                       onClick={() => {
                         setSelectedCategory("")
                         setIsSidebarOpen(false)
@@ -158,9 +173,8 @@ export default function ModularUnitMain() {
                       <i className="fas fa-th-large"></i>
                       <span className="font-medium">All Products</span>
                       <span
-                        className={`ml-auto text-xs px-2 py-1 rounded-full ${
-                          selectedCategory === "" ? "bg-white/20 text-white" : "bg-gray-200 text-gray-600"
-                        }`}
+                        className={`ml-auto text-xs px-2 py-1 rounded-full ${selectedCategory === "" ? "bg-white/20 text-white" : "bg-gray-200 text-gray-600"
+                          }`}
                       >
                         {data?.length || 0}
                       </span>
@@ -169,11 +183,10 @@ export default function ModularUnitMain() {
                     {filteredCategories.map((cat) => (
                       <button
                         key={cat}
-                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${
-                          selectedCategory === cat
+                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${selectedCategory === cat
                             ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
                             : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                        }`}
+                          }`}
                         onClick={() => {
                           navigate(`category/${cat}`)
                           setIsSidebarOpen(false)
@@ -182,9 +195,8 @@ export default function ModularUnitMain() {
                         <i className="fas fa-cube"></i>
                         <span className="font-medium capitalize">{cat}</span>
                         <span
-                          className={`ml-auto text-xs px-2 py-1 rounded-full ${
-                            selectedCategory === cat ? "bg-white/20 text-white" : "bg-gray-200 text-gray-600"
-                          }`}
+                          className={`ml-auto text-xs px-2 py-1 rounded-full ${selectedCategory === cat ? "bg-white/20 text-white" : "bg-gray-200 text-gray-600"
+                            }`}
                         >
                           {data?.filter((unit: SingleUnitType) => unit.unitType === cat)?.length || 0}
                         </span>
@@ -194,7 +206,7 @@ export default function ModularUnitMain() {
                 </div>
 
                 {/* Mobile Add Button - Fixed */}
-                <div className="flex-shrink-0 p-6 border-t md:hidden">
+                <div className="flex-shrink-0 p-2 sm:p-6 border-t md:hidden">
                   <Button
                     onClick={() => {
                       navigate("add")
@@ -211,11 +223,11 @@ export default function ModularUnitMain() {
               {/* Main Content - Scrollable */}
               <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Content Header - Fixed */}
-                <div className="flex-shrink-0 mb-6">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex-shrink-0 mb-3">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl sm:p-6 p-2 px-4 shadow-lg border">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between ">
                       <div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 sm:mb-2 mb-1">
                           {selectedCategory ? `${selectedCategory} Products` : "All Products"}
                         </h2>
                         <p className="text-gray-600 flex items-center gap-2">
@@ -225,7 +237,7 @@ export default function ModularUnitMain() {
                       </div>
 
                       {/* Sort Options */}
-                      <div className="flex items-center gap-3">
+                      {/* <div className="flex items-center gap-3">
                         <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                           <i className="fas fa-sort"></i>
                           Sort by:
@@ -236,13 +248,13 @@ export default function ModularUnitMain() {
                           <option>Price: High to Low</option>
                           <option>Name A-Z</option>
                         </select>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
 
                 {/* Products Content - Scrollable */}
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto ">
                   {isLoading ? (
                     <div className="flex items-center justify-center py-12">
                       <div className="text-center">
@@ -275,7 +287,7 @@ export default function ModularUnitMain() {
                     </div>
                   ) : (
                     <>
-                      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-6">
+                      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-6 overflow-y-auto">
                         {data?.map((unit: SingleUnitType) => (
                           <>
                             {/* <SingleModularUnitCard key={`${unit._id}-1`} unit={unit} />
@@ -288,12 +300,12 @@ export default function ModularUnitMain() {
                       </div>
 
                       {/* Load More Button */}
-                      <div className="text-center py-6">
-                        <Button className="px-8 py-3 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all bg-white rounded-xl shadow-lg hover:shadow-xl">
+                      {/* <div className="text-center py-6">
+                        <Button variant="secondary" className="px-8 py-3 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all bg-white rounded-xl shadow-lg hover:shadow-xl">
                           <i className="fas fa-chevron-down mr-2"></i>
                           Load More Products
                         </Button>
-                      </div>
+                      </div> */}
                     </>
                   )}
                 </div>

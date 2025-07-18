@@ -289,7 +289,7 @@ export default function RequirementForm() {
 
             {/* Form Link Section */}
             <div className="pb-6">
-              {!formData?.projectId ? (
+              {!formData?.shareToken ? (
                 <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg space-y-4">
                   <h2 className="text-lg sm:text-xl font-bold text-blue-900 flex items-center">
                     <i className="fas fa-link mr-2" /> Generate Form Link
@@ -343,12 +343,12 @@ export default function RequirementForm() {
                   <Label>Form Link</Label>
                   <div className="flex flex-col sm:flex-row items-center gap-2">
                     <Input
-                      value={`http://localhost:5173/requirementform/${projectId}/token=${formData?.shareToken}`}
+                      value={formData?.shareToken}
                       readOnly
                       className="bg-blue-50 text-blue-800 flex-1"
                     />
                     <Button
-                      onClick={() => handleCopyStaticLink(`http://localhost:5173/requirementform/${projectId}/token=${formData?.shareToken}`)}
+                      onClick={() => handleCopyStaticLink(formData?.shareToken)}
                       className="w-full sm:w-auto"
                     >
                       <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
