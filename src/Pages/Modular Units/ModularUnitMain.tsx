@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useGetAllMixedUnits, useGetModularUnits } from "../../apiList/Modular Unit Api/ModularUnitApi";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { useGetAllMixedUnits } from "../../apiList/Modular Unit Api/ModularUnitApi";
 import { modularUnitFieldConfig } from "../../utils/Modular Units/fieldConfigs";
 import { Button } from "../../components/ui/Button";
-import { Card } from "../../components/ui/Card";
-import { Select, SelectTrigger, SelectValue } from "../../components/ui/Select";
 import SingleModularUnitCard from "./SingleModularUnit";
 
 type SingleUnitType = {
@@ -18,14 +16,14 @@ type SingleUnitType = {
 };
 
 
-const unitTypes = Object.keys(modularUnitFieldConfig);
+// const unitTypes = Object.keys(modularUnitFieldConfig);
 
 export default function ModularUnitMain() {
     const { organizationId } = useParams() as { organizationId: string }
 
-    const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const [selectedCategory, _setSelectedCategory] = useState<string>("");
     const navigate = useNavigate();
-    const locaiton = useLocation()
+    // const locaiton = useLocation()
 
     // const { data, isLoading, isError } = useGetModularUnits(selectedType);
     const { data, isLoading, isError } = useGetAllMixedUnits(organizationId)
@@ -158,11 +156,6 @@ export default function ModularUnitMain() {
                                     return (
                                     
                                     <>
-                                    <SingleModularUnitCard key={unit._id} unit={unit} />
-                                    <SingleModularUnitCard key={unit._id} unit={unit} />
-                                    <SingleModularUnitCard key={unit._id} unit={unit} />
-                                   
-                                    <SingleModularUnitCard key={unit._id} unit={unit} />
                                     <SingleModularUnitCard key={unit._id} unit={unit} />
                                     </>)
 
