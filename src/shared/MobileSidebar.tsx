@@ -16,6 +16,7 @@ import { resetStaffProfile } from "../features/staffSlices";
 import { COMPANY_DETAILS } from "../constants/constants";
 import type { RootState } from "../store/store";
 import { toast } from "../utils/toast";
+import { useGetStageSelection } from "../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi";
 
 
 
@@ -27,10 +28,13 @@ type MobileSidebarProps = {
 };
 
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, path }) => {
+
   const navigate = useNavigate()
-  const { organizationId } = useParams() as { organizationId: string }
+  const { organizationId, projectId } = useParams() as { organizationId: string, projectId: string }
   const dispatch = useDispatch();
-    const { role } = useSelector((state: RootState) => state.authStore)
+  const { role } = useSelector((state: RootState) => state.authStore)
+
+  const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
 
   const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending } = useLogoutCTO();
   const { mutateAsync: ClientLogoutAsync, isPending: isClientPending } = useLogoutClient();
@@ -38,54 +42,84 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
   const { mutateAsync: LogoutLogoutAsync, isPending: isUserPending } = useLogoutUser();
   const { mutateAsync: WorkerLogoutAsync, isPending: isWorkerPending } = useLogoutWorker();
 
-
-
-
   const handleLogout = async () => {
-         try {
-             if (role === "CTO") {
-                 await CTOLogoutAsync();
-             } else if (role === "client") {
-                 await ClientLogoutAsync();
-             } else if (role === "staff") {
-                 await StaffLogoutAsync();
-             } else if (role === "owner") {
-                 await LogoutLogoutAsync();
-             } else if (role === "worker") {
-                 await WorkerLogoutAsync();
-             }
- 
-             // Clear all slices, just in case
-             dispatch(resetOwnerProfile());
-             dispatch(resetClientProfile());
-             dispatch(resetWorkerProfile());
-             dispatch(resetCTOProfile());
-             dispatch(resetStaffProfile());
-             dispatch(logout());
-                         toast({ title: "Success", description: "logout successfull",  })
-             if (!isCTOPending ||
-                !isClientPending ||
-                !isStaffPending ||
-                !isUserPending ||
-                !isWorkerPending) {
-                navigate('/')
-            }
-         } catch (error:any) {
-            toast({title:"Error", description:error?.response?.data?.message || "Failed to logout", variant:"destructive"})
-         }
-     };
+    try {
+      if (role === "CTO") {
+        await CTOLogoutAsync();
+      } else if (role === "client") {
+        await ClientLogoutAsync();
+      } else if (role === "staff") {
+        await StaffLogoutAsync();
+      } else if (role === "owner") {
+        await LogoutLogoutAsync();
+      } else if (role === "worker") {
+        await WorkerLogoutAsync();
+      }
 
-  const labelEntries = Object.entries(labels);
-
-
-    const pathArray = location.pathname.split('/')
-    const isInStageNavBar = pathArray[2] === "projectdetails"
-    
-    const handleNav = () => {
-        if (isInStageNavBar) {
-            navigate(`/organizations/${organizationId}/projects`)
-        }
+      // Clear all slices, just in case
+      dispatch(resetOwnerProfile());
+      dispatch(resetClientProfile());
+      dispatch(resetWorkerProfile());
+      dispatch(resetCTOProfile());
+      dispatch(resetStaffProfile());
+      dispatch(logout());
+      toast({ title: "Success", description: "logout successfull", })
+      if (!isCTOPending ||
+        !isClientPending ||
+        !isStaffPending ||
+        !isUserPending ||
+        !isWorkerPending) {
+        navigate('/')
+      }
+    } catch (error: any) {
+      toast({ title: "Error", description: error?.response?.data?.message || "Failed to logout", variant: "destructive" })
     }
+  };
+
+  let labelEntries = Object.entries(labels);
+
+
+  const pathArray = location.pathname.split('/')
+  const isInStageNavBar = pathArray[2] === "projectdetails"
+  const isInProjectDetails = pathArray.includes("projectdetails");
+
+
+  if (isInProjectDetails && !selectStagePending) {
+    const selection = stageSelectionData;
+
+    labelEntries = labelEntries.filter(([key]) => {
+      if (!selection) {
+        // No selection made yet → only show SELECTSTAGE
+        return (
+          key !== "MODULARUNIT" &&
+          key !== "MATERIALSELECTION" &&
+          key !== "COSTESTIMATION"
+        );
+      } else if (selection === "Modular Units") {
+        // Modular flow → hide MATERIAL_SELECTION and COST_ESTIMATION
+        return (
+          key !== "MATERIALSELECTION" &&
+          key !== "COSTESTIMATION" &&
+          key !== "SELECTSTAGE"
+        );
+      } else if (selection === "Manual Flow") {
+        // Manual flow → hide modular unit stages
+        return (
+          key !== "MODULARUNIT" &&
+          key !== "SELECTSTAGE"
+        );
+      }
+      return true;
+    });
+  }
+
+
+  const handleNav = () => {
+    if (isInStageNavBar) {
+      navigate(`/organizations/${organizationId}/projects`)
+    }
+  }
+
 
   return (
     <>
@@ -139,7 +173,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
 
         {/* ✅ Static logout at the bottom */}
         <div className="border-t border-gray-200 p-4">
-        {pathArray[1] !== "login" &&  <Button
+          {pathArray[1] !== "login" && <Button
             className="w-full flex items-center justify-center gap-2"
             isLoading={
               isCTOPending ||
@@ -152,7 +186,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
           >
             <i className="fas fa-sign-out-alt"></i> Logout
           </Button>
-}
+          }
         </div>
       </aside>
     </>

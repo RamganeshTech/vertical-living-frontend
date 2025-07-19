@@ -1,5 +1,5 @@
-import { Button } from "../../../components/ui/Button" 
-import { Badge } from "../../../components/ui/Badge" 
+import { Button } from "../../components/ui/Button" 
+import { Badge } from "../../components/ui/Badge" 
 
 interface Product {
   id: number

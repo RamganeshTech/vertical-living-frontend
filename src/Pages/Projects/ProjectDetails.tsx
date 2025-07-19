@@ -30,15 +30,15 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
 
 
   useEffect(() => {
-  const handleResize = () => {
-    setIsMobile(window.innerWidth < 470);
-  };
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 470);
+    };
 
-  window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize);
 
-  // Cleanup
-  return () => window.removeEventListener('resize', handleResize);
-}, []);
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const path = {
     // LABOURS: projectId ? `/${organizationId}/projectdetails/${projectId}/labourlist` : "",
@@ -51,6 +51,8 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     SITEMEASUREMENT: projectId ? `/${organizationId}/projectdetails/${projectId}/sitemeasurement` : "",
     SAMPLEDESIGN: projectId ? `/${organizationId}/projectdetails/${projectId}/sampledesign` : "",
     TECHNICALCONSULTANT: projectId ? `/${organizationId}/projectdetails/${projectId}/technicalconsultant` : "",
+    SELECTSTAGE: projectId ? `/${organizationId}/projectdetails/${projectId}/selectstage` : "",
+    MODULARUNIT: projectId ? `/${organizationId}/projectdetails/${projectId}/modularunits` : "",
     MATERIALSELECTION: projectId ? `/${organizationId}/projectdetails/${projectId}/materialselection` : "",
     COSTESTIMATION: projectId ? `/${organizationId}/projectdetails/${projectId}/costestimation` : "",
     PAYMENTCONFIRMATION: projectId ? `/${organizationId}/projectdetails/${projectId}/paymentconfirmation` : "",

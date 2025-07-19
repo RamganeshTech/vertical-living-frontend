@@ -1,10 +1,11 @@
-"use client"
-
 import type React from "react"
 import { useState } from "react"
-import { Button } from "../../../components/ui/Button" 
-import { toast } from "../../../utils/toast" 
-import { useDeleteModularUnit } from "../../../apiList/Modular Unit Api/ModularUnitApi"
+import { Button } from "../../components/ui/Button"
+import { toast } from "../../utils/toast"
+import { useDeleteModularUnit } from "../../apiList/Modular Unit Api/ModularUnitApi"
+import { useLocation, useParams } from "react-router-dom"
+import { Input } from "../../components/ui/Input"
+import { useAddSelectedModularUnit } from "../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi"
 
 type SingleModularUnitCardProp = {
   unit: any
@@ -12,9 +13,20 @@ type SingleModularUnitCardProp = {
 }
 
 const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEdit }) => {
+  const { projectId } = useParams() as { projectId: string }
+
   const [imageError, setImageError] = useState(false)
   const { mutateAsync: deleteUnit, isPending: isDeleting } = useDeleteModularUnit()
-console.log("unit form deelete", unit)
+  const { mutateAsync: selectUnit, isPending: isSelectLoading } = useAddSelectedModularUnit()
+
+  const location = useLocation()
+  const [isSelecting, setIsSelecting] = useState(false)
+  const [quantity, setQuantity] = useState(1)
+  
+  
+  const isProjectDetails = location.pathname.includes("projectdetails")
+
+
   const handleDelete = async () => {
     try {
       if (!window.confirm("Are you sure you want to delete this unit?")) return
@@ -32,6 +44,37 @@ console.log("unit form deelete", unit)
       })
     }
   }
+
+
+  const handleSelectSubmit = async () => {
+    if (!quantity || quantity <= 0) {
+      toast({ title: "Invalid Quantity", description: "Quantity must be greater than 0" });
+      return;
+    }
+
+    try {
+      const payload = {
+        image:unit?.images[0]?.url,
+        customId:unit.customId,
+        unitId: unit._id,
+        projectId,
+        category: unit.category,
+        singleUnitCost: unit.price,
+        quantity,
+      };
+
+      await selectUnit(payload);
+      toast({ title: "Success", description: "Unit selected successfully" });
+      setIsSelecting(false);
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to select unit",
+      });
+    }
+  };
+
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-blue-200">
@@ -80,7 +123,7 @@ console.log("unit form deelete", unit)
         {/* Category Badge */}
         <div className="absolute top-3 left-3">
           <span className="bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-md shadow-sm">
-            {unit?.category }
+            {unit?.category}
           </span>
         </div>
 
@@ -128,7 +171,7 @@ console.log("unit form deelete", unit)
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        {!isProjectDetails ? <div className="flex gap-2">
           {onEdit && (
             <Button
               onClick={() => onEdit(unit)}
@@ -139,7 +182,7 @@ console.log("unit form deelete", unit)
             </Button>
           )}
           <Button
-          variant="danger"
+            variant="danger"
             onClick={handleDelete}
             disabled={isDeleting}
             className="flex-1 bg-red-600 text-white  py-2 px-3 rounded-lg transition-all disabled:opacity-50 text-sm"
@@ -148,6 +191,34 @@ console.log("unit form deelete", unit)
             {isDeleting ? "Deleting..." : "Delete"}
           </Button>
         </div>
+          :
+
+          <>
+            {!isSelecting ? (
+              <Button
+                variant="primary"
+                className="w-full"
+                onClick={() => setIsSelecting(true)}
+              >
+                <i className="fas fa-plus mr-1"></i> Select
+              </Button>
+            ) : (
+              <div className="space-y-2">
+                <Input
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  placeholder="Enter Quantity"
+                  className="w-full"
+                />
+                <Button variant="primary" isLoading={isSelectLoading} onClick={handleSelectSubmit} className="w-full">
+                  Submit
+                </Button>
+              </div>
+            )}
+          </>
+        }
       </div>
     </div>
   )

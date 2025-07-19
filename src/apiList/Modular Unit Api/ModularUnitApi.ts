@@ -149,7 +149,7 @@ export const useCreateModularUnit = () => {
             formValues: any;
             files: File[];
         }) => {
-            if (!role) throw new Error("Role missing");
+            if (!role) throw new Error("Not Authorized");
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
             if (!api) throw new Error("API instance not found for role");
@@ -178,7 +178,7 @@ export const useUpdateModularUnit = () => {
             formValues: any;
             files: File[];
         }) => {
-            if (!role) throw new Error("Role missing");
+            if (!role) throw new Error("Not Authorized");
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
             if (!api) throw new Error("API instance not found for role");
@@ -205,7 +205,7 @@ export const useDeleteModularUnit = () => {
             unitType: string;
             unitId: string;
         }) => {
-            if (!role) throw new Error("Role missing");
+            if (!role) throw new Error("Not Authorized");
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
@@ -234,7 +234,7 @@ export const useGetModularUnits = (
   return useQuery({
     queryKey: ["modularUnits", unitType, organizationId, filters, searchQuery],
     queryFn: async () => {
-      if (!role) throw new Error("Role missing");
+      if (!role) throw new Error("Not Authorized");
       if (!allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
       if (!api) throw new Error("API instance not found for role");
 

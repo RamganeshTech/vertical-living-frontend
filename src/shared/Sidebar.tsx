@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState } from 'react'
 import { COMPANY_DETAILS, MAIN_PATH_ICON, MAIN_PATH_LABEL, } from '../constants/constants'
 import useSidebarShortcut from '../Hooks/useSideBarShortcut'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import '../../src/App.css'
 import { useLogoutCTO } from '../apiList/CTOApi'
 import { useLogoutClient } from '../apiList/clientApi'
@@ -18,6 +18,7 @@ import { resetStaffProfile } from '../features/staffSlices'
 import { logout } from '../features/authSlice'
 import type { RootState } from '../store/store'
 import { toast } from '../utils/toast'
+import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
 
 
 type SidebarProp = {
@@ -27,21 +28,108 @@ type SidebarProp = {
     path: Record<string, string>,
 }
 
+
+
+
+export const getSidebarConfig = (
+  stageType: string | undefined | null,
+  labels: Record<string, string>,
+  path: Record<string, string>,
+  pathArray: string[],
+  icons?: Record<string, any>,
+) => {
+  const isProjectDetailRoute = pathArray?.some(
+    (segment) => segment.toLowerCase() === "projectdetails"
+  );
+
+  let filteredLabels: Record<string, string> = {};
+  let filteredIcons: Record<string, any> = {};
+  let filteredPaths: Record<string, string> = {};
+
+  if (isProjectDetailRoute) {
+    // Base ordered stage keys
+    let orderedKeys: string[] = [
+      "WORKERS",
+      "INVITECLIENT",
+      "PREREQUIRETIES",
+      "REQUIREMENTFORM",
+      "SITEMEASUREMENT",
+      "SAMPLEDESIGN",
+      "TECHNICALCONSULTANT", // Insert after this
+      "SELECTSTAGE", // Remove this later if needed
+      "PAYMENTCONFIRMATION",
+      "ORDERMATERIALS",
+      "MATERIALARRIVED",
+      "WORKSCHEDULE",
+      "INSTALLATION",
+      "QUALITYCHECK",
+      "CLEANINGSANITATION",
+      "PROJECTDELIVERY"
+    ];
+
+    const insertAfter = "TECHNICALCONSULTANT";
+    const insertIndex = orderedKeys.indexOf(insertAfter) + 1;
+
+    // Insert based on stage type
+    if (stageType === "Manual Flow") {
+      orderedKeys.splice(insertIndex, 0, "MATERIALSELECTION", "COSTESTIMATION");
+    } else if (stageType === "Modular Units") {
+      orderedKeys.splice(insertIndex, 0, "MODULARUNIT");
+    }
+
+    // Remove SELECTSTAGE if a type is chosen
+    if (stageType !== null && stageType !== undefined) {
+      orderedKeys = orderedKeys.filter((key) => key !== "SELECTSTAGE");
+    }
+
+    // Filter the labels, icons, and paths based on ordered keys
+    for (const key of orderedKeys) {
+      if (labels[key] && icons![key] && path[key]) {
+        filteredLabels[key] = labels[key];
+        filteredIcons[key] = icons![key];
+        filteredPaths[key] = path[key];
+      }
+    }
+  } else {
+    // For non-projectdetails routes, just return everything as-is
+    filteredLabels = labels;
+    filteredIcons = icons!;
+    filteredPaths = path;
+  }
+
+  return {
+    filteredLabels,
+    filteredIcons,
+    filteredPaths
+  };
+};
+
+
+
+
+
 const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     const [showSideBar, setShowSideBar] = useState(true)
+    const { projectId } = useParams() as { projectId: string }
     const navigate = useNavigate()
+    const location = useLocation()
+    const pathArray = location.pathname.split('/')
     const { organizationId } = useParams() as { organizationId: string }
 
     const dispatch = useDispatch()
     const { role } = useSelector((state: RootState) => state.authStore)
+    const [activeSidebar, setActiveSidebar] = useState<string>('');
 
-    const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending, } = useLogoutCTO()
+    const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
+
+     const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending, } = useLogoutCTO()
     const { mutateAsync: ClientLogoutAsync, isPending: isClientPending, } = useLogoutClient()
     const { mutateAsync: StaffLogoutAsync, isPending: isStaffPending, } = useLogoutStaff()
     const { mutateAsync: LogoutLogoutAsync, isPending: isUserPending, } = useLogoutUser()
     const { mutateAsync: WorkerLogoutAsync, isPending: isWorkerPending, } = useLogoutWorker()
 
 
+    
 
     const handleSideBarClose = () => {
         setShowSideBar(false)
@@ -51,19 +139,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
         setShowSideBar(true)
     }
 
-    //  to make the navbar navigate to project list page because there is no navigation for back 
-    const pathArray = location.pathname.split('/')
-    const isInStageNavBar = pathArray[2] === "projectdetails"
-    const handleNav = () => {
-        if (isInStageNavBar) {
-            navigate(`/organizations/${organizationId}/projects`)
-        }
-    }
-
-    const [activeSidebar, setActiveSidebar] = useState<string>('');
-
-
-    useEffect(() => {
+      useEffect(() => {
         const pathArray = location.pathname.split('/')
 
         const mainPath = pathArray[4]
@@ -76,8 +152,22 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     useSidebarShortcut(handleSideBarOpen, handleSideBarClose);
 
+    const stageType = !selectStagePending && stageSelectionData; // "Manual Flow" | "Modular Units" | null
+
+    let { filteredLabels, filteredIcons, filteredPaths } = getSidebarConfig(stageType, labels, path, pathArray, icons);
+
+   
 
 
+    //  to make the navbar navigate to project list page because there is no navigation for back 
+    const isInStageNavBar = pathArray[2] === "projectdetails"
+    const handleNav = () => {
+        if (isInStageNavBar) {
+            navigate(`/organizations/${organizationId}/projects`)
+        }
+    }
+
+  
     const handleLogout = async () => {
         try {
             if (role === "CTO") {
@@ -99,7 +189,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
             dispatch(resetCTOProfile());
             dispatch(resetStaffProfile());
             dispatch(logout());
-            toast({ title: "Success", description: "logout successfull"})
+            toast({ title: "Success", description: "logout successfull" })
             if (!isCTOPending ||
                 !isClientPending ||
                 !isStaffPending ||
@@ -112,6 +202,9 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
         }
     };
 
+
+
+    console.log("outside the filterLabels", filteredLabels)
     return (
         <>
             {showSideBar ?
@@ -125,41 +218,27 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                         </div>
 
                         <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
-                            {Object.entries(labels).map(([key, value]) =>
+                            {Object.entries(filteredLabels).map(([key, value]) =>
                                 // <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
-                                path[key] && <Link key={value} to={path[key]} className='outline-none'>
+                                filteredPaths[key] && <Link key={value as string} to={filteredPaths[key]} className='outline-none'>
                                     <div
-                                        onClick={() => setActiveSidebar(value)}
+                                        onClick={() => setActiveSidebar(value as string)}
                                         className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar === value ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
                                             } `}>
-                                        <span className='text-lg'>{value}</span>
+                                        <span className='text-lg'>{value as string}</span>
                                         <span><i className="fa-solid fa-chevron-right"></i></span>
                                     </div>
                                 </Link>
-                                // :
-                                // <div
-                                // key={value}
-                                //     className={`cursor-not-allowed flex justify-between max-w-[95%] py-4 px-4`}>
-                                //     <span className='text-lg'>{value}</span>
-                                //     <span><i className="fa-solid fa-chevron-right"></i></span>
-                                // </div>
                             )}
+
+
+                            
                         </section>
 
                     </div>
 
-
-                    {/* original sidebar close */}
-                    {/* <button
-                        title=" Ctrl+] to close"
-                        onClick={handleSideBarClose} className='absolute flex items-center justify-center outline-none bg-[#2f303a] right-[-5%] bottom-[0%] cursor-pointer w-[40px] h-[40px] border-2 border-blue-600'>
-                        <i className="fa-solid fa-chevron-left"></i>
-                    </button> */}
-
-
-
                     <div className="flex flex-col p-2 border-t border-[#3a3b45]">
-                        {pathArray[1] !== "login" &&  <Button
+                        {pathArray[1] !== "login" && <Button
                             isLoading={
                                 isCTOPending ||
                                 isClientPending ||
@@ -172,7 +251,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                             <i className="fa-solid fa-right-from-bracket"></i>
                             <span>Logout</span>
                         </Button>
-}
+                        }
 
                         <button
                             title="Ctrl+] to close"
@@ -190,9 +269,9 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                         <div className='flex items-center flex-col justify-between w-full'>
 
                             {/* <SidebarIcons path icons={icons} activeSidebar={activeSidebar} setActiveSidebar={setActiveSidebar} /> */}
-                            {Object.entries(icons).map(([key, value]) =>
-                                path[key] ?
-                                    <Link to={path[key]} className={`${path[key] ? "" : "cursor-not-allowed"}`}>
+                            {Object.entries(filteredIcons).map(([key, value]) =>
+                                filteredPaths[key] ?
+                                    <Link to={filteredPaths[key]} className={`${filteredPaths[key] ? "" : "cursor-not-allowed"}`}>
                                         <div
                                             onClick={() => setActiveSidebar(key)}
                                             className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar?.toLowerCase() === key.toLowerCase() ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
@@ -221,23 +300,23 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
 
                     <div className="flex flex-col items-center p-2 border-t border-[#3a3b45]">
-                      {pathArray[1] !== "login" && 
-                        <Button
-                            isLoading={
-                                isCTOPending ||
-                                isClientPending ||
-                                isStaffPending ||
-                                isUserPending ||
-                                isWorkerPending
-                            }
-                            title='logout'
-                            onClick={handleLogout}
-                            className="w-[40px] h-[40px] flex items-center justify-center !bg-[#3a3b45] !text-[#9ca3af] hover:!text-red-500 transition">
-                            <i className="fa-solid fa-right-from-bracket"></i>
-                        </Button>
+                        {pathArray[1] !== "login" &&
+                            <Button
+                                isLoading={
+                                    isCTOPending ||
+                                    isClientPending ||
+                                    isStaffPending ||
+                                    isUserPending ||
+                                    isWorkerPending
+                                }
+                                title='logout'
+                                onClick={handleLogout}
+                                className="w-[40px] h-[40px] flex items-center justify-center !bg-[#3a3b45] !text-[#9ca3af] hover:!text-red-500 transition">
+                                <i className="fa-solid fa-right-from-bracket"></i>
+                            </Button>
 
 
-                       }
+                        }
 
                         <button
                             title="Ctrl+[ to open"

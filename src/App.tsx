@@ -79,9 +79,11 @@ import SubscriptionParent from './Pages/Subscription Payment/SubscriptionParent'
 import MaterialOverviewLoading from './Pages/Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
 import UserProfileDetails from './Pages/UserProfile/UserProfileDetails'
 import PrerequisitesPage from './Pages/PreRequireties Pages/PreRequiretiesMain'
-import ModularUnitMain from './Pages/Modular Units/Modular Units Dummy/ModularUnitMain'
-import AddModularUnit from './Pages/Modular Units/Modular Units Dummy/AddModularUnit'
-import ModularUnitCategoryPage from './Pages/Modular Units/Modular Units Dummy/ModularUnitCategoryPage'
+import ModularUnitMain from './Pages/Modular Units/ModularUnitMain'
+import AddModularUnit from './Pages/Modular Units/AddModularUnit'
+import ModularUnitCategoryPage from './Pages/Modular Units/ModularUnitCategoryPage'
+import SelectStage from './Pages/Stage Pages/SelectStage/SelectStage'
+import SelectedUnits from './Pages/Modular Units/Selected Units/SelectedUnits'
 // import ModularUnitMain from './Pages/Modular Units/ModularUnitMain'
 // import AddModularUnit from './Pages/Modular Units/AddModularUnit'
 // import ModularUnitCategoryPage from './Pages/Modular Units/ModularUnitCategoryPage'
@@ -197,7 +199,7 @@ function App() {
 
 
 
-           <Route path="modularunits" element={
+          <Route path="modularunits" element={
             <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
               <ModularUnitMain />
             </ProtectedRoutes>
@@ -278,10 +280,33 @@ function App() {
             </ProtectedRoutes>
           } />
 
-          {/* <Route path="materialselection" element={<MaterialSelection />} >
-            <Route path="materialroom" element={<MaterialSelectionRoom />} />
 
-          </Route> */}
+
+          <Route path="selectstage" element={
+            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+
+              <SelectStage />
+            </ProtectedRoutes>
+          } />
+
+
+          <Route path="modularunits" element={
+            <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+              <ModularUnitMain />
+            </ProtectedRoutes>
+          } >
+
+             <Route path="selectedunits" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                <SelectedUnits />
+              </ProtectedRoutes>} /> 
+
+            <Route path="category/:unitType" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
+                <ModularUnitCategoryPage />
+              </ProtectedRoutes>} />
+
+          </Route>
 
           <Route path="materialselection" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}>
