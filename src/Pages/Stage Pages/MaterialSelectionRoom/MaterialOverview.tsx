@@ -160,10 +160,10 @@ export default function MaterialRoomOverview() {
 
                         {showCreateForm && (
                             <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-                                <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-                                    <h2 className="text-xl font-semibold mb-4 text-blue-700">Create New Room</h2>
-                                    <CreateRoomformModel onClose={() => setShowCreateForm(false)} projectId={projectId!} />
-                                </div>
+                                {/* <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6"> */}
+                                    {/* <h2 className="text-xl font-semibold mb-4 text-blue-700">Create New Room</h2> */}
+                                    <CreateRoomformModel refetch={refetch} onClose={() => setShowCreateForm(false)} projectId={projectId!} />
+                                {/* </div> */}
                             </Dialog>
                         )}
 
@@ -172,10 +172,10 @@ export default function MaterialRoomOverview() {
                             {!isroomsAvailable ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {rooms?.map((room: any) => (
-                                        <RoomCard organizationId={organizationId!} key={room._id} room={room} projectId={projectId!} />
+                                        <RoomCard roomType="predefinedRoom"  key={room._id} room={room} projectId={projectId!} />
                                     ))}
                                     {customRooms?.map((room: any) => (
-                                        <RoomCard organizationId={organizationId!} key={room._id} room={room} projectId={projectId!} />
+                                        <RoomCard roomType="customRoom"  key={room._id} room={room} projectId={projectId!} />
                                     ))}
                                 </div>
                             ) : (

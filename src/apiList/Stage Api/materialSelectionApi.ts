@@ -14,7 +14,6 @@ const getMaterialConfirmationByProjectApi = async ({
 }) => {
   const { data } = await api.get(`/materialconfirmation/${projectId}`);
   if (!data.ok) throw new Error(data.message);
-  console.log(data)
   return data.data;
 };
 
@@ -22,13 +21,15 @@ const getMaterialConfirmationByProjectApi = async ({
 const getSinglePredefinedRoomApi = async ({
   projectId,
   roomId,
+  roomType,
   api,
 }: {
   projectId: string;
   roomId: string;
+    roomType: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.get(`/materialconfirmation/${projectId}/predefinedroom/${roomId}`);
+  const { data } = await api.get(`/materialconfirmation/${projectId}/predefinedroom/${roomId}/${roomType}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -68,6 +69,22 @@ const createCustomRoomApi = async ({
   api: AxiosInstance;
 }) => {
   const { data } = await api.post(`/materialconfirmation/${projectId}/customroom`, { name });
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+const deleteRoomApi = async ({
+  projectId,
+  roomId,
+  api,
+}: {
+  projectId: string;
+  roomId: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.patch(`/materialconfirmation/${projectId}/${roomId}/deleteroom`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -182,171 +199,6 @@ export const completeMaterialStageApi = async ({
 
 // --- REACT QUERY HOOKS ---
 
-// export const useGetAllMaterialRooms = ({projectId}:{projectId: string}) => {
-//   const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
-//   const { role } = useGetRole();
-//   const api = getApiForRole(role!);
-
-//   return useQuery({
-//     queryKey: ["material-rooms", projectId],
-//     queryFn: async () => {
-//       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed");
-//       if (!api) throw new Error("API instance not found");
-//       return await getAllMaterialRooms({ projectId, api });
-//     },
-//     enabled: !!projectId,
-//     retry: false,
-//     refetchOnWindowFocus: false,
-//     staleTime: 1000 * 60 * 5,
-//   });
-// };
-
-// export const useGetMaterialRoomById = ({projectId, roomId}:{projectId: string, roomId: string}) => {
-//   const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
-//   const { role } = useGetRole();
-//   const api = getApiForRole(role!);
-
-//   return useQuery({
-//     queryKey: ["material-room", projectId, roomId],
-//     queryFn: async () => {
-//       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed");
-//       if (!api) throw new Error("API instance not found");
-//       return await getMaterialRoomById({ projectId, roomId, api });
-//     },
-//     enabled: !!projectId && !!roomId,
-//     retry: false,
-//     refetchOnWindowFocus: false,
-//     staleTime: 1000 * 60 * 5,
-//   });
-// };
-
-// export const useCreateMaterialRoom = () => {
-//   const allowedRoles = ["owner", "staff", "CTO", "client"];
-//   const { role } = useGetRole();
-//   const api = getApiForRole(role!);
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: async ({ projectId, roomName }: { projectId: string; roomName: string }) => {
-//       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed");
-//       if (!api) throw new Error("API instance not found");
-//       return await createMaterialRoom({ projectId, roomName, api });
-//     },
-//     onSuccess: (_, { projectId }) => {
-//       queryClient.invalidateQueries({ queryKey: ["material-rooms", projectId] });
-//     },
-//   });
-// };
-
-// export const useCreateModularWork = () => {
-//   const allowedRoles = ["owner", "staff", "CTO", "client"];
-//   const { role } = useGetRole();
-//   const api = getApiForRole(role!);
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: async ({
-//       projectId,
-//       roomId,
-//       body,
-//     }: {
-//       projectId: string;
-//       roomId: string;
-//       body: { workName: string; notes?: string; materials?: string[] };
-//     }) => {
-//       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized to create modular work");
-//       if (!api) throw new Error("API instance not available for role");
-//       return await createModularWorkApi({ projectId, roomId, body, api });
-//     },
-//     onSuccess: (_, { projectId, roomId }) => {
-//       queryClient.invalidateQueries({ queryKey: ["material-room", projectId, roomId] });
-//     },
-//   });
-// };
-
-// export const useEditModularWork = () => {
-//   const allowedRoles = ["owner", "staff", "CTO", "client"];
-//   const { role } = useGetRole();
-//   const api = getApiForRole("owner");
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: async ({
-//       projectId,
-//       roomId,
-//       workId,
-//       body,
-//     }: {
-//       projectId: string;
-//       roomId: string;
-//       workId: string;
-//       body: { workName?: string; notes?: string | null; materials?: string[] };
-//     }) => {
-//       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized to edit modular work");
-//       if (!api) throw new Error("API instance not available for role");
-//       return await editModularWorkApi({ projectId, roomId, workId, body, api });
-//     },
-//     onSuccess: (_, { projectId, roomId }) => {
-//       queryClient.invalidateQueries({ queryKey: ["material-room", projectId, roomId] });
-//     },
-//   });
-// };
-
-// export const useDeleteModularWork = () => {
-//   const allowedRoles = ["owner", "staff", "CTO"];
-//   const { role } = useGetRole();
-//   const api = getApiForRole(role!);
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: async ({
-//       projectId,
-//       roomId,
-//       workId,
-//     }: {
-//       projectId: string;
-//       roomId: string;
-//       workId: string;
-//     }) => {
-//       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized to delete modular work");
-//       if (!api) throw new Error("API instance not available for role");
-//       return await deleteModularWorkApi({ projectId, roomId, workId, api });
-//     },
-//     onSuccess: (_, { projectId, roomId }) => {
-//       queryClient.invalidateQueries({ queryKey: ["material-room", projectId, roomId] });
-//     },
-//   });
-// };
-
-// export const useDeleteMaterialRoom = () => {
-//   const allowedRoles = ["owner", "staff", "CTO"];
-//   const { role } = useGetRole();
-//   const api = getApiForRole(role!);
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: async ({
-//       projectId,
-//       roomId,
-//     }: {
-//       projectId: string;
-//       roomId: string;
-//     }) => {
-//       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized to delete room");
-//       if (!api) throw new Error("API instance not available for role");
-//       return await deleteRoomApi({ projectId, roomId, api });
-//     },
-//     onSuccess: (_, { projectId }) => {
-//       queryClient.invalidateQueries({ queryKey: ["material-rooms", projectId] });
-//     },
-//   });
-// };
-
-
-
-
-
-
 
 export const useGetMaterialConfirmationByProject = (projectId: string) => {
   const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
@@ -369,9 +221,11 @@ export const useGetMaterialConfirmationByProject = (projectId: string) => {
 export const useGetSinglePredefinedRoom = ({
   projectId,
   roomId,
+  roomType
 }: {
   projectId: string;
   roomId: string;
+  roomType: string;
 }) => {
   const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
   const { role } = useGetRole();
@@ -382,7 +236,7 @@ export const useGetSinglePredefinedRoom = ({
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
       if (!api) throw new Error("API instance unavailable");
-      return await getSinglePredefinedRoomApi({ projectId, roomId, api });
+      return await getSinglePredefinedRoomApi({ projectId, roomId, roomType, api });
     },
     enabled: !!projectId && !!roomId,
     retry: false,
@@ -432,6 +286,27 @@ export const useCreateCustomRoom = () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
       if (!api) throw new Error("API instance not available");
       return await createCustomRoomApi({ projectId, name, api });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["material-confirmation", projectId] });
+    },
+  });
+};
+
+
+
+
+export const useDeleteMaterialSelectionRoom = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ projectId, roomId }: { projectId: string; roomId: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
+      if (!api) throw new Error("API instance not available");
+      return await deleteRoomApi({ projectId, roomId, api });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["material-confirmation", projectId] });

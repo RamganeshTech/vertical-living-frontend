@@ -68,7 +68,7 @@ export const PROJECTS_LABELS = {
   SELECTSTAGE: "Select Stage",
   MODULARUNIT: "Modular Units",
   MATERIALSELECTION: "Material Selection",
-  COSTESTIMATION: "Cost Estiamtion",
+  COSTESTIMATION: "Cost Estimation",
   PAYMENTCONFIRMATION: "Payment Stage",
   ORDERMATERIALS: "Ordering Material",
   MATERIALARRIVED: "Material Arrival",

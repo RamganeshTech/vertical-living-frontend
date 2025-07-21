@@ -313,7 +313,7 @@ function App() {
               <MaterialRoomOverview />
             </ProtectedRoutes>} >
 
-            <Route path="materialroom/:roomId" element={
+            <Route path="materialroom/:roomId/:roomType" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}>
                 <RoomDetailCard />
               </ProtectedRoutes>} />

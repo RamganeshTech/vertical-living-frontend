@@ -38,7 +38,6 @@ const uploadRoomFiles = async ({
         headers: { "Content-Type": "multipart/form-data" }
     });
 
-    if (!data.ok) throw new Error(data.message);
     return data.data;
 };
 

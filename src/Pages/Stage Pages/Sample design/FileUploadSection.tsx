@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import type { IFileItem } from "../../../types/types";
 import { Button } from "../../../components/ui/Button";
-import { toast } from "../../../utils/toast";
 import { downloadImage } from "../../../utils/downloadFile";
 
 interface FileUploadSectionProps {
@@ -44,14 +43,14 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
     const handleUpload = async () => {
         if (selectedFiles.length === 0) return;
 
-        try {
+        // try {
             await onUpload(selectedFiles); // ✅ Upload only on button click
             // setSelectedFiles([]); // Optional: clear files after upload
-            toast({ description: 'File uploaded successfully', title: "Success" });
+            // toast({ description: 'File uploaded successfully', title: "Success" });
 
-        } catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error.message || " Failed to upload the files", variant: "destructive" })
-        }
+        // } catch (error: any) {
+        //     toast({ title: "Error", description: error?.response?.data?.message || error.message || " Failed to upload the files", variant: "destructive" })
+        // }
     };
 
 

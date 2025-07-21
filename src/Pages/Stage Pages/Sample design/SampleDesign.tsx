@@ -23,7 +23,7 @@ const SampleDesignModule: React.FC = () => {
 
   const [showAddRoomModal, setShowAddRoomModal] = useState(false);
   const addRoom = useAddRoom();
-  const uploadFiles = useUploadRoomFiles();
+  const {mutateAsync:uploadFiles, isPending:uploadPending} = useUploadRoomFiles();
   const deleteFile = useDeleteRoomFile();
   const { mutateAsync: deleteRoom, isPending: deleteRoomIsPending } = useDeleteRoomSampleDesign();
   const { data: sampleDesign, isLoading, refetch, error: getAllError } = useGetRoomFiles(projectId);
@@ -76,13 +76,14 @@ const SampleDesignModule: React.FC = () => {
 
   const handleFileUpload = async (roomName: string, files: File[]) => {
     try {
-      await uploadFiles.mutateAsync({ projectId, roomName, files });
+
+       await uploadFiles({ projectId, roomName, files });
       toast({ description: 'File uploaded successfully', title: "Success" });
       refetch();
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error?.response?.data?.message || " Failed to upload the files", 
+        description: error?.response?.data?.message || error?.message || " Failed to upload the files", 
         variant: "destructive"
       });
     }
@@ -244,7 +245,7 @@ const SampleDesignModule: React.FC = () => {
                       files={room.files}
                       onUpload={(files: any) => handleFileUpload(room.roomName, files)}
                       onDelete={(index: number) => handleFileDelete(room.roomName, index)}
-                      uploadPending={uploadFiles.isPending}
+                      uploadPending={uploadPending}
                       deletePending={deleteFile.isPending}
                     />
                   </div>

@@ -68,7 +68,7 @@ export default function CostEstimationRoomDetails() {
           <div className="mb-4 p-2 bg-blue-50 rounded-lg">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-blue-900">Total Material Cost:</span>
-              <span className={`text-lg font-bold  text-blue-900`}>₹{room?.totalCost?.toLocaleString()}</span>
+              <span className={`text-lg font-bold  text-blue-900`}>₹{room?.totalCost?.toLocaleString() || "0"}</span>
             </div>
           </div>
         </section>

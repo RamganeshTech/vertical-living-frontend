@@ -8,10 +8,11 @@ import { useCreateCustomRoom } from "../../../apiList/Stage Api/materialSelectio
 
 interface CreateRoomFormProps {
   onClose: () => void;
+  refetch: () => any;
   projectId: string;
 }
 
-const CreateRoomformModel = ({ onClose, projectId }: CreateRoomFormProps) => {
+const CreateRoomformModel = ({ onClose, projectId, refetch }: CreateRoomFormProps) => {
   const [roomName, setRoomName] = useState("");
   const { mutateAsync: createRoom, isPending } = useCreateCustomRoom();
 
@@ -20,11 +21,12 @@ const CreateRoomformModel = ({ onClose, projectId }: CreateRoomFormProps) => {
       toast({ title: "Error", description: "Room name is required", variant: "destructive" });
       return;
     }
-
+    
     try {
       await createRoom({ projectId, name: roomName });
       toast({ title: "Success", description: "Room created successfully ✅" });
       onClose();
+      refetch()
     } catch (err: any) {
       toast({
         title: "Error",
@@ -36,7 +38,7 @@ const CreateRoomformModel = ({ onClose, projectId }: CreateRoomFormProps) => {
 
   return (
     <div onClick={onClose} className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-2xl p-6">
+      <div onClick={(e)=> e.stopPropagation()} className="bg-white rounded-lg w-full max-w-sm p-6 space-y-4">
         <div>
           <Label htmlFor="roomName" className="text-sm text-gray-700">
             Room Name <span className="text-red-500">*</span>
