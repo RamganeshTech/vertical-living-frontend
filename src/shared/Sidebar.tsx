@@ -32,76 +32,77 @@ type SidebarProp = {
 
 
 export const getSidebarConfig = (
-  stageType: string | undefined | null,
-  labels: Record<string, string>,
-  path: Record<string, string>,
-  pathArray: string[],
-  icons?: Record<string, any>,
+    stageType: string | undefined | null,
+    labels: Record<string, string>,
+    path: Record<string, string>,
+    pathArray: string[],
+    icons?: Record<string, any>,
 ) => {
-  const isProjectDetailRoute = pathArray?.some(
-    (segment) => segment.toLowerCase() === "projectdetails"
-  );
+    const isProjectDetailRoute = pathArray?.some(
+        (segment) => segment.toLowerCase() === "projectdetails"
+    );
 
-  let filteredLabels: Record<string, string> = {};
-  let filteredIcons: Record<string, any> = {};
-  let filteredPaths: Record<string, string> = {};
+    let filteredLabels: Record<string, string> = {};
+    let filteredIcons: Record<string, any> = {};
+    let filteredPaths: Record<string, string> = {};
 
-  if (isProjectDetailRoute) {
-    // Base ordered stage keys
-    let orderedKeys: string[] = [
-      "WORKERS",
-      "INVITECLIENT",
-      "PREREQUIRETIES",
-      "REQUIREMENTFORM",
-      "SITEMEASUREMENT",
-      "SAMPLEDESIGN",
-      "TECHNICALCONSULTANT", // Insert after this
-      "SELECTSTAGE", // Remove this later if needed
-      "PAYMENTCONFIRMATION",
-      "ORDERMATERIALS",
-      "MATERIALARRIVED",
-      "WORKSCHEDULE",
-      "INSTALLATION",
-      "QUALITYCHECK",
-      "CLEANINGSANITATION",
-      "PROJECTDELIVERY"
-    ];
+    if (isProjectDetailRoute) {
+        // Base ordered stage keys
+        let orderedKeys: string[] = [
+            "DOCUMENTATION",
+            "WORKERS",
+            "INVITECLIENT",
+            "PREREQUIRETIES",
+            "REQUIREMENTFORM",
+            "SITEMEASUREMENT",
+            "SAMPLEDESIGN",
+            "TECHNICALCONSULTANT", // Insert after this
+            "SELECTSTAGE", // Remove this later if needed
+            "PAYMENTCONFIRMATION",
+            "ORDERMATERIALS",
+            "MATERIALARRIVED",
+            "WORKSCHEDULE",
+            "INSTALLATION",
+            "QUALITYCHECK",
+            "CLEANINGSANITATION",
+            "PROJECTDELIVERY"
+        ];
 
-    const insertAfter = "TECHNICALCONSULTANT";
-    const insertIndex = orderedKeys.indexOf(insertAfter) + 1;
+        const insertAfter = "TECHNICALCONSULTANT";
+        const insertIndex = orderedKeys.indexOf(insertAfter) + 1;
 
-    // Insert based on stage type
-    if (stageType === "Manual Flow") {
-      orderedKeys.splice(insertIndex, 0, "MATERIALSELECTION", "COSTESTIMATION");
-    } else if (stageType === "Modular Units") {
-      orderedKeys.splice(insertIndex, 0, "MODULARUNIT");
+        // Insert based on stage type
+        if (stageType === "Manual Flow") {
+            orderedKeys.splice(insertIndex, 0, "MATERIALSELECTION", "COSTESTIMATION");
+        } else if (stageType === "Modular Units") {
+            orderedKeys.splice(insertIndex, 0, "MODULARUNIT");
+        }
+
+        // Remove SELECTSTAGE if a type is chosen
+        if (stageType !== null && stageType !== undefined) {
+            orderedKeys = orderedKeys.filter((key) => key !== "SELECTSTAGE");
+        }
+
+        // Filter the labels, icons, and paths based on ordered keys
+        for (const key of orderedKeys) {
+            if (labels[key] && icons![key] && path[key]) {
+                filteredLabels[key] = labels[key];
+                filteredIcons[key] = icons![key];
+                filteredPaths[key] = path[key];
+            }
+        }
+    } else {
+        // For non-projectdetails routes, just return everything as-is
+        filteredLabels = labels;
+        filteredIcons = icons!;
+        filteredPaths = path;
     }
 
-    // Remove SELECTSTAGE if a type is chosen
-    if (stageType !== null && stageType !== undefined) {
-      orderedKeys = orderedKeys.filter((key) => key !== "SELECTSTAGE");
-    }
-
-    // Filter the labels, icons, and paths based on ordered keys
-    for (const key of orderedKeys) {
-      if (labels[key] && icons![key] && path[key]) {
-        filteredLabels[key] = labels[key];
-        filteredIcons[key] = icons![key];
-        filteredPaths[key] = path[key];
-      }
-    }
-  } else {
-    // For non-projectdetails routes, just return everything as-is
-    filteredLabels = labels;
-    filteredIcons = icons!;
-    filteredPaths = path;
-  }
-
-  return {
-    filteredLabels,
-    filteredIcons,
-    filteredPaths
-  };
+    return {
+        filteredLabels,
+        filteredIcons,
+        filteredPaths
+    };
 };
 
 
@@ -122,14 +123,14 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
 
-     const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending, } = useLogoutCTO()
+    const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending, } = useLogoutCTO()
     const { mutateAsync: ClientLogoutAsync, isPending: isClientPending, } = useLogoutClient()
     const { mutateAsync: StaffLogoutAsync, isPending: isStaffPending, } = useLogoutStaff()
     const { mutateAsync: LogoutLogoutAsync, isPending: isUserPending, } = useLogoutUser()
     const { mutateAsync: WorkerLogoutAsync, isPending: isWorkerPending, } = useLogoutWorker()
 
 
-    
+
 
     const handleSideBarClose = () => {
         setShowSideBar(false)
@@ -139,7 +140,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
         setShowSideBar(true)
     }
 
-      useEffect(() => {
+    useEffect(() => {
         const pathArray = location.pathname.split('/')
 
         const mainPath = pathArray[4]
@@ -156,7 +157,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     let { filteredLabels, filteredIcons, filteredPaths } = getSidebarConfig(stageType, labels, path, pathArray, icons);
 
-   
+
 
 
     //  to make the navbar navigate to project list page because there is no navigation for back 
@@ -167,7 +168,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
         }
     }
 
-  
+
     const handleLogout = async () => {
         try {
             if (role === "CTO") {
@@ -232,7 +233,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                             )}
 
 
-                            
+
                         </section>
 
                     </div>

@@ -84,6 +84,8 @@ import AddModularUnit from './Pages/Modular Units/AddModularUnit'
 import ModularUnitCategoryPage from './Pages/Modular Units/ModularUnitCategoryPage'
 import SelectStage from './Pages/Stage Pages/SelectStage/SelectStage'
 import SelectedUnits from './Pages/Modular Units/Selected Units/SelectedUnits'
+import DocumentationMain from './Pages/Documentation/DocumentationMain'
+import SingleStageDocument from './Pages/Documentation/SingleStageDocument'
 // import ModularUnitMain from './Pages/Modular Units/ModularUnitMain'
 // import AddModularUnit from './Pages/Modular Units/AddModularUnit'
 // import ModularUnitCategoryPage from './Pages/Modular Units/ModularUnitCategoryPage'
@@ -241,6 +243,22 @@ function App() {
             </ProtectedRoutes>
           } />
 
+
+
+          <Route path="document" element={
+            <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+              <DocumentationMain />
+            </ProtectedRoutes>
+          } >
+
+            <Route path=":stageNumber" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+                <SingleStageDocument />
+              </ProtectedRoutes>
+            } ></Route>
+
+          </Route>
+
           <Route path="workers" element={
             <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <Workers />
@@ -296,10 +314,10 @@ function App() {
             </ProtectedRoutes>
           } >
 
-             <Route path="selectedunits" element={
+            <Route path="selectedunits" element={
               <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
                 <SelectedUnits />
-              </ProtectedRoutes>} /> 
+              </ProtectedRoutes>} />
 
             <Route path="category/:unitType" element={
               <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>

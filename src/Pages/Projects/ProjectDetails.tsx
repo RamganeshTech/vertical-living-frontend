@@ -44,6 +44,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     // LABOURS: projectId ? `/${organizationId}/projectdetails/${projectId}/labourlist` : "",
     // MATERIALS: projectId ? `/${organizationId}/projectdetails/${projectId}/materiallist` : "",
     // TRANSPORTATION: projectId ? `/${organizationId}/projectdetails/${projectId}/transportationlist` : "",
+    DOCUMENTATION: projectId ? `/${organizationId}/projectdetails/${projectId}/document` : "",
     WORKERS: projectId ? `/${organizationId}/projectdetails/${projectId}/workers` : "",
     INVITECLIENT: projectId ? `/${organizationId}/projectdetails/${projectId}/inviteclient` : "",
     PREREQUIRETIES: projectId ? `/${organizationId}/projectdetails/${projectId}/prerequireties` : "",
