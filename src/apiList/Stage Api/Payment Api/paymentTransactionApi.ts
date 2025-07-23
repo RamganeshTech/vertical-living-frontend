@@ -52,7 +52,6 @@ export const getPaymentTransactionApi = async ({
   api: AxiosInstance;
 }) => {
   const res = await api.get(`/paymentconfirmation/gettransaction/${projectId}`);
-  console.log(res, "drjklsjklfjsldfjasdjfsdj")
   return res.data.data;
 };
 

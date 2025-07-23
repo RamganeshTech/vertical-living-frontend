@@ -3,29 +3,30 @@ import { type AxiosInstance } from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetRole from "../../Hooks/useGetRole";
 import { getApiForRole } from "../../utils/roleCheck";
+import { queryClient } from "../../QueryClient/queryClient";
 
 
 
 export interface DocumentStage {
-    stageNumber:string, 
-    description:string, 
-    uploadedFiles:{
-        url:string,
-        originalName:string
-    }[]
+  stageNumber: string,
+  description: string,
+  uploadedFiles: {
+    url: string,
+    originalName: string
+  }[]
 }
 
 
 
 export interface UploadFileType {
-    url:string,
-    type:string,
-    originalName:string,
-    _id?:string
+  url: string,
+  type: string,
+  originalName: string,
+  _id?: string
 }
 
 // Create or update stage documentation
- const createStageDocumentationApi = async (
+const createStageDocumentationApi = async (
   projectId: string,
   formData: DocumentStage,
   api: AxiosInstance
@@ -36,7 +37,7 @@ export interface UploadFileType {
 };
 
 // Get all documentation details
- const getAllStageDocumentationApi = async (
+const getAllStageDocumentationApi = async (
   projectId: string,
   api: AxiosInstance
 ) => {
@@ -46,7 +47,7 @@ export interface UploadFileType {
 };
 
 // Get documentation for a single stage
- const getSingleStageDocumentationApi = async (
+const getSingleStageDocumentationApi = async (
   projectId: string,
   stageNumber: string,
   api: AxiosInstance
@@ -149,9 +150,9 @@ export const useGetSingleStageDocumentation = (
   {
     projectId,
     stageNumber
-  }:{
+  }: {
     projectId: string,
-  stageNumber: string
+    stageNumber: string
   }
 ) => {
   const allowedRoles = ["owner", "CTO", "staff", "client"];
@@ -251,6 +252,112 @@ export const useUpdateStageDescription = () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed.");
       if (!api) throw new Error("API not found.");
       return await updateStageDescriptionApi(projectId, stageNumber, description, api);
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["stage-documentation", projectId] });
+    },
+  });
+};
+
+
+
+
+
+
+
+
+// Get all documentation details
+const getClientByProject = async (
+  projectId: string,
+  api: AxiosInstance
+) => {
+  const { data } = await api.get(`/documentation/getclient/${projectId}/byproject`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+
+// Get all clients by project
+export const useGetClientByProject = (projectId: string) => {
+  const allowedRoles = ["owner", "CTO", "staff"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ["stage-documentation", projectId],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role))
+        throw new Error("Not allowed to make this API call.");
+      if (!api) throw new Error("API instance not found.");
+      return await getClientByProject(projectId, api);
+    },
+    enabled: !!role && !!projectId && !!api,
+    retry: false,
+    refetchOnMount: false,
+  });
+};
+
+
+
+
+// Get all documentation details
+const getDocMessageForWhatsapp = async (
+  projectId: string,
+  stageNumber: string,
+  api: AxiosInstance
+) => {
+  const { data } = await api.get(`/documentation/sharemessage/${projectId}/${stageNumber}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+
+// Get all clients by project
+export const useGetDocMessageForWhatsapp = ({ projectId, stageNumber }: { projectId: string, stageNumber: string }) => {
+  const allowedRoles = ["owner", "CTO", "staff"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ["stage-documentation", projectId],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role))
+        throw new Error("Not allowed to make this API call.");
+      if (!api) throw new Error("API instance not found.");
+      return await getDocMessageForWhatsapp(projectId, stageNumber, api);
+    },
+    enabled: !!role && !!projectId && !!api,
+    retry: false,
+    refetchOnMount: false,
+  });
+};
+
+
+export const manuallyGenerateStagePdf = async (
+  projectId: string,
+  stageNumber: number,
+  api: AxiosInstance
+): Promise<string> => {
+  const { data } = await api.put(`/documentation/updatedocument/${projectId}/${stageNumber}`);
+  return data.data;
+};
+
+// Get all clients by project
+export const useManuallyGenerateStagePdf = () => {
+  const allowedRoles = ["owner", "CTO", "staff"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId, stageNumber }: { projectId: string, stageNumber: string }) => {
+      if (!role || !allowedRoles.includes(role))
+        throw new Error("Not allowed to make this API call.");
+      if (!api) throw new Error("API instance not found.");
+      return await getDocMessageForWhatsapp(projectId, stageNumber, api);
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["stage-documentation", projectId] });

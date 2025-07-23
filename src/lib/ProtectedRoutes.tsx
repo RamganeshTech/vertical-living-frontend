@@ -1,7 +1,8 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuthCheck } from "../Hooks/useAuthCheck";
 import type React from "react";
-import UnAuthorized from "../Pages/UnAuthorized/UnAuthorized";
+import { lazy } from "react";
+const UnAuthorized = lazy(() => import("../Pages/UnAuthorized/UnAuthorized"));
 
 
 interface ProtectedRoutesProps {

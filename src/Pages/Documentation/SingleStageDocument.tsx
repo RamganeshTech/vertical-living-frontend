@@ -14,7 +14,9 @@ import {
   useDeleteStageFile,
   useUpdateStageDescription,
   type UploadFileType,
+  useManuallyGenerateStagePdf,
 } from "../../apiList/Documentation Api/documentationApi"
+import { downloadImage } from "../../utils/downloadFile"
 
 // Image Modal Component
 const ImageModal: React.FC<{
@@ -102,7 +104,7 @@ const ImageModal: React.FC<{
 }
 
 const SingleStageDocument: React.FC = () => {
-  const { projectId, stageNumber } = useParams()
+  const { projectId, stageNumber } = useParams() as {projectId:string, stageNumber:string}
   const [description, setDescription] = useState("")
   const [isEditingDesc, setIsEditingDesc] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -117,7 +119,7 @@ const SingleStageDocument: React.FC = () => {
   })
   const navigate = useNavigate()
 
-  const { data, isLoading, isError } = useGetSingleStageDocumentation({
+  const { data, isLoading } = useGetSingleStageDocumentation({
     projectId: projectId!,
     stageNumber: stageNumber!,
   })
@@ -125,6 +127,7 @@ const SingleStageDocument: React.FC = () => {
   const uploadMutation = useUploadFilesToStage()
   const deleteMutation = useDeleteStageFile()
   const updateDescMutation = useUpdateStageDescription()
+  const {mutateAsync:updateDocManually, isPending:updateDocPending} = useManuallyGenerateStagePdf()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -203,6 +206,28 @@ const SingleStageDocument: React.FC = () => {
     }
   }
 
+
+  const handleUpdateDocManually = async ()=>{
+    try{
+      await updateDocManually({
+        projectId,
+        stageNumber
+      })
+
+       toast({
+        title: "Success",
+        description: "Document updated successfully",
+      })
+    }
+    catch(error:any){
+       toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to update description",
+        variant: "destructive",
+      })
+    }
+  }
+
   const openImageModal = (imageUrl: string, imageName: string) => {
     setImageModal({
       isOpen: true,
@@ -246,34 +271,34 @@ const SingleStageDocument: React.FC = () => {
     )
   }
 
-  if (isError) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
-              <Button variant="outline" onClick={() => navigate(-1)} className="mb-4 sm:mb-6 h-10 sm:h-11 px-4 sm:px-6">
-                <i className="fa-solid fa-arrow-left mr-2"></i>
-                <span className="hidden sm:inline">Back to Documentation</span>
-                <span className="sm:hidden">Back</span>
-              </Button>
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
-                <div className="flex items-start gap-3">
-                  <i className="fa-solid fa-exclamation-triangle text-red-500 text-lg sm:text-xl mt-0.5"></i>
-                  <div>
-                    <h3 className="font-semibold text-red-800 text-sm sm:text-base">Error Loading Documentation</h3>
-                    <p className="text-red-600 text-xs sm:text-sm mt-1">
-                      Failed to load stage documentation. Please try again later.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // if (isError) {
+  //   return (
+  //     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+  //       <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+  //         <div className="max-w-7xl mx-auto">
+  //           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
+  //             <Button variant="outline" onClick={() => navigate(-1)} className="mb-4 sm:mb-6 h-10 sm:h-11 px-4 sm:px-6">
+  //               <i className="fa-solid fa-arrow-left mr-2"></i>
+  //               <span className="hidden sm:inline">Back to Documentation</span>
+  //               <span className="sm:hidden">Back</span>
+  //             </Button>
+  //             <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
+  //               <div className="flex items-start gap-3">
+  //                 <i className="fa-solid fa-exclamation-triangle text-red-500 text-lg sm:text-xl mt-0.5"></i>
+  //                 <div>
+  //                   <h3 className="font-semibold text-red-800 text-sm sm:text-base">Error Loading Documentation</h3>
+  //                   <p className="text-red-600 text-xs sm:text-sm mt-1">
+  //                     Failed to load stage documentation. Please try again later.
+  //                   </p>
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <>
@@ -282,7 +307,7 @@ const SingleStageDocument: React.FC = () => {
           <div className="max-w-full mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
             {/* Header Section */}
             <div className=" bg-white rounded-2xl shadow-sm border border-gray-200 sm:p-4 p-2 ">
-              <div className="flex flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-row items-center justify-between gap-4">
                 <Button
                   variant="outline"
                   onClick={() => navigate(-1)}
@@ -292,9 +317,64 @@ const SingleStageDocument: React.FC = () => {
                   <span className="hidden sm:inline">Back to Documentation</span>
                   <span className="sm:hidden">Back</span>
                 </Button>
-                <Badge variant="secondary" className="text-xs sm:text-sm px-4 py-1.5 w-fit">
+                {/* <Badge variant="secondary" className="text-xs sm:text-sm px-4 py-1.5 w-fit">
                   Stage {stageNumber}
-                </Badge>
+                </Badge> */}
+
+
+
+
+                <div className="flex flex-col items-center sm:flex-row gap-2">
+                  <h3 className="text-sm sm:text-lg font-normal flex items-center gap-1">
+                    <i className="fa-solid fa-file-pdf text-red-600" />
+                    Document
+                  </h3>
+                  {data.pdfLink ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button
+                        onClick={() =>
+                          downloadImage({
+                            src: data.pdfLink,
+                            alt: `Stage-${data.stageNumber}-Documentation.pdf`,
+                          })
+                        }
+                        size="sm"
+                        className="text-sm"
+                      >
+                        <i className="fa-solid fa-download" />
+
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(data.pdfLink, "_blank", "noopener,noreferrer")}
+                        className="text-sm"
+                      >
+                        <i className="fa-solid fa-eye" />
+
+                      </Button>
+
+
+                       <Button
+                       isLoading={updateDocPending}
+                        variant="outline"
+                        size="sm"
+                        onClick={handleUpdateDocManually}
+                        className="text-sm"
+                      >
+                        <i className="fa-solid fa-rotate" />
+
+                      </Button>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">No PDF available</p>
+                  )}
+
+                </div>
+
+
+
               </div>
             </div>
 
@@ -313,47 +393,47 @@ const SingleStageDocument: React.FC = () => {
                 </div>
               </div>
 
-                 {/* Price Section - Only for Stage 6 and 7 */}
-                {(stageNumber === "6" || stageNumber === "7") && (
-                  <>
-                    <div className=" p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 my-8">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                        <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2 text-gray-900">
-                          <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i className="fa-solid fa-dollar-sign text-blue-600 text-sm"></i>
-                          </div>
-                          Stage Price
-                        </h3>
-                        <Badge
-                          variant="default"
-                          className="text-xs sm:text-sm px-3 py-1.5 w-fit bg-blue-100 text-blue-700 border-blue-200"
-                        >
-                          <i className="fa-solid fa-tag mr-1"></i>
-                          Pricing Stage
-                        </Badge>
-                      </div>
+              {/* Price Section - Only for Stage 6 and 7 */}
+              {(stageNumber === "6" || stageNumber === "7") && (
+                <>
+                  <div className=" p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 my-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                      <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2 text-gray-900">
+                        <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                          <i className="fa-solid fa-dollar-sign text-blue-600 text-sm"></i>
+                        </div>
+                        Stage Price
+                      </h3>
+                      <Badge
+                        variant="default"
+                        className="text-xs sm:text-sm px-3 py-1.5 w-fit bg-blue-100 text-blue-700 border-blue-200"
+                      >
+                        <i className="fa-solid fa-tag mr-1"></i>
+                        Pricing Stage
+                      </Badge>
+                    </div>
 
-                      <div className="bg-gradient-to-br from-blue-50 to-emerald-50 rounded-xl p-4 sm:p-6 border border-blue-200">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div className="flex items-center gap-3 sm:gap-4">
-                            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-blue-100 flex items-center justify-center">
-                              <i className="fa-solid fa-money-bill-wave text-blue-600 text-xl sm:text-2xl"></i>
-                            </div>
-                            <div>
-                              <p className="text-sm sm:text-base text-gray-600 mb-1">Stage {stageNumber} Total Amount</p>
-                              <p className="text-2xl sm:text-3xl font-bold text-blue-700">
-                                ₹{data?.price ? Number(data.price).toLocaleString() : "0.00"}
-                              </p>
-                            </div>
+                    <div className="bg-gradient-to-br from-blue-50 to-emerald-50 rounded-xl p-4 sm:p-6 border border-blue-200">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-blue-100 flex items-center justify-center">
+                            <i className="fa-solid fa-money-bill-wave text-blue-600 text-xl sm:text-2xl"></i>
+                          </div>
+                          <div>
+                            <p className="text-sm sm:text-base text-gray-600 mb-1">Stage {stageNumber} Total Amount</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-blue-700">
+                              ₹{data?.price ? Number(data.price).toLocaleString() : "0.00"}
+                            </p>
                           </div>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                  </>
-                )}
+                </>
+              )}
 
-                <Separator className="my-6 sm:my-8" />
+              <Separator className="my-6 sm:my-8" />
 
               <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
                 {/* Description Section */}
@@ -612,7 +692,7 @@ const SingleStageDocument: React.FC = () => {
                       )}
 
                       <Button
-                                isLoading={uploadMutation.isPending}
+                        isLoading={uploadMutation.isPending}
                         onClick={handleFileUpload}
                         disabled={!selectedFiles.length || uploadMutation.isPending}
                         className="w-full h-11 sm:h-12 text-sm sm:text-base font-medium"

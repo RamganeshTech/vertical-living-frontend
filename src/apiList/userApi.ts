@@ -47,7 +47,6 @@ const createUser = async ({ email, password, userName, phoneNo }: CreateUserPara
 const loginUser = async ({ email, password }: LoginUserParams) => {
     try {
         let { data } = await Api.post(`/auth/login`, { email, password })
-        console.log("data from login user", data)
         if (data.ok) {
             return data
         }

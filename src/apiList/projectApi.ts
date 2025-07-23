@@ -8,7 +8,6 @@ import type { AxiosInstance } from "axios"
 const createProject = async ({ api, projectData, orgsId }: { api: AxiosInstance, projectData: Record<any, any>, orgsId: string }) => {
     try {
         let { data } = await api.post(`/project/createproject/${orgsId}`, projectData)
-        console.log("create project", data)
         if (data.ok) {
             return data
         }
@@ -101,7 +100,6 @@ export const useCreateProject = () => {
             if (!allowedRoles.includes(role)) throw new Error("Not Allowed to make api calls");
             if (!api) throw new Error("API not found");
             return await createProject({ api, orgsId, projectData });
-            // console.log("crareted project with is", projectData)
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['project'] })

@@ -24,7 +24,6 @@ export const getWorkerStepDetailsApi = async (
   api: AxiosInstance
 ) => {
   const res = await api.get(`/workerwall/${projectId}/step/${stepId}`);
-  console.log("res form getsworkerdetialapi",res)
   return res.data;
 };
 

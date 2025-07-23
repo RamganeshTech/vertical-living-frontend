@@ -25,14 +25,12 @@ workerApi.interceptors.response.use(
         try {
                 // Refresh the token
                 const { ok } = await getWorkerRefreshtoken();
-                // console.log("refresh token",ok)
 
                 if (ok) {
                     return workerApi(originalRequest);
                 }
                 // Retry the original failed request after refreshing the token
             } catch (refreshError) {
-                console.error("Token refresh failed", refreshError);
 
                 return Promise.reject(refreshError);
             }

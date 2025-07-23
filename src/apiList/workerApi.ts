@@ -23,7 +23,6 @@ const registerWorker = async ({
 }
 ) => {
   const { data } = await workerApi.post(`/auth/worker/registerworker?invite=${invite}`, payload);
-  console.log("data form register worker",data)
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };

@@ -27,18 +27,14 @@ staffApi.interceptors.response.use(
       originalRequest._retry = true;
 
        try {
-        console.log("gettingcalled infingite time from staff api servive")
                 // Refresh the token
                 const { ok } = await getStaffRefreshtoken();
-                // console.log("refresh token",ok)
 
                 if (ok) {
-                    console.log("ok entering into it", ok)
                     return staffApi(originalRequest);
                 }
                 // Retry the original failed request after refreshing the token
             } catch (refreshError) {
-                console.error("Token refresh failed", refreshError);
 
                 return Promise.reject(refreshError);
             }

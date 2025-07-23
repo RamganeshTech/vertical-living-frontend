@@ -64,9 +64,7 @@ export default function AddModularUnit({ unitToEdit, setUnitToEdit }: AddModular
       if (!formValues.price || formValues.price < 0) {
         throw new Error("Enter valid price")
       }
-      console.log("formValues", formValues)
       const updatedFormValues = { ...formValues, category }
-      console.log("formValues after updated", updatedFormValues)
 
       if (unitToEdit) {
         const sanitized = sanitizeFormValues(updatedFormValues)

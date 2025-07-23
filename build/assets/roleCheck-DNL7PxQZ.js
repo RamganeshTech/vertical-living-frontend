@@ -1,0 +1,1 @@
+import{u as t,A as e,x as i,y as s,C as n,w as u}from"./index-DkfQDeIt.js";const f=()=>t(r=>r.authStore),o=r=>r==="owner"?e:r==="staff"?i:r==="worker"?s:r==="CTO"?n:r==="client"?u:null;export{o as g,f as u};

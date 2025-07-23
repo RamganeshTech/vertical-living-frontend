@@ -14,9 +14,6 @@ const addConsultationMessage = async ({
   formData: FormData;
   api: any;
 }) => {
-  for (const [k, v] of formData.entries()) {
-  console.log("form data", k, v);
-}
 
   const { data } = await api.post(`/technicalconsultation/createmessage/${projectId}`, formData);
   if (!data.ok) throw new Error(data.message);
@@ -32,7 +29,6 @@ const getConsultationMessages = async ({
   api: any;
 }) => {
   const { data } = await api.get(`/technicalconsultation/getmessages/${projectId}`);
-  console.log("data form the message", data)
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -111,7 +107,6 @@ const uploadFiles = async ({ formId, files, projectId, api }: UploadFilePayload 
             },
         }
     );
-    console.log("reposen", response)
     return response.data;
 }
 

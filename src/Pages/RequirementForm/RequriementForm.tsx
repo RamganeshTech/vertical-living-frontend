@@ -20,6 +20,7 @@ import ClientInfoCard from "./components/ClientInfoCard";
 import SectionCards from "./components/SectionCards";
 import AssignStageStaff from "../../shared/AssignStaff";
 import type { ProjectDetailsOutlet } from "../../types/types";
+import ShareDocumentWhatsapp from "../../shared/ShareDocumentWhatsapp";
 
 export type PrivateRequriementFromProp = {
   data: any,
@@ -64,11 +65,11 @@ export default function RequirementForm() {
   const [visibleSection, setVisibleSection] = useState<string | null>(null);
 
   const { data: formData, isLoading, error, refetch } = useGetFormRequriemetn({ projectId: projectId! });
-  const { mutateAsync: linkgenerate, isPending: linkPending,  } = useGenerateShareableLink()
-  const { mutateAsync: completeFormMutate, isPending: completePending,  } = useFormCompletion()
+  const { mutateAsync: linkgenerate, isPending: linkPending, } = useGenerateShareableLink()
+  const { mutateAsync: completeFormMutate, isPending: completePending, } = useFormCompletion()
   // const { mutateAsync: lockFormMutate, isPending: lockPending,  } = useLockUpdationOfForm()
 
-  const { mutateAsync: deadLineMutate, isPending: deadLinePending,  } = useSetDeadLineFormRequirement()
+  const { mutateAsync: deadLineMutate, isPending: deadLinePending, } = useSetDeadLineFormRequirement()
   const { mutateAsync: uploadFilesMutate, isPending: uploadPending } = useUploadRequirementFiles();
   // const { mutateAsync: deleteFormMutate, isPending: deleteFormPending } = useDeleteRequriementForm();
   const { mutateAsync: deleteUploadFile, isPending: deleteUploadPending } = useDeleteRequirementUploadFile()
@@ -148,7 +149,7 @@ export default function RequirementForm() {
   }
 
   const handleShareWhatsApp = () => {
-    const message = `You're requeted to fill the form, Click this link to fill the form: ${inviteLink}`
+    const message = `You're requested to fill the form, Click this link to fill the form: ${inviteLink}`
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
   }
@@ -213,6 +214,14 @@ export default function RequirementForm() {
                 stagePath="requirementform"
                 className="sm:!max-w-[20%] w-full"
               />
+
+              <ShareDocumentWhatsapp
+                projectId={projectId}
+                stageNumber="1"
+                className="w-full sm:w-fit"
+                isStageCompleted={formData.status}
+              />
+
               <AssignStageStaff
                 stageName="RequirementFormModel"
                 projectId={projectId}
@@ -225,21 +234,21 @@ export default function RequirementForm() {
           </div>
 
           {error && (
-        <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-          <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
-            ⚠️ Error Occurred
-          </div>
-          <p className="text-red-500  mb-4 text-lg sm:text-xl">
-            {(error as any)?.response?.data?.message || "Failed to load data"}
-          </p>
-          <Button
-            onClick={() => refetch()}
-            className="bg-red-600 text-white px-4 py-2"
-          >
-            Retry
-          </Button>
-        </div>
-      )}
+            <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+              <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+                ⚠️ Error Occurred
+              </div>
+              <p className="text-red-500  mb-4 text-lg sm:text-xl">
+                {(error as any)?.response?.data?.message || "Failed to load data"}
+              </p>
+              <Button
+                onClick={() => refetch()}
+                className="bg-red-600 text-white px-4 py-2"
+              >
+                Retry
+              </Button>
+            </div>
+          )}
 
 
           {!error && <main className="h-[calc(100vh-90px)] overflow-y-auto custom-scrollbar space-y-6">

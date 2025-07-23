@@ -228,7 +228,6 @@ export const getOrderingMaterialPublicDetailsApi = async (
  
 ) => {
   const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/orderingmaterial/public/${projectId}/${token}`);
-  console.log(data)
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };

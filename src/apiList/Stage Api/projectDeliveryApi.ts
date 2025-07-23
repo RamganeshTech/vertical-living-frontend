@@ -39,7 +39,6 @@ export const deleteProjectDeliveryFileApi = async (
   fileId: string,
   api: AxiosInstance
 ) => {
-  console.log("fielid", fileId)
   const { data } = await api.delete(`/projectdelivery/${projectId}/upload/${fileId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;

@@ -16,7 +16,7 @@ type ProjectDetailsOutlet = {
   openMobileSidebar: () => void;
 };
 
-export const CostEstimationContainer = () => {
+const CostEstimationContainer = () => {
   const { projectId, organizationId } = useParams();
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
   const location = useLocation();
@@ -166,3 +166,6 @@ export const CostEstimationContainer = () => {
     </div>
   );
 };
+
+
+export default CostEstimationContainer

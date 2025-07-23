@@ -433,7 +433,6 @@ export const useInviteClientToProject = () => {
 const fetchClientByOrgsAndProject = async (orgId: string, projectId: string) => {
   const { data } = await Api.get(`/orgs/getclientsofproject/${orgId}/${projectId}`);
   if (!data.ok) [];
-  console.log("data", data)
   return data.data;
 };
 
@@ -466,7 +465,6 @@ export const useGetClientByOrgsAndProject = (orgId: string, projectId: string) =
 // WORKER INVITATION
 
 const inviteWorkerByStaff = async ({ payload, api }: { payload: { projectId: string; role: string, organizationId: string }, api: AxiosInstance }) => {
-  console.log("payload", payload)
   const { data } = await api.post("orgs/inviteworker", payload);
   if (!data.ok) throw new Error(data.message);
   return data.data;

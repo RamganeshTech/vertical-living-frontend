@@ -67,7 +67,6 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
       toast({ title: "Success", description: "Unit selected successfully" });
       setIsSelecting(false);
     } catch (error: any) {
-      console.error(error);
       toast({
         title: "Error",
         description: error?.response?.data?.message || "Failed to select unit",

@@ -10,7 +10,6 @@ import { queryClient } from "../../QueryClient/queryClient";
  formData: FormData,
   api: AxiosInstance
 ) => {
-    console.log("formData", formData)
   const { data } = await api.post(`/installation/${projectId}/${roomName}/item/create`, formData);
   if (!data.ok) throw new Error(data.message);
   return data.data;

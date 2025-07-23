@@ -24,7 +24,6 @@ const allowedRoles = ["owner", "staff", "CTO"]
 
  const getLabourEstiamtionApi = async (projectId: string, api: AxiosInstance) => {
   const { data } = await api.get(`/costestimation/${projectId}/labour/getlabour`);
-  console.log(data, "data form labour estiamtion")
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -52,7 +51,6 @@ const allowedRoles = ["owner", "staff", "CTO"]
   labourData: any,
   api: AxiosInstance
 ) => {
-  console.log("labordata", labourData)
   const { data } = await api.post(`/costestimation/${projectId}/labour`, labourData);
   if (!data.ok) throw new Error(data.message);
   return data.data;
@@ -100,7 +98,6 @@ const allowedRoles = ["owner", "staff", "CTO"]
   fileId: string,
   api: AxiosInstance
 ) => {
-  console.log(fileId)
   const { data } = await api.patch(`/costestimation/${projectId}/deleteuploadedfile/${roomId}/${fileId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;

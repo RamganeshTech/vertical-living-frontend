@@ -16,7 +16,6 @@ const createLabourList = async ({
         `labour/createlabourlist/${projectId}`,
         { labourListName }
     );
-    console.log('create labour list', data);
     if (data.ok) return data;
 };
 
@@ -33,20 +32,17 @@ const createLabour = async ({
         `labour/createlabour/${projectId}?labourListId=${labourListId}`,
         labourData
     );
-    console.log('create labour item', data);
     if (data.ok) return data;
 };
 
 const getLabourLists = async ({ projectId }: { projectId: string }) => {
     const { data } = await Api.get(`labour/getlabourlist/${projectId}`);
-    console.log('get labour lists', data);
     if (data.ok) return data;
     return []
 };
 
 const getLabourItems = async ({ labourListId }: { labourListId: string }) => {
     const { data } = await Api.get(`labour/getlabour/${labourListId}`);
-    console.log('get labour items', data);
     if (data.ok) return data;
 };
 
@@ -63,7 +59,6 @@ const updateLabourList = async ({
         `labour/updatelabourlist/${projectId}/${labourListId}`,
         { labourListName }
     );
-    console.log('update labour list', data);
     if (data.ok) return data;
 };
 
@@ -80,7 +75,6 @@ const updateLabourItem = async ({
         `labour/updatelabouritem/${labourListId}/${labourItemId}`,
         labourItem
     );
-    console.log('update labour item', data);
     if (data.ok) return data;
 };
 
@@ -94,7 +88,6 @@ const deleteLabourList = async ({
     const { data } = await Api.delete(
         `labour/deletelabourlist/${projectId}/${labourListId}`
     );
-    console.log('delete labour list', data);
     if (data.ok) return data;
 };
 
@@ -108,7 +101,6 @@ const deleteLabourItem = async ({
     const { data } = await Api.delete(
         `labour/deletelabour/${labourListId}/${labourItemId}`
     );
-    console.log('delete labour item', data);
     if (data.ok) return data;
 };
 

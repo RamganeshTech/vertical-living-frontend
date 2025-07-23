@@ -31,7 +31,6 @@ export interface IProjectWorker {
 
 export const getProjectWorkersApi = async (projectId: string, api: AxiosInstance) => {
   const res = await api.get(`/worktasks/${projectId}/getworkers`);
-  console.log("res", res)
   return res.data.data;
 };
 
@@ -239,7 +238,6 @@ export const useAddWorkPlan = () => {
     mutationFn: async ({ workScheduleId, formData,  projectId }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      console.log("workschlksdflask", workScheduleId)
       return addWorkPlanApi(workScheduleId, formData, projectId, api);
     },
   });

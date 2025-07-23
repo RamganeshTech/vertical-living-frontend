@@ -68,10 +68,6 @@ const uploadFiles = async ({ formId, files, api, projectId }: UploadFilePayload 
     const formData = new FormData();
     files.forEach((file) => formData.append("file", file));
 
-    // for (let [key, value] of formData.entries()) {
-    //     console.log(key, value);
-    // }
-
     const response = await api.post(`/sitemeasurement/upload/multiple/${projectId}/${formId}`, formData,
         {
             headers: {

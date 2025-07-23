@@ -21,7 +21,6 @@ const createPublicFromSubmission = async ({ projectId, payload, token, api }: { 
 const getRequrimentformDetails = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
     const { data } = await api.get(`/requirementform/getrequirementform/${projectId}`);
     if (!data.ok) throw new Error(data.message);
-    // console.log(data.data)
     return data.data;
 
 }
@@ -41,7 +40,6 @@ const lockUpdationOfForm = async ({ formId, projectId, api }: { formId: string, 
 }
 
 const formCompletion = async ({ formId, projectId, api }: { formId: string, projectId: string, api: AxiosInstance }) => {
-    console.log("formId", formId)
     const { data } = await api.patch(`/requirementform/formcompleted/${projectId}/${formId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
@@ -61,10 +59,8 @@ const deleteFormRequirements = async ({ projectId, api }: { projectId: string, a
 }
 
 const uploadRequirementFiles = async ({ formId, projectId, files, api }: UploadFilePayload & { api: any }) => {
-    console.log("getig iside 1")
     const formData = new FormData();
     files.forEach((file) => formData.append("file", file));
-    console.log("getig iside 1")
 
     const response = await api.post(`/requirementform/upload/multiple/${projectId}/${formId}`, formData,
         {
@@ -73,7 +69,6 @@ const uploadRequirementFiles = async ({ formId, projectId, files, api }: UploadF
             },
         }
     );
-    console.log("reposen", response)
     return response.data;
 }
 

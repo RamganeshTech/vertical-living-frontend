@@ -205,7 +205,6 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
 
 
-    console.log("outside the filterLabels", filteredLabels)
     return (
         <>
             {showSideBar ?

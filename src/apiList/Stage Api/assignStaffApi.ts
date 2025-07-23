@@ -10,7 +10,6 @@ export const assignStaffToStageApi = async (
   stageName: string,
   api: AxiosInstance
 ) => {
-    console.log("staffId", staffId)
   const res = await api.put(`/assignstafftostage/${projectId}/${staffId}/${stageName}`);
   return res.data;
 };

@@ -4,7 +4,6 @@ import type { loginType, RegistrationType } from "../Pages/Login/Login";
 export const handleProjectValidate = (projectData: ProjectInput) => {
     const newErrors: { [key: string]: string } = {};
 
-    console.log("projectData", projectData)
     if (!projectData.projectName?.trim()) {
         newErrors.projectName = "project name is required"
     }

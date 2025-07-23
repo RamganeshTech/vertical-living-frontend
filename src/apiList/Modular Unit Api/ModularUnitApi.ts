@@ -63,7 +63,6 @@ const updateModularUnitApi = async (
     files.forEach((file) => {
         formData.append("images", file);
     });
-            console.log("formvalues form api", formData)
 
     const { data } = await api.put(`/modularunit/update/${unitType}/${unitId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -79,7 +78,6 @@ const deleteModularUnitApi = async (
     unitId: string,
     api: AxiosInstance
 ) => {
-    console.log(unitType)
     const { data } = await api.delete(`/modularunit/delete/${organizationId}/${unitType}/${unitId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
@@ -153,7 +151,6 @@ export const useCreateModularUnit = () => {
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
             if (!api) throw new Error("API instance not found for role");
-            console.log("formvalues form hooks", formValues)
             return await createModularUnitApi(organizationId, unitType, formValues, files, api);
         },
         onSuccess: (_, { unitType }) => {

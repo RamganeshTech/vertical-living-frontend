@@ -143,7 +143,7 @@ const MaterialArrivalOverview = () => {
                             <ResetStageButton
                                 projectId={projectId!}
                                 stageNumber={9}
-                                stagePath="materialarrival"
+                                stagePath="materialarrivalcheck"
                             />
 
                             <AssignStageStaff

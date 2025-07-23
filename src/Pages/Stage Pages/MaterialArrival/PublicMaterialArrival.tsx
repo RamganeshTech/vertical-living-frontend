@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "../../../utils/toast";
 import {
-    useGetPublicMaterialArrival,
-    useUpdateMaterialArrivalRoomItem,
-    useDeleteMaterialArrivalItem,
+  useGetPublicMaterialArrival,
+  useUpdateMaterialArrivalRoomItem,
+  useDeleteMaterialArrivalItem,
 } from "../../../apiList/Stage Api/materialArrivalApi";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
@@ -16,110 +16,105 @@ import { Textarea } from "../../../components/ui/TextArea";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
 export default function MaterialArrivalPublic() {
-    const { projectId, token } = useParams();
-    const { data, isLoading, isError, error, refetch } = useGetPublicMaterialArrival(projectId!, token!);
+  const { projectId, token } = useParams();
+  const { data, isLoading, isError, error, refetch } = useGetPublicMaterialArrival(projectId!, token!);
 
-    if (isLoading) return <MaterialOverviewLoading />;
-    if (isError || !data) return <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
-              <div className="text-red-600 font-semibold mb-2">
-                ⚠️ Error Occurred
-              </div>
-              <p className="text-red-500 text-sm mb-4">
-                {(error as any)?.response?.data?.message || 
-                 (error as any)?.message || 
-                 "Failed to load cost estimation data"}
-              </p>
-              <Button
-                onClick={() => refetch()}
-                className="bg-red-600 text-white px-4 py-2"
-              >
-                Retry
-              </Button>
-            </div>;
+  if (isLoading) return <MaterialOverviewLoading />;
+  if (isError || !data) return <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
+    <div className="text-red-600 font-semibold mb-2">
+      ⚠️ Error Occurred
+    </div>
+    <p className="text-red-500 text-sm mb-4">
+      {(error as any)?.response?.data?.message ||
+        (error as any)?.message ||
+        "Failed to load cost estimation data"}
+    </p>
+    <Button
+      onClick={() => refetch()}
+      className="bg-red-600 text-white px-4 py-2"
+    >
+      Retry
+    </Button>
+  </div>;
 
-    const rooms = Object.entries(data.materialArrivalList || {});
+  const rooms = Object.entries(data.materialArrivalList || {});
 
-    return (
-        <div className="min-h-screen  bg-gray-50  space-y-6">
-            <Header />
-            <main className="flex-1 w-full px-4 py-6 space-y-6 mx-auto sm:max-w-full md:max-w-[95%] lg:max-w-[85%] xl:max-w-[90%]">
+  return (
+    <div className="min-h-screen  bg-gray-50  space-y-6">
+      <Header />
+      <main className="flex-1 w-full px-4 py-6 space-y-6 mx-auto sm:max-w-full md:max-w-[95%] lg:max-w-[85%] xl:max-w-[90%]">
 
-                <h1 className="text-2xl font-semibold">Arrived Materials</h1>
+        <h1 className="text-2xl font-semibold">Arrived Materials</h1>
 
-                {/* Shop + Site */}
+        {/* Shop + Site */}
 
-                <section className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <h2 className="text-lg font-semibold text-blue-700 mb-2">Shop Delivery Details</h2>
-                    {isLoading ? (
-                        <Skeleton />
-                    ) : isError || !data?.shopDetails ? (
-                        <p className="text-red-500">Failed to load shop details</p>
-                    ) : (
-                        <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                            {Object.entries(data.shopDetails).map(([key, value]) => (
-                                <div key={key} className="flex flex-col">
-                                    <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                                    <span className="text-gray-600"> {typeof value === "string" || typeof value === "number"
-                                        ? value
-                                        : typeof value === "boolean"
-                                            ? value ? "✔️" : "❌"
-                                            : "-"}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </section>
+        <section className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-lg font-semibold text-blue-700 mb-2">Shop Delivery Details</h2>
+          {isLoading ? (
+            <Skeleton />
+          ) : isError || !data?.shopDetails ? (
+            <p className="text-red-500">Failed to load shop details</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-4 text-sm">
+              {Object.entries(data.shopDetails).map(([key, value]) => (
+                <div key={key} className="flex flex-col">
+                  <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                  <span className="text-gray-600"> {typeof value === "string" || typeof value === "number"
+                    ? value
+                    : typeof value === "boolean"
+                      ? value ? "✔️" : "❌"
+                      : "-"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
-                {/* Site Details */}
-                <section className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <h2 className="text-lg font-semibold text-blue-700 mb-2">Site Location Details</h2>
-                    {isLoading ? (
-                        <Skeleton />
-                    ) : isError || !data?.deliveryLocationDetails ? (
-                        <p className="text-red-500">Failed to load site details</p>
-                    ) : (
-                        <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                            {Object.entries(data.deliveryLocationDetails).map(([key, value]) => (
-                                <div key={key} className="flex flex-col">
-                                    <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                                    <span className="text-gray-600"> {typeof value === "string" || typeof value === "number"
-                                        ? value
-                                        : typeof value === "boolean"
-                                            ? value ? "✔️" : "❌"
-                                            : "-"}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </section>
+        {/* Site Details */}
+        <section className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <h2 className="text-lg font-semibold text-blue-700 mb-2">Site Location Details</h2>
+          {isLoading ? (
+            <Skeleton />
+          ) : isError || !data?.deliveryLocationDetails ? (
+            <p className="text-red-500">Failed to load site details</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-4 text-sm">
+              {Object.entries(data.deliveryLocationDetails).map(([key, value]) => (
+                <div key={key} className="flex flex-col">
+                  <span className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                  <span className="text-gray-600"> {typeof value === "string" || typeof value === "number"
+                    ? value
+                    : typeof value === "boolean"
+                      ? value ? "✔️" : "❌"
+                      : "-"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
-                {/* Room Accordions */}
-                <section className="max-w-full mx-auto space-y-4">
-                    <h2 className="text-lg font-bold text-blue-800 mb-4">Material Rooms</h2>
+        {/* Room Accordions */}
+        <section className="max-w-full mx-auto space-y-4">
+          <h2 className="text-lg font-bold text-blue-800 mb-4">Material Rooms</h2>
 
-                    {rooms.map(([rk, items]) => (
-                        <RoomSection
-                            key={rk}
-                            projectId={projectId!}
-                            token={token!}
-                            roomKey={rk}
-                            items={items as any[]}
-                            refetch={refetch}
-                        />
-                    ))}
-                </section>
+          {rooms.map(([rk, items]) => (
+            <RoomSection
+              key={rk}
+              projectId={projectId!}
+              token={token!}
+              roomKey={rk}
+              items={items as any[]}
+              refetch={refetch}
+            />
+          ))}
+        </section>
 
-            </main>
+      </main>
 
-            <Footer />
-        </div>
-    );
+      <Footer />
+    </div>
+  );
 }
-
-
-
-
-
 
 
 const RoomSection = ({
@@ -147,10 +142,42 @@ const RoomSection = ({
   const fields = requiredFieldsByRoomArrival[roomKey];
 
   const handleAdd = async () => {
-    const fd = new FormData();
-    fd.append("itemData", JSON.stringify(newData));
-    if (selectedFile) fd.append("upload", selectedFile);
     try {
+
+      if (!fields || fields.length === 0) {
+        throw new Error("Invalid room type or no fields defined.");
+      }
+
+      // Validate: first field must be filled
+      const firstFieldKey = fields[0];
+      const firstFieldValue = newData[firstFieldKey];
+
+      if (!firstFieldValue || firstFieldValue.toString().trim() === "") {
+        throw new Error(`The field "${firstFieldKey}" is required.`);
+      }
+
+      // Optionally: you can enforce at least one non-empty field overall
+      const isAllEmpty = Object.values(newData).every(
+        (val) => !val || val.toString().trim() === ""
+      );
+
+      if (isAllEmpty) {
+        throw new Error("At least one field must be filled.");
+      }
+
+      const firstFieldExists = items?.some(
+        (item: any) =>
+          item[firstFieldKey]?.toString().trim().toLowerCase() ===
+          firstFieldValue.toString().trim().toLowerCase()
+      );
+
+      if (firstFieldExists) {
+        throw new Error(`"${firstFieldValue}" already exists. Please use a unique value.`);
+      }
+
+      const fd = new FormData();
+      fd.append("itemData", JSON.stringify(newData));
+      if (selectedFile) fd.append("upload", selectedFile);
       await updateItem.mutateAsync({ projectId, roomKey, formData: fd });
       toast({ title: "Added", description: "New item saved." });
       setShowAdd(false);
@@ -163,10 +190,34 @@ const RoomSection = ({
   };
 
   const handleSave = async () => {
-    const fd = new FormData();
-    fd.append("itemData", JSON.stringify(editData));
-    if (editFile) fd.append("upload", editFile);
     try {
+
+
+      if (!fields || fields.length === 0) {
+        throw new Error("Invalid room type or no fields defined.");
+      }
+
+      // Validate: first field must be filled
+      const firstFieldKey = fields[0];
+      const firstFieldValue = editData[firstFieldKey];
+
+      if (!firstFieldValue || firstFieldValue.toString().trim() === "") {
+        throw new Error(`The field "${firstFieldKey}" is required.`);
+      }
+
+      // Optionally: you can enforce at least one non-empty field overall
+      const isAllEmpty = Object.values(editData).every(
+        (val) => !val || val.toString().trim() === ""
+      );
+
+      if (isAllEmpty) {
+        throw new Error("At least one field must be filled.");
+      }
+
+
+      const fd = new FormData();
+      fd.append("itemData", JSON.stringify(editData));
+      if (editFile) fd.append("upload", editFile);
       await updateItem.mutateAsync({ projectId, roomKey, formData: fd });
       toast({ title: "Updated", description: "Item saved." });
       refetch();
@@ -392,11 +443,11 @@ const RoomSection = ({
                 </div>
               )}
             </div>
-        </div>
+          </div>
         )}
-        </div>
-        </div>
+      </div>
+    </div>
 
-    );
+  );
 };
 

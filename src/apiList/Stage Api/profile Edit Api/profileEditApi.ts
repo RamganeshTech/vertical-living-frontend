@@ -23,7 +23,6 @@ export const updateProfile = async ({
       throw new Error(data?.message || "Profile update failed.");
     }
   } catch (error) {
-    console.error("Profile update error:", error);
     throw error;
   }
 };

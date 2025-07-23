@@ -51,7 +51,6 @@ export const getMaterialArrivalRoomDetailsApi = async (
   api: any
 ) => {
   const res = await api.get(`/materialarrivalcheck/${projectId}/room/${roomKey}`);
-  console.log("data form the get mateiralarrival room details", res.data.data)
   return res.data.data;
 };
 
