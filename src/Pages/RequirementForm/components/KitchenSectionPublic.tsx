@@ -92,6 +92,7 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
               <SelectValue placeholder="Select layout" selectedValue={formData?.kitchen?.layoutType || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select Layout</SelectItem>
               <SelectItem value="L-shaped">L-shaped</SelectItem>
               <SelectItem value="Straight">Straight</SelectItem>
               <SelectItem value="U-shaped">U-shaped</SelectItem>
@@ -111,6 +112,7 @@ const KitchenSectionPublic = ({ formData, setFormData }: any) => {
               <SelectValue placeholder="Select package" selectedValue={formData?.kitchen?.kitchenPackage || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select package</SelectItem>
               <SelectItem value="Essentials">Essentials</SelectItem>
               <SelectItem value="Premium">Premium</SelectItem>
               <SelectItem value="Luxury">Luxury</SelectItem>

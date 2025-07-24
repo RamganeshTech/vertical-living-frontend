@@ -13,9 +13,9 @@ import { toast } from "../../../utils/toast";
 const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<IKitchenRequirement>({
-    layoutType: data?.layoutType || "L-shaped",
+    layoutType: data?.layoutType || "",
     measurements: data?.measurements || { top: 0, left: 0, right: 0 },
-    kitchenPackage: data?.kitchenPackage || "Essentials",
+    kitchenPackage: data?.kitchenPackage || "",
     graniteCountertop: data?.graniteCountertop || false,
     numberOfShelves: data?.numberOfShelves || 0,
     notes: data?.notes || "",
@@ -89,6 +89,7 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
               <SelectValue placeholder="Select layout" selectedValue={formData.layoutType || ""} />
             </SelectTrigger>
             <SelectContent>
+                            <SelectItem value="">Select Layout</SelectItem>
               <SelectItem value="L-shaped">L-shaped</SelectItem>
               <SelectItem value="Straight">Straight</SelectItem>
               <SelectItem value="U-shaped">U-shaped</SelectItem>
@@ -104,6 +105,7 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
               <SelectValue placeholder="Select package" selectedValue={formData.kitchenPackage || ""} />
             </SelectTrigger>
             <SelectContent>
+                            <SelectItem value="">Select Package</SelectItem>
               <SelectItem value="Essentials">Essentials</SelectItem>
               <SelectItem value="Premium">Premium</SelectItem>
               <SelectItem value="Luxury">Luxury</SelectItem>

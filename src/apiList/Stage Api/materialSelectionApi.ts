@@ -460,7 +460,7 @@ export const useCompleteMaterialStage = () => {
       return await completeMaterialStageApi({ projectId, api });
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["material-rooms", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["material-confirmation", projectId] });
     },
   });
 };

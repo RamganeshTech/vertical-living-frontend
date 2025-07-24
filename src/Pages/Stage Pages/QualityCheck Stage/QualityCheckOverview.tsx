@@ -11,6 +11,7 @@ import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import AssignStageStaff from "../../../shared/AssignStaff";
+import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 
 // Context type for Outlet
 type ProjectDetailsOutlet = {
@@ -125,6 +126,13 @@ export default function QualityCheckOverview() {
                 stagePath="qualitycheck"
                 className="w-full sm:w-auto"
               />
+
+               {!getAllError && <ShareDocumentWhatsapp
+                projectId={projectId!}
+                stageNumber="12"
+                className="w-full sm:w-fit"
+                isStageCompleted={data?.status}
+              />}
 
               <AssignStageStaff
                 stageName="QualityCheckupModel"

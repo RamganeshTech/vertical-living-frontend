@@ -19,6 +19,7 @@ import {
     useCompleteMaterialArrivalStage
 } from "../../../apiList/Stage Api/materialArrivalApi";
 import AssignStageStaff from "../../../shared/AssignStaff";
+import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 
 interface ProjectDetailsOutlet {
     isMobile: boolean;
@@ -46,7 +47,7 @@ const MaterialArrivalOverview = () => {
 
     if (isLoading) return <MaterialOverviewLoading />;
 
-    
+
 
     const { shopDetails, deliveryLocationDetails, materialArrivalList, timer, generatedLink } = data || {};
     const roomKeys = Object.keys(materialArrivalList || {});
@@ -145,6 +146,13 @@ const MaterialArrivalOverview = () => {
                                 stageNumber={9}
                                 stagePath="materialarrivalcheck"
                             />
+
+                            {!error && <ShareDocumentWhatsapp
+                                projectId={projectId!}
+                                stageNumber="9"
+                                className="w-full sm:w-fit"
+                                isStageCompleted={data?.status}
+                            />}
 
                             <AssignStageStaff
                                 stageName="MaterialArrivalModel"
@@ -284,7 +292,7 @@ const MaterialArrivalOverview = () => {
                                         />
                                         <Input
                                             placeholder="Phone Number"
-                                             type="tel"
+                                            type="tel"
                                             maxLength={10}
                                             value={deliveryForm.phoneNumber || ""}
                                             onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })}

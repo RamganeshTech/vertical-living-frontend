@@ -354,6 +354,7 @@ export const useCompleteCostEstimate = () => {
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["cost-estimation", projectId] });
+      
     },
   });
 };

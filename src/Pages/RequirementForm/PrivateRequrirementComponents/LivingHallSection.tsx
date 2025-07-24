@@ -13,13 +13,13 @@ import { toast } from "../../../utils/toast";
 const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<ILivingHallRequirement>({
-    seatingStyle: data?.seatingStyle || "Sofa Set",
+    seatingStyle: data?.seatingStyle || "",
     tvUnitDesignRequired: data?.tvUnitDesignRequired || false,
     falseCeilingRequired: data?.falseCeilingRequired || false,
-    wallDecorStyle: data?.wallDecorStyle || "Paint",
+    wallDecorStyle: data?.wallDecorStyle || "",
     numberOfFans: data?.numberOfFans || 0,
     numberOfLights: data?.numberOfLights || 0,
-    livingHallPackage: data?.livingHallPackage || "Essentials",
+    livingHallPackage: data?.livingHallPackage || "",
     notes: data?.notes || "",
   });
 
@@ -88,7 +88,7 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisi
               <SelectValue placeholder="Select seating style" selectedValue={formData.seatingStyle || ""} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select Value</SelectItem>
+              <SelectItem value="">Select seating style</SelectItem>
               <SelectItem value="Sofa Set">Sofa Set</SelectItem>
               <SelectItem value="L-Shaped Sofa">L-Shaped Sofa</SelectItem>
               <SelectItem value="Recliner Chairs">Recliner Chairs</SelectItem>
@@ -101,10 +101,10 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisi
           <Label>Wall Decor Style</Label>
           <Select onValueChange={(val) => handleSelectChange("wallDecorStyle", val)}>
             <SelectTrigger>
-              <SelectValue placeholder="Select wall decor" selectedValue={formData.wallDecorStyle || ""} />
+              <SelectValue placeholder="Select wall decoration" selectedValue={formData.wallDecorStyle || ""} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select Value</SelectItem>
+              <SelectItem value="">Select wall decoration</SelectItem>
               <SelectItem value="Paint">Paint</SelectItem>
               <SelectItem value="Wallpaper">Wallpaper</SelectItem>
               <SelectItem value="Wood Paneling">Wood Paneling</SelectItem>
@@ -140,7 +140,7 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisi
               <SelectValue placeholder="Select package" selectedValue={formData.livingHallPackage || ""} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select Value</SelectItem>
+              <SelectItem value="">Select package</SelectItem>
               <SelectItem value="Essentials">Essentials</SelectItem>
               <SelectItem value="Premium">Premium</SelectItem>
               <SelectItem value="Luxury">Luxury</SelectItem>

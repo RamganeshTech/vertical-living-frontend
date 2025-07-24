@@ -36,6 +36,7 @@ import { queryClient } from "../../QueryClient/queryClient";
   itemId: string,
   api: AxiosInstance
 ) => {
+  console.log("deleteimnga the itesm")
   const { data } = await api.delete(`/qualitycheck/${projectId}/${roomName}/${itemId}/item/delete`);
   if (!data.ok) throw new Error(data.message);
   return data;
@@ -260,6 +261,7 @@ export const useCompleteQualityCheck = () => {
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["quality-checkup", projectId] });
+      
     },
   });
 };

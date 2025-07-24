@@ -14,6 +14,7 @@ import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import type { ProjectDetailsOutlet } from "../../../types/types";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 
 const SampleDesignModule: React.FC = () => {
   const { projectId, organizationId } = useParams();
@@ -23,7 +24,7 @@ const SampleDesignModule: React.FC = () => {
 
   const [showAddRoomModal, setShowAddRoomModal] = useState(false);
   const addRoom = useAddRoom();
-  const {mutateAsync:uploadFiles, isPending:uploadPending} = useUploadRoomFiles();
+  const { mutateAsync: uploadFiles, isPending: uploadPending } = useUploadRoomFiles();
   const deleteFile = useDeleteRoomFile();
   const { mutateAsync: deleteRoom, isPending: deleteRoomIsPending } = useDeleteRoomSampleDesign();
   const { data: sampleDesign, isLoading, refetch, error: getAllError } = useGetRoomFiles(projectId);
@@ -38,10 +39,10 @@ const SampleDesignModule: React.FC = () => {
       }
       toast({ description: 'Completion status updated successfully', title: "Success" });
     } catch (error: any) {
-      toast({ 
-        title: "Error", 
-        description: error?.response?.data?.message || "Failed to update completion status", 
-        variant: "destructive" 
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to update completion status",
+        variant: "destructive"
       });
     }
   };
@@ -51,10 +52,10 @@ const SampleDesignModule: React.FC = () => {
       await addRoom.mutateAsync({ projectId, roomName });
       toast({ description: 'Room Created successfully', title: "Success" });
     } catch (error: any) {
-      toast({ 
-        title: "Error", 
-        description: error?.response?.data?.message || "Failed to create room status", 
-        variant: "destructive" 
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to create room status",
+        variant: "destructive"
       });
     }
   };
@@ -66,10 +67,10 @@ const SampleDesignModule: React.FC = () => {
       }
       toast({ description: 'Room section Deleted successfully', title: "Success" });
     } catch (error: any) {
-      toast({ 
-        title: "Error", 
-        description: error?.response?.data?.message || "Failed to delete the room", 
-        variant: "destructive" 
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to delete the room",
+        variant: "destructive"
       });
     }
   };
@@ -77,13 +78,13 @@ const SampleDesignModule: React.FC = () => {
   const handleFileUpload = async (roomName: string, files: File[]) => {
     try {
 
-       await uploadFiles({ projectId, roomName, files });
+      await uploadFiles({ projectId, roomName, files });
       toast({ description: 'File uploaded successfully', title: "Success" });
       refetch();
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error?.response?.data?.message || error?.message || " Failed to upload the files", 
+        description: error?.response?.data?.message || error?.message || " Failed to upload the files",
         variant: "destructive"
       });
     }
@@ -95,10 +96,10 @@ const SampleDesignModule: React.FC = () => {
       toast({ description: 'File deleted successfully', title: "Success" });
       refetch();
     } catch (error: any) {
-      toast({ 
-        title: "Error", 
-        description: error?.response?.data?.message || "Failed to delete the files", 
-        variant: "destructive" 
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to delete the files",
+        variant: "destructive"
       });
     }
   };
@@ -110,33 +111,33 @@ const SampleDesignModule: React.FC = () => {
       {/* Responsive Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
-             {isMobile && (
-                <button
-                  onClick={openMobileSidebar}
-                  className="mr-3 p-2 rounded-md  border-gray-300 hover:bg-gray-100"
-                  title="Open Menu"
-                >
-                  <i className="fa-solid fa-bars"></i>
-                </button>
-              )}
+          {isMobile && (
+            <button
+              onClick={openMobileSidebar}
+              className="mr-3 p-2 rounded-md  border-gray-300 hover:bg-gray-100"
+              title="Open Menu"
+            >
+              <i className="fa-solid fa-bars"></i>
+            </button>
+          )}
           <i className="fa-solid fa-object-group mr-2"></i>Sample Design Files
         </h2>
-        
+
         <div className="!w-[100%] sm:!w-[100%] lg:!w-[50%] xl:!w-[65%] flex flex-col sm:flex-row gap-3 justify-end">
-          <div className="flex flex-wrap md:flex-nowrap gap-2 justify-end">
+          <div className="flex  flex-wrap md:flex-nowrap gap-2 justify-end">
             <Button
               onClick={() => setShowAddRoomModal(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-initial min-w-max"
               disabled={!!getAllError}
             >
               <i className="fas fa-plus mr-2" />
-             <span className="">Add room</span>
-             {/* <span className="flex sm:hidden">Add room</span> */}
+              <span className="">Add room</span>
+              {/* <span className="flex sm:hidden">Add room</span> */}
             </Button>
-            
-            <Button 
-            isLoading={completePending}
-              onClick={handleCompletionStatus} 
+
+            <Button
+              isLoading={completePending}
+              onClick={handleCompletionStatus}
               className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
               disabled={!!getAllError}
             >
@@ -144,16 +145,23 @@ const SampleDesignModule: React.FC = () => {
               Mark Complete
             </Button>
           </div>
-          
+
           <div className="flex flex-wrap md:flex-nowrap gap-2 justify-end">
-            <ResetStageButton 
-              projectId={projectId} 
-              stageNumber={3} 
-              stagePath="sampledesign" 
+            <ResetStageButton
+              projectId={projectId}
+              stageNumber={3}
+              stagePath="sampledesign"
               className="flex-1 sm:flex-initial min-w-max"
               disabled={!!getAllError}
             />
-            
+
+            {!getAllError && <ShareDocumentWhatsapp
+              projectId={projectId}
+              stageNumber="3"
+              className="w-full sm:w-fit"
+              isStageCompleted={sampleDesign?.status}
+            />}
+
             <AssignStageStaff
               stageName="SampleDesignModel"
               projectId={projectId}
@@ -229,10 +237,10 @@ const SampleDesignModule: React.FC = () => {
                       {room.roomName}
                     </h2>
 
-                    <Button 
-                      isLoading={deleteRoomIsPending} 
-                      onClick={() => handleDeleteRoom(room._id)} 
-                      variant="danger" 
+                    <Button
+                      isLoading={deleteRoomIsPending}
+                      onClick={() => handleDeleteRoom(room._id)}
+                      variant="danger"
                       className="bg-red-600 text-white  sm:w-auto mt-2 sm:mt-0"
                     >
                       <i className="fa-solid fa-trash mr-2"></i>

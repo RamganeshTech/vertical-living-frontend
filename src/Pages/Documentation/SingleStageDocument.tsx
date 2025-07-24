@@ -209,6 +209,7 @@ const SingleStageDocument: React.FC = () => {
 
   const handleUpdateDocManually = async ()=>{
     try{
+      console.log("gettin isnde 1")
       await updateDocManually({
         projectId,
         stageNumber
@@ -222,7 +223,7 @@ const SingleStageDocument: React.FC = () => {
     catch(error:any){
        toast({
         title: "Error",
-        description: error?.response?.data?.message || "Failed to update description",
+        description: error?.response?.data?.message || "Failed to update document",
         variant: "destructive",
       })
     }
@@ -364,7 +365,7 @@ const SingleStageDocument: React.FC = () => {
                         className="text-sm"
                       >
                         <i className="fa-solid fa-rotate" />
-
+                        <span className="sm:inline hidden "></span>
                       </Button>
                     </div>
                   ) : (

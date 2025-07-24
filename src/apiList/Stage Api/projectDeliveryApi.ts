@@ -236,6 +236,7 @@ export const useCompleteprojectDelivery = () => {
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["project-delivery", projectId] });
+       
     },
   });
 };

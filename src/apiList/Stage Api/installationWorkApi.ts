@@ -230,6 +230,7 @@ export const useCompleteInstallation = () => {
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["installation-details", projectId] });
+      
     },
   });
 };

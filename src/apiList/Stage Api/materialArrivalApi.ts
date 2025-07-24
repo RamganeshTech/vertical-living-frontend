@@ -263,7 +263,7 @@ export const useCompleteMaterialArrivalStage = () => {
       return await completeMaterialArrivalStageApi({ projectId, api });
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["ordering-material", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
     },
   });
 };

@@ -22,11 +22,9 @@ const ShareDocumentWhatsapp = ({
     });
 
 
-    // console.log("mesData", msgData)
-    // console.log("clientData", clientData)
-
-    const formattedPhone = clientData?.phoneNo.startsWith("+91") ? clientData?.phoneNo : `+91${clientData?.phoneNo}`;
-    const fullMessage = `Hello ${clientData?.clientName},\n\n${msgData?.message}`;
+    // console.log("msgData",msgData?.message)
+    const formattedPhone = clientData?.phoneNo?.startsWith("+91") ? clientData?.phoneNo : `+91${clientData?.phoneNo}`;
+    let fullMessage = `Hello *${clientData?.clientName}*,\n\n${msgData?.message}`;
 
     const whatsappUrl = `https://wa.me/${formattedPhone.replace("+", "")}?text=${encodeURIComponent(
         fullMessage
@@ -42,16 +40,21 @@ const ShareDocumentWhatsapp = ({
         <Button variant={`outline`}
             disabled={loadingClient || loadingMessage || isStageCompleted !== "completed"}
             title={getTitle()}
-            className={`bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded items-center ${className}`}
+            className={`bg-green-600 hover:bg-green-700 text-white px-4 py-2 min-w-30 rounded items-center ${className}`}
         >
             <i className="fab fa-whatsapp mr-1 "></i>
-            <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Share via WhatsApp
-            </a>
+            {loadingClient || loadingMessage || isStageCompleted !== "completed" ? (
+                <span>Share Doc</span>
+            ) : (
+                <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className=""
+                >
+                    Share Doc
+                </a>
+            )}
         </Button>
     );
 };

@@ -109,8 +109,11 @@ const RequirementFormPublic: React.FC = () => {
       errors.clientName = "Client name is required";
     }
 
-    if (!email || email.trim() === "") {
-      errors.email = "Email is required";
+
+    if(email){
+      if(!email.includes("@")){
+        errors.email = "should contain @"
+      }
     }
 
     if (!whatsapp || whatsapp.trim() === "") {

@@ -188,7 +188,7 @@ export default function RequirementForm() {
               </h2>
             </div>
 
-            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2  !w-[100%] sm:!w-[50%] justify-end lg:justify-end">
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2  !w-[100%] sm:!w-[50%] lg:!w-[60%] justify-end lg:justify-end">
               {/* <Button onClick={handleLockForm} className="bg-yellow-100 hover:bg-yellow-100 border-yellow-400 text-yellow-800 w-full sm:w-auto">
                 <i className="fa-solid fa-lock"></i>
               </Button> */}
@@ -215,12 +215,12 @@ export default function RequirementForm() {
                 className="sm:!max-w-[20%] w-full"
               />
 
-              <ShareDocumentWhatsapp
+             {!error && <ShareDocumentWhatsapp
                 projectId={projectId}
                 stageNumber="1"
                 className="w-full sm:w-fit"
-                isStageCompleted={formData.status}
-              />
+                isStageCompleted={formData?.status}
+              />}
 
               <AssignStageStaff
                 stageName="RequirementFormModel"

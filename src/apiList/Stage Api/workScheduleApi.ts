@@ -420,7 +420,9 @@ export const useCompleteWorkSchedule = () => {
       return await completeWorkScheduleStageApi({ projectId, api });
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["material-rooms", projectId] });
+      queryClient.invalidateQueries({  queryKey: ["work-main-stage", projectId] });
+         
+
     },
   });
 };

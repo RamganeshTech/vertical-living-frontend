@@ -140,7 +140,7 @@ export default function CTOLogin() {
               <i className="fas fa-user-tie text-white text-2xl"></i>
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-900 to-blue-600 bg-clip-text text-transparent">
-              Cheif Technical Officer Login
+              Chief Technical Officer Login
             </CardTitle>
             <CardDescription className="text-blue-600 text-base">
               Sign in to access your organization dashboard

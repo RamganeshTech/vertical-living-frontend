@@ -308,6 +308,7 @@ export const useCompleteCleaningStage = () => {
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["cleaning-and-sanitation", projectId] });
+      
     },
   });
 };

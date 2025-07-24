@@ -13,11 +13,11 @@ import { toast } from "../../../utils/toast";
 const WardrobeSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<IWardrobeRequirement>({
-    wardrobeType: data?.wardrobeType || "Sliding",
+    wardrobeType: data?.wardrobeType || "",
     lengthInFeet: data?.lengthInFeet || 0,
     heightInFeet: data?.heightInFeet || 0,
     mirrorIncluded: data?.mirrorIncluded || false,
-    wardrobePackage: data?.wardrobePackage || "Essentials",
+    wardrobePackage: data?.wardrobePackage || "",
     numberOfShelves: data?.numberOfShelves || 0,
     numberOfDrawers: data?.numberOfDrawers || 0,
     notes: data?.notes || "",
@@ -89,6 +89,7 @@ const WardrobeSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibl
               <SelectValue placeholder="Select wardrobe type" selectedValue={formData.wardrobeType || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select Type</SelectItem>
               <SelectItem value="Sliding">Sliding</SelectItem>
               <SelectItem value="Openable">Openable</SelectItem>
             </SelectContent>
@@ -127,6 +128,7 @@ const WardrobeSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibl
               <SelectValue placeholder="Select package" selectedValue={formData.wardrobePackage || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select package</SelectItem>
               <SelectItem value="Essentials">Essentials</SelectItem>
               <SelectItem value="Premium">Premium</SelectItem>
               <SelectItem value="Luxury">Luxury</SelectItem>

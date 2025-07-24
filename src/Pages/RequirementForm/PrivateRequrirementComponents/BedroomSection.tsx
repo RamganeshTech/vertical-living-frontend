@@ -13,13 +13,13 @@ import { toast } from "../../../utils/toast";
 const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<IBedroomRequirement>({
-    numberOfBedrooms: data?.numberOfBedrooms || 1,
-    bedType: data?.bedType || "Queen",
+    numberOfBedrooms: data?.numberOfBedrooms || 0,
+    bedType: data?.bedType || "",
     wardrobeIncluded: data?.wardrobeIncluded || false,
     falseCeilingRequired: data?.falseCeilingRequired || false,
     tvUnitRequired: data?.tvUnitRequired || false,
     studyTableRequired: data?.studyTableRequired || false,
-    bedroomPackage: data?.bedroomPackage || "Essentials",
+    bedroomPackage: data?.bedroomPackage || "",
     notes: data?.notes || "",
   });
 
@@ -85,6 +85,7 @@ const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
               <SelectValue placeholder="Select bed type" selectedValue={formData.bedType || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select bed type</SelectItem>
               <SelectItem value="Single">Single</SelectItem>
               <SelectItem value="Double">Double</SelectItem>
               <SelectItem value="Queen">Queen</SelectItem>
@@ -120,6 +121,7 @@ const BedroomSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
               <SelectValue placeholder="Select package" selectedValue={formData.bedroomPackage || ""} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="">Select package</SelectItem>
               <SelectItem value="Essentials">Essentials</SelectItem>
               <SelectItem value="Premium">Premium</SelectItem>
               <SelectItem value="Luxury">Luxury</SelectItem>

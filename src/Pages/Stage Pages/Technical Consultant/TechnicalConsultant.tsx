@@ -1,11 +1,13 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { useParams, useOutletContext } from "react-router-dom";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { Label } from "../../../components/ui/Label";
-import { useAddConsultationMessage, useGetConsultationMessages, 
+import {
+    useAddConsultationMessage, useGetConsultationMessages,
     // useDeleteConsultationMessage, 
-    useEditConsultationMessage, useSetDeadLineTechConsultation, useCompletionStatusTechConsultation } from "../../../apiList/Stage Api/technicalConsultationApi";
+    useEditConsultationMessage, useSetDeadLineTechConsultation, useCompletionStatusTechConsultation
+} from "../../../apiList/Stage Api/technicalConsultationApi";
 import useGetRole from './../../../Hooks/useGetRole';
 import { toast } from "../../../utils/toast";
 import { Card } from "../../../components/ui/Card";
@@ -16,6 +18,7 @@ import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionL
 import { downloadImage } from "../../../utils/downloadFile";
 import type { IConsultationMessage, ITechnicalConsultation } from "../../../types/types";
 import { Badge } from "../../../components/ui/Badge";
+import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -23,7 +26,7 @@ type ProjectDetailsOutlet = {
     openMobileSidebar: () => void;
 };
 
-const TechnicalConsultant:React.FC = () => {
+const TechnicalConsultant: React.FC = () => {
     const { projectId, organizationId } = useParams<{ projectId: string, organizationId: string }>();
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
     const { role, _id: userId } = useGetRole();
@@ -91,13 +94,13 @@ const TechnicalConsultant:React.FC = () => {
 
     const handleEditSubmit = async () => {
         try {
-        if (!editingId || !editText) {
+            if (!editingId || !editText) {
                 throw new Error("please write anything")
             };
-        await editMessage({ projectId: projectId!, messageId: editingId, message: editText, senderId: userId! });
-        setEditingId(null);
-        setEditText("");
-           toast({ description: "message edited successfully", title: "Success" })
+            await editMessage({ projectId: projectId!, messageId: editingId, message: editText, senderId: userId! });
+            setEditingId(null);
+            setEditText("");
+            toast({ description: "message edited successfully", title: "Success" })
         }
         catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to edit the message", variant: "destructive" })
@@ -125,7 +128,7 @@ const TechnicalConsultant:React.FC = () => {
                     <i className="fas fa-comments mr-2"></i> Technical Consultation
                 </h2>
 
-                <div className="w-full lg:w-[60%] flex flex-col sm:flex-row gap-3 justify-end">
+                <div className="w-full lg:w-[60%]  flex flex-col sm:flex-row gap-3 justify-end">
                     {/* <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-end"> */}
                     <Button
                         isLoading={updateCompletionStatus.isPending}
@@ -144,6 +147,13 @@ const TechnicalConsultant:React.FC = () => {
                             stagePath="technicalconsultation"
                             className="flex-1 sm:flex-initial min-w-max"
                         />
+
+                        {!getMessageError && <ShareDocumentWhatsapp
+                            projectId={projectId!}
+                            stageNumber="4"
+                            className="w-full sm:w-fit"
+                            isStageCompleted={techDoc?.status}
+                        />}
 
                         <AssignStageStaff
                             stageName="TechnicalConsultationModel"
@@ -215,13 +225,13 @@ const TechnicalConsultant:React.FC = () => {
                             {techDoc?.messages
                                 ?.slice()
                                 .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                                .map((msg: IConsultationMessage ) => (
+                                .map((msg: IConsultationMessage) => (
                                     <div key={(msg)._id} className="bg-blue-50 w-full group px-4 py-[5px] rounded-lg shadow flex flex-col">
                                         <div className="flex justify-between items-center">
                                             <p className="text-xs sm:text-[10px] text-gray-600">
-                                                {msg.senderRole.toUpperCase()} - {new Date(msg.createdAt).toLocaleString()} 
-                                                
-                                               {msg.isEdited && <Badge className="sm:ml-2 my-1 sm:my-0"> <p className="hidden sm:inline-block">message is  {" "} </p> &nbsp; edited by {msg.senderRole}</Badge> }
+                                                {msg.senderRole.toUpperCase()} - {new Date(msg.createdAt).toLocaleString()}
+
+                                                {msg.isEdited && <Badge className="sm:ml-2 my-1 sm:my-0"> <p className="hidden sm:inline-block">message is  {" "} </p> &nbsp; edited by {msg.senderRole}</Badge>}
                                             </p>
                                             <div className="opacity-0 scale-95 group-hover:opacity-100 transition-all duration-300">
                                                 {(msg.sender === userId || role === "owner" || role === "CTO") && (

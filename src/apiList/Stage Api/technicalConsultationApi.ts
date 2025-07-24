@@ -261,8 +261,8 @@ export const useCompletionStatusTechConsultation  = () => {
 
             return await updateCompletionStatus({ projectId, api });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: (_, {projectId})=>{
+            queryClient.invalidateQueries({queryKey: ["consultationMessages", projectId]})
         }
     });
 };

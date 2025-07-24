@@ -27,6 +27,7 @@ import CommonSiteForm from './CommonSiteForm';
 import { ResetStageButton } from '../../../shared/ResetStageButton';
 import MaterialOverviewLoading from '../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 import AssignStageStaff from '../../../shared/AssignStaff';
+import ShareDocumentWhatsapp from '../../../shared/ShareDocumentWhatsapp';
 
 const initialSiteDetails: SiteDetails = {
   totalPlotAreaSqFt: null,
@@ -88,7 +89,7 @@ function HomeInteriorProject() {
   const handleRoomSubmit = async () => {
     try {
 
-      if(!roomDetails.name) throw new Error("please select the name")
+      if (!roomDetails.name) throw new Error("please select the name")
 
       const calculatedArea = roomDetails.length && roomDetails.breadth
         ? (Number(roomDetails.length) * Number(roomDetails.breadth)).toFixed(2)
@@ -150,7 +151,7 @@ function HomeInteriorProject() {
   if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-2 max-w-full h-full w-full overflow-y-auto custom-scrollbar">
+    <div className="container mx-auto px-2 py-2 max-w-full h-full w-full overflow-y-auto custom-scrollbar">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <div className="w-full sm:w-auto">
           <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
@@ -168,9 +169,9 @@ function HomeInteriorProject() {
           <p className="text-gray-600 hidden sm:block text-sm sm:text-base">Plan your dream home</p>
         </div>
 
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2  !w-[100%] sm:!w-[50%] justify-start lg:justify-end">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2  !w-[100%] sm:!w-[50%] lg:!w-[60%] justify-start lg:justify-end">
           <Button
-                isLoading={updateCompletionStatus.isPending}
+            isLoading={updateCompletionStatus.isPending}
             onClick={handleCompletionStatus}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2  w-full sm:w-auto"
           >
@@ -183,6 +184,13 @@ function HomeInteriorProject() {
             stagePath="sitemeasurement"
             className="sm:!max-w-[20%] w-full"
           />
+
+          {!getAllError && <ShareDocumentWhatsapp
+            projectId={projectId}
+            stageNumber="2"
+            className="w-full sm:w-fit"
+            isStageCompleted={measurementData?.status}
+          />}
 
           <AssignStageStaff
             stageName="SiteMeasurementModel"

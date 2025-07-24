@@ -185,6 +185,7 @@ export const useCompletePaymentConfirmation = () => {
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["payment-confirmation", projectId] });
+      
     },
   });
 };

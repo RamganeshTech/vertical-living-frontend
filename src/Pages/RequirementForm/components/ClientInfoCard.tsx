@@ -24,7 +24,7 @@ const ClientInfoCard = ({ client }: Props) => {
 const Info = ({ label, value, icon }: { label: string, value: string, icon: string }) => (
   <div className="flex items-center gap-2">
     <i className={`fa-solid ${icon} text-gray-600`} />
-    <strong>{label}:</strong> {value || "No data"}
+    <strong>{label}:</strong> {value || "N/A"}
   </div>
 );
 

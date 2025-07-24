@@ -245,6 +245,9 @@ export const useFormCompletion = () => {
 
             return await formCompletion({ formId, projectId, api })
 
+        },
+        onSuccess:()=>{
+            queryClient.invalidateQueries({queryKey:["requirementForm"]})
         }
     })
 }

@@ -321,11 +321,13 @@ const DocumentationMain: React.FC = () => {
     const { projectId } = useParams()
     const location = useLocation()
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>()
-    const { data, isLoading, isError, refetch, isFetching} = useGetAllStageDocumentation(projectId!)
+    const { data, isLoading, isError, refetch, isFetching } = useGetAllStageDocumentation(projectId!)
 
     const locationArray = location.pathname.split("/")
     const isChild = locationArray.indexOf("document") !== locationArray.length - 1
 
+
+   
     if (isLoading) {
         return (
             <div className="mx-auto p-4 space-y-6 overflow-y-auto max-h-full custom-scrollbar">
@@ -387,6 +389,37 @@ const DocumentationMain: React.FC = () => {
         )
     }
 
+
+     if (data === null) {
+        return (
+             <div className="container mx-auto">
+                {isMobile && (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={openMobileSidebar}
+                        className="mb-4 bg-transparent border-slate-300 text-slate-700 hover:bg-slate-100"
+                    >
+                        <i className="fa-solid fa-bars mr-2"></i>
+                        Menu
+                    </Button>
+                )}
+                <div className="max-w-4xl mx-auto">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                        <div className="flex items-center gap-3">
+                            <i className="fa-solid fa-exclamation-triangle text-blue-600 text-xl"></i>
+                            <div>
+                                <h3 className="font-semibold text-blue-800">No Documentation created Yet</h3>
+                                <p className="text-blue-600 text-sm mt-1">Failed to load documentation. Please try again later.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        )
+    }
+
+
     return (
         <div className="mx-auto space-y-6 h-full overflow-y-auto custom-scrollbar">
             {isChild ? (
@@ -394,37 +427,37 @@ const DocumentationMain: React.FC = () => {
             ) : (
                 <>
                     <div className="space-y-4">
-                            <div className="flex flex-col space-y-1">
-                        <div className="flex gap-2 items-center">
-                            {isMobile && (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={openMobileSidebar}
-                                    className="bg-transparent border-slate-300 text-slate-700 hover:bg-slate-100"
-                                >
-                                    <i className="fa-solid fa-bars "></i>
-                                </Button>
-                            )}
+                        <div className="flex flex-col space-y-1">
+                            <div className="flex gap-2 items-center">
+                                {isMobile && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={openMobileSidebar}
+                                        className="bg-transparent border-slate-300 text-slate-700 hover:bg-slate-100"
+                                    >
+                                        <i className="fa-solid fa-bars "></i>
+                                    </Button>
+                                )}
 
                                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-indigo-600">Project Documentation</h1>
                             </div>
-                                <p className="text-slate-600 text-sm sm:text-xl">Track and manage documentation across all project stages</p>
+                            <p className="text-slate-600 text-sm sm:text-xl">Track and manage documentation across all project stages</p>
 
                         </div>
                         {data?.stages?.length ? (
                             <>
                                 <div className="flex justify-between items-center gap-2 text-sm text-slate-500">
-                                  <div>
-                                      <i className="fa-solid fa-file-text text-indigo-500"></i>
-                                    <span>{data.stages.length} stages available</span>
-                                  </div>
+                                    <div>
+                                        <i className="fa-solid fa-file-text text-indigo-500"></i>
+                                        <span>{data.stages.length} stages available</span>
+                                    </div>
 
-                                  <div>
-                                    <Button isLoading={isFetching} onClick={()=> refetch()}>
-                                         <i className="fas fa-refresh mr-1"></i> Sync
-                                    </Button>
-                                  </div>
+                                    <div>
+                                        <Button isLoading={isFetching} onClick={() => refetch()}>
+                                            <i className="fas fa-refresh mr-1"></i> Sync
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

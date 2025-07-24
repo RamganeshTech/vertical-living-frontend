@@ -276,9 +276,6 @@ const getClientByProject = async (
   return data.data;
 };
 
-
-
-
 // Get all clients by project
 export const useGetClientByProject = (projectId: string) => {
   const allowedRoles = ["owner", "CTO", "staff"];
@@ -286,7 +283,7 @@ export const useGetClientByProject = (projectId: string) => {
   const api = getApiForRole(role!);
 
   return useQuery({
-    queryKey: ["stage-documentation", projectId],
+    queryKey: ["stage-documentation-client", projectId],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role))
         throw new Error("Not allowed to make this API call.");
@@ -323,14 +320,16 @@ export const useGetDocMessageForWhatsapp = ({ projectId, stageNumber }: { projec
   const api = getApiForRole(role!);
 
   return useQuery({
-    queryKey: ["stage-documentation", projectId],
+    queryKey: ["stage-documentation-message", projectId],
     queryFn: async () => {
+
       if (!role || !allowedRoles.includes(role))
         throw new Error("Not allowed to make this API call.");
       if (!api) throw new Error("API instance not found.");
+
       return await getDocMessageForWhatsapp(projectId, stageNumber, api);
     },
-    enabled: !!role && !!projectId && !!api,
+    enabled: !!projectId && !!stageNumber,
     retry: false,
     refetchOnMount: false,
   });
@@ -339,14 +338,13 @@ export const useGetDocMessageForWhatsapp = ({ projectId, stageNumber }: { projec
 
 export const manuallyGenerateStagePdf = async (
   projectId: string,
-  stageNumber: number,
+  stageNumber: string,
   api: AxiosInstance
 ): Promise<string> => {
   const { data } = await api.put(`/documentation/updatedocument/${projectId}/${stageNumber}`);
   return data.data;
 };
 
-// Get all clients by project
 export const useManuallyGenerateStagePdf = () => {
   const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
@@ -354,13 +352,16 @@ export const useManuallyGenerateStagePdf = () => {
 
   return useMutation({
     mutationFn: async ({ projectId, stageNumber }: { projectId: string, stageNumber: string }) => {
+    console.log("stageNumber", stageNumber)
+
       if (!role || !allowedRoles.includes(role))
         throw new Error("Not allowed to make this API call.");
       if (!api) throw new Error("API instance not found.");
-      return await getDocMessageForWhatsapp(projectId, stageNumber, api);
+      return await manuallyGenerateStagePdf(projectId, stageNumber, api);
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["stage-documentation", projectId] });
+      // queryClient.invalidateQueries({ queryKey: ["stage-documentation", projectId, stageNumber] });
+      queryClient.invalidateQueries({ queryKey: ["stage-documentation-message", projectId] });
     },
   });
 };

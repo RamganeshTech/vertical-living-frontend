@@ -40,15 +40,15 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete , deleteRoom
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600">Length</p>
-          <p className="font-semibold text-gray-800">{room.length} ft</p>
+          <p className="font-semibold text-gray-800">{room.length || 0} ft</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600">Breadth</p>
-          <p className="font-semibold text-gray-800">{room.breadth} ft</p>
+          <p className="font-semibold text-gray-800">{room.breadth || 0} ft</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600">Height</p>
-          <p className="font-semibold text-gray-800">{room.height || 'N/A'} ft</p>
+          <p className="font-semibold text-gray-800">{room.height || 0} ft</p>
         </div>
       </div>
 

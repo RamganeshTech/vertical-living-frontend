@@ -230,8 +230,8 @@ export const useCompletionStatusSampleDesign= () => {
 
             return await updateCompletionStatus({ projectId, api });
         },
-        onSuccess: ()=>{
-            queryClient.invalidateQueries({queryKey:["siteMeasurement"]})
+        onSuccess: (_m, {projectId})=>{
+            queryClient.invalidateQueries({queryKey:["sampledesign", "roomfiles", projectId]})
         }
     });
 };
