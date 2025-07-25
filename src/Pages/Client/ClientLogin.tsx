@@ -2,7 +2,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useNavigate, useOutletContext } from "react-router-dom"
+import { Link, useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
@@ -70,22 +70,22 @@ export default function ClientLogin() {
     try {
       const data = await loginClient.mutateAsync(formData)
 
-         const clientData = data.data;
+      const clientData = data.data;
 
-    dispatch(setRole({
-      role: clientData.role,
-      isauthenticated: true,
-      _id: clientData.clientId // or _id
-    }));
+      dispatch(setRole({
+        role: clientData.role,
+        isauthenticated: true,
+        _id: clientData.clientId // or _id
+      }));
 
-    dispatch(setClientProfileData({
-      clientId: clientData.clientId,
-      clientName: clientData.clientName,
-      email: clientData.email,
-      phoneNo: clientData.phoneNo,
-      role: clientData.role,
-      isauthenticated: true
-    }));
+      dispatch(setClientProfileData({
+        clientId: clientData.clientId,
+        clientName: clientData.clientName,
+        email: clientData.email,
+        phoneNo: clientData.phoneNo,
+        role: clientData.role,
+        isauthenticated: true
+      }));
 
 
       toast({
@@ -110,17 +110,17 @@ export default function ClientLogin() {
       </Button> */}
 
 
-       <div className="absolute top-2 left-2">
-              {isMobile && (
-                  <button
-                    onClick={openMobileSidebar}
-                    className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
-                    title="Open Menu"
-                  >
-                    <i className="fa-solid fa-bars"></i>
-                  </button>
-                )}
-           </div>
+      <div className="absolute top-2 left-2">
+        {isMobile && (
+          <button
+            onClick={openMobileSidebar}
+            className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+            title="Open Menu"
+          >
+            <i className="fa-solid fa-bars"></i>
+          </button>
+        )}
+      </div>
 
       <div className="relative w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
@@ -137,7 +137,7 @@ export default function ClientLogin() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-blue-800 font-medium">
@@ -189,6 +189,14 @@ export default function ClientLogin() {
                     <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                   </button>
                 </div>
+              </div>
+
+
+
+            
+
+              <div className="text-right">
+                <Link to="/forgotpassword/client" className="text-blue-600 text-sm font-medium ">forgot Password</Link>
               </div>
 
               {/* Submit Button */}

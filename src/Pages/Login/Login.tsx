@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useCreateUser, useLoginUser } from "../../apiList/userApi";
 import { handleLoginValidation, handleRegistrationValidation } from "../../utils/validation";
 // import ErrorComponent from "../../components/ErrorComponent";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { CardDescription, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 import { Label } from "../../components/ui/Label";
@@ -256,7 +256,9 @@ const LoginPage = () => {
                             </div>
 
 
-
+                            <div className="text-right">
+                                <Link to="/forgotpassword/owner" className="text-blue-600 text-sm font-medium ">forgot Password</Link>
+                            </div>
 
                             <Button
                                 type="submit"

@@ -2,12 +2,12 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Button } from "./ui/Button" 
-import { Input } from "./ui/Input" 
-import { Label } from "./ui/Label" 
-import { Textarea } from "./ui/TextArea" 
-import { useCreateOrganization } from "../apiList/orgApi" 
-import { toast } from "../utils/toast" 
+import { Button } from "./ui/Button"
+import { Input } from "./ui/Input"
+import { Label } from "./ui/Label"
+import { Textarea } from "./ui/TextArea"
+import { useCreateOrganization } from "../apiList/orgApi"
+import { toast } from "../utils/toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog';
 
 interface CreateOrganizationModalProps {
@@ -70,7 +70,7 @@ export default function CreateOrganizationModal({ isOpen, onClose }: CreateOrgan
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-4">
+      <DialogContent className="sm:max-w-md p-4 custom-scrollbar">
         <DialogHeader>
           <DialogTitle className="text-blue-900">Create New Organization</DialogTitle>
         </DialogHeader>

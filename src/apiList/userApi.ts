@@ -14,11 +14,11 @@ type LoginUserParams = {
     password: string;
 };
 
-type ForgotPasswordParams = {
+export type ForgotPasswordParams = {
     email: string;
 };
 
-type ResetPasswordParams = {
+export  type ResetPasswordParams = {
     token: string;
     password: string;
 };

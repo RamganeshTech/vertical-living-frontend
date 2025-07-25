@@ -2,7 +2,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useNavigate, useOutletContext } from "react-router-dom"
+import { Link, useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
@@ -148,7 +148,7 @@ export default function CTOLogin() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-blue-800 font-medium">
@@ -202,6 +202,13 @@ export default function CTOLogin() {
                 </div>
               </div>
 
+
+              
+
+              <div className="text-right">
+                <Link to="/forgotpassword/CTO" className="text-blue-600 text-sm font-medium ">forgot Password</Link>
+              </div>
+
               {/* Submit Button */}
               <Button
                 type="submit"
@@ -220,7 +227,11 @@ export default function CTOLogin() {
                   </>
                 )}
               </Button>
+
             </form>
+
+
+
 
             {/* Footer */}
             <div className="text-center pt-4 border-t border-blue-100">

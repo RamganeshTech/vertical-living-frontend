@@ -162,9 +162,14 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     //  to make the navbar navigate to project list page because there is no navigation for back 
     const isInStageNavBar = pathArray[2] === "projectdetails"
+    const isLoginNavBar = pathArray[1] === "login"
     const handleNav = () => {
         if (isInStageNavBar) {
             navigate(`/organizations/${organizationId}/projects`)
+        }
+
+        if(isLoginNavBar){
+            navigate(`/organizations`)
         }
     }
 

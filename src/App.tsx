@@ -5,6 +5,8 @@ import type { RootState } from './store/store';
 import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
+import ForgotPassword from './Pages/Forgot Password/ForgotPassword';
+import ResetPassword from './Pages/Forgot Password/ResetPassword';
 
 // import Home from './Pages/Home/Home'
 // import Issues from './Pages/Issues/Issues'
@@ -214,6 +216,8 @@ function App() {
           <Route path='/workerregister' element={<WorkerRegister />} />
           <Route path='/ctoregister' element={<CTORegister />} />
           <Route path='/clientregister' element={<ClientRegister />} />
+          <Route path='/reset-password/:role' element={<ResetPassword />} />
+          <Route path='/forgotpassword/:role' element={<ForgotPassword />} />
 
           <Route path="/subscription" element={<SubscriptionPlans />} />
 

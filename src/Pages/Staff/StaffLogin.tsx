@@ -2,7 +2,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useNavigate, useOutletContext } from "react-router-dom"
+import { Link, useNavigate, useOutletContext } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
@@ -42,6 +42,7 @@ export default function StaffLogin() {
       newErrors.password = "Password must be at least 6 characters"
     }
 
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -70,7 +71,7 @@ export default function StaffLogin() {
 
     try {
       const data = await loginStaff.mutateAsync(formData)
-     
+
       const staffData = data.data;
 
       dispatch(setRole({
@@ -143,7 +144,7 @@ export default function StaffLogin() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-blue-800 font-medium">
@@ -195,6 +196,11 @@ export default function StaffLogin() {
                     <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                   </button>
                 </div>
+              </div>
+
+
+              <div className="text-right">
+                <Link to="/forgotpassword/staff" className="text-blue-600 text-sm font-medium ">forgot Password</Link>
               </div>
 
               {/* Submit Button */}

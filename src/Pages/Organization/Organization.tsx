@@ -161,7 +161,7 @@ export default function Organization() {
 
               {/* Stats + Button */}
 
-             { !organizations && <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+             { organizations && <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                 <Button
                   onClick={() => setIsCreateModalOpen(true)}
                   variant="primary"

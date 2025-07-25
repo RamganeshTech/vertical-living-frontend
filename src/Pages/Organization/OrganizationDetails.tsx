@@ -103,15 +103,14 @@ export default function OrganizationDetails() {
       return
     }
 
-
-if (!/^\d{10}$/.test(tempPhone)) {
+    if (!/^\d{10}$/.test(tempPhone)) {
       toast({
         title: "Error",
         description: "Phone number should contain 10 digits number",
         variant: "destructive",
       })
       return
-      
+
     }
 
     try {
@@ -143,9 +142,7 @@ if (!/^\d{10}$/.test(tempPhone)) {
       return
     }
 
-
-
-      if (tempAddress.length > 150) {
+    if (tempAddress.length > 150) {
       toast({
         title: "Error",
         description: "Address cannot be more than 150 characters",
@@ -378,6 +375,7 @@ if (!/^\d{10}$/.test(tempPhone)) {
                         <Input
                           value={tempPhone}
                           type="tel"
+                          maxLength={10}
                           onChange={(e) => setTempPhone(e.target.value)}
                           placeholder="Enter phone number"
                           className="text-sm border-blue-200 focus:border-blue-500 bg-white flex-1"
@@ -476,10 +474,10 @@ if (!/^\d{10}$/.test(tempPhone)) {
                         <i className="fas fa-map-marker-alt text-blue-600 mt-1" />
                         <div className="max-w-[90%] overflow-h-auto !max-h-[150px] ">
                           <span className="text-gray-700 text-sm sm:text-base break-words whitespace-pre-wrap">
-                          {organization?.address || "N/A"}
-                        </span>
+                            {organization?.address || "N/A"}
+                          </span>
                         </div>
-                        
+
                       </div>
                       <Button
                         size="sm"

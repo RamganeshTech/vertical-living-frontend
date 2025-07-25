@@ -51,3 +51,62 @@ export const useLogoutCTO = () => {
         },
     });
 };
+
+
+
+
+
+
+
+  
+const forgotPassworduser = async ({ email }: { email: string}) => {
+  try {
+    let { data } = await CTOApi.post(`/auth/CTO/forgotpassword`, { email })
+
+    if (data.ok) {
+      return data.data
+    }
+  }
+  catch (error) {
+    throw error;
+  }
+}
+
+const resetPasswordUser = async ({ token, password }: {
+  token: string;
+  password: string;
+}) => {
+  try {
+    let { data } = await CTOApi.post(`/auth/CTO/resetpassword`, { token, password })
+
+    if (data.ok) {
+      return data.data
+    }
+  }
+  catch (error) {
+    throw error;
+  }
+}
+
+
+export const useCTOforgotPasswordUser = () => {
+ 
+  return useMutation({
+    mutationFn: async ({ email }: { email: string }) => {
+     
+      return await forgotPassworduser({ email })
+    }
+
+  })
+}
+
+
+export const useCTOResetPasswordUser = () => {
+
+  return useMutation({
+    mutationFn: async ({ token, password }: { token: string, password:string }) => {
+    
+      return await resetPasswordUser({ token , password })
+    }
+  })
+}

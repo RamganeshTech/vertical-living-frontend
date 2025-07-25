@@ -28,7 +28,7 @@ export const LOGIN_ICONS_LOGIN_GROUP = {
 
 export const LOGIN_LABELS = {
   ADMIN: `Admin Login`,
-  STAFF: `STaff Login`,
+  STAFF: `Staff Login`,
   CTO: `CTO Login`,
   WORKER: `Worker Login`,
   CLIENT: `Client Login`

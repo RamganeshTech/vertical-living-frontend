@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useNavigate, useOutletContext } from "react-router-dom"
+import { Link, useNavigate, useOutletContext } from "react-router-dom"
 
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
@@ -45,6 +45,8 @@ export default function WorkerLogin() {
       newErrors.password = "Password must be at least 6 characters"
     }
 
+     
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -73,7 +75,7 @@ export default function WorkerLogin() {
 
     try {
       const data = await loginWorker.mutateAsync(formData)
-    
+
       const workerData = data?.data;
 
       // ✅ 1) Update authSlice
@@ -139,7 +141,7 @@ export default function WorkerLogin() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-blue-800 font-medium">
@@ -180,8 +182,8 @@ export default function WorkerLogin() {
                     onChange={handleChange}
                     placeholder="Enter your password"
                     className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.password
-                        ? "border-red-300 focus:border-red-500"
-                        : "border-blue-200 focus:border-blue-500"
+                      ? "border-red-300 focus:border-red-500"
+                      : "border-blue-200 focus:border-blue-500"
                       } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
@@ -193,6 +195,10 @@ export default function WorkerLogin() {
                     <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
                   </button>
                 </div>
+              </div>
+              
+              <div className="text-right">
+                <Link to="/forgotpassword/worker" className="text-blue-600 text-sm font-medium ">forgot Password</Link>
               </div>
 
               {/* Submit Button */}

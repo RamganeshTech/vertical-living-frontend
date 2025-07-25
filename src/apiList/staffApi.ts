@@ -11,9 +11,9 @@ const loginStaff = async ({ email, password }: { email: string; password: string
 };
 export const useLoginStaff = () => {
   return useMutation({
-    mutationFn:loginStaff,
+    mutationFn: loginStaff,
     onSuccess: () => {
-         // invalidate or refetch user-profile queries if you have them
+      // invalidate or refetch user-profile queries if you have them
       queryClient.invalidateQueries({ queryKey: ["staffProfile"] });
     },
   });
@@ -33,7 +33,7 @@ const registerStaff = async (payload: {
 };
 export const useRegisterStaff = () => {
   return useMutation({
-    mutationFn:registerStaff,
+    mutationFn: registerStaff,
   });
 };
 
@@ -45,7 +45,7 @@ const logoutStaff = async () => {
 };
 export const useLogoutStaff = () => {
   return useMutation({
-    mutationFn:logoutStaff,
+    mutationFn: logoutStaff,
     onSuccess: () => {
       queryClient.clear(); // or just invalidate all staff-related queries
     },
@@ -53,3 +53,62 @@ export const useLogoutStaff = () => {
 };
 
 
+
+
+
+
+
+
+const forgotPassworduser = async ({ email }: { email: string}) => {
+  try {
+    let { data } = await staffApi.post(`/auth/staff/forgotpassword`, { email })
+
+    if (data.ok) {
+      return data.data
+    }
+  }
+  catch (error) {
+    throw error;
+  }
+}
+
+const resetPasswordUser = async ({ token, password }: {
+  token: string;
+  password: string;
+}) => {
+  try {
+    let { data } = await staffApi.post(`/auth/staff/resetpassword`, { token, password })
+
+    if (data.ok) {
+      return data.data
+    }
+  }
+  catch (error) {
+    throw error;
+  }
+}
+
+
+export const useStaffforgotPasswordUser = () => {
+ ;
+  return useMutation({
+    mutationFn: async ({ email }: { email: string }) => {
+    
+
+      return await forgotPassworduser({ email })
+    }
+
+  })
+}
+
+
+export const useStaffResetPasswordUser = () => {
+
+   
+  return useMutation({
+    mutationFn: async ({ token, password }: { token: string, password:string }) => {
+     
+      return await resetPasswordUser({ token , password })
+    }
+  })
+}
