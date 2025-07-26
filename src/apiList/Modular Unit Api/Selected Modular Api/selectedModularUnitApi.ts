@@ -128,6 +128,7 @@ export const useDeleteSelectedModularUnit = () => {
         },
         onSuccess: (_, payload) => {
             queryClient.invalidateQueries({ queryKey: ["selected-modular-units", payload.projectId] });
+            
         },
     });
 };

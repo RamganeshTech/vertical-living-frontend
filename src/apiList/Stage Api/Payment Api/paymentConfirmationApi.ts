@@ -91,7 +91,7 @@ export const useGenerateConsentLink = () => {
 
 // ✅ ACCEPT consent
 export const useAcceptClientConsent = () => {
-  const allowedRoles = ["CTO", "owner", "client"];
+  const allowedRoles = ["CTO", "owner", "staff", "client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();

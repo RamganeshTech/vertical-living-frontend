@@ -44,6 +44,7 @@ const initialRoomDetails: SiteRooms = {
   length: null,
   breadth: null,
   height: null,
+  uploads: []
 };
 
 function HomeInteriorProject() {
@@ -241,6 +242,7 @@ function HomeInteriorProject() {
       {!getAllError && <div className="mb-6">
         <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
           <RequirementFileUploader
+            autoUpload={true}
             formId={measurementData?._id}
             refetch={refetch}
             existingUploads={measurementData?.uploads}

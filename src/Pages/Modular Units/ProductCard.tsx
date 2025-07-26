@@ -1,5 +1,6 @@
 import { Button } from "../../components/ui/Button" 
 import { Badge } from "../../components/ui/Badge" 
+import { NO_IMAGE } from "../../constants/constants"
 
 interface Product {
   id: number
@@ -30,7 +31,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
       {/* Product Image */}
       <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : "aspect-square"}`}>
         <img
-          src={product.image || "/placeholder.svg"}
+          src={product.image || NO_IMAGE}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
         />

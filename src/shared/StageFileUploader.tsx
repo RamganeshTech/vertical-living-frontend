@@ -4,6 +4,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { toast } from "../utils/toast";
 import { downloadImage } from "../utils/downloadFile";
+import { createPortal } from "react-dom";
 
 interface UploadSectionProps {
     formId: string;
@@ -19,10 +20,11 @@ interface UploadSectionProps {
     projectId: string,
     onDeleteUpload?: ({ fileId, projectId }: { fileId: string, projectId: string, }) => Promise<any>,
     deleteFilePending?: boolean
-    refetch:()=> Promise<any>
+    autoUpload?: boolean
+    refetch: () => Promise<any>
 }
 
-const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, projectId, refetch, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending, onDeleteUpload, deleteFilePending }) => {
+const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpload, projectId, refetch, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending, onDeleteUpload, deleteFilePending }) => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [popupImage, setPopupImage] = useState<string | null>(null);
 
@@ -31,6 +33,25 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setSelectedFiles(Array.from(e.target.files));
+
+
+            const files = Array.from(e.target.files || []);
+            if (autoUpload && files.length > 0) {
+                (async () => {
+                    try {
+                        await uploadFilesMutate({ formId, files, projectId });
+                        toast({ title: "Success", description: "Files uploaded successfully." });
+                        setSelectedFiles([]); // clear selection
+                        onUploadComplete?.();
+                    } catch (err: any) {
+                        toast({
+                            title: "Upload Failed",
+                            description: err?.response?.data?.message || "Try again later.",
+                            variant: "destructive",
+                        });
+                    }
+                })();
+            }
         }
     };
 
@@ -63,13 +84,38 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
 
     return (
         <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-blue-700">Uploads</h3>
+            <h3 className="text-xl font-semibold text-blue-700">Common Uploads</h3>
 
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center relative">
                 <Input type="file" multiple onChange={handleFileChange} accept="image/jpeg,image/png,application/pdf" />
-                <Button onClick={handleUpload} isLoading={uploadPending} className="bg-blue-600 text-white">
+                {!autoUpload && <Button onClick={handleUpload} isLoading={uploadPending} className="bg-blue-600 text-white">
                     Upload
-                </Button>
+                </Button>}
+                {autoUpload && uploadPending && (
+                    <div className="absolute inset-y-0 right-2 flex items-center">
+                        <svg
+                            className="animate-spin h-5 w-5 text-gray-500"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                            />
+                            <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 100 16v4l3.5-3.5L12 20v-4a8 8 0 01-8-8z"
+                            />
+                        </svg>
+                    </div>
+                )}
+
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
@@ -86,7 +132,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                                         <i className="fa-solid fa-download"></i>
                                     </a> */}
 
-                                    <Button  onClick={() => downloadImage({src:file?.url, alt:file?.originalName || "file.pdf"})} size="sm" className="text-sm">
+                                    <Button onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })} size="sm" className="text-sm">
                                         <i className="fa-solid fa-download"></i>
                                     </Button>
 
@@ -122,7 +168,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                                         <i className="fas fa-eye"></i>
                                     </Button>
 
-                                    <Button size="sm" onClick={() => downloadImage({src:file.url, alt:file.originalName || "file.pdf"})} className="text-sm">
+                                    <Button size="sm" onClick={() => downloadImage({ src: file.url, alt: file.originalName || "file.pdf" })} className="text-sm">
                                         <i className="fa-solid fa-download"></i>
                                     </Button>
 
@@ -139,10 +185,11 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
             </div>
 
 
-            {popupImage && (
+            {popupImage && 
+                createPortal(
                 <div
                     onClick={() => setPopupImage(null)}
-                    className="fixed inset-0 z-50 p-8 bg-opacity-60 flex items-center justify-center"
+                    className="fixed inset-0  bg-black/70 z-50 p-8 bg-opacity-60 flex items-center justify-center"
                 >
                     <div
                         onClick={(e) => e.stopPropagation()}
@@ -158,7 +205,7 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, project
                             className="max-h-[70vh] w-auto object-contain rounded"
                         />
                     </div>
-                </div>
+                </div>, document.body
             )}
         </div>
     );

@@ -128,7 +128,6 @@ export const useGetSiteMeasurementDetails = ({ projectId }: { projectId: string 
         },
         retry: false,
         refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 5
     })
 }
 
@@ -312,7 +311,7 @@ export const useUploadRequirementFiles = () => {
 
 
     return useMutation({
-        mutationFn: async ({ formId, files, projectId }: UploadFilePayload) => {
+        mutationFn: async ({ formId, files, projectId }: {formId:string, files:File[], projectId:string}) => {
 
             if (!role) throw new Error("not authorized")
 
@@ -322,5 +321,86 @@ export const useUploadRequirementFiles = () => {
 
             return await uploadFiles({ formId, files, projectId, api })
         },
+    });
+};
+
+
+
+const uploadRoomFiles = async ({ roomId, files, api, projectId }:{roomId:string, files:FormData, projectId:string, api: any }) => {
+
+    const response = await api.post(`/sitemeasurement/uploadroom/${projectId}/${roomId}`, files,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+    return response.data;
+}
+
+
+const deleteRoomFiles = async ({ roomId, uploadId, api, projectId }:  {roomId:string, uploadId:string, projectId:string, api: any }) => {
+    const response = await api.delete(`/sitemeasurement/deleteroom/${projectId}/${roomId}/${uploadId}`);
+    return response.data;
+}
+
+
+
+
+
+
+
+// file upload hook
+export const useUploadRoomSiteFiles = () => {
+    const allowedRoles = ["owner", "staff", "CTO", "client"]
+
+    const { role } = useGetRole()
+    const api = getApiForRole(role!)
+
+
+    return useMutation({
+        mutationFn: async ({ roomId, files, projectId }: {roomId:string, files:FormData, projectId:string}) => {
+
+            if (!role) throw new Error("not authorized")
+
+            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
+
+            if (!api) throw new Error("api is null")
+
+            return await uploadRoomFiles({ roomId, files, projectId, api })
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
+        }
+    });
+};
+
+
+
+
+
+
+// file upload hook
+export const useDeleteRoomSiteFiles = () => {
+    const allowedRoles = ["owner", "staff", "CTO", "client"]
+
+    const { role } = useGetRole()
+    const api = getApiForRole(role!)
+
+
+    return useMutation({
+        mutationFn: async ({ roomId, uploadId,  projectId }: {roomId:string, uploadId:string, projectId:string }) => {
+
+            if (!role) throw new Error("not authorized")
+
+            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
+
+            if (!api) throw new Error("api is null")
+
+            return await deleteRoomFiles({ roomId, uploadId, projectId, api })
+        },
+         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
+        }
     });
 };

@@ -1,18 +1,18 @@
 import type React from "react"
 import { useState } from "react"
-import { useOutletContext, useParams } from "react-router-dom"
-import { useGetModularUnits } from "../../apiList/Modular Unit Api/ModularUnitApi" 
-import { modularUnitFieldConfig } from "../../utils/Modular Units/fieldConfigs" 
-import SingleModularUnitCard from "./SingleModularUnitCard" 
-import AddModularUnit from "./AddModularUnit" 
-import { Input } from "../../components/ui/Input" 
-import { Button } from "../../components/ui/Button" 
-import { Select ,  SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
+import { useNavigate, useOutletContext, useParams } from "react-router-dom"
+import { useGetModularUnits } from "../../apiList/Modular Unit Api/ModularUnitApi"
+import { modularUnitFieldConfig } from "../../utils/Modular Units/fieldConfigs"
+import SingleModularUnitCard from "./SingleModularUnitCard"
+import AddModularUnit from "./AddModularUnit"
+import { Input } from "../../components/ui/Input"
+import { Button } from "../../components/ui/Button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
 import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren"
 
 export default function ModularUnitCategoryPage() {
   const { isMobile, openMobileSidebar } = useOutletContext<OrganizationOutletTypeProps>()
-
+  const navigate = useNavigate()
   const { unitType, organizationId } = useParams() as { unitType: string; organizationId: string }
   const [filters, setFilters] = useState<Record<string, string[]>>({})
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string[]>>({})
@@ -20,7 +20,7 @@ export default function ModularUnitCategoryPage() {
   const [appliedSearch, setAppliedSearch] = useState("")
   const [showFilters, setShowFilters] = useState(false)
 
-  
+
 
   const { data, isLoading, isError } = useGetModularUnits(unitType, organizationId, appliedFilters, appliedSearch)
 
@@ -45,42 +45,50 @@ export default function ModularUnitCategoryPage() {
   return (
     <>
       {unitToEdit ? (
-        <AddModularUnit unitToEdit={unitToEdit}  setUnitToEdit={setUnitToEdit}/>
+        <AddModularUnit unitToEdit={unitToEdit} setUnitToEdit={setUnitToEdit} />
       ) : (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 overflow-y-auto">
           {/* Compact Category Hero Section */}
           <div className="relative bg-gradient-to-r from-blue-600 to-blue-800 overflow-hidden">
             <div className="absolute inset-0 bg-black/10"></div>
-            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="relative max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="flex flex-col sm:flex-row items-center justify-between text-white">
                 <div className="flex items-center gap-4 mb-4 sm:mb-0">
-                   {isMobile &&
-                      <button
-                        onClick={openMobileSidebar}
-                        className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
-                        title="Open Menu"
-                      >
-                        <i className="fa-solid fa-bars"></i>
-                      </button>
-                    }
+                  {isMobile &&
+                    <button
+                      onClick={openMobileSidebar}
+                      className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                      title="Open Menu"
+                    >
+                      <i className="fa-solid fa-bars"></i>
+                    </button>
+                  }
                   <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl">
                     <i className="fas fa-cube text-xl"></i>
                   </div>
                   <div className="">
-                    
+
                     <h1 className="text-2xl sm:text-3xl font-bold capitalize">{unitType} Collection</h1>
                     <p className="text-blue-100 text-sm">Premium {unitType} products</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                  <i className="fas fa-box text-sm"></i>
-                  <span className="text-sm font-medium">{data?.length || 0} Products</span>
+                <div className="flex gap-2">
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <i className="fas fa-box text-sm"></i>
+                    <span className="text-sm font-medium">{data?.length || 0} Products</span>
+                  </div>
+
+                  <div onClick={() => navigate(`/organizations/${organizationId}/modularunits`)} className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <i className="fas fa-arrow-left text-sm"></i>
+                    <span className="text-sm font-medium">Back</span>
+                  </div>
                 </div>
+
               </div>
             </div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative">
+          <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 relative">
             {/* Search and Filter Controls */}
             <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg border mb-6 sticky top-4 z-30">
               <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
@@ -101,22 +109,22 @@ export default function ModularUnitCategoryPage() {
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
                   >
                     <i className="fas fa-search mr-1"></i>
-                  <span className="hidden sm:inline">Search</span>
+                    <span className="hidden sm:inline">Search</span>
                   </Button>
-                   <Button
-                variant="primary"
-                  onClick={() => setShowFilters((prev) => !prev)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm`}
-                >
-                  <i className="fas fa-filter"></i>
-                  <span className="hidden sm:inline">Filters</span>
-                  {activeFiltersCount > 0 && (
-                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{activeFiltersCount}</span>
-                  )}
-                </Button>
+                  <Button
+                    variant="primary"
+                    onClick={() => setShowFilters((prev) => !prev)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm`}
+                  >
+                    <i className="fas fa-filter"></i>
+                    <span className="hidden sm:inline">Filters</span>
+                    {activeFiltersCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{activeFiltersCount}</span>
+                    )}
+                  </Button>
                 </div>
 
-               
+
               </div>
             </div>
 
@@ -138,7 +146,7 @@ export default function ModularUnitCategoryPage() {
                       <div className="flex items-center gap-3">
                         {activeFiltersCount > 0 && (
                           <Button
-                          variant="danger"
+                            variant="danger"
                             onClick={() => setFilters({})}
                             className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm"
                           >
@@ -167,7 +175,7 @@ export default function ModularUnitCategoryPage() {
 
                             {config.type === "select" && config.options && (
                               <Select
-                                
+
                                 onValueChange={(value) =>
                                   setFilters((prev) => ({
                                     ...prev,
@@ -177,7 +185,7 @@ export default function ModularUnitCategoryPage() {
                               >
                                 <SelectTrigger className="w-full rounded-lg border-gray-200 focus:ring-2 focus:ring-blue-500">
                                   <SelectValue placeholder="All"
-                                  selectedValue={filters[fieldName]?.[0] || ""}
+                                    selectedValue={filters[fieldName]?.[0] || ""}
                                   />
 
 

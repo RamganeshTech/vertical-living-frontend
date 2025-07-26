@@ -26,6 +26,7 @@ export type PrivateRequriementFromProp = {
   data: any,
   isEditable: any,
   setVisibleSection: React.Dispatch<React.SetStateAction<string | null>>
+  sectionName: string
 }
 
 const SectionConfig = [
@@ -158,10 +159,11 @@ export default function RequirementForm() {
     <div className="h-full w-full overflow-y-auto ">
       {visibleSection ? (
         <div className="min-h-screen">
-          {SectionConfig.map(({ Component, key }) => (
+          {SectionConfig.map(({ Component, key, }) => (
             visibleSection === key && (
               <div key={key} className="pt-6">
                 <Component
+                  sectionName={key}
                   data={formData?.[key]}
                   isEditable={formData?.isEditable}
                   setVisibleSection={setVisibleSection}
@@ -215,7 +217,7 @@ export default function RequirementForm() {
                 className="sm:!max-w-[20%] w-full"
               />
 
-             {!error && <ShareDocumentWhatsapp
+              {!error && <ShareDocumentWhatsapp
                 projectId={projectId}
                 stageNumber="1"
                 className="w-full sm:w-fit"
@@ -272,10 +274,10 @@ export default function RequirementForm() {
             </Card>
 
             {/* Client Info & Uploads */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-              <ClientInfoCard client={formData?.clientData} />
+            <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+              <ClientInfoCard className="w-[100%] md:w-[50%]" client={formData?.clientData} />
 
-              <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
+              <Card className="p-4 w-[100%] md:w-[50%] shadow border-l-4 border-blue-500 bg-white">
                 <RequirementFileUploader
                   formId={formData?._id}
                   existingUploads={formData?.uploads}

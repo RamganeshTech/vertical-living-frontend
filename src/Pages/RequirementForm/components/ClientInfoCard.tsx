@@ -3,11 +3,12 @@ import { Card } from "../../../components/ui/Card";
 
 type Props = {
   client: any
+  className:string
 };
 
-const ClientInfoCard = ({ client }: Props) => {
+const ClientInfoCard = ({ client , className }: Props) => {
   return (
-    <Card className="p-4 bg-white shadow border-l-4 border-blue-500">
+    <Card className={` ${className} p-4 bg-white shadow border-l-4 border-blue-500`}>
       <h2 className="text-lg font-semibold text-blue-700 mb-4">
         <i className="fa-solid fa-user-tie mr-2" /> Client Info
       </h2>

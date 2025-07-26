@@ -280,6 +280,7 @@ export interface SiteRooms {
   length: number | null;
   breadth: number | null;
   height?: number | null;
+  uploads:any[]
 }
 
 

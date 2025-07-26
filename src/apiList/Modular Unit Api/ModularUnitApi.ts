@@ -155,6 +155,7 @@ export const useCreateModularUnit = () => {
         },
         onSuccess: (_, { unitType }) => {
             queryClient.invalidateQueries({ queryKey: ["modularUnits", unitType] });
+            queryClient.invalidateQueries({ queryKey: ["mixedunits"] });
         },
     });
 };

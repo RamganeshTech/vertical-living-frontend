@@ -268,25 +268,6 @@ function App() {
             } />
 
 
-            {/* <Route path="modularunits" element={
-            <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
-              <ModularUnitMain />
-            </ProtectedRoutes>
-          } >
-
-            <Route path="add" element={
-              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
-                <AddModularUnit />
-              </ProtectedRoutes>} />
-
-            <Route path="category/:unitType" element={
-              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
-                <ModularUnitCategoryPage />
-              </ProtectedRoutes>} />
-
-          </Route> */}
-
-
 
 
             <Route path="modularunits" element={

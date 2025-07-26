@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { IKitchenRequirement } from "../../../types/types"; 
+import type { IKitchenRequirement } from "../../../types/types";
 import type { PrivateRequriementFromProp } from "../RequriementForm";
 import { Input } from "../../../components/ui/Input";
 import { Label } from "../../../components/ui/Label";
@@ -9,8 +9,9 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from ".
 import { useParams } from "react-router-dom";
 import { useKitchenFormUpdation } from "../../../apiList/Stage Api/requirementFormApi";
 import { toast } from "../../../utils/toast";
+import RequirementSectionUpload from "../components/RequirementSectionUpload";
 
-const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
+const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection, sectionName }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<IKitchenRequirement>({
     layoutType: data?.layoutType || "",
@@ -23,31 +24,31 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
 
   const { mutateAsync, isPending } = useKitchenFormUpdation();
 
-   const handleChange = (
+  const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const target = e.target;
     const { name, type, value } = target;
-  
+
     let finalValue: string | number | boolean = value;
-  
+
     if (type === "checkbox") {
       finalValue = (target as HTMLInputElement).checked;
     } else if (type === "number") {
-         const parsedValue = parseFloat(value);
+      const parsedValue = parseFloat(value);
       finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
-     }
-  
+    }
+
     if (["top", "left", "right"].includes(name)) {
       setFormData((prev: any) => ({
         ...prev,
-          measurements: {
-            ...prev?.measurements,[name]: finalValue,
-          },
-        }
-    ));
+        measurements: {
+          ...prev?.measurements, [name]: finalValue,
+        },
+      }
+      ));
     } else {
-       setFormData((prev) => ({
+      setFormData((prev) => ({
         ...prev,
         [name]: finalValue,
       }));
@@ -62,15 +63,15 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
   };
 
   const handleSubmit = async () => {
-      try{
+    try {
       if (!projectId) return;
-       await mutateAsync({ projectId, updateData: formData });
+      await mutateAsync({ projectId, updateData: formData });
       toast({ title: "Success", description: "Kitchen data updated successfully" })
-      }
-      catch(error:any){
-          toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to generate invitation link", variant: "destructive" })
-      }
-    };
+    }
+    catch (error: any) {
+      toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to generate invitation link", variant: "destructive" })
+    }
+  };
 
   return (
     <div className="space-y-6 bg-white rounded-2xl p-6 shadow border border-blue-200">
@@ -89,7 +90,7 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
               <SelectValue placeholder="Select layout" selectedValue={formData.layoutType || ""} />
             </SelectTrigger>
             <SelectContent>
-                            <SelectItem value="">Select Layout</SelectItem>
+              <SelectItem value="">Select Layout</SelectItem>
               <SelectItem value="L-shaped">L-shaped</SelectItem>
               <SelectItem value="Straight">Straight</SelectItem>
               <SelectItem value="U-shaped">U-shaped</SelectItem>
@@ -105,7 +106,7 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
               <SelectValue placeholder="Select package" selectedValue={formData.kitchenPackage || ""} />
             </SelectTrigger>
             <SelectContent>
-                            <SelectItem value="">Select Package</SelectItem>
+              <SelectItem value="">Select Package</SelectItem>
               <SelectItem value="Essentials">Essentials</SelectItem>
               <SelectItem value="Premium">Premium</SelectItem>
               <SelectItem value="Luxury">Luxury</SelectItem>
@@ -126,17 +127,17 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
 
         <div>
           <Label>Measurement - Top (in feet)</Label>
-          <Input type="number" name="top" value={formData.measurements?.top || ""} onChange={handleChange} min={0} />
+          <Input type="number" name="top" value={formData.measurements?.top || 0} onChange={handleChange} min={0} />
         </div>
 
         <div>
           <Label>Measurement - Left (in feet)</Label>
-          <Input type="number" name="left" value={formData.measurements?.left || ""} onChange={handleChange} min={0} />
+          <Input type="number" name="left" value={formData.measurements?.left || 0} onChange={handleChange} min={0} />
         </div>
 
         <div>
           <Label>Measurement - Right (in feet)</Label>
-          <Input type="number" name="right" value={formData.measurements?.right || ""} onChange={handleChange} min={0} />
+          <Input type="number" name="right" value={formData.measurements?.right || 0} onChange={handleChange} min={0} />
         </div>
 
         <div className="md:col-span-2">
@@ -151,6 +152,14 @@ const KitchenSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisible
           />
         </div>
       </div>
+
+
+
+      <RequirementSectionUpload
+        projectId={projectId!}
+        sectionName={sectionName}
+        existingUploads={data?.uploads  || []}
+      />
 
       <div className="pt-4">
         <Button onClick={handleSubmit} isLoading={isPending} className="bg-blue-600 text-white w-full md:w-auto">

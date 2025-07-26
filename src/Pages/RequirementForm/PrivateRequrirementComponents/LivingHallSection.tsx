@@ -9,8 +9,9 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from ".
 import { useParams } from "react-router-dom";
 import { useLivingHallFormUpdation } from "../../../apiList/Stage Api/requirementFormApi";
 import { toast } from "../../../utils/toast";
+import RequirementSectionUpload from "../components/RequirementSectionUpload";
 
-const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection }) => {
+const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisibleSection, sectionName }) => {
   const { projectId } = useParams();
   const [formData, setFormData] = useState<ILivingHallRequirement>({
     seatingStyle: data?.seatingStyle || "",
@@ -161,6 +162,15 @@ const LivingHallSection: React.FC<PrivateRequriementFromProp> = ({ data, setVisi
           />
         </div>
       </div>
+
+
+
+
+       <RequirementSectionUpload
+        projectId={projectId!}
+        sectionName={sectionName}
+        existingUploads={data?.uploads  || []}
+      />
 
       <div className="pt-4">
         <Button onClick={handleSubmit} isLoading={isPending} className="bg-blue-600 text-white w-full md:w-auto">

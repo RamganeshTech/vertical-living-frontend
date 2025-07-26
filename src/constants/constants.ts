@@ -1,3 +1,5 @@
+import noimg from '../assets/no image.jpeg'
+
 export const SIDEBAR_LABELS = {
   //   DASHBOARD: "Dashboard",
   PROJECTS: "Projects",
@@ -39,7 +41,7 @@ export const ORGANIZATION_ICONS = {
   INVITESTAFFS: "fa-solid fa-user text-2xl",
   DETAILS: "fa-solid fa-building text-2xl",
   PROJECTS: "fa-solid fa-diagram-project  text-2xl",
-  PLAN: "fa-solid fa-cash  text-2xl",
+  PLAN: "fa-solid fa-wallet  text-2xl",
   PROFILE: "fa-solid fa-user-gear  text-2xl",
   MODULAR: "fa-solid fa-box  text-2xl"
 }
@@ -74,7 +76,7 @@ export const PROJECTS_LABELS = {
   ORDERMATERIALS: "Ordering Material",
   MATERIALARRIVED: "Material Arrival",
   WORKSCHEDULE: "Work Schedule",
-  INSTALLATION: "Installation and execution",
+  INSTALLATION: "Installation & execution",
   QUALITYCHECK: "Quality Check",
   CLEANINGSANITATION: "Cleaning & Sanitation",
   PROJECTDELIVERY: "Project Delivery",
@@ -85,7 +87,7 @@ export const PROJECTS_ICONS = {
   // MATERIALS: "fa-solid fa-cubes-stacked text-2xl",
   // LABOURS: "fa-solid fa-users text-2xl",
   // TRANSPORTATION: "fa-solid fa-road text-2xl",
-  DOCUMENTATION: "fa-solid fa-document text-2xl",
+  DOCUMENTATION: "fa-solid fa-file text-2xl",
   WORKERS: "fa-solid fa-circle-info text-2xl",
   INVITECLIENT: "fa-solid fa-user-group text-2xl",
   PREREQUIRETIES: "fa-solid fa-clipboard text-2xl",
@@ -115,20 +117,22 @@ export const MAIN_PATH_LABEL: Record<any, string> = {
   transportationlist: "Transportation",
   workers: "Workers",
   inviteclient: "Invite Client",
-  requirementform: "Requirement Form",
-  sitemeasurement: "Site Measurement",
-  sampledesign: "Sample Designs",
-  technicalconsultant: "Technical consultant",
-  materialselection: "Material Selection",
-  costestimation: "Cost Estiamtion",
-  paymentconfirmation: "Payment Stage",
-  ordermaterial: "Ordering Material",
-  materialarrival: "Material Arrival",
-  workmainschedule: "Work Schedule",
-  installation: "Installation and execution",
-  qualitycheck: "Quality Check",
-  cleaning: "Cleaning & Sanitation",
-  projectdelivery: "Project Delivery",
+  requirementform: "1 Requirement Form",
+  sitemeasurement: "2 Site Measurement",
+  sampledesign: "3 Sample Designs",
+  technicalconsultant: "4 Technical consultant",
+  SELECTSTAGE: "5 Select Stage",
+  modularunits: "5 Modular Unit",
+  materialselection: "5 Material Selection",
+  costestimation: "6 Cost Estiamtion",
+  paymentconfirmation: "7 Payment Stage",
+  ordermaterial: "8 Ordering Material",
+  materialarrival: "9 Material Arrival",
+  workmainschedule: "10 Work Schedule",
+  installation: "11 Installation and execution",
+  qualitycheck: "12 Quality Check",
+  cleaning: "13 Cleaning & Sanitation",
+  projectdelivery: "14 Project Delivery",
 }
 
 
@@ -141,6 +145,8 @@ export const MAIN_PATH_ICON: Record<any, string> = {
   requirementform: "REQUIREMENTFORM",
   sitemeasurement: "SITEMEASUREMENT",
   sampledesign: "SAMPLEDESIGN",
+  modularunits:"MODULARUNIT",
+  selectstage:"SELECTSTAGE",
   technicalconsultant: "TECHNICALCONSULTANT",
   materialselection: "MATERIALSELECTION",
   costestimation: "COSTESTIMATION",
@@ -153,6 +159,8 @@ export const MAIN_PATH_ICON: Record<any, string> = {
   cleaning: "CLEANINGSANITATION",
   projectdelivery: "PROJECTDELIVERY",
 }
+
+export const NO_IMAGE = noimg
 
 export const COMPANY_DETAILS = {
   COMPANY_NAME: "Vertical living",

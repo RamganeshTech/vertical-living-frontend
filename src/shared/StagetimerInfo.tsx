@@ -138,14 +138,14 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
                 });
             }
 
-            const now = new Date();
-            if (selectedDate < now) {
-                return toast({
-                    title: "Invalid Date",
-                    description: "The started time cannot be in the past.",
-                    variant: "destructive",
-                });
-            }
+            // const now = new Date();
+            // if (selectedDate < now) {
+            //     return toast({
+            //         title: "Invalid Date",
+            //         description: "The started time cannot be in the past.",
+            //         variant: "destructive",
+            //     });
+            // }
 
             await startTimerMutate({
                 projectId,
@@ -201,7 +201,7 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
                     <Input
                         type="datetime-local"
                         value={newStartDate} // reuse same state
-                        min={new Date().toISOString().slice(0, 16)}
+                        // min={new Date().toISOString().slice(0, 16)}    ///used to restrict selecting the past
                         onChange={(e) => setNewStartDate(e.target.value)}
                         className="max-w-xs"
                     />

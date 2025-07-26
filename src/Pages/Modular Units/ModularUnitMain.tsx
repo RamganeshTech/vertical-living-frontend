@@ -7,6 +7,7 @@ import { modularUnitFieldConfig } from "../../utils/Modular Units/fieldConfigs"
 import { Button } from "../../components/ui/Button"
 import SingleModularUnitCard from "./SingleModularUnitCard"
 import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren"
+import { useGetSelectedModularUnits } from "../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi"
 
 type SingleUnitType = {
   _id: string
@@ -21,8 +22,10 @@ type SingleUnitType = {
 export default function ModularUnitMain() {
 
   const { isMobile, openMobileSidebar } = useOutletContext<OrganizationOutletTypeProps>()
-  const { organizationId, projectId } = useParams() as { organizationId: string,  projectId: string }
+  const { organizationId, projectId } = useParams() as { organizationId: string, projectId: string }
 
+  const { data, isLoading, isError } = useGetAllMixedUnits(organizationId)
+  const { data: selectedModularUnits } = useGetSelectedModularUnits(projectId!)
 
 
   const [selectedCategory, setSelectedCategory] = useState<string>("")
@@ -34,7 +37,6 @@ export default function ModularUnitMain() {
 
   const isProjectDetails = location.pathname.includes("projectdetails")
 
-  const { data, isLoading, isError } = useGetAllMixedUnits(organizationId)
 
   if (isLoading) {
     return (
@@ -57,7 +59,7 @@ export default function ModularUnitMain() {
     <>
       {isChildRoute ? (
         <div className={`${isProjectDetails ? "max-h-full" : "h-screen"}  bg-gradient-to-br from-gray-50 to-blue-50 overflow-y-auto`}>
-          <Outlet context={{isMobile, openMobileSidebar}} />
+          <Outlet context={{ isMobile, openMobileSidebar }} />
         </div>
       ) : (
         <div className={`${isProjectDetails ? "max-h-full" : "h-screen"} bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col overflow-hidden `}>
@@ -94,17 +96,20 @@ export default function ModularUnitMain() {
 
                   {/* Desktop Add Button */}
                   {!isProjectDetails ? <Button
-                    onClick={() => navigate("add")}
+                    onClick={() => navigate(`add`)}
                     className="hidden md:flex  sm:px-4 py-2  items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                   >
                     <i className="fas fa-plus"></i>
                     Add <span className="hidden sm:inline">New Product</span>
                   </Button>
-                :
-                <div className="p-2 border-2 border-gray-300 rounded-lg">
-                  <Link to={`/${organizationId}/projectdetails/${projectId}/modularunits/selectedunits`}><i className="fas fa-shopping-cart text-xl text-blue-600 "></i></Link>
-                </div>  
-                }
+                    :
+                    <div className="p-2 relative border-2 border-gray-300 rounded-lg">
+                      <div className="w-6 justify-center items-center flex absolute top-[-12px] right-[-10px] h-6 rounded-full bg-gray-200 text-black">
+                      <p className="text-gray-600 font-medium">{selectedModularUnits?.selectedUnits?.length}</p>
+                      </div>
+                      <Link to={`/${organizationId}/projectdetails/${projectId}/modularunits/selectedunits`}><i className="fas fa-shopping-cart text-xl text-blue-600 "></i></Link>
+                    </div>
+                  }
 
                   <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -119,11 +124,11 @@ export default function ModularUnitMain() {
 
           {/* Main Content Container */}
           <div className="flex-1 flex overflow-hidden ">
-            <div onClick={()=>setIsSidebarOpen(false) } className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex gap-6 w-full overflow-hidden">
+            <div onClick={() => setIsSidebarOpen(false)} className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex gap-6 w-full overflow-hidden">
               {/* Mobile Sidebar Overlay */}
-             
+
               {/* Sidebar - Fixed width with internal scroll */}
-              
+
               <aside
                 className={`
                   fixed md:static inset-y-0 left-0 !z-50 w-80 md:w-72 bg-white md:bg-white/90 md:backdrop-blur-sm
@@ -170,8 +175,8 @@ export default function ModularUnitMain() {
                     {/* All Products Option */}
                     <button
                       className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${selectedCategory === ""
-                          ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
-                          : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
+                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                         }`}
                       onClick={() => {
                         setSelectedCategory("")
@@ -192,8 +197,8 @@ export default function ModularUnitMain() {
                       <button
                         key={cat}
                         className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${selectedCategory === cat
-                            ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
-                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
+                          : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                           }`}
                         onClick={() => {
                           navigate(`category/${cat}`)
@@ -284,13 +289,22 @@ export default function ModularUnitMain() {
                         <i className="fas fa-cube text-gray-400 text-5xl mb-6"></i>
                         <h3 className="text-xl font-bold text-gray-900 mb-3">No Products Found</h3>
                         <p className="text-gray-600 mb-6">Get started by adding your first product to the catalog.</p>
-                        <Button
+                        {!isProjectDetails ? <Button
                           onClick={() => navigate("add")}
                           className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl transition-all shadow-lg"
                         >
                           <i className="fas fa-plus mr-2"></i>
                           Add Product
-                        </Button>
+                        </Button> 
+                        :
+                          <Button
+                            onClick={() => navigate(`/organizations/${organizationId}/modularunits/add`)}
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-xl transition-all shadow-lg"
+                          >
+                            <i className="fas fa-plus mr-2"></i>
+                            Add Product
+                          </Button>
+                        }
                       </div>
                     </div>
                   ) : (

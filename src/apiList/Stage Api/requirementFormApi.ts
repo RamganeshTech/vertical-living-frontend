@@ -383,3 +383,118 @@ export const useLivingHallFormUpdation = () => {
 }
 
 
+
+
+
+
+
+// UPLOAD FILE CORRESPONDING TO SECITON
+
+
+
+const uploadRequirementSectionFilesApi = async (
+  projectId: string,
+  sectionName: string,
+  files: FormData,
+  api: AxiosInstance
+) => {
+  const { data } = await api.post(
+    `/requirementform/${projectId}/${sectionName}/upload`,
+    files,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useUploadRequirementSectionFiles = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  const allowedRoles = ["owner", "staff", "CTO", "client"];
+
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+      sectionName,
+      files,
+    }: {
+      projectId: string;
+      sectionName: string;
+      files: FormData;
+    }) => {
+      if (!role || !allowedRoles.includes(role)) {
+        throw new Error("You are not allowed to make this API call");
+      }
+      if (!api) throw new Error("API instance not found for role");
+
+      return await uploadRequirementSectionFilesApi(
+        projectId,
+        sectionName,
+        files,
+        api
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["requirementForm"] });
+    },
+  });
+};
+
+
+
+
+
+
+
+const deleteRequirementSectionFileApi = async (
+  projectId: string,
+  sectionName: string,
+  fileId: string,
+  api: AxiosInstance
+) => {
+  const { data } = await api.delete(`/requirementform/${projectId}/${sectionName}/${fileId}/deletefile`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+export const useDeleteRequirementSectionFile = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  const allowedRoles = ["owner", "staff", "CTO"];
+
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+      sectionName,
+      fileId,
+    }: {
+      projectId: string;
+      sectionName: string;
+      fileId: string;
+    }) => {
+      if (!role || !allowedRoles.includes(role)) {
+        throw new Error("You are not allowed to make this API call");
+      }
+      if (!api) throw new Error("API instance not found for role");
+
+      return await deleteRequirementSectionFileApi(
+        projectId,
+        sectionName,
+        fileId,
+        api
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["requirementForm"] });
+    },
+  });
+};

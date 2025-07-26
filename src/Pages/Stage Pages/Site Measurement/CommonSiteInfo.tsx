@@ -108,7 +108,7 @@ const CommonSiteInfo:React.FC<CommonSiteInfoProps> = ({measurementData,handleDel
                 <p className="text-gray-500">No rooms added yet</p>
               </div>
               :
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="mt-4 grid grid-cols-1 gap-6">
                 {measurementData.rooms.map((room: SiteRooms, index: number) => (
                   <RoomCard
                     key={index}

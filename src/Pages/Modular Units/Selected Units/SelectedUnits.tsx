@@ -1,16 +1,17 @@
-import { useParams, useOutletContext } from "react-router-dom"
+import { useParams, useOutletContext, useNavigate } from "react-router-dom"
 import { toast } from "../../../utils/toast"
 
 
-import { Button } from "../../../components/ui/Button" 
+import { Button } from "../../../components/ui/Button"
 import { Badge } from "../../../components/ui/Badge"
-import { Card , CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { useCompleteModularUnitSelection, useDeleteSelectedModularUnit, useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi"
 import type { OrganizationOutletTypeProps } from "../../Organization/OrganizationChildren";
+import { NO_IMAGE } from "../../../constants/constants";
 
 interface ISelectedUnit {
   unitId: string
-  customId:string
+  customId: string
   category: string
   image: string | null
   quantity: number
@@ -21,6 +22,8 @@ interface ISelectedUnit {
 export default function SelectedUnits() {
   const { projectId } = useParams()
   const { isMobile, openMobileSidebar } = useOutletContext<OrganizationOutletTypeProps>()
+  const navigate = useNavigate()
+
 
   // Custom hooks
   const { data: selectedModularUnits, isLoading, error, refetch } = useGetSelectedModularUnits(projectId!)
@@ -91,9 +94,6 @@ export default function SelectedUnits() {
   //   return iconMap[category] || "fas fa-cube"
   // }
 
-  const getPlaceholderImage = (category: string) => {
-    return `/placeholder.svg?height=200&width=300&text=${encodeURIComponent(formatCategory(category))}`
-  }
 
   const selectedUnits = selectedModularUnits?.selectedUnits || []
   const totalCost = selectedModularUnits?.totalCost || 0
@@ -168,10 +168,10 @@ export default function SelectedUnits() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="h-screen w-full flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Fixed Header with Total and Complete Button */}
-      <div className="bg-white shadow-sm border-b border-slate-200 px-4 py-4 flex-shrink-0">
-        <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="bg-white w-full shadow-sm border-b border-slate-200 px-4 py-4 flex-shrink-0">
+        <div className="flex w-full items-center justify-between flex-wrap gap-4">
           {/* Left side - Menu button and title */}
           <div className="flex items-center">
             {isMobile && (
@@ -183,30 +183,31 @@ export default function SelectedUnits() {
                 <i className="fa-solid fa-bars"></i>
               </button>
             )}
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold text-slate-900">Selected Units</h1>
-              <div className="flex items-center space-x-4 mt-1">
-                {!isMobile && <Badge variant="secondary" className="text-xs px-2 py-1 ">
-                  <i className="fas fa-cube mr-1" />
-                  {selectedUnits.length} {selectedUnits.length === 1 ? "Unit" : "Units"}
-                </Badge>}
-                {/* {selectedModularUnits?.updatedAt && (
-                  <span className="text-xs text-slate-500">
-                    Updated: {new Date(selectedModularUnits.updatedAt).toLocaleDateString()}
-                  </span>
-                )} */}
+            <div className="flex gap-2 items-center flex-row-reverse w-70 justify-between sm:flex-row sm:justify-start">
+              <div onClick={() => navigate(-1)} className="flex bg-gray-200  rounded-full items-center gap-2 backdrop-blur-sm px-4 py-2 ">
+                <i className="fas fa-arrow-left text-sm"></i>
+                <span className="text-sm font-medium">Back</span>
+              </div>
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold text-slate-900">Selected Units</h1>
+                <div className="flex items-center space-x-4 mt-1">
+                  {!isMobile && <Badge variant="secondary" className="text-xs px-2 py-1 ">
+                    <i className="fas fa-cube mr-1" />
+                    {selectedUnits.length} {selectedUnits.length === 1 ? "Unit" : "Units"}
+                  </Badge>}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Right side - Total and Complete button */}
-          <div className="flex items-center justify-between sm:justify-center space-x-4 w-full sm:w-fit">
+          <div className="flex items-center  justify-between sm:justify-center space-x-4 w-full sm:w-fit">
             <div className="text-left sm:text-right">
               <p className="text-sm text-slate-600">Total Cost</p>
               <p className="text-xl md:text-2xl font-bold text-green-600">{formatCurrency(totalCost)}</p>
             </div>
             <Button
-            isLoading={isCompleting}
+              isLoading={isCompleting}
               onClick={handleCompleteSelection}
               disabled={isCompleting || !hasUnits}
               className="px-4 md:px-6 bg-green-600 hover:bg-green-700 text-white"
@@ -219,7 +220,7 @@ export default function SelectedUnits() {
               ) : (
                 <>
                   <i className="fas fa-check-circle mr-2" />
-                  {isMobile ? "Complete" : "Complete Selection"}
+                  {isMobile ? "Generate" : "Generate Bill"}
                 </>
               )}
             </Button>
@@ -246,8 +247,8 @@ export default function SelectedUnits() {
               <>
                 {/* Units Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-4">
-                  {selectedUnits.map((unit:ISelectedUnit, index:number) => (
-                    
+                  {selectedUnits.map((unit: ISelectedUnit, index: number) => (
+
                     <Card
                       key={`${unit.unitId}-${index}`}
                       className="hover:shadow-lg transition-shadow duration-300 overflow-hidden"
@@ -255,17 +256,17 @@ export default function SelectedUnits() {
                       {/* Unit Image */}
                       <div className="relative h-48 bg-gray-100">
                         <img
-                          src={unit.image || getPlaceholderImage(unit.category)}
+                          src={unit.image || NO_IMAGE}
                           alt={formatCategory(unit.category)}
-                          className="w-full border h-full "
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement
-                            target.src = getPlaceholderImage(unit.category)
-                          }}
+                          className="w-full h-full  "
+                        // onError={(e) => {
+                        //   const target = e.target as HTMLImageElement
+                        //   // target.src = getPlaceholderImage(unit.category)
+                        // }}
                         />
                         {/* Delete Button Overlay */}
                         <Button
-                        isLoading={isDeleting}
+                          isLoading={isDeleting}
                           onClick={() => handleDeleteUnit(unit.unitId.toString())}
                           disabled={isDeleting}
                           variant="ghost"

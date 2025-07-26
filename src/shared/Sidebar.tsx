@@ -98,8 +98,28 @@ export const getSidebarConfig = (
         filteredPaths = path;
     }
 
-    return {
-        filteredLabels,
+    let stageCounter = 1;
+let startNumbering = false;
+
+const numberedLabels: Record<string, string> = {};
+
+for (const key of Object.keys(filteredLabels)) {
+  if (key === "REQUIREMENTFORM") {
+    startNumbering = true;
+  }
+
+  if (startNumbering) {
+    numberedLabels[key] = `${stageCounter} ${filteredLabels[key]}`;
+    stageCounter++;
+  } else {
+    // Don't number stages before REQUIREMENTFORM
+    numberedLabels[key] = filteredLabels[key];
+  }
+}
+
+// Use numberedLabels in the return
+return {
+  filteredLabels: numberedLabels,
         filteredIcons,
         filteredPaths
     };
@@ -110,7 +130,7 @@ export const getSidebarConfig = (
 
 
 const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
-    const [showSideBar, setShowSideBar] = useState(true)
+    const [showSideBar, setShowSideBar] = useState(false)
     const { projectId } = useParams() as { projectId: string }
     const navigate = useNavigate()
     const location = useLocation()
@@ -168,7 +188,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
             navigate(`/organizations/${organizationId}/projects`)
         }
 
-        if(isLoginNavBar){
+        if (isLoginNavBar) {
             navigate(`/organizations`)
         }
     }
@@ -209,11 +229,10 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     };
 
 
-
     return (
         <>
             {showSideBar ?
-                <aside className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
+                <aside onMouseLeave={() => setShowSideBar(false)} className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
                     <div className="flex flex-col flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar p-2">
                         <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b-1 py-2`}>
                             <span className='text-xl'>{COMPANY_DETAILS.COMPANY_NAME}</span>
@@ -269,7 +288,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
                 </aside>
                 :
-                <aside className="flex flex-col relative justify-between bg-[#2f303a] w-[6%]  max-h-full  text-[#9ca3af] transition-all duration-300 ">
+                <aside onMouseEnter={() => setShowSideBar(true)} className="flex flex-col relative justify-between bg-[#2f303a] w-[6%]  max-h-full  text-[#9ca3af] transition-all duration-300 ">
                     <div className='max-h-[95%] overflow-y-auto overflow-x-hidden custom-scrollbar'>
                         <div className='flex items-center flex-col justify-between w-full'>
 

@@ -4,8 +4,9 @@ import { Button } from "../../components/ui/Button"
 import { toast } from "../../utils/toast"
 import { useDeleteModularUnit } from "../../apiList/Modular Unit Api/ModularUnitApi"
 import { useLocation, useParams } from "react-router-dom"
-import { Input } from "../../components/ui/Input"
+// import { Input } from "../../components/ui/Input"
 import { useAddSelectedModularUnit } from "../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi"
+import { NO_IMAGE } from "../../constants/constants"
 
 type SingleModularUnitCardProp = {
   unit: any
@@ -20,8 +21,8 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
   const { mutateAsync: selectUnit, isPending: isSelectLoading } = useAddSelectedModularUnit()
 
   const location = useLocation()
-  const [isSelecting, setIsSelecting] = useState(false)
-  const [quantity, setQuantity] = useState(1)
+  // const [isSelecting, setIsSelecting] = useState(false)
+  // const [quantity, setQuantity] = useState(1)
   
   
   const isProjectDetails = location.pathname.includes("projectdetails")
@@ -47,10 +48,10 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
 
 
   const handleSelectSubmit = async () => {
-    if (!quantity || quantity <= 0) {
-      toast({ title: "Invalid Quantity", description: "Quantity must be greater than 0" });
-      return;
-    }
+    // if (!quantity || quantity <= 0) {
+    //   toast({ title: "Invalid Quantity", description: "Quantity must be greater than 0" });
+    //   return;
+    // }
 
     try {
       const payload = {
@@ -60,12 +61,12 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
         projectId,
         category: unit.category,
         singleUnitCost: unit.price,
-        quantity,
+        quantity: 1,
       };
 
       await selectUnit(payload);
       toast({ title: "Success", description: "Unit selected successfully" });
-      setIsSelecting(false);
+      // setIsSelecting(false);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -81,7 +82,7 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
       <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
         {unit.images?.[0]?.url && !imageError ? (
           <img
-            src={unit.images[0].url || "/placeholder.svg"}
+            src={unit.images[0].url || NO_IMAGE}
             alt={unit.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={() => setImageError(true)}
@@ -192,31 +193,32 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
         </div>
           :
 
-          <>
-            {!isSelecting ? (
-              <Button
-                variant="primary"
-                className="w-full"
-                onClick={() => setIsSelecting(true)}
-              >
-                <i className="fas fa-plus mr-1"></i> Select
-              </Button>
-            ) : (
+          // <>
+          //   {!isSelecting ? (
+          //     <Button
+          //       variant="primary"
+          //       className="w-full"
+          //       onClick={() => setIsSelecting(true)}
+          //     >
+          //       <i className="fas fa-plus mr-1"></i> Select
+          //     </Button>
+          //   )
+          //    : (
               <div className="space-y-2">
-                <Input
+                {/* <Input
                   type="number"
                   min={1}
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
                   placeholder="Enter Quantity"
                   className="w-full"
-                />
+                /> */}
                 <Button variant="primary" isLoading={isSelectLoading} onClick={handleSelectSubmit} className="w-full">
                   Submit
                 </Button>
               </div>
-            )}
-          </>
+          //   )}
+          // </>
         }
       </div>
     </div>
