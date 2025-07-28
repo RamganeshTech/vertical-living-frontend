@@ -7,6 +7,7 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import ForgotPassword from './Pages/Forgot Password/ForgotPassword';
 import ResetPassword from './Pages/Forgot Password/ResetPassword';
+import ShortlistMain from './Pages/Stage Pages/Sample design/ShortList/ShortListMain';
 
 // import Home from './Pages/Home/Home'
 // import Issues from './Pages/Issues/Issues'
@@ -354,11 +355,19 @@ function App() {
             } />
 
             <Route path="sampledesign" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
                 <SampleDesign />
               </ProtectedRoutes>
-            } />
+            } >
+
+
+              <Route path="shortlist" element={
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                  <ShortlistMain />
+                </ProtectedRoutes>} />
+
+            </Route>
 
             <Route path="technicalconsultant" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>

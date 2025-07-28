@@ -169,7 +169,6 @@ export const useGetFormRequriemetn = ({ projectId }: { projectId: string }) => {
         },
         retry: false,
         refetchOnWindowFocus: false,
-        staleTime: 1000 * 60 * 5
     })
 }
 

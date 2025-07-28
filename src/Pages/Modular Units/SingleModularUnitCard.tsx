@@ -7,6 +7,7 @@ import { useLocation, useParams } from "react-router-dom"
 // import { Input } from "../../components/ui/Input"
 import { useAddSelectedModularUnit } from "../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi"
 import { NO_IMAGE } from "../../constants/constants"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
 
 type SingleModularUnitCardProp = {
   unit: any
@@ -22,9 +23,9 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
 
   const location = useLocation()
   // const [isSelecting, setIsSelecting] = useState(false)
-  // const [quantity, setQuantity] = useState(1)
-  
-  
+  const [quantity, setQuantity] = useState<number>(1)
+
+
   const isProjectDetails = location.pathname.includes("projectdetails")
 
 
@@ -48,20 +49,20 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
 
 
   const handleSelectSubmit = async () => {
-    // if (!quantity || quantity <= 0) {
-    //   toast({ title: "Invalid Quantity", description: "Quantity must be greater than 0" });
-    //   return;
-    // }
+    if (!quantity || quantity <= 0) {
+      toast({ title: "Invalid Quantity", description: "Quantity must be greater than 0" });
+      return;
+    }
 
     try {
       const payload = {
-        image:unit?.images[0]?.url,
-        customId:unit.customId,
+        image: unit?.images[0]?.url,
+        customId: unit.customId,
         unitId: unit._id,
         projectId,
         category: unit.category,
         singleUnitCost: unit.price,
-        quantity: 1,
+        quantity: quantity,
       };
 
       await selectUnit(payload);
@@ -77,7 +78,7 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
 
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-blue-200">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300  group border border-gray-100 hover:border-blue-200">
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
         {unit.images?.[0]?.url && !imageError ? (
@@ -139,7 +140,7 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 h-auto">
         {/* Title */}
         <h3 className="font-semibold text-gray-900 text-base mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
           {unit.name || "Unnamed Product"}
@@ -204,19 +205,25 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
           //     </Button>
           //   )
           //    : (
-              <div className="space-y-2">
-                {/* <Input
-                  type="number"
-                  min={1}
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  placeholder="Enter Quantity"
-                  className="w-full"
-                /> */}
-                <Button variant="primary" isLoading={isSelectLoading} onClick={handleSelectSubmit} className="w-full">
-                  Submit
-                </Button>
-              </div>
+          <div className="space-y-2 ">
+            <div className="relative overflow-visible z-999">
+              <Select value={quantity.toString()} onValueChange={(val) => setQuantity(Number(val))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Quantity" selectedValue={quantity.toString()} />
+                </SelectTrigger>
+                <SelectContent className="z-50">
+                  {Array.from({ length: 10 }, (_, i) => i + 1).map((option) => (
+                    <SelectItem key={option} value={option.toString()}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button variant="primary" isLoading={isSelectLoading} onClick={handleSelectSubmit} className="w-full">
+              Submit
+            </Button>
+          </div>
           //   )}
           // </>
         }

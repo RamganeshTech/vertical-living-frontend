@@ -75,7 +75,8 @@ function HomeInteriorProject() {
   // Handlers
   const handleSiteSubmit = async () => {
     try {
-      if (measurementData) {
+      const isCreated = Object.values(measurementData.siteDetails).some(value=> typeof value === "number")
+      if (isCreated) {
         await updateSiteDetails.mutateAsync({ projectId, payload: siteDetails });
       } else {
         await createMeasurement.mutateAsync({ projectId, siteDetails });

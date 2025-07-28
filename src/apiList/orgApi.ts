@@ -75,7 +75,6 @@ export const useGetMyOrganizations = () => {
 
       return await fetchMyOrganizations(api)
     },
-    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: false
   });

@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { Button } from "../../../components/ui/Button";
-import { useOutletContext, useParams } from "react-router-dom";
+import { Link, Outlet, useOutletContext, useParams } from "react-router-dom";
 import { useAddRoom, useCompletionStatusSampleDesign, useDeleteRoomFile, useDeleteRoomSampleDesign, useGetRoomFiles, useSetDeadLineSampleDesign, useUploadRoomFiles } from "../../../apiList/Stage Api/sampleDesignApi";
 import { toast } from "../../../utils/toast";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
@@ -106,9 +106,16 @@ const SampleDesignModule: React.FC = () => {
 
   if (isLoading) return <MaterialOverviewLoading />
 
+  const isChildRoute = location.pathname.includes("shortlist")
+  if(isChildRoute){
+    return <Outlet />
+  }
+
   return (
     <div className="container mx-auto  max-w-full min-h-full">
       {/* Responsive Header */}
+
+
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
           {isMobile && (
@@ -211,6 +218,16 @@ const SampleDesignModule: React.FC = () => {
               deadLineMutate={deadLineAsync}
               isPending={deadLinePending}
             />
+          </Card>
+
+
+          <Card className="mb-6  text-blue-600 border-l-4 border-1 border-blue-600">
+           <Link to={`shortlist`}>
+            <div className="py-4 ml-2 flex justify-between items-center">
+              <p className="text-md sm:text-xl">Sample Reference Designs</p>
+              <i className="mr-4 fas fa-arrow-right text-blue-600"></i>
+            </div>
+           </Link>
           </Card>
 
           {/* Rooms Content */}
