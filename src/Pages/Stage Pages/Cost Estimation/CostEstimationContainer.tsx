@@ -45,7 +45,7 @@ const CostEstimationContainer = () => {
   if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <div className="container mx-auto px-2 py-2 w-full  max-h-full overflow-y-auto custom-scrollbar">
+    <div className="mx-auto w-full  max-h-full overflow-y-auto custom-scrollbar">
       {/* Always show header and controls */}
 
       {isChildRoute ? (

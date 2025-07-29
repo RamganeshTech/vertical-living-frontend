@@ -8,95 +8,7 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import ForgotPassword from './Pages/Forgot Password/ForgotPassword';
 import ResetPassword from './Pages/Forgot Password/ResetPassword';
 import ShortlistMain from './Pages/Stage Pages/Sample design/ShortList/ShortListMain';
-
-// import Home from './Pages/Home/Home'
-// import Issues from './Pages/Issues/Issues'
-// import Phase from './Pages/Phases/Phase'
-// import Tasks from './Pages/Tasks/Tasks'
-// import Projects from './Pages/Projects/Projects'
-// import Login from './Pages/Login/Login'
-// // import MaterialList from './Pages/Material/MaterialList/MaterialList'
-// // import MaterialList from './Pages/Material/MaterialList/MaterialList'
-
-// // import MaterialItem from './Pages/Material/MaterialItem/MaterialItem'
-// // import LabourList from './Pages/Labour/LabourList/LabourList'
-// // import LabourItem from './Pages/Labour/LabourItem/LabourItem'
-// import ProjectDetails from './Pages/Projects/ProjectDetails'
-// import ProjectLists from './Pages/Projects/ProjectLists'
-// // import Transportationlist from './Pages/Transportation/Transportationlist'
-// import NotFound from './Pages/Not Found/NotFound'
-// import Organization from './Pages/Organization/Organization'
-// import OrganizationDetails from './Pages/Organization/OrganizationDetails'
-// import StaffRegister from './Pages/Staff/StaffRegister'
-// import StaffLogin from './Pages/Staff/StaffLogin'
-// import Workers from './Pages/Workers/Workers'
-// import WorkerRegister from './Pages/Workers/WorkerRegister'
-// import WorkerLogin from './Pages/Workers/WorkerLogin'
-// import ProtectedRoutes from './lib/ProtectedRoutes'
-// import UnAuthorized from './Pages/UnAuthorized/UnAuthorized'
-// import InviteStaffs from './Pages/Organization/InviteStaffs'
-// import InviteCTO from './Pages/Organization/InviteCTO'
-// import OrganizationChildrens from './Pages/Organization/OrganizationChildren'
-// import CTORegister from './Pages/CTO/CTORegister'
-// import CTOLogin from './Pages/CTO/CTOLogin'
-// import ClientLogin from './Pages/Client/ClientLogin'
-// import ClientRegister from './Pages/Client/ClientRegister'
-// import InviteClient from './Pages/Organization/inviteClient'
-// import RequirementFormPublic from './Pages/RequirementForm/components/RequirementFormPublic'
-// import RequriementForm from './Pages/RequirementForm/RequriementForm'
-// import SiteMeasurement from './Pages/Stage Pages/Site Measurement/SiteMeasurement'
-// import SampleDesign from './Pages/Stage Pages/Sample design/SampleDesign'
-// import TechnicalConsultant from './Pages/Stage Pages/Technical Consultant/TechnicalConsultant'
-// import MaterialRoomOverview from './Pages/Stage Pages/MaterialSelectionRoom/MaterialOverview'
-// import RoomDetailCard from './Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCard'
-// import CostEstimationContainer from './Pages/Stage Pages/Cost Estimation/CostEstimationContainer'
-// import CostEstimationRoomDetails from './Pages/Stage Pages/Cost Estimation/CostEstimationRoomDetails'
-// import LabourEstimateContainer from './Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer'
-// import OrderMaterialOverview from './Pages/Stage Pages/Ordering Materials/OrderMaterialOverview'
-// import OrderMaterialRoomDetails from './Pages/Stage Pages/Ordering Materials/OrderMaterialRoomDetails'
-// // import FormOrderMaterial from './Pages/Stage Pages/Ordering Materials/FormOrderMaterial'
-// import MaterialArrivalOverview from './Pages/Stage Pages/MaterialArrival/MaterialArrivalOverview'
-// import MaterialArrivalRoomDetail from './Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail'
-// import PublicMaterialArrival from './Pages/Stage Pages/MaterialArrival/PublicMaterialArrival'
-// import PublicOrderMaterial from './Pages/Stage Pages/Ordering Materials/PublicOrderMaterial'
-// import WorkMainOverview from './Pages/Stage Pages/Work Schedule/WorkMainOverView'
-// import WorkSchedulePage from './Pages/Stage Pages/Work Schedule/WorkSchedulePage'
-// import DailySchedulePage from './Pages/Stage Pages/Work Schedule/DailySchedulePage'
-// import InstallationOverview from './Pages/Stage Pages/Installation Stage/InstallationOverview'
-// import InstallationRoomDetail from './Pages/Stage Pages/Installation Stage/InstallationRoomDetail'
-// import QualityCheckOverview from './Pages/Stage Pages/QualityCheck Stage/QualityCheckOverview'
-// import QualityCheckRoomDetails from './Pages/Stage Pages/QualityCheck Stage/QualityCheckRoomDetails'
-// import CleaningOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningOverview'
-// import CleaningRoomOverview from './Pages/Stage Pages/Cleaning Sanitation/CleaningRoomOverview'
-// import ProjectDelivery from './Pages/Stage Pages/Project Delivery/ProjectDelivery'
-// import PaymentScheduleSection from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentScheduleSection'
-// import PaymentTransaction from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentTransaction'
-// import PaymentConfirmationStage from './Pages/Stage Pages/PaymentConfirmation Pages/PaymentMainPage'
-// import PaymentConsentSection from './Pages/Stage Pages/PaymentConfirmation Pages/PayementConsentSection'
-// import PublicClientConsentForm from './Pages/Stage Pages/PaymentConfirmation Pages/PublicClientConsentForm/PublicClientConsentForm'
-// import SubscriptionPlans from './Pages/Subscription Payment/SubscriptionMain'
-// import LoginGroup from './Pages/LoginGroups/LoginGroup'
-// import AdminWallMainContainer from './Pages/Wall Painting/AdminWall/AdminWallMainContainer'
-// import AdminWallStepPage from './Pages/Wall Painting/AdminWall/AdminWallStepPage'
-// import WorkerWallMainContainer from './Pages/Wall Painting/WorkerWall/WorkerWallMainContainer'
-// import WorkerWallStepPage from './Pages/Wall Painting/WorkerWall/WorkerWallStepPage'
-// import SubscriptionParent from './Pages/Subscription Payment/SubscriptionParent'
-// import MaterialOverviewLoading from './Pages/Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
-// import UserProfileDetails from './Pages/UserProfile/UserProfileDetails'
-// import PrerequisitesPage from './Pages/PreRequireties Pages/PreRequiretiesMain'
-// import ModularUnitMain from './Pages/Modular Units/ModularUnitMain'
-// import AddModularUnit from './Pages/Modular Units/AddModularUnit'
-// import ModularUnitCategoryPage from './Pages/Modular Units/ModularUnitCategoryPage'
-// import SelectStage from './Pages/Stage Pages/SelectStage/SelectStage'
-// import SelectedUnits from './Pages/Modular Units/Selected Units/SelectedUnits'
-// import DocumentationMain from './Pages/Documentation/DocumentationMain'
-// import SingleStageDocument from './Pages/Documentation/SingleStageDocument'
-// // import ModularUnitMain from './Pages/Modular Units/ModularUnitMain'
-// // import AddModularUnit from './Pages/Modular Units/AddModularUnit'
-// // import ModularUnitCategoryPage from './Pages/Modular Units/ModularUnitCategoryPage'
-
-
-
+import MaterialArrivalOverviewNew from './Pages/Stage Pages/MaterialArrival/MaterialArrivalOverviewNew';
 
 const Home = lazy(() => import("./Pages/Home/Home"));
 const Issues = lazy(() => import("./Pages/Issues/Issues"));
@@ -134,11 +46,12 @@ const CostEstimationContainer = lazy(() => import("./Pages/Stage Pages/Cost Esti
 const CostEstimationRoomDetails = lazy(() => import("./Pages/Stage Pages/Cost Estimation/CostEstimationRoomDetails"));
 const LabourEstimateContainer = lazy(() => import("./Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer"));
 const OrderMaterialOverview = lazy(() => import("./Pages/Stage Pages/Ordering Materials/OrderMaterialOverview"));
-const OrderMaterialRoomDetails = lazy(() => import("./Pages/Stage Pages/Ordering Materials/OrderMaterialRoomDetails"));
-const MaterialArrivalOverview = lazy(() => import("./Pages/Stage Pages/MaterialArrival/MaterialArrivalOverview"));
-const MaterialArrivalRoomDetail = lazy(() => import("./Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail"));
+// const OrderMaterialOverview = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/OrderMaterialOverview"));
+// const OrderMaterialRoomDetails = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/OrderMaterialRoomDetails"));
+// const MaterialArrivalOverview = lazy(() => import("./Pages/Stage Pages/MaterialArrival/MaterialArrivalOverview"));
+// const MaterialArrivalRoomDetail = lazy(() => import("./Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail"));
 const PublicMaterialArrival = lazy(() => import("./Pages/Stage Pages/MaterialArrival/PublicMaterialArrival"));
-const PublicOrderMaterial = lazy(() => import("./Pages/Stage Pages/Ordering Materials/PublicOrderMaterial"));
+const PublicOrderMaterial = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/PublicOrderMaterial"));
 const WorkMainOverview = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkMainOverView"));
 const WorkSchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkSchedulePage"));
 const DailySchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/DailySchedulePage"));
@@ -469,30 +382,30 @@ function App() {
               </ProtectedRoutes>
 
             } >
-              <Route path="ordermaterialroom/:roomKey" element={
+              {/* <Route path="ordermaterialroom/:roomKey" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
                   <OrderMaterialRoomDetails />
                 </ProtectedRoutes>
 
-              } />
+              } /> */}
             </Route>
 
 
             <Route path="materialarrival" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
-                <MaterialArrivalOverview />
+                <MaterialArrivalOverviewNew />
               </ProtectedRoutes>
 
             } >
-              <Route path="materialarrivalroom/:roomKey" element={
+              {/* <Route path="materialarrivalroom/:roomKey" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
                   <MaterialArrivalRoomDetail />
                 </ProtectedRoutes>
 
-              } />
+              } /> */}
             </Route>
 
             <Route path="workmainschedule" element={

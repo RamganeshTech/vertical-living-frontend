@@ -8,15 +8,17 @@ import { queryClient } from "../../QueryClient/queryClient";
 export const uploadShortlistedDesigns = async ({
   projectId,
   roomName,
+  categoryName,
   formData,
   api,
 }: {
   projectId: string;
   roomName: string;
+  categoryName: string;
   formData: FormData;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.post(`/shortlisteddesign/upload/${projectId}/${roomName}`, formData);
+  const { data } = await api.post(`/shortlisteddesign/upload/${projectId}/${roomName}/${categoryName}`, formData);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -24,15 +26,17 @@ export const uploadShortlistedDesigns = async ({
 export const addExistingDesignsToShortlist = async ({
   projectId,
   roomName,
+  categoryName,
   selectedImages,
   api,
 }: {
   projectId: string;
   roomName: string;
+  categoryName: string;
   selectedImages: {url:string, type:string, _id:string, originalName:string}[];
   api: AxiosInstance;
 }) => {
-  const { data } = await api.post(`/shortlisteddesign/addexising/${projectId}/${roomName}`, { selectedImages });
+  const { data } = await api.post(`/shortlisteddesign/addexising/${projectId}/${roomName}/${categoryName}`, { selectedImages });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -54,15 +58,17 @@ export const getShortlistedRoomDesigns = async ({
 export const removeShortlistedDesign = async ({
   projectId,
   roomName,
+  categoryName,
   fileId,
   api,
 }: {
   projectId: string;
   roomName: string;
+  categoryName: string;
   fileId: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.delete(`/shortlisteddesign/remove/${projectId}/${fileId}/${roomName}`);
+  const { data } = await api.delete(`/shortlisteddesign/remove/${projectId}/${roomName}/${fileId}/${categoryName}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -83,15 +89,17 @@ export const useUploadShortlistedDesigns = () => {
     mutationFn: async ({
       projectId,
       roomName,
+      categoryName,
       formData,
     }: {
       projectId: string;
       roomName: string;
+      categoryName: string;
       formData: FormData;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
       if (!api) throw new Error("API instance missing");
-      return await uploadShortlistedDesigns({ projectId, roomName, formData, api });
+      return await uploadShortlistedDesigns({ projectId, roomName, categoryName, formData, api });
     },
     onSuccess: (_, { projectId, roomName }) => {
       queryClient.invalidateQueries({ queryKey: ["shortlistedRoomDesigns", projectId, roomName] });
@@ -109,15 +117,17 @@ export const useAddExistingShortlistedDesigns = () => {
     mutationFn: async ({
       projectId,
       roomName,
+      categoryName,
       selectedImages,
     }: {
       projectId: string;
       roomName: string;
+      categoryName: string;
       selectedImages: {url:string, type:string, _id:string, originalName:string}[];
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
       if (!api) throw new Error("API instance missing");
-      return await addExistingDesignsToShortlist({ projectId, roomName, selectedImages, api });
+      return await addExistingDesignsToShortlist({ projectId, roomName, categoryName, selectedImages, api });
     },
     onSuccess: (_, { projectId, roomName }) => {
       queryClient.invalidateQueries({ queryKey: ["shortlistedRoomDesigns", projectId, roomName] });
@@ -160,15 +170,17 @@ export const useRemoveShortlistedDesign = () => {
     mutationFn: async ({
       projectId,
       roomName,
+      categoryName,
       fileId,
     }: {
       projectId: string;
       roomName: string;
+      categoryName: string;
       fileId: string;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
       if (!api) throw new Error("API instance missing");
-      return await removeShortlistedDesign({ projectId, roomName, fileId, api });
+      return await removeShortlistedDesign({ projectId, roomName,  categoryName ,fileId, api });
     },
     onSuccess: (_, { projectId, roomName }) => {
       queryClient.invalidateQueries({ queryKey: ["shortlistedRoomDesigns", projectId, roomName] });

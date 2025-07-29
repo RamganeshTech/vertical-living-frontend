@@ -127,7 +127,7 @@ export const useGetSiteMeasurementDetails = ({ projectId }: { projectId: string 
             return await getMeasurement({ projectId, api });
         },
         retry: false,
-        refetchOnWindowFocus: false,
+        refetchOnMount: false,
     })
 }
 
@@ -345,7 +345,15 @@ const deleteRoomFiles = async ({ roomId, uploadId, api, projectId }:  {roomId:st
 }
 
 
+const updateImageCategoryName = async ({projectId,roomId,uploadId,categoryName,api,}: {projectId: string; roomId: string; uploadId: string; categoryName: string;api: AxiosInstance;
+}) => {
+  const { data } = await api.patch(`/sitemeasurement/updateimgname/${projectId}/${roomId}/${uploadId}`,
+    { categoryName }
+  );
 
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
 
 
 
@@ -403,4 +411,31 @@ export const useDeleteRoomSiteFiles = () => {
             queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
         }
     });
+};
+
+
+
+export const useUpdateImageCategoryName = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({projectId,roomId,uploadId,categoryName,}: {
+      projectId: string;
+      roomId: string;
+      uploadId: string;
+      categoryName: string;
+    }) => {
+      if (!role || !allowedRoles.includes(role))
+        throw new Error("Not allowed to make this API call");
+
+      if (!api) throw new Error("API instance not found for role");
+
+      return await updateImageCategoryName({projectId,roomId,uploadId,categoryName,api,});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] });
+    },
+  });
 };

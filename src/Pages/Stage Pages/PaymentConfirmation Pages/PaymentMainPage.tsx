@@ -77,7 +77,7 @@ const PaymentConfirmationStage: React.FC = () => {
   const { assignedTo, timer, totalAmount, _id: formId } = data || {};
 
   return (
-    <div className="container mx-auto p-2 max-w-full max-h-full overflow-y-auto">
+    <div className="container mx-auto max-w-full max-h-full overflow-y-auto">
       {/* Header Section with Mobile Sidebar Toggle */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">

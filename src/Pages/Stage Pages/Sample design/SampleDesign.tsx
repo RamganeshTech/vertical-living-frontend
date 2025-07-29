@@ -112,7 +112,7 @@ const SampleDesignModule: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto  max-w-full min-h-full">
+    <div className="container mx-auto max-h-full overflow-y-auto max-w-full min-h-full">
       {/* Responsive Header */}
 
 
@@ -245,7 +245,7 @@ const SampleDesignModule: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:max-h-[60vh] md:max-h-[47vh] lg:max-h-[55vh] xl:max-h-[65vh] overflow-y-auto custom-scrollbar gap-6">
+            <div className="grid grid-cols-1  gap-6">
               {sampleDesign.rooms.map((room: any) => (
                 <div key={room.roomName} className="bg-white border-l-4 border-blue-600 rounded-xl shadow-sm p-1 sm:p-6 flex flex-col">
                   <div className="flex sm:flex-row items-center justify-between gap-3 mb-4">

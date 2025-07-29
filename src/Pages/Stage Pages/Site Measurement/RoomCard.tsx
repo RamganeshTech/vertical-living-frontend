@@ -1,32 +1,33 @@
 import { useState } from "react";
 import { Button } from "../../../components/ui/Button";
 import type { SiteRooms } from "../../../types/types";
-import { useDeleteRoomSiteFiles, useUploadRoomSiteFiles } from "../../../apiList/Stage Api/siteMeasurementApi";
+import {  useUploadRoomSiteFiles } from "../../../apiList/Stage Api/siteMeasurementApi";
 import { toast } from "../../../utils/toast";
 import { useParams } from "react-router-dom";
 import { Input } from "../../../components/ui/Input";
-import { downloadImage } from "../../../utils/downloadFile";
-import { NO_IMAGE } from "../../../constants/constants";
+
+import RoomImage from "./RoomImage";
 
 interface RoomCardProps {
   room: SiteRooms;
   onEdit: (room: SiteRooms) => void;
   onDelete: () => void;
-  deleteRoomLoading:boolean
+  deleteRoomLoading: boolean
 }
 
-const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete , deleteRoomLoading}) => {
+const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomLoading }) => {
 
-  const {projectId} = useParams()
+  const { projectId } = useParams()
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+ 
+  const uploads = room?.uploads || []
   const area = room.length && room.breadth ? (room.length * room.breadth).toFixed(2) : null;
-    const [previewImage, setPreviewImage] = useState<string | null>(null)
-    const uploads = room?.uploads || []
-console.log("uploads", room.uploads)
-const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRoomSiteFiles()
-  const { mutateAsync: deleteFile, isPending: isDeleting } = useDeleteRoomSiteFiles()
+  
+   
+  // console.log("uploads", room.uploads)
+  const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRoomSiteFiles()
+ 
 
-
-    
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const files = event.target.files
@@ -58,7 +59,7 @@ const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRoomSiteFi
       await uploadFiles({
         roomId: (room as any)._id,
         files: formData,
-        projectId:projectId!,
+        projectId: projectId!,
       })
 
       toast({
@@ -77,26 +78,7 @@ const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRoomSiteFi
     }
   }
 
-  const handleDeleteFile = async (uploadId: string) => {
-    try {
-      await deleteFile({
-        roomId: (room as any)._id,
-        uploadId,
-        projectId:projectId!,
-      })
-
-      toast({
-        title: "Success",
-        description: "Image deleted successfully",
-      })
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error?.response?.data?.message || "Failed to delete",
-        variant: "destructive",
-      })
-    }
-  }
+  
 
 
 
@@ -114,7 +96,7 @@ const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRoomSiteFi
             </svg>
           </button>
           <Button
-          isLoading={deleteRoomLoading}
+            isLoading={deleteRoomLoading}
             onClick={onDelete}
             variant="ghost"
             className="!text-red-600 hover:text-red-800 bg-white shadow-none hover:!bg-none"
@@ -122,7 +104,7 @@ const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRoomSiteFi
             {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg> */}
-              <i className="fas fa-trash-can"></i>
+            <i className="fas fa-trash-can"></i>
           </Button>
         </div>
       </div>
@@ -174,96 +156,7 @@ const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRoomSiteFi
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl">
               {uploads.map((file) => (
-                <div
-                  key={file._id}
-                  className="group transition-all duration-300 hover:scale-105 hover:z-10"
-                >
-                  {/* Image Container - Clickable for preview */}
-                  <div
-                    className="relative w-full bg-white rounded-lg shadow-md overflow-hidden border-4 border-white group-hover:shadow-xl transition-all duration-300 cursor-pointer"
-                    onClick={() => setPreviewImage(file?.url)}
-                  >
-                    <div className="aspect-square w-full">
-                      <img
-                        src={file.url || NO_IMAGE}
-                        alt={file.originalName}
-                        className="w-full h-full transition-transform duration-300 group-hover:scale-110"
-                      />
-                    </div>
-
-                    {/* Desktop Hover Overlay */}
-                  <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 items-center justify-center hidden md:flex">
-                      <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
-                         {["eye", "trash", "download"].map((action) => (
-                          <Button
-                            key={action}
-                            variant="secondary"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              action === "eye"
-                                ? setPreviewImage(file?.url)
-                                : action === "trash"
-                                  ? handleDeleteFile(file._id)
-                                  : downloadImage({ src: file?.url, alt: file?.originalName || "image" })
-                            }}
-                            disabled={action === "trash" && isDeleting}
-                            className={`rounded-full bg-white hover:bg-gray-100 shadow-lg transition-all duration-200 ${
-                              action === "trash" ? "hover:bg-red-50" : ""
-                            }`}
-                          >
-                            <i
-                              className={`w-3 h-3 fas fa-${action} ${
-                                action === "trash"
-                                  ? "text-red-500"
-                                  : action === "download"
-                                    ? "text-blue-500"
-                                    : "text-gray-600"
-                              }`}
-                            />
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Mobile Action Buttons - Inside Image at Top Right */}
-                          <div className="absolute top-2 right-[2px] flex flex-col space-y-1 sm:hidden">
-                      {["eye", "trash", "download"].map((action) => (
-                        <Button
-                          key={action}
-                          variant="secondary"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            action === "eye"
-                              ? setPreviewImage(file?.url)
-                              : action === "trash"
-                                ? handleDeleteFile(file._id)
-                                : downloadImage({ src: file?.url, alt: file?.originalName || "image" })
-                          }}
-                          disabled={action === "trash" && isDeleting}
-                          className={`w-6 h-6 p-0 rounded-full bg-white/90 backdrop-blur-sm border shadow-sm transition-all duration-200 ${
-                            action === "trash"
-                              ? "border-red-200 hover:border-red-300 hover:bg-red-50"
-                              : action === "download"
-                                ? "border-blue-200 hover:border-blue-300 hover:bg-blue-50"
-                                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          <i
-                            className={`w-3 h-3 fas fa-${action} ${
-                              action === "trash"
-                                ? "text-red-500"
-                                : action === "download"
-                                  ? "text-blue-500"
-                                  : "text-gray-600"
-                            }`}
-                          />
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <RoomImage room={room} setPreviewImage={setPreviewImage}  file={file} />
               ))}
             </div>
           )}
