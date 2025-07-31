@@ -6,10 +6,11 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
-import { useCompleteOrderingMaterialStage, useGetAllOrderingMaterial, useSetOrderingMaterialDeadline } from "../../../apiList/Stage Api/orderingMaterialApi";
+// import { useCompleteOrderingMaterialStage, useGetAllOrderingMaterial, useSetOrderingMaterialDeadline } from "../../../apiList/Stage Api/orderingMaterialApi";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
-import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
+// import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
 import { NO_IMAGE } from "../../../constants/constants";
+import { useCompleteOrderingMaterialHistoryStage, useGetAllOrderingMaterialHistory, useSetOrderingMaterialHistoryDeadline } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 
 interface ProjectDetailsOutlet {
     isMobile: boolean;
@@ -19,20 +20,20 @@ interface ProjectDetailsOutlet {
 const OrderMaterialOverview = () => {
     const { projectId, organizationId } = useParams();
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
-    const { data, isLoading, isError, error: getAllError, refetch } = useGetAllOrderingMaterial(projectId!);
+    const { data, isLoading, isError, error: getAllError, refetch } = useGetAllOrderingMaterialHistory(projectId!);
     // const { mutateAsync: generateLink, isPending: generatePending } = useGenerateOrderingMaterialLink()
 
-    const { data: orderedUnits, isLoading: orderedLoading, error } = useGetSelectedModularUnits(projectId!);
+    // const { data: orderedUnits, isLoading: orderedLoading, error } = useGetSelectedModularUnits(projectId!);
 
-    const selectedUnits = orderedUnits?.selectedUnits || [];
-    const totalCost = orderedUnits?.totalCost || 0;
+    const selectedUnits = data?.selectedUnits || [];
+    const totalCost = data?.totalCost || 0;
     const hasUnits = selectedUnits.length > 0;
 
     //   const { mutateAsync: updateShop } = useUpdateShopDetails();
     //   const { mutateAsync: updateDelivery } = useUpdateDeliveryLocation();
 
-    const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetOrderingMaterialDeadline()
-    const { mutateAsync: completionStatus, isPending: completePending } = useCompleteOrderingMaterialStage()
+    const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetOrderingMaterialHistoryDeadline()
+    const { mutateAsync: completionStatus, isPending: completePending } = useCompleteOrderingMaterialHistoryStage()
 
 
     const handleCompletionStatus = async () => {
@@ -44,7 +45,7 @@ const OrderMaterialOverview = () => {
         }
     };
 
-    if (isLoading || orderedLoading) return <MaterialOverviewLoading />;
+    if (isLoading) return <MaterialOverviewLoading />;
 
     // const roomKeys = Object.keys(data?.materialOrderingList || {});
     // const { shopDetails, deliveryLocationDetails, generatedLink, materialOrderingList } = data || {};
@@ -94,7 +95,7 @@ const OrderMaterialOverview = () => {
                     />}
 
                     <AssignStageStaff
-                        stageName="OrderingMaterialModel"
+                        stageName="OrderMaterialHistoryModel"
                         projectId={projectId!}
                         organizationId={organizationId!}
                         currentAssignedStaff={data?.assignedTo || null}
@@ -103,14 +104,14 @@ const OrderMaterialOverview = () => {
             </div>
 
             {/* Error Display */}
-            {(isError || error) && (
+            {(isError) && (
                 <div className="flex-1 flex items-center justify-center">
                     <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
                         <div className="text-red-600 font-semibold mb-2">
                             ⚠️ Error Occurred
                         </div>
                         <p className="text-red-500 text-sm mb-4">
-                            {(getAllError as any)?.response?.data?.message || (error as any)?.response?.data?.message || "Failed to load ordering material"}
+                            {(getAllError as any)?.response?.data?.message  || "Failed to load ordering material"}
                         </p>
                         <Button
                             isLoading={isLoading}
@@ -124,7 +125,7 @@ const OrderMaterialOverview = () => {
             )}
 
             {/* Main Content - Only show if no error */}
-            {!isError && !error && (
+            {!isError && (
                 <div className="flex-1 min-h-0 overflow-y-auto space-y-4 sm:space-y-6">
                     {/* Timer Card */}
                     <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
@@ -235,7 +236,7 @@ const OrderMaterialOverview = () => {
                             </section>} */}
 
 
-                    {!isError && !error && (
+                    {!isError  && (
                         <section className="bg-white rounded-3xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
                             {/* Modern header with subtle accent */}
                             <div className="p-6 border-b border-gray-100 relative">
@@ -316,7 +317,7 @@ const OrderMaterialOverview = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="py-16 text-center">
+                                    <div className="py-23 text-center">
                                         <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-5">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -333,9 +334,7 @@ const OrderMaterialOverview = () => {
                                         <p className="text-gray-500 max-w-md mx-auto mb-6">
                                             Your completed orders will appear here
                                         </p>
-                                        <button className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                                            Start Shopping
-                                        </button>
+                                      
                                     </div>
                                 )}
                             </div>

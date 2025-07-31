@@ -103,7 +103,7 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
                                 d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 100 16v4l3.5-3.5L12 20v-4a8 8 0 01-8-8z"
                             />
                         </svg> */}
-                        <div className="animate-spin h-5 w-5 border-t-transparent border-4 border-black"></div>
+                        <div className="animate-spin h-5 w-5 border-t-transparent rounded-full border-2 border-gray-500"></div>
                     </div>
                 )}
             </div>

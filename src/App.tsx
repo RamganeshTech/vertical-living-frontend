@@ -5,10 +5,11 @@ import type { RootState } from './store/store';
 import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
-import ForgotPassword from './Pages/Forgot Password/ForgotPassword';
-import ResetPassword from './Pages/Forgot Password/ResetPassword';
-import ShortlistMain from './Pages/Stage Pages/Sample design/ShortList/ShortListMain';
-import MaterialArrivalOverviewNew from './Pages/Stage Pages/MaterialArrival/MaterialArrivalOverviewNew';
+const ForgotPassword = lazy(() => import( './Pages/Forgot Password/ForgotPassword'));
+const ResetPassword = lazy(() => import( './Pages/Forgot Password/ResetPassword'));
+const ShortlistMain = lazy(() => import( './Pages/Stage Pages/Sample design/ShortList/ShortListMain'));
+const MaterialArrivalOverviewNew = lazy(() => import( './Pages/Stage Pages/MaterialArrival/MaterialArrivalOverviewNew'));
+// import ProjectStageRedirect from './Pages/Projects/ProjectStageRedirect';
 
 const Home = lazy(() => import("./Pages/Home/Home"));
 const Issues = lazy(() => import("./Pages/Issues/Issues"));
@@ -51,7 +52,7 @@ const OrderMaterialOverview = lazy(() => import("./Pages/Stage Pages/Ordering Ma
 // const MaterialArrivalOverview = lazy(() => import("./Pages/Stage Pages/MaterialArrival/MaterialArrivalOverview"));
 // const MaterialArrivalRoomDetail = lazy(() => import("./Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail"));
 const PublicMaterialArrival = lazy(() => import("./Pages/Stage Pages/MaterialArrival/PublicMaterialArrival"));
-const PublicOrderMaterial = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/PublicOrderMaterial"));
+// const PublicOrderMaterial = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/PublicOrderMaterial"));
 const WorkMainOverview = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkMainOverView"));
 const WorkSchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkSchedulePage"));
 const DailySchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/DailySchedulePage"));
@@ -215,6 +216,9 @@ function App() {
           <Route path='/:organizationId/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner", "client", "CTO", "worker", "staff"]}>
             <ProjectDetails projectId={projectId} setProjectId={setProjectId} setOrganizationId={setOrganizationId} organizationId={organizationId} />
           </ProtectedRoutes>}>
+
+
+           {/* <Route index element={<ProjectStageRedirect />} /> */}
 
             {/* <Route path="labourlist" element={<LabourList />} />
           <Route path="materiallist" element={<MaterialList />} />
@@ -500,7 +504,7 @@ function App() {
           {/* REQUIREMENT FORM LINK */}
 
           <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
-          <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderMaterial />} />
+          {/* <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderMaterial />} /> */}
           <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
           <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
 

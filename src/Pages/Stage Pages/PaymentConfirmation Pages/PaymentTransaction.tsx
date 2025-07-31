@@ -95,7 +95,7 @@ const PaymentTransaction = () => {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Payment failed. Please try again.",
+        description: error?.response?.data?.message || error?.message || "Payment failed. Please try again.",
         variant: "destructive",
       });
     }

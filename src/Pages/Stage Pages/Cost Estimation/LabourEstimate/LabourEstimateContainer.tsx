@@ -118,7 +118,7 @@ const LabourEstimateContainer = () => {
             toast({ title: "Success", description: "Labour estimation added" });
             refetch()
         } catch (err: any) {
-            toast({ title: "Error", description: err.message, variant: "destructive" });
+            toast({ title: "Error", description: err?.response?.data?.message || err?.message, variant: "destructive" });
         }
     };
 

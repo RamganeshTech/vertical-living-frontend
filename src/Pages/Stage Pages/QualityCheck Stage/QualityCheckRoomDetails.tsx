@@ -212,7 +212,6 @@ export default function QualityCheckRoomDetails() {
 
   const handleDelete = async (itemId: string) => {
     try {
-      console.log("deleting is not workin")
       await deleteItem({ projectId, roomName: roomkey, itemId });
       toast({ description: "Deleted successfully", title: "Success" });
       refetch()

@@ -41,7 +41,7 @@ export default function SelectedUnits() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error?.message || "Failed to delete unit",
+        description: error?.response?.data?.message  || "Failed to delete unit",
         variant: "destructive",
       })
     }
@@ -59,7 +59,7 @@ export default function SelectedUnits() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error?.message || "Failed to complete selection",
+        description: error?.response?.data?.message || "Failed to complete selection",
         variant: "destructive",
       })
     }

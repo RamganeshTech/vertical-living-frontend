@@ -16,7 +16,7 @@ export const addSelectedModularUnitApi = async (
     },
     api: AxiosInstance
 ) => {
-    const { data } = await api.post("/selectedmodularunits/add", payload);
+    const { data } = await api.post(`/selectedmodularunits/${payload.projectId}/add`, payload);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };

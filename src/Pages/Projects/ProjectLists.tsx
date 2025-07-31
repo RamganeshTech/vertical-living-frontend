@@ -103,7 +103,7 @@ const ProjectLists = () => {
       </header>
       <hr className="my-2 border-b-1 border-gray-300" />
 
-      {!isPending && (getProjects?.length ?? 0) === 0 && <div className="flex h-full flex-col items-center justify-center w-full py-16 text-center text-gray-500">
+      {!error && !isPending && (getProjects?.length ?? 0) === 0 && <div className="flex h-full flex-col items-center justify-center w-full py-16 text-center text-gray-500">
         <div className="text-6xl mb-4">
           📂
         </div>

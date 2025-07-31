@@ -209,7 +209,6 @@ const SingleStageDocument: React.FC = () => {
 
   const handleUpdateDocManually = async ()=>{
     try{
-      console.log("gettin isnde 1")
       await updateDocManually({
         projectId,
         stageNumber

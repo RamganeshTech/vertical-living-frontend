@@ -72,6 +72,7 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
       toast({
         title: "Error",
         description: error?.response?.data?.message || "Failed to select unit",
+        variant:"destructive"
       });
     }
   };

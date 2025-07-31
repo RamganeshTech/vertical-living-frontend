@@ -17,6 +17,7 @@ type ProjectType = {
 const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organizationId, setOrganizationId }) => {
 
   const location = useLocation()
+
   // ProjectDetails.tsx (your layout)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
@@ -27,6 +28,13 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     setProjectId(pathname[3])
     setOrganizationId(pathname[1])
   }, [location.pathname])
+
+  // useEffect(() => {
+  //   if (!isLoading && currentStagePath) {
+  //     // Automatically navigate to the pending stage
+  //     navigate(`${currentStagePath}`);
+  //   }
+  // }, [currentStagePath, isLoading]);
 
 
   useEffect(() => {

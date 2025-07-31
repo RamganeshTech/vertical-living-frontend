@@ -8,6 +8,7 @@ import { useOutletContext } from "react-router-dom";
 import { useDeleteProject } from '../apiList/projectApi';
 import { toast } from '../utils/toast';
 import { Button } from '../components/ui/Button';
+import { useGetCurrentActiveStage } from '../apiList/currentActiveStage api/currentActiveStageApi';
 
 
 type SingleProjectProp = {
@@ -15,7 +16,7 @@ type SingleProjectProp = {
     organizationId: string;
     onEdit: (project: IProject, id: string) => void;
     index: number,
-    refetch: ()=> Promise<any>
+    refetch: () => Promise<any>
 }
 
 
@@ -28,6 +29,9 @@ const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizat
 
     const { setProjectId } = useOutletContext<ProjectsOutletContextType>();
     const { mutateAsync: deleteAsync, isPending } = useDeleteProject()
+    const { data: currentStagePath, isLoading } = useGetCurrentActiveStage(project?._id!);
+
+    // console.log("currentstage", currentStagePath)
 
     const handleSetProejctId = (id: string) => {
         setProjectId(id)
@@ -62,13 +66,13 @@ const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizat
 
     const handleDeleteProject = async () => {
         try {
-            if(!window.confirm("Are you sure you want to delete this project?")) return
+            if (!window.confirm("Are you sure you want to delete this project?")) return
             await deleteAsync(project._id)
             toast({ title: "Success", description: "Project Deleted Successfully" })
             refetch()
         }
         catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message  || error?.message || "Failed to Delete", variant: "destructive" })
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to Delete", variant: "destructive" })
         }
     }
 
@@ -139,9 +143,13 @@ const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizat
             </div>
 
             <div className="flex justify-end gap-4 pt-2 text-sm text-blue-600">
-                <Link to={`/${organizationId}/projectdetails/${(project as any)._id}/requirementform`} onClick={() => handleSetProejctId((project as any)._id)} className="hover:underline cursor-pointer flex items-center gap-1">
+                {/* <Link to={`/${organizationId}/projectdetails/${(project as any)._id}/requirementform`} onClick={() => handleSetProejctId((project as any)._id)} className="hover:underline cursor-pointer flex items-center gap-1">
                     <i className="fa-solid fa-eye" />
                     View
+                </Link>  */}
+                <Link to={`/${organizationId}/projectdetails/${(project as any)._id}/${currentStagePath}`} onClick={() => handleSetProejctId((project as any)._id)} className={`hover:underline ${isLoading ? "cursor-block" : "cursor-pointer"}  flex items-center gap-1`}>
+                    
+                    {isLoading ? <i className='fa fa-spinner animate-spin text-blue-600'></i> : <><i className="fa-solid fa-eye" /> View</>}
                 </Link>
                 <Button isLoading={isPending} variant='outline' onClick={handleDeleteProject} className="hover:underline cursor-pointer flex items-center gap-1 text-red-500 !border-0">
                     <i className="fa-solid fa-trash" />
