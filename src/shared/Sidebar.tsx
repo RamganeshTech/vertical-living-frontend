@@ -75,7 +75,7 @@ export const getSidebarConfig = (
         if (stageType === "Manual Flow") {
             orderedKeys.splice(insertIndex, 0, "MATERIALSELECTION", "COSTESTIMATION");
         } else if (stageType === "Modular Units") {
-            orderedKeys.splice(insertIndex, 0, "MODULARUNIT");
+            orderedKeys.splice(insertIndex, 0, "MODULARUNIT", "EXTERNAL");
         }
 
         // Remove SELECTSTAGE if a type is chosen

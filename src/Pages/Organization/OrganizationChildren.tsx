@@ -28,6 +28,7 @@ const OrganizationChildrens: React.FC = () => {
         PLAN: `/organizations/${organizationId}/subscriptionplan`,
         PROFILE: `/organizations/${organizationId}/userprofile`,
         MODULAR: `/organizations/${organizationId}/modularunits`,
+        EXTERNAL: `/organizations/${organizationId}/externalunits`,
     }
 
 

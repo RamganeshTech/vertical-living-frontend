@@ -5,10 +5,13 @@ import type { RootState } from './store/store';
 import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
-const ForgotPassword = lazy(() => import( './Pages/Forgot Password/ForgotPassword'));
-const ResetPassword = lazy(() => import( './Pages/Forgot Password/ResetPassword'));
-const ShortlistMain = lazy(() => import( './Pages/Stage Pages/Sample design/ShortList/ShortListMain'));
-const MaterialArrivalOverviewNew = lazy(() => import( './Pages/Stage Pages/MaterialArrival/MaterialArrivalOverviewNew'));
+import ExternalMain from './Pages/External Units/ExternalMain';
+import WardrobeExternal from './Pages/External Units/WardrobeExternal';
+import SelectedExternalUnits from './Pages/External Units/SelectedExternal Units/SelectedExternalUnits';
+const ForgotPassword = lazy(() => import('./Pages/Forgot Password/ForgotPassword'));
+const ResetPassword = lazy(() => import('./Pages/Forgot Password/ResetPassword'));
+const ShortlistMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortList/ShortListMain'));
+const MaterialArrivalOverviewNew = lazy(() => import('./Pages/Stage Pages/MaterialArrival/MaterialArrivalOverviewNew'));
 // import ProjectStageRedirect from './Pages/Projects/ProjectStageRedirect';
 
 const Home = lazy(() => import("./Pages/Home/Home"));
@@ -200,6 +203,17 @@ function App() {
                 <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
                   <ModularUnitCategoryPage />
                 </ProtectedRoutes>} />
+            </Route>
+
+
+            <Route path="externalunits" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
+                <ExternalMain />
+              </ProtectedRoutes>}>
+
+              <Route path='wardrobe' element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
+                <WardrobeExternal />
+              </ProtectedRoutes>} />
 
             </Route>
 
@@ -218,7 +232,7 @@ function App() {
           </ProtectedRoutes>}>
 
 
-           {/* <Route index element={<ProjectStageRedirect />} /> */}
+            {/* <Route index element={<ProjectStageRedirect />} /> */}
 
             {/* <Route path="labourlist" element={<LabourList />} />
           <Route path="materiallist" element={<MaterialList />} />
@@ -301,6 +315,21 @@ function App() {
                 <SelectStage />
               </ProtectedRoutes>
             } />
+
+            <Route path="externalunits" element={
+              <ExternalMain />
+            } >
+
+              <Route path='wardrobe' element={
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
+                  <WardrobeExternal />
+                </ProtectedRoutes>} />
+            </Route>
+
+            <Route path='selectedexternalunits' element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
+                <SelectedExternalUnits />
+              </ProtectedRoutes>} />
 
 
             <Route path="modularunits" element={

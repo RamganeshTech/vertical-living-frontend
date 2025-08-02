@@ -3,7 +3,7 @@ import type { currentAssignedStaffType } from "../shared/AssignStaff";
 export type ProjectDetailsOutlet = {
   projectId: string | null;
   setProjectId: React.Dispatch<React.SetStateAction<string | null>>
-  isMobile:boolean,
+  isMobile: boolean,
   isMobileSidebarOpen: boolean;
   openMobileSidebar: () => void;
   closeMobileSidebar: () => void;
@@ -122,7 +122,61 @@ export interface MaterialEstimate extends Document {
   materials: MaterialItemType[];
   totalCost: number;
   _id?: string
+}
 
+
+
+// FOR EXTERNAL UNITS
+
+
+// FOR ADDING THE DIMENTION
+export interface IDimentionRange {
+  start: number,
+  end: number
+}
+
+export interface AddDimention {
+  height: IDimentionRange,
+  width: IDimentionRange,
+  depth: IDimentionRange,
+}
+
+// FOR DISPLAYIN THE SELECTED DIMENTION
+export interface ISelectedDimention {
+  height: number;
+  width: number;
+  depth: number;
+}
+
+export interface IExternalUpload {
+  type: "image",
+  url: string,
+  uploadedAt: Date,
+  originalName: string,
+}
+export interface CommonSingleExternalUnit {
+  _id?: string,
+  unitName: string,
+  price: number,
+  unitCode: string,
+  category: string,
+  image: IExternalUpload
+}
+
+export interface DisplaySingleExternalUnit extends CommonSingleExternalUnit {
+  dimention: ISelectedDimention,
+  totalPrice:number,
+  quantity:number,
+}
+
+export interface SelectedExternalUnits {
+  projectId: string,
+  selectedUnits: DisplaySingleExternalUnit[]
+  totalCost: number,
+  status: string,
+}
+export interface AddSingleExternalUnit extends CommonSingleExternalUnit {
+  dimention: AddDimention
 }
 
 
@@ -214,7 +268,7 @@ export interface IWardrobeRequirement {
 
 
 export interface ILivingHallRequirement {
-  seatingStyle?: "Sofa Set" | "L-Shaped Sofa" | "Recliner Chairs" | "Floor Seating"  | null;
+  seatingStyle?: "Sofa Set" | "L-Shaped Sofa" | "Recliner Chairs" | "Floor Seating" | null;
   tvUnitDesignRequired?: boolean | null;
   falseCeilingRequired?: boolean | null;
   wallDecorStyle?: "Paint" | "Wallpaper" | "Wood Paneling" | "Stone Cladding" | null;
@@ -274,13 +328,13 @@ export interface SiteDetails {
   additionalNotes?: string | null;
 }
 
-export type RoomName = "LivingHall" | "Bedroom" | "Kitchen" | "Wardrobe" | null; 
+export type RoomName = "LivingHall" | "Bedroom" | "Kitchen" | "Wardrobe" | null;
 export interface SiteRooms {
   name: RoomName
   length: number | null;
   breadth: number | null;
   height?: number | null;
-  uploads:any[]
+  uploads: any[]
 }
 
 
@@ -319,38 +373,38 @@ export interface ISampleDesign {
 
 
 export interface IConsultationAttachment {
-    // _id?: string;
-    type: "image" | "pdf";
-    url: string;
-    originalName?: string;
+  // _id?: string;
+  type: "image" | "pdf";
+  url: string;
+  originalName?: string;
 }
 
 
 export interface IConsultationMessage {
-    _id: string;
-    sender: string; // the persons id who sent the message
-    senderModel: string,
-    senderRole: "owner" | "staff" | "CTO" | "worker";
-    message: string;
-    section?: string; // Optional tag like "Kitchen"
-    attachments?: IConsultationAttachment[];
-    createdAt: Date;
-    isEdited:boolean
+  _id: string;
+  sender: string; // the persons id who sent the message
+  senderModel: string,
+  senderRole: "owner" | "staff" | "CTO" | "worker";
+  message: string;
+  section?: string; // Optional tag like "Kitchen"
+  attachments?: IConsultationAttachment[];
+  createdAt: Date;
+  isEdited: boolean
 }
 
 export interface IConsultationTimer {
-    startedAt: string | null;
-    completedAt: string | null;
-    deadLine: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  deadLine: string | null;
 }
 
 export interface ITechnicalConsultation {
-    projectId: string;
-    assignedTo: currentAssignedStaffType
-    messages: IConsultationMessage[];
-    timer: IConsultationTimer;
-    status: "pending" | "completed";
-    isEditable: boolean;
+  projectId: string;
+  assignedTo: currentAssignedStaffType
+  messages: IConsultationMessage[];
+  timer: IConsultationTimer;
+  status: "pending" | "completed";
+  isEditable: boolean;
 }
 
 
@@ -482,15 +536,18 @@ export interface AddWorkPlanPayload {
 
 // INSTALLATION WORK export 
 interface InstallationUpload {
-    type: "image" | "pdf";
-    url: string;
-    originalName: string;
-    uploadedAt: Date
+  type: "image" | "pdf";
+  url: string;
+  originalName: string;
+  uploadedAt: Date
 }
 
 export interface InstallationWorkItem {
-    workName: string,
-    descritpion: string,
-    completedDate: Date,
-    upload: InstallationUpload | null
+  workName: string,
+  descritpion: string,
+  completedDate: Date,
+  upload: InstallationUpload | null
 }
+
+
+

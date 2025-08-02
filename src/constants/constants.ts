@@ -43,7 +43,8 @@ export const ORGANIZATION_ICONS = {
   PROJECTS: "fa-solid fa-diagram-project  text-2xl",
   PLAN: "fa-solid fa-wallet  text-2xl",
   PROFILE: "fa-solid fa-user-gear  text-2xl",
-  MODULAR: "fa-solid fa-box  text-2xl"
+  MODULAR: "fa-solid fa-box  text-2xl",
+  EXTERNAL: "fa-solid fa-boxes-stacked text-2xl"
 }
 
 export const ORGANIZATION_LABELS = {
@@ -53,7 +54,8 @@ export const ORGANIZATION_LABELS = {
   PROJECTS: "Projects",
   PLAN: "Upgrade Plan",
   PROFILE: "User Profile",
-  MODULAR: "Modular Units"
+  MODULAR: "Modular Units",
+  EXTERNAL: "External Units",
 }
 
 export const PROJECTS_LABELS = {
@@ -69,6 +71,7 @@ export const PROJECTS_LABELS = {
   SAMPLEDESIGN: "Sample Designs",
   TECHNICALCONSULTANT: "Technical consultant",
   SELECTSTAGE: "Select Stage",
+  EXTERNAL: "External Units",
   MODULARUNIT: "Modular Units",
   MATERIALSELECTION: "Material Selection",
   COSTESTIMATION: "Cost Estimation",
@@ -96,6 +99,7 @@ export const PROJECTS_ICONS = {
   SAMPLEDESIGN: "fa-solid fa-object-group text-2xl",
   TECHNICALCONSULTANT: "fa-solid fa-comments text-2xl",
   SELECTSTAGE: "fa-solid fa-square-check text-2xl",
+  EXTERNAL: "fa-solid fa-boxes-stacked text-2xl",
   MODULARUNIT: "fa-solid fa-box text-2xl",
   MATERIALSELECTION: "fas fa-box text-2xl",
   COSTESTIMATION: "fa-solid fa-money-bill-1-wave text-2xl",
@@ -123,6 +127,7 @@ export const MAIN_PATH_LABEL: Record<any, string> = {
   technicalconsultant: "4 Technical consultant",
   SELECTSTAGE: "5 Select Stage",
   modularunits: "5 Modular Unit",
+  externalunits: "5.1 External Unit",
   materialselection: "5 Material Selection",
   costestimation: "6 Cost Estiamtion",
   paymentconfirmation: "7 Payment Stage",
@@ -145,8 +150,9 @@ export const MAIN_PATH_ICON: Record<any, string> = {
   requirementform: "REQUIREMENTFORM",
   sitemeasurement: "SITEMEASUREMENT",
   sampledesign: "SAMPLEDESIGN",
-  modularunits:"MODULARUNIT",
-  selectstage:"SELECTSTAGE",
+  modularunits: "MODULARUNIT",
+  externalunits: "EXTERNAL",
+  selectstage: "SELECTSTAGE",
   technicalconsultant: "TECHNICALCONSULTANT",
   materialselection: "MATERIALSELECTION",
   costestimation: "COSTESTIMATION",
