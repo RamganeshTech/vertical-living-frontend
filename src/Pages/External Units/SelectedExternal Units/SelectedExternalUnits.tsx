@@ -6,7 +6,7 @@ import { toast } from "../../../utils/toast"
 import {
     useDeleteSelectedExternalUnit,
     useGetSelectedExternalUnits,
-    // useSelectedExternalUnitComplete,
+    useSelectedExternalUnitComplete,
 } from "../../../apiList/ExternalUnit Api/selectedExternalApi"
 import type { DisplaySingleExternalUnit } from "../../../types/types"
 
@@ -19,7 +19,7 @@ const SelectedExternalUnits = () => {
     const selectedUnits = data?.selectedUnits || []
     // console.log("data", selectedUnits)
     const { mutateAsync: deleteUnitAsync, isPending: isDeleting } = useDeleteSelectedExternalUnit()
-    // const { mutateAsync: completeStatus, isPending: updateStatusPending } = useSelectedExternalUnitComplete()
+    const { mutateAsync: completeStatus, isPending: updateStatusPending } = useSelectedExternalUnitComplete()
 
     const filteredUnits = useMemo(() => {
 
@@ -34,7 +34,6 @@ const SelectedExternalUnits = () => {
 
 
 
-    console.log("filteredUnits", filteredUnits)
 
     const handleDelete = async (unitId: string) => {
         try {
@@ -53,21 +52,21 @@ const SelectedExternalUnits = () => {
     }
 
 
-    // const handleCompleteStatus = async () => {
-    //     try {
-    //         await completeStatus({ projectId: projectId! })
-    //         toast({
-    //             title: "Success",
-    //             description: "Stage Completed successfully",
-    //         })
-    //     } catch (error: any) {
-    //         toast({
-    //             title: "Error",
-    //             description: error?.response?.data?.message || "Failed to Complete unit",
-    //             variant: "destructive",
-    //         })
-    //     }
-    // }
+    const handleCompleteStatus = async () => {
+        try {
+            await completeStatus({ projectId: projectId! })
+            toast({
+                title: "Success",
+                description: "Stage Completed successfully",
+            })
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message || "Failed to Complete unit",
+                variant: "destructive",
+            })
+        }
+    }
 
     if (isLoading) {
         return (
@@ -121,9 +120,9 @@ const SelectedExternalUnits = () => {
 
 
                         <div className="flex gap-2 items-center">
-                            {/* <Button variant="primary" onClick={handleCompleteStatus} isLoading={updateStatusPending}>
+                            <Button variant="primary" onClick={handleCompleteStatus} isLoading={updateStatusPending}>
                                 <i className="fas fa-notebook"></i> Generate Bill
-                            </Button> */}
+                            </Button>
 
 
                             <div className="flex items-center space-x-4 bg-gradient-to-r from-blue-50 to-cyan-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl border border-blue-200 shadow-sm">

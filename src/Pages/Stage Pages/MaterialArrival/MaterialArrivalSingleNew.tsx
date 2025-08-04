@@ -38,6 +38,9 @@ const MaterialArrivalCard: React.FC<MaterialArrivalCardProps> = ({ item, project
     }
   }
 
+
+  console.log("item", item)
+
   return (
     <>
       <div
@@ -51,7 +54,7 @@ const MaterialArrivalCard: React.FC<MaterialArrivalCardProps> = ({ item, project
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs font-semibold">
               {index + 1}
             </div>
-            <span className="font-medium text-gray-800 truncate">{item.customId || "N/A"}</span>
+            <span className="font-medium text-gray-800 truncate">{item?.customId || "N/A"}</span>
           </div>
         </div>
 

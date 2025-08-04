@@ -184,7 +184,7 @@ export default function SelectedUnits() {
               </button>
             )}
             <div className="flex gap-2 items-center flex-row-reverse w-70 justify-between sm:flex-row sm:justify-start">
-              <div onClick={() => navigate(-1)} className="flex bg-gray-200  rounded-full items-center gap-2 backdrop-blur-sm px-4 py-2 ">
+              <div onClick={() => navigate(-1)} className="flex bg-gray-200  cursor-pointer rounded-full items-center gap-2 backdrop-blur-sm px-4 py-2 ">
                 <i className="fas fa-arrow-left text-sm"></i>
                 <span className="text-sm font-medium">Back</span>
               </div>
