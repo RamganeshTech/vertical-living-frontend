@@ -57,7 +57,7 @@ const ExternalMain: React.FC = () => {
           <div className="p-4 sm:p-6 border-b border-blue-200 bg-gradient-to-r from-blue-600 to-cyan-600">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                {isMobile && (
+                {/* {isMobile && (
                   <button
                     onClick={openMobileSidebar}
                     className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
@@ -65,7 +65,7 @@ const ExternalMain: React.FC = () => {
                   >
                     <i className="fa-solid fa-bars text-white"></i>
                   </button>
-                )}
+                )} */}
                 <div>
                   <h2 className="text-lg sm:text-xl font-bold text-white">Categories</h2>
                   <p className="text-blue-100 text-xs sm:text-sm">Browse our products</p>
@@ -92,10 +92,9 @@ const ExternalMain: React.FC = () => {
                   onClick={() => isMobile && setSidebarOpen(false)}
                   className={`
                     flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-xl transition-all duration-200 group
-                    ${
-                      activeCategory === category.name
-                        ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg transform scale-[1.02]"
-                        : "hover:bg-blue-50 text-slate-700 hover:text-slate-900 hover:shadow-md"
+                    ${activeCategory === category.name
+                      ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg transform scale-[1.02]"
+                      : "hover:bg-blue-50 text-slate-700 hover:text-slate-900 hover:shadow-md"
                     }
                   `}
                 >
@@ -106,18 +105,16 @@ const ExternalMain: React.FC = () => {
                     `}
                   >
                     <i
-                      className={`${category.icon} text-sm sm:text-base ${
-                        activeCategory === category.name ? "text-white" : "text-blue-600"
-                      }`}
+                      className={`${category.icon} text-sm sm:text-base ${activeCategory === category.name ? "text-white" : "text-blue-600"
+                        }`}
                     ></i>
                   </div>
                   <div className="flex-1">
                     <span className="font-medium text-sm sm:text-base">{category.name}</span>
                   </div>
                   <i
-                    className={`fa-solid fa-chevron-right transition-transform text-xs sm:text-sm ${
-                      activeCategory === category.name ? "text-white" : "text-slate-400"
-                    } group-hover:translate-x-1`}
+                    className={`fa-solid fa-chevron-right transition-transform text-xs sm:text-sm ${activeCategory === category.name ? "text-white" : "text-slate-400"
+                      } group-hover:translate-x-1`}
                   ></i>
                 </Link>
               ))}
@@ -133,43 +130,58 @@ const ExternalMain: React.FC = () => {
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               {/* Left side - Mobile menu + Title */}
-              <div className="flex items-center space-x-3 sm:space-x-4">
-                {isMobile && (
-                  <button
-                    onClick={() => setSidebarOpen(true)}
-                    className="p-2 rounded-lg border border-blue-300 hover:bg-blue-50 transition-colors lg:hidden"
-                  >
-                    <i className="fa-solid fa-bars text-blue-600"></i>
-                  </button>
-                )}
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <i className="fa-solid fa-home text-white text-lg sm:text-xl lg:text-2xl"></i>
-                  </div>
-                  <div>
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800">External Units</h1>
-                    <p className="text-slate-600 text-xs sm:text-sm lg:text-base hidden sm:block">
-                      Complete home interior collection
-                    </p>
+              <div className="flex  justify-between items-center w-full">
+                <div className="flex  items-center space-x-3 sm:space-x-4">
+                  {isMobile && (
+                    <button
+                      onClick={openMobileSidebar}
+                      className="p-2 rounded-lg border border-blue-300 hover:bg-blue-50 transition-colors lg:hidden"
+                    >
+                      <i className="fa-solid fa-bars text-blue-600"></i>
+                    </button>
+                  )}
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <i className="fa-solid fa-home text-white text-lg sm:text-xl lg:text-2xl"></i>
+                    </div>
+                    <div>
+                      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800">External Units</h1>
+                      <p className="text-slate-600 text-xs sm:text-sm lg:text-base hidden sm:block">
+                        Complete home interior collection
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Right side - Selected Units Link (if in project details) */}
-              {isInProjectDetails && (
-                <Link
-                  to="../selectedexternalunits"
-                  className="flex items-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
-                >
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                    <i className="fa-solid fa-check-circle text-white text-xs sm:text-sm"></i>
+                {/* Right side - Selected Units Link (if in project details) */}
+                {isInProjectDetails && (
+                  <div className={`${isMobile && "flex gap-2 items-center"}`}>
+                    <Link
+                      to="../selectedexternalunits"
+                      className={`flex items-center space-x-2 sm:space-x-3 ${isMobile ? "px-4 sm:px-6 py-2 sm:py-3" : "p-2"} bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105 text-sm sm:text-base`}
+                    >
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                        <i className="fa-solid fa-check-circle text-white text-xs sm:text-sm"></i>
+                      </div>
+                      <div>
+                        <span className="font-medium sm:inline hidden">Selected Units</span>
+                      </div>
+
+                      {!isMobile && <i className="fa-solid fa-arrow-right text-xs sm:text-sm"></i>}
+                    </Link>
+
+                    <div>
+                      <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="p-2 rounded-lg border border-blue-300 hover:bg-blue-50 transition-colors lg:hidden"
+                      >
+                        <i className="fas fa-box text-lg text-blue-600"></i>
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <span className="font-medium">Selected Units</span>
-                  </div>
-                  <i className="fa-solid fa-arrow-right text-xs sm:text-sm"></i>
-                </Link>
-              )}
+
+                )}
+              </div>
             </div>
           </div>
         </div>

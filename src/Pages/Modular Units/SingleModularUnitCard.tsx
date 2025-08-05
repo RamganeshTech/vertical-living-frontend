@@ -207,7 +207,7 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
           //   )
           //    : (
           <div className="space-y-2 ">
-            <div className="relative overflow-visible z-999">
+            <div className="relative overflow-visible z-40">
               <Select value={quantity.toString()} onValueChange={(val) => setQuantity(Number(val))}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select Quantity" selectedValue={quantity.toString()} />

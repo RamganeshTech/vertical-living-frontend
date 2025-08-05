@@ -214,7 +214,6 @@ export const useGetLabourEstimation = (projectId: string) => {
     enabled: !!projectId,
     retry: false,
     refetchOnMount: false,
-    staleTime: 0,
   });
 };
 

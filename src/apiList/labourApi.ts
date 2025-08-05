@@ -109,7 +109,6 @@ export const useGetLabourLists = ({ projectId }: { projectId: string }) =>
   useQuery({
     queryKey: ['labourLists', projectId],
     queryFn: () => getLabourLists({ projectId }),
-    staleTime: 1000 * 60 * 5,
     retry: false,
     refetchOnWindowFocus: false,
   });

@@ -85,7 +85,6 @@ export const useGetProjects = (orgsId: string) => {
         enabled: !!role,
         refetchOnWindowFocus: false,
         retry: false,
-        staleTime: 1000 * 60 * 10
     })
 }
 

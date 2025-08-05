@@ -161,7 +161,6 @@ export const useGetWorkersAsOwner = (projectId: string) =>
     queryKey: ["workers", projectId],
     queryFn: () => getWorkersByProjectAsOwner(projectId),
     enabled: !!projectId,
-    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 

@@ -94,7 +94,6 @@ export const useGetSingleOrganization = (organizationId: string) => {
 
       return await fetchSingleOrganization(organizationId, api)
     },
-    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: false,
   });
