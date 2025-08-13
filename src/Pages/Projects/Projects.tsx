@@ -17,7 +17,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
   const path = {
     PROJECTS: `/organizations/${organizationId}/projects`,
-    ORGANIZATION: `/organizations/${organizationId}/invitecto`
+    ORGANIZATION: `/organizations/${organizationId}/invitecto`,
+    // PROCUREMENT: `/organizations/${organizationId}/procurement`
     // ISSUES: "/issues",
     // COLLABORATION: "/collaboration",
     // TASKS: "/tasks",

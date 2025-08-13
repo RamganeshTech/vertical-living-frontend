@@ -228,12 +228,12 @@ export interface IRequirementFormSchema {
     whatsapp: string | null,
     location: string | null
   },
-  isEditable: boolean,
-  kitchen: IKitchenRequirement,
-  livingHall: ILivingHallRequirement,
-  bedroom: IBedroomRequirement,
-  wardrobe: IWardrobeRequirement,
-  additionalNotes: string | null,
+  // isEditable: boolean,
+  // kitchen: IKitchenRequirement,
+  // livingHall: ILivingHallRequirement,
+  // bedroom: IBedroomRequirement,
+  // wardrobe: IWardrobeRequirement,
+  // additionalNotes: string | null,
 }
 
 export interface IKitchenRequirement {

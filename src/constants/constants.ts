@@ -3,7 +3,9 @@ import noimg from '../assets/no image.jpeg'
 export const SIDEBAR_LABELS = {
   //   DASHBOARD: "Dashboard",
   PROJECTS: "Projects",
-  ORGANIZATION: "Organization"
+  ORGANIZATION: "Organization",
+  // PROCUREMENT: "Procurement",
+
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",
   // TASKS: "Tasks",
@@ -13,6 +15,8 @@ export const SIDEBAR_LABELS = {
 export const SIDEBAR_ICONS = {
   PROJECTS: "fa-solid fa-diagram-project text-2xl",
   ORGANIZATION: "fa-solid fa-building text-2xl",
+  // PROCUREMENT: "fa-solid fa-box text-2xl",
+
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",
   // TASKS: "fa-solid fa-list text-2xl",
@@ -44,7 +48,7 @@ export const ORGANIZATION_ICONS = {
   PLAN: "fa-solid fa-wallet  text-2xl",
   PROFILE: "fa-solid fa-user-gear  text-2xl",
   MODULAR: "fa-solid fa-box  text-2xl",
-  EXTERNAL: "fa-solid fa-boxes-stacked text-2xl"
+  EXTERNAL: "fa-solid fa-boxes-stacked text-2xl",
 }
 
 export const ORGANIZATION_LABELS = {
@@ -56,6 +60,7 @@ export const ORGANIZATION_LABELS = {
   PROFILE: "User Profile",
   MODULAR: "Modular Units",
   EXTERNAL: "External Units",
+
 }
 
 export const PROJECTS_LABELS = {

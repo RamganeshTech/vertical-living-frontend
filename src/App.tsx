@@ -8,6 +8,11 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import ExternalMain from './Pages/External Units/ExternalMain';
 import WardrobeExternal from './Pages/External Units/WardrobeExternal';
 import SelectedExternalUnits from './Pages/External Units/SelectedExternal Units/SelectedExternalUnits';
+import ProcurementMain from './Pages/Procurement/ProcurementMain';
+import RoomPage from './Pages/RequirementForm/RoomPage';
+const RoomDetailCardNew = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCardNew"));
+// const RoomDetailCardNew = 
+
 const ForgotPassword = lazy(() => import('./Pages/Forgot Password/ForgotPassword'));
 const ResetPassword = lazy(() => import('./Pages/Forgot Password/ResetPassword'));
 const ShortlistMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortList/ShortListMain'));
@@ -45,7 +50,7 @@ const SiteMeasurement = lazy(() => import("./Pages/Stage Pages/Site Measurement/
 const SampleDesign = lazy(() => import("./Pages/Stage Pages/Sample design/SampleDesign"));
 const TechnicalConsultant = lazy(() => import("./Pages/Stage Pages/Technical Consultant/TechnicalConsultant"));
 const MaterialRoomOverview = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/MaterialOverview"));
-const RoomDetailCard = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCard"));
+// const RoomDetailCard = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/OldVersion/RoomDetailCard"));
 const CostEstimationContainer = lazy(() => import("./Pages/Stage Pages/Cost Estimation/CostEstimationContainer"));
 const CostEstimationRoomDetails = lazy(() => import("./Pages/Stage Pages/Cost Estimation/CostEstimationRoomDetails"));
 const LabourEstimateContainer = lazy(() => import("./Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer"));
@@ -56,6 +61,7 @@ const OrderMaterialOverview = lazy(() => import("./Pages/Stage Pages/Ordering Ma
 // const MaterialArrivalRoomDetail = lazy(() => import("./Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail"));
 const PublicMaterialArrival = lazy(() => import("./Pages/Stage Pages/MaterialArrival/PublicMaterialArrival"));
 // const PublicOrderMaterial = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/PublicOrderMaterial"));
+const PublicOrderHistoryDetails = lazy(() => import("./Pages/Stage Pages/Ordering Materials/PublicOrderHistory"))
 const WorkMainOverview = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkMainOverView"));
 const WorkSchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkSchedulePage"));
 const DailySchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/DailySchedulePage"));
@@ -218,6 +224,13 @@ function App() {
             </Route>
 
 
+            <Route path="procurement" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                <ProcurementMain />
+              </ProtectedRoutes>
+            } />
+
+
           </Route>
 
 
@@ -276,7 +289,14 @@ function App() {
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <RequriementForm />
               </ProtectedRoutes>
-            } />
+            } >
+
+              <Route path="roompage/:roomId" element={
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                  <RoomPage />
+                </ProtectedRoutes>} />
+
+            </Route>
 
             <Route path="sitemeasurement" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
@@ -357,7 +377,7 @@ function App() {
 
               <Route path="materialroom/:roomId/:roomType" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}>
-                  <RoomDetailCard />
+                  <RoomDetailCardNew />
                 </ProtectedRoutes>} />
             </Route>
 
@@ -533,7 +553,7 @@ function App() {
           {/* REQUIREMENT FORM LINK */}
 
           <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
-          {/* <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderMaterial />} /> */}
+          <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderHistoryDetails />} />
           <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
           <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
 

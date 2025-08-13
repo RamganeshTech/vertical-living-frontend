@@ -233,7 +233,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
         <>
             {showSideBar ?
                 <aside onMouseLeave={() => setShowSideBar(false)} className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
-                    <div className="flex flex-col flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar p-2">
+                    <div className="flex flex-col flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar p-2 large-scrollbar">
                         <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b-1 py-2`}>
                             <span className='text-xl'>{COMPANY_DETAILS.COMPANY_NAME}</span>
                             <div className='w-[30px] h-[30px]' >
@@ -289,7 +289,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                 </aside>
                 :
                 <aside onMouseEnter={() => setShowSideBar(true)} className="flex flex-col relative justify-between bg-[#2f303a] w-[6%]  max-h-full  text-[#9ca3af] transition-all duration-300 ">
-                    <div className='max-h-[95%] overflow-y-auto overflow-x-hidden custom-scrollbar'>
+                    <div className='max-h-[95%] overflow-y-auto overflow-x-hidden custom-scrollbar '>
                         <div className='flex items-center flex-col justify-between w-full'>
 
                             {/* <SidebarIcons path icons={icons} activeSidebar={activeSidebar} setActiveSidebar={setActiveSidebar} /> */}

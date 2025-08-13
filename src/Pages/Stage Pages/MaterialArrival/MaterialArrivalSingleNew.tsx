@@ -14,7 +14,7 @@ interface MaterialArrivalCardProps {
       originalName?: string
     } | null
     quantity: number
-    customId: string
+    unitName: string
     isVerified: boolean
   }
   projectId: string,
@@ -27,7 +27,7 @@ const MaterialArrivalCard: React.FC<MaterialArrivalCardProps> = ({ item, project
 
   const handleToggle = async () => {
     try {
-      await toggleVerification({ projectId, fieldId: item.customId, toggle: !item?.isVerified })
+      await toggleVerification({ projectId, unitName: item.unitName, toggle: !item?.isVerified })
       toast({ title: "Success", description: "Verification status updated." })
     } catch (error: any) {
       toast({
@@ -39,7 +39,7 @@ const MaterialArrivalCard: React.FC<MaterialArrivalCardProps> = ({ item, project
   }
 
 
-  console.log("item", item)
+  // console.log("item", item)
 
   return (
     <>
@@ -54,7 +54,7 @@ const MaterialArrivalCard: React.FC<MaterialArrivalCardProps> = ({ item, project
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs font-semibold">
               {index + 1}
             </div>
-            <span className="font-medium text-gray-800 truncate">{item?.customId || "N/A"}</span>
+            <span className="font-medium text-gray-800 truncate">{item?.unitName || "N/A"}</span>
           </div>
         </div>
 
@@ -146,7 +146,7 @@ const MaterialArrivalCard: React.FC<MaterialArrivalCardProps> = ({ item, project
             <img
               src={item?.image?.url || NO_IMAGE}
               alt={item?.image?.originalName || "Material Image"}
-              className="w-full h-full object-contain rounded-lg shadow-2xl"
+              className="w-full h-full object-cover rounded-lg shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             />
             <div className="absolute bottom-0 left-0 right-0 bg-black  text-white p-4 rounded-b-lg">

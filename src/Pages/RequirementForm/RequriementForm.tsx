@@ -1,12 +1,12 @@
 // RequirementForm.tsx
-import { useOutletContext, useParams } from "react-router-dom";
-import { useDeleteRequirementUploadFile, useFormCompletion, useGenerateShareableLink, useGetFormRequriemetn, useSetDeadLineFormRequirement, useUploadRequirementFiles } from "../../apiList/Stage Api/requirementFormApi";
+import { Outlet, useOutletContext, useParams } from "react-router-dom";
+import { useCreateRoom, useDeleteRequirementUploadFile, useFormCompletion, useGenerateShareableLink, useGetAllRequirementInfo, useSetDeadLineFormRequirement, useUploadRequirementFiles } from "../../apiList/Stage Api/requirementFormApi";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
-import KitchenSection from './PrivateRequrirementComponents/KitchenSection';
-import LivingHallSection from './PrivateRequrirementComponents/LivingHallSection';
-import BedroomSection from './PrivateRequrirementComponents/BedroomSection';
-import WardrobeSection from './PrivateRequrirementComponents/WardrobeSection';
+// import KitchenSection from './PrivateRequrirementComponents/KitchenSection';
+// import LivingHallSection from './PrivateRequrirementComponents/LivingHallSection';
+// // import BedroomSection from './PrivateRequrirementComponents/BedroomSection';
+// import WardrobeSection from './PrivateRequrirementComponents/WardrobeSection';
 import React, { useState } from "react";
 import { toast } from "../../utils/toast";
 import { Label } from "../../components/ui/Label";
@@ -29,32 +29,98 @@ export type PrivateRequriementFromProp = {
   sectionName: string
 }
 
-const SectionConfig = [
-  {
-    Component: BedroomSection,
-    icon: "fa-solid fa-bed",
-    label: "Bedroom Section",
-    key: "bedroom"
-  },
-  {
-    Component: KitchenSection,
-    icon: "fa-solid fa-kitchen-set",
-    label: "Kitchen Section",
-    key: "kitchen"
-  },
-  {
-    Component: LivingHallSection,
-    icon: "fa-solid fa-house",
-    label: "Living Hall Section",
-    key: "livingHall"
-  },
-  {
-    Component: WardrobeSection,
-    icon: "fa-solid fa-shirt",
-    label: "Wardrobe Section",
-    key: "wardrobe"
-  }
-]
+
+
+
+export function CreateRoomModal({
+  open,
+  onClose,
+  onSubmit,
+  isLoading,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (roomName: string) => void;
+  isLoading: boolean;
+}) {
+  const [roomName, setRoomName] = React.useState("");
+
+  React.useEffect(() => {
+    if (!open) setRoomName("");
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed top-0 left-0 w-full h-screen  bg-black/70 bg-opacity-40 flex justify-center items-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg p-6 max-w-sm w-full"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-xl font-semibold mb-4">Create New Room</h3>
+        <input
+          type="text"
+          placeholder="Enter Room Name"
+          className="w-full p-2 border border-gray-300 rounded mb-4"
+          value={roomName}
+          onKeyDown={(e)=>{
+            if(e.key === "Enter"){
+              onSubmit(roomName)
+            }
+          }}
+          onChange={(e) => setRoomName(e.target.value)}
+        />
+        <div className="flex justify-end gap-2">
+          <Button
+            className="px-4 py-2 bg-gray-500 rounded hover:bg-gray-400"
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+            onClick={() => onSubmit(roomName)}
+            disabled={!roomName.trim() || isLoading}
+          >
+            {isLoading ? "Creating..." : "Create"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// const SectionConfig = [
+//   {
+//     Component: BedroomSection,
+//     icon: "fa-solid fa-bed",
+//     label: "Bedroom Section",
+//     key: "bedroom"
+//   },
+//   {
+//     Component: KitchenSection,
+//     icon: "fa-solid fa-kitchen-set",
+//     label: "Kitchen Section",
+//     key: "kitchen"
+//   },
+//   {
+//     Component: LivingHallSection,
+//     icon: "fa-solid fa-house",
+//     label: "Living Hall Section",
+//     key: "livingHall"
+//   },
+//   {
+//     Component: WardrobeSection,
+//     icon: "fa-solid fa-shirt",
+//     label: "Wardrobe Section",
+//     key: "wardrobe"
+//   }
+// ]
 
 export default function RequirementForm() {
   const { projectId, organizationId } = useParams() as { projectId: string; organizationId: string };
@@ -63,9 +129,8 @@ export default function RequirementForm() {
 
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
-  const [visibleSection, setVisibleSection] = useState<string | null>(null);
 
-  const { data: formData, isLoading, error, refetch } = useGetFormRequriemetn({ projectId: projectId! });
+  const { data: formData, isLoading, error, refetch } = useGetAllRequirementInfo({ projectId: projectId! });
   const { mutateAsync: linkgenerate, isPending: linkPending, } = useGenerateShareableLink()
   const { mutateAsync: completeFormMutate, isPending: completePending, } = useFormCompletion()
   // const { mutateAsync: lockFormMutate, isPending: lockPending,  } = useLockUpdationOfForm()
@@ -74,6 +139,28 @@ export default function RequirementForm() {
   const { mutateAsync: uploadFilesMutate, isPending: uploadPending } = useUploadRequirementFiles();
   // const { mutateAsync: deleteFormMutate, isPending: deleteFormPending } = useDeleteRequriementForm();
   const { mutateAsync: deleteUploadFile, isPending: deleteUploadPending } = useDeleteRequirementUploadFile()
+
+  const [isCreateRoomOpen, setIsCreateRoomOpen] = useState(false);
+
+  const { mutateAsync: createRoom, isPending: roomPending } = useCreateRoom();
+
+  // Handler to submit new room creation
+  const handleCreateRoomSubmit = async (roomName: string) => {
+    if (!projectId) return;
+    try {
+      await createRoom({ projectId, payload: { roomName } });
+      toast({ title: "Success", description: "Room created successfully" });
+      setIsCreateRoomOpen(false);
+      refetch(); // refresh form data to include new room
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || error?.message || "Failed to create room",
+        variant: "destructive",
+      });
+    }
+  };
+
 
   if (isLoading) return <MaterialOverviewLoading />;
 
@@ -155,222 +242,227 @@ export default function RequirementForm() {
     window.open(whatsappUrl, "_blank")
   }
 
+
+  // console.log("data", formData.rooms)
+
+
+
+
+  const isChild = location.pathname.includes("roompage")
+
+  if (isChild) {
+    return <Outlet />
+  }
+
   return (
     <div className="h-full w-full overflow-y-auto ">
-      {visibleSection ? (
-        <div className="min-h-screen">
-          {SectionConfig.map(({ Component, key, }) => (
-            visibleSection === key && (
-              <div key={key} className="pt-6">
-                <Component
-                  sectionName={key}
-                  data={formData?.[key]}
-                  isEditable={formData?.isEditable}
-                  setVisibleSection={setVisibleSection}
-                />
-              </div>
-            )
-          ))}
-        </div>
-      ) : (
-        <div className="h-full w-full space-y-4">
-          {/* Header Section */}
-          <div className="flex flex-col w-full sm:flex-row justify-between sm:items-center items-start gap-4">
-            <div className="">
-              <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
-                {isMobile && (
-                  <button
-                    onClick={openMobileSidebar}
-                    className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
-                    title="Open Menu"
-                  >
-                    <i className="fa-solid fa-bars"></i>
-                  </button>
-                )} <i className="fa-solid fa-pencil mr-2"></i> Client Requirement
-              </h2>
-            </div>
 
-            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2  !w-[100%] sm:!w-[50%] lg:!w-[60%] justify-end lg:justify-end">
-              {/* <Button onClick={handleLockForm} className="bg-yellow-100 hover:bg-yellow-100 border-yellow-400 text-yellow-800 w-full sm:w-auto">
+      <div className="h-full w-full space-y-4">
+        {/* Header Section */}
+        <div className="flex flex-col w-full sm:flex-row justify-between sm:items-center items-start gap-4">
+          <div className="">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
+              {isMobile && (
+                <button
+                  onClick={openMobileSidebar}
+                  className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                  title="Open Menu"
+                >
+                  <i className="fa-solid fa-bars"></i>
+                </button>
+              )} <i className="fa-solid fa-pencil mr-2"></i> Client Requirement
+            </h2>
+          </div>
+
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2  !w-[100%] sm:!w-[50%] lg:!w-[60%] justify-end lg:justify-end">
+            {/* <Button onClick={handleLockForm} className="bg-yellow-100 hover:bg-yellow-100 border-yellow-400 text-yellow-800 w-full sm:w-auto">
                 <i className="fa-solid fa-lock"></i>
               </Button> */}
-              <Button
-                isLoading={completePending}
-                onClick={handleFormCompletion}
-                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-              >
-                <i className="fa-solid fa-circle-check mr-2"></i>
-                Mark as Complete
-              </Button>
+            <Button
+              isLoading={completePending}
+              onClick={handleFormCompletion}
+              className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+            >
+              <i className="fa-solid fa-circle-check mr-2"></i>
+              Mark as Complete
+            </Button>
 
-              {/* <Button
+            {/* <Button
                 onClick={handleFormDeletion}
                 className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
               >
                 <i className="fa-solid fa-trash-can"></i>
               </Button> */}
 
-              <ResetStageButton
-                projectId={projectId!}
-                stageNumber={1}
-                stagePath="requirementform"
-                className="sm:!max-w-[20%] w-full"
-              />
-
-              {!error && <ShareDocumentWhatsapp
-                projectId={projectId}
-                stageNumber="1"
-                className="w-full sm:w-fit"
-                isStageCompleted={formData?.status}
-              />}
-
-              <AssignStageStaff
-                stageName="RequirementFormModel"
-                projectId={projectId}
-                organizationId={organizationId}
-                currentAssignedStaff={formData?.assignedTo || null}
-                // className="!w-[100%]"
-                className="w-full sm:w-auto"
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-              <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
-                ⚠️ Error Occurred
-              </div>
-              <p className="text-red-500  mb-4 text-lg sm:text-xl">
-                {(error as any)?.response?.data?.message || "Failed to load data"}
-              </p>
-              <Button
-                onClick={() => refetch()}
-                className="bg-red-600 text-white px-4 py-2"
-              >
-                Retry
-              </Button>
-            </div>
-          )}
-
-
-          {!error && <main className="h-[calc(100vh-90px)] overflow-y-auto custom-scrollbar space-y-6">
-            {/* Timer Section */}
-            <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
-              <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
-                <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
-                <span>Stage Timings</span>
-              </div>
-              <StageTimerInfo
-                startedAt={formData?.timer?.startedAt}
-                projectId={projectId!}
-                stageName="requirementform"
-                refetchStageMutate={refetch}
-                completedAt={formData?.timer?.completedAt}
-                deadLine={formData?.timer?.deadLine}
-                formId={formData?._id}
-                deadLineMutate={deadLineMutate}
-                isPending={deadLinePending}
-              />
-            </Card>
-
-            {/* Client Info & Uploads */}
-            <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
-              <ClientInfoCard className="w-[100%] md:w-[50%]" client={formData?.clientData} />
-
-              <Card className="p-4 w-[100%] md:w-[50%] shadow border-l-4 border-blue-500 bg-white">
-                <RequirementFileUploader
-                  formId={formData?._id}
-                  existingUploads={formData?.uploads}
-                  onUploadComplete={refetch}
-                  uploadFilesMutate={uploadFilesMutate}
-                  uploadPending={uploadPending}
-                  projectId={projectId}
-                  refetch={refetch}
-                  onDeleteUpload={deleteUploadFile}
-                  deleteFilePending={deleteUploadPending}
-                />
-              </Card>
-            </div>
-
-            {/* Section Cards */}
-            <SectionCards
-              sections={SectionConfig}
-              setVisibleSection={setVisibleSection}
+            <ResetStageButton
+              projectId={projectId!}
+              stageNumber={1}
+              stagePath="requirementform"
+              className="sm:!max-w-[20%] w-full"
             />
 
-            {/* Form Link Section */}
-            <div className="pb-6">
-              {!formData?.shareToken ? (
-                <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg space-y-4">
-                  <h2 className="text-lg sm:text-xl font-bold text-blue-900 flex items-center">
-                    <i className="fas fa-link mr-2" /> Generate Form Link
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    Request to fill the form by generating a link.
-                  </p>
-                  {!inviteLink ? (
-                    <Button
-                      onClick={handleGenerateInviteLink}
-                      isLoading={linkPending}
-                      className="w-full bg-blue-600 text-white py-2.5 sm:py-3"
-                    >
-                      <i className="fas fa-link mr-2" /> Generate Form Link
-                    </Button>
-                  ) : (
-                    <div className="space-y-4">
-                      <Label>Form Link</Label>
-                      <div className="flex flex-col sm:flex-row items-center gap-2">
-                        <Input
-                          value={inviteLink}
-                          readOnly
-                          className="bg-blue-50 text-blue-800 flex-1"
-                        />
-                        <Button
-                          onClick={handleCopyLink}
-                          className="w-full sm:w-auto"
-                        >
-                          <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
-                        </Button>
-                      </div>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <Button
-                          onClick={handleShareWhatsApp}
-                          className="w-full sm:w-auto bg-green-600 text-white"
-                        >
-                          <i className="fab fa-whatsapp mr-2" /> Share on WhatsApp
-                        </Button>
-                        <Button
-                          onClick={handleCopyLink}
-                          className="w-full sm:w-auto border border-blue-400 text-blue-700"
-                        >
-                          <i className="fas fa-copy mr-2" /> Copy
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <Label>Form Link</Label>
-                  <div className="flex flex-col sm:flex-row items-center gap-2">
-                    <Input
-                      value={formData?.shareToken}
-                      readOnly
-                      className="bg-blue-50 text-blue-800 flex-1"
-                    />
-                    <Button
-                      onClick={() => handleCopyStaticLink(formData?.shareToken)}
-                      className="w-full sm:w-auto"
-                    >
-                      <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </main>}
+            {!error && <ShareDocumentWhatsapp
+              projectId={projectId}
+              stageNumber="1"
+              className="w-full sm:w-fit"
+              isStageCompleted={formData?.status}
+            />}
+
+            <AssignStageStaff
+              stageName="RequirementFormModel"
+              projectId={projectId}
+              organizationId={organizationId}
+              currentAssignedStaff={formData?.assignedTo || null}
+              // className="!w-[100%]"
+              className="w-full sm:w-auto"
+            />
+          </div>
         </div>
-      )}
+
+        {error && (
+          <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+            <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+              ⚠️ Error Occurred
+            </div>
+            <p className="text-red-500  mb-4 text-lg sm:text-xl">
+              {(error as any)?.response?.data?.message || "Failed to load data"}
+            </p>
+            <Button
+              onClick={() => refetch()}
+              className="bg-red-600 text-white px-4 py-2"
+            >
+              Retry
+            </Button>
+          </div>
+        )}
+
+
+        {!error && <main className="h-[calc(100vh-90px)] overflow-y-auto custom-scrollbar space-y-6">
+          {/* Timer Section */}
+          <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
+            <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
+              <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+              <span>Stage Timings</span>
+            </div>
+            <StageTimerInfo
+              startedAt={formData?.timer?.startedAt}
+              projectId={projectId!}
+              stageName="requirementform"
+              refetchStageMutate={refetch}
+              completedAt={formData?.timer?.completedAt}
+              deadLine={formData?.timer?.deadLine}
+              formId={formData?._id}
+              deadLineMutate={deadLineMutate}
+              isPending={deadLinePending}
+            />
+          </Card>
+
+          {/* Client Info & Uploads */}
+          <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+            <ClientInfoCard className="w-[100%] md:w-[50%]" client={formData?.clientData} />
+
+            <Card className="p-4 w-[100%] md:w-[50%] shadow border-l-4 border-blue-500 bg-white">
+              <RequirementFileUploader
+                formId={formData?._id}
+                existingUploads={formData?.uploads}
+                onUploadComplete={refetch}
+                uploadFilesMutate={uploadFilesMutate}
+                uploadPending={uploadPending}
+                projectId={projectId}
+                refetch={refetch}
+                onDeleteUpload={deleteUploadFile}
+                deleteFilePending={deleteUploadPending}
+              />
+            </Card>
+          </div>
+
+          {/* Create Room Modal */}
+          <CreateRoomModal
+            open={isCreateRoomOpen}
+            onClose={() => setIsCreateRoomOpen(false)}
+            onSubmit={handleCreateRoomSubmit}
+            isLoading={roomPending}
+          />
+
+
+          {/* Section Cards */}
+          <SectionCards
+            sections={formData?.rooms}
+            setIsCreateRoomOpen={setIsCreateRoomOpen}
+          />
+
+          {/* Form Link Section */}
+          <div className="pb-6">
+            {!formData?.shareToken ? (
+              <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg space-y-4">
+                <h2 className="text-lg sm:text-xl font-bold text-blue-900 flex items-center">
+                  <i className="fas fa-link mr-2" /> Generate Form Link
+                </h2>
+                <p className="text-sm text-gray-600">
+                  Request to fill the form by generating a link.
+                </p>
+                {!inviteLink ? (
+                  <Button
+                    onClick={handleGenerateInviteLink}
+                    isLoading={linkPending}
+                    className="w-full bg-blue-600 text-white py-2.5 sm:py-3"
+                  >
+                    <i className="fas fa-link mr-2" /> Generate Form Link
+                  </Button>
+                ) : (
+                  <div className="space-y-4">
+                    <Label>Form Link</Label>
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
+                      <Input
+                        value={inviteLink}
+                        readOnly
+                        className="bg-blue-50 text-blue-800 flex-1"
+                      />
+                      <Button
+                        onClick={handleCopyLink}
+                        className="w-full sm:w-auto"
+                      >
+                        <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
+                      </Button>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button
+                        onClick={handleShareWhatsApp}
+                        className="w-full sm:w-auto bg-green-600 text-white"
+                      >
+                        <i className="fab fa-whatsapp mr-2" /> Share on WhatsApp
+                      </Button>
+                      <Button
+                        onClick={handleCopyLink}
+                        className="w-full sm:w-auto border border-blue-400 text-blue-700"
+                      >
+                        <i className="fas fa-copy mr-2" /> Copy
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Label>Form Link</Label>
+                <div className="flex flex-col sm:flex-row items-center gap-2">
+                  <Input
+                    value={formData?.shareToken}
+                    readOnly
+                    className="bg-blue-50 text-blue-800 flex-1"
+                  />
+                  <Button
+                    onClick={() => handleCopyStaticLink(formData?.shareToken)}
+                    className="w-full sm:w-auto"
+                  >
+                    <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </main>}
+      </div>
     </div>
   );
 }

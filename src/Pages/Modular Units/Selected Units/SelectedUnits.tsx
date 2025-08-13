@@ -13,6 +13,7 @@ interface ISelectedUnit {
   unitId: string
   customId: string
   category: string
+  unitName:string
   image: string | null
   quantity: number
   singleUnitCost: number
@@ -72,7 +73,9 @@ export default function SelectedUnits() {
     }).format(amount)
   }
 
-  const formatCategory = (category: string) => {
+  const formatCategory = (category: string | null) => {
+
+    if(category === null) return "";
     return category
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())
@@ -276,10 +279,7 @@ export default function SelectedUnits() {
                           <i className="fas fa-trash text-sm" />
                         </Button>
 
-                        {/* Category Icon Badge */}
-                        {/* <div className="absolute top-2 left-2 w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                          <i className={`${getCategoryIcon(unit.category)} text-white text-sm`} />
-                        </div> */}
+                       
                       </div>
 
                       {/* Card Content */}
@@ -287,7 +287,7 @@ export default function SelectedUnits() {
                         <div className="flex items-center justify-between">
                           <div className="min-w-0 flex-1">
                             <CardTitle className="text-base md:text-lg font-semibold text-slate-900 truncate">
-                              {formatCategory(unit.category)}
+                              {formatCategory(unit?.unitName)}
                             </CardTitle>
                             <p className="text-xs text-slate-500 truncate"><i className="fas fa-hashtag text-gray-500 text-xs "></i> {unit?.customId}</p>
                           </div>

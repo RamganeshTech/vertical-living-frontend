@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import KitchenSectionPublic from "./KitchenSectionPublic";
-import LivingHallSectionPublic from "./LivingHallSectionPublic";
-import BedroomSectionPublic from "./BedroomSectionPublic";
-import WardrobeSectionPublic from "./WardrobeSectionPublic";
+// import KitchenSectionPublic from "./KitchenSectionPublic";
+// import LivingHallSectionPublic from "./LivingHallSectionPublic";
+// import BedroomSectionPublic from "./BedroomSectionPublic";
+// import WardrobeSectionPublic from "./WardrobeSectionPublic";
 import { useCreateFormSubmission } from "../../../apiList/Stage Api/requirementFormApi";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
 import { Label } from "../../../components/ui/Label";
 import type { IRequirementFormSchema } from "../../../types/types";
-import { Textarea } from "../../../components/ui/TextArea";
+// import { Textarea } from "../../../components/ui/TextArea";
 import { toast } from "../../../utils/toast";
 
 const RequirementFormPublic: React.FC = () => {
@@ -22,46 +22,46 @@ const RequirementFormPublic: React.FC = () => {
     whatsapp: null,
     location: null,
   },
-  isEditable: true,
-  kitchen: {
-    layoutType: null,
-    kitchenPackage: null,
-    measurements: { top: null, left: null, right: null },
-    graniteCountertop: null,
-    numberOfShelves: null,
-    notes: null,
-  },
-  livingHall: {
-    seatingStyle: null,
-    tvUnitDesignRequired: null,
-    falseCeilingRequired: null,
-    wallDecorStyle: null,
-    numberOfFans: null,
-    numberOfLights: null,
-    livingHallPackage: null,
-    notes: null,
-  },
-  bedroom: {
-    numberOfBedrooms: null,
-    bedType: null,
-    wardrobeIncluded: null,
-    falseCeilingRequired: null,
-    tvUnitRequired: null,
-    studyTableRequired: null,
-    bedroomPackage: null,
-    notes: null,
-  },
-  wardrobe: {
-    wardrobeType: null,
-    lengthInFeet: null,
-    heightInFeet: null,
-    mirrorIncluded: null,
-    wardrobePackage: null,
-    numberOfShelves: null,
-    numberOfDrawers: null,
-    notes: null,
-  },
-  additionalNotes: null,
+  // isEditable: true,
+  // kitchen: {
+  //   layoutType: null,
+  //   kitchenPackage: null,
+  //   measurements: { top: null, left: null, right: null },
+  //   graniteCountertop: null,
+  //   numberOfShelves: null,
+  //   notes: null,
+  // },
+  // // livingHall: {
+  //   seatingStyle: null,
+  //   tvUnitDesignRequired: null,
+  //   falseCeilingRequired: null,
+  //   wallDecorStyle: null,
+  //   numberOfFans: null,
+  //   numberOfLights: null,
+  //   livingHallPackage: null,
+  //   notes: null,
+  // },
+  // bedroom: {
+  //   numberOfBedrooms: null,
+  //   bedType: null,
+  //   wardrobeIncluded: null,
+  //   falseCeilingRequired: null,
+  //   tvUnitRequired: null,
+  //   studyTableRequired: null,
+  //   bedroomPackage: null,
+  //   notes: null,
+  // },
+  // wardrobe: {
+  //   wardrobeType: null,
+  //   lengthInFeet: null,
+  //   heightInFeet: null,
+  //   mirrorIncluded: null,
+  //   wardrobePackage: null,
+  //   numberOfShelves: null,
+  //   numberOfDrawers: null,
+  //   notes: null,
+  // },
+  // additionalNotes: null,
 });
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -147,28 +147,28 @@ const RequirementFormPublic: React.FC = () => {
   };
 
   const steps = [
-    {
-      label: "Kitchen",
-      content: <KitchenSectionPublic formData={formData} setFormData={setFormData} />,
-    },
-    {
-      label: "Living Hall",
-      content: <LivingHallSectionPublic formData={formData} setFormData={setFormData} />,
-    },
-    {
-      label: "Bedroom",
-      content: <BedroomSectionPublic formData={formData} setFormData={setFormData} />,
-    },
-    {
-      label: "Wardrobe",
-      content: <WardrobeSectionPublic formData={formData} setFormData={setFormData} />,
-    },
+    // {
+    //   label: "Kitchen",
+    //   content: <KitchenSectionPublic formData={formData} setFormData={setFormData} />,
+    // },
+    // {
+    //   label: "Living Hall",
+    //   content: <LivingHallSectionPublic formData={formData} setFormData={setFormData} />,
+    // },
+    // {
+    //   label: "Bedroom",
+    //   content: <BedroomSectionPublic formData={formData} setFormData={setFormData} />,
+    // },
+    // {
+    //   label: "Wardrobe",
+    //   content: <WardrobeSectionPublic formData={formData} setFormData={setFormData} />,
+    // },
     {
       label: "Client Info",
       content: (
         <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="text-2xl font-semibold text-blue-800 mb-4">Client Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <Label>Client Name</Label>
               <Input
@@ -215,7 +215,7 @@ const RequirementFormPublic: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-4">
+          {/* <div className="mt-4">
             <Label>Additional Notes</Label>
             <Textarea
               name="additionalNotes"
@@ -226,7 +226,7 @@ const RequirementFormPublic: React.FC = () => {
               className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring focus:ring-blue-200"
               rows={4}
             />
-          </div>
+          </div> */}
 
           <div className="mt-6 text-center">
             <Button
@@ -249,7 +249,7 @@ const RequirementFormPublic: React.FC = () => {
   return (
     <div className="space-y-8  max-h-[100vh] overflow-y-auto custom-scrollbar bg-gradient-to-br from-blue-50 via-white to-blue-100 !p-6 h-full w-full">
       <div className="max-w-5xl max-h-full mx-auto space-y-5">
-        <h1 className="text-3xl font-bold text-center text-blue-800">House Requirements Form</h1>
+        <h1 className="text-3xl font-bold text-center text-blue-800">Client Detail Form</h1>
 
         <div className="max-w-5xl  mx-auto">{steps[step].content}</div>
 

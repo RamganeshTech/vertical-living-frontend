@@ -526,7 +526,7 @@
 //             {/* Quantity dropdown */}
 //             <div>
 //               <Select
-                
+
 //                 onValueChange={(value) => handleQuantityChange(item._id, Number(value))}
 //               >
 //                 <SelectTrigger className="w-[100px]" selectedValue={item.quantity?.toString()}>
@@ -871,13 +871,6 @@
 
 // export default PublicMaterialArrival
 
-
-
-
-
-
-"use client"
-
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 import { Input } from "../../../components/ui/Input"
@@ -892,7 +885,7 @@ import {
 
 const PublicMaterialArrival = () => {
   const { projectId, token } = useParams()
-  const { data, isLoading, isError } = useGetPublicMaterialArrivalNew(projectId!, token!)
+  const { data, isLoading, isError, refetch } = useGetPublicMaterialArrivalNew(projectId!, token!)
   const { mutateAsync: updateItem, isPending } = useUpdateMaterialArrivalItemNew()
 
   const [quantities, setQuantities] = useState<Record<string, number>>({})
@@ -911,14 +904,18 @@ const PublicMaterialArrival = () => {
     const quantity = quantities[fieldId]
     const image = images[fieldId]
     const formData = new FormData()
-    formData.append("quantity", String(quantity ?? 0))
+    if (quantity !== undefined) {
+      formData.append("quantity", String(quantity));
+    }
+    // formData.append("quantity", String(quantity ?? 0))
     if (image) formData.append("upload", image)
 
     try {
       await updateItem({ projectId: projectId!, fieldId, formData })
       toast({ title: "Success", description: "Updated successfully" })
       // Clear the form after successful update
-      setQuantities((prev) => ({ ...prev, [fieldId]: 0 }))
+      refetch()
+      setQuantities(() => ({}))
       setImages((prev) => ({ ...prev, [fieldId]: null }))
     } catch (error: any) {
       toast({
@@ -1133,9 +1130,8 @@ const PublicMaterialArrival = () => {
               {data?.materialArrivalList?.map((item: any, index: number) => (
                 <div
                   key={item._id}
-                  className={`grid grid-cols-5 gap-4 px-6 py-6 border-b border-gray-100 hover:bg-slate-50 transition-all duration-200 ${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-25"
-                  }`}
+                  className={`grid grid-cols-5 gap-4 px-6 py-6 border-b border-gray-100 hover:bg-slate-50 transition-all duration-200 ${index % 2 === 0 ? "bg-white" : "bg-gray-25"
+                    }`}
                 >
                   {/* Custom ID */}
                   <div className="flex items-center">
@@ -1144,7 +1140,7 @@ const PublicMaterialArrival = () => {
                         {index + 1}
                       </div>
                       <div>
-                        <span className="font-semibold text-gray-900 block">{item.customId || "-"}</span>
+                        <span className="font-semibold text-gray-900 block">{item.unitName || "N/A"}</span>
                         <span className="text-xs text-gray-500">Item #{index + 1}</span>
                       </div>
                     </div>
@@ -1152,12 +1148,12 @@ const PublicMaterialArrival = () => {
 
                   {/* Quantity Dropdown */}
                   <div className="flex items-center">
-                    <div className="w-full max-w-[140px]">
+                    <div className="w-full max-w-[140px] ">
                       <Select onValueChange={(value) => handleQuantityChange(item._id, Number(value))}>
                         <SelectTrigger className="w-full border-2 border-gray-200 hover:border-slate-400 focus:border-slate-600 transition-colors">
-                          <SelectValue placeholder={`Current: ${item.quantity || 0}`} />
+                          <SelectValue placeholder={`Current: ${item.quantity || 0}`} selectedValue={quantities[item._id] ? String(quantities[item._id]) : ""} />
                         </SelectTrigger>
-                        <SelectContent className="max-h-48">
+                        <SelectContent className="max-h-48 overflow-y-auto custom-scrollbar">
                           {[...Array(21).keys()].map((val) => (
                             <SelectItem key={val} value={val.toString()}>
                               {val} {val === 1 ? "item" : "items"}
@@ -1165,12 +1161,12 @@ const PublicMaterialArrival = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      {quantities[item._id] !== undefined && (
+                      {/* {quantities[item._id] !== undefined && (
                         <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
                           <i className="fa-solid fa-arrow-right"></i>
                           New: {quantities[item._id]}
                         </p>
-                      )}
+                      )} */}
                     </div>
                   </div>
 
@@ -1219,11 +1215,10 @@ const PublicMaterialArrival = () => {
                   {/* Verified Status */}
                   <div className="flex items-center">
                     <div
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-sm ${
-                        item?.isVerified
-                          ? "bg-emerald-100 text-emerald-700 border-2 border-emerald-200"
-                          : "bg-amber-100 text-amber-700 border-2 border-amber-200"
-                      }`}
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-sm ${item?.isVerified
+                        ? "bg-emerald-100 text-emerald-700 border-2 border-emerald-200"
+                        : "bg-amber-100 text-amber-700 border-2 border-amber-200"
+                        }`}
                     >
                       <i className={`fa-solid ${item?.isVerified ? "fa-check-circle" : "fa-clock"} text-sm`}></i>
                       {item?.isVerified ? "Verified" : "Pending"}
@@ -1292,13 +1287,13 @@ const PublicMaterialArrival = () => {
               return item?.image?.url ? (
                 <div className="w-full h-full bg-white rounded-2xl overflow-hidden shadow-2xl">
                   <img
-                    src={item.image.url || NO_IMAGE}
-                    alt={item.image.originalName || "Material Image"}
+                    src={item?.image?.url || NO_IMAGE}
+                    alt={item?.image?.originalName || "Material Image"}
                     className="w-full h-full object-cover"
                     onClick={(e) => e.stopPropagation()}
                   />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent text-white p-6 rounded-b-2xl">
-                    <p className="text-lg font-semibold">{item.image.originalName || "Material Image"}</p>
+                    <p className="text-lg font-semibold">{item?.image?.originalName || "Material Image"}</p>
                     <p className="text-sm text-gray-300 mt-1">Click outside to close • Item ID: {item.customId}</p>
                   </div>
                 </div>

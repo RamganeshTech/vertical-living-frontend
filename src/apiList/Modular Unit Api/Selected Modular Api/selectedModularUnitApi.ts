@@ -8,6 +8,7 @@ export const addSelectedModularUnitApi = async (
     payload: {
         projectId: string;
         customId:string,
+        unitName:string,
         image:string
         unitId: string;
         category: string;
@@ -71,6 +72,7 @@ export const useAddSelectedModularUnit = () => {
             projectId: string;
             image:string,
             customId:string,
+            unitName:string,
             unitId: string;
             category: string;
             quantity: number;

@@ -24,6 +24,11 @@
 
 
 
+/* New modifier class for large scrollbar */
+.custom-scrollbar.large-scrollbar::-webkit-scrollbar {
+  width: 10px; /* Larger width */
+  height: 4px; /* Larger height for horizontal */
+}
 
 
 .filter-animate {

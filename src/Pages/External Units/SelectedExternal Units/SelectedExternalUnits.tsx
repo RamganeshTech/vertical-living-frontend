@@ -256,6 +256,14 @@ const SelectedExternalUnits = () => {
                                                 </span>
                                             </div>
 
+
+                                             <div className="flex items-center justify-between">
+                                                <span className="text-xs sm:text-sm text-slate-600">Quantity</span>
+                                                <span className="px-2 sm:px-3 py-1  text-slate-700 rounded-full text-xs font-medium">
+                                                    {unit.quantity}
+                                                </span>
+                                            </div>
+
                                             {/* Dimensions */}
                                             {unit?.dimention && (
                                                 <div className="pt-3 border-t border-slate-200">

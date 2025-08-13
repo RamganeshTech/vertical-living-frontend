@@ -33,6 +33,7 @@ const allowedRoles = ["owner", "staff", "CTO"]
  const updateMaterialEstimationItemApi = async (
   projectId: string,
   materialKey: string,
+  roomId: string,
   updates: {
     areaSqFt: number;
     predefinedRate: number;
@@ -40,7 +41,7 @@ const allowedRoles = ["owner", "staff", "CTO"]
   },
   api: AxiosInstance
 ) => {
-  const { data } = await api.patch(`/costestimation/${projectId}/material/${materialKey}`, updates);
+  const { data } = await api.patch(`/costestimation/${projectId}/material/${roomId}/${materialKey}`, updates);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -183,11 +184,11 @@ export const useUpdateMaterialEstimationItem = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ projectId, materialKey, updates }: any) => {
+    mutationFn: async ({ projectId, materialKey, updates, roomId }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
       if (!api) throw new Error("API not available");
-      return await updateMaterialEstimationItemApi(projectId, materialKey, updates, api);
+      return await updateMaterialEstimationItemApi(projectId, materialKey, roomId, updates, api);
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["cost-estimation-room", projectId] });

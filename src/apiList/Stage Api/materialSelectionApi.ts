@@ -18,18 +18,18 @@ const getMaterialConfirmationByProjectApi = async ({
 };
 
 
-const getSinglePredefinedRoomApi = async ({
+const getSingleRoomDetails = async ({
   projectId,
   roomId,
-  roomType,
+  // roomType,
   api,
 }: {
   projectId: string;
   roomId: string;
-    roomType: string;
+    // roomType: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.get(`/materialconfirmation/${projectId}/predefinedroom/${roomId}/${roomType}`);
+  const { data } = await api.get(`/materialconfirmation/${projectId}/singleroom/${roomId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -221,11 +221,11 @@ export const useGetMaterialConfirmationByProject = (projectId: string) => {
 export const useGetSinglePredefinedRoom = ({
   projectId,
   roomId,
-  roomType
+  // roomType
 }: {
   projectId: string;
   roomId: string;
-  roomType: string;
+  // roomType: string;
 }) => {
   const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
   const { role } = useGetRole();
@@ -236,7 +236,7 @@ export const useGetSinglePredefinedRoom = ({
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
       if (!api) throw new Error("API instance unavailable");
-      return await getSinglePredefinedRoomApi({ projectId, roomId, roomType, api });
+      return await getSingleRoomDetails({ projectId, roomId, api });
     },
     enabled: !!projectId && !!roomId,
     retry: false,

@@ -47,7 +47,7 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
     }
   }
 
-
+// console.log("unit, unitName", unit)
   const handleSelectSubmit = async () => {
     if (!quantity || quantity <= 0) {
       toast({ title: "Invalid Quantity", description: "Quantity must be greater than 0" });
@@ -58,6 +58,7 @@ const SingleModularUnitCard: React.FC<SingleModularUnitCardProp> = ({ unit, onEd
       const payload = {
         image: unit?.images[0]?.url,
         customId: unit.customId,
+        unitName:unit.name,
         unitId: unit._id,
         projectId,
         category: unit.category,

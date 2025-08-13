@@ -18,12 +18,13 @@ interface RequirementSectionUploadProps {
     projectId: string;
     sectionName: string;
     existingUploads: UploadEntry[];
-    // onRefresh?: () => void;
+    refetch: () => Promise<any>;
 }
 
 const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
     projectId,
     sectionName,
+    refetch,
     existingUploads,
 }) => {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -42,6 +43,7 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
             }
 
             await uploadFiles({ projectId, sectionName, files: formData });
+            refetch()
             toast({ title: "Success", description: "file uploaded successfully" })
 
         }
@@ -55,6 +57,7 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
         try {
 
             await deleteFile({ projectId, sectionName, fileId });
+            refetch()
             toast({ title: "Success", description: "file deleted successfully" })
 
         }

@@ -39,11 +39,11 @@ export const useUpdateMaterialArrivalItemNew = () => {
 // PUT /materialarrivalcheck/updateverification/:projectId/:fieldId
 export const toggleMaterialVerificationApi = async (
     projectId: string,
-    fieldId: string,
+    unitName: string,
     toggle:boolean,
     api: any
 ) => {
-    const res = await api.put(`/materialarrivalcheck/updateverification/${projectId}/${fieldId}`, {isVerified:toggle});
+    const res = await api.put(`/materialarrivalcheck/updateverification/${projectId}/${unitName}`, {isVerified:toggle});
     return res.data;
 };
 
@@ -56,15 +56,15 @@ export const useToggleMaterialVerification = () => {
     return useMutation({
         mutationFn: async ({
             projectId,
-            fieldId,
+            unitName,
             toggle
         }: {
             projectId: string;
-            fieldId: string;
+            unitName: string;
             toggle: boolean;
         }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
-            return await toggleMaterialVerificationApi(projectId, fieldId, toggle, api);
+            return await toggleMaterialVerificationApi(projectId, unitName, toggle, api);
         },
         onSuccess: (_, { projectId }) => {
             queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });

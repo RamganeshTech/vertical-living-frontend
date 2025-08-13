@@ -61,8 +61,11 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
     }
   };
 
+  // console.log(imageFiles)
+
   const handleDelete = async (fileId: string, type: "image" | "pdf") => {
     try {
+      // console.log("file id",fileId)
       await deleteFile({ projectId, roomId, fileId });
       if (type === "pdf") {
         setPdfFiles(prev => prev.filter(file => file._id !== fileId));

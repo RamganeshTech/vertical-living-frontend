@@ -16,165 +16,165 @@ import MaterialArrivalCard from "./MaterialArrivalSingleNew";
 // import { Input } from "../../../components/ui/Input";
 
 interface ProjectDetailsOutlet {
-    isMobile: boolean;
-    openMobileSidebar: () => void;
+  isMobile: boolean;
+  openMobileSidebar: () => void;
 }
 
 const MaterialArrivalOverviewNew = () => {
-    const { projectId, organizationId } = useParams();
-    const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
-    // const isChildRoute = location.pathname.includes("/materialarrivalroom/");
-    // const { mutateAsync: bulkToggleMutate, isPending: bullPending } = useBulkToggleAllVerification()
-    const { data, isLoading, error, isError, refetch } = useGetAllMaterialArrivalDetailsNew(projectId!)
-    const { mutateAsync: generateLink, isPending: linkPending } = useGenerateMaterialArrivalLinkNew()
+  const { projectId, organizationId } = useParams();
+  const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
+  // const isChildRoute = location.pathname.includes("/materialarrivalroom/");
+  // const { mutateAsync: bulkToggleMutate, isPending: bullPending } = useBulkToggleAllVerification()
+  const { data, isLoading, error, isError, refetch } = useGetAllMaterialArrivalDetailsNew(projectId!)
+  const { mutateAsync: generateLink, isPending: linkPending } = useGenerateMaterialArrivalLinkNew()
 
 
-    const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetMaterialArrivalDeadline()
-    const { mutateAsync: completionStatus, isPending: completePending } = useCompleteMaterialArrivalStage()
+  const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetMaterialArrivalDeadline()
+  const { mutateAsync: completionStatus, isPending: completePending } = useCompleteMaterialArrivalStage()
 
-    if (isLoading) return <MaterialOverviewLoading />;
+  if (isLoading) return <MaterialOverviewLoading />;
 
-    const { timer, generatedLink } = data || {};
+  const { timer, generatedLink } = data || {};
 
-    const handleCompletionStatus = async () => {
-        try {
-            await completionStatus({ projectId: projectId! });
-            toast({ description: 'Completion status updated successfully', title: "Success" });
-        } catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to update completion status", variant: "destructive" })
-        }
-    };
+  const handleCompletionStatus = async () => {
+    try {
+      await completionStatus({ projectId: projectId! });
+      toast({ description: 'Completion status updated successfully', title: "Success" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to update completion status", variant: "destructive" })
+    }
+  };
 
 
 
-    
+
   // Calculate statistics
   const totalMaterials = data?.materialArrivalList?.length || 0
   const verifiedMaterials = data?.materialArrivalList?.filter((item: any) => item.isVerified)?.length || 0
   const pendingMaterials = totalMaterials - verifiedMaterials
   const verificationProgress = totalMaterials > 0 ? Math.round((verifiedMaterials / totalMaterials) * 100) : 0
 
-
-    // const handleBulkToggle = async () => {
-
-
-
-    //     try {
-    //         await bulkToggleMutate({ projectId: projectId!, isVerified });
-    //         refetch();
-    //         toast({ title: "Success", description: "All items verification toggled" });
-    //     } catch (error: any) {
-    //         toast({ title: "Error", description: error?.response?.data?.message || error.message || "faied to update", variant:"destructive"});
-    //     }
-    // };
-
-    return (
-        <div className="w-full h-full flex flex-col p-2 ">
+  // console.log("data", data)
+  // const handleBulkToggle = async () => {
 
 
-            {/* Header Section - Always visible */}
-            <div className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 pb-3 ">
-                <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
-                    {isMobile && (
-                        <button
-                            onClick={openMobileSidebar}
-                            className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100"
-                            title="Open Menu"
-                        >
-                            <i className="fa-solid fa-bars"></i>
-                        </button>
-                    )}
-                    <i className="fa-solid fa-receipt mr-2"></i>
-                    <span className="hidden sm:inline">Material Checking</span>
-                    <span className="sm:hidden">Material Check</span>
-                </h2>
 
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <Button
-                        isLoading={completePending}
-                        onClick={handleCompletionStatus}
-                        className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
-                    >
-                        <i className="fa-solid fa-circle-check mr-2"></i>
-                        Mark as Complete
-                    </Button>
+  //     try {
+  //         await bulkToggleMutate({ projectId: projectId!, isVerified });
+  //         refetch();
+  //         toast({ title: "Success", description: "All items verification toggled" });
+  //     } catch (error: any) {
+  //         toast({ title: "Error", description: error?.response?.data?.message || error.message || "faied to update", variant:"destructive"});
+  //     }
+  // };
 
-                    <ResetStageButton
-                        projectId={projectId!}
-                        stageNumber={9}
-                        stagePath="materialarrivalcheck"
-                    />
+  return (
+    <div className="w-full h-full flex flex-col p-2 ">
 
-                    {!error && <ShareDocumentWhatsapp
-                        projectId={projectId!}
-                        stageNumber="9"
-                        className="w-full sm:w-fit"
-                        isStageCompleted={data?.status}
-                    />}
 
-                    <AssignStageStaff
-                        stageName="MaterialArrivalModel"
-                        projectId={projectId!}
-                        organizationId={organizationId!}
-                        currentAssignedStaff={data?.assignedTo || null}
-                    />
-                </div>
+      {/* Header Section - Always visible */}
+      <div className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 pb-3 ">
+        <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
+          {isMobile && (
+            <button
+              onClick={openMobileSidebar}
+              className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100"
+              title="Open Menu"
+            >
+              <i className="fa-solid fa-bars"></i>
+            </button>
+          )}
+          <i className="fa-solid fa-receipt mr-2"></i>
+          <span className="hidden sm:inline">Material Checking</span>
+          <span className="sm:hidden">Material Check</span>
+        </h2>
+
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            isLoading={completePending}
+            onClick={handleCompletionStatus}
+            className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
+          >
+            <i className="fa-solid fa-circle-check mr-2"></i>
+            Mark as Complete
+          </Button>
+
+          <ResetStageButton
+            projectId={projectId!}
+            stageNumber={9}
+            stagePath="materialarrivalcheck"
+          />
+
+          {!error && <ShareDocumentWhatsapp
+            projectId={projectId!}
+            stageNumber="9"
+            className="w-full sm:w-fit"
+            isStageCompleted={data?.status}
+          />}
+
+          <AssignStageStaff
+            stageName="MaterialArrivalModel"
+            projectId={projectId!}
+            organizationId={organizationId!}
+            currentAssignedStaff={data?.assignedTo || null}
+          />
+        </div>
+      </div>
+
+      {/* Error Display */}
+      {isError && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+            <div className="text-red-600 font-semibold mb-2">
+              ⚠️ Error Occurred
             </div>
+            <p className="text-red-500 text-sm mb-4">
+              {(error as any)?.response?.data?.message || "Failed to load material arrival data"}
+            </p>
+            <Button
+              onClick={() => refetch()}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+      )}
 
-            {/* Error Display */}
-            {isError && (
-                <div className="flex-1 flex items-center justify-center">
-                    <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                        <div className="text-red-600 font-semibold mb-2">
-                            ⚠️ Error Occurred
-                        </div>
-                        <p className="text-red-500 text-sm mb-4">
-                            {(error as any)?.response?.data?.message || "Failed to load material arrival data"}
-                        </p>
-                        <Button
-                            onClick={() => refetch()}
-                            className="bg-red-600 text-white hover:bg-red-700"
-                        >
-                            Retry
-                        </Button>
-                    </div>
-                </div>
-            )}
-
-            {/* Main Content - Only show if no error */}
-            {!isError && (
-                <div className="flex-1 min-h-0 overflow-y-auto space-y-4 sm:space-y-6">
-                    {/* Timer Card */}
-                    <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
-                        <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
-                            <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
-                            <span>Stage Timings</span>
-                        </div>
-                        <StageTimerInfo
-                            stageName='materialarrivalcheck'
-                            completedAt={timer?.completedAt}
-                            projectId={projectId!}
-                            formId={(data as any)?._id}
-                            deadLine={timer?.deadLine}
-                            startedAt={timer?.startedAt}
-                            refetchStageMutate={refetch}
-                            deadLineMutate={deadLineAsync}
-                            isPending={deadLinePending}
-                        />
-                    </Card>
-
-                 
-
-                    
+      {/* Main Content - Only show if no error */}
+      {!isError && (
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-4 sm:space-y-6">
+          {/* Timer Card */}
+          <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
+            <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
+              <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+              <span>Stage Timings</span>
+            </div>
+            <StageTimerInfo
+              stageName='materialarrivalcheck'
+              completedAt={timer?.completedAt}
+              projectId={projectId!}
+              formId={(data as any)?._id}
+              deadLine={timer?.deadLine}
+              startedAt={timer?.startedAt}
+              refetchStageMutate={refetch}
+              deadLineMutate={deadLineAsync}
+              isPending={deadLinePending}
+            />
+          </Card>
 
 
-            {/* Material Section */}
+
+
+
+
+          {/* Material Section */}
           <section className="w-full  rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             {/* Enhanced Header */}
-            
 
 
-               <div className=" bg-gradient-to-r from-slate-800 to-gray-900 p-6 text-white">
+
+            <div className=" bg-gradient-to-r from-slate-800 to-gray-900 p-6 text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12  bg-opacity-20 rounded-lg flex items-center justify-center">
@@ -256,7 +256,7 @@ const MaterialArrivalOverviewNew = () => {
                   <div className="grid grid-cols-5 gap-4 px-6 py-4 font-semibold text-gray-700 text-sm">
                     <div className="flex items-center gap-2">
                       <i className="fa-solid fa-hashtag text-blue-500"></i>
-                      <span>Custom ID</span>
+                      <span>Item Name</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <i className="fa-solid fa-calculator text-blue-500"></i>
@@ -312,22 +312,22 @@ const MaterialArrivalOverviewNew = () => {
 
 
 
-                    {/* 🔗 Shareable Link */}
-                    <section className="mt-4">
-                        <GenerateWhatsappLink
-                            projectId={projectId!}
-                            context="Material"
-                            stage="materialarrival"
-                            data={generatedLink}
-                            isPending={linkPending}
-                            generateLink={generateLink}
-                        />
-                    </section>
-                </div>
-            )}
-
+          {/* 🔗 Shareable Link */}
+          <section className="mt-4">
+            <GenerateWhatsappLink
+              projectId={projectId!}
+              context="Material"
+              stage="materialarrival"
+              data={generatedLink}
+              isPending={linkPending}
+              generateLink={generateLink}
+            />
+          </section>
         </div>
-    )
+      )}
+
+    </div>
+  )
 }
 
 export default MaterialArrivalOverviewNew;

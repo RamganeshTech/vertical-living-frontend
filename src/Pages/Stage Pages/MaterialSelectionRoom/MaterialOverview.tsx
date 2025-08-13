@@ -1,14 +1,14 @@
 
 
 // components/material-selection/MaterialRoomOverview.tsx
-import { useState } from "react";
+// import { useState } from "react";
 import RoomCard from "./RoomCard";
 import { Outlet, useLocation, useParams, useOutletContext } from "react-router-dom";
 import { useCompleteMaterialStage, useGetMaterialConfirmationByProject, useSetMaterialDeadline } from "../../../apiList/Stage Api/materialSelectionApi";
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
-import { Dialog } from "../../../components/ui/Dialog";
-import CreateRoomformModel from "./CreateRoomformModel";
+// import { Dialog } from "../../../components/ui/Dialog";
+// import CreateRoomformModel from "./CreateRoomformModel";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "./MaterailSelectionLoadings/MaterialOverviewLoading";
@@ -29,11 +29,12 @@ export default function MaterialRoomOverview() {
     const { data, isLoading, error: getRoomsError, refetch } = useGetMaterialConfirmationByProject(projectId!);
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetMaterialDeadline();
     const { mutateAsync: completionStatus, isPending: completePending } = useCompleteMaterialStage();
-    const [showCreateForm, setShowCreateForm] = useState(false);
+    // const [showCreateForm, setShowCreateForm] = useState(false);
 
     if (isLoading) return <MaterialOverviewLoading />;
 
-    const isroomsAvailable = !data?.customRooms?.length && !data?.rooms?.length;
+    // const isroomsAvailable = !data?.customRooms?.length && !data?.rooms?.length;
+    // const isroomsAvailable =  !data?.rooms?.length;
     const isChildRoute = location.pathname.includes("/materialroom");
     
     const handleCompletionStatus = async () => {
@@ -49,11 +50,13 @@ export default function MaterialRoomOverview() {
         }
     };
 
-    const { rooms, customRooms } = data || {};
-    const totalRooms = (rooms?.length || 0) + (customRooms?.length || 0);
+    // const { rooms, customRooms } = data || {};
+    const { rooms } = data || {};
+    // const totalRooms = (rooms?.length || 0) + (customRooms?.length || 0);
+    const totalRooms = (rooms?.length || 0) 
 
     return (
-        <div className="flex flex-col h-full w-full  py-4">
+        <div className="flex flex-col h-full w-full  py-2">
             {/* Responsive Header with Mobile Sidebar Toggle - Always visible */}
 
             {isChildRoute ? <Outlet /> : 
@@ -83,7 +86,7 @@ export default function MaterialRoomOverview() {
                             Mark Complete
                         </Button>
                         
-                        {!isChildRoute && (
+                        {/* {!isChildRoute && (
                             <Button
                                 variant="primary"
                                 onClick={() => setShowCreateForm(true)}
@@ -91,7 +94,7 @@ export default function MaterialRoomOverview() {
                             >
                                 + Add Room
                             </Button>
-                        )}
+                        )} */}
                     </div>
                     
                     <div className="flex flex-wrap md:flex-nowrap gap-2 justify-end">
@@ -165,28 +168,26 @@ export default function MaterialRoomOverview() {
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-xl sm:text-2xl font-semibold">Total Rooms: {totalRooms}</h2>
                         </div>
-
+{/* 
                         {showCreateForm && (
                             <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-                                {/* <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6"> */}
-                                    {/* <h2 className="text-xl font-semibold mb-4 text-blue-700">Create New Room</h2> */}
+                               
                                     <CreateRoomformModel refetch={refetch} onClose={() => setShowCreateForm(false)} projectId={projectId!} />
-                                {/* </div> */}
                             </Dialog>
-                        )}
+                        )} */}
 
                         {/* Scrollable room cards container */}
                         <div className="flex-grow min-h-[100%] py-2 sm:!min-h-0  overflow-y-auto">
-                            {!isroomsAvailable ? (
+                            {/* {!isroomsAvailable ? ( */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {rooms?.map((room: any) => (
                                         <RoomCard roomType="predefinedRoom"  key={room._id} room={room} projectId={projectId!} />
                                     ))}
-                                    {customRooms?.map((room: any) => (
+                                    {/* {customRooms?.map((room: any) => (
                                         <RoomCard roomType="customRoom"  key={room._id} room={room} projectId={projectId!} />
-                                    ))}
+                                    ))} */}
                                 </div>
-                            ) : (
+                            {/* ) : (
                                 <div className="h-full flex items-center justify-center py-8">
                                     <div className="text-center max-w-md mx-auto">
                                         <i className="fas fa-door-open text-5xl sm:text-6xl text-blue-300 mb-4"></i>
@@ -200,7 +201,7 @@ export default function MaterialRoomOverview() {
                                         </button>
                                     </div>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </>
                 )}

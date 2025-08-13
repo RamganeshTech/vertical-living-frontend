@@ -13,6 +13,7 @@ type SingleUnitType = {
   _id: string
   name: string
   unitType: string
+  unitName:string
   images?: { url: string }[]
   carcassMaterial?: string
   materialCarcass?: string

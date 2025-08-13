@@ -2,7 +2,8 @@ import {
     useGetClientByProject,
     useGetDocMessageForWhatsapp,
 } from "../apiList/Documentation Api/documentationApi";
-import { useGetFormRequriemetn } from "../apiList/Stage Api/requirementFormApi";
+import { useGetAllRequirementInfo } from "../apiList/Stage Api/requirementFormApi";
+// import { useGetFormRequriemetn } from "../apiList/Stage Api/requirementFormApi";
 import { Button } from "../components/ui/Button";
 import { toast } from "../utils/toast";
 
@@ -22,7 +23,7 @@ const ShareDocumentWhatsapp = ({
         projectId,
         stageNumber,
     });
-    const { data: clientrequrieent } = useGetFormRequriemetn({ projectId })
+    const { data: clientrequrieent } = useGetAllRequirementInfo({ projectId })
 
     // console.log("msgData",msgData?.message)
     // const formattedPhone = clientData?.phoneNo?.startsWith("+91") ? clientData?.phoneNo : `+91${clientData?.phoneNo}`;
