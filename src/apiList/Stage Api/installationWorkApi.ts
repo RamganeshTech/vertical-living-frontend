@@ -4,43 +4,63 @@ import { getApiForRole } from "../../utils/roleCheck";
 import useGetRole from '../../Hooks/useGetRole';
 import { queryClient } from "../../QueryClient/queryClient";
 
- const createInstallationItemApi = async (
-    projectId: string,
-    roomName: string,
- formData: FormData,
+//  const createInstallationItemApi = async (
+//     projectId: string,
+//     roomName: string,
+//  formData: FormData,
+//   api: AxiosInstance
+// ) => {
+//   const { data } = await api.post(`/installation/${projectId}/${roomName}/item/create`, formData);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
+
+//  const editInstallationItemApi = async (
+//     projectId: string,
+//     roomName: string,
+//   formData: FormData,
+
+//   api: AxiosInstance
+// ) => {
+//   const { data } = await api.put(`/installation/${projectId}/${roomName}/item/edit`, formData);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
+
+//  const deleteInstallationItemApi = async (
+//   payload: {
+//     projectId: string;
+//     roomName: string;
+//     itemId: string;
+//   },
+//   api: AxiosInstance
+// ) => {
+//   const { data } = await api.delete(`/installation/${payload.projectId}/item/delete`, {
+//     data: payload,
+//   });
+//   if (!data.ok) throw new Error(data.message);
+//   return data.message;
+// };
+
+
+
+
+// API call
+const updateInstallationTaskStatusApi = async (
+  projectId: string,
+  taskId: string,
+  status: "submitted" | "pending" | "inprogress",
   api: AxiosInstance
 ) => {
-  const { data } = await api.post(`/installation/${projectId}/${roomName}/item/create`, formData);
+  const { data } = await api.put(
+    `/installation/${projectId}/${taskId}/status`,
+    { status }
+  );
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
- const editInstallationItemApi = async (
-    projectId: string,
-    roomName: string,
-  formData: FormData,
 
-  api: AxiosInstance
-) => {
-  const { data } = await api.put(`/installation/${projectId}/${roomName}/item/edit`, formData);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
-};
-
- const deleteInstallationItemApi = async (
-  payload: {
-    projectId: string;
-    roomName: string;
-    itemId: string;
-  },
-  api: AxiosInstance
-) => {
-  const { data } = await api.delete(`/installation/${payload.projectId}/item/delete`, {
-    data: payload,
-  });
-  if (!data.ok) throw new Error(data.message);
-  return data.message;
-};
 
  const getInstallationDetailsApi = async (
   projectId: string,
@@ -51,76 +71,76 @@ import { queryClient } from "../../QueryClient/queryClient";
   return data.data;
 };
 
- const getInstallationRoomDetailsApi = async (
-  projectId: string,
-  roomName: string,
-  api: AxiosInstance
-) => {
-  const { data } = await api.get(`/installation/${projectId}/getroomdetail/${roomName}`);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
-};
+//  const getInstallationRoomDetailsApi = async (
+//   projectId: string,
+//   roomName: string,
+//   api: AxiosInstance
+// ) => {
+//   const { data } = await api.get(`/installation/${projectId}/getroomdetail/${roomName}`);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
 
 
 
 
 
-export  const useCreateInstallationItem = () => {
-  const allowedRoles = ["CTO", "owner", "staff", "worker"];
-  const { role } = useGetRole();
-  const api = getApiForRole(role!);
-  const queryClient = useQueryClient();
+// export  const useCreateInstallationItem = () => {
+//   const allowedRoles = ["CTO", "owner", "staff", "worker"];
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({projectId, roomName,formData}: {projectId:string, roomName:string, formData:any}) => {
-      if (!role || !allowedRoles.includes(role))
-        throw new Error("Not allowed to make this API call.");
-      if (!api) throw new Error("API instance not found.");
-      return await createInstallationItemApi(projectId, roomName,formData, api);
-    },
-    onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["installation-details", projectId] });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: async ({projectId, roomName,formData}: {projectId:string, roomName:string, formData:any}) => {
+//       if (!role || !allowedRoles.includes(role))
+//         throw new Error("Not allowed to make this API call.");
+//       if (!api) throw new Error("API instance not found.");
+//       return await createInstallationItemApi(projectId, roomName,formData, api);
+//     },
+//     onSuccess: (_, { projectId }) => {
+//       queryClient.invalidateQueries({ queryKey: ["installation-details", projectId] });
+//     },
+//   });
+// };
 
-export const useEditInstallationItem = () => {
-  const allowedRoles = ["CTO", "owner", "staff", "worker"];
-  const { role } = useGetRole();
-  const api = getApiForRole(role!);
-  const queryClient = useQueryClient();
+// export const useEditInstallationItem = () => {
+//   const allowedRoles = ["CTO", "owner", "staff", "worker"];
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({projectId, roomName,formData}: {projectId:string, roomName:string,formData:any}) => {
-      if (!role || !allowedRoles.includes(role))
-        throw new Error("Not allowed to make this API call.");
-      if (!api) throw new Error("API instance not found.");
-      return await editInstallationItemApi(projectId, roomName, formData, api);
-    },
-    onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["installation-details", projectId] });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: async ({projectId, roomName,formData}: {projectId:string, roomName:string,formData:any}) => {
+//       if (!role || !allowedRoles.includes(role))
+//         throw new Error("Not allowed to make this API call.");
+//       if (!api) throw new Error("API instance not found.");
+//       return await editInstallationItemApi(projectId, roomName, formData, api);
+//     },
+//     onSuccess: (_, { projectId }) => {
+//       queryClient.invalidateQueries({ queryKey: ["installation-details", projectId] });
+//     },
+//   });
+// };
 
-export const useDeleteInstallationItem = () => {
-  const allowedRoles = ["CTO", "owner", "staff", "worker"];
-  const { role } = useGetRole();
-  const api = getApiForRole(role!);
-  const queryClient = useQueryClient();
+// export const useDeleteInstallationItem = () => {
+//   const allowedRoles = ["CTO", "owner", "staff", "worker"];
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (payload: any) => {
-      if (!role || !allowedRoles.includes(role))
-        throw new Error("Not allowed to make this API call.");
-      if (!api) throw new Error("API instance not found.");
-      return await deleteInstallationItemApi(payload, api);
-    },
-    onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["installation-details", projectId] });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: async (payload: any) => {
+//       if (!role || !allowedRoles.includes(role))
+//         throw new Error("Not allowed to make this API call.");
+//       if (!api) throw new Error("API instance not found.");
+//       return await deleteInstallationItemApi(payload, api);
+//     },
+//     onSuccess: (_, { projectId }) => {
+//       queryClient.invalidateQueries({ queryKey: ["installation-details", projectId] });
+//     },
+//   });
+// };
 
 export const useGetInstallationDetails = (projectId: string) => {
   const allowedRoles = ["CTO", "owner", "staff", "worker", "client"];
@@ -141,24 +161,55 @@ export const useGetInstallationDetails = (projectId: string) => {
   });
 };
 
-export const useGetInstallationRoomDetails = (projectId: string, roomName: string) => {
-  const allowedRoles = ["CTO", "owner", "staff", "worker", "client"];
+
+// React Query hook
+export const useUpdateInstallationTaskStatus = () => {
+  const allowedRoles = ["CTO", "owner", "staff", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
 
-  return useQuery({
-    queryKey: ["installation-room-details", projectId, roomName],
-    queryFn: async () => {
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+      taskId,
+      status,
+    }: {
+      projectId: string;
+      taskId: string;
+      status: "submitted" | "pending" | "inprogress";
+    }) => {
       if (!role || !allowedRoles.includes(role))
         throw new Error("Not allowed to make this API call.");
       if (!api) throw new Error("API instance not found.");
-      return await getInstallationRoomDetailsApi(projectId, roomName, api);
+      return await updateInstallationTaskStatusApi(projectId, taskId, status, api);
     },
-    enabled: !!role && !!projectId && !!roomName && !!api,
-    retry: false,
-    refetchOnMount: false,
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["installation-details", projectId],
+      });
+    },
   });
 };
+
+// export const useGetInstallationRoomDetails = (projectId: string, roomName: string) => {
+//   const allowedRoles = ["CTO", "owner", "staff", "worker", "client"];
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+
+//   return useQuery({
+//     queryKey: ["installation-room-details", projectId, roomName],
+//     queryFn: async () => {
+//       if (!role || !allowedRoles.includes(role))
+//         throw new Error("Not allowed to make this API call.");
+//       if (!api) throw new Error("API instance not found.");
+//       return await getInstallationRoomDetailsApi(projectId, roomName, api);
+//     },
+//     enabled: !!role && !!projectId && !!roomName && !!api,
+//     retry: false,
+//     refetchOnMount: false,
+//   });
+// };
 
 
 
@@ -211,8 +262,8 @@ export const useSetInstallationDeadline = () => {
       if (!api) throw new Error("API instance missing");
       return await setInstallationDeadlineApi({ formId, projectId, deadLine, api });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["installation-details"] });
+    onSuccess: (_, {projectId}) => {
+      queryClient.invalidateQueries({ queryKey: ["installation-details", projectId] });
     },
   });
 };

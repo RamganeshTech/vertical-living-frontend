@@ -63,10 +63,10 @@ const PublicMaterialArrival = lazy(() => import("./Pages/Stage Pages/MaterialArr
 // const PublicOrderMaterial = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/PublicOrderMaterial"));
 const PublicOrderHistoryDetails = lazy(() => import("./Pages/Stage Pages/Ordering Materials/PublicOrderHistory"))
 const WorkMainOverview = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkMainOverView"));
-const WorkSchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkSchedulePage"));
+// const WorkSchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkSchedulePage"));
 const DailySchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/DailySchedulePage"));
 const InstallationOverview = lazy(() => import("./Pages/Stage Pages/Installation Stage/InstallationOverview"));
-const InstallationRoomDetail = lazy(() => import("./Pages/Stage Pages/Installation Stage/InstallationRoomDetail"));
+// const InstallationRoomDetail = lazy(() => import("./Pages/Stage Pages/Installation Stage/InstallationRoomDetail"));
 const QualityCheckOverview = lazy(() => import("./Pages/Stage Pages/QualityCheck Stage/QualityCheckOverview"));
 const QualityCheckRoomDetails = lazy(() => import("./Pages/Stage Pages/QualityCheck Stage/QualityCheckRoomDetails"));
 const CleaningOverview = lazy(() => import("./Pages/Stage Pages/Cleaning Sanitation/CleaningOverview"));
@@ -466,11 +466,11 @@ function App() {
                 <WorkMainOverview />
               </ProtectedRoutes>
             } >
-              <Route path="workschedule/:sectionId" element={
+              {/* <Route path="workschedule/:sectionId" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
                   <WorkSchedulePage />
                 </ProtectedRoutes>
-              } />
+              } /> */}
               <Route path="dailyschedule/:sectionId" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
                   <DailySchedulePage />
@@ -483,12 +483,12 @@ function App() {
                 <InstallationOverview />
               </ProtectedRoutes>
             } >
-              <Route path="installationroom/:roomkey" element={
+              {/* <Route path="installationroom/:roomkey" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
                   <InstallationRoomDetail />
                 </ProtectedRoutes>
-              } />
-            </Route>
+              } />*/}
+            </Route> 
 
             <Route path="qualitycheck" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff",]}>

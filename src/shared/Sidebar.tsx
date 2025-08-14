@@ -56,12 +56,12 @@ export const getSidebarConfig = (
             "REQUIREMENTFORM",
             "SITEMEASUREMENT",
             "SAMPLEDESIGN",
+            "WORKSCHEDULE",
             "TECHNICALCONSULTANT", // Insert after this
             "SELECTSTAGE", // Remove this later if needed
             "PAYMENTCONFIRMATION",
             "ORDERMATERIALS",
             "MATERIALARRIVED",
-            "WORKSCHEDULE",
             "INSTALLATION",
             "QUALITYCHECK",
             "CLEANINGSANITATION",
