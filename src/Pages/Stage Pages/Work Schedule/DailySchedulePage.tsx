@@ -1292,11 +1292,6 @@
 // export default DailySchedulePage
 
 
-
-
-
-"use client"
-
 import type React from "react"
 import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -1367,6 +1362,11 @@ const DailySchedulePage: React.FC = () => {
     startDate: "",
     endDate: "",
   })
+
+
+  const [showTaskSelection, setShowTaskSelection] = useState(false)
+const [tasksForSelectedDate, setTasksForSelectedDate] = useState<any[]>([])
+
 
   // API hooks
   const { data: scheduleData, isLoading, error, refetch } = useGetDailySchedule(projectId!)
@@ -1603,17 +1603,40 @@ const DailySchedulePage: React.FC = () => {
   }
 
   // Handle date click
+  // const handleDateClick = (date: Date) => {
+  //   // setSelectedDate(date)
+  //   const tasksForDate = getTasksForDate(date)
+  //   if (tasksForDate.length > 0) {
+  //     setSelectedTask(tasksForDate[0]) // Show first task for the date
+  //     setShowTaskDetails(true)
+  //   }
+  //   else {
+  //     toast({ title: "Warning", description: "No tasks in this date", variant: "destructive" })
+  //   }
+  // }
+
+
   const handleDateClick = (date: Date) => {
-    // setSelectedDate(date)
-    const tasksForDate = getTasksForDate(date)
-    if (tasksForDate.length > 0) {
-      setSelectedTask(tasksForDate[0]) // Show first task for the date
-      setShowTaskDetails(true)
-    }
-    else {
-      toast({ title: "Warning", description: "No tasks in this date", variant: "destructive" })
-    }
+  const tasksForDate = getTasksForDate(date)
+  if (tasksForDate.length > 1) {
+    // Multiple tasks - show selection
+    setTasksForSelectedDate(tasksForDate)
+    setShowTaskSelection(true)
+  } else if (tasksForDate.length === 1) {
+    // Single task - show directly
+    setSelectedTask(tasksForDate[0])
+    setShowTaskDetails(true)
+  } else {
+    toast({ title: "Warning", description: "No tasks in this date", variant: "destructive" })
   }
+}
+
+//  Add function to handle task selection
+const handleTaskSelect = (task: any) => {
+  setSelectedTask(task)
+  setShowTaskSelection(false)
+  setShowTaskDetails(true)
+}
 
   // Handle edit task
   const handleEditTask = () => {
@@ -2050,6 +2073,327 @@ const DailySchedulePage: React.FC = () => {
       )}
 
       {
+      
+        // showTaskDetails && selectedTask && (
+        //   <div
+        //     onClick={() => setShowTaskDetails(false)}
+        //     className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
+        //   >
+        //     <div
+        //       onClick={(e) => e.stopPropagation()}
+        //       className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
+        //     >
+        //       {/* Header */}
+        //       <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+        //         <div className="flex justify-between items-center">
+        //           <div className="flex items-center gap-3">
+        //             <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+        //               <i className="fas fa-tasks text-white text-lg"></i>
+        //             </div>
+        //             <div>
+        //               <h3 className="text-xl font-bold text-white">{selectedTask.taskName}</h3>
+        //               <p className="text-blue-100 text-sm">Task Details</p>
+        //             </div>
+        //           </div>
+        //           <button
+        //             onClick={() => setShowTaskDetails(false)}
+        //             className="text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
+        //           >
+        //             <i className="fas fa-times text-lg"></i>
+        //           </button>
+        //         </div>
+        //       </div>
+
+        //       {/* Content */}
+        //       <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        //         <div className="space-y-6">
+        //           {/* Task Info */}
+        //           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        //             <div className="space-y-4">
+        //               <div>
+        //                 <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+        //                 <div className="bg-gray-50 rounded-lg p-4">
+        //                   <p className="text-gray-800">{selectedTask.description || "No description provided"}</p>
+        //                 </div>
+        //               </div>
+
+        //               <div>
+        //                 <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+        //                 <span
+        //                   className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium ${selectedTask.status === "submitted"
+        //                     ? "bg-green-100 text-green-800"
+        //                     : selectedTask.status === "pending"
+        //                       ? "bg-yellow-100 text-yellow-800"
+        //                       : selectedTask.status === "approved"
+        //                         ? "bg-blue-100 text-blue-800"
+        //                         : "bg-gray-100 text-gray-800"
+        //                     }`}
+        //                 >
+        //                   <div
+        //                     className={`w-2 h-2 rounded-full mr-2 ${selectedTask.status === "submitted"
+        //                       ? "bg-green-500"
+        //                       : selectedTask.status === "pending"
+        //                         ? "bg-yellow-500"
+        //                         : selectedTask.status === "approved"
+        //                           ? "bg-blue-500"
+        //                           : "bg-gray-500"
+        //                       }`}
+        //                   ></div>
+        //                   {selectedTask.status.charAt(0).toUpperCase() + selectedTask.status.slice(1)}
+        //                 </span>
+        //               </div>
+        //             </div>
+
+        //             <div>
+        //               <label className="block text-sm font-semibold text-gray-700 mb-2">Schedule</label>
+        //               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+        //                 {selectedTask.dates.map((dateObj, index) => {
+        //                   let displayDate: string
+        //                   if (typeof dateObj.date === "string") {
+        //                     displayDate = new Date(dateObj.date).toLocaleDateString()
+        //                   } else {
+        //                     displayDate = new Date(dateObj.date).toLocaleDateString()
+        //                   }
+        //                   displayDate = dateFormate(displayDate)
+
+        //                   return (
+        //                     <div
+        //                       key={index}
+        //                       className="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0"
+        //                     >
+        //                       <div className="flex items-center gap-2">
+        //                         <i className="fas fa-calendar-day text-blue-500 text-sm"></i>
+        //                         <span className="text-gray-800 font-medium">{displayDate}</span>
+        //                       </div>
+        //                       <div className="flex items-center gap-2 ">
+        //                         {dateObj.uploads.filter((u) => u.fileType === "image").length > 0 && (
+        //                           <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+        //                             <i className="fas fa-image mr-1"></i>
+        //                             {dateObj.uploads.filter((u) => u.fileType === "image").length}
+        //                           </span>
+        //                         )}
+        //                         <label className="cursor-pointer p-2 hover:bg-blue-50 rounded-lg transition-colors">
+        //                           <input
+        //                             type="file"
+        //                             multiple
+        //                             accept="image/*"
+        //                             className="hidden"
+        //                             onChange={(e) => {
+        //                               if (e.target.files && selectedTask._id && dateObj._id) {
+        //                                 handleImageUpload(e.target.files, selectedTask._id, dateObj._id)
+        //                               }
+        //                             }}
+        //                             disabled={uploadingImages}
+        //                           />
+        //                           <i
+        //                             className={`fas ${uploadingImages ? "fa-spinner fa-spin" : "fa-upload"} text-sm text-blue-500`}
+        //                           ></i>
+        //                         </label>
+        //                       </div>
+        //                     </div>
+        //                   )
+        //                 })}
+        //               </div>
+        //             </div>
+        //           </div>
+
+        //           {/* Images Section */}
+        //           {selectedTask.dates.some((d) => d.uploads.length > 0) && (
+        //             <div>
+        //               <label className="block text-sm font-semibold text-gray-700 mb-4">Uploaded Images</label>
+        //               <div className="space-y-4">
+        //                 {selectedTask.dates.map((dateObj, dateIndex) => {
+        //                   if (dateObj.uploads.length === 0) return null
+
+        //                   let displayDate: string
+        //                   if (typeof dateObj.date === "string") {
+        //                     displayDate = new Date(dateObj.date).toLocaleDateString()
+        //                   } else {
+        //                     displayDate = new Date(dateObj.date).toLocaleDateString()
+        //                   }
+        //                   displayDate = dateFormate(displayDate)
+
+        //                   return (
+        //                     <div key={dateIndex} className="bg-gray-50 rounded-lg p-4">
+        //                       <div className="flex items-center gap-2 mb-3">
+        //                         <i className="fas fa-calendar-day text-blue-500"></i>
+        //                         <h4 className="font-semibold text-gray-800">{displayDate}</h4>
+        //                       </div>
+        //                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        //                         {dateObj.uploads.map((upload, uploadIndex) => (
+        //                           <div key={`${dateIndex}-${uploadIndex}`} className="relative group">
+        //                             {upload.fileType === "image" ? (
+        //                               <div className="relative aspect-square bg-white rounded-lg overflow-hidden shadow-sm border">
+        //                                 <img
+        //                                   src={upload.url || NO_IMAGE}
+        //                                   alt={upload.originalName || "Uploaded image"}
+        //                                   className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+        //                                   onClick={() => handleImageClick(upload.url, upload.originalName || "Image")}
+        //                                 />
+        //                                 {/* Delete button */}
+        //                                 <Button
+        //                                   isLoading={deleteFilePending}
+        //                                   onClick={() => handleDeleteFile(selectedTask._id!, dateObj._id!, upload._id!)}
+        //                                   className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 flex items-center justify-center"
+        //                                 >
+        //                                   <i className="fas fa-trash text-xs"></i>
+        //                                 </Button>
+        //                                 {/* View button */}
+        //                                 {/* <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        //                                 <button
+        //                                   onClick={() => handleImageClick(upload.url, upload.originalName || "Image")}
+        //                                   className="text-white hover:text-blue-200"
+        //                                 >
+        //                                   <i className="fas fa-expand text-lg"></i>
+        //                                 </button>
+        //                               </div> */}
+        //                               </div>
+        //                             ) : (
+        //                               <div className="aspect-square bg-white rounded-lg flex items-center justify-center shadow-sm border">
+        //                                 <i className="fas fa-file-pdf text-3xl text-red-500"></i>
+        //                               </div>
+        //                             )}
+        //                             <p className="text-xs text-gray-600 mt-2 truncate text-center">
+        //                               {upload.originalName || "Uploaded file"}
+        //                             </p>
+        //                           </div>
+        //                         ))}
+        //                       </div>
+        //                     </div>
+        //                   )
+        //                 })}
+        //               </div>
+        //             </div>
+        //           )}
+        //         </div>
+        //       </div>
+
+        //       {/* Footer */}
+        //       <div className="bg-gray-50 px-6 py-4 flex gap-3">
+        //         <button
+        //           onClick={handleEditTask}
+        //           className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+        //         >
+        //           <i className="fas fa-edit"></i>
+        //           Edit Task
+        //         </button>
+        //         <button
+        //           onClick={handleDeleteTask}
+        //           disabled={deleteWorkMutation.isPending}
+        //           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+        //         >
+        //           {deleteWorkMutation.isPending ? (
+        //             <i className="fas fa-spinner fa-spin"></i>
+        //           ) : (
+        //             <i className="fas fa-trash"></i>
+        //           )}
+        //           Delete
+        //         </button>
+        //       </div>
+        //     </div>
+        //   </div>
+        // )
+      }
+
+
+
+       {showTaskSelection && (
+        <div
+          onClick={() => setShowTaskSelection(false)}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden"
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                    <i className="fas fa-list text-white text-lg"></i>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Select Task</h3>
+                    <p className="text-blue-100 text-sm">Choose a task to view</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowTaskSelection(false)}
+                  className="text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
+                >
+                  <i className="fas fa-times text-lg"></i>
+                </button>
+              </div>
+            </div>
+
+            {/* Task List */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+              <div className="space-y-3">
+                {tasksForSelectedDate.map((task, index) => (
+                  <div
+                    key={task._id || index}
+                    onClick={() => handleTaskSelect(task)}
+                    className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                            <i className="fas fa-tasks text-blue-600 text-sm"></i>
+                          </div>
+                          <h4 className="font-semibold text-gray-800 group-hover:text-blue-800 transition-colors">
+                            {task.taskName}
+                          </h4>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          {task.description || "No description provided"}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              task.status === "submitted"
+                                ? "bg-green-100 text-green-800"
+                                : task.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : task.status === "approved"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            <div
+                              className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                                task.status === "submitted"
+                                  ? "bg-green-500"
+                                  : task.status === "pending"
+                                  ? "bg-yellow-500"
+                                  : task.status === "approved"
+                                  ? "bg-blue-500"
+                                  : "bg-gray-500"
+                              }`}
+                            ></div>
+                            {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                          </span>
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <i className="fas fa-calendar-day"></i>
+                            <span>{task.dates?.length || 0} dates</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <i className="fas fa-chevron-right text-gray-400 group-hover:text-blue-500 transition-colors"></i>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/*  Keep existing task details modal unchanged */}
+      {
         showTaskDetails && selectedTask && (
           <div
             onClick={() => setShowTaskDetails(false)}
@@ -2214,15 +2558,6 @@ const DailySchedulePage: React.FC = () => {
                                         >
                                           <i className="fas fa-trash text-xs"></i>
                                         </Button>
-                                        {/* View button */}
-                                        {/* <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <button
-                                          onClick={() => handleImageClick(upload.url, upload.originalName || "Image")}
-                                          className="text-white hover:text-blue-200"
-                                        >
-                                          <i className="fas fa-expand text-lg"></i>
-                                        </button>
-                                      </div> */}
                                       </div>
                                     ) : (
                                       <div className="aspect-square bg-white rounded-lg flex items-center justify-center shadow-sm border">
