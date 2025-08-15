@@ -1,7 +1,7 @@
 import type { AxiosInstance } from "axios";
 import useGetRole from "../../Hooks/useGetRole";
 import { getApiForRole } from "../../utils/roleCheck";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryClient } from "../../QueryClient/queryClient";
 import axios from "axios";
 
@@ -61,6 +61,36 @@ const completeOrderMaterialHistoryStageApi = async ({
   const { data } = await api.put(`/orderingmaterial/completionstatus/${projectId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
+};
+
+
+const updateDeliveryLocationApi = async (
+  projectId: string,
+  updates: any,
+  api: AxiosInstance
+) => {
+  const { data } = await api.put(`/orderingmaterial/${projectId}/delivery-location`, updates);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useUpdateDeliveryLocation = () => {
+  const allowedRoles = ["owner", "staff", "CTO"]
+
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ projectId, updates }: {projectId:string, updates:any}) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to update delivery location");
+      if (!api) throw new Error("API instance not available");
+      return await updateDeliveryLocationApi(projectId, updates, api);
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material", projectId] });
+    },
+  });
 };
 
 

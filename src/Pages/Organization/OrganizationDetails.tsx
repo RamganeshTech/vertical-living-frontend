@@ -186,7 +186,7 @@ export default function OrganizationDetails() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
         {/* Header Skeleton */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10">
-          <div className="max-w-7xl   mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="max-w-full   mx-auto px-4 sm:px-6 py-4 sm:py-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center space-x-3 sm:space-x-4">
                 <Skeleton className="h-8 w-24 sm:h-10 sm:w-32" />
@@ -246,7 +246,7 @@ export default function OrganizationDetails() {
 
         {/* header part */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-10 w-full">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-row sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
+          <div className="max-w-full mx-auto px-4 sm:px-6 py-3 flex flex-row sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
             {/* Left section */}
             <div className="flex flex-row sm:items-center justify-between  w-full gap-3 sm:gap-4">
               {/* Back button & divider */}

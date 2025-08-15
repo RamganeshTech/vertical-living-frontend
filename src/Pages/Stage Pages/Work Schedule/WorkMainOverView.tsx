@@ -244,8 +244,8 @@ const WorkMainOverview = () => {
     */}
 
           {/* Grid: Work Plans & Daily Schedule */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            {/* <Link
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <Link
               to={`workschedule/${data?.workScheduleId}`}
               className="rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors shadow-md px-6 py-5 flex items-center gap-4"
             >
@@ -254,7 +254,7 @@ const WorkMainOverview = () => {
                 <h3 className="text-lg font-bold text-blue-800">Work Plans</h3>
                 <p className="text-sm text-blue-700">Manage detailed work plans for the project.</p>
               </div>
-            </Link> */}
+            </Link> 
 
             <Link
               to={`dailyschedule/${data?.dailyScheduleId}`}
@@ -266,7 +266,56 @@ const WorkMainOverview = () => {
                 <p className="text-sm text-blue-700">Track daily activities and progress reports.</p>
               </div>
             </Link>
+          </div> */}
+
+
+
+            <div className="w-full mb-8">
+      <Link
+        to={`dailyschedule/${data?.dailyScheduleId}`}
+        className="w-full block bg-gradient-to-r from-slate-50 to-gray-50 hover:from-slate-100 hover:to-gray-100 border border-gray-200 hover:border-gray-300 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group"
+      >
+        <div className="flex items-center justify-between p-6 md:p-8">
+          <div className="flex items-center gap-6">
+            {/*  Updated icon styling to match page theme */}
+            <div className="flex-shrink-0 w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-700 transition-colors">
+              <i className="fas fa-calendar-check text-white text-2xl" />
+            </div>
+            
+            <div className="flex-1">
+              {/*  Updated typography and colors for better integration */}
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
+                Daily Task Planner
+              </h3>
+              <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                Organize and track your daily activities with comprehensive progress reports and task management.
+              </p>
+              
+              {/*  Added feature badges for better visual hierarchy */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  <i className="fas fa-tasks text-xs" />
+                  Task Tracking
+                </span>
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                  <i className="fas fa-chart-line text-xs" />
+                  Progress Reports
+                </span>
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                  <i className="fas fa-calendar-alt text-xs" />
+                  Date Planning
+                </span>
+              </div>
+            </div>
           </div>
+          
+          {/*  Added arrow indicator for better UX */}
+          <div className="flex-shrink-0 ml-4">
+            <i className="fas fa-arrow-right text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all text-xl" />
+          </div>
+        </div>
+      </Link>
+    </div>
 
           {/* MD Approval Details */}
           {/* <Card className="p-2 border-l-4 border-blue-600 bg-white border  shadow-md rounded-xl">
