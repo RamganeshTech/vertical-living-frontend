@@ -354,3 +354,67 @@ export const useUpdateOrderingMaterialSubItem = () => {
     },
   });
 };
+
+
+// ==========  UPDATE SHOP DETAILS ==========
+const updateShopDetailsApi = async (
+  projectId: string,
+  updates: any,
+  api: AxiosInstance
+) => {
+  const { data } = await api.put(`/orderingmaterial/${projectId}/shop`, updates);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useUpdateShopDetails = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ projectId, updates }: {projectId:string, updates:any}) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to update shop details");
+      if (!api) throw new Error("API instance not available");
+      return await updateShopDetailsApi(projectId, updates, api);
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+
+
+const deleteOrderPdf = async (
+  projectId: string,
+  pdfId: string,
+  api: AxiosInstance
+) => {
+  const { data } = await api.delete(`/orderingmaterial/delete/${projectId}/${pdfId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useDeleteOrderMaterialPdf = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ projectId, pdfId }: {projectId:string, pdfId: string,}) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Youre not allowed to delete pdf");
+      if (!api) throw new Error("API instance not available");
+      return await deleteOrderPdf(projectId, pdfId, api);
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+

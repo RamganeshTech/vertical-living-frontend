@@ -1108,7 +1108,7 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 // import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
 import { NO_IMAGE } from "../../../constants/constants";
-import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteOrderingMaterialSubItem, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
+import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialPdf, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdateShopDetails } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 // import GenerateWhatsappLink from "../../../shared/GenerateWhatsappLink";
 import { useEffect, useRef, useState } from "react";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
@@ -1141,6 +1141,7 @@ const UNIT_OPTIONS = [
 
 
 interface SubItem {
+    refId: string;
     _id: string;
     subItemName: string;
     quantity: number;
@@ -1160,9 +1161,33 @@ const OrderMaterialOverview = () => {
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetOrderingMaterialHistoryDeadline()
     const { mutateAsync: completionStatus, isPending: completePending } = useCompleteOrderingMaterialHistoryStage()
     const { mutateAsync: updateDelivery } = useUpdateDeliveryLocation();
+    const { mutateAsync: deletePdf, isPending:deletePdfLoading } = useDeleteOrderMaterialPdf();
+    const { mutateAsync: updateShop } = useUpdateShopDetails();
+
+
 
     const [editDelivery, setEditDelivery] = useState(false);
     const [deliveryForm, setDeliveryForm] = useState<any>({});
+    const [editShop, setEditShop] = useState(false);
+    const [shopForm, setShopForm] = useState<any>({});
+
+
+    const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
+    const [editingCell, setEditingCell] = useState<{
+        subItemId: string;
+        field: 'name' | 'quantity' | 'unit';
+    } | null>(null);
+    // const [tempValues, setTempValues] = useState<{ [key: string]: any }>({});
+    const [newRowData, setNewRowData] = useState<{
+        [unitId: string]: {
+            name: string;
+            quantity: number;
+            unit: string;
+        }
+    }>({});
+
+    const inputRef = useRef<HTMLInputElement>(null);
+
 
     // const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
     // const [newSubItemName, setNewSubItemName] = useState("");
@@ -1179,8 +1204,6 @@ const OrderMaterialOverview = () => {
     // const totalCost = data?.totalCost || 0;
     // const hasUnits = selectedUnits.length > 0;
 
-    //   const { mutateAsync: updateShop } = useUpdateShopDetails();
-    //   const { mutateAsync: updateDelivery } = useUpdateDeliveryLocation();
 
 
 
@@ -1267,21 +1290,40 @@ const OrderMaterialOverview = () => {
     };
 
 
-    const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
-    const [editingCell, setEditingCell] = useState<{
-        subItemId: string;
-        field: 'name' | 'quantity' | 'unit';
-    } | null>(null);
-    // const [tempValues, setTempValues] = useState<{ [key: string]: any }>({});
-    const [newRowData, setNewRowData] = useState<{
-        [unitId: string]: {
-            name: string;
-            quantity: number;
-            unit: string;
-        }
-    }>({});
+    const handleUpdateShop = async () => {
+        try {
 
-    const inputRef = useRef<HTMLInputElement>(null);
+            if (shopForm.phoneNumber) {
+                if (!/^\d{10}$/.test(shopForm.phoneNumber.trim())) {
+                    throw new Error("Phone number should contain exactly 10 digit numbers")
+                }
+            }
+
+            await updateShop({ projectId: projectId!, updates: shopForm });
+            toast({ title: "Success", description: "Shop Details Updated" });
+            setEditShop(false);
+            refetch()
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "Update failed" });
+        }
+    };
+
+
+
+    
+    const handleDeletePdf = async (pdfId:string) => {
+        try {
+
+            await deletePdf({ projectId: projectId!, pdfId });
+            toast({ title: "Success", description: "PDF deleted" });
+            setEditShop(false);
+            refetch()
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete" });
+        }
+    };
+
+
     // const selectRef = useRef<HTMLButtonElement>(null);
 
     const selectedUnits = data?.selectedUnits || [];
@@ -1509,8 +1551,72 @@ const OrderMaterialOverview = () => {
                         <section className="bg-white rounded-3xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
 
 
-
+                            {/* Shop Details */}
                             <div className="border-l-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
+                                <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
+                                    <i className="fa-solid fa-store"></i>
+                                    Shop Details
+                                </h2>
+                                {editShop ? (
+                                    <div className="space-y-3">
+                                        <Input
+                                            placeholder="Shop Name"
+                                            value={shopForm?.shopName || ""}
+                                            onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
+                                            className="w-full"
+                                        />
+                                        <Input
+                                            placeholder="Contact Person"
+                                            value={shopForm?.contactPerson || ""}
+                                            onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
+                                            className="w-full"
+                                        />
+                                        <Input
+                                            placeholder="Phone Number"
+                                            value={shopForm?.phoneNumber || ""}
+                                            type="tel"
+                                            maxLength={10}
+                                            onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })}
+                                            className="w-full"
+                                        />
+                                        <Input
+                                            placeholder="Address"
+                                            value={shopForm?.address || ""}
+                                            onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
+                                            className="w-full"
+                                        />
+                                        <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                                            <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
+                                                <i className="fa-solid fa-save mr-2"></i>Save
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setEditShop(false)}
+                                                className="w-full sm:w-auto"
+                                            >
+                                                <i className="fa-solid fa-times mr-2"></i>Cancel
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2 text-sm sm:text-base">
+                                        <p><strong>Shop Name:</strong> {data?.shopDetails?.shopName || "-"}</p>
+                                        <p><strong>Contact Person:</strong> {data?.shopDetails?.contactPerson || "-"}</p>
+                                        <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
+                                        <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
+
+                                        <button
+                                            onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
+                                            className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
+                                        >
+                                            <i className="fa-solid fa-edit mr-1"></i>Edit
+                                        </button>
+
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="border-l-4 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
                                 <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
                                     <i className="fa-solid fa-truck"></i>
                                     Delivery Location
@@ -1648,7 +1754,7 @@ const OrderMaterialOverview = () => {
                                                                 </span>
                                                             </div>
 
-                                                            <div className="grid grid-cols-2 gap-4">
+                                                            <div className="grid grid-cols-3 gap-4">
                                                                 <div>
                                                                     <p className="text-sm text-gray-500 mb-1">Unit Price</p>
                                                                     <p className="font-medium">₹{unit.singleUnitCost.toFixed(2)}</p>
@@ -1657,6 +1763,15 @@ const OrderMaterialOverview = () => {
                                                                     <p className="text-sm text-gray-500 mb-1">Quantity</p>
                                                                     <p className="font-medium">{unit.quantity}</p>
                                                                 </div>
+
+
+                                                                {unit?.dimention && <div>
+                                                                    <p className="text-sm text-gray-500 mb-1">Dimentions</p>
+                                                                    <p className="font-medium">Height: {unit?.dimention?.height || 0}mm</p>
+                                                                    <p className="font-medium">depth: {unit?.dimention?.depth || 0}mm</p>
+                                                                    <p className="font-medium">width: {unit?.dimention?.width || 0}mm</p>
+                                                                </div>}
+
                                                             </div>
                                                         </div>
 
@@ -1681,8 +1796,11 @@ const OrderMaterialOverview = () => {
 
                                                         {/* Spreadsheet Header */}
                                                         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                                                            <div className="grid grid-cols-12 gap-0 bg-gray-100 border-b border-gray-200">
-                                                                <div className="col-span-6 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                                            <div className="grid grid-cols-17 gap-0 bg-gray-100 border-b border-gray-200">
+                                                                <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                                                    Ref ID
+                                                                </div>
+                                                                <div className="col-span-8 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
                                                                     Material Name
                                                                 </div>
                                                                 <div className="col-span-2 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
@@ -1698,9 +1816,16 @@ const OrderMaterialOverview = () => {
 
                                                             {/* Existing Sub Items */}
                                                             {unit.subItems && unit.subItems.length > 0 && unit.subItems.map((sub: SubItem) => (
-                                                                <div key={sub._id} className="grid grid-cols-12 gap-0 border-b border-gray-100 hover:bg-gray-50">
+                                                                <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-gray-100 hover:bg-gray-50">
                                                                     {/* Item Name Cell */}
-                                                                    <div className="col-span-6 border-r border-gray-200">
+                                                                    <div className="col-span-3 border-r border-gray-200">
+
+                                                                        <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
+                                                                            {sub?.refId || "N/A"}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="col-span-8 border-r border-gray-200">
                                                                         {editingCell?.subItemId === sub._id && editingCell?.field === 'name' ? (
                                                                             <input
                                                                                 ref={inputRef}
@@ -1812,9 +1937,19 @@ const OrderMaterialOverview = () => {
                                                             ))}
 
                                                             {/* New Row for Adding Items */}
-                                                            <div className="grid grid-cols-12 gap-0 bg-green-50 border-b border-gray-100">
+                                                            <div className="grid grid-cols-17 gap-0 bg-green-50 border-b border-gray-100">
                                                                 {/* New Item Name */}
-                                                                <div className="col-span-6 border-r border-gray-200">
+
+
+                                                                <div className="col-span-3 border-r border-gray-200">
+
+                                                                        <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
+                                                                            Ref Id
+                                                                        </div>
+                                                                    </div>
+
+
+                                                                <div className="col-span-8 border-r border-gray-200">
                                                                     <input
                                                                         type="text"
                                                                         placeholder="Enter matterial name..."
@@ -1956,28 +2091,7 @@ const OrderMaterialOverview = () => {
 
 
                         <div className="space-y-4">
-                            {/* <Button onClick={handleGenerate} disabled={generatePending}>
-                                Generate PDF
-                            </Button>
-
-                            {data?.generatedLink && (
-                                <div className="flex gap-3">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => window.open(data.generatedLink, "_blank")}
-                                    >
-
-                                        View PDF
-                                    </Button>
-
-                                    <Button variant="outline" onClick={() => downloadImage({ src: data.generatedLink, alt: "order material" })}>
-                                        <i className="fas fa-download"></i>
-                                        Download
-                                    </Button>
-                                </div>
-                            )} */}
-
-                            {/* second option below  */}
+                           
 
                             <div className="space-y-6">
                                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -2010,8 +2124,10 @@ const OrderMaterialOverview = () => {
                                     </Button>
                                 </div>
 
-                                {data?.generatedLink && (
-                                    <Card className="border-green-200 bg-green-50">
+                                {data?.generatedLink && data?.generatedLink?.length > 0 ?
+                                
+                                data?.generatedLink?.map((ele:any)=> (
+                                    <Card key={ele._id} className="border-green-200 bg-green-50">
                                         <CardContent className="p-6">
                                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                                 <div className="flex items-center gap-3 flex-1">
@@ -2020,8 +2136,10 @@ const OrderMaterialOverview = () => {
                                                     </div>
                                                     <div>
                                                         <h4 className="font-semibold text-green-900 mb-1">
-                                                            PDF Generated Successfully
+                                                            {/* PDF Generated Successfully */}
+                                                            {ele.pdfName}
                                                         </h4>
+                                                        <span className="text-sm">Pdf Reference Id: {ele.refUniquePdf || "N/A"}</span>
                                                         <p className="text-sm text-green-700">
                                                             Your order material PDF is ready to view or download
                                                         </p>
@@ -2031,7 +2149,7 @@ const OrderMaterialOverview = () => {
                                                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                                                     <Button
                                                         variant="outline"
-                                                        onClick={() => window.open(data.generatedLink, "_blank")}
+                                                        onClick={() => window.open(ele.url, "_blank")}
                                                         className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
                                                     >
                                                         <i className="fas mr-2 fa-external-link-alt"></i>
@@ -2040,16 +2158,33 @@ const OrderMaterialOverview = () => {
 
                                                     <Button
                                                         variant="secondary"
-                                                        onClick={() => downloadImage({ src: data.generatedLink, alt: "order material" })}
+                                                        onClick={() => downloadImage({ src: ele.url, alt: "order material" })}
                                                         className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
                                                     >
                                                         Download PDF
+                                                    </Button>
+
+
+                                                     <Button
+                                                        variant="danger"
+                                                        isLoading={deletePdfLoading}
+                                                        onClick={() => handleDeletePdf(ele._id)}
+                                                        className="border-red-300 bg-red-600 text-white hover:bg-red-600 hover:border-red-400"
+                                                    >
+                                                        Delete PDF
                                                     </Button>
                                                 </div>
                                             </div>
                                         </CardContent>
                                     </Card>
-                                )}
+                                ))
+                            :
+                            <>
+                            <div>
+                                No PDF Generated
+                            </div>
+                            </>
+                            }
                             </div>
 
 

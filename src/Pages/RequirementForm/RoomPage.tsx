@@ -163,7 +163,7 @@ const RoomPage: React.FC = () => {
                         <div className="flex items-center space-x-4">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 transition-colors duration-200 group"
+                                className="flex cursor-pointer items-center space-x-2 text-slate-600 hover:text-blue-600 transition-colors duration-200 group"
                             >
                                 <div className="bg-slate-100 group-hover:bg-blue-50 rounded-lg p-2 transition-colors duration-200">
                                     <i className="fas fa-arrow-left text-sm" />
