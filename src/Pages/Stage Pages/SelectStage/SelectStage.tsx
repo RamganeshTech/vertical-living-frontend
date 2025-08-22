@@ -62,7 +62,7 @@ export default function SelectStage() {
     },
     {
       id: "Manual Flow",
-      title: "Manual Flow",
+      title: "Carpentry Work",
       description: "Complete customization with detailed material selection and cost estimation",
       icon: "fas fa-sliders-h",
       colorClass: "bg-purple-500",

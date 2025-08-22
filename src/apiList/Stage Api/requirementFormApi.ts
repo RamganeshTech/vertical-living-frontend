@@ -247,9 +247,9 @@ export const useCreateFormSubmission = () => {
 
             return await createPublicFromSubmission({ projectId, payload, token, api })
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["requirementForm"] })
-        }
+        onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
+        },
     })
 
 }
@@ -291,6 +291,9 @@ export const useDeleteRequriementForm = () => {
 
             return await deleteFormRequirements({ projectId, api });
         },
+         onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
+        },
     });
 };
 
@@ -308,6 +311,9 @@ export const useGenerateShareableLink = () => {
             if (!api) throw new Error("API instance not found for role");
 
             return await generateRequirementFormLink({ projectId, api });
+        },
+         onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
         },
     });
 };
@@ -327,7 +333,10 @@ export const useLockUpdationOfForm = () => {
             if (!api) throw new Error("api is null")
 
             return await lockUpdationOfForm({ formId, projectId, api })
-        }
+        },
+         onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
+        },
     })
 
 }
@@ -348,8 +357,9 @@ export const useFormCompletion = () => {
             return await formCompletion({ formId, projectId, api })
 
         },
-        onSuccess: () => {
+        onSuccess: (_, {projectId}) => {
             queryClient.invalidateQueries({ queryKey: ["requirementForm"] })
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
         }
     })
 }
@@ -368,7 +378,10 @@ export const useSetDeadLineFormRequirement = () => {
 
             return await setDeadlineFormRequirement({ formId, deadLine, projectId, api })
 
-        }
+        },
+         onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
+        },
     })
 }
 
@@ -391,6 +404,9 @@ export const useUploadRequirementFiles = () => {
             if (!api) throw new Error("api is null")
 
             return await uploadRequirementFiles({ formId, projectId, files, api })
+        },
+         onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
         },
     });
 };
@@ -597,7 +613,7 @@ export const useGetAllRequirementInfo = ({ projectId }: { projectId: string }) =
             return await getAllInfoApi({ projectId, api });
         },
         retry: false,
-        refetchOnWindowFocus: false,
+        // refetchOnWindowFocus: false,
     });
 };
 
@@ -621,7 +637,7 @@ export const useGetSingleRoomRequirement = ({
         },
         enabled: !!projectId && !!roomId,
         retry: false,
-        refetchOnWindowFocus: false,
+        // refetchOnWindowFocus: false,
     });
 };
 
@@ -677,8 +693,8 @@ export const useUploadRequirementSectionFiles = () => {
                 api
             );
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["requirementForm"] });
+        onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
         },
     });
 };
@@ -730,8 +746,8 @@ export const useDeleteRequirementSectionFile = () => {
                 api
             );
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["requirementForm"] });
+        onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
         },
     });
 };

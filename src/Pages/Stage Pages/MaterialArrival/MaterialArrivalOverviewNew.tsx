@@ -1,4 +1,4 @@
-import { useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { toast } from "../../../utils/toast";
 
 import { Button } from "../../../components/ui/Button";
@@ -23,6 +23,7 @@ interface ProjectDetailsOutlet {
 const MaterialArrivalOverviewNew = () => {
   const { projectId, organizationId } = useParams();
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
+  const navigate = useNavigate()
   // const isChildRoute = location.pathname.includes("/materialarrivalroom/");
   // const { mutateAsync: bulkToggleMutate, isPending: bullPending } = useBulkToggleAllVerification()
   const { data, isLoading, error, isError, refetch } = useGetAllMaterialArrivalDetailsNew(projectId!)
@@ -40,6 +41,8 @@ const MaterialArrivalOverviewNew = () => {
     try {
       await completionStatus({ projectId: projectId! });
       toast({ description: 'Completion status updated successfully', title: "Success" });
+      navigate('../installation')
+
     } catch (error: any) {
       toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to update completion status", variant: "destructive" })
     }

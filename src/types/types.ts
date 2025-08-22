@@ -380,9 +380,16 @@ export interface IConsultationAttachment {
 }
 
 
+export interface IUserRef {
+  _id: string;
+  username: string;
+  email:string
+}
+
+
 export interface IConsultationMessage {
   _id: string;
-  sender: string; // the persons id who sent the message
+  sender: any; // the persons id who sent the message
   senderModel: string,
   senderRole: "owner" | "staff" | "CTO" | "worker";
   message: string;
@@ -550,4 +557,73 @@ export interface InstallationWorkItem {
 }
 
 
+// DEPARTMENT TYPES
 
+
+export interface IPersonalInfo {
+  empName?: string;
+  dateOfBirth?: Date;
+  email?: string;
+  phoneNo?: string;
+  gender?: "male" | "female" | "other";
+  maritalStatus?: "single" | "married" | "divorced" | "widowed";
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    country?: string;
+  };
+  emergencyContact?: {
+    name?: string;
+    relationship?: string;
+    phone?: string;
+  };
+}
+
+
+export interface IEmployment {
+  joinDate?: Date;
+  designation?: string;
+  department?: string;
+  reportingTo?: string;
+  employmentType?: "full_time" | "part_time" | "contract" | "intern";
+  salary?: {
+    basic?: number;
+    hra?: number;
+    allowances?: number;
+    total?: number;
+  };
+  workLocation?: string;
+}
+
+export interface IDocument {
+  _id?: string;
+  type?: "resume" | "aadhar" | "pan" | "passport" | "education" | "experience";
+  fileName?: string;
+  fileUrl?: string;
+  uploadedAt?: Date;
+}
+
+export interface IEmployee {
+  _id: string;
+  organizationId: string;
+  empId?: string;
+  employeeModel: "UserModel" | "StaffModel" | "CTOModel" | "WorkerModel";
+  empRole: "organization_staff" | "nonorganization_staff";
+  personalInfo: IPersonalInfo | null;
+  employment: IEmployment | null;
+  documents?: IDocument[];
+  status?: "active" | "inactive" | "terminated" | "on_leave";
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface EmployeeFilters {
+  name?: string;
+  email?: string;
+  phone?: string;
+  empRole?: string;
+  status?: string;
+  department?: string;
+}

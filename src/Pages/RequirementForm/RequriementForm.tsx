@@ -1,5 +1,5 @@
 // RequirementForm.tsx
-import { Outlet, useOutletContext, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useCreateRoom, useDeleteRequirementUploadFile, useFormCompletion, useGenerateShareableLink, useGetAllRequirementInfo, useSetDeadLineFormRequirement, useUploadRequirementFiles } from "../../apiList/Stage Api/requirementFormApi";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
@@ -71,6 +71,7 @@ export function CreateRoomModal({
               onSubmit(roomName)
             }
           }}
+          autoFocus
           onChange={(e) => setRoomName(e.target.value)}
         />
         <div className="flex justify-end gap-2">
@@ -126,6 +127,8 @@ export default function RequirementForm() {
   const { projectId, organizationId } = useParams() as { projectId: string; organizationId: string };
   const { role } = useGetRole()
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>()
+
+  const navigate = useNavigate()
 
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
@@ -184,6 +187,7 @@ export default function RequirementForm() {
       if (!completePending) {
         await completeFormMutate({ formId: formData._id, projectId })
         toast({ title: "Success", description: "completion updated successfully" })
+        navigate(`../sitemeasurement`)
       }
     } catch (error: any) {
       toast({ title: "Error", description: error?.response?.data?.message || "Failed to update to complete the form", variant: "destructive" })

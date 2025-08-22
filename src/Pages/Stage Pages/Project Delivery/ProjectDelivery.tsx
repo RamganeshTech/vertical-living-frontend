@@ -18,6 +18,7 @@ import AssignStageStaff from "../../../shared/AssignStaff";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { downloadImage } from "../../../utils/downloadFile";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 
 type ProjectDetailsOutlet = {
   isMobile: boolean;
@@ -125,117 +126,10 @@ export default function ProjectDeliveryPanel() {
     }
   };
 
-  let pdfFiles = (data?.uploads || []).filter((file: any) => file.type === "pdf");
-  let imageFiles = (data?.uploads || []).filter((file: any) => file.type === "image");
+  let pdfFiles = (data?.uploads || [])?.filter((file: any) => file.type === "pdf");
+  let imageFiles = (data?.uploads || [])?.filter((file: any) => file.type === "image");
 
   if (isLoading) return <MaterialOverviewLoading />
-
-  // pdfFiles = [
-  //   {
-  //     _id: "pdf1",
-  //     type: "pdf",
-  //     url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-  //     originalName: "project-overview.pdf",
-  //     uploadedAt: new Date("2024-07-01T10:30:00Z"),
-  //   },
-  //   {
-  //     _id: "pdf2",
-  //     type: "pdf",
-  //     url: "https://www.africau.edu/images/default/sample.pdf",
-  //     originalName: "specifications.pdf",
-  //     uploadedAt: new Date("2024-07-02T10:00:00Z"),
-  //   },
-  //   {
-  //     _id: "pdf3",
-  //     type: "pdf",
-  //     url: "https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf",
-  //     originalName: "client-brief.pdf",
-  //     uploadedAt: new Date("2024-07-03T11:45:00Z"),
-  //   },
-  //   {
-  //     _id: "pdf2",
-  //     type: "pdf",
-  //     url: "https://www.africau.edu/images/default/sample.pdf",
-  //     originalName: "specifications.pdf",
-  //     uploadedAt: new Date("2024-07-02T10:00:00Z"),
-  //   },
-  //   {
-  //     _id: "pdf2",
-  //     type: "pdf",
-  //     url: "https://www.africau.edu/images/default/sample.pdf",
-  //     originalName: "specifications.pdf",
-  //     uploadedAt: new Date("2024-07-02T10:00:00Z"),
-  //   },
-  //   {
-  //     _id: "pdf3",
-  //     type: "pdf",
-  //     url: "https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf",
-  //     originalName: "client-brief.pdf",
-  //     uploadedAt: new Date("2024-07-03T11:45:00Z"),
-  //   },
-  //   {
-  //     _id: "pdf2",
-  //     type: "pdf",
-  //     url: "https://www.africau.edu/images/default/sample.pdf",
-  //     originalName: "specifications.pdf",
-  //     uploadedAt: new Date("2024-07-02T10:00:00Z"),
-  //   },
-
-  // ];
-
-
-  // imageFiles = [
-  //   {
-  //     _id: "img1",
-  //     type: "image",
-  //     url: "https://via.placeholder.com/300x200.png?text=Living+Room",
-  //     originalName: "living-room.jpg",
-  //     uploadedAt: new Date("2024-07-01T11:00:00Z"),
-  //   },
-  //   {
-  //     _id: "img2",
-  //     type: "image",
-  //     url: "https://via.placeholder.com/300x200.png?text=Kitchen",
-  //     originalName: "kitchen-view.jpg",
-  //     uploadedAt: new Date("2024-07-02T09:20:00Z"),
-  //   },
-  //   {
-  //     _id: "img3",
-  //     type: "image",
-  //     url: "https://via.placeholder.com/300x200.png?text=Elevation",
-  //     originalName: "front-elevation.png",
-  //     uploadedAt: new Date("2024-07-03T08:45:00Z"),
-  //   },
-  //   {
-  //     _id: "img2",
-  //     type: "image",
-  //     url: "https://via.placeholder.com/300x200.png?text=Kitchen",
-  //     originalName: "kitchen-view.jpg",
-  //     uploadedAt: new Date("2024-07-02T09:20:00Z"),
-  //   },
-  //   {
-  //     _id: "img2",
-  //     type: "image",
-  //     url: "https://via.placeholder.com/300x200.png?text=Kitchen",
-  //     originalName: "kitchen-view.jpg",
-  //     uploadedAt: new Date("2024-07-02T09:20:00Z"),
-  //   },
-  //   {
-  //     _id: "img3",
-  //     type: "image",
-  //     url: "https://via.placeholder.com/300x200.png?text=Elevation",
-  //     originalName: "front-elevation.png",
-  //     uploadedAt: new Date("2024-07-03T08:45:00Z"),
-  //   },
-  //   {
-  //     _id: "img2",
-  //     type: "image",
-  //     url: "https://via.placeholder.com/300x200.png?text=Kitchen",
-  //     originalName: "kitchen-view.jpg",
-  //     uploadedAt: new Date("2024-07-02T09:20:00Z"),
-  //   },
-  // ];
-
 
   return (
     <div className="w-full sm:min-h-full sm:overflow-y-auto space-y-6 py-1 sm:py-0">
@@ -353,7 +247,7 @@ export default function ProjectDeliveryPanel() {
             {/* Uploaded Files (PDF & Images) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* 📑 PDF Files */}
-              <div className="min-h-[220px] sm:max-h-[150px] sm:min-h-[150px]  lg:min-h-[220px] overflow-y-auto custom-scrollbar">
+              <div className="min-h-[220px] sm:max-h-[150px] sm:min-h-[150px] border-2 border-[#0a0a0a18] px-2 rounded-xl lg:min-h-[280px]  overflow-y-auto custom-scrollbar">
                 <h3 className="font-semibold text-blue-700 mb-2 flex items-center gap-2">
                   <i className="fas fa-file-pdf" />
                   PDF Files
@@ -396,7 +290,7 @@ export default function ProjectDeliveryPanel() {
               </div>
 
               {/* 🖼️ Image Files */}
-              <div className=" min-h-[220px] sm:max-h-[150px]  sm:min-h-[150px] lg:min-h-[220px] overflow-y-auto custom-scrollbar">
+              <div className=" min-h-[220px] sm:max-h-[150px]  sm:min-h-[150px]  border-2 border-[#0a0a0a18] px-2 rounded-xl lg:min-h-[280px] overflow-y-auto custom-scrollbar">
                 <h3 className="font-semibold text-blue-700 mb-2 flex items-center gap-2">
                   <i className="fas fa-image" />
                   Image Files
@@ -408,40 +302,50 @@ export default function ProjectDeliveryPanel() {
                     </p>
                   </div>
                 ) : (
-                  <ul className="space-y-2">
-                    {imageFiles.map((file: any) => (
-                      <li
-                        key={file._id}
-                        className="flex justify-between items-center bg-blue-50 px-3 py-2 rounded"
-                      >
-                        <span className="truncate text-sm">{file.originalName}</span>
-                        <div className="flex gap-3 items-center text-blue-600">
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => setPopupImage(file?.url)}
-                          >
-                            <i className="fas fa-eye"></i>
-                          </Button>
-                          <Button size="sm"
-                            variant="primary"
-                            onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
-                          >
-                            <i className="fa-solid fa-download"></i>
-                          </Button>
+                  // <ul className="space-y-2">
+                  //   {imageFiles.map((file: any) => (
+                  //     <li
+                  //       key={file._id}
+                  //       className="flex justify-between items-center bg-blue-50 px-3 py-2 rounded"
+                  //     >
+                  //       <span className="truncate text-sm">{file.originalName}</span>
+                  //       <div className="flex gap-3 items-center text-blue-600">
+                  //         <Button
+                  //           size="sm"
+                  //           variant="primary"
+                  //           onClick={() => setPopupImage(file?.url)}
+                  //         >
+                  //           <i className="fas fa-eye"></i>
+                  //         </Button>
+                  //         <Button size="sm"
+                  //           variant="primary"
+                  //           onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
+                  //         >
+                  //           <i className="fa-solid fa-download"></i>
+                  //         </Button>
 
-                          <Button
-                            size="sm"
-                            isLoading={variables?.fileId === file._id && deletePending}
-                            onClick={() => handleDelete(file._id)}
-                            className="text-red-600"
-                          >
-                            <i className="fas fa-trash" />
-                          </Button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                  //         <Button
+                  //           size="sm"
+                  //           isLoading={variables?.fileId === file._id && deletePending}
+                  //           onClick={() => handleDelete(file._id)}
+                  //           className="text-red-600"
+                  //         >
+                  //           <i className="fas fa-trash" />
+                  //         </Button>
+                  //       </div>
+                  //     </li>
+                  //   ))}
+                  // </ul>
+
+
+                    <ImageGalleryExample
+                                          imageFiles={imageFiles}
+                                          handleDeleteFile={handleDelete}
+                                          // className="grid grid-cols-3"
+                                          height={80}
+                                          minWidth={98}
+                                          maxWidth={100}
+                                      />
                 )}
               </div>
             </div>

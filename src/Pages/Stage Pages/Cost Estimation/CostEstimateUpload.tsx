@@ -4,6 +4,7 @@ import { Button } from "../../../components/ui/Button";
 import { useDeleteCostEstimationFile, useUploadCostEstimationFiles } from "../../../apiList/Stage Api/costEstimationApi";
 import { toast } from "../../../utils/toast";
 import { downloadImage } from "../../../utils/downloadFile";
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 
 interface UploadFile {
   _id: string;
@@ -94,7 +95,7 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles, 
         {/* PDFs */}
         <div className="p-2">
           <h4 className="font-semibold text-red-700 mb-2">📄 PDF Files</h4>
-          <ul className="space-y-2 max-h-[180px] h-[180px] rounded-lg shadow-lg p-2 overflow-y-auto custom-scrollbar-none">
+          <ul className="space-y-2 max-h-[280px] h-[280px] rounded-lg shadow-lg p-2 overflow-y-auto custom-scrollbar-none">
             {pdfFiles.length === 0 && <div className="min-h-[180px] rounded-lg  flex items-center justify-center"><p className="text-sm text-gray-500">No PDFs uploaded.</p></div>}
 
             {pdfFiles.map(file => {
@@ -129,7 +130,7 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles, 
         {/* Images */}
         <div className="p-2">
           <h4 className="font-semibold text-green-700 mb-2">🖼️ Image Files</h4>
-          <ul className="space-y-2 max-h-[180px] min-h-[180px] shadow-lg rounded-lg p-2 overflow-y-auto custom-scrollbar">
+          {/* <ul className="space-y-2 max-h-[180px] min-h-[180px] shadow-lg rounded-lg p-2 overflow-y-auto custom-scrollbar">
             {imageFiles.length === 0 && <div className="min-h-[180px] rounded-lg  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
 
             {imageFiles.map(file => (
@@ -165,7 +166,19 @@ const CostEstimateUpload: React.FC<Props> = ({ projectId, roomId, initialFiles, 
                 </div>
               </li>
             ))}
-          </ul>
+          </ul> */}
+
+
+           <section className="space-y-2 max-h-[280px] h-[280px] shadow-lg rounded-lg p-2 overflow-y-auto custom-scrollbar">
+                      <ImageGalleryExample
+                        imageFiles={imageFiles}
+                        handleDeleteFile={handleDelete}
+                        // className="grid grid-cols-3"
+                        height={80}
+                        minWidth={98}
+                        maxWidth={100}
+                      />
+                    </section>
         </div>
       </div>
 

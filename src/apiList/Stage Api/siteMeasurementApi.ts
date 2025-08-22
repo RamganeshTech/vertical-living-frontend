@@ -117,7 +117,7 @@ export const useGetSiteMeasurementDetails = ({ projectId }: { projectId: string 
 
     const api = getApiForRole(role!)
     return useQuery({
-        queryKey: ["siteMeasurement"],
+        queryKey: ["siteMeasurement", projectId],
         queryFn: async () => {
 
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
@@ -127,7 +127,7 @@ export const useGetSiteMeasurementDetails = ({ projectId }: { projectId: string 
             return await getMeasurement({ projectId, api });
         },
         retry: false,
-        refetchOnMount: false,
+        // refetchOnMount: false,
     })
 }
 
@@ -147,9 +147,9 @@ export const useCreateMeasurement = () => {
 
             return await createmeasurement({ projectId, api, siteDetails, });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+       onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -169,9 +169,9 @@ export const useCreateRoomSiteMeasurement = () => {
 
             return await createRoom({ projectId, api, room });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+       onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -191,9 +191,9 @@ export const useUpdateCommonSiteMeasurementDetails = () => {
 
             return await updateCommonSiteDetails({ projectId, api, payload });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+       onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -213,9 +213,9 @@ export const useUdpateSiteMeasurmentRoomDetails = () => {
 
             return await udpateRoomDetails({ projectId, api, roomId, room });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -235,9 +235,9 @@ export const useCompletionStatusSiteMeasurement = () => {
 
             return await updateCompletionStatus({ projectId, api });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -256,9 +256,9 @@ export const useDeleteRoomFromMeauserementStage = () => {
 
             return await deleteRoomFromMeauserementStage({ projectId, api, roomId });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -278,9 +278,9 @@ export const useDeleteSiteMeasurementAndResetTimer = () => {
 
             return await deleteSiteMeauserementStage({ projectId, api });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -298,7 +298,10 @@ export const useSetDeadLineSiteMeasurement = () => {
 
             return await setDeadlineSiteMeasurement({ formId, deadLine, projectId, api })
 
-        }
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     })
 }
 
@@ -320,6 +323,9 @@ export const useUploadRequirementFiles = () => {
             if (!api) throw new Error("api is null")
 
             return await uploadFiles({ formId, files, projectId, api })
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
         },
     });
 };
@@ -377,9 +383,9 @@ export const useUploadRoomSiteFiles = () => {
 
             return await uploadRoomFiles({ roomId, files, projectId, api })
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -407,9 +413,9 @@ export const useDeleteRoomSiteFiles = () => {
 
             return await deleteRoomFiles({ roomId, uploadId, projectId, api })
         },
-         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] })
-        }
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
     });
 };
 
@@ -434,8 +440,8 @@ export const useUpdateImageCategoryName = () => {
 
       return await updateImageCategoryName({projectId,roomId,uploadId,categoryName,api,});
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["siteMeasurement"] });
-    },
+    onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["siteMeasurement", projectId] });
+        },
   });
 };

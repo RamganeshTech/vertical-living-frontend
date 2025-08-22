@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { Button } from "../../../components/ui/Button";
-import { Link, Outlet, useOutletContext, useParams } from "react-router-dom";
+import { Link, Outlet, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useAddRoom, useCompletionStatusSampleDesign, useDeleteRoomFile, useDeleteRoomSampleDesign, useGetRoomFiles, useSetDeadLineSampleDesign, useUploadRoomFiles } from "../../../apiList/Stage Api/sampleDesignApi";
 import { toast } from "../../../utils/toast";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
@@ -19,6 +19,7 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 const SampleDesignModule: React.FC = () => {
   const { projectId, organizationId } = useParams();
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>()
+  const navigate = useNavigate()
 
   if (!projectId) return null;
 
@@ -36,6 +37,7 @@ const SampleDesignModule: React.FC = () => {
     try {
       if (!completePending) {
         await completeStatus({ projectId });
+        navigate('../workmainschedule')
       }
       toast({ description: 'Completion status updated successfully', title: "Success" });
     } catch (error: any) {
@@ -90,9 +92,9 @@ const SampleDesignModule: React.FC = () => {
     }
   };
 
-  const handleFileDelete = async (roomName: string, fileIndex: number) => {
+  const handleFileDelete = async (roomName: string, fileId: string) => {
     try {
-      await deleteFile.mutateAsync({ projectId, roomName, fileIndex });
+      await deleteFile.mutateAsync({ projectId, roomName, fileId });
       toast({ description: 'File deleted successfully', title: "Success" });
       refetch();
     } catch (error: any) {
@@ -269,7 +271,7 @@ const SampleDesignModule: React.FC = () => {
                     <FileUploadSection
                       files={room.files}
                       onUpload={(files: any) => handleFileUpload(room.roomName, files)}
-                      onDelete={(index: number) => handleFileDelete(room.roomName, index)}
+                      onDelete={(fileId: string) => handleFileDelete(room.roomName, fileId)}
                       uploadPending={uploadPending}
                       deletePending={deleteFile.isPending}
                     />

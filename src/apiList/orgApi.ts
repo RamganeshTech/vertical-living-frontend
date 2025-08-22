@@ -243,7 +243,7 @@ export const useGetStaffsByOrganization = (orgId: string) => {
 
 
 export const useInviteStaffToOrganization = () => {
-  const allowedRoles = ["owner"];
+  const allowedRoles = ["owner", "CTO"];
   const { role } = useGetRole();
 
   const api = getApiForRole(role!);
@@ -260,6 +260,9 @@ export const useInviteStaffToOrganization = () => {
       if (!api) throw new Error("api is null")
 
       return await inviteStaffToOrganization(payload, api)
+    },
+    onSuccess:(_, payload)=>{
+      queryClient.invalidateQueries({queryKey:["staffs", payload.organizationId]})
     }
 
 
@@ -474,8 +477,8 @@ const getWorkersByProjectAsStaff = async (projectId: string, api: AxiosInstance)
   return data.data;
 };
 
-const removeWorkerAsStaff = async ({ workerId, projectId, api }: { workerId: string; projectId: string, api: AxiosInstance }) => {
-  const { data } = await api.put(`orgs/removeworker/${workerId}/${projectId}`);
+const removeWorkerAsStaff = async ({ workerId, orgId, projectId, api }: { orgId:string,workerId: string; projectId: string, api: AxiosInstance }) => {
+  const { data } = await api.put(`orgs/removeworker/${orgId}/${workerId}/${projectId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -527,12 +530,12 @@ export const useRemoveWorkerAsStaff = () => {
   const api = getApiForRole(role!)
 
   return useMutation({
-    mutationFn: async ({ workerId, projectId }: { workerId: string; projectId: string }) => {
+    mutationFn: async ({ workerId, orgId, projectId }: { workerId: string; orgId:string, projectId: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
       if (!api) throw new Error("API instance not found for role");
 
-      return await removeWorkerAsStaff({ workerId, projectId, api })
+      return await removeWorkerAsStaff({ workerId, orgId, projectId, api })
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workers"] }),
   })

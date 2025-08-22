@@ -1,4 +1,4 @@
-import { Link, Outlet, useParams, useLocation, useOutletContext } from "react-router-dom";
+import { Link, Outlet, useParams, useLocation, useOutletContext, useNavigate } from "react-router-dom";
 import {
   useCompleteWorkSchedule,
   useGetWorkMainStage,
@@ -23,6 +23,7 @@ const WorkMainOverview = () => {
   const { projectId, organizationId } = useParams<{ projectId: string; organizationId: string }>();
   const location = useLocation();
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
+  const navigate = useNavigate()
 
   const {
     data,
@@ -51,6 +52,7 @@ const WorkMainOverview = () => {
         description: "Completion status updated successfully.",
         title: "Success",
       });
+        navigate('../technicalconsultant')
       refetch();
     } catch (error: any) {
       toast({

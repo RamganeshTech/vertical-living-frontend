@@ -1,4 +1,4 @@
-import { Link, Outlet, useParams, useLocation, useOutletContext } from "react-router-dom";
+import { Link, Outlet, useParams, useLocation, useOutletContext, useNavigate } from "react-router-dom";
 import {
   useGetQualityCheckup,
   useSetQualityCheckDeadline,
@@ -19,21 +19,21 @@ type ProjectDetailsOutlet = {
   openMobileSidebar: () => void;
 };
 
-export const QualityCheckRoomKeys = [
-  "LivingRoom",
-  "Bedroom",
-  "Kitchen",
-  "DiningRoom",
-  "Balcony",
-  "FoyerArea",
-  "Terrace",
-  "StudyRoom",
-  "CarParking",
-  "Garden",
-  "StorageRoom",
-  "EntertainmentRoom",
-  "HomeGym",
-];
+// export const QualityCheckRoomKeys = [
+//   "LivingRoom",
+//   "Bedroom",
+//   "Kitchen",
+//   "DiningRoom",
+//   "Balcony",
+//   "FoyerArea",
+//   "Terrace",
+//   "StudyRoom",
+//   "CarParking",
+//   "Garden",
+//   "StorageRoom",
+//   "EntertainmentRoom",
+//   "HomeGym",
+// ];
 
 export const wallSectionSop = [
   {
@@ -51,7 +51,7 @@ export default function QualityCheckOverview() {
   const { projectId, organizationId } = useParams();
   const location = useLocation();
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
-
+  const navigate = useNavigate()
   if (!projectId) return null;
 
   const {
@@ -71,6 +71,7 @@ export default function QualityCheckOverview() {
     try {
       await completionStatus({ projectId });
       toast({ title: "Success", description: "Quality Check marked as complete." });
+      navigate('../cleaning')
       refetch();
     } catch (error: any) {
       toast({
@@ -90,7 +91,7 @@ export default function QualityCheckOverview() {
     <main className="w-full h-full  overflow-y-auto custom-scrollbar">
       {/* 🔵 Header Details - Always Visible */}
       {isChildRoute ? (
-        <Outlet context={{isMobile, openMobileSidebar}} />
+        <Outlet context={{ isMobile, openMobileSidebar }} />
       ) :
         <>
 
@@ -127,7 +128,7 @@ export default function QualityCheckOverview() {
                 className="w-full sm:w-auto"
               />
 
-               {!getAllError && <ShareDocumentWhatsapp
+              {!getAllError && <ShareDocumentWhatsapp
                 projectId={projectId!}
                 stageNumber="12"
                 className="w-full sm:w-fit"
@@ -184,21 +185,32 @@ export default function QualityCheckOverview() {
               <h3 className="text-xl text-blue-600 font-semibold mb-2">Rooms</h3>
               {/* 🗂️ Room Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mb-10">
-                {QualityCheckRoomKeys.map((room) => (
-                  <Link
-                    key={room}
-                    to={`qualitycheckroom/${room}`}
-                    className="border-l-4 border-blue-600 p-4 rounded-xl bg-white shadow hover:shadow-lg transition cursor-pointer"
-                  >
-                    <h3 className="text-md font-semibold text-blue-800 capitalize mb-1">
-                      {room.replace(/([A-Z])/g, " $1").trim()}
-                    </h3>
-                    <p className="text-xs text-gray-500">
-                      {data?.[room]?.length || 0} works completed
-                    </p>
-                    <p className="text-xs text-gray-400">Click to view details</p>
-                  </Link>
-                ))}
+                {data?.rooms?.length > 0 ?
+                  data?.room?.map((room: { _id: string, roomName: string, tasks: any }) => (
+                    <Link
+                      key={room._id}
+                      to={`qualitycheckroom/${room}`}
+                      className="border-l-4 border-blue-600 p-4 rounded-xl bg-white shadow hover:shadow-lg transition cursor-pointer"
+                    >
+                      <h3 className="text-md font-semibold text-blue-800 capitalize mb-1">
+                        {room.roomName.replace(/([A-Z])/g, " $1").trim()}
+                      </h3>
+                      <p className="text-xs text-gray-500">
+                        {room.tasks?.length || 0} works completed
+                      </p>
+                      <p className="text-xs text-gray-400">Click to view details</p>
+                    </Link>
+                  ))
+                  : <>
+                    <div className="h-full flex items-center justify-center py-8">
+                      <div className="text-center max-w-md mx-auto">
+                        <i className="fas fa-door-open text-5xl sm:text-6xl text-blue-300 mb-4"></i>
+                        <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-2">No Rooms Created Yet</h2>
+                        <p className="text-gray-500">Add rooms in client requirement stage</p>
+                      </div>
+                    </div>
+                  </>
+                }
               </div>
 
 

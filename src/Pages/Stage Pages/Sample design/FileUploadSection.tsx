@@ -2,12 +2,13 @@ import { useRef, useState } from "react";
 import type { IFileItem } from "../../../types/types";
 import { Button } from "../../../components/ui/Button";
 import { downloadImage } from "../../../utils/downloadFile";
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 
 interface FileUploadSectionProps {
 
     files: IFileItem[];
     onUpload: (files: File[]) => Promise<void>;
-    onDelete: (index: number) => Promise<void>;
+    onDelete: (fileId: string) => Promise<any>;
     uploadPending: boolean,
     deletePending: boolean,
 }
@@ -44,9 +45,9 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
         if (selectedFiles.length === 0) return;
 
         // try {
-            await onUpload(selectedFiles); // ✅ Upload only on button click
-            // setSelectedFiles([]); // Optional: clear files after upload
-            // toast({ description: 'File uploaded successfully', title: "Success" });
+        await onUpload(selectedFiles); // ✅ Upload only on button click
+        // setSelectedFiles([]); // Optional: clear files after upload
+        // toast({ description: 'File uploaded successfully', title: "Success" });
 
         // } catch (error: any) {
         //     toast({ title: "Error", description: error?.response?.data?.message || error.message || " Failed to upload the files", variant: "destructive" })
@@ -142,9 +143,9 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                                             </Button>
 
                                             <Button
-                                            size="sm"
+                                                size="sm"
                                                 isLoading={deletePending}
-                                                onClick={() => onDelete(index)}
+                                                onClick={() => onDelete((file as any)._id)}
                                                 // className="text-red-600 hover:text-red-800 p-1"
                                                 title="Delete"
                                             >
@@ -169,51 +170,52 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                         {imageFiles.length === 0 ? (
                             <p className="text-gray-500 text-center py-4">No image files uploaded</p>
                         ) : (
-                            <div className="space-y-2 max-w-[100%] ">
-                                {imageFiles.map((file, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center max-w-full justify-between py-2 px-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-                                    >
-                                        {/* <div className="flex items-center gap-2 flex-1"> */}
-                                        <span className="text-gray-700 truncate whitespace-wrap max-w-[80%] ">
-                                            {file.originalName || 'Unnamed Image'}
-                                        </span>
-                                        {/* </div> */}
-                                        <div className="flex items-center gap-2">
-                                            {/* <button
-                                                onClick={() => window.open(file.url, '_blank')}
-                                                className="text-blue-600 hover:text-blue-800 p-1"
-                                                title="View"
-                                            >
-                                                 <i className="fas fa-eye" /> 
-                                            </button> */}
+                            // <div className="space-y-2 max-w-[100%] ">
+                            //     {imageFiles.map((file, index) => (
+                            //         <div
+                            //             key={index}
+                            //             className="flex items-center max-w-full justify-between py-2 px-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                            //         >
+                            //             <span className="text-gray-700 truncate whitespace-wrap max-w-[80%] ">
+                            //                 {file.originalName || 'Unnamed Image'}
+                            //             </span>
+                            //             <div className="flex items-center gap-2">
+                            //                 <Button size="sm"
+                            //                     variant="primary"
+                            //                     onClick={() => setPopupImage(file?.url)}
+                            //                 >
+                            //                     <i className="fas fa-eye"></i>
+                            //                 </Button>
 
-                                            <Button size="sm"
-                                                variant="primary"
-                                                onClick={() => setPopupImage(file?.url)}
-                                            >
-                                                <i className="fas fa-eye"></i>
-                                            </Button>
-
-                                             <Button  onClick={() => downloadImage({src:file?.url, alt:file?.originalName || "file.pdf"})} size="sm" className="text-sm">
-                                                                                   <i className="fa-solid fa-download"></i>
-                                                                               </Button>
+                            //                  <Button  onClick={() => downloadImage({src:file?.url, alt:file?.originalName || "file.pdf"})} size="sm" className="text-sm">
+                            //                                                        <i className="fa-solid fa-download"></i>
+                            //                                                    </Button>
                                            
-                                            <Button
-                                                size="sm"
-                                                isLoading={deletePending}
-                                                onClick={() => onDelete(index)}
-                                                // className="text-red-600 hover:text-red-800 p-1"
-                                                title="Delete"
-                                            >
-                                                <i className="fas fa-trash" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            //                 <Button
+                            //                     size="sm"
+                            //                     isLoading={deletePending}
+                            //                     onClick={() => onDelete((file as any)._id)}
+                            //                     // className="text-red-600 hover:text-red-800 p-1"
+                            //                     title="Delete"
+                            //                 >
+                            //                     <i className="fas fa-trash" />
+                            //                 </Button>
+                            //             </div>
+                            //         </div>
+                            //     ))}
+                            // </div>
+
+                            <ImageGalleryExample
+                            imageFiles={imageFiles}  handleDeleteFile={onDelete}
+                            // className="grid grid-cols-3"
+                            height={80}
+                            minWidth={98}
+                            maxWidth={100}
+                        />
                         )}
+
+
+                        
                     </div>
                 </div>
             </div>

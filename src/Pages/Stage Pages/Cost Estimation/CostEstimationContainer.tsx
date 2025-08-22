@@ -31,6 +31,8 @@ const CostEstimationContainer = () => {
     try {
       await completionStatus({ projectId: projectId! });
       toast({ description: 'Completion status updated successfully', title: "Success" });
+      navigate('../paymentconfirmation')
+
     } catch (error: any) {
       toast({
         title: "Error",

@@ -1,15 +1,28 @@
 import React, { useState } from 'react'
 import { Skeleton } from '../../components/ui/Skeleton';
-import { Badge } from './../../components/ui/Badge';
+// import { Badge } from './../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { useGetStaffsByOrganization, useInviteStaffToOrganization, useRemoveStaffFromOrganization } from '../../apiList/orgApi';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { toast } from '../../utils/toast';
 import { Label } from '../../components/ui/Label';
 import { Input } from '../../components/ui/Input';
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar';
-import { COMPANY_DETAILS } from '../../constants/constants';
+// import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar';
+// import { COMPANY_DETAILS } from '../../constants/constants';
 import type { OrganizationOutletTypeProps } from './OrganizationChildren';
+// import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
+
+
+
+const roles = [
+  "Accounting",
+  "Logistics",
+  "Factory Production",
+  "HR & Admin",
+  "Legal",
+  "Procurement",
+];
 
 const InviteStaffs: React.FC = () => {
 
@@ -20,12 +33,28 @@ const InviteStaffs: React.FC = () => {
 
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
+  const [workerRole, setWorkerRole] = useState("")
+
+  // 🔎 search filters
+  const [searchName, setSearchName] = useState("")
+  const [searchEmail, setSearchEmail] = useState("")
+  const [searchPhone, setSearchPhone] = useState("")
 
   const { data: staffs, isLoading: staffsLoading, error: staffsError, isError: staffIsError } = useGetStaffsByOrganization(organizationId!)
 
 
   const removeStaff = useRemoveStaffFromOrganization()
   const inviteStaff = useInviteStaffToOrganization()
+
+
+  const filteredStaffs = staffs?.filter((staff: any) => {
+    return (
+      (searchName === "" || staff.staffName?.toLowerCase().includes(searchName.toLowerCase())) &&
+      (searchEmail === "" || staff.email?.toLowerCase().includes(searchEmail.toLowerCase())) &&
+      (searchPhone === "" || staff.phoneNo?.toString().includes(searchPhone))
+    )
+  })
+
 
   const handleRemoveStaff = async (staffId: string, staffName: string) => {
     if (window.confirm(`Are you sure you want to remove ${staffName} from this organization?`)) {
@@ -54,7 +83,7 @@ const InviteStaffs: React.FC = () => {
         organizationId: organizationId!,
         role: "staff",
       })
-      setInviteLink(response.inviteLink || response)
+      setInviteLink(response?.inviteLink || response)
       toast({
         title: "Success",
         description: "Invitation link generated successfully",
@@ -95,13 +124,13 @@ const InviteStaffs: React.FC = () => {
 
 
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-  }
+  // const getInitials = (name: string) => {
+  //   return name
+  //     .split(" ")
+  //     .map((n) => n[0])
+  //     .join("")
+  //     .toUpperCase()
+  // }
 
 
   // Loading state
@@ -193,9 +222,9 @@ const InviteStaffs: React.FC = () => {
         </div>
       </header>
 
-      <div className="w-full flex flex-col md:flex-row p-4 gap-6 h-full">
+      <div className="w-full flex flex-col  p-4 gap-6 h-full">
         {/* invitiation link */}
-        <div className="bg-white sm:max-h-[60vh] lg:max-h-[45vh] h-fit w-full  md:w-1/2  p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
+        {/* <div className="bg-white  h-fit w-full   p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
           <div>
             <h2 className="text-2xl font-bold text-blue-900 mb-2 flex items-center">
               <i className="fas fa-user-plus mr-2" /> Invite Staffs
@@ -203,6 +232,34 @@ const InviteStaffs: React.FC = () => {
             <p className="text-sm text-gray-600 mb-4">
               Invite Staffs to your organization by generating a link.
             </p>
+
+
+            <div className="space-y-2">
+              <Label className="text-gray-700 font-medium">Staff Role</Label>
+             
+              <Select
+                value={workerRole}
+                onValueChange={(val) => {
+                  setWorkerRole(val);
+                }}
+              >
+                <SelectTrigger className="w-full bg-white">
+                  <SelectValue placeholder="Select Role" selectedValue={workerRole} />
+                </SelectTrigger>
+                <SelectContent>
+                  {["HR", "Logistics", "Accounting", "Factory", "Legal", "Procurement Department"].map(ele => {
+
+                    return (
+                      <SelectItem key={ele} value={ele}>
+                        {ele}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+
+              <p className="text-xs text-gray-500">Specify the type of staff needed for this project</p>
+            </div>
 
             {!inviteLink ? (
               <Button
@@ -213,46 +270,151 @@ const InviteStaffs: React.FC = () => {
                 <i className="fas fa-link mr-2" /> Generate Invitation Link
               </Button>
             ) : (
-              <div className="space-y-4">
-                <Label>Invitation Link</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={inviteLink}
-                    readOnly
-                    className="bg-blue-50 text-blue-800 flex-1"
-                  />
-                  <Button onClick={handleCopyLink}>
-                    <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
+              <>
+                <div className="space-y-4 h-fit mt-2">
+                  <Label>Invitation Link</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={inviteLink}
+                      readOnly
+                      className="bg-blue-50 text-blue-800 flex-1"
+                    />
+                    <Button onClick={handleCopyLink}>
+                      <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleShareWhatsApp}
+                      className="w-full bg-green-600 text-white"
+                    >
+                      <i className="fab fa-whatsapp mr-2" /> Share on WhatsApp
+                    </Button>
+                    <Button
+                      onClick={handleCopyLink}
+                      className="w-full border border-blue-400 text-blue-700"
+                    >
+                      <i className="fas fa-copy mr-2" /> Copy
+                    </Button>
+                  </div>
+                  <Button
+                    onClick={handleGenerateInviteLink}
+                    className="w-full bg-purple-600 text-white"
+                  >
+                    <i className="fas fa-sync-alt mr-2" /> Generate New Link
                   </Button>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleShareWhatsApp}
-                    className="w-full bg-green-600 text-white"
-                  >
-                    <i className="fab fa-whatsapp mr-2" /> Share on WhatsApp
-                  </Button>
-                  <Button
-                    onClick={handleCopyLink}
-                    className="w-full border border-blue-400 text-blue-700"
-                  >
-                    <i className="fas fa-copy mr-2" /> Copy
-                  </Button>
-                </div>
+              </>
+            )}
+          </div>
+        </div> */}
+
+
+        <div className="bg-white w-full max-w-full mx-auto p-6 sm:p-8 rounded-xl shadow-lg">
+          {/* Header */}
+          <div className="mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 flex items-center gap-2">
+              <i className="fas fa-user-plus text-blue-600 text-lg" />
+              Invite Staffs
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Generate an invitation link for your staff.
+            </p>
+          </div>
+
+          {/* Grid container for form and actions */}
+          <div className={`grid grid-cols-1  md:grid-cols-3 md:gap-6 ${inviteLink ? "items-start" :"items-end"}`}>
+
+            {/* Role Selection */}
+            <div className="md:col-span-1  space-y-2">
+              <Label className="block text-sm text-gray-700 font-medium">Staff Role</Label>
+              <Select
+                value={workerRole}
+                onValueChange={(val) => setWorkerRole(val)}
+              >
+                <SelectTrigger className="w-full bg-white text-sm border-gray-300 rounded-md shadow-sm h-10">
+                  <SelectValue placeholder="Select Role" selectedValue={workerRole} />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles?.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {role}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+             
+            </div>
+
+            {/* Invite Link and Buttons */}
+            <div className="md:col-span-2  mt-6 md:mt-0 space-y-3">
+              {/* Generate Button or Link UI */}
+              {!inviteLink ? (
                 <Button
                   onClick={handleGenerateInviteLink}
-                  className="w-full bg-purple-600 text-white"
+                  isLoading={inviteStaff.isPending}
+                  className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md text-sm font-medium flex items-center gap-2"
                 >
-                  <i className="fas fa-sync-alt mr-2" /> Generate New Link
+                  <i className="fas fa-link" />
+                  Generate Invitation Link
                 </Button>
-              </div>
-            )}
+              ) : (
+                <div className="space-y-4">
+                  {/* Link Display with Copy */}
+                  <div>
+                    <Label className="block text-sm font-medium text-gray-700 mb-1">
+                      Invitation Link
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={inviteLink}
+                        readOnly
+                        className="flex-1 text-sm bg-blue-50 border border-blue-200 text-blue-800 rounded-md h-10"
+                      />
+                      <Button
+                        onClick={handleCopyLink}
+                        className="h-10 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+                      >
+                        <i className={`fas ${copied ? "fa-check" : "fa-copy"}`} />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Share buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      onClick={handleShareWhatsApp}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2"
+                    >
+                      <i className="fab fa-whatsapp" />
+                      WhatsApp
+                    </Button>
+                    <Button
+                      onClick={handleCopyLink}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2"
+                    >
+                      <i className="fas fa-copy" />
+                      Copy
+                    </Button>
+                  </div>
+
+                  {/* Regenerate Link Button */}
+                  <Button
+                    onClick={handleGenerateInviteLink}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2"
+                  >
+                    <i className="fas fa-sync-alt" />
+                    Generate New Link
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/*invited memebers */}
 
-        <div className="bg-white p-6 py-2 w-full  !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] md:w-1/2 rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
+        {/*old invited memebers */}
+        {/* <div className="bg-white p-6 py-2 w-full  !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] md:w-1/2 rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
           <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
             <i className="fas fa-users mr-2" /> Staff Members ({staffs?.length})
           </h2>
@@ -272,7 +434,7 @@ const InviteStaffs: React.FC = () => {
                   <div className="flex items-center gap-4">
                     <Avatar className="w-12 h-12">
                       <AvatarImage
-                        src={staff.avatarUrl || COMPANY_DETAILS.COMPANY_LOGO}
+                        src={staff?.avatarUrl || COMPANY_DETAILS.COMPANY_LOGO}
                       />
                       <AvatarFallback className="bg-blue-600 text-white">
                         {getInitials(staff.staffName)}
@@ -307,6 +469,86 @@ const InviteStaffs: React.FC = () => {
               ))}
             </div>
           )}
+        </div> */}
+
+
+        <div className="bg-white p-6 py-2 w-full !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
+          <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
+            <i className="fas fa-users mr-2" /> Staff Members ({filteredStaffs?.length})
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <Input
+              placeholder="Search by Name"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+            />
+            <Input
+              placeholder="Search by Email"
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+            />
+            <Input
+              placeholder="Search by Phone"
+              value={searchPhone}
+              onChange={(e) => setSearchPhone(e.target.value)}
+            />
+          </div>
+
+          {/* fourth desing */}
+          <div className="hidden md:grid grid-cols-3 font-semibold text-gray-700 border-b border-gray-300 pb-3 text-sm uppercase tracking-wide">
+            <p className='text-left px-4'>S. No</p>
+            <p className='text-left'>Staff Details</p>
+            {/* <p className='text-center'>Roles</p> */}
+            <p className='text-center'>Action</p>
+          </div>
+
+          {filteredStaffs?.map((staff: any, index: number) => (
+            <div
+              key={staff._id}
+              className="grid grid-cols-1 md:grid-cols-3  items-start md:items-center border-b border-gray-200 py-4 px-2 hover:bg-gray-50 transition"
+            >
+              <div className="text-gray-600 md:text-left px-4 font-medium">{index + 1}</div>
+
+              <div className="space-y-0.5 ">
+                <p className="font-semibold text-gray-900 text-base">{staff.staffName}</p>
+                <p className="text-sm text-gray-500 flex items-center gap-1">
+                  <i className="fas fa-envelope text-gray-400"></i> {staff.email}
+                </p>
+                <p className="text-sm text-gray-500 flex items-center gap-1">
+                  <i className="fas fa-phone-alt text-gray-400"></i> {staff.phoneNo}
+                </p>
+              </div>
+
+              {/* <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
+      {roles.map((role) => (
+        <button
+          key={role}
+          className={`px-3 py-1 rounded-full text-sm font-medium border transition-all duration-150 flex items-center gap-1
+            ${
+              staff.role === role
+                ? "bg-blue-600 text-white border-blue-600"
+                : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+            }`}
+        >
+          <i className="fas fa-user-tag"></i> {role}
+        </button>
+      ))}
+    </div> */}
+
+              <div className="mt-2 md:mt-0 md:text-center">
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => handleRemoveStaff(staff._id, staff.staffName)}
+                  className="flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-600 px-3 py-1 rounded-md font-semibold text-sm transition"
+                >
+                  <i className="fas fa-trash-alt"></i>
+                  Delete
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -314,7 +556,6 @@ const InviteStaffs: React.FC = () => {
 }
 
 export default InviteStaffs
-
 
 
 // above is original

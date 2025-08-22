@@ -464,833 +464,6 @@
 // export default DailySchedulePage;
 
 
-// THIRD ONE 
-
-// import type React from "react"
-// import { useState } from "react"
-// import { useParams } from "react-router-dom"
-// import {
-//   useCreateWork,
-//   useUpdateWork,
-//   useDeleteWork,
-//   useGetDailySchedule,
-//   useUploadDailyScheduleImages,
-//   useDeleteDailyScheduleImage,
-// } from "../../../apiList/Stage Api/workScheduleApi"
-// import { toast } from "../../../utils/toast"
-// import { Button } from "../../../components/ui/Button"
-// import { NO_IMAGE } from "../../../constants/constants"
-
-// interface IUploadFile {
-//   fileType: "image" | "pdf"
-//   url: string
-//   originalName?: string
-//   uploadedAt?: Date
-// }
-
-// interface IDailyTaskDate {
-//   _id?: string
-//   date: Date
-//   uploads: IUploadFile[]
-// }
-
-// interface IDailyTask {
-//   _id?: string
-//   taskName: string
-//   description: string
-//   status: "pending" | "submitted" | "approved" | "rejected"
-//   assignedTo: string | null
-//   dates: IDailyTaskDate[]
-// }
-
-// interface TaskFormData {
-//   taskName: string
-//   description: string
-//   assignedTo: string
-//   startDate: string
-//   endDate: string
-// }
-
-// const DailySchedulePage: React.FC = () => {
-//   const { projectId } = useParams<{ projectId: string }>()
-//   const [currentDate, setCurrentDate] = useState(new Date())
-//   const [showTaskForm, setShowTaskForm] = useState(false)
-//   const [showTaskDetails, setShowTaskDetails] = useState(false)
-//   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-//   const [selectedTask, setSelectedTask] = useState<IDailyTask | null>(null)
-//   const [isEditMode, setIsEditMode] = useState(false)
-//   const [selectedDateId, setSelectedDateId] = useState<string | null>(null)
-//   const [uploadingImages, setUploadingImages] = useState(false)
-//   const [formData, setFormData] = useState<TaskFormData>({
-//     taskName: "",
-//     description: "",
-//     assignedTo: "",
-//     startDate: "",
-//     endDate: "",
-//   })
-
-//   // API hooks
-//   const { data: scheduleData, isLoading, error, refetch } = useGetDailySchedule(projectId!)
-//   const createWorkMutation = useCreateWork()
-//   const updateWorkMutation = useUpdateWork()
-//   const deleteWorkMutation = useDeleteWork()
-//   const uploadImagesMutation = useUploadDailyScheduleImages()
-//   const { mutateAsync: deletefile, isPending: deletefileLoading } = useDeleteDailyScheduleImage()
-
-//   // Generate calendar months for 50 years (25 years back, 25 years forward)
-//   const generateCalendarMonths = () => {
-//     const months = []
-//     const currentYear = new Date().getFullYear()
-//     const startYear = currentYear - 25
-//     const endYear = currentYear + 25
-
-//     for (let year = startYear; year <= endYear; year++) {
-//       for (let month = 0; month < 12; month++) {
-//         months.push(new Date(year, month, 1))
-//       }
-//     }
-//     return months
-//   }
-
-//   const calendarMonths = generateCalendarMonths()
-
-
-//   const handleDeleteFile = async (taskId: string, dateId: string, imageId: string) => {
-//     try {
-//       await deletefile({
-//         projectId: projectId!,
-//         taskId,
-//         dateId,
-//         imageId,
-//       })
-
-//       toast({ title: "Success", description: "deleted succesfully" })
-//     }
-//     catch (error: any) {
-//       toast({ title: "Error", description: error?.response?.data?.message || "failed to delete" })
-
-//     }
-//   }
-
-//   // Get days in month
-//   const getDaysInMonth = (date: Date) => {
-//     const year = date.getFullYear()
-//     const month = date.getMonth()
-//     const firstDay = new Date(year, month, 1)
-//     const lastDay = new Date(year, month + 1, 0)
-//     const daysInMonth = lastDay.getDate()
-//     const startingDayOfWeek = firstDay.getDay()
-
-//     const days = []
-
-//     // Add empty cells for days before the first day of the month
-//     for (let i = 0; i < startingDayOfWeek; i++) {
-//       days.push(null)
-//     }
-
-//     // Add all days of the month
-//     for (let day = 1; day <= daysInMonth; day++) {
-//       days.push(new Date(year, month, day))
-//     }
-
-//     return days
-//   }
-
-//   // Get tasks for a specific date
-//   const getTasksForDate = (date: Date) => {
-//     if (!scheduleData?.tasks) return []
-
-//     // Use local date string to avoid timezone conversion
-//     const dateStr =
-//       date.getFullYear() +
-//       "-" +
-//       String(date.getMonth() + 1).padStart(2, "0") +
-//       "-" +
-//       String(date.getDate()).padStart(2, "0")
-
-//     const tasksForDate: IDailyTask[] = []
-
-//     scheduleData.tasks.forEach((task: IDailyTask) => {
-//       task.dates.forEach((taskDate) => {
-//         // Parse the database date string directly without timezone conversion
-//         let taskDateStr: string
-//         if (typeof taskDate.date === "string") {
-//           taskDateStr = (taskDate.date as any).split("T")[0]
-//         } else {
-//           // If it's already a Date object, convert carefully
-//           const dbDate = new Date(taskDate.date)
-//           taskDateStr =
-//             dbDate.getUTCFullYear() +
-//             "-" +
-//             String(dbDate.getUTCMonth() + 1).padStart(2, "0") +
-//             "-" +
-//             String(dbDate.getUTCDate()).padStart(2, "0")
-//         }
-
-//         if (taskDateStr === dateStr) {
-//           tasksForDate.push(task)
-//         }
-//       })
-//     })
-
-//     return tasksForDate
-//   }
-
-//   const getImagesForDate = (date: Date) => {
-//     if (!scheduleData?.tasks) return []
-
-//     const dateStr =
-//       date.getFullYear() +
-//       "-" +
-//       String(date.getMonth() + 1).padStart(2, "0") +
-//       "-" +
-//       String(date.getDate()).padStart(2, "0")
-
-//     const imagesForDate: { image: IUploadFile; taskName: string; dateId: string }[] = []
-
-//     scheduleData.tasks.forEach((task: IDailyTask) => {
-//       task.dates.forEach((taskDate) => {
-//         let taskDateStr: string
-//         if (typeof taskDate.date === "string") {
-//           taskDateStr = (taskDate.date as any).split("T")[0]
-//         } else {
-//           const dbDate = new Date(taskDate.date)
-//           taskDateStr =
-//             dbDate.getUTCFullYear() +
-//             "-" +
-//             String(dbDate.getUTCMonth() + 1).padStart(2, "0") +
-//             "-" +
-//             String(dbDate.getUTCDate()).padStart(2, "0")
-//         }
-
-//         if (taskDateStr === dateStr && taskDate.uploads.length > 0) {
-//           taskDate.uploads.forEach((upload) => {
-//             if (upload.fileType === "image") {
-//               imagesForDate.push({
-//                 image: upload,
-//                 taskName: task.taskName,
-//                 dateId: taskDate._id || "",
-//               })
-//             }
-//           })
-//         }
-//       })
-//     })
-
-//     return imagesForDate
-//   }
-
-//   // Handle form submission
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault()
-
-//     if (!projectId) return
-
-//     try {
-//       const dates = []
-//       const startDate = new Date(formData.startDate + "T00:00:00.000Z")
-//       const endDate = formData.endDate ? new Date(formData.endDate + "T00:00:00.000Z") : startDate
-
-//       // Generate date range using UTC dates
-//       const currentDate = new Date(startDate)
-//       while (currentDate <= endDate) {
-//         dates.push({ date: currentDate.toISOString() })
-//         currentDate.setUTCDate(currentDate.getUTCDate() + 1)
-//       }
-
-//       const payload = {
-//         taskName: formData.taskName,
-//         description: formData.description,
-//         assignedTo: formData.assignedTo || null,
-//         dates,
-//       }
-
-//       if (isEditMode && selectedTask?._id) {
-//         await updateWorkMutation.mutateAsync({
-//           projectId,
-//           taskId: selectedTask._id,
-//           formData: payload,
-//         })
-//       } else {
-//         await createWorkMutation.mutateAsync({
-//           projectId,
-//           formData: payload,
-//         })
-//       }
-
-//       // Reset form and close modal
-//       setFormData({
-//         taskName: "",
-//         description: "",
-//         assignedTo: "",
-//         startDate: "",
-//         endDate: "",
-//       })
-//       setShowTaskForm(false)
-//       setIsEditMode(false)
-//       setSelectedTask(null)
-//       refetch()
-//     } catch (error) {
-//       console.error("Error saving task:", error)
-//     }
-//   }
-
-//   const handleImageUpload = async (files: FileList, taskId: string, dateId: string) => {
-//     if (!projectId || !files.length) return
-
-//     try {
-//       setUploadingImages(true)
-//       const fileArray = Array.from(files)
-
-//       await uploadImagesMutation.mutateAsync({
-//         projectId,
-//         taskId,
-//         dateId,
-//         files: fileArray,
-//       })
-
-//       refetch()
-//     } catch (error) {
-//       console.error("Error uploading images:", error)
-//     } finally {
-//       setUploadingImages(false)
-//     }
-//   }
-
-//   // Handle date click
-//   const handleDateClick = (date: Date) => {
-//     setSelectedDate(date)
-//     const tasksForDate = getTasksForDate(date)
-//     if (tasksForDate.length > 0) {
-//       setSelectedTask(tasksForDate[0]) // Show first task for the date
-//       setShowTaskDetails(true)
-//     }
-//   }
-
-//   // Handle edit task
-//   const handleEditTask = () => {
-//     if (!selectedTask) return
-
-//     const firstDate = selectedTask.dates[0]?.date
-//     const lastDate = selectedTask.dates[selectedTask.dates.length - 1]?.date
-
-//     // Parse dates without timezone conversion
-//     let startDateStr = ""
-//     let endDateStr = ""
-
-//     if (firstDate) {
-//       if (typeof firstDate === "string") {
-//         startDateStr = (firstDate as any).split("T")[0]
-//       } else {
-//         const date = new Date(firstDate)
-//         startDateStr =
-//           date.getUTCFullYear() +
-//           "-" +
-//           String(date.getUTCMonth() + 1).padStart(2, "0") +
-//           "-" +
-//           String(date.getUTCDate()).padStart(2, "0")
-//       }
-//     }
-
-//     if (lastDate && selectedTask.dates.length > 1) {
-//       if (typeof lastDate === "string") {
-//         endDateStr = (lastDate as any).split("T")[0]
-//       } else {
-//         const date = new Date(lastDate)
-//         endDateStr =
-//           date.getUTCFullYear() +
-//           "-" +
-//           String(date.getUTCMonth() + 1).padStart(2, "0") +
-//           "-" +
-//           String(date.getUTCDate()).padStart(2, "0")
-//       }
-//     }
-
-//     setFormData({
-//       taskName: selectedTask.taskName,
-//       description: selectedTask.description,
-//       assignedTo: selectedTask.assignedTo || "",
-//       startDate: startDateStr,
-//       endDate: endDateStr,
-//     })
-
-//     setIsEditMode(true)
-//     setShowTaskDetails(false)
-//     setShowTaskForm(true)
-//   }
-
-//   // Handle delete task
-//   const handleDeleteTask = async () => {
-//     if (!selectedTask?._id || !projectId) return
-
-//     try {
-//       await deleteWorkMutation.mutateAsync({
-//         projectId,
-//         taskId: selectedTask._id,
-//       })
-//       setShowTaskDetails(false)
-//       setSelectedTask(null)
-//       refetch()
-//     } catch (error) {
-//       console.error("Error deleting task:", error)
-//     }
-//   }
-
-//   // Navigate to specific month
-//   const navigateToMonth = (monthsToAdd: number) => {
-//     const newDate = new Date(currentDate)
-//     newDate.setMonth(newDate.getMonth() + monthsToAdd)
-//     setCurrentDate(newDate)
-//   }
-
-//   const dateFormate = (dateString: string) => {
-//     const date = new Date(dateString)
-//     return date.toLocaleDateString("en-US", {
-//       year: "numeric",
-//       month: "short",
-//       day: "numeric",
-//     })
-//   }
-
-//   if (isLoading) {
-//     return (
-//       <div className="flex items-center justify-center min-h-screen">
-//         <div className="text-center">
-//           <i className="fas fa-spinner fa-spin text-4xl text-blue-500 mb-4"></i>
-//           <p className="text-gray-600">Loading schedule...</p>
-//         </div>
-//       </div>
-//     )
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="flex items-center justify-center min-h-screen">
-//         <div className="text-center text-red-600">
-//           <i className="fas fa-exclamation-triangle text-4xl mb-4"></i>
-//           <p>Error loading schedule. Please try again.</p>
-//           <button onClick={() => refetch()} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-//             Retry
-//           </button>
-//         </div>
-//       </div>
-//     )
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-gray-50 p-4">
-//       {/* Header */}
-//       <div className="max-w-7xl mx-auto mb-6">
-//         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-//           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-//             <i className="fas fa-calendar-alt mr-3 text-blue-500"></i>
-//             Daily Schedule
-//           </h1>
-//           <button
-//             onClick={() => {
-//               setIsEditMode(false)
-//               setSelectedTask(null)
-//               setFormData({
-//                 taskName: "",
-//                 description: "",
-//                 assignedTo: "",
-//                 startDate: "",
-//                 endDate: "",
-//               })
-//               setShowTaskForm(true)
-//             }}
-//             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
-//           >
-//             <i className="fas fa-plus"></i>
-//             Add Task
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Calendar Navigation */}
-//       <div className="max-w-7xl mx-auto mb-6">
-//         <div className="flex items-center justify-between bg-white rounded-lg shadow p-4">
-//           <button onClick={() => navigateToMonth(-1)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-//             <i className="fas fa-chevron-left text-gray-600"></i>
-//           </button>
-
-//           <h2 className="text-xl font-semibold text-gray-800">
-//             {currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-//           </h2>
-
-//           <button onClick={() => navigateToMonth(1)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-//             <i className="fas fa-chevron-right text-gray-600"></i>
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Calendar Grid */}
-//       <div className="max-w-7xl mx-auto">
-//         <div className="bg-white rounded-lg shadow overflow-hidden">
-//           {/* Days of week header */}
-//           <div className="grid grid-cols-7 bg-gray-100">
-//             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-//               <div key={day} className="p-3 text-center font-semibold text-gray-700 text-sm">
-//                 {day}
-//               </div>
-//             ))}
-//           </div>
-
-//           {/* Calendar days */}
-//           <div className="grid grid-cols-7">
-//             {getDaysInMonth(currentDate).map((date, index) => {
-//               if (!date) {
-//                 return <div key={index} className="h-24 sm:h-32 border border-gray-200"></div>
-//               }
-
-//               const tasksForDate = getTasksForDate(date)
-//               const imagesForDate = getImagesForDate(date)
-//               const isToday = date.toDateString() === new Date().toDateString()
-
-//               return (
-//                 <div
-//                   key={date.toISOString()}
-//                   onClick={() => handleDateClick(date)}
-//                   className={`h-24 sm:h-32 border border-gray-200 p-2 cursor-pointer hover:bg-gray-50 transition-colors ${isToday ? "bg-blue-50 border-blue-300" : ""
-//                     }`}
-//                 >
-//                   <div className={`text-sm font-medium mb-1 ${isToday ? "text-blue-600" : "text-gray-700"}`}>
-//                     {date.getDate()}
-//                   </div>
-
-//                   {/* Task indicators */}
-//                   <div className="space-y-1">
-//                     {tasksForDate.slice(0, 1).map((task, taskIndex) => (
-//                       <div
-//                         key={taskIndex}
-//                         className={`text-xs px-2 py-1 rounded truncate ${task.status === "submitted"
-//                           ? "bg-green-100 text-green-800"
-//                           : task.status === "pending"
-//                             ? "bg-yellow-100 text-yellow-800"
-//                             : "bg-gray-100 text-gray-800"
-//                           }`}
-//                       >
-//                         {task.taskName}
-//                       </div>
-//                     ))}
-
-//                     {imagesForDate.length > 0 && (
-//                       <div className="flex items-center gap-1">
-//                         <i className="fas fa-image text-xs text-blue-500"></i>
-//                         <span className="text-xs text-blue-600">{imagesForDate.length}</span>
-//                       </div>
-//                     )}
-
-//                     {tasksForDate.length > 1 && (
-//                       <div className="text-xs text-gray-500">+{tasksForDate.length - 1} more</div>
-//                     )}
-//                   </div>
-//                 </div>
-//               )
-//             })}
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Task Form Modal */}
-//       {showTaskForm && (
-//         <div
-//           onClick={() => {
-//             setShowTaskForm(false)
-//             setIsEditMode(false)
-//             setSelectedTask(null)
-//           }}
-//           className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center p-4 z-50"
-//         >
-//           <div
-//             onClick={(e) => e.stopPropagation()}
-//             className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
-//           >
-//             <div className="p-6">
-//               <div className="flex justify-between items-center mb-4">
-//                 <h3 className="text-lg font-semibold text-gray-800">{isEditMode ? "Edit Task" : "Add New Task"}</h3>
-//                 <button
-//                   onClick={() => {
-//                     setShowTaskForm(false)
-//                     setIsEditMode(false)
-//                     setSelectedTask(null)
-//                   }}
-//                   className="text-gray-400 hover:text-gray-600"
-//                 >
-//                   <i className="fas fa-times text-xl"></i>
-//                 </button>
-//               </div>
-
-//               <form onSubmit={handleSubmit} className="space-y-4">
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">Task Name *</label>
-//                   <input
-//                     type="text"
-//                     required
-//                     value={formData.taskName}
-//                     onChange={(e) => setFormData({ ...formData, taskName: e.target.value })}
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//                     placeholder="Enter task name"
-//                   />
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-//                   <textarea
-//                     value={formData.description}
-//                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-//                     rows={3}
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//                     placeholder="Enter task description"
-//                   />
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
-//                   <input
-//                     type="text"
-//                     value={formData.assignedTo}
-//                     onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//                     placeholder="Enter assignee ID"
-//                   />
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
-//                   <input
-//                     type="date"
-//                     required
-//                     value={formData.startDate}
-//                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//                   />
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">End Date (Optional)</label>
-//                   <input
-//                     type="date"
-//                     value={formData.endDate}
-//                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-//                     min={formData.startDate}
-//                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//                   />
-//                   <p className="text-xs text-gray-500 mt-1">Leave empty for single day task</p>
-//                 </div>
-
-//                 <div className="flex gap-3 pt-4">
-//                   <button
-//                     type="submit"
-//                     disabled={createWorkMutation.isPending || updateWorkMutation.isPending}
-//                     className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-//                   >
-//                     {createWorkMutation.isPending || updateWorkMutation.isPending ? (
-//                       <>
-//                         <i className="fas fa-spinner fa-spin mr-2"></i>
-//                         {isEditMode ? "Updating..." : "Creating..."}
-//                       </>
-//                     ) : (
-//                       <>
-//                         <i className={`fas ${isEditMode ? "fa-save" : "fa-plus"} mr-2`}></i>
-//                         {isEditMode ? "Update Task" : "Create Task"}
-//                       </>
-//                     )}
-//                   </button>
-//                   <button
-//                     type="button"
-//                     onClick={() => {
-//                       setShowTaskForm(false)
-//                       setIsEditMode(false)
-//                       setSelectedTask(null)
-//                     }}
-//                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-//                   >
-//                     Cancel
-//                   </button>
-//                 </div>
-//               </form>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Task Details Modal */}
-//       {showTaskDetails && selectedTask && (
-//         <div
-//           onClick={() => setShowTaskDetails(false)}
-//           className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center p-4 z-50"
-//         >
-//           <div
-//             onClick={(e) => e.stopPropagation()}
-//             className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
-//           >
-//             <div className="p-6">
-//               <div className="flex justify-between items-center mb-4">
-//                 <h3 className="text-lg font-semibold text-gray-800">Task Details</h3>
-//                 <button onClick={() => setShowTaskDetails(false)} className="text-gray-400 hover:text-gray-600">
-//                   <i className="fas fa-times text-xl"></i>
-//                 </button>
-//               </div>
-
-//               <div className="space-y-4">
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
-//                   <p className="text-gray-900 font-medium">{selectedTask.taskName}</p>
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-//                   <p className="text-gray-900">{selectedTask.description || "No description"}</p>
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-//                   <span
-//                     className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${selectedTask.status === "submitted"
-//                       ? "bg-green-100 text-green-800"
-//                       : selectedTask.status === "pending"
-//                         ? "bg-yellow-100 text-yellow-800"
-//                         : selectedTask.status === "approved"
-//                           ? "bg-blue-100 text-blue-800"
-//                           : "bg-gray-100 text-gray-800"
-//                       }`}
-//                   >
-//                     {selectedTask.status.replace("_", " ").toUpperCase()}
-//                   </span>
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 mb-1">Dates</label>
-//                   <div className="space-y-1">
-//                     {selectedTask.dates.map((dateObj, index) => {
-//                       let displayDate: string
-//                       console.log("date object", dateObj)
-//                       if (typeof dateObj.date === "string") {
-//                         console.log("date gettng inside")
-//                         // displayDate = new Date(dateObj.date + "T12:00:00.000Z").toLocaleDateString()
-//                         displayDate = new Date(dateObj.date).toLocaleDateString()
-//                         console.log(" date display date", displayDate)
-//                       } else {
-//                         displayDate = new Date(dateObj.date).toLocaleDateString()
-//                       }
-//                       displayDate = dateFormate(displayDate)
-//                       return (
-//                         <div key={index} className="flex items-center justify-between">
-//                           <p className="text-gray-900 text-sm">{displayDate}</p>
-//                           <div className="flex items-center gap-2">
-//                             {dateObj.uploads.filter((u) => u.fileType === "image").length > 0 && (
-//                               <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-//                                 <i className="fas fa-image mr-1"></i>
-//                                 {dateObj.uploads.filter((u) => u.fileType === "image").length}
-//                               </span>
-//                             )}
-//                             <label className="cursor-pointer">
-//                               <input
-//                                 type="file"
-//                                 multiple
-//                                 accept="image/*"
-//                                 className="hidden"
-//                                 onChange={(e) => {
-//                                   if (e.target.files && selectedTask._id && dateObj._id) {
-//                                     handleImageUpload(e.target.files, selectedTask._id, dateObj._id)
-//                                   }
-//                                 }}
-//                                 disabled={uploadingImages}
-//                               />
-//                               <i
-//                                 className={`fas fa-upload text-sm text-gray-500 hover:text-blue-500 ${uploadingImages ? "fa-spinner fa-spin" : ""}`}
-//                               ></i>
-//                             </label>
-//                           </div>
-//                         </div>
-//                       )
-//                     })}
-//                   </div>
-//                 </div>
-
-//                 {selectedTask.dates.some((d) => d.uploads.length > 0) && (
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 mb-2">Uploads by Date</label>
-//                     <div className="space-y-3">
-//                       {selectedTask.dates.map((dateObj, dateIndex) => {
-//                         if (dateObj.uploads.length === 0) return null
-
-//                         let displayDate: string
-//                         if (typeof dateObj.date === "string") {
-//                           displayDate = new Date(dateObj.date).toLocaleDateString()
-//                         } else {
-//                           displayDate = new Date(dateObj.date).toLocaleDateString()
-//                         }
-//                         displayDate = dateFormate(displayDate)
-
-//                         return (
-//                           <div key={dateIndex} className="border rounded-lg p-3">
-//                             <h4 className="text-sm font-medium text-gray-800 mb-2">{displayDate}</h4>
-//                             <div className="grid grid-cols-2 gap-2">
-//                               {dateObj.uploads.map((upload, uploadIndex) => (
-//                                 <div key={`${dateIndex}-${uploadIndex}`} className="relative">
-//                                   {upload.fileType === "image" ? (
-//                                     <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-//                                       <Button variant="danger" className="bg-red-600 text-white hover:bg-red-600" onClick={() => handleDeleteFile(selectedTask._id!, dateObj._id!, (upload as any)._id)}>
-//                                         <i className="fas fa-trash"></i>
-//                                       </Button>
-//                                       <img
-//                                         src={upload.url || NO_IMAGE}
-//                                         alt={upload.originalName || "Uploaded image"}
-//                                         className="w-full h-full object-cover cursor-pointer hover:opacity-80"
-//                                         onClick={() => window.open(upload.url, "_blank")}
-//                                       />
-//                                     </div>
-//                                   ) : (
-//                                     <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-//                                       <i className="fas fa-file-pdf text-2xl text-red-500"></i>
-//                                     </div>
-//                                   )}
-//                                   <p className="text-xs text-gray-600 mt-1 truncate">
-//                                     {upload.originalName || "Uploaded file"}
-//                                   </p>
-//                                 </div>
-//                               ))}
-//                             </div>
-//                           </div>
-//                         )
-//                       })}
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
-
-//               <div className="flex gap-3 pt-6">
-//                 <button
-//                   onClick={handleEditTask}
-//                   className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-//                 >
-//                   <i className="fas fa-edit mr-2"></i>
-//                   Edit Task
-//                 </button>
-//                 <button
-//                   onClick={handleDeleteTask}
-//                   disabled={deleteWorkMutation.isPending}
-//                   className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-//                 >
-//                   {deleteWorkMutation.isPending ? (
-//                     <i className="fas fa-spinner fa-spin"></i>
-//                   ) : (
-//                     <i className="fas fa-trash"></i>
-//                   )}
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   )
-// }
-
-// export default DailySchedulePage
-
 
 import type React from "react"
 import { useState } from "react"
@@ -1304,9 +477,10 @@ import {
   useDeleteDailyScheduleImage,
   useGetProjectWorkers,
 } from "../../../apiList/Stage Api/workScheduleApi"
-import { NO_IMAGE } from "../../../constants/constants"
-import { Button } from "../../../components/ui/Button"
+// import { NO_IMAGE } from "../../../constants/constants"
+// import { Button } from "../../../components/ui/Button"
 import { toast } from "../../../utils/toast"
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select"
 
 interface IUploadFile {
@@ -1347,8 +521,8 @@ const DailySchedulePage: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [showTaskDetails, setShowTaskDetails] = useState(false)
-  const [showImagePreview, setShowImagePreview] = useState(false)
-  const [previewImage, setPreviewImage] = useState<{ url: string; name: string } | null>(null)
+  // const [showImagePreview, setShowImagePreview] = useState(false)
+  // const [previewImage, setPreviewImage] = useState<{ url: string; name: string } | null>(null)
   // const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedTask, setSelectedTask] = useState<IDailyTask | null>(null)
   const [isEditMode, setIsEditMode] = useState(false)
@@ -1365,7 +539,7 @@ const DailySchedulePage: React.FC = () => {
 
 
   const [showTaskSelection, setShowTaskSelection] = useState(false)
-const [tasksForSelectedDate, setTasksForSelectedDate] = useState<any[]>([])
+  const [tasksForSelectedDate, setTasksForSelectedDate] = useState<any[]>([])
 
 
   // API hooks
@@ -1375,7 +549,7 @@ const [tasksForSelectedDate, setTasksForSelectedDate] = useState<any[]>([])
   const updateWorkMutation = useUpdateWork()
   const deleteWorkMutation = useDeleteWork()
   const uploadImagesMutation = useUploadDailyScheduleImages()
-  const { mutateAsync: deleteFile, isPending: deleteFilePending } = useDeleteDailyScheduleImage()
+  const { mutateAsync: deleteFile } = useDeleteDailyScheduleImage()
 
   const handleDeleteFile = async (taskId: string, dateId: string, imageId: string) => {
     try {
@@ -1390,14 +564,14 @@ const [tasksForSelectedDate, setTasksForSelectedDate] = useState<any[]>([])
       refetch()
     } catch (error: any) {
       console.error("Error deleting file:", error)
-      toast({ title: "Error", description: error?.response?.data?.message || "failed to delete" })
+      toast({ title: "Error", description: error?.response?.data?.message || "failed to delete", variant: "destructive" })
     }
   }
 
-  const handleImageClick = (url: string, name: string) => {
-    setPreviewImage({ url, name })
-    setShowImagePreview(true)
-  }
+  // const handleImageClick = (url: string, name: string) => {
+  //   setPreviewImage({ url, name })
+  //   setShowImagePreview(true)
+  // }
 
   // Generate calendar months for 50 years (25 years back, 25 years forward)
   // const generateCalendarMonths = () => {
@@ -1441,44 +615,44 @@ const [tasksForSelectedDate, setTasksForSelectedDate] = useState<any[]>([])
   }
 
   // Get tasks for a specific date
-  const getTasksForDate = (date: Date) => {
-    if (!scheduleData?.tasks) return []
+    const getTasksForDate = (date: Date) => {
+      if (!scheduleData?.tasks) return []
 
-    // Use local date string to avoid timezone conversion
-    const dateStr =
-      date.getFullYear() +
-      "-" +
-      String(date.getMonth() + 1).padStart(2, "0") +
-      "-" +
-      String(date.getDate()).padStart(2, "0")
+      // Use local date string to avoid timezone conversion
+      const dateStr =
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(date.getDate()).padStart(2, "0")
 
-    const tasksForDate: IDailyTask[] = []
+      const tasksForDate: IDailyTask[] = []
 
-    scheduleData.tasks.forEach((task: IDailyTask) => {
-      task.dates.forEach((taskDate) => {
-        // Parse the database date string directly without timezone conversion
-        let taskDateStr: string
-        if (typeof taskDate.date === "string") {
-          taskDateStr = (taskDate.date as any).split("T")[0]
-        } else {
-          // If it's already a Date object, convert carefully
-          const dbDate = new Date(taskDate.date)
-          taskDateStr =
-            dbDate.getUTCFullYear() +
-            "-" +
-            String(dbDate.getUTCMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(dbDate.getUTCDate()).padStart(2, "0")
-        }
+      scheduleData.tasks.forEach((task: IDailyTask) => {
+        task.dates.forEach((taskDate) => {
+          // Parse the database date string directly without timezone conversion
+          let taskDateStr: string
+          if (typeof taskDate.date === "string") {
+            taskDateStr = (taskDate.date as any).split("T")[0]
+          } else {
+            // If it's already a Date object, convert carefully
+            const dbDate = new Date(taskDate.date)
+            taskDateStr =
+              dbDate.getUTCFullYear() +
+              "-" +
+              String(dbDate.getUTCMonth() + 1).padStart(2, "0") +
+              "-" +
+              String(dbDate.getUTCDate()).padStart(2, "0")
+          }
 
-        if (taskDateStr === dateStr) {
-          tasksForDate.push(task)
-        }
+          if (taskDateStr === dateStr) {
+            tasksForDate.push(task)
+          }
+        })
       })
-    })
 
-    return tasksForDate
-  }
+      return tasksForDate
+    }
 
   const getImagesForDate = (date: Date) => {
     if (!scheduleData?.tasks) return []
@@ -1617,26 +791,26 @@ const [tasksForSelectedDate, setTasksForSelectedDate] = useState<any[]>([])
 
 
   const handleDateClick = (date: Date) => {
-  const tasksForDate = getTasksForDate(date)
-  if (tasksForDate.length > 1) {
-    // Multiple tasks - show selection
-    setTasksForSelectedDate(tasksForDate)
-    setShowTaskSelection(true)
-  } else if (tasksForDate.length === 1) {
-    // Single task - show directly
-    setSelectedTask(tasksForDate[0])
-    setShowTaskDetails(true)
-  } else {
-    toast({ title: "Warning", description: "No tasks in this date", variant: "destructive" })
+    const tasksForDate = getTasksForDate(date)
+    if (tasksForDate.length > 1) {
+      // Multiple tasks - show selection
+      setTasksForSelectedDate(tasksForDate)
+      setShowTaskSelection(true)
+    } else if (tasksForDate.length === 1) {
+      // Single task - show directly
+      setSelectedTask(tasksForDate[0])
+      setShowTaskDetails(true)
+    } else {
+      toast({ title: "Warning", description: "No tasks in this date", variant: "destructive" })
+    }
   }
-}
 
-//  Add function to handle task selection
-const handleTaskSelect = (task: any) => {
-  setSelectedTask(task)
-  setShowTaskSelection(false)
-  setShowTaskDetails(true)
-}
+  //  Add function to handle task selection
+  const handleTaskSelect = (task: any) => {
+    setSelectedTask(task)
+    setShowTaskSelection(false)
+    setShowTaskDetails(true)
+  }
 
   // Handle edit task
   const handleEditTask = () => {
@@ -1977,14 +1151,14 @@ const handleTaskSelect = (task: any) => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
-                 
+
 
                   <select
                     className="border-b px-2 py-1 text-sm w-[100%]"
                     value={formData.assignedTo}
                     onChange={(e) => {
                       const selectedId = e.target.value;
-                      const selectedWorker = workers.find((w:any) => w._id === selectedId);
+                      const selectedWorker = workers.find((w: any) => w._id === selectedId);
 
                       setFormData({
                         ...formData,
@@ -1997,7 +1171,7 @@ const handleTaskSelect = (task: any) => {
                       <option disabled>Loading workers...</option>
                     ) : (
                       <>
-                        <option value="">{formData.assignedToName ||"Assign worker"}</option>
+                        <option value="">{formData.assignedToName || "Assign worker"}</option>
                         {Array.isArray(workers) && workers.length > 0 ? (
                           workers.map((worker: { _id: string; workerName: string; email: string }) => (
                             <option key={worker._id} value={worker._id}>
@@ -2072,232 +1246,8 @@ const handleTaskSelect = (task: any) => {
         </div >
       )}
 
-      {
-      
-        // showTaskDetails && selectedTask && (
-        //   <div
-        //     onClick={() => setShowTaskDetails(false)}
-        //     className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
-        //   >
-        //     <div
-        //       onClick={(e) => e.stopPropagation()}
-        //       className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
-        //     >
-        //       {/* Header */}
-        //       <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
-        //         <div className="flex justify-between items-center">
-        //           <div className="flex items-center gap-3">
-        //             <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-        //               <i className="fas fa-tasks text-white text-lg"></i>
-        //             </div>
-        //             <div>
-        //               <h3 className="text-xl font-bold text-white">{selectedTask.taskName}</h3>
-        //               <p className="text-blue-100 text-sm">Task Details</p>
-        //             </div>
-        //           </div>
-        //           <button
-        //             onClick={() => setShowTaskDetails(false)}
-        //             className="text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
-        //           >
-        //             <i className="fas fa-times text-lg"></i>
-        //           </button>
-        //         </div>
-        //       </div>
 
-        //       {/* Content */}
-        //       <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-        //         <div className="space-y-6">
-        //           {/* Task Info */}
-        //           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        //             <div className="space-y-4">
-        //               <div>
-        //                 <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-        //                 <div className="bg-gray-50 rounded-lg p-4">
-        //                   <p className="text-gray-800">{selectedTask.description || "No description provided"}</p>
-        //                 </div>
-        //               </div>
-
-        //               <div>
-        //                 <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-        //                 <span
-        //                   className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium ${selectedTask.status === "submitted"
-        //                     ? "bg-green-100 text-green-800"
-        //                     : selectedTask.status === "pending"
-        //                       ? "bg-yellow-100 text-yellow-800"
-        //                       : selectedTask.status === "approved"
-        //                         ? "bg-blue-100 text-blue-800"
-        //                         : "bg-gray-100 text-gray-800"
-        //                     }`}
-        //                 >
-        //                   <div
-        //                     className={`w-2 h-2 rounded-full mr-2 ${selectedTask.status === "submitted"
-        //                       ? "bg-green-500"
-        //                       : selectedTask.status === "pending"
-        //                         ? "bg-yellow-500"
-        //                         : selectedTask.status === "approved"
-        //                           ? "bg-blue-500"
-        //                           : "bg-gray-500"
-        //                       }`}
-        //                   ></div>
-        //                   {selectedTask.status.charAt(0).toUpperCase() + selectedTask.status.slice(1)}
-        //                 </span>
-        //               </div>
-        //             </div>
-
-        //             <div>
-        //               <label className="block text-sm font-semibold text-gray-700 mb-2">Schedule</label>
-        //               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-        //                 {selectedTask.dates.map((dateObj, index) => {
-        //                   let displayDate: string
-        //                   if (typeof dateObj.date === "string") {
-        //                     displayDate = new Date(dateObj.date).toLocaleDateString()
-        //                   } else {
-        //                     displayDate = new Date(dateObj.date).toLocaleDateString()
-        //                   }
-        //                   displayDate = dateFormate(displayDate)
-
-        //                   return (
-        //                     <div
-        //                       key={index}
-        //                       className="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0"
-        //                     >
-        //                       <div className="flex items-center gap-2">
-        //                         <i className="fas fa-calendar-day text-blue-500 text-sm"></i>
-        //                         <span className="text-gray-800 font-medium">{displayDate}</span>
-        //                       </div>
-        //                       <div className="flex items-center gap-2 ">
-        //                         {dateObj.uploads.filter((u) => u.fileType === "image").length > 0 && (
-        //                           <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
-        //                             <i className="fas fa-image mr-1"></i>
-        //                             {dateObj.uploads.filter((u) => u.fileType === "image").length}
-        //                           </span>
-        //                         )}
-        //                         <label className="cursor-pointer p-2 hover:bg-blue-50 rounded-lg transition-colors">
-        //                           <input
-        //                             type="file"
-        //                             multiple
-        //                             accept="image/*"
-        //                             className="hidden"
-        //                             onChange={(e) => {
-        //                               if (e.target.files && selectedTask._id && dateObj._id) {
-        //                                 handleImageUpload(e.target.files, selectedTask._id, dateObj._id)
-        //                               }
-        //                             }}
-        //                             disabled={uploadingImages}
-        //                           />
-        //                           <i
-        //                             className={`fas ${uploadingImages ? "fa-spinner fa-spin" : "fa-upload"} text-sm text-blue-500`}
-        //                           ></i>
-        //                         </label>
-        //                       </div>
-        //                     </div>
-        //                   )
-        //                 })}
-        //               </div>
-        //             </div>
-        //           </div>
-
-        //           {/* Images Section */}
-        //           {selectedTask.dates.some((d) => d.uploads.length > 0) && (
-        //             <div>
-        //               <label className="block text-sm font-semibold text-gray-700 mb-4">Uploaded Images</label>
-        //               <div className="space-y-4">
-        //                 {selectedTask.dates.map((dateObj, dateIndex) => {
-        //                   if (dateObj.uploads.length === 0) return null
-
-        //                   let displayDate: string
-        //                   if (typeof dateObj.date === "string") {
-        //                     displayDate = new Date(dateObj.date).toLocaleDateString()
-        //                   } else {
-        //                     displayDate = new Date(dateObj.date).toLocaleDateString()
-        //                   }
-        //                   displayDate = dateFormate(displayDate)
-
-        //                   return (
-        //                     <div key={dateIndex} className="bg-gray-50 rounded-lg p-4">
-        //                       <div className="flex items-center gap-2 mb-3">
-        //                         <i className="fas fa-calendar-day text-blue-500"></i>
-        //                         <h4 className="font-semibold text-gray-800">{displayDate}</h4>
-        //                       </div>
-        //                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        //                         {dateObj.uploads.map((upload, uploadIndex) => (
-        //                           <div key={`${dateIndex}-${uploadIndex}`} className="relative group">
-        //                             {upload.fileType === "image" ? (
-        //                               <div className="relative aspect-square bg-white rounded-lg overflow-hidden shadow-sm border">
-        //                                 <img
-        //                                   src={upload.url || NO_IMAGE}
-        //                                   alt={upload.originalName || "Uploaded image"}
-        //                                   className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
-        //                                   onClick={() => handleImageClick(upload.url, upload.originalName || "Image")}
-        //                                 />
-        //                                 {/* Delete button */}
-        //                                 <Button
-        //                                   isLoading={deleteFilePending}
-        //                                   onClick={() => handleDeleteFile(selectedTask._id!, dateObj._id!, upload._id!)}
-        //                                   className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 flex items-center justify-center"
-        //                                 >
-        //                                   <i className="fas fa-trash text-xs"></i>
-        //                                 </Button>
-        //                                 {/* View button */}
-        //                                 {/* <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-        //                                 <button
-        //                                   onClick={() => handleImageClick(upload.url, upload.originalName || "Image")}
-        //                                   className="text-white hover:text-blue-200"
-        //                                 >
-        //                                   <i className="fas fa-expand text-lg"></i>
-        //                                 </button>
-        //                               </div> */}
-        //                               </div>
-        //                             ) : (
-        //                               <div className="aspect-square bg-white rounded-lg flex items-center justify-center shadow-sm border">
-        //                                 <i className="fas fa-file-pdf text-3xl text-red-500"></i>
-        //                               </div>
-        //                             )}
-        //                             <p className="text-xs text-gray-600 mt-2 truncate text-center">
-        //                               {upload.originalName || "Uploaded file"}
-        //                             </p>
-        //                           </div>
-        //                         ))}
-        //                       </div>
-        //                     </div>
-        //                   )
-        //                 })}
-        //               </div>
-        //             </div>
-        //           )}
-        //         </div>
-        //       </div>
-
-        //       {/* Footer */}
-        //       <div className="bg-gray-50 px-6 py-4 flex gap-3">
-        //         <button
-        //           onClick={handleEditTask}
-        //           className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
-        //         >
-        //           <i className="fas fa-edit"></i>
-        //           Edit Task
-        //         </button>
-        //         <button
-        //           onClick={handleDeleteTask}
-        //           disabled={deleteWorkMutation.isPending}
-        //           className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-        //         >
-        //           {deleteWorkMutation.isPending ? (
-        //             <i className="fas fa-spinner fa-spin"></i>
-        //           ) : (
-        //             <i className="fas fa-trash"></i>
-        //           )}
-        //           Delete
-        //         </button>
-        //       </div>
-        //     </div>
-        //   </div>
-        // )
-      }
-
-
-
-       {showTaskSelection && (
+      {showTaskSelection && (
         <div
           onClick={() => setShowTaskSelection(false)}
           className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
@@ -2351,26 +1301,24 @@ const handleTaskSelect = (task: any) => {
                         </p>
                         <div className="flex items-center justify-between">
                           <span
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              task.status === "submitted"
-                                ? "bg-green-100 text-green-800"
-                                : task.status === "pending"
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${task.status === "submitted"
+                              ? "bg-green-100 text-green-800"
+                              : task.status === "pending"
                                 ? "bg-yellow-100 text-yellow-800"
                                 : task.status === "approved"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
                           >
                             <div
-                              className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                                task.status === "submitted"
-                                  ? "bg-green-500"
-                                  : task.status === "pending"
+                              className={`w-1.5 h-1.5 rounded-full mr-1.5 ${task.status === "submitted"
+                                ? "bg-green-500"
+                                : task.status === "pending"
                                   ? "bg-yellow-500"
                                   : task.status === "approved"
-                                  ? "bg-blue-500"
-                                  : "bg-gray-500"
-                              }`}
+                                    ? "bg-blue-500"
+                                    : "bg-gray-500"
+                                }`}
                             ></div>
                             {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                           </span>
@@ -2532,6 +1480,7 @@ const handleTaskSelect = (task: any) => {
                             displayDate = new Date(dateObj.date).toLocaleDateString()
                           }
                           displayDate = dateFormate(displayDate)
+                          const imageFiles = dateObj.uploads.filter(upload => upload.fileType === "image")
 
                           return (
                             <div key={dateIndex} className="bg-gray-50 rounded-lg p-4">
@@ -2539,7 +1488,7 @@ const handleTaskSelect = (task: any) => {
                                 <i className="fas fa-calendar-day text-blue-500"></i>
                                 <h4 className="font-semibold text-gray-800">{displayDate}</h4>
                               </div>
-                              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                              {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                 {dateObj.uploads.map((upload, uploadIndex) => (
                                   <div key={`${dateIndex}-${uploadIndex}`} className="relative group">
                                     {upload.fileType === "image" ? (
@@ -2550,7 +1499,6 @@ const handleTaskSelect = (task: any) => {
                                           className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
                                           onClick={() => handleImageClick(upload.url, upload.originalName || "Image")}
                                         />
-                                        {/* Delete button */}
                                         <Button
                                           isLoading={deleteFilePending}
                                           onClick={() => handleDeleteFile(selectedTask._id!, dateObj._id!, upload._id!)}
@@ -2569,7 +1517,18 @@ const handleTaskSelect = (task: any) => {
                                     </p>
                                   </div>
                                 ))}
-                              </div>
+                              </div> */}
+
+                              <ImageGalleryExample
+                                imageFiles={imageFiles}
+                                handleDeleteFile={(imageId: string) =>
+                                  handleDeleteFile(selectedTask._id!, dateObj._id!, imageId)
+                                }
+                                // className="grid grid-cols-3"
+                                height={80}
+                                minWidth={98}
+                                maxWidth={100}
+                              />
                             </div>
                           )
                         })}
@@ -2606,7 +1565,7 @@ const handleTaskSelect = (task: any) => {
         )
       }
 
-      {
+      {/* {
         showImagePreview && previewImage && (
           <div
             onClick={() => setShowImagePreview(false)}
@@ -2629,7 +1588,7 @@ const handleTaskSelect = (task: any) => {
             </div>
           </div>
         )
-      }
+      } */}
     </div >
   )
 }

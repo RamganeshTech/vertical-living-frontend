@@ -1,6 +1,16 @@
-"use client"
-
 import { useState, useEffect } from "react"
+
+import { NO_IMAGE } from "../../constants/constants"
+import { downloadImage } from "../../utils/downloadFile"
+import { createPortal } from "react-dom"
+
+
+interface ImageFile {
+  _id: string
+  url: string
+  originalName?: string
+}
+
 
 interface ImageFile {
   _id: string
@@ -10,11 +20,14 @@ interface ImageFile {
 
 interface ImageGalleryProps {
   images: ImageFile[]
-  onDelete: (id: string) => void
-  onDownload: (params: { src: string; alt: string }) => void
+  onDownload: (params: { src: string; alt: string }) => Promise<any>
+  onDelete?: (fieldId: string) => Promise<any> | undefined
   isDeleting?: boolean
   refetch?: () => void
-  className?: string
+  minWidth?:number,
+  maxWidth?:number,
+  className?: string,
+  heightClass?: number,
 }
 
 export function ImageGallery({
@@ -24,27 +37,27 @@ export function ImageGallery({
   isDeleting = false,
   refetch,
   className = "",
+  minWidth=100,
+  maxWidth=100,
+  heightClass = 0
 }: ImageGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [isPopupOpen, setIsPopupOpen] = useState(false)
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closePopup()
-      }
-    }
+  const [imageHeights, setImageHeights] = useState<{ [key: string]: number }>({})
 
-    if (isPopupOpen) {
-      document.addEventListener("keydown", handleEscape)
-      document.body.style.overflow = "hidden"
-    }
+  const handleImageLoad = (imageId: string, naturalWidth: number, naturalHeight: number) => {
+    const aspectRatio = naturalHeight / naturalWidth
+    const baseWidth = 200 // Base width for calculation
+    const calculatedHeight = Math.max(150, Math.min(400, baseWidth * aspectRatio))
 
-    return () => {
-      document.removeEventListener("keydown", handleEscape)
-      document.body.style.overflow = "unset"
-    }
-  }, [isPopupOpen])
+    setImageHeights((prev) => ({
+      ...prev,
+      [imageId]: calculatedHeight,
+    }))
+  }
+
+
 
   const openPopup = (index: number) => {
     setSelectedImageIndex(index)
@@ -56,187 +69,488 @@ export function ImageGallery({
     setSelectedImageIndex(null)
   }
 
+  // const goToPrevious = () => {
+  //   if (selectedImageIndex !== null){
+  //     if( selectedImageIndex > 0) {
+  //     setSelectedImageIndex(selectedImageIndex - 1)
+  //   } else if(selectedImageIndex === 0){
+  //       setSelectedImageIndex(images.length -1)
+  //   }
+  // }
+  // }
+
+  // const goToNext = () => {
+  //   if (selectedImageIndex !== null){
+  //     if( selectedImageIndex < images.length - 1) {
+  //     setSelectedImageIndex(selectedImageIndex + 1)
+  //   }
+  //   else if(selectedImageIndex === images.length - 1){
+  //       setSelectedImageIndex(0)
+  //   }
+  // }
+  // }
+
+
+
   const goToPrevious = () => {
-    if (selectedImageIndex !== null && selectedImageIndex > 0) {
-      setSelectedImageIndex(selectedImageIndex - 1)
+  if (selectedImageIndex !== null) {   
+    setSelectedImageIndex(
+      (selectedImageIndex - 1 + images.length) % images.length
+    );
+  }
+};
+
+
+
+  
+const goToNext = () => {
+  if (selectedImageIndex !== null) {
+    setSelectedImageIndex(
+      (selectedImageIndex + 1) % images.length
+    );
+  }
+};
+
+  //   useEffect(() => {
+  //   const handleEscape = (e: KeyboardEvent) => {
+  //     if (e.key === "Escape") {
+  //       closePopup()
+  //     }
+  //   }
+
+  //   if (isPopupOpen) {
+  //     document.addEventListener("keydown", handleEscape)
+  //     document.addEventListener("keydown", handleEscape)
+  //     document.addEventListener("keydown", handleEscape)
+  //     document.body.style.overflow = "hidden"
+  //   }
+
+    
+
+  //   return () => {
+  //     document.removeEventListener("keydown", handleEscape)
+  //     document.body.style.overflow = "unset"
+  //   }
+  // }, [isPopupOpen])
+
+useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      closePopup();
+    } else if (e.key === "ArrowRight") {
+      goToNext(); // 👈 your function to go next
+    } else if (e.key === "ArrowLeft") {
+      goToPrevious(); // 👈 your function to go previous
     }
+  };
+
+  if (isPopupOpen) {
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
   }
 
-  const goToNext = () => {
-    if (selectedImageIndex !== null && selectedImageIndex < images.length - 1) {
-      setSelectedImageIndex(selectedImageIndex + 1)
-    }
-  }
+  return () => {
+    document.removeEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "unset";
+  };
+}, [isPopupOpen, goToNext, goToPrevious, closePopup]);
 
   const handleDelete = async (id: string) => {
-    await onDelete(id)
-    if (refetch) {
-      refetch()
-    }
-    if (images.length <= 1) {
-      closePopup()
-    } else if (selectedImageIndex !== null && selectedImageIndex >= images.length - 1) {
-      setSelectedImageIndex(Math.max(0, images.length - 2))
+    if (onDelete) {
+
+      try {
+
+        await onDelete(id)
+        if (refetch) {
+          await refetch()
+        }
+        if (images.length <= 1) {
+          closePopup()
+        } else if (selectedImageIndex !== null && selectedImageIndex >= images.length - 1) {
+          setSelectedImageIndex(Math.max(0, images.length - 2))
+        }
+      } catch (error) {
+        console.error("Error deleting image:", error)
+      }
     }
   }
 
   const handleDownload = (image: ImageFile) => {
     onDownload({
-      src: image.url,
-      alt: image.originalName || "image",
+      src: image?.url,
+      alt: image?.originalName || "image",
     })
   }
 
-  if (images.length === 0) {
-    return (
-      <div className={`text-center py-8 text-gray-500 ${className}`}>
-        <i className="fas fa-images text-4xl mb-2"></i>
-        <p>No images to display</p>
-      </div>
-    )
+  const handleBackgroundClick = () => {
+    // if (e.target === e.currentTarget) {
+    closePopup()
+    // }
   }
+
+  // if (images.length === 0) {
+  //   return (
+  //     <div className={`text-center py-8 text-gray-500 ${className}`}>
+  //       <i className="fas fa-images text-4xl mb-2"></i>
+  //       <p>No images to display</p>
+  //     </div>
+  //   )
+  // }
 
   const currentImage =
     selectedImageIndex !== null && selectedImageIndex >= 0 && selectedImageIndex < images.length
       ? images[selectedImageIndex]
       : null
 
+
+  // const width = 120
+
   return (
     <>
       {/* Gallery Grid */}
-      <div className={`grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-0.5 p-1 ${className}`}>
-        {images.map((image, index) => (
-          <div
-            key={image._id}
-            className="relative cursor-pointer bg-gray-100 overflow-hidden aspect-square"
-            onClick={() => openPopup(index)}
-          >
-            <img
-              src={image.url || NO_IMAGE}
-              alt={image.originalName || `Image ${index + 1}`}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        ))}
-      </div>
+      {/* <div className={`grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-3  ${className}`}> */}
+      {/* <div className={`flex flex-wrap items-center  ${className}`}> */}
+      {/* <div
+  className={`grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(200px,1fr))] ${className}`}
+  style={{ gridAutoFlow: "dense" }}
+> */}
+      <div
+        className={`gap-1 flex flex-wrap ${className}`}
+      // style={{
+      //   columnFill: "balance",
+      //   columns: "auto",
+      //   columnWidth: "150px",
+      // }}
+      >
+        {images.map((image, index) => {
+          const height = imageHeights[image._id] || 200
+          return (
+            <>
+            <div
+              key={image._id}
+              className="relative cursor-pointer bg-gray-100 overflow-hidden mb-1 break-inside-avoid"
+              style={{
+                // flex: "1 1 180px",   // each item at least 180px wide, shrink/grow as needed
+                // flex: "0 1 180px",
+                flex: `0 1 ${minWidth}px`,
+                minWidth: `${minWidth}px`,
+                maxWidth: `${maxWidth}px`,
+                // 🚀 don’t grow/shrink
+                // width: `${width || 180}px`,     // <- you can add `width` as a prop
+                height: `${heightClass || height}px`,
+              }}
+              // style={{ height: `${heightClass || height}px` }}
+              onClick={() => openPopup(index)}
+            >
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+
+              
+            </div>
+             {/* <div
+              key={image._id}
+              className="relative cursor-pointer bg-gray-100 overflow-hidden mb-1 break-inside-avoid"
+              style={{
+                // flex: "1 1 180px",   // each item at least 180px wide, shrink/grow as needed
+                // flex: "0 1 180px",
+                flex: `0 1 ${minWidth}px`,
+                minWidth: `${minWidth}px`,
+                maxWidth: `${maxWidth}px`,
+                // 🚀 don’t grow/shrink
+                // width: `${width || 180}px`,     // <- you can add `width` as a prop
+                height: `${heightClass || height}px`,
+              }}
+              // style={{ height: `${heightClass || height}px` }}
+              onClick={() => openPopup(index)}
+            >
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+
+              
+            </div>
+
+             <div
+              key={image._id}
+              className="relative cursor-pointer bg-gray-100 overflow-hidden mb-1 break-inside-avoid"
+              style={{
+                // flex: "1 1 180px",   // each item at least 180px wide, shrink/grow as needed
+                // flex: "0 1 180px",
+                flex: `0 1 ${minWidth}px`,
+                minWidth: `${minWidth}px`,
+                maxWidth: `${maxWidth}px`,
+                // 🚀 don’t grow/shrink
+                // width: `${width || 180}px`,     // <- you can add `width` as a prop
+                height: `${heightClass || height}px`,
+              }}
+              // style={{ height: `${heightClass || height}px` }}
+              onClick={() => openPopup(index)}
+            >
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+
+              
+            </div>
+
+             <div
+              key={image._id}
+              className="relative cursor-pointer bg-gray-100 overflow-hidden mb-1 break-inside-avoid"
+              style={{
+                // flex: "1 1 180px",   // each item at least 180px wide, shrink/grow as needed
+                // flex: "0 1 180px",
+                flex: `0 1 ${minWidth}px`,
+                minWidth: `${minWidth}px`,
+                maxWidth: `${maxWidth}px`,
+                // 🚀 don’t grow/shrink
+                // width: `${width || 180}px`,     // <- you can add `width` as a prop
+                height: `${heightClass || height}px`,
+              }}
+              // style={{ height: `${heightClass || height}px` }}
+              onClick={() => openPopup(index)}
+            >
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+
+              
+            </div>
+
+
+             <div
+              key={image._id}
+              className="relative cursor-pointer bg-gray-100 overflow-hidden mb-1 break-inside-avoid"
+              style={{
+                // flex: "1 1 180px",   // each item at least 180px wide, shrink/grow as needed
+                // flex: "0 1 180px",
+                flex: `0 1 ${minWidth}px`,
+                minWidth: `${minWidth}px`,
+                maxWidth: `${maxWidth}px`,
+                // 🚀 don’t grow/shrink
+                // width: `${width || 180}px`,     // <- you can add `width` as a prop
+                height: `${heightClass || height}px`,
+              }}
+              // style={{ height: `${heightClass || height}px` }}
+              onClick={() => openPopup(index)}
+            >
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+              <img
+                src={image?.url || NO_IMAGE}
+                alt={image?.originalName || `Image ${index + 1}`}
+                className="w-full cursor-pointer h-full object-cover"
+                loading="lazy"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement
+                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                }}
+              />
+
+              
+            </div> */}
+
+            </>
+          )
+        })}
+      </div >
 
       {/* Popup Modal */}
-      {isPopupOpen && currentImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90">
-          <div className="absolute top-4 right-4 z-60 flex items-center gap-3">
-            <button
-              onClick={() => handleDownload(currentImage)}
-              className="text-white hover:text-gray-300 transition-colors p-2"
-              title="Download"
+      {
+        isPopupOpen && currentImage &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center"
+            onClick={handleBackgroundClick}
+            style={{ margin: 0, padding: 0 }}
+          >
+            <div className="absolute top-6 right-6 z-[10000] flex items-center gap-4">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDownload(currentImage)
+                }}
+                className="bg-black/50 hover:bg-black/70 text-white rounded-full p-3 transition-all duration-200"
+                title="Download"
+              >
+                <i className="fas fa-download text-lg"></i>
+              </button>
+
+              {onDelete && <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDelete(currentImage._id)
+                }}
+                className="bg-black/50 hover:bg-red-600/70 text-white rounded-full p-3 transition-all duration-200"
+                title="Delete"
+                disabled={isDeleting}
+              >
+                <i className={`fas ${isDeleting ? "fa-spinner fa-spin" : "fa-trash-can"} text-lg`}></i>
+              </button>}
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  closePopup()
+                }}
+                className="bg-black/50 hover:bg-black/70 text-white rounded-full p-3 transition-all duration-200"
+                title="Close"
+              >
+                <i className="fas fa-times text-xl"></i>
+              </button>
+            </div>
+
+            {/* Navigation Arrows */}
+            {(
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  goToPrevious()
+                }}
+                className="absolute left-6 top-1/2 transform -translate-y-1/2 z-[10000] bg-black/50 hover:bg-black/70 text-white rounded-full p-3 transition-all duration-200"
+              >
+                <i className="fas fa-chevron-left text-2xl"></i>
+              </button>
+            )}
+
+            { (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  goToNext()
+                }}
+                className="absolute right-6 top-1/2 transform -translate-y-1/2 z-[10000] bg-black/50 hover:bg-black/70 text-white rounded-full p-3 transition-all duration-200"
+              >
+                <i className="fas fa-chevron-right text-2xl"></i>
+              </button>
+            )}
+
+            <div
+              className="relative flex items-center justify-center"
+              style={{
+                width: "70vw",
+                height: "70vh",
+                maxWidth: "70vw",
+                maxHeight: "70vh",
+              }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <i className="fas fa-download text-xl"></i>
-            </button>
+              <img
+                src={currentImage?.url || NO_IMAGE}
+                alt={currentImage.originalName || `Image ${selectedImageIndex !== null ? selectedImageIndex + 1 : 1}`}
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
 
-            <button
-              onClick={() => handleDelete(currentImage._id)}
-              className="text-white hover:text-red-400 transition-colors p-2"
-              title="Delete"
-              disabled={isDeleting}
-            >
-              <i className={`fas ${isDeleting ? "fa-spinner fa-spin" : "fa-trash-can"} text-xl`}></i>
-            </button>
-
-            <button onClick={closePopup} className="text-white hover:text-gray-300 transition-colors p-2" title="Close">
-              <i className="fas fa-times text-2xl"></i>
-            </button>
-          </div>
-
-          {/* Navigation Arrows */}
-          {selectedImageIndex !== null && selectedImageIndex > 0 && (
-            <button
-              onClick={goToPrevious}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-60 text-white hover:text-gray-300 transition-colors"
-            >
-              <i className="fas fa-chevron-left text-3xl"></i>
-            </button>
-          )}
-
-          {selectedImageIndex !== null && selectedImageIndex < images.length - 1 && (
-            <button
-              onClick={goToNext}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-60 text-white hover:text-gray-300 transition-colors"
-            >
-              <i className="fas fa-chevron-right text-3xl"></i>
-            </button>
-          )}
-
-          {/* Image Container */}
-          <div className="relative max-w-[80vw] max-h-[80vh] flex items-center justify-center">
-            <img
-              src={currentImage.url || NO_IMAGE}
-              alt={currentImage.originalName || `Image ${selectedImageIndex !== null ? selectedImageIndex + 1 : 1}`}
-              className="max-w-full max-h-full object-contain"
-            />
-          </div>
-
-          {/* Image Counter */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black bg-opacity-50 px-3 py-1 rounded-full">
-            {selectedImageIndex !== null ? selectedImageIndex + 1 : 1} of {images.length}
-          </div>
-        </div>
-      )}
+            {/* Image Counter */}
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black/50 px-4 py-2 rounded-full">
+              {selectedImageIndex !== null ? selectedImageIndex + 1 : 1} of {images.length}
+            </div>
+          </div>, document.body
+        )
+      }
     </>
   )
 }
 
 
-import { NO_IMAGE } from "../../constants/constants"
-import { downloadImage } from "../../utils/downloadFile"
-
 // Example usage component
 
-export default function ImageGalleryExample({imageFiles}:{imageFiles:any}) {
-  // Example image data - replace with your actual data
-  // const imageFiles = [
-  //   {
-  //     _id: "1",
-  //     url: "/placeholder.svg?height=300&width=300",
-  //     originalName: "landscape.jpg",
-  //   },
-  //   {
-  //     _id: "2",
-  //     url: "/placeholder.svg?height=300&width=300",
-  //     originalName: "city.jpg",
-  //   },
-  //   {
-  //     _id: "3",
-  //     url: "/placeholder.svg?height=300&width=300",
-  //     originalName: "mountain.jpg",
-  //   },
-  //   {
-  //     _id: "4",
-  //     url: "/placeholder.svg?height=300&width=300",
-  //     originalName: "ocean.jpg",
-  //   },
-  // ]
-
-  const handleDeleteFile = (id: string) => {
-    console.log("Deleting file with id:", id)
-    // Your delete logic here
-  }
-
-  const refetchImages = () => {
-    console.log("Refetching images...")
-    // Your refetch logic here
-  }
-
+export default function ImageGalleryExample({ imageFiles = [], height, refetch, handleDeleteFile, className = "", minWidth, maxWidth }: { height: number, imageFiles: any, handleDeleteFile?: (...args: any[]) => any, refetch?:() => Promise<any>, className?: string, minWidth?:number,maxWidth?:number }) {
+// console.log("imageFiles", imageFiles)
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Image Gallery Example</h2>
+    // <div className="p-6">
+    <>
+      {/* <h2 className="text-2xl font-bold mb-6">Image Gallery Example</h2> */}
       <ImageGallery
         images={imageFiles}
         onDelete={handleDeleteFile}
         onDownload={downloadImage}
-        refetch={refetchImages}
+        refetch={refetch}
         isDeleting={false}
-        className="mb-8"
+        className={className}
+        heightClass={height}
+        minWidth={minWidth}
+         maxWidth={maxWidth}
       />
-    </div>
+
+    </>
+    // </div>
   )
 }

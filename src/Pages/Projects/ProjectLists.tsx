@@ -25,6 +25,7 @@ const ProjectLists = () => {
     projectName: "",
     description: "",
     duration: 0,
+    // category:"",
     tags: [],
     startDate: new Date(),
     endDate: null,

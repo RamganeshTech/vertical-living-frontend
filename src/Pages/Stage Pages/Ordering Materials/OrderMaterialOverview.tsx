@@ -1094,7 +1094,7 @@
 
 
 
-import { useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import { Card, CardContent } from "../../../components/ui/Card";
@@ -1151,17 +1151,18 @@ interface SubItem {
 const OrderMaterialOverview = () => {
     const { projectId, organizationId } = useParams() as { projectId: string, organizationId: string };
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
+    const navigate = useNavigate()
     const { data, isLoading, isError, error: getAllError, refetch } = useGetAllOrderingMaterialHistory(projectId!);
     const { mutateAsync: generateLink, isPending: generatePending } = useOrderHistoryGenerateLink()
 
-    const { mutateAsync: addSubItem, isPending: addItemLoading } = useAddOrderingMaterialSubItem();
+    const { mutateAsync: addSubItem } = useAddOrderingMaterialSubItem();
     const { mutateAsync: deleteSubItem, isPending: deleteItemLoading } = useDeleteOrderingMaterialSubItem();
     const { mutateAsync: updateSubItem } = useUpdateOrderingMaterialSubItem();
 
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetOrderingMaterialHistoryDeadline()
     const { mutateAsync: completionStatus, isPending: completePending } = useCompleteOrderingMaterialHistoryStage()
     const { mutateAsync: updateDelivery } = useUpdateDeliveryLocation();
-    const { mutateAsync: deletePdf, isPending:deletePdfLoading } = useDeleteOrderMaterialPdf();
+    const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
     const { mutateAsync: updateShop } = useUpdateShopDetails();
 
 
@@ -1264,6 +1265,8 @@ const OrderMaterialOverview = () => {
         try {
             await completionStatus({ projectId: projectId! });
             toast({ description: 'Completion status updated successfully', title: "Success" });
+            navigate('../materialarrival')
+
         } catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
         }
@@ -1310,8 +1313,8 @@ const OrderMaterialOverview = () => {
 
 
 
-    
-    const handleDeletePdf = async (pdfId:string) => {
+
+    const handleDeletePdf = async (pdfId: string) => {
         try {
 
             await deletePdf({ projectId: projectId!, pdfId });
@@ -1325,7 +1328,6 @@ const OrderMaterialOverview = () => {
 
 
     // const selectRef = useRef<HTMLButtonElement>(null);
-
     const selectedUnits = data?.selectedUnits || [];
     const totalCost = data?.totalCost || 0;
     const hasUnits = selectedUnits.length > 0;
@@ -1368,8 +1370,9 @@ const OrderMaterialOverview = () => {
     };
 
     // Handle new row creation
-    const handleNewRowSave = async (unitId: string) => {
-        const rowData: any = newRowData[unitId];
+    const handleNewRowSave = async (unitId: string, newData: any) => {
+        const rowData: any = newData;
+        // console.log("row data", rowData)
 
         if (!rowData && !rowData?.name.trim()) {
             return toast({
@@ -1381,14 +1384,14 @@ const OrderMaterialOverview = () => {
 
         // if (!rowData || !rowData.name.trim() || !rowData.unit) return;
 
-        console.log("row data", rowData)
+        // console.log("row data", rowData)
 
         try {
             await addSubItem({
                 projectId,
                 unitId,
                 subItemName: rowData.name,
-                quantity: rowData.quantity || 0,
+                quantity: rowData.quantity ?? 1,
                 unit: rowData.unit,
             });
 
@@ -1709,7 +1712,7 @@ const OrderMaterialOverview = () => {
                                                     {/* Product Image */}
                                                     <div className="relative w-full md:w-32 h-32 bg-gray-50 rounded-lg overflow-hidden">
                                                         <img
-                                                            src={unit.image || NO_IMAGE}
+                                                            src={unit?.image || NO_IMAGE}
                                                             alt={unit.customId || "Product image"}
                                                             className="w-full h-full object-contain p-3"
                                                         />
@@ -1943,10 +1946,10 @@ const OrderMaterialOverview = () => {
 
                                                                 <div className="col-span-3 border-r border-gray-200">
 
-                                                                        <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
-                                                                            Ref Id
-                                                                        </div>
+                                                                    <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
+                                                                        Ref Id
                                                                     </div>
+                                                                </div>
 
 
                                                                 <div className="col-span-8 border-r border-gray-200">
@@ -1955,7 +1958,6 @@ const OrderMaterialOverview = () => {
                                                                         placeholder="Enter matterial name..."
                                                                         value={newRowData[unit._id]?.name || ''}
                                                                         onChange={(e) => {
-                                                                            console.log("e.target name", newRowData)
                                                                             setNewRowData(prev => ({
                                                                                 ...prev,
                                                                                 [unit._id]: {
@@ -1967,12 +1969,12 @@ const OrderMaterialOverview = () => {
                                                                         onBlur={() => {
                                                                             if (newRowData[unit._id]?.name?.trim() &&
                                                                                 newRowData[unit._id]?.unit) {
-                                                                                handleNewRowSave(unit._id);
+                                                                                handleNewRowSave(unit._id, newRowData);
                                                                             }
                                                                         }}
                                                                         onKeyDown={(e) => {
                                                                             if (e.key === 'Enter') {
-                                                                                handleNewRowSave(unit._id);
+                                                                                handleNewRowSave(unit._id, newRowData);
                                                                             }
                                                                         }}
                                                                         className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
@@ -1985,13 +1987,13 @@ const OrderMaterialOverview = () => {
                                                                         type="number"
                                                                         placeholder="Qty"
                                                                         min="0"
-                                                                        value={newRowData[unit._id]?.quantity || 0}
+                                                                        value={newRowData[unit._id]?.quantity || 1}
                                                                         onChange={(e) => {
                                                                             setNewRowData(prev => ({
                                                                                 ...prev,
                                                                                 [unit._id]: {
                                                                                     ...prev[unit._id],
-                                                                                    quantity: Number(e.target.value) || 0
+                                                                                    quantity: Number(e.target.value) || 1
                                                                                 }
                                                                             }));
                                                                         }}
@@ -2007,16 +2009,28 @@ const OrderMaterialOverview = () => {
                                                                         <select
                                                                             value={newRowData[unit._id]?.unit || ''}
                                                                             onChange={async (e) => {
+
+                                                                                const updatedRow = {
+                                                                                    ...newRowData[unit._id],
+                                                                                    unit: e.target.value
+                                                                                };
+
+                                                                                // update state
                                                                                 setNewRowData(prev => ({
                                                                                     ...prev,
-                                                                                    [unit._id]: {
-                                                                                        ...prev[unit._id],
-                                                                                        unit: e.target.value
-                                                                                    }
+                                                                                    [unit._id]: updatedRow
                                                                                 }));
 
+                                                                                // setNewRowData(prev => ({
+                                                                                //     ...prev,
+                                                                                //     [unit._id]: {
+                                                                                //         ...prev[unit._id],
+                                                                                //         unit: e.target.value
+                                                                                //     }
+                                                                                // }));
 
-                                                                                await handleNewRowSave(unit._id);
+
+                                                                                await handleNewRowSave(unit._id, updatedRow);
 
                                                                             }}
                                                                             className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
@@ -2032,15 +2046,13 @@ const OrderMaterialOverview = () => {
                                                                 </div>
 
                                                                 {/* Add Icon */}
-                                                                <div onClick={() => {
-                                                                    // if (!newRowData[unit._id]?.name?.trim()) {
-                                                                    //     toast({ title: "Error", description: "Material Name is mandatory", variant: "destructive" })
-                                                                    // }
-                                                                    handleNewRowSave(unit._id)
+                                                                {/* <div onClick={() => {
+                                                                   
+                                                                    handleNewRowSave(unit._id, newRowData)
                                                                 }} className="col-span-1 cursor-pointer flex items-center justify-center">
                                                                     {addItemLoading && <i className="fas fa-spinner animate-spin mr-2"></i>}
                                                                     <i className="fa fa-plus text-green-600 text-sm"></i>
-                                                                </div>
+                                                                </div> */}
                                                             </div>
 
                                                             {/* Empty State */}
@@ -2091,7 +2103,7 @@ const OrderMaterialOverview = () => {
 
 
                         <div className="space-y-4">
-                           
+
 
                             <div className="space-y-6">
                                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -2125,66 +2137,66 @@ const OrderMaterialOverview = () => {
                                 </div>
 
                                 {data?.generatedLink && data?.generatedLink?.length > 0 ?
-                                
-                                data?.generatedLink?.map((ele:any)=> (
-                                    <Card key={ele._id} className="border-green-200 bg-green-50">
-                                        <CardContent className="p-6">
-                                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                                <div className="flex items-center gap-3 flex-1">
-                                                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                                        <i className="fas fa-check-circle text-green-600"></i>
+
+                                    data?.generatedLink?.map((ele: any) => (
+                                        <Card key={ele._id} className="border-green-200 bg-green-50">
+                                            <CardContent className="p-6">
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                                    <div className="flex items-center gap-3 flex-1">
+                                                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                                            <i className="fas fa-check-circle text-green-600"></i>
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="font-semibold text-green-900 mb-1">
+                                                                {/* PDF Generated Successfully */}
+                                                                {ele.pdfName}
+                                                            </h4>
+                                                            <span className="text-sm">Pdf Reference Id: {ele.refUniquePdf || "N/A"}</span>
+                                                            <p className="text-sm text-green-700">
+                                                                Your order material PDF is ready to view or download
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <h4 className="font-semibold text-green-900 mb-1">
-                                                            {/* PDF Generated Successfully */}
-                                                            {ele.pdfName}
-                                                        </h4>
-                                                        <span className="text-sm">Pdf Reference Id: {ele.refUniquePdf || "N/A"}</span>
-                                                        <p className="text-sm text-green-700">
-                                                            Your order material PDF is ready to view or download
-                                                        </p>
+
+                                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                                        <Button
+                                                            variant="outline"
+                                                            onClick={() => window.open(ele.url, "_blank")}
+                                                            className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                        >
+                                                            <i className="fas mr-2 fa-external-link-alt"></i>
+                                                            View in New Tab
+                                                        </Button>
+
+                                                        <Button
+                                                            variant="secondary"
+                                                            onClick={() => downloadImage({ src: ele.url, alt: "order material" })}
+                                                            className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                        >
+                                                            Download PDF
+                                                        </Button>
+
+
+                                                        <Button
+                                                            variant="danger"
+                                                            isLoading={deletePdfLoading}
+                                                            onClick={() => handleDeletePdf(ele._id)}
+                                                            className="border-red-300 bg-red-600 text-white hover:bg-red-600 hover:border-red-400"
+                                                        >
+                                                            Delete PDF
+                                                        </Button>
                                                     </div>
                                                 </div>
-
-                                                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                                                    <Button
-                                                        variant="outline"
-                                                        onClick={() => window.open(ele.url, "_blank")}
-                                                        className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
-                                                    >
-                                                        <i className="fas mr-2 fa-external-link-alt"></i>
-                                                        View in New Tab
-                                                    </Button>
-
-                                                    <Button
-                                                        variant="secondary"
-                                                        onClick={() => downloadImage({ src: ele.url, alt: "order material" })}
-                                                        className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
-                                                    >
-                                                        Download PDF
-                                                    </Button>
-
-
-                                                     <Button
-                                                        variant="danger"
-                                                        isLoading={deletePdfLoading}
-                                                        onClick={() => handleDeletePdf(ele._id)}
-                                                        className="border-red-300 bg-red-600 text-white hover:bg-red-600 hover:border-red-400"
-                                                    >
-                                                        Delete PDF
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))
-                            :
-                            <>
-                            <div>
-                                No PDF Generated
-                            </div>
-                            </>
-                            }
+                                            </CardContent>
+                                        </Card>
+                                    ))
+                                    :
+                                    <>
+                                        <div>
+                                            No PDF Generated
+                                        </div>
+                                    </>
+                                }
                             </div>
 
 

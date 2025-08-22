@@ -16,149 +16,7 @@ import { Textarea } from "../../../components/ui/TextArea";
 import { Input } from "../../../components/ui/Input";
 import { Label } from "../../../components/ui/Label";
 import { downloadImage } from "../../../utils/downloadFile";
-
-// const dummyUploads: ICleaningUpload[] = [
-//     {
-//         _id: "000c10101",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "livingroom_before.jpg",
-//         uploadedAt: new Date("2024-07-01T09:00:00Z"),
-//     },
-//     {
-//         _id: "0001l0101",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "kitchen_before.jpg",
-//         uploadedAt: new Date("2024-07-01T09:05:00Z"),
-//     },
-//     {
-//         _id: "0001a0101",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report1.pdf",
-//         originalName: "kitchen_checklist.pdf",
-//         uploadedAt: new Date("2024-07-01T09:10:00Z"),
-//     },
-//     {
-//         _id: "000101n01",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "bathroom_after.jpg",
-//         uploadedAt: new Date("2024-07-01T09:15:00Z"),
-//     },
-//     {
-//         _id: "000101x01",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report2.pdf",
-//         originalName: "bathroom_sanitation_report.pdf",
-//         uploadedAt: new Date("2024-07-01T09:20:00Z"),
-//     },
-//     {
-//         _id: "000101f01",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "balcony_cleaned.jpg",
-//         uploadedAt: new Date("2024-07-01T09:25:00Z"),
-//     },
-//     {
-//         _id: "000101n01",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "foyer_area.jpg",
-//         uploadedAt: new Date("2024-07-01T09:30:00Z"),
-//     },
-//     {
-//         _id: "0001010a1",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report3.pdf",
-//         originalName: "terrace_inspection.pdf",
-//         uploadedAt: new Date("2024-07-01T09:35:00Z"),
-//     },
-//     {
-//         _id: "000101b01",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "study_room.jpg",
-//         uploadedAt: new Date("2024-07-01T09:40:00Z"),
-//     },
-//     {
-//         _id: "0001010 1",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report4.pdf",
-//         originalName: "studyroom_report.pdf",
-//         uploadedAt: new Date("2024-07-01T09:45:00Z"),
-//     },
-//     {
-//         _id: "0001010v1",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "car_parking.jpg",
-//         uploadedAt: new Date("2024-07-01T09:50:00Z"),
-//     },
-//     {
-//         _id: "0001010s1",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report5.pdf",
-//         originalName: "car_parking_checklist.pdf",
-//         uploadedAt: new Date("2024-07-01T09:55:00Z"),
-//     },
-//     {
-//         _id: "0001010d1",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "garden_cleaned.jpg",
-//         uploadedAt: new Date("2024-07-01T10:00:00Z"),
-//     },
-//     {
-//         _id: "000101016",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report6.pdf",
-//         originalName: "garden_maintenance.pdf",
-//         uploadedAt: new Date("2024-07-01T10:05:00Z"),
-//     },
-//     {
-//         _id: "000101015",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "storage_room.jpg",
-//         uploadedAt: new Date("2024-07-01T10:10:00Z"),
-//     },
-//     {
-//         _id: "000101014",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report7.pdf",
-//         originalName: "storage_room_report.pdf",
-//         uploadedAt: new Date("2024-07-01T10:15:00Z"),
-//     },
-//     {
-//         _id: "000101013",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "entertainment_room.jpg",
-//         uploadedAt: new Date("2024-07-01T10:20:00Z"),
-//     },
-//     {
-//         _id: "000101012",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report8.pdf",
-//         originalName: "entertainment_check.pdf",
-//         uploadedAt: new Date("2024-07-01T10:25:00Z"),
-//     },
-//     {
-//         _id: "000101031",
-//         type: "image",
-//         url: "https://picsum.photos/200",
-//         originalName: "home_gym.jpg",
-//         uploadedAt: new Date("2024-07-01T10:30:00Z"),
-//     },
-//     {
-//         _id: "000101021",
-//         type: "pdf",
-//         url: "https://s3.example.com/uploads/cleaning/report9.pdf",
-//         originalName: "gym_report.pdf",
-//         uploadedAt: new Date("2024-07-01T10:35:00Z"),
-//     },
-// ];
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 
 export default function CleaningRoomOverview() {
     const { projectId, roomId, organizationId } = useParams() as { projectId: string, roomId: string, organizationId: string };
@@ -285,6 +143,7 @@ export default function CleaningRoomOverview() {
         </div>
     }
 
+const imageFiles = (data?.uploads || [])?.filter((file:any)=> file.type === "image")
 
     return (
         <div className="w-full h-full max-h-full overflow-y-auto custom-scrollbar-none sm:custom-scrollbar">
@@ -389,7 +248,7 @@ export default function CleaningRoomOverview() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[95%] sm:h-[65%]">
                 {/* Images Section */}
-                <Card className="p-2 lg:p-4 max-h-full overflow-y-auto custom-scrollbar border-1 border-[#8485887a]">
+                {/* <Card className="p-2 lg:p-4 max-h-full overflow-y-auto custom-scrollbar border-1 border-[#8485887a]">
                     <h3 className="text-lg font-semibold mb-3 text-blue-700">Images</h3>
                     {data?.uploads?.filter((f: ICleaningUpload) => f.type === "image").length === 0 ? (
                         <p className="text-gray-400 text-sm">No images uploaded.</p>
@@ -402,17 +261,14 @@ export default function CleaningRoomOverview() {
                                         key={f.url}
                                         className="relative group rounded overflow-hidden"
                                     >
-                                        {/* Image */}
                                         <img
                                             src={f.url}
                                             alt={f.originalName}
                                             className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
                                         />
 
-                                        {/* Bottom gradient overlay */}
                                         <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                                        {/* Delete Button (top-right) */}
                                         <Button
                                         size="sm"
                                         variant="danger"
@@ -424,7 +280,6 @@ export default function CleaningRoomOverview() {
                                             <i className="fas fa-trash"></i>
                                         </Button>
 
-                                        {/* Bottom-right actions */}
                                         <div className="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                             <Button
                                             size="sm"
@@ -445,7 +300,29 @@ export default function CleaningRoomOverview() {
                                 ))}
                         </div>
                     )}
+                </Card> */}
+
+                <Card className="p-2 lg:p-4 max-h-full overflow-y-auto custom-scrollbar border-1 border-[#8485887a]">
+                    <h3 className="text-lg font-semibold mb-3 text-blue-700">Images</h3>
+                    {data?.uploads?.filter((f: ICleaningUpload) => f.type === "image").length === 0 ? (
+                        <p className="text-gray-400 text-sm">No images uploaded.</p>
+                    ) : (
+                       
+                         <ImageGalleryExample
+                        imageFiles={imageFiles}
+                        handleDeleteFile={handleDelete}
+                        // className="grid grid-cols-3"
+                        height={80}
+                        minWidth={98}
+                        maxWidth={100}
+                    />
+                    )}
+
+
+                   
+
                 </Card>
+
 
                 {/* PDFs Section */}
                 <Card className="p-4 max-h-full overflow-y-auto border-1 border-[#8485887a] custom-scrollbar">
@@ -488,7 +365,7 @@ export default function CleaningRoomOverview() {
                                             </Button>
 
                                             <Button
-                                            size="sm"
+                                                size="sm"
                                                 isLoading={deleting}
                                                 onClick={() => handleDelete(f._id)}
                                                 disabled={deleting}

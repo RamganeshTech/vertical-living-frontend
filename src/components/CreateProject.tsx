@@ -5,6 +5,8 @@ import ErrorComponent from "./ErrorComponent";
 import { handleProjectValidate } from "../utils/validation";
 import { toast } from "../utils/toast";
 import { Button } from "./ui/Button";
+// import { Label } from "./ui/Label";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 
 const priorities = ["none", "low", "medium", "high"];
 const statuses = [
@@ -19,6 +21,7 @@ const statuses = [
   "Planning",
   "Invoice",
 ];
+// const category = ["commercial", "residential"]
 
 export const statusColors: Record<string, string> = {
   Active: "bg-green-100 text-green-800",
@@ -37,6 +40,7 @@ export interface ProjectInput {
   projectName: string,
   description: string,
   duration: number,
+  // category: string,
   tags: string[],
   startDate: Date | null,
   endDate: Date | null,
@@ -63,6 +67,7 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, refetch, setShowF
     projectName: "",
     description: "",
     duration: 0,
+    // category: "",
     tags: [],
     startDate: new Date(),
     endDate: null,
@@ -226,6 +231,37 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, refetch, setShowF
             </div>
           </div>
 
+
+          {/* <div className="col-span-1"> */}
+            {/* <Label className="block text-sm font-medium text-slate-700 mb-2">Category</Label> */}
+            {/* <Select onValueChange={(val: any) => setFormData(p => ({ ...p, category: val }))}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select height" selectedValue={formData.category} />
+              </SelectTrigger>
+              <SelectContent>
+                {["residential", "commercial"].map((option) => (
+                  <SelectItem key={option} value={option.toString()}>
+                    {option}mm
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select> */}
+
+            {/* <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select
+              name="category"
+              onChange={(e) => handleChange(e, isEditing ? setEditForm : setFormData)}
+              value={isEditing ? editForm.category : formData.category}
+              className="input w-full border border-gray-300 rounded-md px-3 py-2"
+            >
+              {category.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div> */}
+
+
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
@@ -331,7 +367,7 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, refetch, setShowF
 
           <div className="text-end">
             <Button
-            isLoading={isPending || updatePending}
+              isLoading={isPending || updatePending}
               type="submit"
               disabled={isPending || updatePending}
               className="bg-blue-600 text-white px-6 w-full sm:w-40 py-2 rounded-xl hover:bg-blue-700 transition-all"

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { Label } from "../../../components/ui/Label";
@@ -19,6 +19,7 @@ import { downloadImage } from "../../../utils/downloadFile";
 import type { IConsultationMessage, ITechnicalConsultation } from "../../../types/types";
 import { Badge } from "../../../components/ui/Badge";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+import { useGetStageSelection } from "../../../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -30,6 +31,9 @@ const TechnicalConsultant: React.FC = () => {
     const { projectId, organizationId } = useParams<{ projectId: string, organizationId: string }>();
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
     const { role, _id: userId } = useGetRole();
+    const navigate = useNavigate()
+
+    const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId!)
 
     const [text, setText] = useState("");
     const [attachments, setAttachments] = useState<File[]>([]);
@@ -51,6 +55,20 @@ const TechnicalConsultant: React.FC = () => {
         try {
             await updateCompletionStatus.mutateAsync({ projectId: projectId! });
             toast({ description: 'Completion status updated successfully', title: "Success" });
+
+            if (!selectStagePending) {
+                if (!stageSelectionData) {
+                    navigate('../selectstage')
+                }
+                else if (stageSelectionData && stageSelectionData === "Manual Flow") {
+                    navigate('../materialselection')
+
+                } else if (stageSelectionData && stageSelectionData === "Modular Units") {
+                    navigate('../modularunits')
+                }
+            } else {
+                alert("Please navigate to next stage manually , you havet selected the stage yet")
+            }
         } catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
         }
@@ -110,6 +128,27 @@ const TechnicalConsultant: React.FC = () => {
 
 
     if (getMessageLoading) return <MaterialOverviewLoading />
+
+    console.log("techDoc", techDoc)
+
+
+    const getName = (role: string, sender: any) => {
+        if (role === "owner") {
+           return sender.username
+        }
+        if (role === "staff") {
+            return sender.staffName
+
+        }
+        if (role === "worker") {
+            return sender.workerName
+        }
+
+        if (role == "CTO") {
+            return sender.CTOName
+        }
+    }
+
 
     return (
         <div className="container mx-auto  max-w-full max-h-full">
@@ -186,7 +225,7 @@ const TechnicalConsultant: React.FC = () => {
             </Card>
 
             {/* Messages Section */}
-            <div className=" flex flex-col bg-white rounded-xl p-2 shadow-md border custom-scrollbar min-h-[200px] sm:min-h-[170px] md:min-h-[190px] lg:min-h-[300px] border-gray-200 mb-2 flex-grow max-h-[70vh] sm:!max-h-[30vh] md:!max-h-[30vh] lg:!max-h-[42vh] xl:!max-h-[49vh] overflow-y-auto ">
+            <div className=" flex flex-col bg-white rounded-xl p-2 shadow-md border custom-scrollbar min-h-[200px] sm:min-h-[170px] md:min-h-[190px] lg:min-h-[340px] border-gray-200 mb-2 flex-grow max-h-[70vh] sm:!max-h-[30vh] md:!max-h-[30vh] lg:!max-h-[42vh] xl:!max-h-[49vh] overflow-y-auto ">
                 <div className="flex flex-col-reverse overflow-y-auto custom-scrollbar  flex-grow p-2  md:!max-h-full space-y-reverse space-y-4">
                     {(getMessageIsError || getMessageError) && (
                         <div className="flex h-full items-center justify-center py-10">
@@ -225,77 +264,80 @@ const TechnicalConsultant: React.FC = () => {
                             {techDoc?.messages
                                 ?.slice()
                                 .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                                .map((msg: IConsultationMessage) => (
-                                    <div key={(msg)._id} className="bg-blue-50 w-full group px-4 py-[5px] rounded-lg shadow flex flex-col">
-                                        <div className="flex justify-between items-center">
-                                            <p className="text-xs sm:text-[10px] text-gray-600">
-                                                {msg.senderRole.toUpperCase()} - {new Date(msg.createdAt).toLocaleString()}
+                                .map((msg: IConsultationMessage) => {
+                                    console.log("messge", msg)
+                                    return (
+                                        <div key={(msg)._id} className="bg-blue-50 w-full group px-4 py-[5px] rounded-lg shadow flex flex-col">
+                                            <div className="flex justify-between items-center">
+                                                <p className="text-xs sm:text-[10px] text-gray-600">
+                                                    {getName(msg.senderRole, msg.sender) || msg?.senderRole?.toUpperCase() || "User"} - {new Date(msg.createdAt).toLocaleString()}
 
-                                                {msg.isEdited && <Badge className="sm:ml-2 my-1 sm:my-0"> <p className="hidden sm:inline-block">message is  {" "} </p> &nbsp; edited by {msg.senderRole}</Badge>}
-                                            </p>
-                                            <div className="opacity-0 scale-95 group-hover:opacity-100 transition-all duration-300">
-                                                {(msg.sender === userId || role === "owner" || role === "CTO") && (
-                                                    <div className="flex gap-2">
-                                                        <Button variant="secondary" onClick={() => handleEdit(msg._id, msg.message)} className="text-blue-600 text-sm">
-                                                            <i className="fas fa-edit"></i>
-                                                        </Button>
-                                                        {/* <Button variant="danger" isLoading={deletePending} onClick={() => handleDelete(msg._id)} className="text-white bg-red-600 text-sm">
+                                                    {msg.isEdited && <Badge className="sm:ml-2 my-1 sm:my-0"> <p className="hidden sm:inline-block">message is  {" "} </p> &nbsp; edited by {msg.senderRole}</Badge>}
+                                                </p>
+                                                <div className="opacity-0 scale-95 group-hover:opacity-100 transition-all duration-300">
+                                                    {(msg.sender._id === userId || role === "owner" || role === "CTO") && (
+                                                        <div className="flex gap-2">
+                                                            <Button variant="secondary" onClick={() => handleEdit(msg._id, msg.message)} className="text-blue-600 text-sm">
+                                                                <i className="fas fa-edit"></i>
+                                                            </Button>
+                                                            {/* <Button variant="danger" isLoading={deletePending} onClick={() => handleDelete(msg._id)} className="text-white bg-red-600 text-sm">
                                                             <i className="fas fa-trash"></i>
                                                         </Button> */}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {editingId === msg._id ? (
-                                            <div className="flex flex-col sm:flex-row gap-2 items-center mt-2">
-                                                <Input
-                                                    value={editText}
-                                                    onChange={(e) => setEditText(e.target.value)}
-                                                    className="flex-grow"
-                                                />
-                                                <div className="flex gap-2 w-full sm:w-auto">
-                                                    <Button isLoading={editPending} onClick={handleEditSubmit} className="w-full sm:w-auto">Save</Button>
-                                                    <Button variant="danger" className="w-full sm:w-auto border-red-200 hover:bg-red-700 bg-red-600 text-white" onClick={handleCancelEdit}>
-                                                        Cancel
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <p className="text-gray-900 text-sm">{msg.message}</p>
-                                        )}
-
-                                        <div className="flex flex-wrap gap-3 mt-3">
-                                            {msg.attachments?.map((att: any, index: number) => (
-                                                <div key={index} className="flex items-center gap-2 bg-white border px-3 py-2 rounded shadow-sm w-full max-w-[280px]">
-                                                    <i className={`fas ${att.type === "pdf" ? "fa-file-pdf text-red-500" : "fa-image text-blue-500"}`}></i>
-                                                    <span className="text-xs sm:text-sm text-gray-700 truncate flex-grow min-w-0">
-                                                        {att.originalName}
-                                                    </span>
-
-                                                    {att.type === "image" && (
-
-
-                                                        <Button size="sm"
-                                                            variant="primary"
-                                                            onClick={() => {
-                                                                setPreviewImage(att.url);
-                                                                setImageLoading(true);
-                                                            }}
-                                                        >
-                                                            <i className="fas fa-eye"></i>
-                                                        </Button>
+                                                        </div>
                                                     )}
-
-                                                    <Button onClick={() => downloadImage({ src: att?.url, alt: att?.originalName || "file.pdf" })} size="sm" className="text-sm">
-                                                        <i className="fa-solid fa-download"></i>
-                                                    </Button>
-
                                                 </div>
-                                            ))}
+                                            </div>
+
+                                            {editingId === msg._id ? (
+                                                <div className="flex flex-col sm:flex-row gap-2 items-center mt-2">
+                                                    <Input
+                                                        value={editText}
+                                                        onChange={(e) => setEditText(e.target.value)}
+                                                        className="flex-grow"
+                                                    />
+                                                    <div className="flex gap-2 w-full sm:w-auto">
+                                                        <Button isLoading={editPending} onClick={handleEditSubmit} className="w-full sm:w-auto">Save</Button>
+                                                        <Button variant="danger" className="w-full sm:w-auto border-red-200 hover:bg-red-700 bg-red-600 text-white" onClick={handleCancelEdit}>
+                                                            Cancel
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="text-gray-900 text-sm">{msg.message}</p>
+                                            )}
+
+                                            <div className="flex flex-wrap gap-3 mt-3">
+                                                {msg.attachments?.map((att: any, index: number) => (
+                                                    <div key={index} className="flex items-center gap-2 bg-white border px-3 py-2 rounded shadow-sm w-full max-w-[280px]">
+                                                        <i className={`fas ${att.type === "pdf" ? "fa-file-pdf text-red-500" : "fa-image text-blue-500"}`}></i>
+                                                        <span className="text-xs sm:text-sm text-gray-700 truncate flex-grow min-w-0">
+                                                            {att.originalName}
+                                                        </span>
+
+                                                        {att.type === "image" && (
+
+
+                                                            <Button size="sm"
+                                                                variant="primary"
+                                                                onClick={() => {
+                                                                    setPreviewImage(att.url);
+                                                                    setImageLoading(true);
+                                                                }}
+                                                            >
+                                                                <i className="fas fa-eye"></i>
+                                                            </Button>
+                                                        )}
+
+                                                        <Button onClick={() => downloadImage({ src: att?.url, alt: att?.originalName || "file.pdf" })} size="sm" className="text-sm">
+                                                            <i className="fa-solid fa-download"></i>
+                                                        </Button>
+
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))
+                                    )
+                                })
                             }
                         </div>
                     )}

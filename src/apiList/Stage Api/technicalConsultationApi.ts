@@ -81,33 +81,33 @@ const editConsultationMessage = async ({
 
 
 // deadline and completion
-const setDeadlineTechnicalConsult = async ({ formId, projectId,  deadLine, api }: {  projectId: string,formId: string, deadLine: string, api: AxiosInstance }) => {
-    const { data } = await api.put(`/technicalconsultation/deadline/${projectId}/${formId}`, { deadLine });
-    if (!data.ok) throw new Error(data.message);
-    return data.data;
+const setDeadlineTechnicalConsult = async ({ formId, projectId, deadLine, api }: { projectId: string, formId: string, deadLine: string, api: AxiosInstance }) => {
+  const { data } = await api.put(`/technicalconsultation/deadline/${projectId}/${formId}`, { deadLine });
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
 }
 
 const updateCompletionStatus = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
-    const { data } = await api.put(`/technicalconsultation/completionstatus/${projectId}`);
-    if (!data.ok) throw new Error(data.message);
-    return data.data;
+  const { data } = await api.put(`/technicalconsultation/completionstatus/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
 }
 
 // file upload api
 
 
 const uploadFiles = async ({ formId, files, projectId, api }: UploadFilePayload & { api: any }) => {
-    const formData = new FormData();
-    files.forEach((file) => formData.append("file", file));
+  const formData = new FormData();
+  files.forEach((file) => formData.append("file", file));
 
-    const response = await api.post(`/technicalconsultation/upload/multiple/${projectId}/${formId}`, formData,
-        {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        }
-    );
-    return response.data;
+  const response = await api.post(`/technicalconsultation/upload/multiple/${projectId}/${formId}`, formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
 }
 
 
@@ -124,9 +124,9 @@ export const useGetConsultationMessages = (projectId: string) => {
       return await getConsultationMessages({ projectId, api });
     },
     enabled: !!projectId,
-    retry:false,
-    refetchOnMount:false,
-    refetchOnWindowFocus:false,
+    retry: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -142,8 +142,8 @@ export const useAddConsultationMessage = () => {
       if (!api) throw new Error("API not found");
       return await addConsultationMessage({ projectId, formData, api });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["consultationMessages"] });
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["consultationMessages", projectId] });
     },
   });
 };
@@ -177,8 +177,8 @@ export const useEditConsultationMessage = () => {
         api,
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["consultationMessages"] });
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["consultationMessages", projectId] });
     },
   });
 };
@@ -209,8 +209,8 @@ export const useDeleteConsultationMessage = () => {
         api,
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["consultationMessages"] });
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["consultationMessages", projectId] });
     },
   });
 };
@@ -218,69 +218,71 @@ export const useDeleteConsultationMessage = () => {
 
 // file upload hook
 export const useUploadRequirementFiles = () => {
-    const allowedRoles = ["owner", "staff", "CTO", "client"]
+  const allowedRoles = ["owner", "staff", "CTO", "client"]
 
-    const { role } = useGetRole()
-    const api = getApiForRole(role!)
+  const { role } = useGetRole()
+  const api = getApiForRole(role!)
 
 
-    return useMutation({
-        mutationFn: async ({ formId, files, projectId }: UploadFilePayload) => {
+  return useMutation({
+    mutationFn: async ({ formId, files, projectId }: UploadFilePayload) => {
 
-            if (!role) throw new Error("not authorized")
+      if (!role) throw new Error("not authorized")
 
-            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
+      if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
 
-            if (!api) throw new Error("api is null")
+      if (!api) throw new Error("api is null")
 
-            return await uploadFiles({ formId, projectId, files, api })
-        },
-        onSuccess:()=>{
-      queryClient.invalidateQueries({ queryKey: ["consultationMessages"] });
-
-        }
-    });
+      return await uploadFiles({ formId, projectId, files, api })
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["consultationMessages", projectId] });
+    },
+  });
 };
 
 
 
 
 
-export const useCompletionStatusTechConsultation  = () => {
-    const allowedRoles = ["owner", "staff", "CTO"]
-    const { role } = useGetRole()
+export const useCompletionStatusTechConsultation = () => {
+  const allowedRoles = ["owner", "staff", "CTO"]
+  const { role } = useGetRole()
 
-    const api = getApiForRole(role!)
+  const api = getApiForRole(role!)
 
-    return useMutation({
-        mutationFn: async ({ projectId  }: { projectId: string}) => {
+  return useMutation({
+    mutationFn: async ({ projectId }: { projectId: string }) => {
 
-            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
-            if (!api) throw new Error("API instance not found for role");
+      if (!api) throw new Error("API instance not found for role");
 
-            return await updateCompletionStatus({ projectId, api });
-        },
-        onSuccess: (_, {projectId})=>{
-            queryClient.invalidateQueries({queryKey: ["consultationMessages", projectId]})
-        }
-    });
+      return await updateCompletionStatus({ projectId, api });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["consultationMessages", projectId] })
+    }
+  });
 };
 
 export const useSetDeadLineTechConsultation = () => {
-    const allowedRoles = ["owner", "staff", "CTO"]
-    const { role } = useGetRole()
-    const api = getApiForRole(role!)
-    return useMutation({
-        mutationFn: async ({ formId,projectId,  deadLine }: {  projectId: string,formId: string, deadLine: string }) => {
-            if (!role) throw new Error("not authorized")
+  const allowedRoles = ["owner", "staff", "CTO"]
+  const { role } = useGetRole()
+  const api = getApiForRole(role!)
+  return useMutation({
+    mutationFn: async ({ formId, projectId, deadLine }: { projectId: string, formId: string, deadLine: string }) => {
+      if (!role) throw new Error("not authorized")
 
-            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
+      if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
 
-            if (!api) throw new Error("api is null")
+      if (!api) throw new Error("api is null")
 
-            return await setDeadlineTechnicalConsult({ formId, projectId, deadLine, api })
+      return await setDeadlineTechnicalConsult({ formId, projectId, deadLine, api })
 
-        }
-    })
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["consultationMessages", projectId] });
+    },
+  })
 }

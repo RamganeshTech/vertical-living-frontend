@@ -52,7 +52,7 @@ export const getSidebarConfig = (
             "DOCUMENTATION",
             "WORKERS",
             "INVITECLIENT",
-            "PREREQUIRETIES",
+            "PREREQUISTIES",
             "REQUIREMENTFORM",
             "SITEMEASUREMENT",
             "SAMPLEDESIGN",
@@ -99,27 +99,27 @@ export const getSidebarConfig = (
     }
 
     let stageCounter = 1;
-let startNumbering = false;
+    let startNumbering = false;
 
-const numberedLabels: Record<string, string> = {};
+    const numberedLabels: Record<string, string> = {};
 
-for (const key of Object.keys(filteredLabels)) {
-  if (key === "REQUIREMENTFORM") {
-    startNumbering = true;
-  }
+    for (const key of Object.keys(filteredLabels)) {
+        if (key === "REQUIREMENTFORM") {
+            startNumbering = true;
+        }
 
-  if (startNumbering) {
-    numberedLabels[key] = `${stageCounter} ${filteredLabels[key]}`;
-    stageCounter++;
-  } else {
-    // Don't number stages before REQUIREMENTFORM
-    numberedLabels[key] = filteredLabels[key];
-  }
-}
+        if (startNumbering) {
+            numberedLabels[key] = `${stageCounter} ${filteredLabels[key]}`;
+            stageCounter++;
+        } else {
+            // Don't number stages before REQUIREMENTFORM
+            numberedLabels[key] = filteredLabels[key];
+        }
+    }
 
-// Use numberedLabels in the return
-return {
-  filteredLabels: numberedLabels,
+    // Use numberedLabels in the return
+    return {
+        filteredLabels: numberedLabels,
         filteredIcons,
         filteredPaths
     };
@@ -242,17 +242,30 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                         </div>
 
                         <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
-                            {Object.entries(filteredLabels).map(([key, value]) =>
+                            {Object.entries(filteredLabels).map(([key, value]) => {
+                                const isActive = activeSidebar === value;
+
                                 // <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
-                                filteredPaths[key] && <Link key={value as string} to={filteredPaths[key]} className='outline-none'>
+                                return (filteredPaths[key] && <Link key={value as string} to={filteredPaths[key]} className='outline-none'>
                                     <div
                                         onClick={() => setActiveSidebar(value as string)}
                                         className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar === value ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
-                                            } `}>
+                                            } `}
+                                        ref={el => {
+                                            if (isActive && el) {
+                                                el.scrollIntoView({
+                                                    behavior: "smooth",
+                                                    block: "center"   // 👈 ensures it's centered
+                                                });
+                                            }
+                                        }}
+                                    >
                                         <span className='text-lg'>{value as string}</span>
                                         <span><i className="fa-solid fa-chevron-right"></i></span>
                                     </div>
                                 </Link>
+                                )
+                            }
                             )}
 
 
@@ -293,13 +306,24 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                         <div className='flex items-center flex-col justify-between w-full'>
 
                             {/* <SidebarIcons path icons={icons} activeSidebar={activeSidebar} setActiveSidebar={setActiveSidebar} /> */}
-                            {Object.entries(filteredIcons).map(([key, value]) =>
-                                filteredPaths[key] ?
-                                    <Link to={filteredPaths[key]} className={`${filteredPaths[key] ? "" : "cursor-not-allowed"}`}>
+                            {Object.entries(filteredIcons).map(([key, value]) => {
+                                const isActive = activeSidebar?.toLowerCase() === key.toLowerCase();
+
+                                return (filteredPaths[key] ?
+                                    <Link key={key} to={filteredPaths[key]} className={`${filteredPaths[key] ? "" : "cursor-not-allowed"}`}>
                                         <div
                                             onClick={() => setActiveSidebar(key)}
                                             className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar?.toLowerCase() === key.toLowerCase() ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
-                                                } `}>
+                                                } `}
+                                            ref={el => {
+                                                if (isActive && el) {
+                                                    el.scrollIntoView({
+                                                        behavior: "smooth",
+                                                        block: "center"
+                                                    });
+                                                }
+                                            }}
+                                        >
                                             <i className={`${value} ${activeSidebar?.toLowerCase() === key.toLowerCase() ? 'text-[#4a86f7]' : 'text-[#9ca3af]'} `}></i>
                                         </div>
                                     </Link>
@@ -308,6 +332,8 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                                         className={`cursor-not-allowed flex justify-between max-w-[95%] py-4 px-4`}>
                                         <i className={`${value}`}></i>
                                     </div>
+                                )
+                            }
                             )}
 
                         </div>

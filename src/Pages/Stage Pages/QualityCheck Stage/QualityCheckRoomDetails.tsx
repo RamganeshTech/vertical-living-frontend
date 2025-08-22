@@ -319,7 +319,7 @@ export default function QualityCheckRoomDetails() {
                           setForm({ ...form, status: val })
                         }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger selectedValue={form.status}>
                           <SelectValue
                             selectedValue={form.status}
                             placeholder="Select status"

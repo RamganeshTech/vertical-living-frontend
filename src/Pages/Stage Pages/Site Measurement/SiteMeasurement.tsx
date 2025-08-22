@@ -13,7 +13,7 @@ import {
   useCompletionStatusSiteMeasurement,
   useDeleteSiteRequriementFile
 } from './../../../apiList/Stage Api/siteMeasurementApi';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 
 import type { ProjectDetailsOutlet, SiteDetails, SiteRooms } from "../../../types/types";
 import { toast } from '../../../utils/toast';
@@ -52,6 +52,7 @@ function HomeInteriorProject() {
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>()
 
   if (!projectId) return
+  const navigate = useNavigate()
 
   const [showSiteForm, setShowSiteForm] = useState<boolean>(false);
   const [showRoomForm, setShowRoomForm] = useState<boolean>(false);
@@ -139,6 +140,7 @@ function HomeInteriorProject() {
     try {
       await updateCompletionStatus.mutateAsync({ projectId });
       toast({ description: 'Completion updated', title: "Success" });
+        navigate(`../sampledesign`)
     } catch (error: any) {
       toast({ title: "Error", description: error?.response?.data?.message || "Update failed", variant: "destructive" });
     }

@@ -8,8 +8,11 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import ExternalMain from './Pages/External Units/ExternalMain';
 import WardrobeExternal from './Pages/External Units/WardrobeExternal';
 import SelectedExternalUnits from './Pages/External Units/SelectedExternal Units/SelectedExternalUnits';
-import ProcurementMain from './Pages/Procurement/ProcurementMain';
-import RoomPage from './Pages/RequirementForm/RoomPage';
+import ProcurementMain from './Pages/Department Pages/Procurement/ProcurementMain';
+const RoomPage = lazy(() => import( './Pages/RequirementForm/RoomPage'));
+const HRMainPage = lazy(() => import( './Pages/Department Pages/Hr Pages/HRMainPage'));
+const CommonOrdersMain = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrdersMain'));
+const CommonOrderProject = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrderProject'));
 const RoomDetailCardNew = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCardNew"));
 // const RoomDetailCardNew = 
 
@@ -238,6 +241,22 @@ function App() {
             <Route index element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <ProjectLists />
             </ProtectedRoutes>} />
+
+            <Route path="hr" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <HRMainPage />
+            </ProtectedRoutes>} />
+
+            <Route path="commonorder" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <CommonOrdersMain />
+            </ProtectedRoutes>} >
+
+
+              <Route path=":id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CommonOrderProject />
+              </ProtectedRoutes>} />
+
+            </Route>
+
           </Route>
 
           <Route path='/:organizationId/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner", "client", "CTO", "worker", "staff"]}>
@@ -251,7 +270,7 @@ function App() {
           <Route path="materiallist" element={<MaterialList />} />
           <Route path="transportationlist" element={<Transportationlist />} /> */}
 
-            <Route path="prerequireties" element={
+            <Route path="prerequisites" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <PrerequisitesPage />
               </ProtectedRoutes>
@@ -488,7 +507,7 @@ function App() {
                   <InstallationRoomDetail />
                 </ProtectedRoutes>
               } />*/}
-            </Route> 
+            </Route>
 
             <Route path="qualitycheck" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff",]}>

@@ -1,4 +1,4 @@
-import {  Outlet, useLocation, useParams, useOutletContext } from "react-router-dom";
+import { Outlet, useLocation, useParams, useOutletContext, useNavigate } from "react-router-dom";
 import {
   useCompleteInstallation,
   useGetInstallationDetails,
@@ -13,9 +13,10 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
-import { NO_IMAGE } from './../../../constants/constants';
-import { useState } from "react";
+// import { NO_IMAGE } from './../../../constants/constants';
+// import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -42,10 +43,10 @@ type ProjectDetailsOutlet = {
 export default function InstallationOverview() {
   const { projectId, organizationId } = useParams();
   const location = useLocation();
-
+  const navigate = useNavigate()
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
-   const [showImagePreview, setShowImagePreview] = useState(false)
-    const [previewImage, setPreviewImage] = useState<string>("")
+  // const [showImagePreview, setShowImagePreview] = useState(false)
+  // const [previewImage, setPreviewImage] = useState<string>("")
 
   const isChildRoute = location.pathname.includes("/installationroom");
 
@@ -64,6 +65,7 @@ export default function InstallationOverview() {
     try {
       await completionStatus({ projectId: projectId! });
       toast({ title: "Success", description: "Completion status updated successfully" });
+      navigate('../qualitycheck')
     } catch (error: any) {
       toast({
         title: "Error",
@@ -262,50 +264,50 @@ export default function InstallationOverview() {
 
 
                               <div className="flex items-center gap-3">
-                      <div className="flex flex-col gap-1">
-                        <label className="text-xs font-medium text-gray-600">Update Status</label>
-                        <Select
-                          onValueChange={(val) =>
-                            handleStatusChange(task._id, val as "submitted" | "pending" | "inprogress")
-                          }
-                          value={task.status || ""}
-                        >
-                          <SelectTrigger className="w-40 rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500 bg-white">
-                            <SelectValue placeholder="Select status" selectedValue={task.status || ""} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                                Pending
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="inprogress">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                In Progress
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="submitted">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                Submitted
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                                <div className="flex flex-col gap-1">
+                                  <label className="text-xs font-medium text-gray-600">Update Status</label>
+                                  <Select
+                                    onValueChange={(val) =>
+                                      handleStatusChange(task._id, val as "submitted" | "pending" | "inprogress")
+                                    }
+                                    value={task.status || ""}
+                                  >
+                                    <SelectTrigger className="w-40 rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500 bg-white">
+                                      <SelectValue placeholder="Select status" selectedValue={task.status || ""} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="pending">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                          Pending
+                                        </div>
+                                      </SelectItem>
+                                      <SelectItem value="inprogress">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                          In Progress
+                                        </div>
+                                      </SelectItem>
+                                      <SelectItem value="submitted">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                          Submitted
+                                        </div>
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
 
-                      {updateTaskStatus.isPending && (
-                        <div className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                        </div>
-                      )}
-                    </div>
+                                {updateTaskStatus.isPending && (
+                                  <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
 
                             {/* Images Grid */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                            {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                               {task.images.map((image: any, imageIndex: number) => (
                                 <div
                                   key={image._id || imageIndex}
@@ -323,22 +325,24 @@ export default function InstallationOverview() {
                                     loading="lazy"
                                   />
 
-                                  {/* Hover Overlay */}
-                                  {/* <div className="absolute inset-0 bg-black/70 bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                      <div className="bg-white rounded-full p-2 shadow-lg">
-                                        <i className="fa-solid fa-expand text-gray-700 text-sm" />
-                                      </div>
-                                    </div>
-                                  </div> */}
-
-                                  {/* Image Number Badge */}
                                   <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full">
                                     {imageIndex + 1}
                                   </div>
                                 </div>
                               ))}
-                            </div>
+                            </div> */}
+
+
+                            {/* Image Number Badge */}
+                            <h2 className="text-lg text-gray-500 font-semibold ">Images</h2>
+                            <ImageGalleryExample
+                              imageFiles={task?.images}
+                              // handleDeleteFile={handleDelete}
+                              // className="grid grid-cols-3"
+                              height={80}
+                              minWidth={98}
+                              maxWidth={100}
+                            />
 
                             {/* Empty State for Task with No Images */}
                             {task.images.length === 0 && (
@@ -362,18 +366,18 @@ export default function InstallationOverview() {
                     )}
                   </Card>
                 )
-              :
-                <div className="text-center py-12 text-gray-500">
-                        <i className="fa-solid fa-images text-4xl mb-4 opacity-50" />
-                        <h3 className="text-lg font-medium mb-2">No Installation Images Yet</h3>
-                        <p className="text-sm">Images will appear here once they are uploaded to installation tasks</p>
-                      </div>
-              
-              }
+                  :
+                  <div className="text-center py-12 text-gray-500">
+                    <i className="fa-solid fa-images text-4xl mb-4 opacity-50" />
+                    <h3 className="text-lg font-medium mb-2">No Installation Images Yet</h3>
+                    <p className="text-sm">Images will appear here once they are uploaded to installation tasks</p>
+                  </div>
+
+                }
 
 
 
-                {showImagePreview && previewImage && (
+                {/* {showImagePreview && previewImage && (
                   <div
                     onClick={() => setShowImagePreview(false)}
                     className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[60]"
@@ -393,7 +397,7 @@ export default function InstallationOverview() {
                       />
                     </div>
                   </div>
-                )}
+                )} */}
               </>
             )
           )}

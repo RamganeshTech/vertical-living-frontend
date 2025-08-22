@@ -59,15 +59,15 @@ const getRoomFiles = async ({
 const deleteRoomFile = async ({
     projectId,
     roomName,
-    fileIndex,
+    fileId,
     api
 }: {
     projectId: string;
     roomName: string;
-    fileIndex: number;
+    fileId: string;
     api: AxiosInstance;
 }) => {
-    const { data } = await api.delete(`/sampledesign/${projectId}/rooms/${roomName}/delete/${fileIndex}`);
+    const { data } = await api.delete(`/sampledesign/${projectId}/rooms/${roomName}/delete/${fileId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
@@ -109,8 +109,8 @@ export const useAddRoom = () => {
             if (!api) throw new Error("API instance not found for role");
             return await addRoomToProject({ projectId, roomName, api });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["sampledesign", "rooms"] });
+        onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["sampledesign", "roomfiles", projectId] });
         }
     });
 };
@@ -137,8 +137,8 @@ export const useUploadRoomFiles = () => {
             if (!api) throw new Error("API instance not found for role");
             return await uploadRoomFiles({ projectId, roomName, files, api });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["sampledesign", "roomfiles"] });
+        onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["sampledesign", "roomfiles", projectId] });
         }
     });
 };
@@ -172,18 +172,18 @@ export const useDeleteRoomFile = () => {
         mutationFn: async ({
             projectId,
             roomName,
-            fileIndex
+            fileId
         }: {
             projectId: string;
             roomName: string;
-            fileIndex: number;
+            fileId: string;
         }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
             if (!api) throw new Error("API instance not found for role");
-            return await deleteRoomFile({ projectId, roomName, fileIndex, api });
+            return await deleteRoomFile({ projectId, roomName, fileId, api });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["sampledesign", "roomfiles"] });
+        onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["sampledesign", "roomfiles", projectId] });
         }
     });
 };
@@ -206,8 +206,8 @@ export const useDeleteRoomSampleDesign = () => {
             if (!api) throw new Error("API instance not found for role");
             return await deleteRoom({ projectId , roomId, api });
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["sampledesign", "roomfiles"] });
+        onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["sampledesign", "roomfiles", projectId] });
         }
     });
 };

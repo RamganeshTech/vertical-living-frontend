@@ -1,11 +1,9 @@
-"use client"
-
 import type React from "react"
 import { useState } from "react"
 // import { ToastContainer } from "./components/toast-container"
 import { useGetAllPreRequireties, useUpdatePreRequiretyBoolean, useUpdatePreRequiretyNotes } from './../../apiList/preqRequiretiesApi.ts/preRequiretiesApi';
 import { toast } from "../../utils/toast";
-import { useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import type { ProjectDetailsOutlet } from "../../types/types";
 import { Button } from "../../components/ui/Button";
 
@@ -212,6 +210,7 @@ const PrerequisitesPage: React.FC = () => {
 
     //   const { toast } = useToast()
     const { data, isLoading, error, refetch } = useGetAllPreRequireties(projectId)
+    const navigate = useNavigate()
 
     const workTypes = [
         { key: "modularWork", title: "Modular Work", description: "Prefabricated components and modular construction", _id: data?.data?._id },
@@ -224,6 +223,7 @@ const PrerequisitesPage: React.FC = () => {
             description: "Interior design, painting, and finishing touches",
             _id: data?.data?._id
         },
+        { key: "carpentryWork", title: "Carpentry Work", description: "Woodwork including doors, windows, furniture, partitions, and fittings", _id: data?.data?._id },
     ]
 
     const handleUpdate = () => {
@@ -336,7 +336,7 @@ const PrerequisitesPage: React.FC = () => {
                     {/* Summary */}
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Prerequisites Summary</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                             {workTypes.map((workType) => {
                                 const sectionData = prerequisites[workType.key as keyof typeof prerequisites]
                                 const isRequired = sectionData?.isRequired || false
@@ -368,6 +368,7 @@ const PrerequisitesPage: React.FC = () => {
                         </Button>
                         <Button
                             onClick={() => {
+                                navigate(`../requirementform`)
                                 toast({
                                     title: "Success",
                                     description: "Prerequisites configured successfully. You can now proceed to the 14-step process.",

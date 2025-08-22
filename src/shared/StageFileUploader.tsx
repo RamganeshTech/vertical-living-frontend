@@ -5,6 +5,7 @@ import { Input } from "../components/ui/Input";
 import { toast } from "../utils/toast";
 import { downloadImage } from "../utils/downloadFile";
 import { createPortal } from "react-dom";
+import ImageGalleryExample from "./ImageGallery/ImageGalleryMain";
 
 interface UploadSectionProps {
     formId: string;
@@ -153,14 +154,18 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
                     <ul className="space-y-2  max-h-[180px] rounded-lg border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto custom-scrollbar">
                         {imageFiles.length === 0 && <div className="min-h-[145px]  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
 
-                        {imageFiles.map((file, i) => (
+                        {imageFiles.length > 0 && <ImageGalleryExample
+                            imageFiles={imageFiles} refetch={refetch} handleDeleteFile={handleDeleteFile}
+                            // className="grid grid-cols-3"
+                            height={80}
+                            minWidth={98}
+                            maxWidth={100}
+                        />}
+
+                        {/* {imageFiles.map((file, i) => (
                             <li key={i} className="flex justify-between items-center bg-green-50 sm:p-2 p-1 rounded-xl">
                                 <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
                                 <div className="flex gap-2 items-center">
-                                    {/* <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                                        <i className="fa-solid fa-eye"></i>
-                                    </a> */}
-
                                     <Button size="sm"
                                         variant="primary"
                                         onClick={() => setPopupImage(file?.url)}
@@ -178,35 +183,36 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
 
                                 </div>
                             </li>
-                        ))}
-                        {/* {imageFiles.length === 0 && <p className="text-sm text-gray-500">No images uploaded.</p>} */}
+                        ))} */}
                     </ul>
                 </div>
+
+
             </div>
 
 
-            {popupImage && 
+            {popupImage &&
                 createPortal(
-                <div
-                    onClick={() => setPopupImage(null)}
-                    className="fixed inset-0  bg-black/70 z-50 p-8 bg-opacity-60 flex items-center justify-center"
-                >
                     <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="relative bg-white rounded py-8 px-4 max-w-[90vw] max-h-[80vh] shadow-lg"
+                        onClick={() => setPopupImage(null)}
+                        className="fixed inset-0  bg-black/70 z-50 p-8 bg-opacity-60 flex items-center justify-center"
                     >
-                        <i
-                            className="fas fa-times absolute top-2 right-3 text-xl text-gray-700 hover:text-red-500 cursor-pointer"
-                            onClick={() => setPopupImage(null)}
-                        ></i>
-                        <img
-                            src={popupImage}
-                            alt="Full View"
-                            className="max-h-[70vh] w-auto object-contain rounded"
-                        />
-                    </div>
-                </div>, document.body
-            )}
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative bg-white rounded py-8 px-4 max-w-[90vw] max-h-[80vh] shadow-lg"
+                        >
+                            <i
+                                className="fas fa-times absolute top-2 right-3 text-xl text-gray-700 hover:text-red-500 cursor-pointer"
+                                onClick={() => setPopupImage(null)}
+                            ></i>
+                            <img
+                                src={popupImage}
+                                alt="Full View"
+                                className="max-h-[70vh] w-auto object-contain rounded"
+                            />
+                        </div>
+                    </div>, document.body
+                )}
         </div>
     );
 };

@@ -62,6 +62,8 @@ const PaymentConfirmationStage: React.FC = () => {
       await completeStage({ projectId: projectId! });
       toast({ title: "Success", description: "Completion status updated successfully" });
       refetch();
+      navigate('../ordermaterial')
+
     } catch (error: any) {
       toast({
         title: "Error",

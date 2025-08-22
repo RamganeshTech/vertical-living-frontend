@@ -4,6 +4,9 @@ export const SIDEBAR_LABELS = {
   //   DASHBOARD: "Dashboard",
   PROJECTS: "Projects",
   ORGANIZATION: "Organization",
+  COMMONORDER: "Common Order",
+  // HR: "HR Dept",
+
   // PROCUREMENT: "Procurement",
 
   // ISSUES: "Issues",
@@ -15,6 +18,8 @@ export const SIDEBAR_LABELS = {
 export const SIDEBAR_ICONS = {
   PROJECTS: "fa-solid fa-diagram-project text-2xl",
   ORGANIZATION: "fa-solid fa-building text-2xl",
+  COMMONORDER: "fa-solid fa-box text-2xl",
+  // HR: "fa-solid fa-users text-2xl",
   // PROCUREMENT: "fa-solid fa-box text-2xl",
 
   // ISSUES: "fa-solid fa-bug text-2xl",
@@ -67,10 +72,10 @@ export const PROJECTS_LABELS = {
   // MATERIALS: "Materials",
   // LABOURS: "Labours",
   // TRANSPORTATION: "Transportation",
-  DOCUMENTATION: "Documentation",
+  // DOCUMENTATION: "Documentation",
   WORKERS: "Invite Workers",
   INVITECLIENT: "Invite Client",
-  PREREQUIRETIES: "Pre Requireties",
+  PREREQUISTIES: "Prerequisites",
   REQUIREMENTFORM: "Requirement Form",
   SITEMEASUREMENT: "Site Measurement",
   SAMPLEDESIGN: "Sample Designs",
@@ -95,10 +100,10 @@ export const PROJECTS_ICONS = {
   // MATERIALS: "fa-solid fa-cubes-stacked text-2xl",
   // LABOURS: "fa-solid fa-users text-2xl",
   // TRANSPORTATION: "fa-solid fa-road text-2xl",
-  DOCUMENTATION: "fa-solid fa-file text-2xl",
+  // DOCUMENTATION: "fa-solid fa-file text-2xl",
   WORKERS: "fa-solid fa-circle-info text-2xl",
   INVITECLIENT: "fa-solid fa-user-group text-2xl",
-  PREREQUIRETIES: "fa-solid fa-clipboard text-2xl",
+  PREREQUISTIES: "fa-solid fa-clipboard text-2xl",
   REQUIREMENTFORM: "fa-solid fa-pencil text-2xl",
   SITEMEASUREMENT: "fa-solid fa-building text-2xl",
   SAMPLEDESIGN: "fa-solid fa-object-group text-2xl",
@@ -121,9 +126,9 @@ export const PROJECTS_ICONS = {
 
 
 export const MAIN_PATH_LABEL: Record<any, string> = {
-  labourlist: "Labours",
-  materiallist: "Materials",
-  transportationlist: "Transportation",
+  // labourlist: "Labours",
+  // materiallist: "Materials",
+  // transportationlist: "Transportation",
   workers: "Workers",
   inviteclient: "Invite Client",
   requirementform: "1 Requirement Form",

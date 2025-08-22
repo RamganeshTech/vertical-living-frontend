@@ -87,6 +87,7 @@ export default function Workers() {
       try {
         await removeWorker.mutateAsync({
           workerId,
+          orgId:organizationId!,
           projectId: projectId || "",
         })
         toast({

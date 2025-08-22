@@ -125,7 +125,7 @@ const MaterialArrivalCard: React.FC<MaterialArrivalCardProps> = ({ item, project
             ) : (
               <i className={`fa-solid ${item.isVerified ? "fa-times" : "fa-check"}`}></i>
             )}
-            {item.isVerified ? "Unverify" : "Verify"}
+            {item.isVerified ? "Not Confirm" : "Confirm"}
           </Button>
         </div>
       </div>
