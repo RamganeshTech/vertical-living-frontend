@@ -594,6 +594,7 @@ export interface IEmployment {
     allowances?: number;
     total?: number;
   };
+  specificRole?: string,
   workLocation?: string;
 }
 

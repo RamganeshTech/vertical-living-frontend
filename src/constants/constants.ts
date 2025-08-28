@@ -5,7 +5,7 @@ export const SIDEBAR_LABELS = {
   PROJECTS: "Projects",
   ORGANIZATION: "Organization",
   COMMONORDER: "Common Order",
-  // HR: "HR Dept",
+  HR: "HR Dept",
 
   // PROCUREMENT: "Procurement",
 
@@ -19,7 +19,7 @@ export const SIDEBAR_ICONS = {
   PROJECTS: "fa-solid fa-diagram-project text-2xl",
   ORGANIZATION: "fa-solid fa-building text-2xl",
   COMMONORDER: "fa-solid fa-box text-2xl",
-  // HR: "fa-solid fa-users text-2xl",
+  HR: "fa-solid fa-users text-2xl",
   // PROCUREMENT: "fa-solid fa-box text-2xl",
 
   // ISSUES: "fa-solid fa-bug text-2xl",
@@ -386,6 +386,14 @@ export const PREDEFINED_ROOMS = [
 
 
 
+export const roles = [
+  "Accounting",
+  "Logistics",
+  "Factory Production",
+  "HR & Adminstration",
+  "Legal",
+  "Procurement",
+];
 
 
 

@@ -196,6 +196,7 @@ const fetchStaffsByOrganization = async (orgId: string, api: AxiosInstance) => {
 const inviteStaffToOrganization = async (payload: {
   organizationId: string;
   role: string;
+  specificRole: string
 }, api: AxiosInstance) => {
   const { data } = await api.post("/orgs/invitestafftoorganization", payload);
   if (!data.ok) throw new Error(data.message);
@@ -251,6 +252,7 @@ export const useInviteStaffToOrganization = () => {
     mutationFn: async (payload: {
       organizationId: string;
       role: string;
+      specificRole: string
     }) => {
 
       if (!role) throw new Error("Not authrized")

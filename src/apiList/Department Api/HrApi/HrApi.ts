@@ -17,6 +17,8 @@ export const getEmployees = async ({
   email,
   phone,
   empRole,
+   status,
+  department,
   api
 }: {
   organizationId: string;
@@ -26,10 +28,12 @@ export const getEmployees = async ({
   email?: string;
   phone?: string;
   empRole?: string;
+  status?: string;
+  department?: string;
   api: AxiosInstance;
 }) => {
   const { data } = await api.get(`/department/hr/getallemployee`, {
-    params: { organizationId, page, limit, name, email, phone, empRole }
+    params: { organizationId, page, limit, name, email, phone, empRole, department, status }
   });
   if (!data.ok) throw new Error(data.message);
   return data;
@@ -147,7 +151,7 @@ export const useGetEmployeesInfinite = (organizationId: string, filters?: any) =
     [string, string, string?, any?],
     number
   >({
-    queryKey: ["hr", "employees", organizationId, filters],
+    queryKey: ["hr", "employees", organizationId, { ...filters }],
     enabled: !!organizationId && !!role,
     initialPageParam: 1, // ✅ required
     queryFn: async ({ pageParam = 1 }) => {

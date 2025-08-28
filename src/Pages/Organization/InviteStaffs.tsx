@@ -12,17 +12,10 @@ import { Input } from '../../components/ui/Input';
 import type { OrganizationOutletTypeProps } from './OrganizationChildren';
 // import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
+import { roles } from '../../constants/constants';
 
 
 
-const roles = [
-  "Accounting",
-  "Logistics",
-  "Factory Production",
-  "HR & Admin",
-  "Legal",
-  "Procurement",
-];
 
 const InviteStaffs: React.FC = () => {
 
@@ -33,7 +26,7 @@ const InviteStaffs: React.FC = () => {
 
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
-  const [workerRole, setWorkerRole] = useState("")
+  const [specificRole, setSpecificRole] = useState("")
 
   // 🔎 search filters
   const [searchName, setSearchName] = useState("")
@@ -82,6 +75,7 @@ const InviteStaffs: React.FC = () => {
       const response = await inviteStaff.mutateAsync({
         organizationId: organizationId!,
         role: "staff",
+        specificRole,
       })
       setInviteLink(response?.inviteLink || response)
       toast({
@@ -329,11 +323,11 @@ const InviteStaffs: React.FC = () => {
             <div className="md:col-span-1  space-y-2">
               <Label className="block text-sm text-gray-700 font-medium">Staff Role</Label>
               <Select
-                value={workerRole}
-                onValueChange={(val) => setWorkerRole(val)}
+                value={specificRole}
+                onValueChange={(val) => setSpecificRole(val)}
               >
                 <SelectTrigger className="w-full bg-white text-sm border-gray-300 rounded-md shadow-sm h-10">
-                  <SelectValue placeholder="Select Role" selectedValue={workerRole} />
+                  <SelectValue placeholder="Select Role" selectedValue={specificRole} />
                 </SelectTrigger>
                 <SelectContent>
                   {roles?.map((role) => (

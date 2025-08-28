@@ -5,12 +5,13 @@ import type { RootState } from './store/store';
 import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
-import ExternalMain from './Pages/External Units/ExternalMain';
-import WardrobeExternal from './Pages/External Units/WardrobeExternal';
-import SelectedExternalUnits from './Pages/External Units/SelectedExternal Units/SelectedExternalUnits';
-import ProcurementMain from './Pages/Department Pages/Procurement/ProcurementMain';
-const RoomPage = lazy(() => import( './Pages/RequirementForm/RoomPage'));
-const HRMainPage = lazy(() => import( './Pages/Department Pages/Hr Pages/HRMainPage'));
+const ExternalMain = lazy(() => import( './Pages/External Units/ExternalMain'));
+const WardrobeExternal = lazy(() => import( './Pages/External Units/WardrobeExternal'));
+const SelectedExternalUnits = lazy(() => import( './Pages/External Units/SelectedExternal Units/SelectedExternalUnits'));
+const ProcurementMain = lazy(() => import( './Pages/Department Pages/Procurement/ProcurementMain'));
+const HrSingleEmployeeDetail = lazy(() => import( './Pages/Department Pages/Hr Pages/HrSingleEmployeeDetail'));
+const RoomPage = lazy(() => import('./Pages/RequirementForm/RoomPage'));
+const HRMainPage = lazy(() => import('./Pages/Department Pages/Hr Pages/HRMainPage'));
 const CommonOrdersMain = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrdersMain'));
 const CommonOrderProject = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrderProject'));
 const RoomDetailCardNew = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCardNew"));
@@ -244,7 +245,14 @@ function App() {
 
             <Route path="hr" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <HRMainPage />
-            </ProtectedRoutes>} />
+            </ProtectedRoutes>} >
+
+
+              <Route path=":id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <HrSingleEmployeeDetail />
+              </ProtectedRoutes>} ></Route>
+
+            </Route>
 
             <Route path="commonorder" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <CommonOrdersMain />
