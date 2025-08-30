@@ -44,7 +44,7 @@ export const useGetStageSelection = (projectId: string) => {
         },
         enabled: !!projectId && !!role,
         retry:false,
-        refetchOnMount:false
+        // refetchOnMount:true
     });
 };
 

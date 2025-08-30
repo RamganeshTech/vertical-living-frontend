@@ -85,7 +85,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
 
 
   if (isInProjectDetails && !selectStagePending) {
-    const selection = stageSelectionData;
+    const selection = stageSelectionData.mode;
 
     labelEntries = labelEntries.filter(([key]) => {
       if (!selection) {

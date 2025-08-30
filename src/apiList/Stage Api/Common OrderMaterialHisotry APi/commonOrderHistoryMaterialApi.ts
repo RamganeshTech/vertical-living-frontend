@@ -429,9 +429,9 @@ const updateOrderingMaterialSubItemApi = async ({
 }) => {
 
 
-    console.log("subitem", subItemName)
-    console.log("quantity", quantity)
-    console.log("unit", unit)
+    // console.log("subitem", subItemName)
+    // console.log("quantity", quantity)
+    // console.log("unit", unit)
   const { data } = await api.put(
     `/commonorder/${id}/unit/${unitId}/updatesubitem/${subItemId}`,
     { subItemName, quantity, unit }
@@ -530,6 +530,8 @@ const deleteOrderPdf = async (
   return data.data;
 };
 
+
+
 export const useDeleteCommonOrderMaterialPdf = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
 
@@ -548,6 +550,9 @@ export const useDeleteCommonOrderMaterialPdf = () => {
     },
   });
 };
+
+
+
 
 
 
@@ -578,6 +583,47 @@ export const useCommonOrderMaterialGenerateLink = () => {
     },
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["common-order-single", id] });
+    },
+  });
+};
+
+
+
+
+
+
+const updateCommonPdfStatus = async ({
+  id,
+  pdfId,
+  status,
+  api,
+}: {
+  id: string;
+  pdfId: string;
+  status: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.patch(`/commonorder/upddatepdfstatus/${id}/${pdfId}`, {status});
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+
+export const useUpdateCommonOrderPdfStatus = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ id , pdfId, status }: { id: string, pdfId:string, status:string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await updateCommonPdfStatus({ id, pdfId, status, api });
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", id] });
     },
   });
 };

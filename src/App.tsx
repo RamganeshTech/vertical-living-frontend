@@ -5,6 +5,7 @@ import type { RootState } from './store/store';
 import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
+const InventoryMain  = lazy(() => import( './Pages/Stage Pages/Inventory Main/InventoryMain'));
 const ExternalMain = lazy(() => import( './Pages/External Units/ExternalMain'));
 const WardrobeExternal = lazy(() => import( './Pages/External Units/WardrobeExternal'));
 const SelectedExternalUnits = lazy(() => import( './Pages/External Units/SelectedExternal Units/SelectedExternalUnits'));
@@ -281,6 +282,14 @@ function App() {
             <Route path="prerequisites" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <PrerequisitesPage />
+              </ProtectedRoutes>
+            } />
+
+
+
+            <Route path="inventory" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+                <InventoryMain />
               </ProtectedRoutes>
             } />
 

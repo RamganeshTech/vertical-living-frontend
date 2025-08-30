@@ -21,6 +21,7 @@ import {
     useGetSingleCommonOrder,
     useUpdateCommonOrderDeliveryLocation,
     useUpdateCommonOrderMaterialSubItem,
+    useUpdateCommonOrderPdfStatus,
     useUpdateCommonOrderShopDetails
 } from "../../../apiList/Stage Api/Common OrderMaterialHisotry APi/commonOrderHistoryMaterialApi"
 import { toast } from "../../../utils/toast"
@@ -80,6 +81,7 @@ const CommonOrderProject = () => {
     const [shopForm, setShopForm] = useState<any>({});
 
 
+
     const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
     const [editingCell, setEditingCell] = useState<{
         subItemId: string;
@@ -103,6 +105,8 @@ const CommonOrderProject = () => {
     const { mutateAsync: updateShop, isPending: shopPending } = useUpdateCommonOrderShopDetails()
     const { mutateAsync: generateLink, isPending: generatePending } = useCommonOrderMaterialGenerateLink()
     const { mutateAsync: deletePdf, isPending: deletepdfPending } = useDeleteCommonOrderMaterialPdf()
+    const { mutateAsync: updateCommonOrderPdfStatus } = useUpdateCommonOrderPdfStatus()
+
     // const { mutateAsync: completionStatus, isPending: completePending } = useCompleteCommonOrderMaterialHistoryStage()
 
 
@@ -296,6 +300,20 @@ const CommonOrderProject = () => {
             toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete" });
         }
     };
+
+
+    const handleUpdatePdfStatus = async (pdfId: string, status: string) => {
+        try {
+            await updateCommonOrderPdfStatus({ id: id!, pdfId, status });
+
+            toast({ title: "Success", description: "Pdf status updated successfully" });
+            refetch()
+
+        } catch (err: any) {
+            toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to update status", variant: "destructive" });
+        }
+    };
+
 
 
     const selectedUnits = data?.selectedUnits || [];
@@ -1071,6 +1089,43 @@ const CommonOrderProject = () => {
                                                 >
                                                     Download PDF
                                                 </Button>
+
+
+                                                  <div className="relative  min-w-[160px]">
+                                                            <label
+                                                                htmlFor={`pdf-status-${ele._id}`}
+                                                                className="hidden md:block mb-1 text-sm font-medium text-gray-600 absolute top-[-20px]"
+                                                            >
+                                                                Order Status
+                                                            </label>
+                                                            <select
+                                                                id={`pdf-status-${ele._id}`}
+                                                                value={ele.status || "pending"}
+                                                                onChange={async (e) => {
+                                                                    const val = e.target.value;
+                                                                  
+                                                                    await handleUpdatePdfStatus(ele._id, val);
+                                                                }}
+                                                                className="
+                                                                                    w-full h-[45px] px-3 py-2 text-md  bg-white border  rounded-xl shadow 
+                                                                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                                                                    disabled:opacity-50 appearance-none transition ease-in-out
+                                                                                    border-blue-300 text-blue-800  hover:border-blue-400
+                                                                                    "
+                                                            >
+                                                                {/* <option disabled value="">Select Status</option> */}
+                                                                {["pending", "delivered", "shipped", "ordered", "cancelled"].map((status) => (
+                                                                    <option key={status} value={status}>
+                                                                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+
+                                                            {/* Custom dropdown chevron icon */}
+                                                            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                                                                <i className="fas fa-chevron-down text-xs"></i>
+                                                            </div>
+                                                        </div>
 
 
                                                 <Button

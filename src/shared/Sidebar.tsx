@@ -26,6 +26,8 @@ type SidebarProp = {
     icons: Record<string, string>,
     projectId?: string | null,
     path: Record<string, string>,
+    setProjectName?: React.Dispatch<React.SetStateAction<string>>,
+    projectName?: string
 }
 
 
@@ -50,6 +52,7 @@ export const getSidebarConfig = (
         // Base ordered stage keys
         let orderedKeys: string[] = [
             "DOCUMENTATION",
+            "INVENTORY",
             "WORKERS",
             "INVITECLIENT",
             "PREREQUISTIES",
@@ -129,7 +132,7 @@ export const getSidebarConfig = (
 
 
 
-const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
+const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, projectName }) => {
     const [showSideBar, setShowSideBar] = useState(false)
     const { projectId } = useParams() as { projectId: string }
     const navigate = useNavigate()
@@ -142,14 +145,20 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     const [activeSidebar, setActiveSidebar] = useState<string>('');
 
     const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
-
+    // console.log("stageSelectinDate", stageSelectionData)
     const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending, } = useLogoutCTO()
     const { mutateAsync: ClientLogoutAsync, isPending: isClientPending, } = useLogoutClient()
     const { mutateAsync: StaffLogoutAsync, isPending: isStaffPending, } = useLogoutStaff()
     const { mutateAsync: LogoutLogoutAsync, isPending: isUserPending, } = useLogoutUser()
     const { mutateAsync: WorkerLogoutAsync, isPending: isWorkerPending, } = useLogoutWorker()
 
-
+    useEffect(() => {
+        if (setProjectName) {
+            if (stageSelectionData && stageSelectionData.projectName) {
+                setProjectName(stageSelectionData.projectName || "Project")
+            }
+        }
+    }, [stageSelectionData])
 
 
     const handleSideBarClose = () => {
@@ -159,6 +168,9 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
     const handleSideBarOpen = () => {
         setShowSideBar(true)
     }
+
+       
+        const isProjectDetailRoute = pathArray[2] === "projectdetails"
 
     useEffect(() => {
         const pathArray = location.pathname.split('/')
@@ -173,7 +185,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
 
     useSidebarShortcut(handleSideBarOpen, handleSideBarClose);
 
-    const stageType = !selectStagePending && stageSelectionData; // "Manual Flow" | "Modular Units" | null
+    const stageType = !selectStagePending && stageSelectionData?.mode; // "Manual Flow" | "Modular Units" | null
 
     let { filteredLabels, filteredIcons, filteredPaths } = getSidebarConfig(stageType, labels, path, pathArray, icons);
 
@@ -235,7 +247,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path }) => {
                 <aside onMouseLeave={() => setShowSideBar(false)} className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
                     <div className="flex flex-col flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar p-2 large-scrollbar">
                         <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b-1 py-2`}>
-                            <span className='text-xl'>{COMPANY_DETAILS.COMPANY_NAME}</span>
+                            <span className='text-xl'>{isProjectDetailRoute ? (projectName || "Project") : COMPANY_DETAILS.COMPANY_NAME}</span>
                             <div className='w-[30px] h-[30px]' >
                                 <img className='w-full h-full' src={COMPANY_DETAILS.COMPANY_LOGO} alt="LOGO" />
                             </div>

@@ -7,6 +7,8 @@ export type ProjectDetailsOutlet = {
   isMobileSidebarOpen: boolean;
   openMobileSidebar: () => void;
   closeMobileSidebar: () => void;
+  setProjectName: React.Dispatch<React.SetStateAction<string>>
+  projectName: string
 }
 
 

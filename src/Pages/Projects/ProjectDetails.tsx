@@ -21,6 +21,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
   // ProjectDetails.tsx (your layout)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
+  const [projectName, setProjectName] = useState<string>("Vertical Living");
 
 
   useLayoutEffect(() => {
@@ -53,6 +54,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     // MATERIALS: projectId ? `/${organizationId}/projectdetails/${projectId}/materiallist` : "",
     // TRANSPORTATION: projectId ? `/${organizationId}/projectdetails/${projectId}/transportationlist` : "",
     // DOCUMENTATION: projectId ? `/${organizationId}/projectdetails/${projectId}/document` : "",
+    INVENTORY: projectId ? `/${organizationId}/projectdetails/${projectId}/inventory` : "",
     WORKERS: projectId ? `/${organizationId}/projectdetails/${projectId}/workers` : "",
     INVITECLIENT: projectId ? `/${organizationId}/projectdetails/${projectId}/inviteclient` : "",
     PREREQUISTIES: projectId ? `/${organizationId}/projectdetails/${projectId}/prerequisites` : "",
@@ -92,6 +94,8 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
             path={path}
             labels={PROJECTS_LABELS}
             icons={PROJECTS_ICONS}
+            setProjectName={setProjectName}
+            projectName={projectName}
           />
         )}
 
@@ -102,6 +106,8 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
             isMobileSidebarOpen,
             openMobileSidebar: () => setIsMobileSidebarOpen(true),
             closeMobileSidebar: () => setIsMobileSidebarOpen(false),
+            setProjectName,
+            projectName
           }} />
         </main>
       </div>

@@ -172,6 +172,24 @@ const generatedPublicLink = async ({
 };
 
 
+
+const updatePdfStatus = async ({
+  projectId,
+  pdfId,
+  status,
+  api,
+}: {
+  projectId: string;
+  pdfId: string;
+  status: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.patch(`/orderingmaterial/upddatepdfstatus/${projectId}/${pdfId}`, {status});
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
 export const useOrderHistoryGenerateLink = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
@@ -182,6 +200,24 @@ export const useOrderHistoryGenerateLink = () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await generatedPublicLink({ projectId, api });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+
+export const useUpdatePdfStatus = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId , pdfId, status }: { projectId: string, pdfId:string, status:string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await updatePdfStatus({ projectId, pdfId, status, api });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
@@ -221,6 +257,7 @@ export const useAddOrderingMaterialSubItem = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async ({
@@ -242,6 +279,10 @@ export const useAddOrderingMaterialSubItem = () => {
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["inventory", vars.projectId],
+         refetchType: 'active' // Force active queries to refetch
+      });
     },
   });
 };
@@ -269,7 +310,7 @@ export const useDeleteOrderingMaterialSubItem = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({
       projectId,
@@ -286,6 +327,10 @@ export const useDeleteOrderingMaterialSubItem = () => {
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["inventory", vars.projectId],
+         refetchType: 'active' // Force active queries to refetch
+      });
     },
   });
 };
@@ -320,6 +365,7 @@ export const useUpdateOrderingMaterialSubItem = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async ({
@@ -351,6 +397,12 @@ export const useUpdateOrderingMaterialSubItem = () => {
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["inventory", vars.projectId],
+         refetchType: 'active' // Force active queries to refetch
+      });
+
+      
     },
   });
 };

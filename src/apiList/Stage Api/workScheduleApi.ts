@@ -162,6 +162,28 @@ const createCorrection = async ({
   return data.data;
 };
 
+
+
+const uploadSelectImageManually = async ({
+  scheduleId ,
+  comparisonId,
+  formData,
+  api,
+}: {
+  projectId: string;
+  scheduleId: string;
+  comparisonId: string | null;
+  formData: FormData;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.put(
+    `/worktasks/uploadselectimagemanually/${scheduleId}/${comparisonId}`,
+    formData
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
 const uploadCorrectedImage = async ({
   scheduleId,
   comparisonId,
@@ -199,6 +221,27 @@ const updateSelectedImageComment = async ({
   const { data } = await api.put(
     `/worktasks/updateSelectimagecomment/${scheduleId}/${comparisonId}/${selectedImageId}`,
     formData
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+const deleteSelectImage = async ({
+ 
+  scheduleId,
+  comparisonId,
+  selectId,
+  api,
+}: {
+  projectId: string;
+  scheduleId: string;
+  comparisonId: string;
+  selectId: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.delete(
+    `/worktasks/deleteselectimages/${scheduleId}/${comparisonId}/${selectId}`
   );
   if (!data.ok) throw new Error(data.message);
   return data.data;
@@ -435,8 +478,17 @@ export const useDeleteWork = () => {
 
 
 export const useUploadDailyScheduleImages = () => {
+
+
+  
+    const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const allowedRoles = ["owner", "staff", "CTO", "worker", "client"];
+  
+
+
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       scheduleId,
       taskId,
       date,
@@ -447,7 +499,13 @@ export const useUploadDailyScheduleImages = () => {
       projectId:string;
       date: string;
       files: File[];
-    }) => uploadDailyScheduleImagesApi(scheduleId, taskId, date, files),
+    }) =>{
+       if (!role || !allowedRoles.includes(role))
+        throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+
+      return await uploadDailyScheduleImagesApi(scheduleId, taskId, date, files)
+    },
      onSuccess: (_, { projectId }) => {
       if (projectId) {
         queryClient.invalidateQueries({ queryKey: ["work-schedule", projectId] });
@@ -459,9 +517,20 @@ export const useUploadDailyScheduleImages = () => {
 
 // newly created dlete ai for contrllers 
 export const useDeleteDailyScheduleImage = () => {
+
+    const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const allowedRoles = ["owner", "staff", "CTO", "worker", "client"];
+  
+
+
   return useMutation({
     mutationFn: async ({scheduleId,taskId,date,imageId,}: 
       {scheduleId: string;taskId: string; projectId: string;date: string;imageId: string;})=> {
+         if (!role || !allowedRoles.includes(role))
+        throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+
       return await deleteDailyScheduleImageApi({scheduleId, taskId, date, imageId})
     },
     onSuccess:(_, {projectId})=>{
@@ -539,8 +608,42 @@ export const useCreateCorrection = () => {
   });
 };
 
-export const useUploadCorrectedImage = () => {
+export const useUploadSelectImageManaully = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+      scheduleId,
+      comparisonId,
+      formData,
+    }: {
+      projectId: string;
+      scheduleId: string;
+      comparisonId: string | null;
+      formData: FormData;
+    }) => {
+      if (!role || !allowedRoles.includes(role))
+        throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await uploadSelectImageManually({
+        projectId,
+        scheduleId,
+        comparisonId,
+        formData,
+        api,
+      });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["daily-schedule", projectId] });
+    },
+  });
+};
+
+export const useUploadCorrectedImage = () => {
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -611,7 +714,7 @@ export const useUpdateSelectedImageComment = () => {
 };
 
 export const useDeleteCorrectedImage = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -643,6 +746,42 @@ export const useDeleteCorrectedImage = () => {
     },
   });
 };
+
+
+export const useDeleteSelectedImage = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+      scheduleId,
+      comparisonId,
+      selectId,
+    }: {
+      projectId: string;
+      scheduleId: string;
+      comparisonId: string;
+      selectId: string;
+    }) => {
+      if (!role || !allowedRoles.includes(role))
+        throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await deleteSelectImage({
+        projectId,
+        scheduleId,
+        comparisonId,
+        selectId,
+        api,
+      });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["daily-schedule", projectId] });
+    },
+  });
+};
+
 
 // export const useAddWorkPlan = () => {
 //   const { role } = useGetRole();

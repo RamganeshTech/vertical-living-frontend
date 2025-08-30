@@ -57,13 +57,13 @@ const TechnicalConsultant: React.FC = () => {
             toast({ description: 'Completion status updated successfully', title: "Success" });
 
             if (!selectStagePending) {
-                if (!stageSelectionData) {
+                if (!stageSelectionData.mode) {
                     navigate('../selectstage')
                 }
-                else if (stageSelectionData && stageSelectionData === "Manual Flow") {
+                else if (stageSelectionData && stageSelectionData.mode === "Manual Flow") {
                     navigate('../materialselection')
 
-                } else if (stageSelectionData && stageSelectionData === "Modular Units") {
+                } else if (stageSelectionData && stageSelectionData?.mode === "Modular Units") {
                     navigate('../modularunits')
                 }
             } else {

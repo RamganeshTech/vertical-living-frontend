@@ -5,17 +5,18 @@ import { downloadImage } from "../../utils/downloadFile"
 import { createPortal } from "react-dom"
 
 
-interface ImageFile {
-  _id: string
-  url: string
-  originalName?: string
-}
+// interface ImageFile {
+//   _id: string
+//   url: string
+//   originalName?: string
+// }
 
 
 interface ImageFile {
   _id: string
   url: string
   originalName?: string
+  comment?: string
 }
 
 interface ImageGalleryProps {
@@ -24,10 +25,19 @@ interface ImageGalleryProps {
   onDelete?: (fieldId: string) => Promise<any> | undefined
   isDeleting?: boolean
   refetch?: () => void
-  minWidth?:number,
-  maxWidth?:number,
+  minWidth?: number,
+  maxWidth?: number,
   className?: string,
   heightClass?: number,
+
+
+  isComments?: boolean; // enable/disable comment UI
+  editingId?: string | null;
+  tempComment?: Record<string, string>;
+  setEditingId?: (id: string | null) => void;
+  setTempComment?: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  onUpdateComment?: (imageId: string, newComment: string) => void;
+
 }
 
 export function ImageGallery({
@@ -37,12 +47,21 @@ export function ImageGallery({
   isDeleting = false,
   refetch,
   className = "",
-  minWidth=100,
-  maxWidth=100,
-  heightClass = 0
+  minWidth = 100,
+  maxWidth = 100,
+  heightClass = 0,
+  isComments,
+
+
+  editingId,
+  tempComment,
+  setEditingId,
+  setTempComment,
+  onUpdateComment,
 }: ImageGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [hoveredCommentId, setHoveredCommentId] = useState<string | null>(null);
 
   const [imageHeights, setImageHeights] = useState<{ [key: string]: number }>({})
 
@@ -93,23 +112,23 @@ export function ImageGallery({
 
 
   const goToPrevious = () => {
-  if (selectedImageIndex !== null) {   
-    setSelectedImageIndex(
-      (selectedImageIndex - 1 + images.length) % images.length
-    );
-  }
-};
+    if (selectedImageIndex !== null) {
+      setSelectedImageIndex(
+        (selectedImageIndex - 1 + images.length) % images.length
+      );
+    }
+  };
 
 
 
-  
-const goToNext = () => {
-  if (selectedImageIndex !== null) {
-    setSelectedImageIndex(
-      (selectedImageIndex + 1) % images.length
-    );
-  }
-};
+
+  const goToNext = () => {
+    if (selectedImageIndex !== null) {
+      setSelectedImageIndex(
+        (selectedImageIndex + 1) % images.length
+      );
+    }
+  };
 
   //   useEffect(() => {
   //   const handleEscape = (e: KeyboardEvent) => {
@@ -125,7 +144,7 @@ const goToNext = () => {
   //     document.body.style.overflow = "hidden"
   //   }
 
-    
+
 
   //   return () => {
   //     document.removeEventListener("keydown", handleEscape)
@@ -133,27 +152,27 @@ const goToNext = () => {
   //   }
   // }, [isPopupOpen])
 
-useEffect(() => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      closePopup();
-    } else if (e.key === "ArrowRight") {
-      goToNext(); // 👈 your function to go next
-    } else if (e.key === "ArrowLeft") {
-      goToPrevious(); // 👈 your function to go previous
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closePopup();
+      } else if (e.key === "ArrowRight") {
+        goToNext(); // 👈 your function to go next
+      } else if (e.key === "ArrowLeft") {
+        goToPrevious(); // 👈 your function to go previous
+      }
+    };
+
+    if (isPopupOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     }
-  };
 
-  if (isPopupOpen) {
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
-  }
-
-  return () => {
-    document.removeEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "unset";
-  };
-}, [isPopupOpen, goToNext, goToPrevious, closePopup]);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [isPopupOpen, goToNext, goToPrevious, closePopup]);
 
   const handleDelete = async (id: string) => {
     if (onDelete) {
@@ -226,46 +245,89 @@ useEffect(() => {
           const height = imageHeights[image._id] || 200
           return (
             <>
-            <div
-              key={image._id}
-              className="relative cursor-pointer bg-gray-100 overflow-hidden mb-1 break-inside-avoid"
-              style={{
-                // flex: "1 1 180px",   // each item at least 180px wide, shrink/grow as needed
-                // flex: "0 1 180px",
-                flex: `0 1 ${minWidth}px`,
-                minWidth: `${minWidth}px`,
-                maxWidth: `${maxWidth}px`,
-                // 🚀 don’t grow/shrink
-                // width: `${width || 180}px`,     // <- you can add `width` as a prop
-                height: `${heightClass || height}px`,
-              }}
-              // style={{ height: `${heightClass || height}px` }}
-              onClick={() => openPopup(index)}
-            >
-              <img
-                src={image?.url || NO_IMAGE}
-                alt={image?.originalName || `Image ${index + 1}`}
-                className="w-full cursor-pointer h-full object-cover"
-                loading="lazy"
-                onLoad={(e) => {
-                  const img = e.target as HTMLImageElement
-                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
-                }}
-              />
-              <img
-                src={image?.url || NO_IMAGE}
-                alt={image?.originalName || `Image ${index + 1}`}
-                className="w-full cursor-pointer h-full object-cover"
-                loading="lazy"
-                onLoad={(e) => {
-                  const img = e.target as HTMLImageElement
-                  handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
-                }}
-              />
+              <div
+                key={image._id}
+                className={`relative cursor-pointer bg-gray-100 overflow-hidden mb-1 break-inside-avoid ${isComments ? "flex flex-col" : ""}`}
+                style={{
+                  // flex: "1 1 180px",   // each item at least 180px wide, shrink/grow as needed
+                  flex: `0 1 ${minWidth}px`,
+                  minWidth: `${minWidth}px`,
+                  maxWidth: `${maxWidth}px`,
+                  height: isComments
+                    ? `${(heightClass || height) + 40 }px` // extra space for comment box
+                    : `${heightClass || height}px`,
 
-              
-            </div>
-             {/* <div
+                }}
+                onClick={() => openPopup(index)}
+              >
+                <img
+                  src={image?.url || NO_IMAGE}
+                  alt={image?.originalName || `Image ${index + 1}`}
+                  className={`w-full cursor-pointer ${isComments ? "" : "h-full"} object-cover`}
+                  loading="lazy"
+                  onLoad={(e) => {
+                    const img = e.target as HTMLImageElement
+                    handleImageLoad(image._id, img.naturalWidth, img.naturalHeight)
+                  }}
+                />
+
+
+                {isComments && (
+                  <div
+                    className="text-xs border-t border-gray-200 bg-gray-50 p-1 h-full border overflow-y-auto custom-scrollbar"
+                    // onClick={(e) => e.stopPropagation()} // stop opening popup when editing
+                    onMouseEnter={() => setHoveredCommentId(image._id)}
+                    onMouseLeave={() => setHoveredCommentId(null)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                          setEditingId?.(image._id);
+                          setTempComment?.((prev) => ({
+                            ...prev,
+                            [image._id]: image.comment || "",
+                          }));
+                        }}
+                  >
+                    {editingId === image._id ? (
+                      <input
+                        autoFocus
+                        value={tempComment?.[image._id] || ""}
+                        onChange={(e) =>
+                          setTempComment?.((prev) => ({ ...prev, [image._id]: e.target.value }))
+                        }
+                        onBlur={() => onUpdateComment?.(image._id, tempComment?.[image._id] || "")}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            onUpdateComment?.(image._id, tempComment?.[image._id] || "");
+                          }
+                        }}
+                        className="w-full border p-1 rounded text-xs"
+                      />
+                    ) : (
+                      <div
+                        
+                        className="cursor-pointer p-1 hover:bg-gray-100 rounded"
+                      >
+                        <div className="flex items-start gap-1">
+                          <i className="fas fa-comment text-gray-400 mt-0.5" />
+                          <p className="whitespace-pre-wrap break-words text-gray-700 text-xs">
+                            {image.comment || (
+                              <span className="italic text-gray-400">Add a comment</span>
+                            )}
+                          </p>
+                          
+                            {hoveredCommentId === (image as any)._id && (
+                              <i className="fas fa-pen ml-auto text-gray-400 text-xs mt-1" />
+                            )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+
+              </div>
+              {/* <div
               key={image._id}
               className="relative cursor-pointer bg-gray-100 overflow-hidden mb-1 break-inside-avoid"
               style={{
@@ -489,7 +551,7 @@ useEffect(() => {
               </button>
             )}
 
-            { (
+            {(
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -516,7 +578,16 @@ useEffect(() => {
                 alt={currentImage.originalName || `Image ${selectedImageIndex !== null ? selectedImageIndex + 1 : 1}`}
                 className="max-w-full max-h-full object-contain"
               />
+
+              {/* ✅ Show comments only if enabled */}
+              {isComments && (
+                <div className="absolute bottom-0 w-full bg-black/40 text-white text-xs p-1">
+                  {currentImage?.comment || "No comments yet"}
+                </div>
+              )}
+
             </div>
+
 
             {/* Image Counter */}
             <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black/50 px-4 py-2 rounded-full">
@@ -532,8 +603,29 @@ useEffect(() => {
 
 // Example usage component
 
-export default function ImageGalleryExample({ imageFiles = [], height, refetch, handleDeleteFile, className = "", minWidth, maxWidth }: { height: number, imageFiles: any, handleDeleteFile?: (...args: any[]) => any, refetch?:() => Promise<any>, className?: string, minWidth?:number,maxWidth?:number }) {
-// console.log("imageFiles", imageFiles)
+export default function ImageGalleryExample({ imageFiles = [], height, refetch, handleDeleteFile,
+  className = "", minWidth, maxWidth,
+
+  isComments = false,
+  editingId,
+  tempComment,
+  setEditingId,
+  setTempComment,
+  onUpdateComment
+}:
+  {
+    isComments?: boolean, height: number, imageFiles: any,
+    handleDeleteFile?: (...args: any[]) => any, refetch?: () => Promise<any>, className?: string,
+    minWidth?: number, maxWidth?: number,
+
+    editingId?: string | null;
+    tempComment?: Record<string, string>;
+    setEditingId?: (id: string | null) => void;
+    setTempComment?: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+    onUpdateComment?: (imageId: string, newComment: string) => void;
+
+  }) {
+  // console.log("imageFiles", imageFiles)
   return (
     // <div className="p-6">
     <>
@@ -547,7 +639,15 @@ export default function ImageGalleryExample({ imageFiles = [], height, refetch, 
         className={className}
         heightClass={height}
         minWidth={minWidth}
-         maxWidth={maxWidth}
+        maxWidth={maxWidth}
+        isComments={isComments}
+
+
+        editingId={editingId}
+        tempComment={tempComment}
+        setEditingId={setEditingId}
+        setTempComment={setTempComment}
+        onUpdateComment={onUpdateComment}
       />
 
     </>

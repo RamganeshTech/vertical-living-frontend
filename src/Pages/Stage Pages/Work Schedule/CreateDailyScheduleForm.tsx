@@ -792,7 +792,7 @@
 
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, Fragment } from "react"
 import { Button } from "../../../components/ui/Button"
 import { Input } from "../../../components/ui/Input"
 import { Textarea } from "../../../components/ui/TextArea"
@@ -800,10 +800,11 @@ import { Label } from "../../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select"
 // import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
-import { useCreateCorrection, useCreateWork, useDeleteCorrectedImage, useGeneratePdfWorkSchedule, useGetProjectAssigneDetail, useUpdateSelectedImageComment, useUpdateWork, useUploadCorrectedImage } from "../../../apiList/Stage Api/workScheduleApi"
+import { useCreateCorrection, useCreateWork, useDeleteCorrectedImage, useDeleteSelectedImage, useGeneratePdfWorkSchedule, useGetProjectAssigneDetail, useUpdateSelectedImageComment, useUpdateWork, useUploadCorrectedImage, useUploadSelectImageManaully } from "../../../apiList/Stage Api/workScheduleApi"
 import { toast } from "../../../utils/toast"
 import { downloadImage } from "../../../utils/downloadFile"
 import { useCurrentSupervisor } from "../../../Hooks/useCurrentSupervisor"
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 // import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 // import { NO_IMAGE } from "../../../constants/constants"
 
@@ -846,7 +847,7 @@ interface SupervisorCheck {
     reviewerName: string
     reviewerId: string
     reviewDateTime: string
-    status: "approved" | "needs_changes" | "rejected" | ""
+    status: "approved" | "needs_changes" | "pending" | ""
     remarks: string
     gatekeeping: "block" | "allow_with_watch"
 }
@@ -928,7 +929,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
 
     const [sliderPosition, setSliderPosition] = useState(50)
-    const [isDragging, setIsDragging] = useState(false)
+    const [Image, setIsDragging] = useState(false)
 
     const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
 
@@ -1008,7 +1009,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             reviewerName: currentUser?.name || "",
             reviewerId: currentUser?.id || "",
             reviewDateTime: formatDateTimeLocal(new Date()),
-            status: "needs_changes",
+            status: "pending",
             remarks: "",
             gatekeeping: "block",
         },
@@ -1019,7 +1020,27 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
 
     const [workComparion, setWorkComparions] = useState<IWorkComparison[] | any[]>([])
+    const [isImageDragging, setIsImageDragging] = useState(false);
 
+    // const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    //     e.preventDefault();
+    //     setIsImageDragging(true);
+    // };
+
+    // const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    //     e.preventDefault();
+    //     setIsImageDragging(false);
+    // };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>, section: "site" | "design") => {
+        e.preventDefault();
+        setIsDragging(false);
+
+        const dt = new DataTransfer();
+        Array.from(e.dataTransfer.files).forEach(file => dt.items.add(file));
+
+        handleFileUpload(dt.files, section); // dynamically pass "site" or "design"
+    };
 
 
 
@@ -1342,57 +1363,6 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
         }
     }
 
-    //     const handleFileUpload = (files: FileList | null, type: "design" | "site" | "task") => {
-    //     if (!files) return
-
-    //     // Array.from(files).forEach((_file:any) => {
-    //     //   const reader = new FileReader()
-    //     //   reader.onload = (e) => {
-    //         // const newImage: ImageFile = {
-    //         // //   _id: Date.now().toString(),
-    //         //   fileType: "image",
-    //         //   url: e.target?.result as string,
-    //         //   originalName: file.name,
-    //         // //   uploadedAt: new Date(),
-    //         // }
-    //   const fileArray = Array.from(files); // convert FileList to array
-
-    //         if (type === "design") {
-    //           setFormData((prev) => ({
-    //             ...prev,
-    //             designPlanImages: [...prev.designPlanImages, fileArray],
-    //           }))
-    //         } else if (type === "site") {
-    //           setFormData((prev) => ({
-    //             ...prev,
-    //             siteImages: [...prev.siteImages, fileArray],
-    //           }))
-    //         } else if (type === "task" && selectedTaskIndex !== null) {
-    //         //   setFormData((prev) => ({
-    //         //     ...prev,
-    //         //     dailyTasks: prev.dailyTasks.map((task, i) =>
-    //         //       i === selectedTaskIndex
-    //         //         ? {
-    //         //             ...task,
-    //         //             uploadedImages: [
-    //         //               ...task.uploadedImages,
-    //         //               {
-    //         //                 _id: Date.now().toString(),
-    //         //                 date: new Date(),
-    //         //                 uploads: [newImage],
-    //         //               },
-    //         //             ],
-    //         //           }
-    //         //         : task,
-    //         //     ),
-    //         //   }))
-    //         }
-    //     //   }
-    //     //   reader.readAsDataURL(file)
-    //     // })
-    //   }
-
-
 
     const handleFileUpload = (files: FileList | null, type: "design" | "site") => {
         if (!files) return;
@@ -1470,14 +1440,17 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
 
     //CORRECTION UPDLOADS
-    const [hoveredCommentId, setHoveredCommentId] = useState<string | null>(null);
+    // const [hoveredCommentId, setHoveredCommentId] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [tempComment, setTempComment] = useState<Record<string, string>>({});
 
     const { mutateAsync: createCorrection, isPending } = useCreateCorrection();
-    const { mutateAsync: uploadCorrectedImage, isPending: uploadcorrectPending } = useUploadCorrectedImage();
-    const { mutateAsync: deleteCorrectedImage, isPending: deleteCorrectPending } = useDeleteCorrectedImage();
+    const { mutateAsync: uploadCorrectImageManually, isPending: crctImgPending } = useUploadSelectImageManaully();
     const { mutateAsync: updateCommentSelectImage } = useUpdateSelectedImageComment();
+    const { mutateAsync: deleteSelectImage } = useDeleteSelectedImage();
+
+    const { mutateAsync: uploadCorrectedImage, isPending: uploadcorrectPending } = useUploadCorrectedImage();
+    const { mutateAsync: deleteCorrectedImage } = useDeleteCorrectedImage();
 
 
     const toggleImageSelection = (image: any) => {
@@ -1539,10 +1512,43 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
             // 🔥 update local state with new corrected images
             setWorkComparions(response);
-        } catch (err) {
+        } catch (err: any) {
             toast({
                 title: "Error",
-                description: "Failed to upload corrected images",
+                description: err?.response?.data?.message || "Failed to upload corrected images",
+                variant: "destructive",
+            });
+        }
+    };
+
+
+    const handleUploadSelectImgManually = async (
+        files: FileList | null,
+        compId: string | null
+    ) => {
+        if (!files || files.length === 0) return;
+
+        const formData = new FormData();
+        Array.from(files).forEach((file) => {
+            formData.append("correctfiles", file);
+        });
+
+        try {
+            const response = await uploadCorrectImageManually({
+                projectId,
+                scheduleId: scheduleId!,
+                comparisonId: compId,
+                formData: formData
+            });
+
+            // 🔥 update local state with new corrected images
+            setWorkComparions(response);
+
+            refetch()
+        } catch (err: any) {
+            toast({
+                title: "Error",
+                description: err?.response?.data?.message || "Failed to upload images",
                 variant: "destructive",
             });
         }
@@ -1565,22 +1571,50 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                 description: "Corrected image deleted successfully",
             });
         } catch (err: any) {
-            console.error("Failed to delete corrected image:", err);
+            // console.error("Failed to delete corrected image:", err);
             toast({
                 title: "Error",
-                description: err?.message || "Failed to delete corrected image",
+                description:  err?.response?.data?.message || "Failed to delete corrected image",
                 variant: "destructive",
             });
         }
     };
 
 
-    const handleChangeComment = (imageId: string, value: string) => {
-        setTempComment((prev) => ({
-            ...prev,
-            [imageId]: value,
-        }));
+
+    const handleDeleteSelectImage = async (compId: string, selectId: string) => {
+        try {
+            const response = await deleteSelectImage({
+                projectId,
+                scheduleId: scheduleId!,
+                comparisonId: compId,
+                selectId,
+            });
+
+            // 🔥 update local state after deletion
+            setWorkComparions(response);
+
+            toast({
+                title: "Success",
+                description: "image deleted successfully",
+            });
+        } catch (err: any) {
+            // console.error("Failed to delete corrected image:", err);
+            toast({
+                title: "Error",
+                description: err?.response?.data?.message || "Failed to delete corrected image",
+                variant: "destructive",
+            });
+        }
     };
+
+
+    // const handleChangeComment = (imageId: string, value: string) => {
+    //     setTempComment((prev) => ({
+    //         ...prev,
+    //         [imageId]: value,
+    //     }));
+    // };
 
     const handleUpdateComment = async (
         compId: string,
@@ -1604,10 +1638,10 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                 description: "Comment updated successfully",
             });
         } catch (err: any) {
-            console.error("Failed to update comment:", err);
+            // console.error("Failed to update comment:", err);
             toast({
                 title: "Error",
-                description: err?.message || "Failed to update comment",
+                description:  err?.response?.data?.message || "Failed to update comment",
                 variant: "destructive",
             });
         }
@@ -1643,7 +1677,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
     }
 
     const handleSliderMouseMove = (e: React.MouseEvent) => {
-        if (!isDragging) return
+        if (!Image) return
 
         const rect = e.currentTarget.getBoundingClientRect()
         const x = e.clientX - rect.left
@@ -1685,11 +1719,27 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
         return task?.status || "planned"
     }
 
+
+    const formatSupervisorStatus = () => {
+        const existingStatus = formData.supervisorCheck.status
+        if (existingStatus === "approved") {
+            return "Approved"
+        }
+        else if (existingStatus === "needs_changes") {
+            return "Changes Required"
+        }
+        else {
+            return "Pending"
+        }
+
+
+    }
+
     if (!isOpen) return null
 
     return (
         <div onClick={onClose} className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
-            <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg max-w-7xl max-h-[90vh] overflow-y-auto w-full mx-4">
+            <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg max-w-[90%] max-h-[90vh] overflow-y-auto w-full mx-4">
                 <div className="bg-blue-600 text-white p-4 rounded-t-lg">
                     <div className="flex justify-between items-center">
                         <div>
@@ -1700,7 +1750,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                             </p>
                         </div>
                         <div className="flex gap-2">
-                            <Button variant="secondary" size="sm" onClick={handleSave}>
+                            <Button isLoading={updateWorkMutation.isPending || createWorkMutation.isPending} variant="secondary" size="sm" onClick={handleSave}>
                                 Save
                             </Button>
                             {/* <Button variant="secondary" size="sm" onClick={() => document.getElementById("json-import")?.click()}>
@@ -1927,8 +1977,13 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                         </CardHeader>
                         <CardContent>
                             <div
-                                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                                // className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isImageDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
+                                    }`}
                                 onClick={() => fileInputRef.current?.click()}
+                                onDragOver={(e) => { e.preventDefault(); setIsImageDragging(true); }}
+                                onDragLeave={() => setIsImageDragging(false)}
+                                onDrop={(e) => handleDrop(e, "design")}
                             >
                                 <div className="space-y-2">
                                     <p className="text-lg font-medium">Drag & drop plan/reference images here or</p>
@@ -1993,8 +2048,14 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                         </CardHeader>
                         <CardContent>
                             <div
-                                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                                // className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isImageDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
+                                    }`}
                                 onClick={() => siteFileInputRef.current?.click()}
+                                onDragOver={(e) => { e.preventDefault(); setIsImageDragging(true); }}
+
+                                onDragLeave={() => setIsImageDragging(false)}
+                                onDrop={(e) => handleDrop(e, "site")} // "site" section
                             >
                                 <div className="space-y-2">
                                     <p className="text-lg font-medium">Drag & drop site/progress images here or</p>
@@ -2012,7 +2073,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                             />
 
                             <div>
-                                <div className="flex items-center gap-3 mb-4">
+                                {editData && <div className="flex items-center gap-3 mb-4">
                                     <input
                                         type="checkbox"
                                         id="correctionMode"
@@ -2035,7 +2096,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                             {isPending ? "Uploading..." : "Upload Selected"}
                                         </Button>
                                     )}
-                                </div>
+                                </div>}
 
                             </div>
                             {formData.siteImages.length > 0 && (
@@ -2087,139 +2148,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                         </CardContent>
                     </Card>
 
-{/* OLd version */}
-                    {/* <Card>
-
-                        <CardContent>
-                            {workComparion?.length > 0 ?
-                                <>
-                                    {workComparion?.map((comp: IWorkComparison, compIdx: number) => (
-                                        comp.selectImage.length > 0 && (
-                                            <>
-                                                <div key={comp._id || compIdx} className="mt-6">
-                                                    <h3 className="text-md font-semibold mb-2">
-                                                        Selected Images for Correction
-                                                    </h3>
-                                                    <div className="flex flex-wrap gap-4">
-                                                        {comp.selectImage.map((img: ISelectedImgForCorrection, idx: number) => (
-                                                            <div key={(img as any)._id || idx}
-                                                                className="relative w-32 h-32 border rounded-lg shadow-sm">
-                                                                <img
-                                                                    src={img?.plannedImage?.url}
-                                                                    alt={`Correction ${idx + 1}`}
-                                                                    className="w-full h-full object-cover rounded-lg"
-                                                                />
-
-
-                                                                
-                                                                <div className="absolute bottom-0 w-full bg-black/50 text-white text-xs p-1 flex items-center">
-                                                                    {editingId === (img as any)._id ? (
-                                                                        <Input
-                                                                            autoFocus
-                                                                            value={tempComment[(img as any)._id] || ""}
-                                                                            onChange={(e) => handleChangeComment((img as any)._id, e.target.value)}
-                                                                            onBlur={() =>
-                                                                                handleUpdateComment(
-                                                                                    comp._id!,
-                                                                                    (img as any)._id,
-                                                                                    tempComment[(img as any)._id] || ""
-                                                                                )
-                                                                            }
-                                                                            onKeyDown={(e) => {
-                                                                                if (e.key === "Enter") {
-                                                                                    e.preventDefault();
-                                                                                    handleUpdateComment(
-                                                                                        comp._id!,
-                                                                                        (img as any)._id,
-                                                                                        tempComment[(img as any)._id] || ""
-                                                                                    );
-                                                                                }
-                                                                            }}
-                                                                            className="text-xs py-1 px-2 h-6"
-                                                                        />
-
-                                                                    ) : (
-                                                                        <span
-                                                                            onClick={() => {
-                                                                                setEditingId((img as any)._id);
-                                                                                setTempComment(p => ({ ...p, [(img as any)._id]: img.comment }));
-                                                                            }}
-                                                                            className="cursor-pointer truncate hover:underline"
-                                                                        >
-                                                                            {img.comment || "💬 Add comment"}
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-
-                                                               
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div>
-                                                        <input
-                                                            type="file"
-                                                            multiple
-                                                            accept="image/*"
-                                                            className=" border-2 w-full"
-                                                            onChange={(e) => handleUploadCorrected(e.target.files, comp._id!)}
-                                                        />
-                                                        {uploadcorrectPending && <span className="animate-spin fas fa-spinner"></span>}
-
-                                                    </div>
-                                                    {comp?.correctedImages?.length > 0 ?
-                                                        <>
-                                                            <div key={comp._id || compIdx} className="mt-6">
-
-                                                                <h3 className="text-md font-semibold mb-2">
-                                                                    Refactored Images
-                                                                </h3>
-                                                                <div className="flex flex-wrap gap-4">
-                                                                    {comp.correctedImages.map((img: IImage, idx: number) => (
-                                                                        <div key={img._id}
-                                                                            className="relative group w-32 h-32 border rounded-lg shadow-sm">
-                                                                            <img
-                                                                                src={img.url}
-                                                                                alt={`Correction ${idx + 1}`}
-                                                                                className="w-full h-full object-cover rounded-lg"
-                                                                            />
-
-                                                                            <Button
-                                                                                variant="danger"
-                                                                                size="sm"
-                                                                                isLoading={deleteCorrectPending}
-                                                                                className="absolute bg-red-600 text-white top-1 right-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-full "
-                                                                                onClick={() => handleDeleteCorrected(comp._id!, img._id!)}
-                                                                            >
-                                                                                <i className="w-4 h-4 fas fa-trash" />
-                                                                            </Button>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        </> : <>
-                                                            <div>
-                                                                no Corrected images uploaded so far
-                                                            </div>
-                                                        </>
-                                                    }
-                                                </div>
-                                            </>
-                                        )
-                                    ))}
-                                </>
-                                : <>
-                                    <div className="h-20 w-full flex items-center justify-center">
-                                        No Corrections has been assigned
-                                    </div>
-                                </>
-                            }
-                        </CardContent>
-                    </Card> */}
-
-
-                    <Card>
+                    {editData && <Card>
                         <CardHeader>
                             <CardTitle className="">Correction Section</CardTitle>
                         </CardHeader>
@@ -2230,102 +2159,15 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                             {workComparion && workComparion.length > 0 ? (
                                 <>
                                     {workComparion.map((comp: IWorkComparison, compIdx: number) => (
-                                        <div key={comp._id || compIdx} className=" border-b pb-6 last:border-b-0">
-                                            <div className="flex flex-col md:flex-row gap-6">
-                                                {/* Left: Selected Images */}
-                                                <div className="md:w-1/2 w-full">
-                                                    <h3 className="text-md font-semibold mb-2">
-                                                        Stage {compIdx + 1}: Selected Images for Correction
-                                                    </h3>
-                                                    {comp.selectImage && comp.selectImage.length > 0 ? (
-                                                        <div className="flex flex-wrap gap-4">
-                                                            {comp.selectImage.map((img: ISelectedImgForCorrection, idx: number) => (
-                                                                <div
-                                                                    key={(img as any)._id || idx}
-                                                                    className="w-32 sm:w-36 flex-shrink-0"
-                                                                >
-                                                                    <div className="w-full h-32 sm:h-36 border rounded-lg overflow-hidden shadow-sm mb-2">
-                                                                        <img
-                                                                            src={img?.plannedImage?.url || ""}
-                                                                            alt={`Selected ${idx + 1}`}
-                                                                            className="w-full h-full object-cover rounded-lg"
-                                                                        />
-                                                                    </div>
+                                        <Fragment key={comp._id || compIdx}>
+                                            <div className=" border-b pb-6 last:border-b-0">
+                                                <div className="flex flex-col md:flex-row gap-6">
+                                                    {/* Left: Selected Images */}
+                                                    <div className="md:w-1/2 w-full">
 
-                                                                    {/* Comments outside the image */}
-                                                                    <div
-                                                                        className="text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 max-h-40 overflow-y-auto custom-scrollbar"
-                                                                        onMouseEnter={() => setHoveredCommentId((img as any)._id)}
-                                                                        onMouseLeave={() => setHoveredCommentId(null)}
-                                                                    >
-                                                                        {editingId === (img as any)._id ? (
-                                                                            <Input
-                                                                                autoFocus
-                                                                                value={tempComment[(img as any)._id] || ""}
-                                                                                onChange={(e) =>
-                                                                                    handleChangeComment((img as any)._id, e.target.value)
-                                                                                }
-                                                                                onBlur={() =>
-                                                                                    handleUpdateComment(
-                                                                                        comp._id!,
-                                                                                        (img as any)._id,
-                                                                                        tempComment[(img as any)._id] || ""
-                                                                                    )
-                                                                                }
-                                                                                onKeyDown={(e) => {
-                                                                                    if (e.key === "Enter") {
-                                                                                        e.preventDefault();
-                                                                                        handleUpdateComment(
-                                                                                            comp._id!,
-                                                                                            (img as any)._id,
-                                                                                            tempComment[(img as any)._id] || ""
-                                                                                        );
-                                                                                    }
-                                                                                }}
-                                                                                className="text-sm w-full border p-1 rounded resize-none"
-                                                                            />
-                                                                        ) : (
-                                                                            <div
-                                                                                onClick={() => {
-                                                                                    setEditingId((img as any)._id);
-                                                                                    setTempComment((prev) => ({
-                                                                                        ...prev,
-                                                                                        [(img as any)._id]: img.comment,
-                                                                                    }));
-                                                                                }}
-                                                                                className="cursor-pointer break-words hover:bg-gray-100 p-1 rounded"
-                                                                            >
-                                                                                <div className="flex items-start gap-2">
-                                                                                    <i className="fas fa-comment text-gray-500 mt-1" />
-                                                                                    <p className="whitespace-pre-wrap break-words text-gray-800 text-sm">
-                                                                                        {img.comment || (
-                                                                                            <span className="italic text-gray-500">Add a comment</span>
-                                                                                        )}
-                                                                                    </p>
-                                                                                    {hoveredCommentId === (img as any)._id && (
-                                                                                        <i className="fas fa-pen ml-auto text-gray-400 text-xs mt-1" />
-                                                                                    )}
-                                                                                </div>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="text-sm text-gray-500">
-                                                            No selected images available for this comparison.
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Right: Refactored Images + Upload first */}
-                                                <div className="md:w-1/2 w-full flex flex-col justify-between">
-                                                    <div>
-                                                        {/* Upload input comes first */}
                                                         <div className="mb-4">
                                                             <label className="text-sm font-medium block mb-2">
-                                                                Upload Refactored Images (Stage {compIdx + 1})
+                                                                Upload Select Images (Stage {compIdx + 1})
                                                             </label>
 
                                                             <input
@@ -2334,83 +2176,305 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                                                 accept="image/*"
                                                                 className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
                                                                 onChange={(e) =>
-                                                                    handleUploadCorrected(e.target.files, comp._id!)
+                                                                    handleUploadSelectImgManually(e.target.files, comp._id!)
                                                                 }
                                                             />
-                                                            {uploadcorrectPending && (
+                                                            {crctImgPending && (
                                                                 <span className="ml-2 text-gray-600 animate-spin">
                                                                     <i className="fas fa-spinner animate-spin" />
                                                                 </span>
                                                             )}
                                                         </div>
 
-                                                        {/* Refactored images */}
-                                                        <div>
-                                                            <h3 className="text-md font-semibold mb-2">
-                                                                Stage {compIdx + 1}: Refactored Outputs
-                                                            </h3>
-
-                                                            {comp.correctedImages && comp.correctedImages.length > 0 ? (
-                                                                <div className="flex flex-wrap gap-4">
-                                                                    {comp.correctedImages.map((img: IImage, idx: number) => (
-                                                                        <div
-                                                                            key={img._id}
-                                                                            className="relative group w-32 h-32 sm:w-36 sm:h-36 border rounded-lg shadow-sm overflow-hidden"
-                                                                        >
+                                                        <h3 className="text-md font-semibold mb-2">
+                                                            Stage {compIdx + 1}: Selected Images for Correction
+                                                        </h3>
+                                                        {comp.selectImage && comp.selectImage.length > 0 ? (
+                                                            <div className="flex flex-wrap gap-4">
+                                                                {/* {comp.selectImage.map((img: ISelectedImgForCorrection, idx: number) => (
+                                                                    <div
+                                                                        key={(img as any)._id || idx}
+                                                                        className="w-32 sm:w-36 flex-shrink-0"
+                                                                    >
+                                                                        <div className="w-full h-32 sm:h-36 border rounded-lg overflow-hidden shadow-sm mb-2">
                                                                             <img
-                                                                                src={img.url}
-                                                                                alt={`Refactored ${idx + 1}`}
+                                                                                src={img?.plannedImage?.url || ""}
+                                                                                alt={`Selected ${idx + 1}`}
                                                                                 className="w-full h-full object-cover rounded-lg"
                                                                             />
-                                                                            <Button
-                                                                                variant="danger"
-                                                                                size="sm"
-                                                                                isLoading={deleteCorrectPending}
-                                                                                className="absolute bg-red-600 text-white top-1 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-1 rounded-full"
-                                                                                onClick={() =>
-                                                                                    handleDeleteCorrected(comp._id!, img._id!)
-                                                                                }
-                                                                            >
-                                                                                <i className="w-4 h-4 fas fa-trash" />
-                                                                            </Button>
                                                                         </div>
-                                                                    ))}
-                                                                </div>
-                                                            ) : (
-                                                                <div className="text-sm text-gray-500">
-                                                                    No refactored images uploaded yet.
-                                                                </div>
-                                                            )}
+
+                                                                        <div
+                                                                            className="text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 max-h-40 overflow-y-auto custom-scrollbar"
+                                                                            onMouseEnter={() => setHoveredCommentId((img as any)._id)}
+                                                                            onMouseLeave={() => setHoveredCommentId(null)}
+                                                                        >
+                                                                            {editingId === (img as any)._id ? (
+                                                                                <Input
+                                                                                    autoFocus
+                                                                                    value={tempComment[(img as any)._id] || ""}
+                                                                                    onChange={(e) =>
+                                                                                        handleChangeComment((img as any)._id, e.target.value)
+                                                                                    }
+                                                                                    onBlur={() =>
+                                                                                        handleUpdateComment(
+                                                                                            comp._id!,
+                                                                                            (img as any)._id,
+                                                                                            tempComment[(img as any)._id] || ""
+                                                                                        )
+                                                                                    }
+                                                                                    onKeyDown={(e) => {
+                                                                                        if (e.key === "Enter") {
+                                                                                            e.preventDefault();
+                                                                                            handleUpdateComment(
+                                                                                                comp._id!,
+                                                                                                (img as any)._id,
+                                                                                                tempComment[(img as any)._id] || ""
+                                                                                            );
+                                                                                        }
+                                                                                    }}
+                                                                                    className="text-sm w-full border p-1 rounded resize-none"
+                                                                                />
+                                                                            ) : (
+                                                                                <div
+                                                                                    onClick={() => {
+                                                                                        setEditingId((img as any)._id);
+                                                                                        setTempComment((prev) => ({
+                                                                                            ...prev,
+                                                                                            [(img as any)._id]: img.comment,
+                                                                                        }));
+                                                                                    }}
+                                                                                    className="cursor-pointer break-words hover:bg-gray-100 p-1 rounded"
+                                                                                >
+                                                                                    <div className="flex items-start gap-2">
+                                                                                        <i className="fas fa-comment text-gray-500 mt-1" />
+                                                                                        <p className="whitespace-pre-wrap break-words text-gray-800 text-sm">
+                                                                                            {img.comment || (
+                                                                                                <span className="italic text-gray-500">Add a comment</span>
+                                                                                            )}
+                                                                                        </p>
+                                                                                        {hoveredCommentId === (img as any)._id && (
+                                                                                            <i className="fas fa-pen ml-auto text-gray-400 text-xs mt-1" />
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                ))} */}
+
+
+                                                                <ImageGalleryExample
+                                                                    imageFiles={comp?.selectImage.map((s) => {
+                                                                        const { _id, ...plannedImageWithoutId } = s.plannedImage || {}; // remove _id from plannedImage
+                                                                        return {
+                                                                            _id: (s as any)._id,                // keep parent s _id
+                                                                            ...plannedImageWithoutId,  // spread plannedImage without its _id
+                                                                            comment: s.comment,
+                                                                            createdBy: s.createdBy,
+                                                                            createModel: s.createModel,
+                                                                            createdAt: s.createdAt
+                                                                        };
+                                                                    })}
+                                                                    handleDeleteFile={(id)=>{
+                                                                        handleDeleteSelectImage(comp._id!, id)
+                                                                    }}
+
+                                                                    height={120}
+                                                                    minWidth={120}
+                                                                    maxWidth={140}
+                                                                    isComments={true}
+                                                                    editingId={editingId}
+                                                                    tempComment={tempComment}
+                                                                    setEditingId={setEditingId}
+                                                                    setTempComment={setTempComment}
+                                                                    onUpdateComment={(imgId, comment) =>
+                                                                        handleUpdateComment(comp._id!, imgId, comment)
+                                                                    }
+                                                                />
+
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-sm text-gray-500">
+                                                                No selected images available for this comparison.
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Right: Refactored Images + Upload first */}
+                                                    <div className="md:w-1/2 w-full flex flex-col justify-between">
+                                                        <div>
+                                                            {/* Upload input comes first */}
+                                                            <div className="mb-4">
+                                                                <label className="text-sm font-medium block mb-2">
+                                                                    Upload Refactored Images (Stage {compIdx + 1})
+                                                                </label>
+
+                                                                <input
+                                                                    type="file"
+                                                                    multiple
+                                                                    accept="image/*"
+                                                                    className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                                    onChange={(e) =>
+                                                                        handleUploadCorrected(e.target.files, comp._id!)
+                                                                    }
+                                                                />
+                                                                {uploadcorrectPending && (
+                                                                    <span className="ml-2 text-gray-600 animate-spin">
+                                                                        <i className="fas fa-spinner animate-spin" />
+                                                                    </span>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Refactored images */}
+                                                            <div>
+                                                                <h3 className="text-md font-semibold mb-2">
+                                                                    Stage {compIdx + 1}: Refactored Outputs
+                                                                </h3>
+
+                                                                {comp.correctedImages && comp.correctedImages.length > 0 ? (
+                                                                    <div className="flex flex-wrap gap-4">
+                                                                        {/* {comp.correctedImages.map((img: IImage, idx: number) => (
+                                                                            <div
+                                                                                key={img._id}
+                                                                                className="relative group w-32 h-32 sm:w-36 sm:h-36 border rounded-lg shadow-sm overflow-hidden"
+                                                                            >
+                                                                                <img
+                                                                                    src={img.url}
+                                                                                    alt={`Refactored ${idx + 1}`}
+                                                                                    className="w-full h-full object-cover rounded-lg"
+                                                                                />
+                                                                                <Button
+                                                                                    variant="danger"
+                                                                                    size="sm"
+                                                                                    isLoading={deleteCorrectPending}
+                                                                                    className="absolute bg-red-600 text-white top-1 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-1 rounded-full"
+                                                                                    onClick={() =>
+                                                                                        handleDeleteCorrected(comp._id!, img._id!)
+                                                                                    }
+                                                                                >
+                                                                                    <i className="w-4 h-4 fas fa-trash" />
+                                                                                </Button>
+                                                                            </div>
+                                                                        ))} */}
+
+
+                                                                        <ImageGalleryExample
+                                                                            imageFiles={comp?.correctedImages}
+                                                                            handleDeleteFile={(imgId: string) =>
+                                                                                handleDeleteCorrected(comp._id!, imgId!)
+                                                                            }
+                                                                            refetch={refetch}
+                                                                            // className="grid grid-cols-3"
+                                                                            // height={80}
+                                                                            // minWidth={98}
+                                                                            // maxWidth={100}
+                                                                            height={120}
+                                                                            minWidth={120}
+                                                                            maxWidth={140}
+                                                                        />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="text-sm text-gray-500">
+                                                                        No refactored images uploaded yet.
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Fragment>
                                     ))}
+
+
+                                    <div className="md:w-1/2 w-full flex flex-col justify-between">
+                                        <div>
+                                            <div className="mb-4">
+                                                <label className="text-sm font-medium block mb-2">
+                                                    Upload Select Images (Stage {workComparion?.length + 1 || 1})
+                                                </label>
+
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    accept="image/*"
+                                                    className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                    onChange={(e) =>
+                                                        handleUploadSelectImgManually(e.target.files, null)
+                                                    }
+                                                />
+                                                {crctImgPending && (
+                                                    <span className="ml-2 text-gray-600 animate-spin">
+                                                        <i className="fas fa-spinner animate-spin" />
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h3 className="text-md font-semibold mb-2">
+                                                Stage  {workComparion.length + 1 || 1}: Select Outputs
+                                            </h3>
+
+                                        </div>
+                                    </div>
                                 </>
                             ) : (
-                                <div className="w-full px-6 py-8 flex justify-center">
-  <div className="bg-gray-100 border border-gray-200 rounded-lg p-6 max-w-full w-full text-sm text-gray-800 shadow-sm mx-auto flex justify-center">
-    <div className="">
- <div className="flex items-start gap-2 mb-3">
-      <i className="fas fa-info-circle mt-1 text-gray-500" />
-      <p className="font-semibold">No corrections have been assigned.</p>
-    </div>
+                                // <div className="w-full px-6 py-8 flex justify-center">
+                                //     <div className="bg-gray-100 border border-gray-200 rounded-lg p-6 max-w-full w-full text-sm text-gray-800 shadow-sm mx-auto flex justify-center">
+                                //         <div className="">
+                                //             <div className="flex items-start gap-2 mb-3">
+                                //                 <i className="fas fa-info-circle mt-1 text-gray-500" />
+                                //                 <p className="font-semibold">No corrections have been assigned.</p>
+                                //             </div>
 
-    <p className="mb-2">To upload images for correction:</p>
-    <ul className="list-disc list-inside space-y-1 pl-4 text-sm">
-      <li>Select checkbox in the <strong>Site/Actual Images</strong></li>
-      <li>Click on the images that you need to upload for correction</li>
-      <li>Click the <strong>"Upload Selected"</strong> button to upload</li>
-    </ul>
-    </div>
-   
-  </div>
-</div>
+                                //             <p className="mb-2">To upload images for correction:</p>
+                                //             <ul className="list-disc list-inside space-y-1 pl-4 text-sm">
+                                //                 <li>Select checkbox in the <strong>Site/Actual Images</strong></li>
+                                //                 <li>Click on the images that you need to upload for correction</li>
+                                //                 <li>Click the <strong>"Upload Selected"</strong> button to upload</li>
+                                //             </ul>
+                                //         </div>
+
+                                //     </div>
+                                // </div>
+
+                                <div className="md:w-1/2 w-full flex flex-col justify-between">
+                                    <div>
+                                        <div className="mb-4">
+                                            <label className="text-sm font-medium block mb-2">
+                                                Upload Select Images (Stage 1)
+                                            </label>
+
+                                            <input
+                                                type="file"
+                                                multiple
+                                                accept="image/*"
+                                                className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                onChange={(e) =>
+                                                    handleUploadSelectImgManually(e.target.files, null)
+                                                }
+                                            />
+                                            {crctImgPending && (
+                                                <span className="ml-2 text-gray-600 animate-spin">
+                                                    <i className="fas fa-spinner animate-spin" />
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-md font-semibold mb-2">
+                                            Stage 1: Select Outputs
+                                        </h3>
+
+                                    </div>
+                                </div>
                             )}
                         </CardContent>
                     </Card>
-
+                    }
 
 
                     <div className="border rounded-lg p-4">
@@ -2571,7 +2635,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                 <span>Supervisor Visual Check & Approval</span>
                                 <div className="flex items-center gap-2">
                                     <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                                    <span className="text-sm">Pending Review</span>
+                                    <span className="text-sm">{formatSupervisorStatus()}</span>
                                 </div>
                             </CardTitle>
                         </CardHeader>
@@ -2598,7 +2662,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                             </div>
 
                             <div className="flex gap-4 mb-4">
-                                <div className="flex items-center space-x-2">
+                                {/* <div className="flex items-center space-x-2">
                                     <input
                                         type="radio"
                                         id="pending"
@@ -2622,7 +2686,77 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                     onClick={() => handleSupervisorCheckChange("status", "needs_changes")}
                                 >
                                     Changes Required
-                                </Button>
+                                </Button> */}
+
+
+                                <div className="flex gap-6">
+                                    {/* Pending */}
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            id="pending"
+                                            name="status"
+                                            value="pending"
+                                            checked={formData.supervisorCheck.status === "pending"}
+                                            onChange={(e) => handleSupervisorCheckChange("status", e.target.value)}
+                                            className="hidden peer"
+                                        />
+                                        <Label
+                                            htmlFor="pending"
+                                            className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
+        ${formData.supervisorCheck.status === "pending"
+                                                    ? "border-gray-500 bg-gray-100 text-gray-900 font-semibold"
+                                                    : "border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50"}`}
+                                        >
+                                            Pending
+                                        </Label>
+                                    </div>
+
+                                    {/* Approved */}
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            id="approved"
+                                            name="status"
+                                            value="approved"
+                                            checked={formData.supervisorCheck.status === "approved"}
+                                            onChange={(e) => handleSupervisorCheckChange("status", e.target.value)}
+                                            className="hidden peer"
+                                        />
+                                        <Label
+                                            htmlFor="approved"
+                                            className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
+        ${formData.supervisorCheck.status === "approved"
+                                                    ? "border-green-600 bg-green-100 text-green-800 font-semibold"
+                                                    : "border-gray-300 text-green-700 hover:border-green-400 hover:bg-green-50"}`}
+                                        >
+                                            Approve
+                                        </Label>
+                                    </div>
+
+                                    {/* Needs Changes */}
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="radio"
+                                            id="needs_changes"
+                                            name="status"
+                                            value="needs_changes"
+                                            checked={formData.supervisorCheck.status === "needs_changes"}
+                                            onChange={(e) => handleSupervisorCheckChange("status", e.target.value)}
+                                            className="hidden peer"
+                                        />
+                                        <Label
+                                            htmlFor="needs_changes"
+                                            className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
+        ${formData.supervisorCheck.status === "needs_changes"
+                                                    ? "border-orange-600 bg-orange-100 text-orange-800 font-semibold"
+                                                    : "border-gray-300 text-orange-700 hover:border-orange-400 hover:bg-orange-50"}`}
+                                        >
+                                            Changes Required
+                                        </Label>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

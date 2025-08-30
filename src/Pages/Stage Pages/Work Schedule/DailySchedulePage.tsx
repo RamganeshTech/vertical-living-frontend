@@ -1141,9 +1141,9 @@ import {
 
 import CreateDailyScheduleForm from "./CreateDailyScheduleForm"
 import { useNavigate, useParams } from "react-router-dom"
-import { NO_IMAGE } from "../../../constants/constants"
 import { Button } from "../../../components/ui/Button"
 import { toast } from "../../../utils/toast"
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 
 interface CalendarDay {
   date: Date
@@ -1240,7 +1240,7 @@ const DailySchedulePage: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
 
-        if (!selectedDate) return;
+      if (!selectedDate) return;
 
       if (e.key === "Escape") {
         setSelectedDate(null);
@@ -1263,13 +1263,13 @@ const DailySchedulePage: React.FC = () => {
     //   document.body.style.overflow = "unset";
     // };
 
-    
-  // Always attach listener once on mount
-  document.addEventListener("keydown", handleKeyDown);
-  return () => {
-    document.removeEventListener("keydown", handleKeyDown);
-  };
-  }, [ goToNextDate, goToPreviousDate]);
+
+    // Always attach listener once on mount
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [goToNextDate, goToPreviousDate]);
 
 
   // const getTasksForDate = (date: Date) => {
@@ -1440,46 +1440,46 @@ const DailySchedulePage: React.FC = () => {
         });
 
 
-      //   const uploads  = uploadedImages; // contains array with _id, url, etc.
+        //   const uploads  = uploadedImages; // contains array with _id, url, etc.
 
-      // setSelectedTask((prev: any) => {
-      //   if (!prev) return prev;
+        // setSelectedTask((prev: any) => {
+        //   if (!prev) return prev;
 
-      //   const updatedImages = [...(prev.uploadedImages || [])];
-      //   const existingDateIndex = updatedImages.findIndex(
-      //     (entry) =>
-      //       new Date(entry.date).toDateString() ===
-      //       new Date(selectedDate).toDateString()
-      //   );
+        //   const updatedImages = [...(prev.uploadedImages || [])];
+        //   const existingDateIndex = updatedImages.findIndex(
+        //     (entry) =>
+        //       new Date(entry.date).toDateString() ===
+        //       new Date(selectedDate).toDateString()
+        //   );
 
-      //   if (existingDateIndex !== -1) {
-      //     // merge into same date entry
-      //     updatedImages[existingDateIndex] = {
-      //       ...updatedImages[existingDateIndex],
-      //       uploads: [
-      //         ...updatedImages[existingDateIndex].uploads,
-      //         ...uploads, // 👈 now with _id
-      //       ],
-      //     };
-      //   } else {
-      //     // create new date entry
-      //     updatedImages.push({
-      //       date: selectedDate,
-      //       uploads,
-      //     });
-      //   }
+        //   if (existingDateIndex !== -1) {
+        //     // merge into same date entry
+        //     updatedImages[existingDateIndex] = {
+        //       ...updatedImages[existingDateIndex],
+        //       uploads: [
+        //         ...updatedImages[existingDateIndex].uploads,
+        //         ...uploads, // 👈 now with _id
+        //       ],
+        //     };
+        //   } else {
+        //     // create new date entry
+        //     updatedImages.push({
+        //       date: selectedDate,
+        //       uploads,
+        //     });
+        //   }
 
-      //   return {
-      //     ...prev,
-      //     uploadedImages: updatedImages,
-      //   };
-      // });
+        //   return {
+        //     ...prev,
+        //     uploadedImages: updatedImages,
+        //   };
+        // });
 
         toast({ title: "Success", description: "image uploaded successfully" })
       }
     } catch (error: any) {
       toast({ title: "Error", description: error?.response?.data?.message || "failed to upload", variant: "destructive" })
-    } 
+    }
   }
 
   const handleImageDelete = async (imageId: string, task: DailyTask) => {
@@ -1487,7 +1487,7 @@ const DailySchedulePage: React.FC = () => {
       const scheduleId = scheduleData?.find((s: ScheduleData) => s.dailyTasks.some((t) => t._id === task._id))?._id
 
       if (scheduleId) {
-        console.log("work maing the scuekndlahflsjkkkkkkkkk")
+        // console.log("work maing the scuekndlahflsjkkkkkkkkk")
 
         const uploadedImages = await deleteImageMutation.mutateAsync({
           scheduleId,
@@ -1500,45 +1500,45 @@ const DailySchedulePage: React.FC = () => {
         console.log("upladsImages", uploadedImages)
         refetch()
 
-//     setSelectedTask(prev => {
-//   if (!prev) return prev;
+        //     setSelectedTask(prev => {
+        //   if (!prev) return prev;
 
-//   const updatedImages = prev.uploadedImages?.map(group => {
-//     // console.log("group before merge:", group); // 👈 inspect the current group
-//     if (group.date.split("T")[0] === selectedDate!.toISOString().split("T")[0]) {
-//       // console.log("Replacing uploads with backend:", uploadedImages.uploads);
-//       console.log("group",group)
-//       return {
-//         ...group,
-//         uploads: uploadedImages.uploads, // replace entirely
-//       };
-//     }
-//     return group;
-//   });
+        //   const updatedImages = prev.uploadedImages?.map(group => {
+        //     // console.log("group before merge:", group); // 👈 inspect the current group
+        //     if (group.date.split("T")[0] === selectedDate!.toISOString().split("T")[0]) {
+        //       // console.log("Replacing uploads with backend:", uploadedImages.uploads);
+        //       console.log("group",group)
+        //       return {
+        //         ...group,
+        //         uploads: uploadedImages.uploads, // replace entirely
+        //       };
+        //     }
+        //     return group;
+        //   });
 
-//   console.log("updatedImages after merge:", updatedImages); // final array
-//   return { ...prev, uploadedImages: updatedImages };
-// });
+        //   console.log("updatedImages after merge:", updatedImages); // final array
+        //   return { ...prev, uploadedImages: updatedImages };
+        // });
 
-//  const updatedDateGroup = uploadedImages; // ← Should be { date: "", uploads: [] }
+        //  const updatedDateGroup = uploadedImages; // ← Should be { date: "", uploads: [] }
 
-    const currentDate = selectedDate?.toISOString().split("T")[0] || "";
-      // ✅ Update selected task without full refetch
-    setSelectedTask((prev) => {
-      if (!prev) return prev;
+        const currentDate = selectedDate?.toISOString().split("T")[0] || "";
+        // ✅ Update selected task without full refetch
+        setSelectedTask((prev) => {
+          if (!prev) return prev;
 
-      const updatedImages = prev.uploadedImages?.map((group) => {
-        if (group.date.split("T")[0] === currentDate) {
-          return {
-            ...group,
-            uploads: group.uploads.filter((img) => img._id !== imageId),
-          };
-        }
-        return group;
-      });
+          const updatedImages = prev.uploadedImages?.map((group) => {
+            if (group.date.split("T")[0] === currentDate) {
+              return {
+                ...group,
+                uploads: group.uploads.filter((img) => img._id !== imageId),
+              };
+            }
+            return group;
+          });
 
-      return { ...prev, uploadedImages: updatedImages };
-    });
+          return { ...prev, uploadedImages: updatedImages };
+        });
 
         toast({ title: "Success", description: "deleted successfully" })
       }
@@ -1785,47 +1785,99 @@ const DailySchedulePage: React.FC = () => {
                           </label>
                         </div>
 
-                        {selectedTask.uploadedImages && selectedTask.uploadedImages.length > 0 ? (
-                          <div className="grid grid-cols-3 gap-4">
-                            {/* {selectedTask.uploadedImages.map((image: any, imgIdx: number) => {
-                              console.log("image, ", image)
-                              return (
+                        {selectedTask?.uploadedImages && selectedTask?.uploadedImages.length > 0 ? (
+                          <div className="">
+                            {/* {selectedTask?.uploadedImages?.map((imgGroup) =>
+                              Array.isArray(imgGroup?.uploads) && imgGroup?.uploads?.length > 0 ?
+                                // <div className="grid grid-cols-3 gap-4">
 
-                                <div key={imgIdx} className="relative group">
-                                  <img
-                                    src={image.url || NO_IMAGE}
-                                    alt={`Task image ${imgIdx + 1}`}
-                                    className="w-full h-32 object-cover rounded-lg border shadow-sm"
-                                  />
-                                  <button
-                                    onClick={() => handleImageDelete(image._id, selectedTask)}
-                                    className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
-                                  >
-                                    <i className="fas fa-times"></i>
-                                  </button>
+                                //    { imgGroup?.uploads.map((file, imgIdx) => (
+                                //       <div key={`${groupIdx}-${imgIdx}`} className="relative group">
+                                //         <img
+                                //           src={file?.url || NO_IMAGE}
+                                //           alt={`Task image ${imgIdx + 1}`}
+                                //           className="w-full h-32 object-cover rounded-lg border shadow-sm"
+                                //         />
+                                //         <button
+                                //           onClick={() => handleImageDelete(file._id, selectedTask)}
+                                //           className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                                //         >
+                                //           <i className="fas fa-times"></i>
+                                //         </button>
+                                //       </div>
+                                //     ))}
+                                //      </div>
+
+                                <ImageGalleryExample
+                                  imageFiles={imgGroup?.uploads}
+                                  handleDeleteFile={(imgId: string) =>
+                                    handleImageDelete(imgId!, selectedTask)
+                                  }
+                                  refetch={refetch}
+                                  height={120}
+                                  minWidth={120}
+                                  maxWidth={140}
+                                />
+                                :
+                                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                                  <i className="fas fa-images text-3xl mb-2"></i>
+                                  <p>No images uploaded for this task main</p>
                                 </div>
-                              )
+                            )} */}
 
-                            })} */}
+{(() => {
+  const groups = (selectedTask?.uploadedImages || []).reduce(
+    (acc: Record<string, any[]>, imgGroup: any) => {
+      if (!Array.isArray(imgGroup?.uploads) || imgGroup.uploads.length === 0) return acc;
 
+      // Normalize dateKey from imgGroup.date -> "YYYY-MM-DD" (fallback to raw value)
+      let dateKey = "Unknown Date";
+      if (imgGroup?.date) {
+        const parsed = new Date(imgGroup.date);
+        dateKey = !isNaN(parsed.getTime()) ? parsed.toISOString().split("T")[0] : String(imgGroup.date);
+      }
 
-                            {selectedTask?.uploadedImages?.map((imgGroup, groupIdx) =>
-                              imgGroup.uploads.map((file, imgIdx) => (
-                                <div key={`${groupIdx}-${imgIdx}`} className="relative group">
-                                  <img
-                                    src={file.url || NO_IMAGE}
-                                    alt={`Task image ${imgIdx + 1}`}
-                                    className="w-full h-32 object-cover rounded-lg border shadow-sm"
-                                  />
-                                  <button
-                                    onClick={() => handleImageDelete(file._id, selectedTask)}
-                                    className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
-                                  >
-                                    <i className="fas fa-times"></i>
-                                  </button>
-                                </div>
-                              ))
-                            )}
+      if (!acc[dateKey]) acc[dateKey] = [];
+      acc[dateKey].push(...imgGroup.uploads); // merge uploads for same date
+      return acc;
+    },
+    {}
+  );
+
+  const dateKeys = Object.keys(groups);
+  if (dateKeys.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+        <i className="fas fa-images text-3xl mb-2" />
+        <p>No images uploaded for this task</p>
+      </div>
+    );
+  }
+
+  // // Optional: sort newest-first. Remove or change comparator if you want another order.
+  // dateKeys.sort((a, b) => {
+  //   const da = new Date(a).getTime();
+  //   const db = new Date(b).getTime();
+  //   // if either is Invalid Date (NaN), keep original order by falling back to string compare
+  //   if (isNaN(da) || isNaN(db)) return a.localeCompare(b);
+  //   return db - da;
+  // });
+
+  return dateKeys.map((dateKey) => (
+    <div key={dateKey} className="mb-4">
+      {/* <h3 className="text-sm font-semibold text-gray-600 mb-2">{dateKey}</h3> */}
+      <ImageGalleryExample
+        imageFiles={groups[dateKey]}
+        handleDeleteFile={(imgId: string) => handleImageDelete(imgId!, selectedTask)}
+        refetch={refetch}
+        height={120}
+        minWidth={120}
+        maxWidth={140}
+      />
+    </div>
+  ));
+})()}
+
 
                           </div>
                         ) : (
@@ -1865,10 +1917,10 @@ const DailySchedulePage: React.FC = () => {
               </div>
 
               <button
-               onClick={(e) => {
-      e.stopPropagation(); // 🛑 prevent background click
-      goToNextDate();
-    }}
+                onClick={(e) => {
+                  e.stopPropagation(); // 🛑 prevent background click
+                  goToNextDate();
+                }}
                 className="p-2 text-gray-600  bg-gray-50 hover:text-gray-900"
               >
                 <i className="fas fa-chevron-right"></i>
@@ -1884,16 +1936,18 @@ const DailySchedulePage: React.FC = () => {
                 setShowTaskForm(false)
                 setEditingTask(null)
               }}
-              onSave={(data) => {
-                console.log("Saving:", data)
+              onSave={() => {
+                // console.log("Saving:", data)
                 setShowTaskForm(false)
               }}
               refetch={refetch}
               scheduleId={editingTask ? (selectedTask as any).scheduleId : null}
               editData={editingTask}
-              onUpdate={(data) => {
-                console.log("Updating:", data)
-                setShowTaskForm(false)
+              onUpdate={() => {
+
+                setSelectedDate(null);
+                setSelectedTask(null);
+                setShowTaskList(false);
               }}
             />
           )}

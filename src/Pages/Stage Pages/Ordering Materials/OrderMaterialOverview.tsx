@@ -1108,7 +1108,7 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 // import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
 import { NO_IMAGE } from "../../../constants/constants";
-import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialPdf, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdateShopDetails } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
+import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialPdf, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdatePdfStatus, useUpdateShopDetails } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 // import GenerateWhatsappLink from "../../../shared/GenerateWhatsappLink";
 import { useEffect, useRef, useState } from "react";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
@@ -1154,6 +1154,7 @@ const OrderMaterialOverview = () => {
     const navigate = useNavigate()
     const { data, isLoading, isError, error: getAllError, refetch } = useGetAllOrderingMaterialHistory(projectId!);
     const { mutateAsync: generateLink, isPending: generatePending } = useOrderHistoryGenerateLink()
+    const { mutateAsync: updatePdfStatus } = useUpdatePdfStatus()
 
     const { mutateAsync: addSubItem } = useAddOrderingMaterialSubItem();
     const { mutateAsync: deleteSubItem, isPending: deleteItemLoading } = useDeleteOrderingMaterialSubItem();
@@ -1171,6 +1172,8 @@ const OrderMaterialOverview = () => {
     const [deliveryForm, setDeliveryForm] = useState<any>({});
     const [editShop, setEditShop] = useState(false);
     const [shopForm, setShopForm] = useState<any>({});
+
+
 
 
     const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
@@ -1361,6 +1364,7 @@ const OrderMaterialOverview = () => {
             await updateSubItem(updatedData);
             toast({ title: "Success", description: "Item updated successfully" });
         } catch (error: any) {
+            console.log("filed",error)
             toast({
                 title: "Error",
                 description: error?.response?.data?.message || "Failed to update item",
@@ -1446,6 +1450,19 @@ const OrderMaterialOverview = () => {
 
         } catch (err: any) {
             toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
+        }
+    };
+
+
+    const handleUpdatePdfStatus = async (pdfId: string, status: string) => {
+        try {
+            await updatePdfStatus({ projectId, pdfId, status });
+
+            toast({ title: "Success", description: "Pdf status updated successfully" });
+            refetch()
+
+        } catch (err: any) {
+            toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to update status", variant: "destructive" });
         }
     };
 
@@ -1739,7 +1756,8 @@ const OrderMaterialOverview = () => {
                                                                         className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                                                                     >
                                                                         <span className="hidden sm:inline">
-                                                                            {expandedUnitId === unit._id ? 'Hide' : 'Show'} Sub Items
+                                                                            {/* {expandedUnitId === unit._id ? 'Hide' : 'Show'} Sub Items */}
+                                                                            Create Material Items
                                                                         </span>
                                                                         <i
                                                                             className={`fa ${expandedUnitId === unit._id
@@ -2139,7 +2157,7 @@ const OrderMaterialOverview = () => {
                                 {data?.generatedLink && data?.generatedLink?.length > 0 ?
 
                                     data?.generatedLink?.map((ele: any) => (
-                                        <Card key={ele._id} className="border-green-200 bg-green-50">
+                                        <Card key={ele._id} className="border-green-200 bg-green-50 ">
                                             <CardContent className="p-6">
                                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                                     <div className="flex items-center gap-3 flex-1">
@@ -2158,7 +2176,7 @@ const OrderMaterialOverview = () => {
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto ">
                                                         <Button
                                                             variant="outline"
                                                             onClick={() => window.open(ele.url, "_blank")}
@@ -2175,7 +2193,42 @@ const OrderMaterialOverview = () => {
                                                         >
                                                             Download PDF
                                                         </Button>
+                                                    
 
+                                                        <div className="relative  min-w-[160px]">
+                                                            <label
+                                                                htmlFor={`pdf-status-${ele._id}`}
+                                                                className="hidden md:block mb-1 text-sm font-medium text-gray-600 absolute top-[-20px]"
+                                                            >
+                                                                Order Status
+                                                            </label>
+                                                            <select
+                                                                id={`pdf-status-${ele._id}`}
+                                                                value={ele.status || "pending"}
+                                                                onChange={async (e) => {
+                                                                    const val = e.target.value;
+                                                                    await handleUpdatePdfStatus(ele._id, val);
+                                                                }}
+                                                                className="
+                                                                                    w-full h-[45px] px-3 py-2 text-md  bg-white border  rounded-xl shadow 
+                                                                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                                                                    disabled:opacity-50 appearance-none transition ease-in-out
+                                                                                    border-blue-300 text-blue-800  hover:border-blue-400
+                                                                                    "
+                                                            >
+                                                                {/* <option disabled value="">Select Status</option> */}
+                                                                {["pending", "delivered", "shipped", "ordered", "cancelled"].map((status) => (
+                                                                    <option key={status} value={status}>
+                                                                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+
+                                                            {/* Custom dropdown chevron icon */}
+                                                            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                                                                <i className="fas fa-chevron-down text-xs"></i>
+                                                            </div>
+                                                        </div>
 
                                                         <Button
                                                             variant="danger"
