@@ -184,12 +184,14 @@ export const useGetProjectDeliveryDetails = (projectId: string) => {
 // ✅ 11. Complete Stage
  const completeprojectDeliveryStageApi = async ({
   projectId,
+  organizationId,
   api,
 }: {
   projectId: string;
+  organizationId: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/projectdelivery/completionstatus/${projectId}`);
+  const { data } = await api.put(`/projectdelivery/completionstatus/${organizationId}/${projectId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -229,10 +231,10 @@ export const useCompleteprojectDelivery = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ projectId }: { projectId: string }) => {
+    mutationFn: async ({ projectId , organizationId}: { projectId: string, organizationId:string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await completeprojectDeliveryStageApi({ projectId, api });
+      return await completeprojectDeliveryStageApi({ projectId, organizationId, api });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["project-delivery", projectId] });

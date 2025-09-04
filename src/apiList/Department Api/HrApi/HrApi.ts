@@ -52,6 +52,24 @@ export const getSingleEmployee = async ({
   return data.data;
 };
 
+
+
+
+
+// Update employee
+export const createEmployee = async ({
+  formData,
+  api
+}: {
+  formData: FormData;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.post(`/department/hr/createemployee`, formData);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
 // Update employee
 export const updateEmployee = async ({
   empId,
@@ -197,6 +215,26 @@ export const useGetSingleEmployee = (empId: string) => {
 // ===============================
 // Mutations
 // ===============================
+
+
+export const useAddEmployeeByHR = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ formData }: { formData: FormData }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance not found for role");
+      return await createEmployee({  formData, api });
+    },
+    onSuccess: () => {
+      // queryClient.invalidateQueries({ queryKey: ["hr", "employee", empId] });
+      queryClient.invalidateQueries({ queryKey: ["hr", "employees"] });
+    },
+  });
+};
+
+
 
 export const useUpdateEmployee = () => {
   const { role } = useGetRole();

@@ -344,7 +344,6 @@
 //         const importedData = JSON.parse(e.target?.result as string)
 //         setFormData(importedData)
 //       } catch (error) {
-//         console.error("Error importing JSON:", error)
 //       }
 //     }
 //     reader.readAsText(file)
@@ -800,14 +799,15 @@ import { Label } from "../../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select"
 // import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
-import { useCreateCorrection, useCreateWork, useDeleteCorrectedImage, useDeleteSelectedImage, useGeneratePdfWorkSchedule, useGetProjectAssigneDetail, useUpdateSelectedImageComment, useUpdateWork, useUploadCorrectedImage, useUploadSelectImageManaully } from "../../../apiList/Stage Api/workScheduleApi"
+import { useCreateCorrection, useCreateWork, useDeleteCorrectedImage, useDeleteSelectedImage, useGeneratePdfWorkSchedule, useGetProjectAssigneDetail, useGetProjectWorkers, useUpdateSelectedImageComment, useUpdateWork, useUploadCorrectedImage, useUploadSelectImageManaully } from "../../../apiList/Stage Api/workScheduleApi"
 import { toast } from "../../../utils/toast"
 import { downloadImage } from "../../../utils/downloadFile"
 import { useCurrentSupervisor } from "../../../Hooks/useCurrentSupervisor"
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
+import { useParams } from "react-router-dom"
+import { socket } from "../../../lib/socket"
 // import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 // import { NO_IMAGE } from "../../../constants/constants"
-
 
 interface ImageFile {
 
@@ -839,6 +839,7 @@ interface ProjectAssignee {
     siteAddress: string
     designReferenceId: string
     carpenterName: string
+    carpenterUIName: string
     supervisorName: string
     plannedStartDate: string
 }
@@ -906,6 +907,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
     scheduleId = null,
     refetch,
 }) => {
+    const { organizationId } = useParams() as { organizationId: string }
     const fileInputRef = useRef<HTMLInputElement>(null)
     const siteFileInputRef = useRef<HTMLInputElement>(null)
     // const [selectedTaskIndex, _setSelectedTaskIndex] = useState<number | null>(null)
@@ -913,7 +915,8 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
     const currentUser = useCurrentSupervisor()
     const { data: projectAssigneData } = useGetProjectAssigneDetail(projectId)
-
+    const { data: workers, isLoading: workerloading } = useGetProjectWorkers(organizationId!)
+    const [shouldListenToSocketEvents, setShouldListenToSocketEvents] = useState<boolean>(false);
 
     const [plannedImage, setPlannedImage] = useState({
         name: "",
@@ -931,7 +934,137 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
     const [sliderPosition, setSliderPosition] = useState(50)
     const [Image, setIsDragging] = useState(false)
 
+
+
+
+    const handleUploadComparisonSocket = (data: any) => {
+        if (data.scheduleId !== scheduleId) return;
+        if (data.addedBy === currentUser?.id) return;
+
+        // 🧠 data.selectImages is the new comparison
+        setWorkComparions((prev: any) => [...prev, data.selectImages]);
+
+        toast({
+            title: "Comparison Added",
+            description: `by ${data.addedByRole}`,
+        });
+    };
+
+    const handleUploadSelectImgManuallySocket = (data: any) => {
+        console.log("entierngint othe funtio")
+        if (data.scheduleId !== scheduleId) return;
+        if (data.uploadedBy === currentUser?.id) return;
+
+        setWorkComparions(data.newSelectImages); // Returning full `workComparison`
+        toast({
+            title: "Select Images Added",
+            description: `by ${data.uploadedByRole}`,
+        });
+    };
+
+    const handleComparisonCreatedSocket = (data: any) => {
+        if (data.scheduleId !== scheduleId) return;
+        if (data.createdBy === currentUser?.id) return;
+
+        setWorkComparions((prev: any) => [...prev, data.selectImages]);
+
+        toast({
+            title: "New Comparison",
+            description: `created by ${data.createdByRole}`,
+        });
+    };
+
+    const handleUploadCorrectedSocket = (data: any) => {
+        if (data.scheduleId !== scheduleId) return;
+        if (data.uploadedBy === currentUser?.id) return;
+
+        setWorkComparions(data.newCorrectedImages); // Full workComparison
+        toast({
+            title: "Corrected Images Uploaded",
+            description: `by ${data.uploadedByRole}`,
+        });
+    };
+
+    const handleUpdateCommentSocket = (data: any) => {
+        if (data.scheduleId !== scheduleId) return;
+        if (data.updatedBy === currentUser?.id) return;
+
+        const { comparisonId, selectedImageId, comment } = data;
+
+        setWorkComparions(prev => {
+            if (!prev) return prev;
+            return prev.map(comp => {
+                if (comp._id === comparisonId) {
+                    return {
+                        ...comp,
+                        selectImage: comp.selectImage.map((img: any) =>
+                            img._id === selectedImageId ? { ...img, comment } : img
+                        )
+                    };
+                }
+                return comp;
+            });
+        });
+
+        toast({
+            title: "Comment Updated",
+            description: `by ${data.updatedByRole}`,
+        });
+    };
+    const handleDeleteSelectImageSocket = (data: any) => {
+        if (data.scheduleId !== scheduleId) return;
+        if (data.deletedBy === currentUser?.id) return;
+
+        setWorkComparions(data.images); // Full updated list already returned from backend
+
+        toast({
+            title: "Select Image Deleted",
+            description: `by ${data.deletedByRole}`,
+        });
+    };
+
+    const handleDeleteCorrectedSocket = (data: any) => {
+        if (data.scheduleId !== scheduleId) return;
+        if (data.deletedBy === currentUser?.id) return;
+
+        setWorkComparions(data.deletedImage); // Full updated list
+        toast({
+            title: "Corrected Image Deleted",
+            description: `by ${data.deletedByRole}`,
+        });
+    };
+
+
+    useEffect(() => {
+
+
+
+        console.log("getting called iwht the useEfffect wfor websockets")
+        if (!socket || !scheduleId || !projectId) return;
+
+
+        socket.on("workSchedule:selectimage_added", handleUploadComparisonSocket);
+        socket.on("workSchedule:selectimage_added_manual", handleUploadSelectImgManuallySocket);
+        socket.on("workSchedule:comparison_created", handleComparisonCreatedSocket);
+        socket.on("workSchedule:correctimage_upload", handleUploadCorrectedSocket);
+        socket.on("workSchedule:selectimage_comment", handleUpdateCommentSocket);
+        socket.on("workSchedule:selectimage_delete", handleDeleteSelectImageSocket);
+        socket.on("workSchedule:correctimage_delete", handleDeleteCorrectedSocket);
+
+        return () => {
+            socket.off("workSchedule:selectimage_added", handleUploadComparisonSocket);
+            socket.off("workSchedule:selectimage_added_manual", handleUploadSelectImgManuallySocket);
+            socket.off("workSchedule:comparison_created", handleComparisonCreatedSocket);
+            socket.off("workSchedule:correctimage_upload", handleUploadCorrectedSocket);
+            socket.off("workSchedule:selectimage_comment", handleUpdateCommentSocket);
+            socket.off("workSchedule:selectimage_delete", handleDeleteSelectImageSocket);
+            socket.off("workSchedule:correctimage_delete", handleDeleteCorrectedSocket);
+        };
+    }, [socket, scheduleId, currentUser?.id, shouldListenToSocketEvents]);
+
     const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+
 
     const formatDateTimeLocal = (date: Date) => {
         const pad = (n: number) => String(n).padStart(2, "0");
@@ -986,6 +1119,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             siteAddress: "",
             designReferenceId: "",
             carpenterName: "",
+            carpenterUIName: "",
             supervisorName: currentUser?.name || "",
             plannedStartDate: today,
         },
@@ -1048,12 +1182,20 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
     useEffect(() => {
         if (!projectAssigneData && !editData) return;
 
+
+        let assignedWorker;
+        if (!projectAssigneData && !editData) {
+            assignedWorker = workers?.find((w: any) => w?._id === (editData.projectAssignee.carpenterName as any)?._id)
+        }
+        // console.log("assingedWroker",assignedWorker )
+
         setFormData({
             projectAssignee: {
                 projectName: editData?.projectAssignee?.projectName || projectAssigneData?.projectName || "",
                 siteAddress: editData?.projectAssignee?.siteAddress || projectAssigneData?.siteAddress || "",
                 designReferenceId: editData?.projectAssignee?.designReferenceId || projectAssigneData?.designReferenceId || "",
-                carpenterName: editData?.projectAssignee?.carpenterName || "",
+                carpenterName: editData?.projectAssignee?.carpenterName || null,
+                carpenterUIName: assignedWorker?.workerName || "",
                 supervisorName: editData?.projectAssignee?.supervisorName || currentUser?.name || "",
                 plannedStartDate: editData?.projectAssignee?.plannedStartDate || today,
             },
@@ -1298,7 +1440,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                 siteImageFiles.forEach(file => formDataToSend.append('siteImages', file));
 
 
-                console.log("first enteirng i")
+                // console.log("first enteirng i")
                 await createWorkMutation.mutateAsync({
                     projectId,
                     formData: formDataToSend,
@@ -1310,7 +1452,6 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             }
             onClose()
         } catch (error: any) {
-            console.error("Error saving work schedule:", error)
             toast({ title: "Error", description: error?.response?.data?.message || "something went wrong", variant: "destructive" })
 
         }
@@ -1431,7 +1572,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                 const importedData = JSON.parse(e.target?.result as string)
                 setFormData(importedData)
             } catch (error) {
-                console.error("Error importing JSON:", error)
+                toast({ title: "Error", description: "Error importing JSON file", variant: "destructive" })
             }
         }
         reader.readAsText(file)
@@ -1478,6 +1619,8 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             );
 
             setWorkComparions((prev: any) => ([...prev, response]));
+            // After upload/delete happens
+            setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             toast({ description: 'Pdf Generated successfully', title: "Success" });
         }
         catch (error: any) {
@@ -1512,6 +1655,8 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
             // 🔥 update local state with new corrected images
             setWorkComparions(response);
+            // After upload/delete happens
+setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
         } catch (err: any) {
             toast({
                 title: "Error",
@@ -1543,7 +1688,8 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
             // 🔥 update local state with new corrected images
             setWorkComparions(response);
-
+// After upload/delete happens
+setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             refetch()
         } catch (err: any) {
             toast({
@@ -1565,16 +1711,16 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
             // 🔥 update local state after deletion
             setWorkComparions(response);
-
+// After upload/delete happens
+setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             toast({
                 title: "Success",
                 description: "Corrected image deleted successfully",
             });
         } catch (err: any) {
-            // console.error("Failed to delete corrected image:", err);
             toast({
                 title: "Error",
-                description:  err?.response?.data?.message || "Failed to delete corrected image",
+                description: err?.response?.data?.message || "Failed to delete corrected image",
                 variant: "destructive",
             });
         }
@@ -1593,13 +1739,13 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
             // 🔥 update local state after deletion
             setWorkComparions(response);
-
+// After upload/delete happens
+setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             toast({
                 title: "Success",
                 description: "image deleted successfully",
             });
         } catch (err: any) {
-            // console.error("Failed to delete corrected image:", err);
             toast({
                 title: "Error",
                 description: err?.response?.data?.message || "Failed to delete corrected image",
@@ -1633,15 +1779,16 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             // 🔥 update local state after update
             setWorkComparions(response);
             setEditingId("")
+            // After upload/delete happens
+setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             toast({
                 title: "Success",
                 description: "Comment updated successfully",
             });
         } catch (err: any) {
-            // console.error("Failed to update comment:", err);
             toast({
                 title: "Error",
-                description:  err?.response?.data?.message || "Failed to update comment",
+                description: err?.response?.data?.message || "Failed to update comment",
                 variant: "destructive",
             });
         }
@@ -1737,10 +1884,12 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
     if (!isOpen) return null
 
+
+
     return (
         <div onClick={onClose} className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
             <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg max-w-[90%] max-h-[90vh] overflow-y-auto w-full mx-4">
-                <div className="bg-blue-600 text-white p-4 rounded-t-lg">
+                <div className=" bg-blue-600 text-white p-4 rounded-t-lg sticky top-0 z-10">
                     <div className="flex justify-between items-center">
                         <div>
                             <h2 className="text-xl font-bold">Vertical Living — Carpenter Work Schedule & Visual Approval</h2>
@@ -1816,12 +1965,70 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                 </div>
                                 <div>
                                     <Label htmlFor="carpenterName">Carpenter Name</Label>
-                                    <Input
-                                        id="carpenterName"
-                                        placeholder="Assigned carpenter"
+                                    {/* <Input
+                                         id="carpenterName"
+                                         placeholder="Assigned carpenter"
+                                         value={formData.projectAssignee.carpenterName}
+                                         onChange={(e) => handleProjectAssigneeChange("carpenterName", e.target.value)}
+                                     />
+                                    */}
+
+
+                                    {/* <select
+                                        className="border-b px-2 py-1 text-sm"
                                         value={formData.projectAssignee.carpenterName}
-                                        onChange={(e) => handleProjectAssigneeChange("carpenterName", e.target.value)}
-                                    />
+                                         onChange={(e) => handleProjectAssigneeChange("carpenterName", e.target.value)}
+                                    >
+                                        <option value="">Select</option>
+                                        {workers?.map((w: { _id: string, workerName: string, email: string }) => (
+                                            <option key={w?._id} value={w?._id}>
+                                                {w.workerName}
+                                            </option>
+                                        ))}
+                                    </select> */}
+
+
+
+                                    <select
+                                        className="border-b px-2 py-1 text-sm w-[100%]"
+                                        value={formData.projectAssignee.carpenterUIName}
+                                        onChange={(e) => {
+                                            const selectedId = e.target.value;
+                                            const selectedWorker = workers?.find((w: any) => w._id === selectedId);
+
+                                            // setFormData({
+                                            //     ...formData,
+                                            //     assignedTo: selectedId,
+                                            //     assignedToName: selectedWorker ? selectedWorker.workerName : "",
+                                            // });
+
+                                            handleProjectAssigneeChange("carpenterName", e.target.value)
+                                            //  handleProjectAssigneeChange("carpenterUIName", selectedWorker.workerName)
+                                            handleProjectAssigneeChange(
+                                                "carpenterUIName",
+                                                selectedWorker ? selectedWorker.workerName : ""
+                                            );
+
+                                        }}
+                                    >
+                                        {workerloading ? (
+                                            <option disabled>Loading workers...</option>
+                                        ) : (
+                                            <>
+                                                <option disabled value="">{"Assign worker"}</option>
+                                                {Array.isArray(workers) && workers?.length > 0 ? (
+                                                    workers?.map((worker: { _id: string; workerName: string; email: string }) => (
+                                                        <option key={worker._id} value={worker._id}>
+                                                            {worker.workerName} {worker.email && `(${worker.email})`}
+                                                        </option>
+                                                    ))
+                                                ) : (
+                                                    <option disabled>No workers registered</option>
+                                                )}
+                                            </>
+                                        )}
+                                    </select>
+
                                 </div>
                                 <div>
                                     <Label htmlFor="supervisorName">Supervisor Name</Label>
@@ -2276,7 +2483,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                                                             createdAt: s.createdAt
                                                                         };
                                                                     })}
-                                                                    handleDeleteFile={(id)=>{
+                                                                    handleDeleteFile={(id) => {
                                                                         handleDeleteSelectImage(comp._id!, id)
                                                                     }}
 

@@ -1,6 +1,6 @@
 import React, {  useState } from 'react'
 import type {  IDocument, IEmployee } from '../../../types/types';
-import { useDeleteEmployee, useDeleteEmployeeDocument, useGetSingleEmployee, useUpdateEmployee, useUploadEmployeeDocument } from '../../../apiList/Department Api/HrApi/HrApi';
+import {  useDeleteEmployee, useDeleteEmployeeDocument, useGetSingleEmployee, useUpdateEmployee, useUploadEmployeeDocument } from '../../../apiList/Department Api/HrApi/HrApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import MaterialOverviewLoading from '../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 import { toast } from '../../../utils/toast';
@@ -9,6 +9,7 @@ import { roles } from '../../../constants/constants';
 const HrSingleEmployeeDetail = () => {
 
 
+    // const {organizationId} = useParams() as {organizationId:string}
     const {id} = useParams()
     const navigate = useNavigate()
     
@@ -17,15 +18,61 @@ const HrSingleEmployeeDetail = () => {
         const [isEditing, setIsEditing] = useState(false);
         const [editData, setEditData] = useState<IEmployee | null>(null);
         const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
-      
+        
+        
+        // const [newData, setNewData] = useState<IEmployee>({
+        //       organizationId: organizationId,
+        //       empId: null,
+        //       employeeModel: null,
+        //       empRole: "organization_staff",
+        //         personalInfo: {
+        //             empName: "",
+        //             dateOfBirth: new Date(),
+        //             email: "",
+        //             phoneNo: "",
+        //             gender: "male",
+        //             maritalStatus: "unmarried",
+        //             address: {
+        //                 street: "",
+        //                 city: "",
+        //                 state: "",
+        //                 pincode: "",
+        //                 country: "India",
+        //             },
+        //             emergencyContact: {
+        //                 name: "",
+        //                 relationship: "",
+        //                 phone: "",
+        //             },
+        //             },
+        //             employment: {
+        //             joinDate: new Date(),
+        //             designation: "",
+        //             department: "",
+        //             reportingTo: "",
+        //             employmentType: 'full_time',
+        //             salary: {
+        //                 basic: 0,
+        //                 hra: 0,
+        //                 allowances: 0,
+        //                 total: 0,
+        //             },
+        //             specificRole: "",
+        //             workLocation: "",
+        //             },
 
+        //             documents: [],
+
+        //             status: "active",
+        // })
+      
           const { 
             data: singleEmployeeData, 
             isLoading: isLoadingSingleEmployee 
           } = useGetSingleEmployee( id!);
         
 
-          
+        //   const newEmployeeByHR = useAddEmployeeByHR()
             const updateEmployeeMutation = useUpdateEmployee();
             const deleteEmployeeMutation = useDeleteEmployee();
             const uploadDocumentMutation = useUploadEmployeeDocument();
@@ -44,7 +91,7 @@ const HrSingleEmployeeDetail = () => {
             
                 try {
                   await updateEmployeeMutation.mutateAsync({
-                    empId: selectedEmployee._id,
+                    empId: selectedEmployee._id!,
                     updates: editData
                   });
                   setIsEditing(false);
@@ -54,6 +101,21 @@ const HrSingleEmployeeDetail = () => {
                   toast({title:"Error", description:error?.response?.data?.message || "Failed to update employee", variant:"destructive"})
                 }
               };
+            
+            //    const handleAddNewEmployee = async () => {
+            //     if (!newData) return;
+            
+            //     try {
+            //       await newEmployeeByHR.mutateAsync({
+            //        newData
+            //       });
+            //     //   setIsEditing(false);
+            //     //   setSelectedEmployee(editData);
+            //     toast({title:"Success", description:"Employee Created successfully"})
+            //     } catch (error:any) {
+            //       toast({title:"Error", description:error?.response?.data?.message || "Failed to create employee", variant:"destructive"})
+            //     }
+            //   };
             
               const handleDeleteEmployee = async (empId: string) => {
                 if (!window.confirm('Are you sure you want to delete this employee? This action cannot be undone.')) {
@@ -148,7 +210,7 @@ const HrSingleEmployeeDetail = () => {
                 return <MaterialOverviewLoading />
               }
            
-            console.log("data", singleEmployeeData)
+            // console.log("data", singleEmployeeData)
               // Use single employee data if available, otherwise use selected employee
               const currentEmployee = singleEmployeeData;
             
@@ -645,10 +707,10 @@ const HrSingleEmployeeDetail = () => {
                         </label>
                         {isEditing ? (
                             <select
-                            value={editData?.employment?.specificRole || ''}
+                            value={editData?.employment?.department || ''}
                             onChange={(e) => setEditData(prev => prev ? {
                                 ...prev,
-                                employment: { ...prev.employment, specificRole: e.target.value as any }
+                                employment: { ...prev.employment, department: e.target.value as any }
                             } : null)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
@@ -660,7 +722,7 @@ const HrSingleEmployeeDetail = () => {
                                               ))}
                             </select>
                         ) : (
-                            <p className="text-gray-900 py-2">{currentEmployee.employment?.specificRole || 'N/A'}</p>
+                            <p className="text-gray-900 py-2">{currentEmployee.employment?.department || 'N/A'}</p>
                         )}
                         </div>
 

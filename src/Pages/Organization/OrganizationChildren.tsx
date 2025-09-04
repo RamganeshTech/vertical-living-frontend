@@ -13,7 +13,12 @@ export type OrganizationOutletTypeProps = {
     closeMobileSidebar: () => void;
 }
 
-const OrganizationChildrens: React.FC = () => {
+
+interface OrganizationChildrenProps {
+  setOrganizationId: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+const OrganizationChildrens:React.FC<OrganizationChildrenProps> = ({setOrganizationId}) => {
 
     const { organizationId } = useParams<{ organizationId: string }>()
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
@@ -39,6 +44,9 @@ const OrganizationChildrens: React.FC = () => {
 
         window.addEventListener('resize', handleResize);
 
+        if(organizationId){
+            setOrganizationId(organizationId)
+        }
         // Cleanup
         return () => window.removeEventListener('resize', handleResize);
     }, []);

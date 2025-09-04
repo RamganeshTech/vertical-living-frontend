@@ -89,7 +89,7 @@ const LoginPage = () => {
             }
         }
         catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || "Failed to login", variant: "destructive" })
+            toast({ title: "Error", description: error?.response?.data?.message|| error?.message || "Failed to login", variant: "destructive" })
         }
     };
 

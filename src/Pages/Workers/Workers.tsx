@@ -128,7 +128,7 @@ export default function Workers() {
   }
 
   return (
-    <div className="max-h-full sm:overflow-y-hidden custom-scrollbar">
+    <div className="max-h-full h-full  sm:overflow-y-hidden custom-scrollbar">
       {/* Header */}
       <div className="bg-white ">
         <div className="max-w-full mx-auto  py-2">
@@ -160,8 +160,8 @@ export default function Workers() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-full !max-h-[100%] overflow-y-auto custom-scrollbar mx-auto p-2">
-        <div className="grid grid-cols-1 max-h-full lg:grid-cols-3 gap-6 lg:gap-8 w-full">
+      <div className="max-w-full !h-[100%]  overflow-y-auto custom-scrollbar mx-auto p-2">
+        <div className="grid grid-cols-1 h-full lg:grid-cols-3 gap-6 lg:gap-8 w-full ">
           {/* Invite Section */}
           <div className="lg:col-span-1 h-fit space-y-6">
             {/* Invite Workers */}
@@ -273,8 +273,8 @@ export default function Workers() {
           </div>
 
           {/* Workers List */}
-          <div className={`lg:col-span-2 sm:max-h-[43%] lg:!max-h-[48%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto shadow-md custom-scrollbar`}>
-            <Card className="bg-white/70 backdrop-blur-sm border-0  shadow-xl">
+          <div className={`lg:col-span-2 sm:max-h-[43%] lg:!max-h-[90%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto custom-scrollbar`}>
+            <Card className="bg-white/70 backdrop-blur-sm border-0  !shadow-none">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center justify-between">
                   <div className="flex items-center">
@@ -298,11 +298,11 @@ export default function Workers() {
                     ))}
                   </div>
                 ) : workers && workers.length > 0 ? (
-                  <div className="space-y-4 overflow-hidden">
+                  <div className="space-y-4  ">
                     {workers.map((worker: any) => (
                       <div
                         key={worker._id}
-                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-blue-100 rounded-xl hover:bg-blue-50/50 transition-all duration-200 gap-4"
+                        className="flex flex-col shadow-md sm:flex-row sm:items-center sm:justify-between p-4 border border-blue-100 rounded-xl hover:bg-blue-50/50 transition-all duration-200 gap-4"
                       >
                         <div className="flex items-center space-x-4 min-w-0 flex-1">
                           <Avatar className="w-12 h-12 border-2 border-blue-200 flex-shrink-0">

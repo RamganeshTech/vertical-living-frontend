@@ -6,12 +6,13 @@ import { Input } from "../../../components/ui/Input";
 import { downloadImage } from "../../../utils/downloadFile";
 // import { NO_IMAGE } from "../../../constants/constants";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
+import VideoGalleryMain from "../../../shared/VideoGallery/VideoGalleryMain";
 
 interface UploadEntry {
   _id: string;
   url: string;
   originalName: string;
-  type: "image" | "pdf";
+  type: "image" | "pdf" | "video";
   uploadedAt: string;
 }
 
@@ -71,6 +72,7 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
 
   const imageFiles = existingUploads.filter(image => image.type === "image")
   const pdfFiles = existingUploads?.filter(file => file.type === "pdf")
+  const videoFiles = existingUploads?.filter(file => file.type === "video")
 
 
 
@@ -180,6 +182,37 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
         }
       </div>
 
+      <div className="mt-6 w-full ">
+        <h3 className="text-lg font-semibold mb-4 text-gray-800"> Videos </h3>
+        {videoFiles?.length === 0 ? (
+          <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
+            No Videos uploaded yet.
+          </div>
+        ) : <>
+          <div className="">
+            {/* <ImageGalleryExample
+              imageFiles={videoFiles} refetch={refetch} handleDeleteFile={handleDelete}
+              height={190}
+              minWidth={156}
+              maxWidth={100}
+            // className="flex-1 flex  flex-wrap w-[100px] border"
+            /> */}
+
+
+            <VideoGalleryMain
+              videoFiles={videoFiles}
+              refetch={refetch}
+              handleDeleteFile={handleDelete}
+              isDeleting={isDeleting}
+              height={190}
+              minWidth={156}
+              maxWidth={100}
+            />
+          </div>
+
+        </>
+        }
+      </div>
 
       {previewImage && (
         <div onClick={() => setPreviewImage(null)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">

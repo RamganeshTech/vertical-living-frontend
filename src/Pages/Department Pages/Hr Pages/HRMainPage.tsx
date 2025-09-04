@@ -5,11 +5,14 @@ import {
   useGetEmployeesInfinite,
   useDeleteEmployee,
 } from '../../../apiList/Department Api/HrApi/HrApi';
-import { Outlet, useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { Outlet, useOutletContext, useParams } from 'react-router-dom';
 import type { OrganizationOutletTypeProps } from '../../Organization/OrganizationChildren';
 import { roles } from '../../../constants/constants';
 import { toast } from '../../../utils/toast';
 import { Button } from '../../../components/ui/Button';
+import CreateNewEmployee from './CreateNewEmployee';
+import GridCardEmployeeView from './GridCardEmployeeView';
+import EmployeeListView from './EmployeeListView';
 
 const HRMainPage: React.FC = () => {
   const { openMobileSidebar, isMobile } = useOutletContext<OrganizationOutletTypeProps>()
@@ -17,7 +20,6 @@ const HRMainPage: React.FC = () => {
   const [filters, setFilters] = useState<EmployeeFilters>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, _setViewMode] = useState<'grid' | 'list'>('list');
-  const navigate = useNavigate()
 
 
   // Hooks
@@ -31,6 +33,8 @@ const HRMainPage: React.FC = () => {
     refetch
   } = useGetEmployeesInfinite(organizationId, filters);
 
+          const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
+  
   const deleteEmployeeMutation = useDeleteEmployee();
 
   const allEmployees = useMemo(() => {
@@ -87,29 +91,7 @@ const HRMainPage: React.FC = () => {
     }
   };
 
-  const getEmploymentTypeColor = (type?: string) => {
-    switch (type) {
-      case 'full_time': return 'bg-blue-100 text-blue-800';
-      case 'part_time': return 'bg-purple-100 text-purple-800';
-      case 'contract': return 'bg-orange-100 text-orange-800';
-      case 'intern': return 'bg-pink-100 text-pink-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatDate = (date?: Date) => {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString();
-  };
-
-  const formatSalary = (salary?: { total?: number }) => {
-    if (!salary?.total) return 'N/A';
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(salary.total);
-  };
+  
 
   const handleFilterChange = (key: keyof EmployeeFilters, value: string) => {
 
@@ -175,6 +157,8 @@ const HRMainPage: React.FC = () => {
   return (
     <div className="min-h-full max-h-full overflow-y-auto bg-gray-50">
       {/* Header */}
+      {!showCreateForm && 
+      <>
       <div className="bg-white shadow-sm border-b">
         <div className="px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -198,6 +182,10 @@ const HRMainPage: React.FC = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-80"
                 />
+              </div>
+
+              <div>
+                <Button onClick={()=> setShowCreateForm(true)}>Create New Employee</Button>
               </div>
 
               {/* <div className="flex gap-2">
@@ -249,21 +237,21 @@ const HRMainPage: React.FC = () => {
                 {/* Employee Role */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Employee Role
+                    Organization Type
                   </label>
                   <select
                     value={filters.empRole || ''}
                     onChange={(e) => handleFilterChange('empRole', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="">All Roles</option>
+                    <option value="">Select Type</option>
                     <option value="organization_staff">Organization Staff</option>
                     <option value="nonorganization_staff">Non-Organization Staff</option>
                   </select>
                 </div>
 
                 {/* Status */}
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Status
                   </label>
@@ -278,7 +266,7 @@ const HRMainPage: React.FC = () => {
                     <option value="terminated">Terminated</option>
                     <option value="on_leave">On Leave</option>
                   </select>
-                </div>
+                </div> */}
 
                 {/* Department */}
                 <div>
@@ -337,7 +325,7 @@ const HRMainPage: React.FC = () => {
 
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1  max-h-[74vh] overflow-y-auto">
             {/* Stats Cards */}
 
 
@@ -415,112 +403,7 @@ const HRMainPage: React.FC = () => {
                 {viewMode === 'grid' ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
                     {filteredEmployees.map((employee:IEmployee) => (
-                      <div
-                        key={employee._id}
-                        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-blue-200 group"
-                      >
-                        <div className="p-6">
-                          {/* Header */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center">
-                              {/* <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                {employee.personalInfo?.empName?.charAt(0)?.toUpperCase() || 'N'}
-                              </div> */}
-                              <div className="ml-3">
-                                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                  {employee.personalInfo?.empName || 'N/A'}
-                                </h3>
-                              </div>
-                            </div>
-                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(employee.status)}`}>
-                              {employee.status || 'N/A'}
-                            </span>
-                          </div>
-
-                          {/* Employment Info */}
-                          <div className="space-y-3 mb-4">
-                            <div className="flex items-center text-sm">
-                              <i className="fas fa-briefcase text-gray-400 w-4"></i>
-                              <span className="ml-2 text-gray-600">
-                                {employee.employment?.designation || 'N/A'}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center text-sm">
-                              <i className="fas fa-building text-gray-400 w-4"></i>
-                              <span className="ml-2 text-gray-600">
-                                {employee.employment?.department || 'N/A'}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center text-sm">
-                              <i className="fas fa-envelope text-gray-400 w-4"></i>
-                              <span className="ml-2 text-gray-600 truncate">
-                                {employee.personalInfo?.email || 'N/A'}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center text-sm">
-                              <i className="fas fa-phone text-gray-400 w-4"></i>
-                              <span className="ml-2 text-gray-600">
-                                {employee.personalInfo?.phoneNo || 'N/A'}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Employment Type & Salary */}
-                          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                            {employee.employment?.employmentType && (
-                              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getEmploymentTypeColor(employee.employment.employmentType)}`}>
-                                {employee.employment.employmentType.replace('_', ' ')}
-                              </span>
-                            )}
-
-                            <div className="text-right">
-                              <p className="text-xs text-gray-500">Salary</p>
-                              <p className="text-sm font-semibold text-gray-900">
-                                {formatSalary(employee.employment?.salary)}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Join Date */}
-                          <div className="mt-3 pt-3 border-t border-gray-100">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-500">Joined</span>
-                              <span className="text-gray-900 font-medium">
-                                {formatDate(employee.employment?.joinDate)}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
-                            <button
-                              // onClick={() => handleEmployeeClick(employee)}
-                              onClick={() => navigate(employee._id)}
-                              className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                            >
-                              <i className="fas fa-eye mr-1"></i>
-                              View Details
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteEmployee(employee._id);
-                              }}
-                              className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm"
-                              disabled={deleteEmployeeMutation.isPending}
-                            >
-                              {deleteEmployeeMutation.isPending ? (
-                                <i className="fas fa-spinner fa-spin"></i>
-                              ) : (
-                                <i className="fas fa-trash"></i>
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                      <GridCardEmployeeView key={employee._id} employee={employee} getStatusColor={getStatusColor}  handleDeleteEmployee={handleDeleteEmployee} deleteEmployeeMutation={deleteEmployeeMutation} />
                     ))}
                   </div>
                 ) : (
@@ -536,10 +419,10 @@ const HRMainPage: React.FC = () => {
                               Contact
                             </th>
                             <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Position
+                              Department
                             </th>
                             <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Status
+                              Type
                             </th>
                             <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Actions
@@ -548,73 +431,7 @@ const HRMainPage: React.FC = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                           {filteredEmployees.map((employee:IEmployee) => (
-                            <tr key={employee._id} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-6 py-4 text-center">
-                                <div className="flex items-center">
-                                  {/* <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                    {employee.personalInfo?.empName?.charAt(0)?.toUpperCase() || 'N'}
-                                  </div> */}
-                                  <div className="ml-4">
-                                    <div className="text-sm font-medium text-gray-900">
-                                      {employee.personalInfo?.empName || 'N/A'}
-                                    </div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 text-center">
-                                <div className="text-sm text-gray-900">
-                                  {employee.personalInfo?.email || 'N/A'}
-                                </div>
-                                <div className="text-sm text-gray-500 ">
-                                  {employee.personalInfo?.phoneNo || 'N/A'}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 text-center">
-                                {/* <div className="text-sm text-gray-900">
-                                  {employee.employment?.designation || 'N/A'}
-                                </div> */}
-                                <div className="text-sm text-gray-900">
-                                  {employee?.employeeModel === "StaffModel" ? employee.employment?.department || 'N/A' : 'N/A'}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 text-center ">
-                                <div>
-                                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(employee.status)}`}>
-                                    {employee.status || 'N/A'}
-                                  </span>
-                                  {/* {employee.employment?.employmentType && (
-                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getEmploymentTypeColor(employee.employment.employmentType)}`}>
-                                      {employee.employment.employmentType.replace('_', ' ')}
-                                    </span>
-                                  )} */}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 text-center">
-                                <div className="flex gap-2 justify-center">
-                                  <Button
-                                  variant='secondary'
-                                    onClick={() => navigate(employee._id)}
-                                    className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                                  >
-                                    <i className="fas fa-eye mr-1"></i>
-                                    View
-                                  </Button>
-                                  <Button
-                                  variant='danger'
-                                    onClick={() => handleDeleteEmployee(employee._id)}
-                                    className="text-white  bg-red-600 font-medium text-sm"
-                                    disabled={deleteEmployeeMutation.isPending}
-                                  >
-                                    {deleteEmployeeMutation.isPending ? (
-                                      <i className="fas fa-spinner fa-spin mr-1"></i>
-                                    ) : (
-                                      <i className="fas fa-trash mr-1"></i>
-                                    )}
-                                    Delete
-                                  </Button>
-                                </div>
-                              </td>
-                            </tr>
+                           <EmployeeListView key={employee._id} employee={employee}   handleDeleteEmployee={handleDeleteEmployee} deleteEmployeeMutation={deleteEmployeeMutation}/>
                           ))}
                         </tbody>
                       </table>
@@ -649,6 +466,12 @@ const HRMainPage: React.FC = () => {
           </div>
         </div>
       </div>
+      </>
+      }
+
+
+      { showCreateForm && <CreateNewEmployee organizationId={organizationId} onSuccess={()=> setShowCreateForm(false)}/>}
+
     </div>
   );
 };

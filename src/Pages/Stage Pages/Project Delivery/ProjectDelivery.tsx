@@ -49,7 +49,7 @@ export default function ProjectDeliveryPanel() {
 
   const handleCompletionStatus = async () => {
     try {
-      await completionStatus({ projectId });
+      await completionStatus({ projectId , organizationId});
       toast({ description: "Project Delivery marked as complete.", title: "Success" });
       refetch();
     } catch (error: any) {

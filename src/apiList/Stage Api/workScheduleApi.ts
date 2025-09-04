@@ -30,8 +30,8 @@ export interface IProjectWorker {
   [key: string]: any;
 }
 
-export const getProjectWorkersApi = async (projectId: string, api: AxiosInstance) => {
-  const res = await api.get(`/worktasks/${projectId}/getworkers`);
+export const getProjectWorkersApi = async (organizationId: string, api: AxiosInstance) => {
+  const res = await api.get(`/worktasks/${organizationId}/getworkers`);
   return res.data.data;
 };
 
@@ -74,6 +74,7 @@ const uploadDailyScheduleImagesApi = async (
   scheduleId: string,
   taskId: string,
   date: string,
+  api:AxiosInstance,
   files: File[]
 ) => {
   const formData = new FormData();
@@ -82,8 +83,8 @@ const uploadDailyScheduleImagesApi = async (
     formData.append("files", file);
   });
 
-  const res = await axios.post(
-    `${import.meta.env.VITE_API_URL}/api/worktasks/${scheduleId}/task/${taskId}/upload`,
+  const res = await api.post(
+    `/worktasks/${scheduleId}/task/${taskId}/uploaddailyimage`,
     formData,
     {
       headers: {
@@ -100,11 +101,13 @@ export const deleteDailyScheduleImageApi = async ({
   scheduleId,
   taskId,
   date,
+  api,
   imageId,
 }: {
   scheduleId: string;
   taskId: string;
   date: string;
+  api:AxiosInstance,
   imageId: string;
 }) => {
 
@@ -115,8 +118,8 @@ export const deleteDailyScheduleImageApi = async ({
   //   console.log("date", date)
 
 
-  const { data } = await axios.delete(
-    `${import.meta.env.VITE_API_URL}/api/worktasks/${scheduleId}/deleteworkimage/${taskId}/date/${date}/image/${imageId}`
+  const { data } = await api.delete(
+    `/worktasks/${scheduleId}/deleteworkimage/${taskId}/date/${date}/image/${imageId}`
   );
   return data.data;
 };
@@ -400,18 +403,18 @@ export const useGetDailySchedule = (projectId: string) => {
   });
 };
 
-export const useGetProjectWorkers = (projectId: string) => {
+export const useGetProjectWorkers = (organizationId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];
   return useQuery({
-    queryKey: ["project-workers", projectId],
+    queryKey: ["project-workers", organizationId],
     queryFn: () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
-      return getProjectWorkersApi(projectId, api);
+      return getProjectWorkersApi(organizationId, api);
     },
-    enabled: !!projectId,
+    enabled: !!organizationId,
     retry:false,
     refetchOnMount:false
   });
@@ -504,7 +507,7 @@ export const useUploadDailyScheduleImages = () => {
         throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
 
-      return await uploadDailyScheduleImagesApi(scheduleId, taskId, date, files)
+      return await uploadDailyScheduleImagesApi(scheduleId, taskId, date, api, files)
     },
      onSuccess: (_, { projectId }) => {
       if (projectId) {
@@ -531,7 +534,7 @@ export const useDeleteDailyScheduleImage = () => {
         throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
 
-      return await deleteDailyScheduleImageApi({scheduleId, taskId, date, imageId})
+      return await deleteDailyScheduleImageApi({scheduleId, taskId, date, api, imageId})
     },
     onSuccess:(_, {projectId})=>{
       queryClient.invalidateQueries({queryKey: ["daily-schedule", projectId]})

@@ -568,7 +568,7 @@ export interface IPersonalInfo {
   email?: string;
   phoneNo?: string;
   gender?: "male" | "female" | "other";
-  maritalStatus?: "single" | "married" | "divorced" | "widowed";
+  maritalStatus?: "unmarried" | "married" | "divorced" | "widowed";
   address?: {
     street?: string;
     city?: string;
@@ -609,10 +609,10 @@ export interface IDocument {
 }
 
 export interface IEmployee {
-  _id: string;
+  _id?: string;
   organizationId: string;
-  empId?: string;
-  employeeModel: "UserModel" | "StaffModel" | "CTOModel" | "WorkerModel";
+  empId?: string | null;
+  employeeModel: "UserModel" | "StaffModel" | "CTOModel" | "WorkerModel" | null;
   empRole: "organization_staff" | "nonorganization_staff";
   personalInfo: IPersonalInfo | null;
   employment: IEmployment | null;

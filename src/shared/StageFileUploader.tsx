@@ -6,15 +6,20 @@ import { toast } from "../utils/toast";
 import { downloadImage } from "../utils/downloadFile";
 import { createPortal } from "react-dom";
 import ImageGalleryExample from "./ImageGallery/ImageGalleryMain";
+import VideoGalleryMain from "./VideoGallery/VideoGalleryMain";
 
-interface UploadSectionProps {
-    formId: string;
-    existingUploads: {
-        type: "image" | "pdf";
+
+interface ExistingUploads {
+type: "image" | "pdf" | "video";
         url: string;
         originalName: string;
         uploadedAt: string;
-    }[];
+}
+
+
+interface UploadSectionProps {
+    formId: string;
+    existingUploads: ExistingUploads[];
     onUploadComplete?: () => void;
     uploadFilesMutate: ({ formId, files, projectId }: { formId: string, projectId: string, files: any }) => Promise<any>,
     uploadPending: boolean
@@ -82,13 +87,13 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
 
     const pdfFiles = existingUploads.filter((file) => file.type === "pdf");
     const imageFiles = existingUploads.filter((file) => file.type === "image");
-
+    const videoFiles  = existingUploads.filter((file) => file.type === "video");
     return (
         <div className="space-y-6">
             <h3 className="text-xl font-semibold text-blue-700">Common Uploads</h3>
 
             <div className="flex gap-4 items-center relative">
-                <Input type="file" multiple onChange={handleFileChange} accept="image/jpeg,image/png,application/pdf" />
+                <Input type="file" multiple onChange={handleFileChange} accept="image/jpeg,image/png,application/pdf,video/*" />
                 {!autoUpload && <Button onClick={handleUpload} isLoading={uploadPending} className="bg-blue-600 text-white">
                     Upload
                 </Button>}
@@ -119,7 +124,9 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
 
             </div>
 
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4"> */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+
                 <div>
                     <h4 className="font-semibold text-blue-800 mb-2">📄 PDF Files</h4>
                     <ul className="space-y-2 max-h-[180px]  rounded-lg  border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto ">
@@ -187,6 +194,44 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
                     </ul>
                 </div>
 
+
+                <div className="overflow-y-auto">
+                    <h4 className="font-semibold text-blue-800 mb-2">🎥 Video Files</h4>
+                    <ul className="space-y-2 max-h-[180px] rounded-lg border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto">
+                        {videoFiles.length === 0 && <div className="min-h-[145px] flex items-center justify-center"><p className="text-sm text-gray-500">No Videos uploaded.</p></div>}
+                        {/* {videoFiles.map((file, i) => (
+                            <li key={i} className="flex justify-between items-center bg-purple-50 p-2 rounded-xl">
+                                <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
+                                <div className="flex gap-2 items-center">
+                                    <Button size="sm"
+                                        variant="primary"
+                                        onClick={() => window.open(file.url, '_blank')}
+                                    >
+                                        <i className="fas fa-play"></i>
+                                    </Button>
+                                    <Button onClick={() => downloadImage({ src: file.url, alt: file.originalName || "video.mp4" })} size="sm" className="text-sm">
+                                        <i className="fa-solid fa-download"></i>
+                                    </Button>
+                                    <Button size="sm" isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-red-600 text-sm">
+                                        <i className="fa-solid fa-trash-can"></i>
+                                    </Button>
+                                </div>
+                            </li>
+                        ))} */}
+
+                        {videoFiles.length > 0 && (
+                            <VideoGalleryMain
+                                videoFiles={videoFiles}
+                                refetch={refetch}
+                                handleDeleteFile={handleDeleteFile}
+                                isDeleting={deleteFilePending}
+                                height={80}
+                            minWidth={98}
+                            maxWidth={100}
+                            />
+                        )}
+                    </ul>
+                </div>
 
             </div>
 

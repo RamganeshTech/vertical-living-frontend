@@ -1144,6 +1144,8 @@ import { useNavigate, useParams } from "react-router-dom"
 import { Button } from "../../../components/ui/Button"
 import { toast } from "../../../utils/toast"
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
+import { socket } from "../../../lib/socket"
+import { useCurrentSupervisor } from "../../../Hooks/useCurrentSupervisor"
 
 interface CalendarDay {
   date: Date
@@ -1179,7 +1181,7 @@ interface ScheduleData {
 }
 
 const DailySchedulePage: React.FC = () => {
-  const { projectId } = useParams() as { projectId: string }
+  const { projectId , organizationId} = useParams() as { projectId: string , organizationId:string}
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [calendarDays, setCalendarDays] = useState<CalendarDay[]>([])
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
@@ -1270,6 +1272,225 @@ const DailySchedulePage: React.FC = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [goToNextDate, goToPreviousDate]);
+
+
+    const currentUser =useCurrentSupervisor()
+
+
+  // Add this useEffect in your DailySchedulePage component
+useEffect(() => {
+  if (!socket || !organizationId) return;
+
+  // 1. Task Created
+  const handleTaskCreated = (data: {
+    taskId: string;
+    dailyTasks: any[];
+    projectAssignee: any;
+    supervisorCheck: any;
+    createdBy: string;
+    createdByRole: string;
+  }) => {
+    const { createdBy } = data;
+    console.log("workinged created form teh socket 1294")
+    // Only refetch if someone else created the task
+    if (createdBy !== currentUser?.id) {
+      refetch(); // Refetch entire schedule data
+      
+      toast({
+        title: "New Task Created",
+        description: `New work schedule created by ${data.createdByRole}`,
+      });
+    }
+  };
+
+  // 2. Task Updated
+  const handleTaskUpdated = (data: {
+    taskId: string;
+    updatedData: {
+      dailyTasks: any[];
+      projectAssignee: any;
+      supervisorCheck: any;
+    };
+    updatedBy: string;
+    updatedByRole: string;
+  }) => {
+    const { updatedBy } = data;
+    
+     console.log('🔥 WebSocket Event Received:', data);
+  console.log('👤 Current User ID:', currentUser?.id);
+
+    // Only refetch if someone else updated the task
+    if (updatedBy !== currentUser?.id) {
+       console.log('✅ Refetching data... in weebsocket useEffect');
+      refetch(); // Refetch entire schedule data
+      
+      toast({
+        title: "Task Updated",
+        description: `Work schedule updated by ${data.updatedByRole}`,
+      });
+      
+      // If the updated task is currently being viewed, refresh it
+      if (selectedTask && (selectedTask as any).scheduleId === data.taskId) {
+        // Find and update the selected task
+        const updatedScheduleData = scheduleData?.find((s: any) => s._id === data.taskId);
+        if (updatedScheduleData) {
+          const updatedTask = updatedScheduleData.dailyTasks.find((t: any) => t._id === selectedTask._id);
+          if (updatedTask) {
+            setSelectedTask({...updatedTask, scheduleId: data.taskId});
+          }
+        }
+      }
+    }
+  };
+
+  // 3. Task Deleted
+  const handleTaskDeleted = (data: {
+    scheduleId: string;
+    taskId: string;
+    deletedBy: string;
+    deletedByRole: string;
+  }) => {
+    const {  taskId, deletedBy } = data;
+    
+    // Only update if someone else deleted the task
+    if (deletedBy !== currentUser?.id) {
+      refetch(); // Refetch entire schedule data
+      
+      toast({
+        title: "Task Deleted",
+        description: `Task deleted by ${data.deletedByRole}`,
+      });
+      
+      // If the deleted task is currently being viewed, close the modal
+      if (selectedTask && selectedTask._id === taskId) {
+        setSelectedTask(null);
+        setSelectedDate(null);
+        setShowTaskList(false);
+      }
+    }
+  };
+
+  // 4. Image Uploaded to Task
+  const handleImageUploaded = (data: {
+    scheduleId: string;
+    taskId: string;
+    date: string;
+    newImages: any[];
+    uploadedBy: string;
+    uploadedByRole: string;
+  }) => {
+    const {  taskId, date, newImages, uploadedBy } = data;
+    
+    // Only update if someone else uploaded images
+    if (uploadedBy !== currentUser?.id) {
+      // Update selectedTask if it matches
+      if (selectedTask && selectedTask._id === taskId) {
+        setSelectedTask(prev => {
+          if (!prev) return prev;
+          
+          const updatedImages = [...(prev.uploadedImages || [])];
+          const dateObj = new Date(date);
+          const existingDateIndex = updatedImages.findIndex(
+            (entry) => new Date(entry.date).toDateString() === dateObj.toDateString()
+          );
+
+          if (existingDateIndex !== -1) {
+            // Add to existing date entry
+            updatedImages[existingDateIndex] = {
+              ...updatedImages[existingDateIndex],
+              uploads: [...updatedImages[existingDateIndex].uploads, ...newImages]
+            };
+          } else {
+            // Create new date entry
+            updatedImages.push({
+              date: dateObj.toISOString(),
+              uploads: newImages
+            });
+          }
+
+          return { ...prev, uploadedImages: updatedImages };
+        });
+      }
+      
+      toast({
+        title: "Images Uploaded",
+        description: `New images uploaded by ${data.uploadedByRole}`,
+      });
+    }
+  };
+
+  // 5. Image Deleted from Task
+  const handleImageDeleted = (data: {
+    scheduleId: string;
+    taskId: string;
+    date: string;
+    imageId: string;
+    remainingImages: any[];
+    deletedBy: string;
+    deletedByRole: string;
+  }) => {
+    const {  taskId, date,  remainingImages, deletedBy } = data;
+    
+    // Only update if someone else deleted the image
+    if (deletedBy !== currentUser?.id) {
+      // Update selectedTask if it matches
+      if (selectedTask && selectedTask._id === taskId) {
+        setSelectedTask(prev => {
+          if (!prev) return prev;
+          
+          const updatedImages = prev.uploadedImages?.map((group) => {
+            if (group.date.split("T")[0] === date) {
+              return {
+                ...group,
+                uploads: remainingImages // Use the remaining images from backend
+              };
+            }
+            return group;
+          });
+
+          return { ...prev, uploadedImages: updatedImages };
+        });
+      }
+      
+      toast({
+        title: "Image Deleted",
+        description: `Image deleted by ${data.deletedByRole}`,
+      });
+    }
+  };
+
+  // Register all event listeners
+  socket.on('workSchedule:task_created', handleTaskCreated);
+  socket.on('workSchedule:task_updated', handleTaskUpdated);
+  socket.on('workSchedule:task_deleted', handleTaskDeleted);
+  socket.on('workSchedule:image_uploaded', handleImageUploaded);
+  socket.on('workSchedule:image_deleted', handleImageDeleted);
+
+  
+  // Cleanup function
+  return () => {
+    socket.off('workSchedule:task_created', handleTaskCreated);
+    socket.off('workSchedule:task_updated', handleTaskUpdated);
+    socket.off('workSchedule:task_deleted', handleTaskDeleted);
+    socket.off('workSchedule:image_uploaded', handleImageUploaded);
+    socket.off('workSchedule:image_deleted', handleImageDeleted);
+  };
+}, [organizationId, currentUser?.id, selectedTask, scheduleData, showTaskList]);
+
+
+
+useEffect(() => {
+  socket.on('workSchedule:task_created', (data) => {
+    console.log('🎯 Received task_created:', data);
+    toast({title:"success", description:"created task for socket chekcing in the chrom "})
+  });
+}, []);
+
+// useEffect(() => {
+//   if (!socket || !organizationId) return;
+// console.log("📡 Sending 'join_project' for project:", organizationId);
+//   socket.emit("join_project", { organizationId });
+// }, [socket, organizationId]);
 
 
   // const getTasksForDate = (date: Date) => {

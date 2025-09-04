@@ -1,16 +1,19 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { RootState } from './store/store';
 import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
-const InventoryMain  = lazy(() => import( './Pages/Stage Pages/Inventory Main/InventoryMain'));
-const ExternalMain = lazy(() => import( './Pages/External Units/ExternalMain'));
-const WardrobeExternal = lazy(() => import( './Pages/External Units/WardrobeExternal'));
-const SelectedExternalUnits = lazy(() => import( './Pages/External Units/SelectedExternal Units/SelectedExternalUnits'));
-const ProcurementMain = lazy(() => import( './Pages/Department Pages/Procurement/ProcurementMain'));
-const HrSingleEmployeeDetail = lazy(() => import( './Pages/Department Pages/Hr Pages/HrSingleEmployeeDetail'));
+import { socket } from './lib/socket';
+import LogisticsMain from './Pages/Department Pages/Logistics Pages/LogisticsMain';
+// import LogisticsVehicle from './Pages/Department Pages/Logistics Pages/LogisticsVehicle';
+const InventoryMain = lazy(() => import('./Pages/Stage Pages/Inventory Main/InventoryMain'));
+const ExternalMain = lazy(() => import('./Pages/External Units/ExternalMain'));
+const WardrobeExternal = lazy(() => import('./Pages/External Units/WardrobeExternal'));
+const SelectedExternalUnits = lazy(() => import('./Pages/External Units/SelectedExternal Units/SelectedExternalUnits'));
+const ProcurementMain = lazy(() => import('./Pages/Department Pages/Procurement/ProcurementMain'));
+const HrSingleEmployeeDetail = lazy(() => import('./Pages/Department Pages/Hr Pages/HrSingleEmployeeDetail'));
 const RoomPage = lazy(() => import('./Pages/RequirementForm/RoomPage'));
 const HRMainPage = lazy(() => import('./Pages/Department Pages/Hr Pages/HRMainPage'));
 const CommonOrdersMain = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrdersMain'));
@@ -114,6 +117,22 @@ function App() {
   //it is used to check whether which user is now currently using the application
   const { loading } = useAuthCheck()
 
+
+  useEffect(() => {
+    if (!organizationId) return;
+
+    console.log("📡 Sending 'join_project' for project:", organizationId);
+
+    // ✅ Join organization room once on load
+    socket.emit("join_organization", { organizationId: organizationId });
+    return () => {
+      console.log("left 'leav_organizaiton' for project:", organizationId);
+
+      socket.emit("leave_organization", { organizationId: organizationId });
+    };
+  }, [organizationId]);
+
+
   if (loading) <MaterialOverviewLoading />;
   return (
     <>
@@ -166,7 +185,7 @@ function App() {
           } />
 
           <Route path="/organizations/:organizationId" element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
-            <OrganizationChildrens />
+            <OrganizationChildrens setOrganizationId={setOrganizationId} />
           </ProtectedRoutes>} >
 
             <Route index
@@ -251,9 +270,24 @@ function App() {
 
               <Route path=":id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <HrSingleEmployeeDetail />
-              </ProtectedRoutes>} ></Route>
+              </ProtectedRoutes>} />
+
 
             </Route>
+
+
+            <Route path="logistics" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <LogisticsMain />
+            </ProtectedRoutes>} >
+
+
+              {/* <Route path="vehicle" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <LogisticsVehicle />
+              </ProtectedRoutes>} /> */}
+
+
+            </Route>
+
 
             <Route path="commonorder" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <CommonOrdersMain />
