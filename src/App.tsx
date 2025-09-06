@@ -7,12 +7,15 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import LogisticsMain from './Pages/Department Pages/Logistics Pages/LogisticsMain';
+import LogisticsSingle from './Pages/Department Pages/Logistics Pages/LogisticsSingle';
+import ProcurementSub from './Pages/Department Pages/ProcurementNew Pages/ProcurementSub';
+import ProcurementNewMain from './Pages/Department Pages/ProcurementNew Pages/ProcurementNewMain';
 // import LogisticsVehicle from './Pages/Department Pages/Logistics Pages/LogisticsVehicle';
 const InventoryMain = lazy(() => import('./Pages/Stage Pages/Inventory Main/InventoryMain'));
 const ExternalMain = lazy(() => import('./Pages/External Units/ExternalMain'));
 const WardrobeExternal = lazy(() => import('./Pages/External Units/WardrobeExternal'));
 const SelectedExternalUnits = lazy(() => import('./Pages/External Units/SelectedExternal Units/SelectedExternalUnits'));
-const ProcurementMain = lazy(() => import('./Pages/Department Pages/Procurement/ProcurementMain'));
+// const ProcurementMain = lazy(() => import('./Pages/Department Pages/Procurement/ProcurementMain'));
 const HrSingleEmployeeDetail = lazy(() => import('./Pages/Department Pages/Hr Pages/HrSingleEmployeeDetail'));
 const RoomPage = lazy(() => import('./Pages/RequirementForm/RoomPage'));
 const HRMainPage = lazy(() => import('./Pages/Department Pages/Hr Pages/HRMainPage'));
@@ -248,11 +251,11 @@ function App() {
             </Route>
 
 
-            <Route path="procurement" element={
+            {/* <Route path="procurement" element={
               <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
                 <ProcurementMain />
               </ProtectedRoutes>
-            } />
+            } /> */}
 
 
           </Route>
@@ -284,6 +287,28 @@ function App() {
               {/* <Route path="vehicle" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <LogisticsVehicle />
               </ProtectedRoutes>} /> */}
+
+
+               <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <LogisticsSingle/>
+              </ProtectedRoutes>} /> 
+
+
+            </Route>
+
+              <Route path="procurement" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ProcurementNewMain />
+            </ProtectedRoutes>} >
+
+
+              {/* <Route path="vehicle" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <LogisticsVehicle />
+              </ProtectedRoutes>} /> */}
+
+
+               <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <ProcurementSub/>
+              </ProtectedRoutes>} /> 
 
 
             </Route>

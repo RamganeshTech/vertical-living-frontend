@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import {
-  useDeleteShipment,
   useGetShipments,
 } from "../../../apiList/Department Api/Logistics Api/logisticsApi";
-import { LogisticsShipmentForm } from "./LogisticsShipmentForm";
-import { useParams } from "react-router-dom";
+import { LogisticsShipmentForm, type AvailableProjetType } from "./LogisticsShipmentForm";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 import { Button } from "../../../components/ui/Button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/Card";
-import { toast } from "../../../utils/toast";
+
+import { useGetProjects } from "../../../apiList/projectApi";
+import ShipmentCard from "./ShipmentCard";
+import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
 
 export interface ILogisticsVehicle {
@@ -30,8 +31,7 @@ export interface ILogisticsVehicle {
 export interface IShipmentItem {
   name: string;
   quantity: number;
-  weight: number;
-  description: string;
+  // weight: number;
 }
 
 export interface ILogisticsShipment {
@@ -64,38 +64,62 @@ export interface ILogisticsShipment {
 
 const LogisticsMain: React.FC = () => {
   const { organizationId } = useParams();
-  // const location = useLocation();
-
-  // const isSubPage = location.pathname.includes("/vehicles");
+  const location = useLocation();
 
 
-  const { data: shipments, isLoading, isError, error, refetch } = useGetShipments(organizationId!);
+  const [filters, setFilters] = useState({
+    status: "",
+    projectId: "",
+    projectName: "",
+    scheduledDate: "",
+  });
 
-  const { mutateAsync: deleteShipment, isPending } = useDeleteShipment();
+
+  const { data: shipments, isLoading, isError, error, refetch } = useGetShipments(organizationId!, filters);
+
+  const { data } = useGetProjects(organizationId!)
+  // console.log("data", data)
+  const projects = data?.map((project: AvailableProjetType) => ({ _id: project._id, projectName: project.projectName }))
+
 
   const [editingShipment, setEditingShipment] = useState<any | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  const handleDelete = async (shipmentId: string) => {
-    try {
-      await deleteShipment({ shipmentId, organizationId: organizationId! });
-      toast({ title: "success", description: "Deleted Successfully" })
-refetch()
-    }
-    catch (error: any) {
-      toast({
-        title: "Error",
-        description: error?.response?.data?.message || "Failed to delete",
-        variant: "destructive"
-      });
-    }
+
+  const isSubPage = location.pathname.includes("sub");
+
+  if (isSubPage) return <Outlet />; // subpage like /vehicles
+
+
+  const activeFiltersCount = Object.values(filters).filter(Boolean).length;
+
+
+
+  const clearFilters = () => {
+    setFilters({
+      status: "",
+      projectId: "",
+      projectName: "",
+      scheduledDate: "",
+    });
   };
 
-  // if (isSubPage) return <Outlet />; // subpage like /vehicles
   return (
-    <div className="p-2 space-y-6">
+    <div className="p-2 space-y-6 h-full">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold text-blue-600">Logistics Department</h2>
+
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+            <i className="fas fa-dolly mr-3 text-blue-600"></i>
+            Logistics Department
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Manage your material transport
+          </p>
+        </div>
+
+
+        {/* <h2 className="text-3xl font-bold text-blue-600">Logistics Department</h2> */}
         <Button
           onClick={() => {
             setEditingShipment(null);
@@ -108,7 +132,7 @@ refetch()
       </div>
 
       {isLoading ? (
-        <p>Loading shipments...</p>
+       <MaterialOverviewLoading />
       ) : isError ? (
         <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
           <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
@@ -125,7 +149,89 @@ refetch()
           </Button>
         </div>
       ) : (
-        <>
+        <main className="flex gap-2 h-[90%]">
+
+          <div className="xl:w-80 flex-shrink-0">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <i className="fas fa-filter mr-2 text-blue-600"></i>
+                  Filters
+                </h3>
+                {activeFiltersCount > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Clear All ({activeFiltersCount})
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={filters.status || ''}
+                    onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="assigned">Assigned</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="in_transit">In Transit</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Schedule Date
+                  </label>
+                  <input
+                    type="date"
+                    onChange={(e) => setFilters((f) => ({ ...f, scheduledDate: e.target.value }))}
+                    value={filters.scheduledDate}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Project
+                  </label>
+
+                  <select
+                    value={filters?.projectId || ''}
+                    onChange={(e) => {
+                      const selectedProject = projects?.find(
+                        (p: AvailableProjetType) => p._id === e.target.value
+                      );
+                      if (selectedProject) {
+                        setFilters(prev => ({
+                          ...prev,
+                          projectId: selectedProject._id,
+                          projectName: selectedProject.projectName, // keep name too
+                        }));
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {/* <option value="">All Projects</option> */}
+                    {projects?.map((project: AvailableProjetType) => (
+                      <option key={project._id} value={project._id}>{project.projectName}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* No Shipments Fallback */}
           {shipments.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
@@ -137,60 +243,18 @@ refetch()
               </p>
             </div>
           ) : (
-            // Responsive Grid of Shipment Cards
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-              {shipments.map((s: any) => (
-                <Card key={s._id} className="border-l-4 border-blue-600">
-                  <CardHeader>
-                    <CardTitle>{s.shipmentNumber || "Untitled Shipment"}</CardTitle>
-                    <CardDescription className="capitalize">{s.shipmentType}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-1 text-sm text-blue-950">
-                    <p>
-                      <i className="fas fa-stream mr-1 text-gray-500" />
-                      <span className="font-medium text-gray-700">Status:</span> {s.status}
-                    </p>
-                    <p>
-                      <i className="fas fa-truck mr-1 text-gray-500" />
-                      <span className="font-medium text-gray-700">Vehicle:</span> {s.vehicleDetails?.vehicleNumber || "N/A"}
-                    </p>
-                    <p>
-                      <i className="fas fa-map-marker-alt mr-1 text-gray-500" />
-                      <span className="font-medium text-gray-700">From:</span> {s.origin?.address || "-"}
-                    </p>
-                    <p>
-                      <i className="fas fa-location-arrow mr-1 text-gray-500" />
-                      <span className="font-medium text-gray-700">To:</span> {s.destination?.address || "-"}
-                    </p>
+            <div className="flex-1 max-h-[100%] overflow-y-auto">
 
-                    <div className="mt-4 flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setEditingShipment(s);
-                          setShowForm(true);
-                        }}
-                      >
-                        <i className="fas fa-edit mr-1" />
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        isLoading={isPending}
-                        variant="danger"
-                        onClick={() => handleDelete(s._id)}
-                      >
-                        <i className="fas fa-trash mr-1" />
-                        Delete
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 ">
+                {shipments.map((s: ILogisticsShipment) => (
+                  <>
+                    <ShipmentCard key={(s as any)._id} s={s} organizationId={organizationId!} setEditingShipment={setEditingShipment} setShowForm={setShowForm} />
+                  </>
+                ))}
+              </div>
             </div>
           )}
-        </>
+        </main>
       )}
 
       {showForm && (
@@ -198,7 +262,7 @@ refetch()
           shipment={editingShipment}
           onClose={() => {
             setShowForm(false)
-            refetch()
+            // refetch()
           }}
           organizationId={organizationId!}
 

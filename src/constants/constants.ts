@@ -7,8 +7,7 @@ export const SIDEBAR_LABELS = {
   COMMONORDER: "Common Order",
   HR: "HR Dept",
   LOGISTICS: "Logistics",
-
-  // PROCUREMENT: "Procurement",
+  PROCUREMENT: "Procurement",
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",
@@ -21,8 +20,8 @@ export const SIDEBAR_ICONS = {
   ORGANIZATION: "fa-solid fa-building text-2xl",
   COMMONORDER: "fa-solid fa-box text-2xl",
   HR: "fa-solid fa-users text-2xl",
-  LOGISTICS: "fa-solid fa-trasnport text-2xl",
-  // PROCUREMENT: "fa-solid fa-box text-2xl",
+  LOGISTICS: "fa-solid fa-dolly text-2xl",
+  PROCUREMENT: "fa-solid fa-box-open text-2xl",
 
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",

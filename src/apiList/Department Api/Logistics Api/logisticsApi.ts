@@ -4,67 +4,68 @@ import { type AxiosInstance } from "axios";
 import { useMutation, useQuery } from '@tanstack/react-query';
 import useGetRole from "../../../Hooks/useGetRole";
 import { getApiForRole } from "../../../utils/roleCheck";
+import { queryClient } from "../../../QueryClient/queryClient";
 
 
-// 1. Create Vehicle
-export const createVehicle = async ({
-  payload,
-  organizationId,
-  api
-}: {
-  payload: any;
-  organizationId: string;
-  api: AxiosInstance;
-}) => {
-  const { data } = await api.post(`/department/logistics/vehicle/create/${organizationId}`, payload);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
-};
+// // 1. Create Vehicle
+// export const createVehicle = async ({
+//   payload,
+//   organizationId,
+//   api
+// }: {
+//   payload: any;
+//   organizationId: string;
+//   api: AxiosInstance;
+// }) => {
+//   const { data } = await api.post(`/department/logistics/vehicle/create/${organizationId}`, payload);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
 
-// 2. Update Vehicle
-export const updateVehicle = async ({
-  vehicleId,
-  organizationId,
-  payload,
-  api
-}: {
-  vehicleId: string;
-  organizationId: string;
-  payload: any;
-  api: AxiosInstance;
-}) => {
-  const { data } = await api.put(`/department/logistics/vehicle/update/${vehicleId}/${organizationId}`, payload);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
-};
+// // 2. Update Vehicle
+// export const updateVehicle = async ({
+//   vehicleId,
+//   organizationId,
+//   payload,
+//   api
+// }: {
+//   vehicleId: string;
+//   organizationId: string;
+//   payload: any;
+//   api: AxiosInstance;
+// }) => {
+//   const { data } = await api.put(`/department/logistics/vehicle/update/${vehicleId}/${organizationId}`, payload);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
 
-// 3. Delete Vehicle
-export const deleteVehicle = async ({
-  vehicleId,
-  organizationId,
-  api
-}: {
-  vehicleId: string;
-  organizationId: string;
-  api: AxiosInstance;
-}) => {
-  const { data } = await api.delete(`/department/logistics/vehicle/delete/${vehicleId}/${organizationId}`);
-  if (!data.ok) throw new Error(data.message);
-  return data.message;
-};
+// // 3. Delete Vehicle
+// export const deleteVehicle = async ({
+//   vehicleId,
+//   organizationId,
+//   api
+// }: {
+//   vehicleId: string;
+//   organizationId: string;
+//   api: AxiosInstance;
+// }) => {
+//   const { data } = await api.delete(`/department/logistics/vehicle/delete/${vehicleId}/${organizationId}`);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.message;
+// };
 
-// 4. Get Vehicles by Org
-export const getVehicles = async ({
-  organizationId,
-  api
-}: {
-  organizationId: string;
-  api: AxiosInstance;
-}) => {
-  const { data } = await api.get(`/department/logistics/vehicle/getvehicle/${organizationId}`);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
-};
+// // 4. Get Vehicles by Org
+// export const getVehicles = async ({
+//   organizationId,
+//   api
+// }: {
+//   organizationId: string;
+//   api: AxiosInstance;
+// }) => {
+//   const { data } = await api.get(`/department/logistics/vehicle/getvehicle/${organizationId}`);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
 
 // 5. Create Shipment
 export const createShipment = async ({
@@ -122,12 +123,39 @@ export const deleteShipment = async ({
 // 8. Get Shipments
 export const getShipments = async ({
   api,
-  organizationId
+  organizationId,
+   status,
+  projectId,
+  scheduledDate,
 }: {
   api: AxiosInstance;
-  organizationId:string
+  organizationId:string,
+   status?: string;
+  projectId?: string;
+  scheduledDate?: string;
 }) => {
-  const { data } = await api.get(`/department/logistics/shipment/getshipment?organizationId=${organizationId}`);
+   const params = new URLSearchParams({ organizationId });
+
+  if (status) params.append("status", status);
+  if (projectId) params.append("projectId", projectId);
+  if (scheduledDate) params.append("scheduledDate", scheduledDate);
+
+  const { data } = await api.get(`/department/logistics/shipment/getshipment?${params.toString()}`);
+  if (!data.ok) throw new Error(data.message);
+  return data?.data;
+};
+
+
+
+// 8. Get Shipments
+export const getSingleShipment = async ({
+  api,
+  shipmentId
+}: {
+  api: AxiosInstance;
+  shipmentId:string
+}) => {
+  const { data } = await api.get(`/department/logistics/shipment/getsingle/${shipmentId}`);
   if (!data.ok) throw new Error(data.message);
   return data?.data;
 };
@@ -136,77 +164,77 @@ export const getShipments = async ({
 
 const allowedRoles = ["owner", "CTO", "staff"];
 
-export const useCreateVehicle = () => {
-  const { role } = useGetRole();
-  const api = getApiForRole(role!);
-  return useMutation({
-    mutationFn: async ({ organizationId, payload }: any) => {
-      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
-      return await createVehicle({ organizationId, payload, api });
-    },
-    onSuccess: () => {
-      // can refresh relevant queries
-      console.log("Vehicle created");
-    }
-  });
-};
+// export const useCreateVehicle = () => {
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   return useMutation({
+//     mutationFn: async ({ organizationId, payload }: any) => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+//          if (!api) throw new Error("API instance not found for role");
+//       return await createVehicle({ organizationId, payload, api });
+//     },
+//     onSuccess: () => {
+//       // can refresh relevant queries
+//       console.log("Vehicle created");
+//     }
+//   });
+// };
 
-export const useUpdateVehicle = () => {
-  const { role } = useGetRole();
-  const api = getApiForRole(role!);
-  return useMutation({
-    mutationFn: async ({ vehicleId, organizationId, payload }: any) => {
-      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
-      return await updateVehicle({ vehicleId, organizationId, payload, api });
-    },
-    onSuccess: () => {
-      console.log("Vehicle updated");
-    },
-  });
-};
+// export const useUpdateVehicle = () => {
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   return useMutation({
+//     mutationFn: async ({ vehicleId, organizationId, payload }: any) => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+//          if (!api) throw new Error("API instance not found for role");
+//       return await updateVehicle({ vehicleId, organizationId, payload, api });
+//     },
+//     onSuccess: () => {
+//       console.log("Vehicle updated");
+//     },
+//   });
+// };
 
-export const useDeleteVehicle = () => {
-  const { role } = useGetRole();
-  const api = getApiForRole(role!);
-  return useMutation({
-    mutationFn: async ({ vehicleId, organizationId }: any) => {
-      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
-      return await deleteVehicle({ vehicleId, organizationId, api });
-    },
-    onSuccess: () => {
-      console.log("Vehicle deleted");
-    }
-  });
-};
+// export const useDeleteVehicle = () => {
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   return useMutation({
+//     mutationFn: async ({ vehicleId, organizationId }: any) => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+//          if (!api) throw new Error("API instance not found for role");
+//       return await deleteVehicle({ vehicleId, organizationId, api });
+//     },
+//     onSuccess: () => {
+//       console.log("Vehicle deleted");
+//     }
+//   });
+// };
 
-export const useGetVehicles = (organizationId: string) => {
-  const { role } = useGetRole();
-  const api = getApiForRole(role!);
-  return useQuery({
-    queryKey: ['logistics', 'vehicles', organizationId],
-    queryFn: async () => {
-      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
-      return await getVehicles({ organizationId, api });
-    },
-    enabled: !!organizationId
-  });
-};
+// export const useGetVehicles = (organizationId: string) => {
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   return useQuery({
+//     queryKey: ['logistics', 'vehicles', organizationId],
+//     queryFn: async () => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+//          if (!api) throw new Error("API instance not found for role");
+//       return await getVehicles({ organizationId, api });
+//     },
+//     enabled: !!organizationId
+//   });
+// };
 
 export const useCreateShipment = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   return useMutation({
-    mutationFn: async ({ projectId, organizationId, payload, projectName }: any) => {
+    mutationFn: async ({ projectId, organizationId, payload, projectName }: {projectId:string,  organizationId:string, payload:any, projectName:string}) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
          if (!api) throw new Error("API instance not found for role");
       return await createShipment({ projectId, organizationId, payload, projectName, api });
     },
     onSuccess: () => {
-      console.log("Shipment created");
+      queryClient.invalidateQueries({queryKey: ['logistics', 'shipments']})
     }
   });
 };
@@ -221,8 +249,10 @@ export const useUpdateShipment = () => {
       return await updateShipment({ projectId, organizationId, shipmentId, payload, api });
     },
     onSuccess: () => {
-      console.log("Shipment updated");
+      queryClient.invalidateQueries({queryKey: ['logistics', 'shipments']})
+
     }
+
   });
 };
 
@@ -236,22 +266,42 @@ export const useDeleteShipment = () => {
       return await deleteShipment({ shipmentId, organizationId, api });
     },
     onSuccess: () => {
-      console.log("Shipment deleted");
+      queryClient.invalidateQueries({queryKey: ['logistics', 'shipments']})
     }
   });
 };
 
-export const useGetShipments = (organizationId:string) => {
+export const useGetShipments = (organizationId:string, filters?: { status?: string; projectId?: string; scheduledDate?: string }) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   return useQuery({
-    queryKey: ['logistics', 'shipments'],
+    queryKey: ['logistics', 'shipments', filters],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
          if (!api) throw new Error("API instance not found for role");
-      return await getShipments({ api , organizationId});
+      return await getShipments({ api , organizationId, 
+        status: filters?.status,
+        projectId: filters?.projectId,
+        scheduledDate: filters?.scheduledDate,});
     },
     retry:false,
     enabled: !!organizationId,
   });
 };
+
+
+export const useGetSinglShipment = (shipmentId:string) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  return useQuery({
+    queryKey: ['logistics', 'single'],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+         if (!api) throw new Error("API instance not found for role");
+      return await getSingleShipment({ api , shipmentId});
+    },
+    retry:false,
+    enabled: !!shipmentId,
+  });
+};
+

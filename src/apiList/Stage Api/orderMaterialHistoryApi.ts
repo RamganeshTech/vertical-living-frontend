@@ -161,12 +161,14 @@ export const useGetOrderPublicDetails = (projectId: string) => {
 
 const generatedPublicLink = async ({
   projectId,
+  organizationId,
   api,
 }: {
   projectId: string;
+  organizationId: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.patch(`/orderingmaterial/generatelink/${projectId}`);
+  const { data } = await api.patch(`/orderingmaterial/generatelink/${projectId}/${organizationId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -196,10 +198,10 @@ export const useOrderHistoryGenerateLink = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ projectId }: { projectId: string }) => {
+    mutationFn: async ({ projectId , organizationId}: { projectId: string, organizationId:string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await generatedPublicLink({ projectId, api });
+      return await generatedPublicLink({ projectId, api, organizationId });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });

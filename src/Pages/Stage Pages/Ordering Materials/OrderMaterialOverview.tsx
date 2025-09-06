@@ -1364,7 +1364,7 @@ const OrderMaterialOverview = () => {
             await updateSubItem(updatedData);
             toast({ title: "Success", description: "Item updated successfully" });
         } catch (error: any) {
-            console.log("filed",error)
+            console.log("filed", error)
             toast({
                 title: "Error",
                 description: error?.response?.data?.message || "Failed to update item",
@@ -1443,7 +1443,7 @@ const OrderMaterialOverview = () => {
 
     const handleGenerate = async () => {
         try {
-            await generateLink({ projectId });
+            await generateLink({ projectId, organizationId });
 
             toast({ title: "Success", description: "Pdf Generated successfully" });
             refetch()
@@ -1605,7 +1605,7 @@ const OrderMaterialOverview = () => {
                                             onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
                                             className="w-full"
                                         />
-                                        <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                                        <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
                                             <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
                                                 <i className="fa-solid fa-save mr-2"></i>Save
                                             </Button>
@@ -1669,7 +1669,7 @@ const OrderMaterialOverview = () => {
                                             onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
                                             className="w-full"
                                         />
-                                        <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                                        <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
                                             <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
                                                 <i className="fa-solid fa-save mr-2"></i>Save
                                             </Button>
@@ -2119,8 +2119,8 @@ const OrderMaterialOverview = () => {
                             generateLink={generateLink} /> */}
 
 
-
                         <div className="space-y-4">
+
 
 
                             <div className="space-y-6">
@@ -2193,7 +2193,7 @@ const OrderMaterialOverview = () => {
                                                         >
                                                             Download PDF
                                                         </Button>
-                                                    
+
 
                                                         <div className="relative  min-w-[160px]">
                                                             <label
@@ -2245,8 +2245,11 @@ const OrderMaterialOverview = () => {
                                     ))
                                     :
                                     <>
-                                        <div>
-                                            No PDF Generated
+                                        <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+                                            <i className="fa-solid fa-file-lines text-5xl text-blue-300 mb-4" />
+                                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Pdf Found</h3>
+                                            <p className="text-sm text-gray-500">
+                                                No PDF Generated</p>
                                         </div>
                                     </>
                                 }

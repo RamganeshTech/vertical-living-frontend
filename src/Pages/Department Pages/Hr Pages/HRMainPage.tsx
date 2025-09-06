@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 
 import { type EmployeeFilters, type IEmployee } from '../../../types/types';
 import {
@@ -106,9 +106,6 @@ const HRMainPage: React.FC = () => {
   };
 
 
-  useEffect(() => {
-    console.log("filter", filters)
-  }, [filters])
   const activeFiltersCount = Object.values(filters).filter(Boolean).length;
 
   // Use single employee data if available, otherwise use selected employee

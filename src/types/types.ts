@@ -561,7 +561,7 @@ export interface InstallationWorkItem {
 
 // DEPARTMENT TYPES
 
-
+// HR DEPARTMENT
 export interface IPersonalInfo {
   empName?: string;
   dateOfBirth?: Date;

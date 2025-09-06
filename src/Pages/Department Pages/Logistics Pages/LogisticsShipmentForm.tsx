@@ -14,10 +14,10 @@ interface LogisticsShipmentFormProps {
 }
 
 
-interface AvailableProjetType { _id: string, projectName: string }
+export interface AvailableProjetType { _id: string, projectName: string }
 
 
-const formatDateTimeLocal = (date: Date | string) => {
+export const formatDateTimeLocal = (date: Date | string) => {
   if (!date) return "";
   const d = new Date(date);
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -45,7 +45,7 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
   const { mutateAsync: updateShipment, isPending: isUpdatePending } = useUpdateShipment();
 
   const { data } = useGetProjects(organizationId!)
-  console.log("data", data)
+  // console.log("data", data)
   const projects = data?.map((project: AvailableProjetType) => ({ _id: project._id, projectName: project.projectName }))
 
 
@@ -81,7 +81,10 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
       contactPerson: "",
       contactPhone: "",
     },
-    items: [],
+    items: [{
+      name: "",
+      quantity: 0
+    }],
     scheduledDate: "",
     actualPickupTime: "",
     actualDeliveryTime: "",
@@ -124,33 +127,22 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
         }
       })
     }
-    // else if (projects && projects.length > 0) {
-
-
-    //   console.log("projects", projects)
-    //   setProjectId(() => {
-    //     return {
-    //       _id: projects[0]?._id,
-    //       projectName: projects[0]?.projectName
-    //     }
-    //   })
-    // }
   }, [shipment]);
 
 
   useEffect(() => {
-    if(!shipment){
- if (projects && projects.length > 0) {
-      console.log("projects", projects)
-      setProjectId(() => {
-        return {
-          _id: projects[0]?._id,
-          projectName: projects[0]?.projectName
-        }
-      })
+    if (!shipment) {
+      if (projects && projects.length > 0) {
+        console.log("projects", projects)
+        setProjectId(() => {
+          return {
+            _id: projects[0]?._id,
+            projectName: projects[0]?.projectName
+          }
+        })
+      }
     }
-    }
-   
+
   }, [data])
 
 
@@ -227,18 +219,21 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
       errors.push("vehicle number is required.");
     }
 
+    // if (formData?.items?.length === 0) {
+    //   errors.push("At least one shipment item is required.");
+    // }
 
-
-
+    if (formData?.items?.length > 0) {
+      formData?.items?.forEach((item, i) => {
+        if (!item.name) errors.push(`Item ${i + 1} is missing a name.`);
+        if (item.quantity < 0) errors.push(`Item ${i + 1} has invalid quantity.`);
+      })
+    }
     return errors;
-
   }
 
   const handleSubmit = async () => {
     try {
-
-
-
       const errors = handleInputValidation(formData);
       if (errors.length > 0) {
         errors.forEach(err => {
@@ -285,7 +280,7 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
   return (
     // Inside your modal:
     <div onClick={onClose} className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
-      <div onClick={e => e.stopPropagation()} className="bg-white rounded-xl p-6 shadow-lg w-full max-w-3xl h-[90vh] flex flex-col">
+      <div onClick={e => e.stopPropagation()} className="bg-white rounded-xl p-6 shadow-lg w-[90vw] max-w-[1300px] h-[90vh] flex flex-col">
 
         <h3 className="text-xl font-bold mb-3">
           {shipment ? "Edit Shipment" : "Create Shipment"}
@@ -361,14 +356,14 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
 
               <Input name="vehicleDetails.driver.name" placeholder="Driver Name" value={formData.vehicleDetails.driver.name} onChange={handleChange} />
               <Input name="vehicleDetails.driver.phone"
-              type="tel"
-                    maxLength={10}
-              placeholder="Driver Phone" value={formData.vehicleDetails.driver.phone} onChange={(e) => {
-                      const val = e.target.value;
-                      if (/^\d*$/.test(val)) {
-                        handleChange(e)
-                      }
-                    }} />
+                type="tel"
+                maxLength={10}
+                placeholder="Driver Phone" value={formData.vehicleDetails.driver.phone} onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^\d*$/.test(val)) {
+                    handleChange(e)
+                  }
+                }} />
               <Input name="vehicleDetails.driver.licenseNumber" placeholder="License Number" value={formData.vehicleDetails.driver.licenseNumber} onChange={handleChange} />
               <Input name="vehicleDetails.driverCharge" type="number" placeholder="Driver Charge" value={formData.vehicleDetails.driverCharge}
                 onChange={(e) => {
@@ -457,6 +452,111 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
           <div>
             <Label>Notes</Label>
             <textarea name="notes" className="w-full px-3 py-2 border rounded-xl" rows={3} value={formData.notes} onChange={handleChange} />
+          </div>
+
+          {/* Items Section */}
+          <div>
+            <h4 className="text-lg font-semibold text-pink-700 mb-2">Shipment Items</h4>
+
+            <div className="space-y-4">
+              {formData.items.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="grid grid-cols-12  items-center gap-2 sm:gap-4"
+                >
+                  <div className="col-span-6 sm:col-span-5">
+                    <Label>Item Name</Label>
+                    <Input
+                      name={`item-name-${idx}`}
+                      value={item.name}
+                      placeholder="e.g. Wooden Pallets"
+                      // onChange={(e) =>
+                      //   setFormData((prev) => {
+                      //     const newItems = [...prev.items];
+                      //     newItems[idx].name = e.target.value;
+                      //     return { ...prev, items: newItems };
+                      //   })
+                      // }
+
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        setFormData((prev) => {
+                          const newItems = [...prev.items];
+                          newItems[idx].name = value;
+
+                          // ✅ Auto-add new empty row if typing in the last one
+                          if (idx === newItems.length - 1 && value.trim() !== "") {
+                            newItems.push({ name: "", quantity: 0,});
+                          }
+
+                          // ✅ Auto-remove empty row if cleared
+                          if (value.trim() === "" && idx < newItems.length - 1) {
+                            newItems.splice(idx, 1);
+                          }
+
+                          return { ...prev, items: newItems };
+                        });
+                      }}
+                    />
+                  </div>
+
+                  <div className="col-span-4 sm:col-span-3">
+                    <Label>Quantity</Label>
+                    <Input
+                      type="number"
+                      name={`item-qty-${idx}`}
+                      value={item.quantity}
+                      placeholder="e.g. 10"
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 0;
+                        if (Number(val) >= 0) {
+                          setFormData((prev) => {
+                            const newItems = [...prev.items];
+                            newItems[idx].quantity = val;
+                            return { ...prev, items: newItems };
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <div className="col-span-2 sm:col-span-2 flex mt-5 place-items-center h-full">
+                    <Button
+                      variant="danger"
+                      size="md"
+                      type="button"
+                      className="text-white bg-red-600"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          items: prev.items.filter((_, i) => i !== idx),
+                        }));
+                      }}
+                    >
+                      <i className="fas fa-trash"></i>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+
+              <div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      items: [...prev.items, { name: "", quantity: 0 }],
+                    }))
+                  }
+                >
+                  <i className="fas fa-plus mr-1" />
+                  Add Item
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
