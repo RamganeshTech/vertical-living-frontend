@@ -19,6 +19,7 @@ export interface ILogisticsVehicle {
     phone: string;
     licenseNumber: string;
   };
+  driverUpiId: string | null,
   // isAvailable: boolean;
   // currentLocation: {
   //   address: string;

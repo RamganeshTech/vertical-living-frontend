@@ -10,6 +10,8 @@ import LogisticsMain from './Pages/Department Pages/Logistics Pages/LogisticsMai
 import LogisticsSingle from './Pages/Department Pages/Logistics Pages/LogisticsSingle';
 import ProcurementSub from './Pages/Department Pages/ProcurementNew Pages/ProcurementSub';
 import ProcurementNewMain from './Pages/Department Pages/ProcurementNew Pages/ProcurementNewMain';
+import AccountingMain from './Pages/Department Pages/Accounting Pages/AccountingMain';
+import AccountingSingle from './Pages/Department Pages/Accounting Pages/AccountingSingle';
 // import LogisticsVehicle from './Pages/Department Pages/Logistics Pages/LogisticsVehicle';
 const InventoryMain = lazy(() => import('./Pages/Stage Pages/Inventory Main/InventoryMain'));
 const ExternalMain = lazy(() => import('./Pages/External Units/ExternalMain'));
@@ -289,26 +291,30 @@ function App() {
               </ProtectedRoutes>} /> */}
 
 
-               <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-                <LogisticsSingle/>
-              </ProtectedRoutes>} /> 
+              <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <LogisticsSingle />
+              </ProtectedRoutes>} />
 
 
             </Route>
 
-              <Route path="procurement" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="procurement" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <ProcurementNewMain />
             </ProtectedRoutes>} >
 
+              <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <ProcurementSub />
+              </ProtectedRoutes>} />
+            </Route>
 
-              {/* <Route path="vehicle" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-                <LogisticsVehicle />
-              </ProtectedRoutes>} /> */}
 
+            <Route path="accounting" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <AccountingMain />
+            </ProtectedRoutes>} >
 
-               <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-                <ProcurementSub/>
-              </ProtectedRoutes>} /> 
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <AccountingSingle />
+              </ProtectedRoutes>} />
 
 
             </Route>

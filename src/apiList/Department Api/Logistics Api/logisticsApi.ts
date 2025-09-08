@@ -124,17 +124,17 @@ export const deleteShipment = async ({
 export const getShipments = async ({
   api,
   organizationId,
-   status,
+  status,
   projectId,
   scheduledDate,
 }: {
   api: AxiosInstance;
-  organizationId:string,
-   status?: string;
+  organizationId: string,
+  status?: string;
   projectId?: string;
   scheduledDate?: string;
 }) => {
-   const params = new URLSearchParams({ organizationId });
+  const params = new URLSearchParams({ organizationId });
 
   if (status) params.append("status", status);
   if (projectId) params.append("projectId", projectId);
@@ -153,7 +153,7 @@ export const getSingleShipment = async ({
   shipmentId
 }: {
   api: AxiosInstance;
-  shipmentId:string
+  shipmentId: string
 }) => {
   const { data } = await api.get(`/department/logistics/shipment/getsingle/${shipmentId}`);
   if (!data.ok) throw new Error(data.message);
@@ -228,13 +228,13 @@ export const useCreateShipment = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   return useMutation({
-    mutationFn: async ({ projectId, organizationId, payload, projectName }: {projectId:string,  organizationId:string, payload:any, projectName:string}) => {
+    mutationFn: async ({ projectId, organizationId, payload, projectName }: { projectId: string, organizationId: string, payload: any, projectName: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
+      if (!api) throw new Error("API instance not found for role");
       return await createShipment({ projectId, organizationId, payload, projectName, api });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['logistics', 'shipments']})
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] })
     }
   });
 };
@@ -245,11 +245,11 @@ export const useUpdateShipment = () => {
   return useMutation({
     mutationFn: async ({ projectId, organizationId, shipmentId, payload }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
+      if (!api) throw new Error("API instance not found for role");
       return await updateShipment({ projectId, organizationId, shipmentId, payload, api });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['logistics', 'shipments']})
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] })
 
     }
 
@@ -262,46 +262,90 @@ export const useDeleteShipment = () => {
   return useMutation({
     mutationFn: async ({ organizationId, shipmentId }: any) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
+      if (!api) throw new Error("API instance not found for role");
       return await deleteShipment({ shipmentId, organizationId, api });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['logistics', 'shipments']})
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] })
     }
   });
 };
 
-export const useGetShipments = (organizationId:string, filters?: { status?: string; projectId?: string; scheduledDate?: string }) => {
+export const useGetShipments = (organizationId: string, filters?: { status?: string; projectId?: string; scheduledDate?: string }) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   return useQuery({
     queryKey: ['logistics', 'shipments', filters],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
-      return await getShipments({ api , organizationId, 
+      if (!api) throw new Error("API instance not found for role");
+      return await getShipments({
+        api, organizationId,
         status: filters?.status,
         projectId: filters?.projectId,
-        scheduledDate: filters?.scheduledDate,});
+        scheduledDate: filters?.scheduledDate,
+      });
     },
-    retry:false,
+    retry: false,
     enabled: !!organizationId,
   });
 };
 
 
-export const useGetSinglShipment = (shipmentId:string) => {
+export const useGetSinglShipment = (shipmentId: string) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   return useQuery({
     queryKey: ['logistics', 'single'],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-         if (!api) throw new Error("API instance not found for role");
-      return await getSingleShipment({ api , shipmentId});
+      if (!api) throw new Error("API instance not found for role");
+      return await getSingleShipment({ api, shipmentId });
     },
-    retry:false,
+    retry: false,
     enabled: !!shipmentId,
   });
 };
 
+
+
+
+
+
+export interface IAccountsEntry {
+  organizationId: string;
+  projectId: string;
+  fromDept: "logistics" | "procurement" | "hr" | "factory" ;
+  totalCost: number;
+  upiId: string | null
+  api?: AxiosInstance
+}
+
+export const useSyncAccountsLogistics = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ organizationId, projectId, fromDept, totalCost , upiId}: IAccountsEntry) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("API instance not found for role");
+      return await synAccountsFromLogistics({ organizationId, projectId, fromDept, totalCost, api, upiId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] })
+    }
+  });
+};
+
+
+const synAccountsFromLogistics = async ({
+  api,
+  organizationId,
+  projectId,
+  fromDept,
+  totalCost,
+  upiId
+}: IAccountsEntry) => {
+  const { data } = await api!.post(`/department/logistics/syncaccounting/${organizationId}/${projectId}`, {totalCost, fromDept, upiId});
+  return data;
+}

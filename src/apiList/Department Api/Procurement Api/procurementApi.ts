@@ -4,6 +4,7 @@ import { type AxiosInstance } from "axios";
 import useGetRole from "../../../Hooks/useGetRole";
 import { getApiForRole } from "../../../utils/roleCheck";
 import { queryClient } from "../../../QueryClient/queryClient";
+import type { IAccountsEntry } from "../Logistics Api/logisticsApi";
 
 
 // ---------------------- API FUNCTIONS ----------------------
@@ -126,6 +127,20 @@ const syncLogisticsDept = async ( id: string, api: AxiosInstance)=>{
   const { data } = await api.post(`/department/procurement/synclogistics/${id}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
+}
+
+
+const synAccountsFromProcurement = async ({
+  api,
+  organizationId,
+  projectId,
+  fromDept,
+  totalCost,
+  upiId
+}: IAccountsEntry) => {
+  const { data } = await api!.post(`/department/procurement/syncaccounting/${organizationId}/${projectId}`, {totalCost, fromDept, upiId});
+  if(!data.ok) throw new Error(data.message)
+  return data;
 }
 
 // ---------------------- HOOKS ----------------------
@@ -294,3 +309,22 @@ export const useSyncLogistics = ()=>{
     },
   });
 }
+
+
+
+export const useSyncAccountsProcurement = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ organizationId, projectId, fromDept, totalCost, upiId }: {organizationId:string, projectId:string, fromDept:"logistics" | "procurement" | "hr" | "factory" , totalCost:number, upiId:string | null }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("API instance not found for role");
+      return await synAccountsFromProcurement({ organizationId, projectId, fromDept, totalCost, api , upiId});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] })
+    }
+  });
+};
+

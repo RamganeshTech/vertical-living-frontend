@@ -67,6 +67,7 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
         phone: "",
         licenseNumber: "",
       },
+      driverUpiId: ""
       // currentLocation: {
       //   address: "",
       // }
@@ -365,12 +366,21 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
                   }
                 }} />
               <Input name="vehicleDetails.driver.licenseNumber" placeholder="License Number" value={formData.vehicleDetails.driver.licenseNumber} onChange={handleChange} />
-              <Input name="vehicleDetails.driverCharge" type="number" placeholder="Driver Charge" value={formData.vehicleDetails.driverCharge}
+              <Input name="vehicleDetails.driverCharge" type="number" placeholder="Driver Charge" value={formData?.vehicleDetails?.driverCharge}
                 onChange={(e) => {
                   const val = e.target.value;
                   if (val === "" || Number(val) >= 0) {
                     handleChange(e); // only update if >= 0
                   }
+                }}
+
+
+              />
+
+
+              <Input name="vehicleDetails.driverUpiId" type="text" placeholder="Driver Upi" value={formData.vehicleDetails.driverUpiId || ""}
+                onChange={(e) => {
+                    handleChange(e); 
                 }}
 
 

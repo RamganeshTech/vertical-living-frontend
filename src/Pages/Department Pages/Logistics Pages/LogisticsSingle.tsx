@@ -278,14 +278,15 @@
 
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetSinglShipment } from "../../../apiList/Department Api/Logistics Api/logisticsApi";
+import { useGetSinglShipment, useSyncAccountsLogistics } from "../../../apiList/Department Api/Logistics Api/logisticsApi";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Separator } from "../../../components/ui/Seperator";
 import { Badge } from "../../../components/ui/Badge";
 import { formatDateTimeLocal, LogisticsShipmentForm } from "./LogisticsShipmentForm";
-import {  type IShipmentItem } from "./LogisticsMain";
+import { type IShipmentItem } from "./LogisticsMain";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { Button } from "../../../components/ui/Button";
+import { toast } from "../../../utils/toast";
 
 const InfoRow: React.FC<{ label: string; value?: React.ReactNode; }> = ({ label, value }) => (
     <div className="text-sm font-medium text-gray-700">
@@ -319,17 +320,44 @@ const getStatusVariant = (status: string): "default" | "secondary" | "outline" =
 };
 
 const LogisticsSingle: React.FC = () => {
-    const { id, organizationId } = useParams() as { id: string, organizationId:string };
+    const { id, organizationId } = useParams() as { id: string, organizationId: string };
     const navigate = useNavigate()
     const { data: shipment, isLoading, refetch } = useGetSinglShipment(id);
+    const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsLogistics()
 
-  const [editingShipment, setEditingShipment] = useState<any | null>(null);
-  const [showForm, setShowForm] = useState(false);
+    const [editingShipment, setEditingShipment] = useState<any | null>(null);
+    const [showForm, setShowForm] = useState(false);
 
+    const handleGenerateAccounts = async () => {
+        try {
+            await syncAccounts({
+                fromDept: "logistics",
+                organizationId,
+                projectId: shipment?.projectId,
+                upiId: shipment?.vehicleDetails.driverUpiId || null,
+                totalCost: shipment?.vehicleDetails?.driverCharge
+            });
+            toast({ title: "Success", description: "Details sent to Accounts Department" });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+        }
+    }
 
-    if (isLoading || !shipment) return <MaterialOverviewLoading />;
+    if (isLoading) return <MaterialOverviewLoading />;
 
     const vehicle = shipment?.vehicleDetails;
+
+    if (!shipment) {
+        <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+            <i className="fas fa-dolly text-5xl text-blue-300 mb-4" />
+            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Logistics Found</h3>
+            {/* <p className="text-sm text-gray-500">
+                                Looks like there are no Procurements yet for this project.<br />
+                                Once you have <strong> generated the Pdf </strong>  items will be listed here  to get started 🚀
+                            </p> */}
+        </div>
+    }
+
 
     return (
         <div className=" max-h-full overflow-y-auto max-w-full space-y-8">
@@ -345,17 +373,34 @@ const LogisticsSingle: React.FC = () => {
                     </h1>
                 </div>
 
-                <Button
-                    size="md"
-                    variant="primary"
-                    onClick={() => {
-                        setEditingShipment(shipment);
-                        setShowForm(true);
-                    }}
-                >
-                    <i className="fas fa-edit mr-1" />
-                    Edit
-                </Button>
+                <div className="flex gap-2 items-start ">
+
+                    <div className="flex flex-col items-start space-y-1">
+                        <Button
+                            variant="primary"
+                            isLoading={syncAccountsLoading}
+                            onClick={handleGenerateAccounts}
+                        >
+                            Send To Accounts Dept
+                        </Button>
+                        <span className="text-xs text-blue-500 mx-auto">
+                            <strong>*</strong> Click the button to send the <br /> details to  accounts dept
+                        </span>
+                    </div>
+
+                    <Button
+                        size="md"
+                        variant="primary"
+                        onClick={() => {
+                            setEditingShipment(shipment);
+                            setShowForm(true);
+                        }}
+                    >
+                        <i className="fas fa-edit mr-1" />
+                        Edit
+                    </Button>
+                </div>
+
             </header>
 
             <Card>
@@ -384,6 +429,7 @@ const LogisticsSingle: React.FC = () => {
                             <InfoRow label="Driver Phone" value={vehicle?.driver?.phone} />
                             <InfoRow label="License Number" value={vehicle?.driver?.licenseNumber} />
                             <InfoRow label="Driver Charge" value={`₹ ${vehicle?.driverCharge}`} />
+                            <InfoRow label="Upi Id" value={vehicle?.driverUpiId} />
                         </div>
                     </Section>
 
@@ -458,16 +504,16 @@ const LogisticsSingle: React.FC = () => {
 
 
             {showForm && (
-                    <LogisticsShipmentForm
-                      shipment={editingShipment}
-                      onClose={() => {
+                <LogisticsShipmentForm
+                    shipment={editingShipment}
+                    onClose={() => {
                         setShowForm(false)
                         refetch()
-                      }}
-                      organizationId={organizationId!}
-            
-                    />
-                  )}
+                    }}
+                    organizationId={organizationId!}
+
+                />
+            )}
         </div>
     );
 };

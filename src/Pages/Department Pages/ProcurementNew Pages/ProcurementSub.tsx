@@ -16,14 +16,15 @@ import {
     useUpdateProcurementTotalCost,
     useProcurementGeneratePdf,
     useDeleteProcurementPdf,
-    useSyncLogistics
+    useSyncLogistics,
+    useSyncAccountsProcurement
 } from "../../../apiList/Department Api/Procurement Api/procurementApi";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
 import { downloadImage } from "../../../utils/downloadFile";
 
 const ProcurementSub: React.FC = () => {
-    const { id } = useParams() as { id: string }
+    const { id, organizationId } = useParams() as { id: string, organizationId: string }
     const navigate = useNavigate()
     const { data, isLoading } = useGetSingleProcurementDetails(id);
     const { mutateAsync: updateShop } = useUpdateProcurementShopDetails();
@@ -32,6 +33,7 @@ const ProcurementSub: React.FC = () => {
     const { mutateAsync: generateLink, isPending: generatePending } = useProcurementGeneratePdf()
     const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteProcurementPdf()
     const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
+    const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsProcurement()
 
     const [editCost, setEditCost] = useState(false);
     const [totalCost, setTotalCost] = useState<number>(data?.totalCost || 0);
@@ -130,10 +132,23 @@ const ProcurementSub: React.FC = () => {
             await syncLogistics({ id });
             toast({ title: "Success", description: "Details sent to Logistics Department" });
         } catch (error: any) {
-            console.log("error", error)
             toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
         }
     }
+
+
+    const handleGenerateAccounts = async () => {
+        try {
+            await syncAccounts({ fromDept: "procurement", organizationId,
+                 projectId: data?.projectId, totalCost: data?.totalCost,
+                  upiId: data?.shopDetails?.upiId || null
+                });
+            toast({ title: "Success", description: "Details sent to Accounts Department" });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+        }
+    }
+
 
 
     if (isLoading) return <MaterialOverviewLoading />;
@@ -165,17 +180,34 @@ const ProcurementSub: React.FC = () => {
                         </h1>
                     </div>
 
-                    <div className="flex flex-col items-start space-y-1">
-                        <Button
-                            variant="primary"
-                            isLoading={syncLogisticsLoading}
-                            onClick={handleGenerateLogistics}
-                        >
-                            Send To Logistics Dept
-                        </Button>
-                        <span className="text-xs text-blue-500 mx-auto">
-                            <strong>*</strong> Click the button to send the <br /> details to  logistics dept
-                        </span>
+                    <div className="flex gap-2 items-center ">
+
+                        <div className="flex flex-col items-start space-y-1">
+                            <Button
+                                variant="primary"
+                                isLoading={syncAccountsLoading}
+                                onClick={handleGenerateAccounts}
+                            >
+                                Send To Accounts Dept
+                            </Button>
+                            <span className="text-xs text-blue-500 mx-auto">
+                                <strong>*</strong> Click the button to send the <br /> details to  accounts dept
+                            </span>
+                        </div>
+
+                        <div className="flex flex-col items-start space-y-1">
+                            <Button
+                                variant="primary"
+                                isLoading={syncLogisticsLoading}
+                                onClick={handleGenerateLogistics}
+                            >
+                                Send To Logistics Dept
+                            </Button>
+                            <span className="text-xs text-blue-500 mx-auto">
+                                <strong>*</strong> Click the button to send the <br /> details to  logistics dept
+                            </span>
+                        </div>
+
                     </div>
                 </section>
             </header>
@@ -215,6 +247,12 @@ const ProcurementSub: React.FC = () => {
                             className="w-full"
                         />
                         <Input
+                            placeholder="upi Id"
+                            value={shopForm?.upiId || ""}
+                            onChange={(e) => setShopForm({ ...shopForm, upiId: e.target.value })}
+                            className="w-full"
+                        />
+                        <Input
                             placeholder="Address"
                             value={shopForm?.address || ""}
                             onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
@@ -238,6 +276,7 @@ const ProcurementSub: React.FC = () => {
                         <p><strong>Shop Name:</strong> {data?.shopDetails?.shopName || "-"}</p>
                         <p><strong>Contact Person:</strong> {data?.shopDetails?.contactPerson || "-"}</p>
                         <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
+                        <p><strong>Upi Id:</strong> {data?.shopDetails?.upiId || "-"}</p>
                         <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
 
                         <button
