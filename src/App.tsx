@@ -6,12 +6,12 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-import LogisticsMain from './Pages/Department Pages/Logistics Pages/LogisticsMain';
-import LogisticsSingle from './Pages/Department Pages/Logistics Pages/LogisticsSingle';
-import ProcurementSub from './Pages/Department Pages/ProcurementNew Pages/ProcurementSub';
-import ProcurementNewMain from './Pages/Department Pages/ProcurementNew Pages/ProcurementNewMain';
-import AccountingMain from './Pages/Department Pages/Accounting Pages/AccountingMain';
-import AccountingSingle from './Pages/Department Pages/Accounting Pages/AccountingSingle';
+const LogisticsMain = lazy(() => import( './Pages/Department Pages/Logistics Pages/LogisticsMain'));
+const LogisticsSingle = lazy(() => import( './Pages/Department Pages/Logistics Pages/LogisticsSingle'));
+const ProcurementSub = lazy(() => import( './Pages/Department Pages/ProcurementNew Pages/ProcurementSub'));
+const ProcurementNewMain = lazy(() => import( './Pages/Department Pages/ProcurementNew Pages/ProcurementNewMain'));
+const AccountingMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/AccountingMain'));
+const AccountingSingle = lazy(() => import( './Pages/Department Pages/Accounting Pages/AccountingSingle'));
 // import LogisticsVehicle from './Pages/Department Pages/Logistics Pages/LogisticsVehicle';
 const InventoryMain = lazy(() => import('./Pages/Stage Pages/Inventory Main/InventoryMain'));
 const ExternalMain = lazy(() => import('./Pages/External Units/ExternalMain'));
@@ -476,7 +476,7 @@ function App() {
                 <MaterialRoomOverview />
               </ProtectedRoutes>} >
 
-              <Route path="materialroom/:roomId/:roomType" element={
+              <Route path="materialroom/:roomId/:roomType/:packageId" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}>
                   <RoomDetailCardNew />
                 </ProtectedRoutes>} />

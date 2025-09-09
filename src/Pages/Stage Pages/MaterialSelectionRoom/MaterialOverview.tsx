@@ -4,7 +4,7 @@
 // import { useState } from "react";
 import RoomCard from "./RoomCard";
 import { Outlet, useLocation, useParams, useOutletContext, useNavigate } from "react-router-dom";
-import { useCompleteMaterialStage, useGetMaterialConfirmationByProject, useSetMaterialDeadline } from "../../../apiList/Stage Api/materialSelectionApi";
+import { useCompleteMaterialStage, useGetMaterialConfirmationByProject, useMaterialArrivalGeneratePdfComparisonLink, useSetMaterialDeadline } from "../../../apiList/Stage Api/materialSelectionApi";
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 // import { Dialog } from "../../../components/ui/Dialog";
@@ -15,6 +15,9 @@ import MaterialOverviewLoading from "./MaterailSelectionLoadings/MaterialOvervie
 import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+import { useEffect, useState } from "react";
+import type { IPackage } from "../../../types/types";
+import { downloadImage } from "../../../utils/downloadFile";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -27,11 +30,27 @@ export default function MaterialRoomOverview() {
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
     const location = useLocation();
     const navigate = useNavigate()
+    const [selectedPackage, setSelectedPackage] = useState<{ level: string; id: string } | null>(null);
+    // Find the selected package
 
     const { data, isLoading, error: getRoomsError, refetch } = useGetMaterialConfirmationByProject(projectId!);
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetMaterialDeadline();
     const { mutateAsync: completionStatus, isPending: completePending } = useCompleteMaterialStage();
+    const { mutateAsync: generateLink, isPending: generatePending } = useMaterialArrivalGeneratePdfComparisonLink()
+
     // const [showCreateForm, setShowCreateForm] = useState(false);
+
+    useEffect(() => {
+        if (!selectedPackage && data?.package?.length) {
+            const economyPackage = data?.package?.find((pkg: IPackage) => pkg?.level === "economy");
+            if (economyPackage) {
+                setSelectedPackage({ level: economyPackage.level, id: economyPackage._id });
+            }
+        }
+    }, [data, selectedPackage]);
+
+    const selectedPkgObj = data?.package?.find((p: IPackage) => p._id === selectedPackage?.id);
+    const rooms = selectedPkgObj?.rooms || [];
 
     if (isLoading) return <MaterialOverviewLoading />;
 
@@ -53,10 +72,27 @@ export default function MaterialRoomOverview() {
         }
     };
 
-    // const { rooms, customRooms } = data || {};
-    const { rooms } = data || {};
-    // const totalRooms = (rooms?.length || 0) + (customRooms?.length || 0);
-    const totalRooms = (rooms?.length || 0)
+
+
+    const handleGenerate = async () => {
+        try {
+            const data = await generateLink({ projectId: projectId! });
+
+
+            downloadImage({ src: data?.url as string, alt: "home-material-selection" })
+
+            toast({ title: "Success", description: "Pdf Generated successfully" });
+            refetch()
+
+        } catch (err: any) {
+            toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
+        }
+    };
+
+    // // const { rooms, customRooms } = data || {};
+    // const { rooms } = data || {};
+    // // const totalRooms = (rooms?.length || 0) + (customRooms?.length || 0);
+    // const totalRooms = (rooms?.length || 0)
 
     return (
         <div className="flex flex-col h-full w-full  py-2">
@@ -168,23 +204,118 @@ export default function MaterialRoomOverview() {
                                     />
                                 </Card>
 
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-xl sm:text-2xl font-semibold">Total Rooms: {totalRooms}</h2>
+
+                                {/* <div className="flex justify-between items-center gap-4 mb-4">
+                                    <div className="flex gap-4   items-center">
+                                        {data?.package?.map((pkg: IPackage) => (
+                                            <div
+                                                key={pkg._id}
+                                                onClick={() => setSelectedPackage({ level: pkg.level, id: pkg._id! })}
+                                                className={`cursor-pointer px-4 py-2 border-2 rounded-lg font-semibold
+                                                    ${selectedPackage?.id === pkg._id
+                                                        ? "border-blue-500 text-blue-600 bg-blue-50"
+                                                        : "border-gray-300 text-gray-600"}
+                                                            `}
+                                            >
+                                                {pkg.level.charAt(0).toUpperCase() + pkg.level.slice(1)}
+                                            </div>
+                                        ))}
+                                    </div>
+
+
+                                    <div>
+                                        <Button isLoading={generatePending} onClick={handleGenerate}>
+                                            Generate Comparison PDF
+                                        </Button>
+                                    </div>
+                                </div> */}
+
+
+                                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                                    {/* Package Cards */}
+                                    <div className="flex flex-wrap gap-3">
+                                        {data?.package?.map((pkg: IPackage) => {
+                                            const isSelected = selectedPackage?.id === pkg._id;
+
+                                            const packageConfig = {
+                                                economy: {
+                                                    bgUnselected: "bg-green-100",
+                                                    textUnselected: "text-green-800",
+                                                    bgSelected: "bg-green-600",
+                                                    textSelected: "text-white",
+                                                    borderSelected: "border-green-700"
+                                                },
+                                                premium: {
+                                                    bgUnselected: "bg-amber-100",
+                                                    textUnselected: "text-amber-800",
+                                                    bgSelected: "bg-amber-500",
+                                                    textSelected: "text-white",
+                                                    borderSelected: "border-amber-600"
+                                                },
+                                                luxury: {
+                                                    bgUnselected: "bg-violet-100",
+                                                    textUnselected: "text-violet-800",
+                                                    bgSelected: "bg-violet-600",
+                                                    textSelected: "text-white",
+                                                    borderSelected: "border-violet-700"
+                                                }
+                                            };
+
+                                            const config = packageConfig[pkg.level as "economy" | "premium" | "luxury"];
+
+                                            return (
+                                                <div
+                                                    key={pkg._id}
+                                                    onClick={() => setSelectedPackage({ level: pkg.level, id: pkg._id! })}
+                                                    className={`
+            min-w-[120px] px-5 py-3 rounded-md text-sm font-semibold text-center capitalize
+            border-2 cursor-pointer select-none transition-all duration-200 shadow-sm
+            ${isSelected
+                                                            ? `${config.bgSelected} ${config.textSelected} ${config.borderSelected} border`
+                                                            : `${config.bgUnselected} ${config.textUnselected} border-transparent hover:brightness-95`
+                                                        }
+          `}
+                                                >
+                                                    <i className="fa-solid fa-box-open mr-2" />
+                                                    {pkg.level}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Generate Button */}
+                                    <div>
+                                        <Button
+                                        isLoading={generatePending}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md shadow-md transition"
+                                            onClick={handleGenerate}
+                                        >
+                                            <i className="fas fa-file-pdf mr-2"></i>
+                                            {generatePending ? "Generating..." : "Generate Comparison PDF"}
+                                        </Button>
+                                    </div>
                                 </div>
+
+                                {/* <div className="flex items-center justify-between mb-4">
+                                    <h2 className="text-xl sm:text-2xl font-semibold">Total Rooms: {totalRooms}</h2>
+                                </div> */}
+
                                 {/* 
                         {showCreateForm && (
                             <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-                               
                                     <CreateRoomformModel refetch={refetch} onClose={() => setShowCreateForm(false)} projectId={projectId!} />
                             </Dialog>
                         )} */}
 
+                                <h1 className="text-lg text-gray-600 font-bold">Rooms  {selectedPackage ? `for ${selectedPackage!?.level[0].toUpperCase()+selectedPackage!?.level.slice(1)}`: ""} </h1>
                                 {/* Scrollable room cards container */}
                                 <div className="flex-grow min-h-[100%] py-2 sm:!min-h-0  overflow-y-auto">
                                     {/* {!isroomsAvailable ? ( */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {rooms?.map((room: any) => (
-                                            <RoomCard roomType="predefinedRoom" key={room._id} room={room} projectId={projectId!} />
+                                            <RoomCard roomType="predefinedRoom"
+                                                packageId={selectedPackage?.id || null}
+                                                key={room._id} room={room} projectId={projectId!} />
                                         ))}
                                         {/* {customRooms?.map((room: any) => (
                                         <RoomCard roomType="customRoom"  key={room._id} room={room} projectId={projectId!} />
@@ -195,7 +326,7 @@ export default function MaterialRoomOverview() {
                                         <div className="text-center max-w-md mx-auto">
                                             <i className="fas fa-door-open text-5xl sm:text-6xl text-blue-300 mb-4"></i>
                                             <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-2">No Rooms Created Yet</h2>
-                                            <p className="text-gray-500">Add rooms in client requirement stage</p>
+                                            <p className="text-gray-500">Add rooms in client requirement stage and complete the stage</p>
                                         </div>
                                     </div>}
                                 </div>

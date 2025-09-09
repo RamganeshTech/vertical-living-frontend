@@ -8,12 +8,14 @@ import { memo } from "react";
 interface RoomCardProp {
   room: any;
   projectId: string;
+  packageId: string | null;
   roomType: string;
 }
 
 const RoomCard: React.FC<RoomCardProp> = ({
   room,
   projectId,
+  packageId,
   roomType,
 }) => {
   const navigate = useNavigate();
@@ -22,7 +24,15 @@ const RoomCard: React.FC<RoomCardProp> = ({
     e.stopPropagation(); // Prevent card click
     try {
       if (!confirm("Are you sure you need to delete the room?")) return;
-      await deleteRoom({ projectId, roomId: room._id });
+      if (!packageId) {
+        toast({
+          title: "Error",
+          description: "Package is not selected",
+          variant: "destructive",
+        });
+        return;
+      }
+      await deleteRoom({ projectId, roomId: room._id, packageId });
       toast({ title: "Success", description: "Room deleted successfully" });
     } catch (error: any) {
       toast({
@@ -38,7 +48,7 @@ const RoomCard: React.FC<RoomCardProp> = ({
     <div
       onClick={() =>
         navigate(
-          `materialroom/${room._id}/${roomType}`
+          `materialroom/${room._id}/${roomType}/${packageId}`
         )
       }
       className="border-l-4 border-blue-600 cursor-pointer shadow-sm hover:shadow-md transition-all duration-200 rounded-lg p-4 bg-white flex justify-between items-center"
@@ -47,7 +57,7 @@ const RoomCard: React.FC<RoomCardProp> = ({
       <div>
         <h3 className="text-lg font-semibold text-gray-800">{room.name}</h3>
         <p className="text-sm text-blue-500">
-          No of Fields: {Object.keys(fieldLength|| {})?.length}
+          No of Fields: {Object.keys(fieldLength || {})?.length}
         </p>
       </div>
 
@@ -57,7 +67,7 @@ const RoomCard: React.FC<RoomCardProp> = ({
           onClick={(e) => {
             e.stopPropagation();
             navigate(
-              `materialroom/${room._id}/${roomType}`
+              `materialroom/${room._id}/${roomType}/${packageId}`
             );
           }}
           className="text-sm text-blue-600 underline hover:no-underline cursor-pointer"

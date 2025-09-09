@@ -15,13 +15,14 @@ interface UploadFile {
 
 interface Props {
   projectId: string;
+  packageId: string,
   roomId: string;
   initialFiles: UploadFile[];
   refetch: () => Promise<any>
 
 }
 
-const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles, refetch }) => {
+const MaterialRoomUploads: React.FC<Props> = ({ projectId, packageId, roomId, initialFiles, refetch }) => {
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [pdfFiles, setPdfFiles] = useState<UploadFile[]>(initialFiles.filter(f => f.type === "pdf"));
@@ -46,7 +47,7 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
     selectedFiles.forEach(file => formData.append("files", file));
 
     try {
-      const uploaded = await uploadFiles({ projectId, roomId, formData });
+      const uploaded = await uploadFiles({ projectId, roomId, formData ,packageId});
       const newPDFs = uploaded.filter((file: UploadFile) => file.type === "pdf");
       const newImages = uploaded.filter((file: UploadFile) => file.type === "image");
 
@@ -67,7 +68,7 @@ const MaterialRoomUploads: React.FC<Props> = ({ projectId, roomId, initialFiles,
   const handleDelete = async (fileId: string, type: "image" | "pdf") => {
     try {
       // console.log("file id",fileId)
-      await deleteFile({ projectId, roomId, fileId });
+      await deleteFile({ projectId, roomId, fileId , packageId});
       if (type === "pdf") {
         setPdfFiles(prev => prev.filter(file => file._id !== fileId));
       } else {

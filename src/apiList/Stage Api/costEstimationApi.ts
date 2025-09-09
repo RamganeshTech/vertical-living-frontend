@@ -153,7 +153,7 @@ export const useGetCostEstimationByProject = (projectId: string) => {
     },
     enabled: !!role && !!projectId && !!api,
     retry: false,
-    refetchOnMount: false
+    // refetchOnMount: false
   });
 };
 

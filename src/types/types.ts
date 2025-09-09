@@ -167,8 +167,8 @@ export interface CommonSingleExternalUnit {
 
 export interface DisplaySingleExternalUnit extends CommonSingleExternalUnit {
   dimention: ISelectedDimention,
-  totalPrice:number,
-  quantity:number,
+  totalPrice: number,
+  quantity: number,
 }
 
 export interface SelectedExternalUnits {
@@ -385,7 +385,7 @@ export interface IConsultationAttachment {
 export interface IUserRef {
   _id: string;
   username: string;
-  email:string
+  email: string
 }
 
 
@@ -419,37 +419,60 @@ export interface ITechnicalConsultation {
 
 // MATERIAL SELECTION STAGE 5 
 
-export interface IMaterialSelectionRoomUpload {
+export interface IMaterialRoomUpload {
+  _id:string
   type: "image" | "pdf";
   url: string;
-  originalName?: string;
+  originalName: string;
   uploadedAt: Date
 }
 
-export interface IMaterialSelectionWork {
-  workName: string;
-  notes?: string;
-  materials: string[]; // Can be expanded to object if needed later
+export interface IMaterialSubItems {
+  _id?: string,
+  materialName: string
+  unit: string,
+  price: number,
+  labourCost: number,
+  quantity: number,
+}
+export interface IMatItems {
+  _id?: string,
+  itemName: string,
+  quantity: number,
+  unit?: string,
+  materialItems: IMaterialSubItems[]
 }
 
-export interface IMaterialSelectionRoom {
-  roomName: string;
-  uploads: IMaterialSelectionRoomUpload[];
-  modularWorks: IMaterialSelectionWork[];
+export interface IMaterialRoom {
+  _id?: string
+  name: string; // predefined names only
+  roomFields: IMatItems[];
+  totalCost: number,
+  uploads: IMaterialRoomUpload[];
 }
 
-export interface IMaterialSelectionRoomConfirmation {
+export interface IPackage {
+  _id?: string,
+  level: string,
+  rooms: IMaterialRoom[]
+}
+
+// 👇 Final model interface for Material Selection
+export interface IMaterialRoomConfirmation extends Document {
   projectId: string;
-  rooms: IMaterialSelectionRoom[];
+  package: IPackage[]
+  packageSelected: string,
+  // rooms: IMaterialRoom[];
   status: "pending" | "completed";
   isEditable: boolean;
   timer: {
-    startedAt: Date | null;
-    completedAt: Date | null;
-    deadLine: Date | null;
+    startedAt: string | null;
+    completedAt: string | null;
+    deadLine: string | null;
+    reminderSent: boolean;
   };
+  assignedTo: string;
 }
-
 
 
 
