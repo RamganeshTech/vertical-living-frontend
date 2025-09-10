@@ -4,7 +4,7 @@
 // import { useState } from "react";
 import RoomCard from "./RoomCard";
 import { Outlet, useLocation, useParams, useOutletContext, useNavigate } from "react-router-dom";
-import { useCompleteMaterialStage, useGetMaterialConfirmationByProject, useMaterialArrivalGeneratePdfComparisonLink, useSetMaterialDeadline } from "../../../apiList/Stage Api/materialSelectionApi";
+import { useCompleteMaterialStage, useGetMaterialConfirmationByProject, useMaterialArrivalGeneratePdfComparisonLink, useSetMaterialDeadline, useUpdateSelectedPackage } from "../../../apiList/Stage Api/materialSelectionApi";
 import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 // import { Dialog } from "../../../components/ui/Dialog";
@@ -18,6 +18,7 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import { useEffect, useState } from "react";
 import type { IPackage } from "../../../types/types";
 import { downloadImage } from "../../../utils/downloadFile";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -25,18 +26,25 @@ type ProjectDetailsOutlet = {
     openMobileSidebar: () => void;
 };
 
+type packageLevelType = "economy" | "premium" | "luxury"
+
+const packageLevel = ["economy", "premium", "luxury"]
+
 export default function MaterialRoomOverview() {
     const { projectId, organizationId } = useParams();
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
     const location = useLocation();
     const navigate = useNavigate()
     const [selectedPackage, setSelectedPackage] = useState<{ level: string; id: string } | null>(null);
+    // const [clientSelectPackage, setClientSelectPackage] = useState<packageLevelType>("economy")
+
     // Find the selected package
 
     const { data, isLoading, error: getRoomsError, refetch } = useGetMaterialConfirmationByProject(projectId!);
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetMaterialDeadline();
     const { mutateAsync: completionStatus, isPending: completePending } = useCompleteMaterialStage();
     const { mutateAsync: generateLink, isPending: generatePending } = useMaterialArrivalGeneratePdfComparisonLink()
+    const { mutateAsync: updatePackage } = useUpdateSelectedPackage()
 
     // const [showCreateForm, setShowCreateForm] = useState(false);
 
@@ -52,6 +60,25 @@ export default function MaterialRoomOverview() {
     const selectedPkgObj = data?.package?.find((p: IPackage) => p._id === selectedPackage?.id);
     const rooms = selectedPkgObj?.rooms || [];
 
+    
+    const handlePackageSelectChage = async (val:packageLevelType ) => {
+        // setClientSelectPackage(val)
+console.log("value", val)
+        try {
+            await updatePackage({
+                projectId: projectId!,
+                selectedPacakge: val
+            })
+            toast({ description: 'Package updated successfully', title: "Success" });
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message || error.message || "Failed to update Package level",
+                variant: "destructive"
+            });
+        }
+
+    }
     if (isLoading) return <MaterialOverviewLoading />;
 
     // const isroomsAvailable = !data?.customRooms?.length && !data?.rooms?.length;
@@ -284,9 +311,26 @@ export default function MaterialRoomOverview() {
                                     </div>
 
                                     {/* Generate Button */}
-                                    <div>
+                                    <div className="flex gap-2 items-center">
+
+                                        <Select 
+                                        value={data?.packageSelected || "economy"}
+                                        onValueChange={(value) => handlePackageSelectChage(value as packageLevelType)}>
+                                            <SelectTrigger className="w-full border-2 border-gray-200 hover:border-slate-400 focus:border-slate-600 transition-colors">
+                                                <SelectValue placeholder={`${data?.packageSelected}`}  />
+                                            </SelectTrigger>
+                                            <SelectContent className="max-h-48 overflow-y-auto custom-scrollbar">
+                                                {packageLevel.map((val) => (
+                                                    <SelectItem key={val} value={val}>
+                                                        {val}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+
+
                                         <Button
-                                        isLoading={generatePending}
+                                            isLoading={generatePending}
                                             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md shadow-md transition"
                                             onClick={handleGenerate}
                                         >
@@ -307,7 +351,7 @@ export default function MaterialRoomOverview() {
                             </Dialog>
                         )} */}
 
-                                <h1 className="text-lg text-gray-600 font-bold">Rooms  {selectedPackage ? `for ${selectedPackage!?.level[0].toUpperCase()+selectedPackage!?.level.slice(1)}`: ""} </h1>
+                                <h1 className="text-lg text-gray-600 font-bold">Rooms  {selectedPackage ? `for ${selectedPackage!?.level[0].toUpperCase() + selectedPackage!?.level.slice(1)}` : ""} </h1>
                                 {/* Scrollable room cards container */}
                                 <div className="flex-grow min-h-[100%] py-2 sm:!min-h-0  overflow-y-auto">
                                     {/* {!isroomsAvailable ? ( */}

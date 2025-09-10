@@ -308,6 +308,18 @@ const deleteOrderingMaterialSubItemApi = async ({
   return data.data;
 };
 
+
+
+const deleteAllSubUnits = async (
+  projectId: string,
+  api: AxiosInstance
+) => {
+  const { data } = await api.delete(`/orderingmaterial/deleteallsubunits/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
 export const useDeleteOrderingMaterialSubItem = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
@@ -326,6 +338,34 @@ export const useDeleteOrderingMaterialSubItem = () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await deleteOrderingMaterialSubItemApi({ projectId, unitId, subItemId, api });
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["inventory", vars.projectId],
+         refetchType: 'active' // Force active queries to refetch
+      });
+    },
+  });
+};
+
+
+
+
+export const useDeleteAllSubItems = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+    }: {
+      projectId: string;
+    }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await deleteAllSubUnits( projectId, api );
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
@@ -451,6 +491,8 @@ const deleteOrderPdf = async (
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
+
+
 
 export const useDeleteOrderMaterialPdf = () => {
   const allowedRoles = ["owner", "staff", "CTO"];

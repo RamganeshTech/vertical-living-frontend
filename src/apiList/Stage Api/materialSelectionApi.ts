@@ -182,6 +182,16 @@ export const uploadFilesToRoomApi = async ({
 
 
 
+export const updateSelectedPackage = async (
+  projectId: string,
+  selectedPackage: string,
+  api: any
+) => {
+  const res = await api.patch(`/materialconfirmation/updatepackage/${projectId}`, {selectedPackage});
+  return res.data;
+};
+
+
 const deleteSubItemApi = async ({
   projectId,
   itemId,
@@ -616,7 +626,33 @@ export const useMaterialArrivalGeneratePdfComparisonLink = () => {
       return await generatedPublicLink({ projectId, api });
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({ queryKey: ["common-order-single", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["material-confirmation", projectId] });
+    },
+  });
+};
+
+
+
+
+
+export const useUpdateSelectedPackage = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+     selectedPacakge
+    }: {
+      projectId: string;
+      selectedPacakge: string;
+    }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized please login");
+      return await updateSelectedPackage(projectId, selectedPacakge, api);
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["material-confirmation", projectId] });
     },
   });
 };

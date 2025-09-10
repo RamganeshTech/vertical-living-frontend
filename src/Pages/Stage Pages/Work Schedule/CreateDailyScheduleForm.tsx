@@ -1039,7 +1039,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
 
 
-        console.log("getting called iwht the useEfffect wfor websockets")
+        // console.log("getting called iwht the useEfffect wfor websockets")
         if (!socket || !scheduleId || !projectId) return;
 
 
@@ -1189,6 +1189,28 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
         }
         // console.log("assingedWroker",assignedWorker )
 
+
+        // ⏰ Building supervisorCheck.reviewDateTime
+        let resolvedReviewDateTime: string;
+
+        if (editData?.supervisorCheck?.reviewDateTime) {
+            console.log("gettign into the place 1")
+            // ✅ Case 1: has full datetime value
+            // resolvedReviewDateTime = editData?.supervisorCheck?.reviewDateTime;
+            resolvedReviewDateTime = formatDateTimeLocal(new Date(editData?.supervisorCheck?.reviewDateTime)); // ✅ correct
+        } else if (editData?.dailyTasks?.[0]?.datePlanned) {
+            // Convert to Date object, then format correctly
+            const dateObj = new Date(editData.dailyTasks[0].datePlanned);
+            dateObj.setHours(12, 0, 0); // Set 12:00 PM
+
+            resolvedReviewDateTime = formatDateTimeLocal(dateObj);
+        } else {
+            console.log("gettign into the place 333333")
+
+            // Fallback to now
+            resolvedReviewDateTime = formatDateTimeLocal(new Date());
+        }
+
         setFormData({
             projectAssignee: {
                 projectName: editData?.projectAssignee?.projectName || projectAssigneData?.projectName || "",
@@ -1199,19 +1221,6 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                 supervisorName: editData?.projectAssignee?.supervisorName || currentUser?.name || "",
                 plannedStartDate: editData?.projectAssignee?.plannedStartDate || today,
             },
-            // dailyTasks: editData?.dailyTasks || [
-            //     {
-            //         datePlanned: "",
-            //         room: "",
-            //         workDescription: "",
-            //         startTime: "",
-            //         endTime: "",
-            //         materialsNeeded: [],
-            //         manpower: 0,
-            //         status: "planned",
-            //         uploadedImages: [],
-            //     },
-            // ],
             dailyTasks: editData?.dailyTasks?.map((task: any) => ({
                 ...task,
                 // Ensure uploadedImages is properly preserved
@@ -1234,7 +1243,8 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             supervisorCheck: {
                 reviewerName: editData?.supervisorCheck?.reviewerName || currentUser?.name || "",
                 reviewerId: editData?.supervisorCheck?.reviewerId || currentUser?.id || "",
-                reviewDateTime: editData?.supervisorCheck?.reviewDateTime || formatDateTimeLocal(new Date()),
+                // reviewDateTime: editData?.supervisorCheck?.reviewDateTime || formatDateTimeLocal(new Date()),
+                reviewDateTime: resolvedReviewDateTime,
                 status: editData?.supervisorCheck?.status || "needs_changes",
                 remarks: editData?.supervisorCheck?.remarks || "",
                 gatekeeping: editData?.supervisorCheck?.gatekeeping || "block",
@@ -1292,12 +1302,33 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
 
     const handleTaskChange = (index: number, field: keyof DailyTask, value: any) => {
-        setFormData((prev) => ({
-            ...prev,
-            dailyTasks: prev.dailyTasks.map((task, i) => (i === index ? { ...task, [field]: value } : task)),
-        }))
-    }
+        // setFormData((prev) => ({
+        //     ...prev,
+        //     dailyTasks: prev.dailyTasks.map((task, i) => (i === index ? { ...task, [field]: value } : task)),
+        // }))
 
+        setFormData((prev) => {
+            const updatedTasks = prev.dailyTasks.map((task, i) =>
+                i === index ? { ...task, [field]: value } : task
+            );
+
+            // Check if updating first task & field is datePlanned
+            let updatedSupervisorCheck = prev.supervisorCheck;
+            if (scheduleId === null && index === 0 && field === "datePlanned") {
+                const datetimeValue = `${value}T12:00`; // Set time manually
+                updatedSupervisorCheck = {
+                    ...prev.supervisorCheck,
+                    reviewDateTime: datetimeValue,
+                };
+            }
+
+            return {
+                ...prev,
+                dailyTasks: updatedTasks,
+                supervisorCheck: updatedSupervisorCheck,
+            };
+        });
+    }
 
     // Add this state to store raw input
     const [rawMaterialInputs, setRawMaterialInputs] = useState<{ [key: number]: string }>({});
@@ -1656,7 +1687,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             // 🔥 update local state with new corrected images
             setWorkComparions(response);
             // After upload/delete happens
-setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
+            setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
         } catch (err: any) {
             toast({
                 title: "Error",
@@ -1688,8 +1719,8 @@ setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or s
 
             // 🔥 update local state with new corrected images
             setWorkComparions(response);
-// After upload/delete happens
-setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
+            // After upload/delete happens
+            setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             refetch()
         } catch (err: any) {
             toast({
@@ -1711,8 +1742,8 @@ setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or s
 
             // 🔥 update local state after deletion
             setWorkComparions(response);
-// After upload/delete happens
-setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
+            // After upload/delete happens
+            setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             toast({
                 title: "Success",
                 description: "Corrected image deleted successfully",
@@ -1739,8 +1770,8 @@ setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or s
 
             // 🔥 update local state after deletion
             setWorkComparions(response);
-// After upload/delete happens
-setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
+            // After upload/delete happens
+            setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             toast({
                 title: "Success",
                 description: "image deleted successfully",
@@ -1780,7 +1811,7 @@ setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or s
             setWorkComparions(response);
             setEditingId("")
             // After upload/delete happens
-setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
+            setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or socket update
             toast({
                 title: "Success",
                 description: "Comment updated successfully",
@@ -2897,7 +2928,7 @@ setShouldListenToSocketEvents(prev => !prev); // toggle to trigger rerender or s
 
 
                                 <div className="flex gap-6">
-                                    {/* Pending */}
+
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="radio"

@@ -1108,7 +1108,7 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 // import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
 import { NO_IMAGE } from "../../../constants/constants";
-import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialPdf, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdatePdfStatus, useUpdateShopDetails } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
+import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialPdf, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdatePdfStatus, useUpdateShopDetails } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 // import GenerateWhatsappLink from "../../../shared/GenerateWhatsappLink";
 import { useEffect, useRef, useState } from "react";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
@@ -1165,6 +1165,7 @@ const OrderMaterialOverview = () => {
     const { mutateAsync: updateDelivery } = useUpdateDeliveryLocation();
     const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
     const { mutateAsync: updateShop } = useUpdateShopDetails();
+    const { mutateAsync: deleteAllSubItems, isPending:deleteAllPending } = useDeleteAllSubItems();
 
 
 
@@ -1272,6 +1273,20 @@ const OrderMaterialOverview = () => {
 
         } catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
+        }
+    };
+
+
+     const handleDeleteAllSubItems = async () => {
+        try {
+            if(!window.confirm("Are you sure need to perform this operation?")){
+                return 
+            } 
+            await deleteAllSubItems({ projectId: projectId! });
+            toast({ description: 'All Sub Items successfully', title: "Success" });
+
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to delete sub items", variant: "destructive" })
         }
     };
 
@@ -1708,12 +1723,21 @@ const OrderMaterialOverview = () => {
                                             {hasUnits ? `${selectedUnits.length} items purchased` : 'No orders yet'}
                                         </p> */}
                                     </div>
-                                    {hasUnits && (
+                                   <div className="flex gap-2">
+
+                                    <Button variant="danger" className="bg-red-600 text-white" 
+                                    isLoading={deleteAllPending} onClick={handleDeleteAllSubItems}>
+                                            <i className="fas fa-trash !mr-2"></i>
+                                        Delete All SubItems
+                                    </Button>
+
+                                     {hasUnits && (
                                         <div className="flex items-center gap-2">
                                             <span className="text-gray-500 text-sm">Total:</span>
                                             <span className="text-xl font-bold text-blue-600">₹{totalCost.toFixed(2)}</span>
                                         </div>
                                     )}
+                                   </div>
                                 </div>
                             </div>
 
