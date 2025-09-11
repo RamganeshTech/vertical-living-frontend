@@ -9,6 +9,8 @@ export const SIDEBAR_LABELS = {
   LOGISTICS: "Logistics",
   PROCUREMENT: "Procurement",
   ACCOUNTING: "Accounting",
+  RATECONIG: "Rate Config",
+  INTERNALQUOTE: "Intenal Quote"
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",
@@ -24,6 +26,8 @@ export const SIDEBAR_ICONS = {
   LOGISTICS: "fa-solid fa-dolly text-2xl",
   PROCUREMENT: "fa-solid fa-box-open text-2xl",
   ACCOUNTING: "fas fa-money-bill-wave text-2xl",
+  RATECONIG: "fas fa-money-bill-wave text-2xl",
+  INTERNALQUOTE: "fas fa-file text-2xl",
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",
   // TASKS: "fa-solid fa-list text-2xl",

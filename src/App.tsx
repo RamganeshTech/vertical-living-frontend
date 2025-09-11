@@ -6,12 +6,15 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-const LogisticsMain = lazy(() => import( './Pages/Department Pages/Logistics Pages/LogisticsMain'));
-const LogisticsSingle = lazy(() => import( './Pages/Department Pages/Logistics Pages/LogisticsSingle'));
-const ProcurementSub = lazy(() => import( './Pages/Department Pages/ProcurementNew Pages/ProcurementSub'));
-const ProcurementNewMain = lazy(() => import( './Pages/Department Pages/ProcurementNew Pages/ProcurementNewMain'));
-const AccountingMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/AccountingMain'));
-const AccountingSingle = lazy(() => import( './Pages/Department Pages/Accounting Pages/AccountingSingle'));
+import RateConfigAdminMain from './Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain';
+import RateConfigSub from './Pages/Quote Pages/RateConfig Pages/RateConfigSub';
+import QuoteGenerateMain from './Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/QuoteGeenrateMain';
+const LogisticsMain = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsMain'));
+const LogisticsSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsSingle'));
+const ProcurementSub = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/ProcurementSub'));
+const ProcurementNewMain = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/ProcurementNewMain'));
+const AccountingMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/AccountingMain'));
+const AccountingSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/AccountingSingle'));
 // import LogisticsVehicle from './Pages/Department Pages/Logistics Pages/LogisticsVehicle';
 const InventoryMain = lazy(() => import('./Pages/Stage Pages/Inventory Main/InventoryMain'));
 const ExternalMain = lazy(() => import('./Pages/External Units/ExternalMain'));
@@ -329,6 +332,21 @@ function App() {
                 <CommonOrderProject />
               </ProtectedRoutes>} />
 
+            </Route>
+
+
+            <Route path="rateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}>
+              <RateConfigAdminMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}>
+                <RateConfigSub />
+              </ProtectedRoutes>} />
+            </Route>
+
+            <Route path="internalquote" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <QuoteGenerateMain />
+            </ProtectedRoutes>} >
             </Route>
 
           </Route>
