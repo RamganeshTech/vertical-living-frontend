@@ -63,6 +63,7 @@ export const getSidebarConfig = (
             "TECHNICALCONSULTANT", // Insert after this
             "SELECTSTAGE", // Remove this later if needed
             "PAYMENTCONFIRMATION",
+            "QUOTEPDF",
             "ORDERMATERIALS",
             "MATERIALARRIVED",
             "INSTALLATION",

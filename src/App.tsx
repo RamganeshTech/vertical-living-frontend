@@ -6,9 +6,13 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-import RateConfigAdminMain from './Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain';
-import RateConfigSub from './Pages/Quote Pages/RateConfig Pages/RateConfigSub';
-import QuoteGenerateMain from './Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/QuoteGeenrateMain';
+import QuotePdfMain from './Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain';
+const QuoteGenerateVariantSub = lazy(() => import( './Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub '));
+const RateConfigAdminMain  = lazy(() => import(  './Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain'));
+const RateConfigSub  = lazy(() => import(  './Pages/Quote Pages/RateConfig Pages/RateConfigSub'));
+const QuoteGenerateMain  = lazy(() => import(  './Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/QuoteGeenrateMain'));
+const QuoteVariantGenerateMain = lazy(() => import( './Pages/Quote Pages/Quote VariantGenerate Pages/QuoteVariantGenerateMain'));
+// const QuoteGenerateVariantSub = lazy(() => import( './Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub'));
 const LogisticsMain = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsMain'));
 const LogisticsSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsSingle'));
 const ProcurementSub = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/ProcurementSub'));
@@ -349,6 +353,19 @@ function App() {
             </ProtectedRoutes>} >
             </Route>
 
+
+            <Route path="quotevariant" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <QuoteVariantGenerateMain />
+            </ProtectedRoutes>} >
+
+
+              <Route
+                path="single/:quoteId"
+                element={<QuoteGenerateVariantSub />}
+              />
+
+            </Route>
+
           </Route>
 
           <Route path='/:organizationId/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner", "client", "CTO", "worker", "staff"]}>
@@ -545,6 +562,15 @@ function App() {
               } />
 
             </Route>
+
+
+             <Route path="quotepdf" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+
+                <QuotePdfMain />
+              </ProtectedRoutes>
+
+            } ></Route>
 
 
             <Route path="ordermaterial" element={

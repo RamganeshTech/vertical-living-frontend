@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { type AxiosInstance } from "axios";
 import { getApiForRole } from "../../../utils/roleCheck";
 import useGetRole from "../../../Hooks/useGetRole";
+import { queryClient } from "../../../QueryClient/queryClient";
 
 interface CreateQuotePayload {
     organizationId: string;
@@ -32,6 +33,8 @@ export const createMaterialQuote = async ({
 };
 
 
+
+
 export const useCreateMaterialQuote = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
@@ -44,10 +47,9 @@ export const useCreateMaterialQuote = () => {
 
             return await createMaterialQuote({ api, organizationId, projectId, formData });
         },
-        // onSuccess: (_, { organizationId }) => {
-        //   // Optionally invalidate query cache if needed
-        //   queryClient.invalidateQueries({ queryKey: ["quotes", organizationId] });
-        // },
+        onSuccess: (_, { organizationId }) => {
+          queryClient.invalidateQueries({queryKey: ["quote-material-items", organizationId] });
+        },
     });
 };
 

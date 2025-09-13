@@ -10,7 +10,8 @@ export const SIDEBAR_LABELS = {
   PROCUREMENT: "Procurement",
   ACCOUNTING: "Accounting",
   RATECONIG: "Rate Config",
-  INTERNALQUOTE: "Intenal Quote"
+  INTERNALQUOTE: "Internal Quote",
+  QUOTEVARIENT: "Quote Generator",
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",
@@ -28,6 +29,7 @@ export const SIDEBAR_ICONS = {
   ACCOUNTING: "fas fa-money-bill-wave text-2xl",
   RATECONIG: "fas fa-money-bill-wave text-2xl",
   INTERNALQUOTE: "fas fa-file text-2xl",
+  QUOTEVARIENT: "fas fa-file-invoice text-2xl",
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",
   // TASKS: "fa-solid fa-list text-2xl",
@@ -93,6 +95,7 @@ export const PROJECTS_LABELS = {
   MATERIALSELECTION: "Material Selection",
   COSTESTIMATION: "Cost Estimation",
   PAYMENTCONFIRMATION: "Payment Stage",
+  QUOTEPDF: "Quote Pdfs",
   ORDERMATERIALS: "Ordering Material",
   MATERIALARRIVED: "Material Arrival",
   WORKSCHEDULE: "Work Schedule",
@@ -122,6 +125,7 @@ export const PROJECTS_ICONS = {
   MATERIALSELECTION: "fas fa-box text-2xl",
   COSTESTIMATION: "fa-solid fa-money-bill-1-wave text-2xl",
   PAYMENTCONFIRMATION: "fa-solid fa-money-bill-wave text-2xl",
+  QUOTEPDF: "fas fa-file-invoice text-2xl",
   ORDERMATERIALS: "fa-solid fa-shopping-cart text-2xl",
   MATERIALARRIVED: "fa-solid fa-receipt text-2xl",
   WORKSCHEDULE: "fas fa-digging text-2xl",

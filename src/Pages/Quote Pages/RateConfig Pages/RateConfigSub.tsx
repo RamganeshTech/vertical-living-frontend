@@ -13,9 +13,9 @@ export default function RateConfigSub() {
     const navigate = useNavigate()
 
     const { data: categories } = useGetCategories(organizationId!);
-    const { data: existingItems, isLoading } = useGetItemsByCategory(categoryId!);
-    const { mutateAsync: createItems } = useCreateItems();
-    const { mutateAsync: deleteItem } = useDeleteItem();
+    const { data: existingItems, isLoading, refetch } = useGetItemsByCategory(categoryId!);
+    const { mutateAsync: createItems, isPending: createPending } = useCreateItems();
+    const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteItem();
 
     const [rows, setRows] = useState([{ data: {} }]);
 
@@ -127,7 +127,7 @@ export default function RateConfigSub() {
 
             const newItems = rows
                 .map((row) => row.data)
-                .filter((data:any) => {
+                .filter((data: any) => {
                     const value = data[firstFieldKey];
                     return value !== undefined && value !== null && value.toString().trim() !== "";
                 });
@@ -141,13 +141,13 @@ export default function RateConfigSub() {
                 });
 
 
-           
 
-                await createItems({
-                    categoryId: categoryId!,
-                    items: newItems,
-                    organizationId: organizationId!,
-                });
+
+            await createItems({
+                categoryId: categoryId!,
+                items: newItems,
+                organizationId: organizationId!,
+            });
 
             toast({
                 title: "Success",
@@ -155,9 +155,13 @@ export default function RateConfigSub() {
             });
 
             setRows([{ data: {} }]);
+            refetch()
         }
         catch (error: any) {
-
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message ?? "Operation failed",
+            });
         }
     };
 
@@ -175,7 +179,7 @@ export default function RateConfigSub() {
                     <Button onClick={handleAddRow} variant="primary" className="">
                         + Add Row
                     </Button>
-                    <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button onClick={handleSave} isLoading={createPending} className="bg-blue-600 hover:bg-blue-700 text-white">
                         <i className="fas fa-file mr-2"></i> Save Items
                     </Button>
                 </div>
@@ -222,6 +226,7 @@ export default function RateConfigSub() {
                                     <Button
                                         size="sm"
                                         variant="danger"
+                                        isLoading={deletePending}
                                         className="group text-white bg-red-600"
                                         onClick={() =>
                                             deleteItem({ itemId: item?._id, categoryId: categoryId! })
