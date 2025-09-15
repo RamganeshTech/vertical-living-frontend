@@ -140,8 +140,10 @@ const QuoteGenerateMain = () => {
                     return {
                         furnitureName: f.furnitureName,
                         coreMaterials: f.coreMaterials.map(cm => {
-                            const { imageUrl, previewUrl, ...rest } = cm;
-                            return rest;
+                          if (Object.values(cm).some(value => Boolean(value))) {
+                                const { imageUrl, previewUrl, ...rest } = cm;
+                                return rest;
+                            }
                         }),
                         fittingsAndAccessories: f.fittingsAndAccessories,
                         glues: f.glues,
@@ -228,11 +230,11 @@ const QuoteGenerateMain = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
                     <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md relative animate-scaleIn">
-                        <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Furniture</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Product</h3>
 
                         <input
                             className="w-full border border-gray-300 rounded px-3 py-2 mb-4 outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="Enter Furniture Name"
+                            placeholder="Enter Product Name"
                             value={tempFurnitureName}
                             autoFocus
                             onChange={(e) => setTempFurnitureName(e.target.value)}
@@ -269,9 +271,9 @@ const QuoteGenerateMain = () => {
             {furnitures.length === 0 && (
                 <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white  rounded-lg">
                     <i className="fas fa-couch text-5xl text-blue-400 mb-4"></i>
-                    <h3 className="text-lg font-semibold text-gray-600 mb-1">No Furnitures Created</h3>
+                    <h3 className="text-lg font-semibold text-gray-600 mb-1">No Products Created</h3>
                     <p className="text-sm text-gray-500">
-                        Click the <strong>+ furniture</strong>  to create the furnitures<br />
+                        Click the <strong>+ Product</strong>  to create the product<br />
                     </p>
 
                     <Button
@@ -279,7 +281,7 @@ const QuoteGenerateMain = () => {
                         className="bg-blue-600 text-white px-4 py-2 rounded mt-2 flex items-center"
                     >
                         <i className="fas fa-add !mr-2"> </i>
-                         Furniture
+                         Product
                     </Button>
                 </div>
             )}

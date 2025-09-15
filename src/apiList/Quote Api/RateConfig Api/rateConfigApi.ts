@@ -20,7 +20,7 @@ const createCategory = async ({
 };
 
 export const useCreateCategory = () => {
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -50,7 +50,7 @@ const getCategories = async ({
 };
 
 export const useGetCategories = (organizationId: string) => {
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -79,7 +79,7 @@ const deleteCategory = async ({
 };
 
 export const useDeleteCategory = () => {
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -115,7 +115,7 @@ const createItems = async ({
 };
 
 export const useCreateItems = () => {
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -153,7 +153,7 @@ const getItemsByCategory = async ({
 };
 
 export const useGetItemsByCategory = (categoryId: string) => {
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -184,7 +184,7 @@ const updateItem = async ({
 };
 
 export const useUpdateItem = () => {
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -214,7 +214,7 @@ const deleteItem = async ({
 };
 
 export const useDeleteItem = () => {
-  const allowedRoles = ["owner", "CTO"];
+  const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 

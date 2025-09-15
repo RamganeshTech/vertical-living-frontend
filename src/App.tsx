@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
-import { lazy, Suspense, useEffect, useState } from 'react';
+import {  lazy, Suspense, useEffect, useState } from 'react';
 import type { RootState } from './store/store';
 import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
@@ -143,6 +143,37 @@ function App() {
       socket.emit("leave_organization", { organizationId: organizationId });
     };
   }, [organizationId]);
+
+
+  
+// interface ErrorBoundaryProps {
+//   children: React.ReactNode;
+// }
+// interface ErrorBoundaryState {
+//   hasError: boolean;
+// }
+// class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+//   constructor(props: ErrorBoundaryProps) {
+//     super(props);
+//     this.state = { hasError: false };
+//   }
+
+//   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+//     console.log(error)
+//     return { hasError: true };
+//   }
+
+//   componentDidCatch(error: Error, info: React.ErrorInfo) {
+//     console.error("Error boundary caught an error:", error, info);
+//   }
+
+//   render() {
+//     if (this.state.hasError) {
+//       return <h1>Something went wrong from error boudary.</h1>;
+//     }
+//     return this.props.children;
+//   }
+// }
 
 
   if (loading) <MaterialOverviewLoading />;
@@ -339,11 +370,11 @@ function App() {
             </Route>
 
 
-            <Route path="rateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}>
+            <Route path="rateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <RateConfigAdminMain />
             </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}>
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO",  "staff"]}>
                 <RateConfigSub />
               </ProtectedRoutes>} />
             </Route>
@@ -567,7 +598,7 @@ function App() {
              <Route path="quotepdf" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
-                <QuotePdfMain />
+                <QuotePdfMain  />
               </ProtectedRoutes>
 
             } ></Route>

@@ -47,10 +47,18 @@ const QuoteVarientCard: React.FC<Props> = ({ quote, organizationId }) => {
             <CardContent className="p-4 space-y-2">
                 <div className="flex items-start justify-between">
                     <div>
-                        <h3 className="text-base font-bold text-blue-700 mb-1">
-                            Quote No: <span className='text-black'>{quote.quoteNo || "N/A"}</span>
-                        </h3>
-                        <p className="text-xs text-gray-500">
+
+                        <div className='my-1'>
+                            <h3 className="text-base font-bold text-blue-700 leading-[8px] ">
+                                Project: <span className='text-black'>{quote?.projectId?.projectName || "Project"}</span>
+                            </h3>
+                            <span className="text-[12px] font-semibold text-gray-500">
+                                Quote No: <span className='text-black'>{quote.quoteNo || "N/A"}</span>
+                            </span>
+                        </div>
+
+
+                        <p className="text-xs text-gray-500 ">
                             Created on: {new Date(quote.createdAt).toLocaleString()}
                         </p>
                     </div>

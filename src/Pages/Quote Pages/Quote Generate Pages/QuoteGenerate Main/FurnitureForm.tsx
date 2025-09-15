@@ -37,6 +37,8 @@ export type FurnitureBlock = {
     nbms: number;
     furnitureTotal: number;
   };
+  plywoodBrand?: string | null,
+  laminateBrand?: string | null,
 };
 
 type Props = {
@@ -73,6 +75,37 @@ const emptySimpleItem = (): SimpleItemRow => ({
   rowTotal: 0,
 });
 
+
+export const calculateCoreMaterialCosts = (
+    coreRows: CoreMaterialRow[]
+  ): CoreMaterialRow[] => {
+    if (coreRows.length === 0) return [];
+
+    const totalRows = coreRows.length;
+
+    const base = coreRows[0];
+    const totalLabour = base.carpenters * base.days * RATES.labour;
+    const labourWithProfit = totalLabour * (1 + (base.profitOnLabour || 0) / 100);
+    const labourPerRow = labourWithProfit / totalRows;
+
+    return coreRows.map((row) => {
+      const plywoodQty = row.plywoodNos?.quantity || 0;
+      const laminateQty = row.laminateNos?.quantity || 0;
+
+      // Material cost and margin per row
+      const materialCost =
+        (plywoodQty * RATES.plywood + laminateQty * RATES.laminate) *
+        (1 + (row.profitOnMaterial || 0) / 100);
+
+        // console.log("console.log", materialCost)
+
+      return {
+        ...row,
+        rowTotal: Math.round(materialCost + labourPerRow),
+      };
+    });
+  };
+
 // Component ----------------------------------------
 const FurnitureForm: React.FC<Props> = ({
   // index,
@@ -80,39 +113,28 @@ const FurnitureForm: React.FC<Props> = ({
   updateFurniture,
   removeFurniture,
 }) => {
-  // Calculation logic ----------------------------------
+
+
+
   // const calculateCoreRowTotal = (row: CoreMaterialRow) => {
-  //   const materialCost =
-  //     row.plywoodNos.quantity * RATES.plywood +
-  //     row.laminateNos.quantity * RATES.laminate;
-  //   const labourCost = row.carpenters * row.days * RATES.labour;
+  //   const plywoodQty = row.plywoodNos?.quantity || 0;
+  //   const laminateQty = row.laminateNos?.quantity || 0;
+  //   const carpenters = row.carpenters || 0;
+  //   const days = row.days || 0;
 
-  //   return Math.round(
-  //     materialCost * (1 + row.profitOnMaterial / 100) +
-  //     labourCost * (1 + row.profitOnLabour / 100)
-  //   );
+  //   // 🔹 Step 1: Material Cost
+  //   const materialCost = (plywoodQty * RATES.plywood) + (laminateQty * RATES.laminate);
+
+  //   // 🔹 Step 2: Labour Cost
+  //   const labourCost = carpenters * days * RATES.labour;
+
+  //   // 🔹 Step 3: Apply profit margins
+  //   const materialWithProfit = materialCost * (1 + (row.profitOnMaterial || 0) / 100);
+  //   const labourWithProfit = labourCost * (1 + (row.profitOnLabour || 0) / 100);
+
+  //   // 🔹 Step 4: Row total
+  //   return Math.round(materialWithProfit + labourWithProfit);
   // };
-
-
-  const calculateCoreRowTotal = (row: CoreMaterialRow) => {
-  const plywoodQty = row.plywoodNos?.quantity || 0;
-  const laminateQty = row.laminateNos?.quantity || 0;
-  const carpenters = row.carpenters || 0;
-  const days = row.days || 0;
-
-  // 🔹 Step 1: Material Cost
-  const materialCost = (plywoodQty * RATES.plywood) + (laminateQty * RATES.laminate);
-
-  // 🔹 Step 2: Labour Cost
-  const labourCost = carpenters * days * RATES.labour;
-
-  // 🔹 Step 3: Apply profit margins
-  const materialWithProfit = materialCost * (1 + (row.profitOnMaterial || 0) / 100);
-  const labourWithProfit = labourCost * (1 + (row.profitOnLabour || 0) / 100);
-
-  // 🔹 Step 4: Row total
-  return Math.round(materialWithProfit + labourWithProfit);
-};
 
   const computeTotals = (fb: FurnitureBlock) => {
     const totalCore = fb.coreMaterials.reduce((sum, row) => sum + row.rowTotal, 0);
@@ -129,38 +151,71 @@ const FurnitureForm: React.FC<Props> = ({
   };
 
   // Handlers ----------------------------------------
+  // const handleCoreChange = (rowIndex: number, key: keyof CoreMaterialRow, value: any) => {
+  //   const updated: any = [...data.coreMaterials];
+  //   if (key === "imageUrl") {
+  //     updated[rowIndex].imageUrl = value;
+  //     updated[rowIndex].previewUrl = URL.createObjectURL(value);
+  //   } else {
+  //     updated[rowIndex][key] = value;
+  //   }
+
+  //   updated[rowIndex].rowTotal = calculateCoreRowTotal(updated[rowIndex]);
+
+
+  //    // 👉 Automatically add a new row if typing in the last one
+  // const isLastRow = rowIndex === updated.length - 1;
+  // const isNotEmpty = Object.values(updated[rowIndex]).some(v => {
+  //   if (typeof v === "object" && v !== null && "quantity" in v) {
+  //     return v.quantity || (v as any).thickness;
+  //   }
+  //   return v !== "" && v !== 0 && v !== null;
+  // });
+
+  // if (isLastRow && isNotEmpty) {
+  //   updated.push(emptyCoreMaterial());
+  // }
+
+  //   const updatedFurniture: FurnitureBlock = {
+  //     ...data,
+  //     coreMaterials: updated,
+  //   };
+  //   updatedFurniture.totals = computeTotals(updatedFurniture);
+  //   updateFurniture && updateFurniture(updatedFurniture);
+  // };
+
+
+  
+
+
   const handleCoreChange = (rowIndex: number, key: keyof CoreMaterialRow, value: any) => {
     const updated: any = [...data.coreMaterials];
+
     if (key === "imageUrl") {
       updated[rowIndex].imageUrl = value;
       updated[rowIndex].previewUrl = URL.createObjectURL(value);
+    } else if (key === "plywoodNos" || key === "laminateNos") {
+      updated[rowIndex][key] = {
+        ...(updated[rowIndex][key] || {}),
+        ...value,
+      };
     } else {
       updated[rowIndex][key] = value;
     }
 
-    updated[rowIndex].rowTotal = calculateCoreRowTotal(updated[rowIndex]);
+    const updatedRows = calculateCoreMaterialCosts(updated);
 
 
-     // 👉 Automatically add a new row if typing in the last one
-  const isLastRow = rowIndex === updated.length - 1;
-  const isNotEmpty = Object.values(updated[rowIndex]).some(v => {
-    if (typeof v === "object" && v !== null && "quantity" in v) {
-      return v.quantity || (v as any).thickness;
-    }
-    return v !== "" && v !== 0 && v !== null;
-  });
-
-  if (isLastRow && isNotEmpty) {
-    updated.push(emptyCoreMaterial());
-  }
 
     const updatedFurniture: FurnitureBlock = {
       ...data,
-      coreMaterials: updated,
+      coreMaterials: updatedRows,
     };
+
     updatedFurniture.totals = computeTotals(updatedFurniture);
-    updateFurniture && updateFurniture(updatedFurniture);
+    updateFurniture?.(updatedFurniture);
   };
+
 
   const handleSimpleChange = (
     kind: "fittingsAndAccessories" | "glues" | "nonBrandMaterials",
@@ -170,15 +225,20 @@ const FurnitureForm: React.FC<Props> = ({
   ) => {
     const section: any = [...data[kind]];
     section[i][key] = value;
-    section[i].rowTotal = section[i].quantity * section[i].cost;
+    if (kind !== "glues") {
+      section[i].rowTotal = section[i].quantity * section[i].cost;
+    }
+    else {
+      section[i].rowTotal = section[i].cost;
+    }
 
-     // 👉 Automatically add new row on typing in last row
-  const isLastRow = i === section.length - 1;
-  const isTyping = section[i].itemName || section[i].description || section[i].quantity || section[i].cost;
+    // 👉 Automatically add new row on typing in last row
+    const isLastRow = i === section.length - 1;
+    const isTyping = section[i].itemName || section[i].description || section[i].quantity || section[i].cost;
 
-  if (isLastRow && isTyping) {
-    section.push(emptySimpleItem());
-  }
+    if (isLastRow && isTyping) {
+      section.push(emptySimpleItem());
+    }
 
     const updatedFurniture: FurnitureBlock = {
       ...data,
@@ -186,6 +246,8 @@ const FurnitureForm: React.FC<Props> = ({
     };
     updatedFurniture.totals = computeTotals(updatedFurniture);
     updateFurniture && updateFurniture(updatedFurniture);
+
+
   };
 
   // Render core material table
@@ -194,35 +256,35 @@ const FurnitureForm: React.FC<Props> = ({
       <h3 className="font-semibold text-md mb-2">Core Materials - Total: ₹{data?.totals.core.toLocaleString("en-IN")}</h3>
       <div className="overflow-x-auto  rounded-md">
         <table className="min-w-full text-sm bg-white shadow-sm">
-          
+
 
           <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
-  <tr>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Image</th>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Item Name</th>
-    <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan={2}>Plywood</th>
-    <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan={2}>Laminate</th>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>No. of Carpenters / Day</th>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>No. of Days</th>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Profit % Material</th>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Profit % Labour</th>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Remarks</th>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Total</th>
-    <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Actions</th>
-  </tr>
-  <tr>
-    <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-    <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Thk</th>
-    <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-    <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Thk</th>
-  </tr>
-</thead>
+            <tr>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Image</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Item Name</th>
+              <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan={2}>Plywood</th>
+              <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan={2}>Laminate</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>No. of Carpenters / Day</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>No. of Days</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Profit % Material</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Profit % Labour</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Remarks</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Total</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Actions</th>
+            </tr>
+            <tr>
+              <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+              <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Thk</th>
+              <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+              <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Thk</th>
+            </tr>
+          </thead>
           <tbody>
             {data.coreMaterials.map((row, i) => (
               <tr key={i}
                 className="group relative border-none !border-b-1 px-4 py-2 transition-all duration-150 hover:bg-gray-50"
               >
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" >
+                {/* <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" >
                   <input
                     type="file"
                     onChange={(e) =>
@@ -234,7 +296,21 @@ const FurnitureForm: React.FC<Props> = ({
                   {row.previewUrl && (
                     <img src={row.previewUrl} className="h-10 mx-auto mt-1" />
                   )}
-                </td>
+                </td> */}
+
+                {i === 0 && (
+                  <td rowSpan={data.coreMaterials.length}>
+                    <input
+                      type="file"
+                      className="w-full px-2 py-3 text-center outline-none"
+                      onChange={(e) => handleCoreChange(0, "imageUrl", e.target.files?.[0])}
+                    />
+                    {row.previewUrl && (
+                      <img src={row.previewUrl} className="h-10 mt-2 mx-auto" />
+                    )}
+                  </td>
+                )}
+
                 <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                   <input
                     value={row.itemName}
@@ -249,14 +325,14 @@ const FurnitureForm: React.FC<Props> = ({
                       <input
                         type="number"
                         value={(row as any)[field][sub]}
-                        onChange={(e) =>{
-                      if(Number(e.target.value)>=0){
+                        onChange={(e) => {
+                          if (Number(e.target.value) >= 0) {
 
-                          handleCoreChange(i, field as any, {
-                            ...(row as any)[field],
-                            [sub]: Number(e.target.value),
-                          })
-                      }
+                            handleCoreChange(i, field as any, {
+                              ...(row as any)[field],
+                              [sub]: Number(e.target.value),
+                            })
+                          }
                         }
                         }
                         className="w-full px-2 py-1 text-center outline-none"
@@ -264,26 +340,34 @@ const FurnitureForm: React.FC<Props> = ({
                     </td>
                   ))
                 )}
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
-                  <input
-                    type="number"
-                    value={row.carpenters}
-                    onChange={(e) =>
-                      handleCoreChange(i, "carpenters", Number(e.target.value))
-                    }
-                    className="w-full px-2 py-1 text-center outline-none"
-                  />
-                </td>
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
-                  <input
-                    type="number"
-                    value={row.days}
-                    onChange={(e) =>
-                      handleCoreChange(i, "days", Number(e.target.value))
-                    }
-                    className="w-full px-2 py-1 text-center outline-none"
-                  />
-                </td>
+                {i === 0 && (
+                  <>
+                    <td
+                      rowSpan={data.coreMaterials.length}
+                      className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                      <input
+                        type="number"
+                        value={row.carpenters}
+                        onChange={(e) =>
+                          handleCoreChange(i, "carpenters", Number(e.target.value))
+                        }
+                        className="w-full px-2 py-1 text-center outline-none"
+                      />
+                    </td>
+                    <td
+                      rowSpan={data.coreMaterials.length}
+                      className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                      <input
+                        type="number"
+                        value={row.days}
+                        onChange={(e) =>
+                          handleCoreChange(i, "days", Number(e.target.value))
+                        }
+                        className="w-full px-2 py-1 text-center outline-none"
+                      />
+                    </td>
+                  </>
+                )}
                 <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                   <input
                     type="number"
@@ -294,16 +378,21 @@ const FurnitureForm: React.FC<Props> = ({
                     className="w-full px-2 py-1 text-center outline-none"
                   />
                 </td>
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
-                  <input
-                    type="number"
-                    value={row.profitOnLabour}
-                    onChange={(e) =>
-                      handleCoreChange(i, "profitOnLabour", Number(e.target.value))
-                    }
-                    className="w-full px-2 py-1 text-center outline-none"
-                  />
-                </td>
+                {i === 0 && (
+                  <>
+                    <td
+                      rowSpan={data.coreMaterials.length}
+                      className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                      <input
+                        type="number"
+                        value={row.profitOnLabour}
+                        onChange={(e) =>
+                          handleCoreChange(i, "profitOnLabour", Number(e.target.value))
+                        }
+                        className="w-full px-2 py-1 text-center outline-none"
+                      />
+                    </td>
+                  </>)}
                 <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                   <input
                     value={row.remarks}
@@ -321,12 +410,14 @@ const FurnitureForm: React.FC<Props> = ({
                     onClick={() => {
                       const updated = [...data.coreMaterials];
                       updated.splice(i, 1);
+                      const recalculated = calculateCoreMaterialCosts(updated);
+
                       const updatedFurniture: FurnitureBlock = {
                         ...data,
-                        coreMaterials: updated,
+                        coreMaterials: recalculated,
                       };
                       updatedFurniture.totals = computeTotals(updatedFurniture);
-                      updateFurniture && updateFurniture(updatedFurniture);
+                      updateFurniture?.(updatedFurniture);
                     }}
                     className="px-1 text-xs bg-red-600 text-white"
                   >
@@ -342,12 +433,15 @@ const FurnitureForm: React.FC<Props> = ({
         <Button
           onClick={() => {
             const updated = [...data.coreMaterials, emptyCoreMaterial()];
+            const updatedRows = calculateCoreMaterialCosts(updated);
+
             const updatedFurniture: FurnitureBlock = {
               ...data,
-              coreMaterials: updated,
+              coreMaterials: updatedRows,
             };
             updatedFurniture.totals = computeTotals(updatedFurniture);
-            updateFurniture && updateFurniture(updatedFurniture);
+            updateFurniture?.(updatedFurniture);
+
           }}
         >
           + Add Core Material
@@ -368,12 +462,12 @@ const FurnitureForm: React.FC<Props> = ({
         <table className="min-w-full text-sm bg-white shadow-sm">
           <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
             <tr>
-              <th  className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
-              <th  className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th  className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-              <th  className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
-              <th  className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-              <th  className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -382,7 +476,7 @@ const FurnitureForm: React.FC<Props> = ({
                 className="group relative border-none !border-b-1 px-4 !py-2 transition-all duration-150 hover:bg-gray-50"
               >
                 <td
-                className="p-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" 
+                  className="p-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
                     value={row.itemName}
@@ -395,7 +489,7 @@ const FurnitureForm: React.FC<Props> = ({
                   />
                 </td>
                 <td
-                className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" 
+                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
                     value={row.description}
@@ -408,22 +502,23 @@ const FurnitureForm: React.FC<Props> = ({
                   />
                 </td>
                 <td
-                className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" 
+                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
                     type="number"
                     value={row.quantity}
-                    onChange={(e) =>{
-                      if(Number(e.target.value)>=0){
+                    onChange={(e) => {
+                      if (Number(e.target.value) >= 0) {
 
                         handleSimpleChange(kind, i, "quantity", Number(e.target.value))
-                      }}
+                      }
+                    }
                     }
                     className="w-full px-2 py-1 text-center outline-none"
                   />
                 </td>
                 <td
-                className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" 
+                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
                     type="number"
@@ -435,10 +530,10 @@ const FurnitureForm: React.FC<Props> = ({
                   />
                 </td>
                 <td
-                className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" 
+                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >₹{row.rowTotal.toLocaleString("en-IN")}</td>
                 <td
-                className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" 
+                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <Button
                     variant="danger"
@@ -484,11 +579,11 @@ const FurnitureForm: React.FC<Props> = ({
     <div className="shadow-md p-4 my-4 border rounded-lg bg-white">
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-xl font-semibold text-gray-700">
-          Furniture: {data.furnitureName}
+          Product: {data.furnitureName}
         </h2>
         {removeFurniture && (
           <Button variant="danger" size="sm" onClick={removeFurniture} className="bg-red-600 text-white">
-            Remove Furniture
+            Remove Product
           </Button>
         )}
       </div>
@@ -499,10 +594,11 @@ const FurnitureForm: React.FC<Props> = ({
       {renderSimpleItemSection("Non-Branded Materials", "nonBrandMaterials")}
 
       <div className="mt-6 text-right text-xl text-green-700 font-bold">
-        Furniture Total: ₹{data.totals.furnitureTotal.toLocaleString("en-IN")}
+        Product Total: ₹{data.totals.furnitureTotal.toLocaleString("en-IN")}
       </div>
     </div>
   );
 };
 
 export default FurnitureForm;
+

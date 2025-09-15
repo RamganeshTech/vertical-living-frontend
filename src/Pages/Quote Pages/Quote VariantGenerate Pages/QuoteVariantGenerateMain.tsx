@@ -19,7 +19,7 @@ const QuoteGenerateVariantMain = () => {
     });
 
     const [searchInput, setSearchInput] = useState("");     // user typing
-    const [searchTerm, setSearchTerm] = useState<string>(""); // value used for query
+    const [searchTerm, setSearchTerm] = useState<string>(""); // value used for sending to the api
     const { data } = useGetProjects(organizationId!)
     // console.log("data", data)
     const projects = data?.map((project: AvailableProjetType) => ({ _id: project._id, projectName: project.projectName }))
@@ -61,7 +61,7 @@ const internalQuoteNavigate = ()=>{
 
 
     return (
-        <div className="p-2 max-h-full overflow-y-auto">
+        <div className="p-2 max-h-full overflow-y-auto  min-h-full">
             <header className="flex justify-between items-center">
                 <div className="flex gap-2">
                     <i className="fas fa-file-invoice text-4xl text-blue-600" />
@@ -95,7 +95,7 @@ const internalQuoteNavigate = ()=>{
             </header>
 
 
-            <main className="flex gap-2 !max-h-[87vh]">
+            <main className="flex gap-2 !max-h-[87%]">
 
                 <div className="xl:w-80 flex-shrink-0">
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
@@ -179,7 +179,7 @@ const internalQuoteNavigate = ()=>{
                     </div>
                 </div>
 
-                <section className="w-full max-h-full  gap-2  overflow-y-auto">
+                <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
 
                     {isLoading ? (
                         <p><MaterialOverviewLoading /></p>
