@@ -193,6 +193,11 @@ export default function RateConfigSub() {
                         className="bg-blue-50 text-sm font-semibold text-gray-600 px-6 py-1 sm:py-3"
                     >
                         <tr>
+                            <th
+                                    className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                S.NO
+                            </th>
                             {currentCategory.fields.map((field: any) => (
                                 <th key={field.key}
                                     className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -206,7 +211,7 @@ export default function RateConfigSub() {
 
                     <tbody>
                         {/* Existing Items */}
-                        {existingItems?.map((item: any) => (
+                        {existingItems?.map((item: any, i:number) => (
                             <tr
                                 key={`existing-${item?._id}`}
                                 // className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}
@@ -214,6 +219,11 @@ export default function RateConfigSub() {
      hover:bg-gray-50 hover:border-gray-300
   `}
                             >
+                                 <td 
+                                        className="border border-gray-100 font-medium text-center  text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
+                                    >
+                                        {i+1 || "—"}
+                                    </td>
                                 {currentCategory?.fields?.map((field: any) => (
                                     <td key={field?.key}
                                         //    className="p-4 border-t text-gray-700"

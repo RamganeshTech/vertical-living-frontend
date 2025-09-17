@@ -7,6 +7,7 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import QuotePdfMain from './Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain';
+import ShortListReferenceDesignMain from './Pages/Stage Pages/Sample design/ShortListReference Pages/ShortListReferenceDesignMain';
 const QuoteGenerateVariantSub = lazy(() => import( './Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub '));
 const RateConfigAdminMain  = lazy(() => import(  './Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain'));
 const RateConfigSub  = lazy(() => import(  './Pages/Quote Pages/RateConfig Pages/RateConfigSub'));
@@ -343,6 +344,11 @@ function App() {
               <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <ProcurementSub />
               </ProtectedRoutes>} />
+            </Route>
+
+               <Route path="shortlistdesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ShortListReferenceDesignMain />
+            </ProtectedRoutes>} >
             </Route>
 
 

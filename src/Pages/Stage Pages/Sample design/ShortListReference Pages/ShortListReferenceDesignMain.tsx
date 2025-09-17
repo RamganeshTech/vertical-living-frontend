@@ -1,0 +1,214 @@
+import React, { useRef, useState } from "react";
+import { useDeleteReferenceDesign, useGetReferenceDesigns, useUploadReferenceDesigns } from "../../../../apiList/Stage Api/shortlistReferenceDesignApi";
+import { toast } from "../../../../utils/toast";
+import ImageGalleryExample from "../../../../shared/ImageGallery/ImageGalleryMain";
+import { useParams } from "react-router-dom";
+import MaterialOverviewLoading from "../../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/Card";
+import { Button } from "../../../../components/ui/Button";
+
+
+const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+export default function ShortListReferenceDesignMain() {
+    //   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const { organizationId } = useParams() as { organizationId: string }
+
+    const { data: imageData, refetch, isFetching } = useGetReferenceDesigns({
+        organizationId,
+    });
+
+    const { mutateAsync: uploadImages, } = useUploadReferenceDesigns();
+    const { mutateAsync: deleteImage, } = useDeleteReferenceDesign();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isDragging, setIsDragging] = useState(false);
+
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        const validImages = files.filter((file) => allowedImageTypes.includes(file.type));
+
+        if (validImages.length === 0) {
+            toast({ title: "Error", description: "Please select valid image files (JPG, JPEG, PNG, WEBP)", variant: "destructive" });
+            return;
+        }
+
+        // setSelectedFiles(validImages);
+        handleUpload(validImages);
+    };
+
+    const handleUpload = async (files: File[]) => {
+        try {
+            const formData = new FormData();
+            files.forEach((file) => {
+                formData.append("files", file); // assuming your multer/express handler uses `images` as the field
+            });
+
+            await uploadImages({ organizationId, formData });
+            toast({ title: "Success", description: "Image(s) uploaded successfully." });
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to upload images", variant: "destructive" });
+        }
+    };
+
+    const handleDelete = async (imageId: string) => {
+        try {
+            await deleteImage({ organizationId, imageId });
+            toast({ title: "Success", description: "Image deleted" });
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to upload images", variant: "destructive" });
+
+        }
+    };
+
+
+
+    // ✅ Drag handlers
+    // const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     setIsDragging(true);
+    // };
+
+    const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Needed to allow drop
+    };
+
+    const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+
+        const files = Array.from(e.dataTransfer.files);
+        await handleUpload(files);
+    };
+
+
+    return (
+        <div className="w-full max-w-full mx-auto p-2 overflow-y-auto">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <h1 className="text-2xl font-semibold text-gray-800">
+                    <i className="fa-solid fa-object-group text-2xl text-blue-600 mr-2"></i>
+                    Reference Designs
+                    
+                    </h1>
+                {/* <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 text-sm">
+                    {isUploading ? "Uploading..." : "Upload Images"}
+                    <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        multiple
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        className="hidden"
+                        disabled={isUploading}
+                    />
+                </label> */}
+            </div>
+
+
+            {/* <div
+                ref={dropRef}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                className={`w-full p-10 border-2 border-dashed rounded-md text-center transition-all duration-300
+          ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-gray-50"}
+        `}
+            >
+                <p className="text-gray-600">
+{isDragging
+                            ? "Drop files here..."
+                            : "Drag and drop image files here or "}
+                    <span
+                        className="text-blue-600 underline cursor-pointer"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        browse
+                    </span>{" "}
+                    to upload.
+                </p>
+            </div> */}
+
+
+            <Card className="">
+                <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                        {isDragging
+                            ? "Drop files here..."
+                            : "Drag and drop image files here or "}
+                        <Button variant="outline" size="sm" className="text-blue-600 bg-transparent">
+                            Upload reference images, and can be used to compare in the projects
+                        </Button>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div
+                        // className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
+                            }`}
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragLeave={handleDragLeave}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                    >
+                        <div className="space-y-2">
+                            <p className="text-lg font-medium">Drag & drop plan/reference images here or</p>
+                            <Button variant="outline">Browse</Button>
+                            <p className="text-sm text-gray-500">Accepted: JPG/PNG/WebP • Images auto-saved locally</p>
+                        </div>
+                    </div>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}
+                    />
+                </CardContent>
+            </Card>
+
+            {/* Image Gallery */}
+            <div className="mt-5">
+
+                <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images</h1>
+
+            {isFetching ? (
+                <div className="text-center text-gray-600">
+                    <MaterialOverviewLoading />
+                </div>
+            ) : (
+               imageData?.referenceImages.length ?
+                <ImageGalleryExample
+                    imageFiles={imageData?.referenceImages || []}
+                    refetch={refetch}
+                    handleDeleteFile={handleDelete}
+                    height={190}
+                    minWidth={156}
+                    maxWidth={200}
+                />
+                : <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
+                            <i className="fas fa-image text-5xl text-blue-300 mb-4" />
+                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Images Found</h3>
+                            <p className="text-sm text-gray-500">
+                                Please upload images 
+                            </p>
+                        </div>
+            
+            )}
+            </div>
+
+        </div>
+    );
+}

@@ -50,7 +50,7 @@ type Props = {
 
 // Constants ----------------------------------------
 export const RATES = {
-  labour: 2000,
+  labour: 1300,
   plywood: 1,
   laminate: 1,
 };

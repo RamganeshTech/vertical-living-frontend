@@ -3,6 +3,7 @@ import noimg from '../assets/no image.jpeg'
 export const SIDEBAR_LABELS = {
   //   DASHBOARD: "Dashboard",
   PROJECTS: "Projects",
+  SHORTLIST: "Reference Design",
   ORGANIZATION: "Organization",
   COMMONORDER: "Common Order",
   HR: "HR Dept",
@@ -21,6 +22,7 @@ export const SIDEBAR_LABELS = {
 
 export const SIDEBAR_ICONS = {
   PROJECTS: "fa-solid fa-diagram-project text-2xl",
+  SHORTLIST: "fa-solid fa-object-group text-2xl",
   ORGANIZATION: "fa-solid fa-building text-2xl",
   COMMONORDER: "fa-solid fa-box text-2xl",
   HR: "fa-solid fa-users text-2xl",

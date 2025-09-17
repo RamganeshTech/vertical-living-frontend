@@ -222,7 +222,7 @@ const QuoteGenerateMain = () => {
                     </div>
 
 
-                    <Button className="flex items-center" onClick={() => setModalOpen(true)}><i className="fas fa-add mr-1"> </i> Furniture</Button>
+                    <Button className="flex items-center" onClick={() => setModalOpen(true)}><i className="fas fa-add mr-1"> </i> Product</Button>
                 </div>
 
             </header>
