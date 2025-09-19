@@ -564,8 +564,8 @@
 import React, { createRef, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGenerateQuotePdf, useGetMaterialBrands, useGetMaterialQuoteSingleEntry } from "../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
-import { type FurnitureBlock } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
-import FurnitureQuoteVariantForm, { type FurnitureQuoteRef } from "./FurnitureQuoteVariantForm";
+import { RATES, type FurnitureBlock } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
+import FurnitureQuoteVariantForm, { getRateForThickness, type FurnitureQuoteRef } from "./FurnitureQuoteVariantForm";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
@@ -580,29 +580,19 @@ const QuoteGenerateVariantSub = () => {
 
     const { data: quote, isLoading: quoteLoading } = useGetMaterialQuoteSingleEntry(organizationId!, quoteId!);
     let { data: materialBrands, isLoading: loadingBrands } = useGetMaterialBrands(organizationId!, "plywood");
-    // START OF LAMINATION
     let { data: laminateBrands } = useGetMaterialBrands(organizationId!, "Laminate");
-    // console.log("laminateBrands", laminateBrands)
-    // END OF LAMINATION
 
     const { mutateAsync: generateQuote, isPending: quotePending } = useGenerateQuotePdf()
+    const furnitureRefs = useRef<Array<React.RefObject<FurnitureQuoteRef | null>>>([]);
+    const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+    const [selectedLaminateBrand, setSelectedLaminateBrand] = useState<string | null>(null);
+
+
+
     // materialBrands = []
     // laminateBrands = []
     // console.log("quote", quote)
     // console.log("materialBrands", materialBrands)
-    // Add at the top of your component
-    const furnitureRefs = useRef<Array<React.RefObject<FurnitureQuoteRef | null>>>([]);
-
-
-
-
-    const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-
-
-
-    // ✅ START OF LAMINATE
-    const [selectedLaminateBrand, setSelectedLaminateBrand] = useState<string | null>(null);
-    // END OF LAMINATE
 
     // Extract all unique brand names from materialBrands data
     const brandRatesByName: Record<string, { thickness: string; rs: number }[]> = useMemo(() => {
@@ -665,12 +655,9 @@ const QuoteGenerateVariantSub = () => {
 
     // ✅ Brand dropdown options
     const laminateBrandOptions = useMemo(() => Object.keys(laminateRatesByBrand), [laminateRatesByBrand]);
-
-    // END OF LAMINATION
-
     const [furnitures, setFurnitures] = useState<FurnitureBlock[]>([]);
-
     const [grandTotal, setGrandTotal] = useState(0);
+    const [rawCostWithoutProfit, setRawCostWithoutProfit] = useState(0);
 
     const updateGrandTotal = () => {
         const updatedFurnitures = furnitureRefs.current
@@ -684,234 +671,53 @@ const QuoteGenerateVariantSub = () => {
         );
 
         setGrandTotal(total);
+        setRawCostWithoutProfit(calculateCostWithoutProfit()); // 👈 Add this line
+
     };
 
 
-    // const getRateForThickness = (thickness: number | string): number => {
-    //     if (!selectedBrand) return 0; // 💡 prevent null error
-    //     const thicknessStr = String(thickness).toLowerCase().replace("mm", "").trim();
+    const calculateCostWithoutProfit = () => {
+        const updatedFurnitures = furnitureRefs.current
+            .map(ref => ref.current)
+            .filter((ref): ref is FurnitureQuoteRef => ref !== null)
+            .map(ref => ref.getUpdatedFurniture());
 
-    //     const matched = (brandRatesByName[selectedBrand])?.find((item) => {
-    //         const normalized = String(item.thickness).toLowerCase().replace("mm", "").trim();
-    //         return normalized === thicknessStr;
-    //     });
+        const SHEET_SQFT = 32;
+        let totalRawCost = 0;
 
-    //     //          console.log("🔍  rrrr Input thickness:", thicknessStr);
-    //     //   console.log("📦 rrrr Available rates:", brandRatesByName[selectedBrand]);
-    //     //   console.log("✅ rrrr Matched:", matched);
+        updatedFurnitures.forEach(furniture => {
+            // Core materials
+            const selectedBrandRates = furniture.plywoodBrand ? (brandRatesByName[furniture.plywoodBrand] || []) : [];
+            const selectedLaminateRates = furniture.laminateBrand ? (laminateRatesByBrand[furniture.laminateBrand] || []) : [];
 
-    //     return matched?.rs || 0;
-    // };
+            // labour info is based on the first core row
+            const coreRows = furniture.coreMaterials;
+            const base = coreRows[0];
+            const totalLabourCost = (base?.carpenters || 0) * (base?.days || 0) * RATES.labour;
+            const labourPerRow = coreRows.length > 0 ? totalLabourCost / coreRows.length : 0;
 
+            coreRows.forEach(row => {
+                const plyRate = getRateForThickness(row.plywoodNos.thickness, selectedBrandRates, "plywood");
+                const lamiRate = getRateForThickness(row.laminateNos.thickness, selectedLaminateRates, "laminate");
 
-    // // ✅ 💡 Modular & safe: Get rate for laminate
-    // const getLaminateRate = (thickness: number | string): number => {
+                const plyCost = row.plywoodNos.quantity * (plyRate * SHEET_SQFT);
+                const lamiCost = row.laminateNos.quantity * (lamiRate * SHEET_SQFT);
+                const baseMaterialCost = plyCost + lamiCost;
 
+                totalRawCost += baseMaterialCost + labourPerRow; // ❌ No profit added
+            });
 
-    //     if (!selectedLaminateBrand) return DEFAULT_LAMINATE_RATE_PER_SQFT;
+            // Fittings, Glues, NBMs
+            const getSimpleRowTotal = (row: any) => row.quantity * row.cost;
+            const fittingsTotal = furniture.fittingsAndAccessories.reduce((sum, r) => sum + getSimpleRowTotal(r), 0);
+            const gluesTotal = furniture.glues.reduce((sum, r) => sum + (r.cost || 0), 0);
+            const nbmsTotal = furniture.nonBrandMaterials.reduce((sum, r) => sum + getSimpleRowTotal(r), 0);
 
-    //     const normalize = (val: string | number) =>
-    //         String(val).replace(/mm/gi, "").replace(/\s+/g, "").trim().toLowerCase();
+            totalRawCost += fittingsTotal + gluesTotal + nbmsTotal;
+        });
 
-    //     const thicknessStr = normalize(thickness);
-
-    //     const matched = laminateRatesByBrand[selectedLaminateBrand]?.find((item) => {
-    //         const itemThk = normalize(item.thickness);
-    //         return itemThk === thicknessStr;
-    //     });
-
-    //     //   console.log("🔍 rrrrrr Input thickness:", thicknessStr);
-    //     //   console.log("📦 rrrrrr Available rates:", laminateRatesByBrand[selectedLaminateBrand]);
-    //     //   console.log("✅ rrrrrr Matched:", matched);
-
-    //     //   if (!matched) {
-    //     //     toast({
-    //     //       title: "Missing Laminate Rate",
-    //     //       description: `Rate not found for thickness "${thickness}" in brand "${selectedLaminateBrand}". Using default ₹${DEFAULT_LAMINATE_RATE_PER_SQFT}.`,
-    //     //       variant: "destructive",
-    //     //     });
-    //     //   }
-
-    //     return matched?.rs ?? DEFAULT_LAMINATE_RATE_PER_SQFT;
-    // };
-
-
-    // const calculatedVariantGrandTotal = useMemo(() => {
-    //     if (furnitures.length === 0) return 0;
-
-    //     const SHEET_SQFT = 32;
-
-    //     const calculateFurnitureTotal = (furniture: FurnitureBlock) => {
-    //         const coreTotal = furniture.coreMaterials.reduce((sum, row) => {
-    //             const noBrandSelected = !selectedBrand && !selectedLaminateBrand;
-
-    //             if (noBrandSelected) {
-    //                 // ✅ Use the existing base rowTotal entered by user
-    //                 return sum + (row.rowTotal || 0);
-    //             } else {
-    //                 // ✅ Recalculate only if brand(s) selected
-
-    //                 const plyRate = getRateForThickness(row.plywoodNos.thickness); // from selectedBrand
-
-    //                 const lamiRate = getLaminateRate(row.laminateNos.thickness);   // from selectedLaminateBrand
-    //                 // console.log("rrrrr plyRate", plyRate)
-    //                 // console.log("rrrrr laminateRate", lamiRate)
-    //                 const plywoodCost = row.plywoodNos?.quantity * plyRate * SHEET_SQFT;
-    //                 const laminateCost = row.laminateNos?.quantity * lamiRate * SHEET_SQFT;
-    //                 const materialCost = plywoodCost + laminateCost;
-
-    //                 const profitOnMaterial = materialCost * (row.profitOnMaterial / 100);
-
-    //                 // const labourCost = row.carpenters * row.days * RATES.labour; // ✅ base labour cost
-    //                 // const profitOnLabour = labourCost * (row.profitOnLabour / 100);
-    //                 const totalRows = furniture.coreMaterials.length;
-
-    //                 const base = furniture.coreMaterials[0];
-    //                 const totalLabourCost = base.carpenters * base.days * RATES.labour;
-    //                 const labourWithProfit = totalLabourCost * (1 + (base.profitOnLabour || 0) / 100);
-    //                 const labourPerRow = labourWithProfit / totalRows;
-
-    //                 // console.log("prfotonlabour", profitOnLabour)
-    //                 // console.log("prfotonlabour", profitOnMaterial)
-
-    //                 const total = materialCost + profitOnMaterial + labourPerRow;
-
-    //                 return sum + Math.round(total);
-    //             }
-    //         }, 0);
-
-    //         const fittings = furniture.fittingsAndAccessories.reduce((sum, row) => sum + (row.quantity * row.cost), 0);
-    //         const glues = furniture.glues.reduce((sum, row) => sum + row.cost, 0);
-    //         const nbms = furniture.nonBrandMaterials.reduce((sum, row) => sum + (row.quantity * row.cost), 0);
-
-    //         return Math.round(coreTotal + fittings + glues + nbms);
-    //     };
-
-    //     const grandTotal = furnitures.reduce(
-    //         (total, furniture) => total + calculateFurnitureTotal(furniture),
-    //         0
-    //     );
-
-    //     return grandTotal;
-    // }, [furnitures, selectedBrand, selectedLaminateBrand]);
-
-
-
-    // const getUpdatedFurnitureWithTotals = (): FurnitureBlock[] => {
-
-    //     return furnitures.map((furniture) => {
-    //         const coreMaterials = furniture.coreMaterials || [];
-
-    //         const calculateRowTotal = (row: CoreMaterialRow) => {
-    //             const noBrandSelected = !selectedBrand && !selectedLaminateBrand;
-
-    //             if (noBrandSelected) {
-    //                 return row.rowTotal || 0;
-    //             }
-
-    //             // ✅ Get brand-specific rates
-    //             const plyRate = getRateForThickness(row.plywoodNos.thickness);        // from selectedBrand
-    //             const lamiRate = getLaminateRate(row.laminateNos.thickness);          // from selectedLaminateBrand
-
-    //             const SHEET_SQFT = 32;
-
-    //             const plyCost = row.plywoodNos.quantity * plyRate * SHEET_SQFT;
-    //             const lamiCost = row.laminateNos.quantity * lamiRate * SHEET_SQFT;
-    //             const baseMaterialCost = plyCost + lamiCost;
-
-    //             const profitOnMaterial = baseMaterialCost * (row.profitOnMaterial / 100);
-    //             const labourCost = row.carpenters * row.days * RATES.labour;
-    //             const profitOnLabour = labourCost * (row.profitOnLabour / 100);
-
-    //             const total = baseMaterialCost + profitOnMaterial + labourCost + profitOnLabour;
-
-    //             return Math.round(total); // ✅ Final updated rowTotal
-    //         };
-
-
-    //         const calculateSimpleRowTotal = (row: SimpleItemRow) =>
-    //             row.quantity * row.cost;
-
-    //         const updatedCoreMaterials = coreMaterials.map((row) => ({
-    //             ...row,
-    //             rowTotal: calculateRowTotal(row),
-    //         }));
-
-    //         const fittingsTotal = furniture.fittingsAndAccessories.reduce((sum, itm) => sum + calculateSimpleRowTotal(itm), 0);
-    //         const gluesTotal = furniture.glues.reduce((sum, itm) => sum + calculateSimpleRowTotal(itm), 0);
-    //         const nbmsTotal = furniture.nonBrandMaterials.reduce((sum, itm) => sum + calculateSimpleRowTotal(itm), 0);
-    //         const coreTotal = updatedCoreMaterials.reduce((sum, row) => sum + row.rowTotal, 0);
-
-    //         const furnitureTotal = coreTotal + fittingsTotal + gluesTotal + nbmsTotal;
-
-    //         return {
-    //             ...furniture,
-    //             coreMaterials: updatedCoreMaterials,
-    //             coreMaterialsTotal: coreTotal,
-    //             fittingsAndAccessoriesTotal: fittingsTotal,
-    //             gluesTotal,
-    //             nonBrandMaterialsTotal: nbmsTotal,
-    //             furnitureTotal,
-    //             totals: {
-    //                 core: coreTotal,
-    //                 fittings: fittingsTotal,
-    //                 glues: gluesTotal,
-    //                 nbms: nbmsTotal,
-    //                 furnitureTotal,
-    //             },
-    //         };
-    //     });
-    // };
-
-    // const calculatedVariantGrandTotal = () => {
-    //     if (furnitureRefs.current.length !== furnitures.length) {
-    //         furnitureRefs.current = furnitures.map(
-    //             (_, i) => furnitureRefs.current[i] ?? React.createRef<FurnitureQuoteRef>()
-    //         );
-    //     }
-
-    //     const updatedFurnitures = furnitureRefs.current
-    //         .map(ref => ref.current)
-    //         .filter((ref): ref is FurnitureQuoteRef => ref !== null)
-    //         .map(ref => ref.getUpdatedFurniture());
-
-
-    //     return updatedFurnitures.reduce((total, furniture) => {
-    //         const SHEET_SQFT = 32;
-
-    //         const coreTotal = furniture.coreMaterials.reduce((sum, row) => {
-    //             const noBrandSelected = !selectedBrand && !selectedLaminateBrand;
-
-    //             if (noBrandSelected) {
-    //                 return sum + (row.rowTotal || 0);
-    //             } else {
-    //                 const plyRate = getRateForThickness(row.plywoodNos.thickness);
-    //                 const lamiRate = getLaminateRate(row.laminateNos.thickness);
-    //                 const plywoodCost = row.plywoodNos.quantity * plyRate * SHEET_SQFT;
-    //                 const laminateCost = row.laminateNos.quantity * lamiRate * SHEET_SQFT;
-    //                 const materialCost = plywoodCost + laminateCost;
-    //                 const profitOnMaterial = materialCost * (row.profitOnMaterial / 100);
-
-    //                 const totalRows = furniture.coreMaterials.length;
-    //                 const base = furniture.coreMaterials[0];
-    //                 const totalLabourCost = base.carpenters * base.days * RATES.labour;
-    //                 const labourWithProfit = totalLabourCost * (1 + (base.profitOnLabour || 0) / 100);
-    //                 const labourPerRow = labourWithProfit / totalRows;
-
-    //                 return sum + Math.round(materialCost + profitOnMaterial + labourPerRow);
-    //             }
-    //         }, 0);
-
-    //         const fittings = furniture.fittingsAndAccessories.reduce((sum, row) => sum + (row.quantity * row.cost), 0);
-    //         const glues = furniture.glues.reduce((sum, row) => sum + row.cost, 0);
-    //         const nbms = furniture.nonBrandMaterials.reduce((sum, row) => sum + (row.quantity * row.cost), 0);
-
-    //         return total + Math.round(coreTotal + fittings + glues + nbms);
-    //     }, 0);
-    // }
-
-
-
+        return Math.round(totalRawCost);
+    };
 
     const handleGenerateQuote = async () => {
         try {
@@ -924,8 +730,8 @@ const QuoteGenerateVariantSub = () => {
                 return;
             }
 
-            console.log("fff Furnitures", furnitures)
-            console.log("fff furnitureRefs", furnitureRefs)
+            // console.log("fff Furnitures", furnitures)
+            // console.log("fff furnitureRefs", furnitureRefs)
 
             // const updatedFurnitures = furnitureRefs.current
             //     .map((ref) => ref.current?.getUpdatedFurniture())
@@ -939,7 +745,7 @@ const QuoteGenerateVariantSub = () => {
                 (sum, f) => sum + f.totals.furnitureTotal,
                 0
             );
-            console.log("fff updatedFurnitures", updatedFurnitures)
+            // console.log("fff updatedFurnitures", updatedFurnitures)
             // const updatedFurnitures = getUpdatedFurnitureWithTotals();
             // console.log("✅ Submitting Furnitures for Quote", updatedFurnitures);
             // const updatedGrandTotal = updatedFurnitures.reduce((sum, f: any) => sum + f.furnitureTotal, 0);
@@ -971,14 +777,6 @@ const QuoteGenerateVariantSub = () => {
             });
         }
     }
-
-
-    // useEffect(() => {
-    //     furnitureRefs.current = furnitures.map(() =>
-    //         React.createRef<FurnitureQuoteRef>()
-    //     );
-    // }, [furnitures.length]);
-
 
     useEffect(() => {
         if (!quote?.furnitures) return;
@@ -1017,11 +815,7 @@ const QuoteGenerateVariantSub = () => {
         );
     }, [furnitures]);
 
-
-
-
-
-    console.log("furnitureRefs", furnitureRefs)
+    // console.log("furnitureRefs", furnitureRefs)
 
     useEffect(() => {
         if (!selectedBrand && brandOptions?.length > 0) {
@@ -1051,19 +845,6 @@ const QuoteGenerateVariantSub = () => {
 
     // END OF LAMINATE 
 
-
-    //     const handleSelect = (option: { label: string; value: string }) => {
-    //     console.log('Selected:', option);
-    //   };
-
-    //   const [selectedOption, setSelectedOption] = useState<SelectOption | null>(null);
-
-    //  const handleSelect = (option: SelectOption | null) => {
-    //     setSelectedOption(option);
-    //     console.log('Selected:', option);
-    //   };
-
-
     return (
         <div className="p-2 max-h-full overflow-y-auto">
             <header className="flex justify-between items-center mb-6">
@@ -1080,8 +861,19 @@ const QuoteGenerateVariantSub = () => {
 
                 <div className="flex items-center gap-3 justify-end ">
 
-                    <p className="text-2xl font-bold text-green-700">
-                        ₹{grandTotal.toLocaleString("en-IN")}
+                    <div className="text-right mr-6">
+                        <p className="text-md text-gray-600">Project Cost <br /><span className="font-bold">(without profit)</span></p>
+                        <p className="text-xl font-semibold text-blue-600">
+                            ₹{rawCostWithoutProfit.toLocaleString("en-IN")}
+                        </p>
+                    </div>
+
+                    <p className="text-right text-green-700">
+                         <p className="text-md text-gray-600">Client Quote Amount <br /><span className="font-bold">(with profit)</span></p>
+                        <p className="text-xl font-semibold text-blue-600">
+                            ₹{grandTotal.toLocaleString("en-IN")}
+                        </p>
+                        {/* ₹{grandTotal.toLocaleString("en-IN")} */}
                     </p>
 
                     <div>
@@ -1184,24 +976,6 @@ const QuoteGenerateVariantSub = () => {
 
                     </div>
 
-
-
-                    {/* <div className="flex justify-center items-center h-screen bg-gray-100">
-                        <SelectSearch options={options} onSelect={handleSelect} />
-                    </div>
-
-
-                    <div className="flex justify-center items-center h-screen bg-gray-100">
-                        <SearchSelect
-                            options={options}
-                            placeholder="Select a fruit..."
-                            searchPlaceholder="Search fruits..."
-                            onSelect={handleSelect}
-                            selectedValue={selectedOption?.value}
-                            className="mb-4"
-                        />
-                    </div> */}
-
                 </div>
             </header>
 
@@ -1266,59 +1040,37 @@ const QuoteGenerateVariantSub = () => {
                 <MaterialOverviewLoading />
             ) : (
                 <>
-                    {/* {selectedBrand ? ( */}
-                    <>
-                        <div className="space-y-6">
-                            {furnitures.map((furniture, index) => (
-                                <FurnitureQuoteVariantForm
-                                    key={index}
-                                    index={index}
-                                    data={furniture}
-                                    ref={furnitureRefs.current[index] as React.RefObject<FurnitureQuoteRef>} // 🔄 Pass the ref down
-                                    // selectedBrandRates={selectedBrand ? brandRatesByName[selectedBrand] || [] : []}
-                                    // selectedLaminateRates={selectedLaminateBrand ? laminateRatesByBrand[selectedLaminateBrand] || [] : []}
-                                    laminateRatesByBrand={laminateRatesByBrand}
-                                    brandRatesByName={brandRatesByName}
-                                    selectedBrand={selectedBrand}
-                                    selectedLaminateBrand={selectedLaminateBrand}
-                                    brandOptions={brandOptions}
-                                    laminateBrandOptions={laminateBrandOptions}
-                                    onFurnitureChange={updateGrandTotal}
-                                />
-                            ))}
+                    <div className="space-y-6">
+                        {furnitures.map((furniture, index) => (
+                            <FurnitureQuoteVariantForm
+                                key={index}
+                                index={index}
+                                data={furniture}
+                                ref={furnitureRefs.current[index] as React.RefObject<FurnitureQuoteRef>} // 🔄 Pass the ref down
+                                // selectedBrandRates={selectedBrand ? brandRatesByName[selectedBrand] || [] : []}
+                                // selectedLaminateRates={selectedLaminateBrand ? laminateRatesByBrand[selectedLaminateBrand] || [] : []}
+                                laminateRatesByBrand={laminateRatesByBrand}
+                                brandRatesByName={brandRatesByName}
+                                selectedBrand={selectedBrand}
+                                selectedLaminateBrand={selectedLaminateBrand}
+                                brandOptions={brandOptions}
+                                laminateBrandOptions={laminateBrandOptions}
+                                onFurnitureChange={updateGrandTotal}
+                            />
+                        ))}
 
-                            <div className="mt-10 text-right">
-                                <div className="inline-block bg-green-50 border border-green-200 rounded-md px-6 py-4">
-                                    <p className="text-md font-medium text-gray-700 mb-1">
-                                        Total Estimate
-                                    </p>
-                                    {/* <p className="text-2xl font-bold text-green-700">
-                                        ₹{calculatedVariantGrandTotal().toLocaleString("en-IN")}
-                                    </p> */}
+                        <div className="mt-10 text-right">
+                            <div className="inline-block bg-green-50 border border-green-200 rounded-md px-6 py-4">
+                                <p className="text-md font-medium text-gray-700 mb-1">
+                                    Total Estimate
+                                </p>
 
-                                    <p className="text-2xl font-bold text-green-700">
-                                        ₹{grandTotal.toLocaleString("en-IN")}
-                                    </p>
-                                </div>
+                                <p className="text-2xl font-bold text-green-700">
+                                    ₹{grandTotal.toLocaleString("en-IN")}
+                                </p>
                             </div>
                         </div>
-                    </>
-                    {/* ) : 
-                    (
-                        <div className="flex flex-col items-center justify-center py-16 text-center bg-white border rounded-md shadow-sm mt-6">
-                            <i className="fas fa-cubes text-blue-300 text-6xl mb-4" />
-
-                            <h2 className="text-xl font-semibold text-blue-700">
-                                No Brand Selected
-                            </h2>
-
-                            <p className="text-sm text-gray-500 mt-2 max-w-md">
-                                Please <strong className="text-gray-600">select a brand</strong>  from the dropdown above to view quote details, pricing, and breakdown.
-                            </p>
-                        </div>
-                    )
-                    } */}
-
+                    </div>
                 </>
             )}
         </div>

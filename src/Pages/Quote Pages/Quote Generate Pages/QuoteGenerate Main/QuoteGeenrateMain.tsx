@@ -1,11 +1,13 @@
-import { useMemo, useState } from "react";
-import { useCreateMaterialQuote } from "../../../../apiList/Quote Api/QuoteGenerator Api/quoteGenerateApi";
+import { useEffect, useMemo, useState } from "react";
+import { useCreateMaterialQuote, useEditMaterialQuote } from "../../../../apiList/Quote Api/QuoteGenerator Api/quoteGenerateApi";
 import { toast } from "../../../../utils/toast";
 import { useParams } from "react-router-dom";
 import type { AvailableProjetType } from "../../../Department Pages/Logistics Pages/LogisticsShipmentForm";
 import { useGetProjects } from "../../../../apiList/projectApi";
 import { Button } from "../../../../components/ui/Button";
 import FurnitureForm from "./FurnitureForm";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/Select";
+import QuoteGenerateList from "../QuoteGenerateList";
 
 
 type CoreMaterialRow = {
@@ -69,12 +71,39 @@ const QuoteGenerateMain = () => {
     const [furnitures, setFurnitures] = useState<FurnitureBlock[]>([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [tempFurnitureName, setTempFurnitureName] = useState("");
+    const [editingId, setIsEditingId] = useState<string | null>(null)
 
-
+    const [quoteType, setQuoteType] = useState<"single" | "residential" | null>(null)
+    const [editQuoteNo, setEditQuoteNo] = useState<string | null>(null)
 
     const { mutateAsync: createQuote, isPending } = useCreateMaterialQuote();
+    const { mutateAsync: editQuote, isPending: editPending } = useEditMaterialQuote();
 
+    const handleQuoteType = (type: "single" | "residential" | null) => {
+        setQuoteType(type)
+    }
 
+    const handleQuoteName = () => {
+        if (quoteType === "single") {
+            return "Single Quote"
+        }
+        else if (quoteType === "residential") {
+            return "Residential Quote"
+        }
+        return ""
+    }
+
+    useEffect(() => {
+        
+        if (quoteType === "single" && !editingId) {
+            setFurnitures([])
+            addFurniture("Common Category")
+        }
+        else if (quoteType === "residential" && !editingId) {
+            setFurnitures([])
+            setModalOpen(true)
+        }
+    }, [quoteType])
 
     const addFurniture = (furnitureName: string) => {
         setFurnitures(prev => [
@@ -115,13 +144,6 @@ const QuoteGenerateMain = () => {
     });
 
 
-    // const calculateCoreRowTotal = (row: CoreMaterialRow) => {
-    //     const materials = (row.plywoodNos.quantity + row.laminateNos.quantity) * 1;
-    //     const labour = row.carpenters * row.days * RATES.labour;
-    //     return Math.round(
-    //         materials * (1 + row.profitOnMaterial / 100) + labour * (1 + row.profitOnLabour / 100)
-    //     );
-    // };
 
     const grandTotal = furnitures?.reduce((sum, f) => sum + f.totals.furnitureTotal, 0);
     const handleSubmit = async () => {
@@ -140,7 +162,7 @@ const QuoteGenerateMain = () => {
                     return {
                         furnitureName: f.furnitureName,
                         coreMaterials: f.coreMaterials.map(cm => {
-                          if (Object.values(cm).some(value => Boolean(value))) {
+                            if (Object.values(cm).some(value => Boolean(value))) {
                                 const { imageUrl, previewUrl, ...rest } = cm;
                                 return rest;
                             }
@@ -173,6 +195,7 @@ const QuoteGenerateMain = () => {
 
             toast({ title: "Success", description: "Created Successfully, Visit in Quote Generator Section" });
             setFurnitures([])
+            setQuoteType(null)
 
         }
         catch (error: any) {
@@ -180,10 +203,64 @@ const QuoteGenerateMain = () => {
         }
     };
 
+    const handleEditSubmit = async () => {
+        try {
 
+
+            if (!filters.projectId) {
+                toast({ title: "Error", description: "Please select a project", variant: "destructive" });
+                return;
+            }
+
+            const payload = {
+                furnitures: furnitures.map((f) => ({
+                    furnitureName: f.furnitureName,
+                    coreMaterials: f.coreMaterials.map((cm) => {
+                        const {
+                            previewUrl, // ignore
+                            ...rest
+                        } = cm;
+                        return {
+                            ...rest,
+                            imageUrl: cm.imageUrl || null, // preserve uploaded image
+                        };
+                    }),
+                    fittingsAndAccessories: f.fittingsAndAccessories,
+                    glues: f.glues,
+                    nonBrandMaterials: f.nonBrandMaterials,
+                    coreMaterialsTotal: f.totals.core,
+                    fittingsAndAccessoriesTotal: f.totals.fittings,
+                    gluesTotal: f.totals.glues,
+                    nonBrandMaterialsTotal: f.totals.nbms,
+                    furnitureTotal: f.totals.furnitureTotal,
+                })),
+                grandTotal,
+                notes: "Updated via frontend",
+                quoteNo: editQuoteNo
+            };
+
+
+            if (editingId) {
+                await editQuote({
+                    organizationId,
+                    projectId: filters.projectId,
+                    formData: payload,
+                    id: editingId,
+                });
+
+                toast({ title: "Updated!", description: "Quote edited successfully." });
+                setFurnitures([])
+                setQuoteType(null)
+                setIsEditingId(null);
+            }
+        }
+        catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to Update the Quote", variant: "destructive" });
+        }
+    };
 
     return (
-        <div className=" h-full mx-auto max-h-full ">
+        <div className={`h-full mx-auto max-h-full ${editingId ? "overflow-y-auto" : ""} `}>
 
 
             <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-1 border-b-1 border-[#818283]">
@@ -194,7 +271,28 @@ const QuoteGenerateMain = () => {
                     </h1>
                 </div>
 
+
+
                 <div className="flex gap-6 items-center ">
+
+                    <div>
+                        <label className="block text-sm font-medium">Select QuoteType</label>
+
+                        <Select onValueChange={(val: any) => handleQuoteType(val)}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Quote" selectedValue={quoteType || ""} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {["single", "residential"].map((option) => (
+                                    <SelectItem key={option} value={option.toString()}>
+                                        {option}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+
                     <div>
                         <label className="block text-sm font-medium">Select Project *</label>
                         <select
@@ -216,14 +314,18 @@ const QuoteGenerateMain = () => {
                         </select>
                     </div>
 
-                    <div className="text-right flex gap-2 items-center">
+                   {furnitures.length> 0 &&  <div className="text-right flex gap-2 items-center">
                         <div className="text-xs text-gray-600 uppercase tracking-widest">Grand Total</div>
                         <div className="text-xl font-semibold text-green-600">₹{grandTotal.toLocaleString("en-IN")}</div>
                     </div>
+}
 
-
-                    <Button className="flex items-center" onClick={() => setModalOpen(true)}><i className="fas fa-add mr-1"> </i> Product</Button>
+                 <Button className="flex items-center" onClick={() => {
+                        setModalOpen(true)
+                        // setQuoteType("single")
+                    }}><i className="fas fa-add mr-1"> </i> Product</Button>
                 </div>
+
 
             </header>
 
@@ -268,25 +370,28 @@ const QuoteGenerateMain = () => {
             )}
 
 
-            {furnitures.length === 0 && (
-                <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white  rounded-lg">
-                    <i className="fas fa-couch text-5xl text-blue-400 mb-4"></i>
-                    <h3 className="text-lg font-semibold text-gray-600 mb-1">No Products Created</h3>
-                    <p className="text-sm text-gray-500">
-                        Click the <strong>+ Product</strong>  to create the product<br />
-                    </p>
+            {/* {furnitures.length === 0 && (
+                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white  rounded-lg">
+                        <i className="fas fa-couch text-5xl text-blue-400 mb-4"></i>
+                        <h3 className="text-lg font-semibold text-gray-600 mb-1">No Products Created</h3>
+                        <p className="text-sm text-gray-500">
+                            Click the <strong>+ Product</strong>  to create the product<br />
+                        </p>
 
-                    <Button
-                        onClick={() => setModalOpen(true)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded mt-2 flex items-center"
-                    >
-                        <i className="fas fa-add !mr-2"> </i>
-                         Product
-                    </Button>
-                </div>
-            )}
+                        <Button
+                            onClick={() => setModalOpen(true)}
+                            className="bg-blue-600 text-white px-4 py-2 rounded mt-2 flex items-center"
+                        >
+                            <i className="fas fa-add !mr-2"> </i>
+                            Product
+                        </Button>
+                    </div>
+                )} */}
 
             {furnitures.length > 0 && <section className="shadow overflow-y-auto max-h-[86%]">
+               {!editingId &&  <h1 className="text-2xl text-gray-500">
+                    {handleQuoteName()}
+                </h1>}
                 {furnitures.map((furniture, index) => (
                     <FurnitureForm
                         key={index}
@@ -303,16 +408,50 @@ const QuoteGenerateMain = () => {
             </section>}
 
 
-            {furnitures.length !== 0 && <div className="mt-1 text-right">
+            {furnitures.length !== 0 && <div className="mt-1 text-right flex gap-2 justify-end">
                 <Button
                     variant="primary"
-                    isLoading={isPending}
-                    onClick={handleSubmit}
+                    isLoading={isPending || editPending}
+                    onClick={editingId ? handleEditSubmit : handleSubmit}
                     className="px-6 py-2 bg-blue-600 text-white rounded"
                 >
                     Save Quote
                 </Button>
+
+
+                {!editingId && <Button
+                    variant="secondary"
+                    onClick={() => {
+                       
+                        setFurnitures([])
+                        setQuoteType(null)
+
+                    }}
+                    className=""
+                >
+                    Cancel
+                </Button>}
+
+                {editingId && <Button
+                    variant="secondary"
+                    onClick={() => {
+                        setIsEditingId(null)
+                        setFurnitures([])
+                        setQuoteType(null)
+                        setEditQuoteNo(null)
+                    }}
+                    className=""
+                >
+                    Cancel
+                </Button>}
             </div>}
+
+            {(!editingId && furnitures?.length === 0) && <section className="my-4">
+
+                {/* <h1 className="text-2xl text-gray-700  font-semibold">Quote List</h1> */}
+                <QuoteGenerateList setEditQuoteNo={setEditQuoteNo} setIsEditingId={setIsEditingId} setFurnitures={setFurnitures} setQuoteType={setQuoteType}
+                    setFiltersMain={setFilters} />
+            </section>}
         </div>
     );
 };

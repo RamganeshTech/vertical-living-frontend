@@ -252,6 +252,15 @@ export const getAllSiteImages = async ({
 };
 
 
+const deleteOrderPdf = async (
+  id: string,
+  api: AxiosInstance
+) => {
+  const { data } = await api.delete(`/shortlisteddesign/deletepdf/${id}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
 export const useGetShortlistedDesigns = (projectId: string) => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
@@ -279,6 +288,27 @@ export const useUploadShortlistedDesigns = () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not authorized");
       if (!api) throw new Error("API instance missing");
       return await uploadShortlistedDesigns({ projectId, selections, api });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["shortlistedDesigns", projectId] });
+    },
+  });
+};
+
+
+
+
+export const useDeleteShortListedPdf = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ id }: {id:string, projectId:string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Youre not allowed to delete pdf");
+      if (!api) throw new Error("API instance not available");
+      return await deleteOrderPdf(id, api);
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["shortlistedDesigns", projectId] });

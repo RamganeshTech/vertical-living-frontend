@@ -12,7 +12,7 @@ export const SIDEBAR_LABELS = {
   ACCOUNTING: "Accounting",
   RATECONIG: "Rate Config",
   INTERNALQUOTE: "Internal Quote",
-  QUOTEVARIENT: "Quote Generator",
+  QUOTEVARIENT: "Project Cost Rate Config",
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",

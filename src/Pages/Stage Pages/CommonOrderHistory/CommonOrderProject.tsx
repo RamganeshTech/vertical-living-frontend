@@ -1091,41 +1091,41 @@ const CommonOrderProject = () => {
                                                 </Button>
 
 
-                                                  <div className="relative  min-w-[160px]">
-                                                            <label
-                                                                htmlFor={`pdf-status-${ele._id}`}
-                                                                className="hidden md:block mb-1 text-sm font-medium text-gray-600 absolute top-[-20px]"
-                                                            >
-                                                                Order Status
-                                                            </label>
-                                                            <select
-                                                                id={`pdf-status-${ele._id}`}
-                                                                value={ele.status || "pending"}
-                                                                onChange={async (e) => {
-                                                                    const val = e.target.value;
-                                                                  
-                                                                    await handleUpdatePdfStatus(ele._id, val);
-                                                                }}
-                                                                className="
+                                                <div className="relative  min-w-[160px]">
+                                                    <label
+                                                        htmlFor={`pdf-status-${ele._id}`}
+                                                        className="hidden md:block mb-1 text-sm font-medium text-gray-600 absolute top-[-20px]"
+                                                    >
+                                                        Order Status
+                                                    </label>
+                                                    <select
+                                                        id={`pdf-status-${ele._id}`}
+                                                        value={ele.status || "pending"}
+                                                        onChange={async (e) => {
+                                                            const val = e.target.value;
+
+                                                            await handleUpdatePdfStatus(ele._id, val);
+                                                        }}
+                                                        className="
                                                                                     w-full h-[45px] px-3 py-2 text-md  bg-white border  rounded-xl shadow 
                                                                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                                                                                     disabled:opacity-50 appearance-none transition ease-in-out
                                                                                     border-blue-300 text-blue-800  hover:border-blue-400
                                                                                     "
-                                                            >
-                                                                {/* <option disabled value="">Select Status</option> */}
-                                                                {["pending", "delivered", "shipped", "ordered", "cancelled"].map((status) => (
-                                                                    <option key={status} value={status}>
-                                                                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
+                                                    >
+                                                        {/* <option disabled value="">Select Status</option> */}
+                                                        {["pending", "delivered", "shipped", "ordered", "cancelled"].map((status) => (
+                                                            <option key={status} value={status}>
+                                                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                            </option>
+                                                        ))}
+                                                    </select>
 
-                                                            {/* Custom dropdown chevron icon */}
-                                                            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
-                                                                <i className="fas fa-chevron-down text-xs"></i>
-                                                            </div>
-                                                        </div>
+                                                    {/* Custom dropdown chevron icon */}
+                                                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                                                        <i className="fas fa-chevron-down text-xs"></i>
+                                                    </div>
+                                                </div>
 
 
                                                 <Button
@@ -1143,9 +1143,13 @@ const CommonOrderProject = () => {
                             ))
                             :
                             <>
-                                <div>
-                                    No PDF Generated
+                                <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+                                    <i className="fa-solid fa-file-lines text-5xl text-blue-300 mb-4" />
+                                    <h3 className="text-lg font-semibold text-blue-800 mb-1">No Pdf Found</h3>
+                                    <p className="text-sm text-gray-500">
+                                        No PDF Generated</p>
                                 </div>
+
                             </>
                         }
                     </div>

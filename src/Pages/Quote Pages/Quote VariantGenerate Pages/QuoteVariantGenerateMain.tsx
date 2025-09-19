@@ -47,7 +47,6 @@ const internalQuoteNavigate = ()=>{
 
     const clearFilters = () => {
         setFilters({
-            //   status: "",
             projectId: "",
             projectName: "",
             createdAt: "",
@@ -65,7 +64,7 @@ const internalQuoteNavigate = ()=>{
             <header className="flex justify-between items-center">
                 <div className="flex gap-2">
                     <i className="fas fa-file-invoice text-4xl text-blue-600" />
-                    <h1 className="text-2xl font-bold mb-4">Quote Variant Generator</h1>
+                    <h1 className="text-2xl font-bold mb-4">Project Cost Rate Config</h1>
                 </div>
 
 
@@ -198,7 +197,7 @@ const internalQuoteNavigate = ()=>{
                             </p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {quotes.map((quote: any) => (
                                 <>
                                     <QuoteVarientCard key={quote._id} quote={quote} organizationId={organizationId!} />

@@ -1769,6 +1769,7 @@ import { useGetAllSiteImages, useUploadShortlistedDesigns } from "../../../../ap
 import { useGetReferenceDesigns } from "../../../../apiList/Stage Api/shortlistReferenceDesignApi";
 import MaterialOverviewLoading from "../../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { Button } from "../../../../components/ui/Button";
+import ShortListPdfList from "./ShortListPdfList";
 
 interface ImageFile {
   _id: string;
@@ -1817,9 +1818,8 @@ export default function ShortlistMain() {
   }, [isSitePopupOpen, isReferencePopupOpen]);
 
   const handleConfirmSiteImage = (e: any, image: ImageFile) => {
-    // e.stopPropagation(); // 🛑 typo!()
-    // setSelectedSiteImage(image);
     e.stopPropagation();
+    // setSelectedSiteImage(image);
 
     setSelectedSiteImage((currentSelected) => {
       // if same image is already selected, deselect it (toggle off)
@@ -1890,7 +1890,7 @@ export default function ShortlistMain() {
 
   return (
     <div className="max-w-full overflow-y-auto max-h-full px-4 mx-auto py-2">
-      <div className="flex gap-2 items-center justify-between">
+      <header className="flex gap-2 items-center justify-between">
         <div className="flex gap-2">
           <div
             onClick={() => navigate(-1)}
@@ -1937,13 +1937,13 @@ export default function ShortlistMain() {
         >
           Confirm Selection
         </button>}
-      </div>
+      </header>
 <hr className="my-3 bg-gray-500" />
 
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-8 border-gray-300 border-2 rounded-2xl p-2">
         {/* ➕ Reference Designs */}
-        <div>
+        <div className="border-r-1 border-gray-300 pr-8">
           <h2 className="font-semibold text-lg mb-2">Reference Designs</h2>
 <div className="my-3 w-full h-[1px] bg-gray-200" />
 
@@ -2044,13 +2044,25 @@ export default function ShortlistMain() {
 
               <h3 className="font-bold text-xl mb-4">Selected Designs</h3>
 
-              <Button
+             <div className="flex gap-2">
+               <Button
                 isLoading={isGenerating}
                 onClick={handleGenerate}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow disabled:opacity-50"
               >
-                {isGenerating ? "Generating..." : "Generate Design"}
+                {isGenerating ? "Generating..." : "Generate Pdf"}
               </Button>
+
+               <Button
+                onClick={()=>{
+                  setSelections([])
+                }}
+                variant="danger"
+                className="bg-red-600  text-white px-6 py-2 rounded shadow disabled:opacity-50"
+              >
+                Clear List
+              </Button>
+             </div>
             </div>
 
             {selections.map(({ siteImage, referenceImages }, index) => (
@@ -2110,7 +2122,7 @@ export default function ShortlistMain() {
         )
         :
         <>
-          <h3 className="text-xl font-semibold text-black-800 mb-1">Youre Selections will appear below</h3>
+          <h3 className="text-xl font-semibold text-black-800 my-3">Youre Selections will appear below</h3>
 
         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl shadow-xl border border-gray-100  text-center p-6">
           <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
@@ -2123,6 +2135,12 @@ export default function ShortlistMain() {
         </div>
         </>
       }
+
+
+
+      <section className="mt-6">
+        <ShortListPdfList projectId={projectId} />
+      </section>
     </div>
   );
 }

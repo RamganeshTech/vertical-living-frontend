@@ -1140,12 +1140,13 @@ import {
 } from "./../../../apiList/Stage Api/workScheduleApi"
 
 import CreateDailyScheduleForm from "./CreateDailyScheduleForm"
-import { useNavigate, useParams } from "react-router-dom"
+import { Outlet, useNavigate, useParams } from "react-router-dom"
 import { Button } from "../../../components/ui/Button"
 import { toast } from "../../../utils/toast"
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 import { socket } from "../../../lib/socket"
 import { useCurrentSupervisor } from "../../../Hooks/useCurrentSupervisor"
+import CreateWorkReport from "./CreateWorkReport"
 
 interface CalendarDay {
   date: Date
@@ -1181,7 +1182,7 @@ interface ScheduleData {
 }
 
 const DailySchedulePage: React.FC = () => {
-  const { projectId , organizationId} = useParams() as { projectId: string , organizationId:string}
+  const { projectId, organizationId } = useParams() as { projectId: string, organizationId: string }
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [calendarDays, setCalendarDays] = useState<CalendarDay[]>([])
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
@@ -1192,6 +1193,9 @@ const DailySchedulePage: React.FC = () => {
   // const [uploadingImages, setUploadingImages] = useState(false)
   const [tasksForSelectedDate, setTasksForSelectedDate] = useState<DailyTask[]>([])
   const [showTaskList, setShowTaskList] = useState(false)
+  const [showWorkReport, setShowWorkReport] = useState(false)
+  const [selectedScheduleIdForWr, setSelectedScheduleIdForWr] = useState<string | null>(null);
+
   const navigate = useNavigate()
 
   const { data: scheduleData, isLoading, error, refetch } = useGetDailySchedule(projectId!)
@@ -1274,252 +1278,210 @@ const DailySchedulePage: React.FC = () => {
   }, [goToNextDate, goToPreviousDate]);
 
 
-    const currentUser =useCurrentSupervisor()
+  const currentUser = useCurrentSupervisor()
 
 
   // Add this useEffect in your DailySchedulePage component
-useEffect(() => {
-  if (!socket || !organizationId) return;
+  useEffect(() => {
+    if (!socket || !organizationId) return;
 
-  // 1. Task Created
-  const handleTaskCreated = (data: {
-    taskId: string;
-    dailyTasks: any[];
-    projectAssignee: any;
-    supervisorCheck: any;
-    createdBy: string;
-    createdByRole: string;
-  }) => {
-    const { createdBy } = data;
-    console.log("workinged created form teh socket 1294")
-    // Only refetch if someone else created the task
-    if (createdBy !== currentUser?.id) {
-      refetch(); // Refetch entire schedule data
-      
-      toast({
-        title: "New Task Created",
-        description: `New work schedule created by ${data.createdByRole}`,
-      });
-    }
-  };
-
-  // 2. Task Updated
-  const handleTaskUpdated = (data: {
-    taskId: string;
-    updatedData: {
+    // 1. Task Created
+    const handleTaskCreated = (data: {
+      taskId: string;
       dailyTasks: any[];
       projectAssignee: any;
       supervisorCheck: any;
-    };
-    updatedBy: string;
-    updatedByRole: string;
-  }) => {
-    const { updatedBy } = data;
-    
-     console.log('🔥 WebSocket Event Received:', data);
-  console.log('👤 Current User ID:', currentUser?.id);
+      createdBy: string;
+      createdByRole: string;
+    }) => {
+      const { createdBy } = data;
+      console.log("workinged created form teh socket 1294")
+      // Only refetch if someone else created the task
+      if (createdBy !== currentUser?.id) {
+        refetch(); // Refetch entire schedule data
 
-    // Only refetch if someone else updated the task
-    if (updatedBy !== currentUser?.id) {
-       console.log('✅ Refetching data... in weebsocket useEffect');
-      refetch(); // Refetch entire schedule data
-      
-      toast({
-        title: "Task Updated",
-        description: `Work schedule updated by ${data.updatedByRole}`,
-      });
-      
-      // If the updated task is currently being viewed, refresh it
-      if (selectedTask && (selectedTask as any).scheduleId === data.taskId) {
-        // Find and update the selected task
-        const updatedScheduleData = scheduleData?.find((s: any) => s._id === data.taskId);
-        if (updatedScheduleData) {
-          const updatedTask = updatedScheduleData.dailyTasks.find((t: any) => t._id === selectedTask._id);
-          if (updatedTask) {
-            setSelectedTask({...updatedTask, scheduleId: data.taskId});
+        toast({
+          title: "New Task Created",
+          description: `New work schedule created by ${data.createdByRole}`,
+        });
+      }
+    };
+
+    // 2. Task Updated
+    const handleTaskUpdated = (data: {
+      taskId: string;
+      updatedData: {
+        dailyTasks: any[];
+        projectAssignee: any;
+        supervisorCheck: any;
+      };
+      updatedBy: string;
+      updatedByRole: string;
+    }) => {
+      const { updatedBy } = data;
+
+      console.log('🔥 WebSocket Event Received:', data);
+      console.log('👤 Current User ID:', currentUser?.id);
+
+      // Only refetch if someone else updated the task
+      if (updatedBy !== currentUser?.id) {
+        console.log('✅ Refetching data... in weebsocket useEffect');
+        refetch(); // Refetch entire schedule data
+
+        toast({
+          title: "Task Updated",
+          description: `Work schedule updated by ${data.updatedByRole}`,
+        });
+
+        // If the updated task is currently being viewed, refresh it
+        if (selectedTask && (selectedTask as any).scheduleId === data.taskId) {
+          // Find and update the selected task
+          const updatedScheduleData = scheduleData?.find((s: any) => s._id === data.taskId);
+          if (updatedScheduleData) {
+            const updatedTask = updatedScheduleData.dailyTasks.find((t: any) => t._id === selectedTask._id);
+            if (updatedTask) {
+              setSelectedTask({ ...updatedTask, scheduleId: data.taskId });
+            }
           }
         }
       }
-    }
-  };
+    };
 
-  // 3. Task Deleted
-  const handleTaskDeleted = (data: {
-    scheduleId: string;
-    taskId: string;
-    deletedBy: string;
-    deletedByRole: string;
-  }) => {
-    const {  taskId, deletedBy } = data;
-    
-    // Only update if someone else deleted the task
-    if (deletedBy !== currentUser?.id) {
-      refetch(); // Refetch entire schedule data
-      
-      toast({
-        title: "Task Deleted",
-        description: `Task deleted by ${data.deletedByRole}`,
-      });
-      
-      // If the deleted task is currently being viewed, close the modal
-      if (selectedTask && selectedTask._id === taskId) {
-        setSelectedTask(null);
-        setSelectedDate(null);
-        setShowTaskList(false);
-      }
-    }
-  };
+    // 3. Task Deleted
+    const handleTaskDeleted = (data: {
+      scheduleId: string;
+      taskId: string;
+      deletedBy: string;
+      deletedByRole: string;
+    }) => {
+      const { taskId, deletedBy } = data;
 
-  // 4. Image Uploaded to Task
-  const handleImageUploaded = (data: {
-    scheduleId: string;
-    taskId: string;
-    date: string;
-    newImages: any[];
-    uploadedBy: string;
-    uploadedByRole: string;
-  }) => {
-    const {  taskId, date, newImages, uploadedBy } = data;
-    
-    // Only update if someone else uploaded images
-    if (uploadedBy !== currentUser?.id) {
-      // Update selectedTask if it matches
-      if (selectedTask && selectedTask._id === taskId) {
-        setSelectedTask(prev => {
-          if (!prev) return prev;
-          
-          const updatedImages = [...(prev.uploadedImages || [])];
-          const dateObj = new Date(date);
-          const existingDateIndex = updatedImages.findIndex(
-            (entry) => new Date(entry.date).toDateString() === dateObj.toDateString()
-          );
+      // Only update if someone else deleted the task
+      if (deletedBy !== currentUser?.id) {
+        refetch(); // Refetch entire schedule data
 
-          if (existingDateIndex !== -1) {
-            // Add to existing date entry
-            updatedImages[existingDateIndex] = {
-              ...updatedImages[existingDateIndex],
-              uploads: [...updatedImages[existingDateIndex].uploads, ...newImages]
-            };
-          } else {
-            // Create new date entry
-            updatedImages.push({
-              date: dateObj.toISOString(),
-              uploads: newImages
-            });
-          }
-
-          return { ...prev, uploadedImages: updatedImages };
+        toast({
+          title: "Task Deleted",
+          description: `Task deleted by ${data.deletedByRole}`,
         });
-      }
-      
-      toast({
-        title: "Images Uploaded",
-        description: `New images uploaded by ${data.uploadedByRole}`,
-      });
-    }
-  };
 
-  // 5. Image Deleted from Task
-  const handleImageDeleted = (data: {
-    scheduleId: string;
-    taskId: string;
-    date: string;
-    imageId: string;
-    remainingImages: any[];
-    deletedBy: string;
-    deletedByRole: string;
-  }) => {
-    const {  taskId, date,  remainingImages, deletedBy } = data;
-    
-    // Only update if someone else deleted the image
-    if (deletedBy !== currentUser?.id) {
-      // Update selectedTask if it matches
-      if (selectedTask && selectedTask._id === taskId) {
-        setSelectedTask(prev => {
-          if (!prev) return prev;
-          
-          const updatedImages = prev.uploadedImages?.map((group) => {
-            if (group.date.split("T")[0] === date) {
-              return {
-                ...group,
-                uploads: remainingImages // Use the remaining images from backend
+        // If the deleted task is currently being viewed, close the modal
+        if (selectedTask && selectedTask._id === taskId) {
+          setSelectedTask(null);
+          setSelectedDate(null);
+          setShowTaskList(false);
+        }
+      }
+    };
+
+    // 4. Image Uploaded to Task
+    const handleImageUploaded = (data: {
+      scheduleId: string;
+      taskId: string;
+      date: string;
+      newImages: any[];
+      uploadedBy: string;
+      uploadedByRole: string;
+    }) => {
+      const { taskId, date, newImages, uploadedBy } = data;
+
+      // Only update if someone else uploaded images
+      if (uploadedBy !== currentUser?.id) {
+        // Update selectedTask if it matches
+        if (selectedTask && selectedTask._id === taskId) {
+          setSelectedTask(prev => {
+            if (!prev) return prev;
+
+            const updatedImages = [...(prev.uploadedImages || [])];
+            const dateObj = new Date(date);
+            const existingDateIndex = updatedImages.findIndex(
+              (entry) => new Date(entry.date).toDateString() === dateObj.toDateString()
+            );
+
+            if (existingDateIndex !== -1) {
+              // Add to existing date entry
+              updatedImages[existingDateIndex] = {
+                ...updatedImages[existingDateIndex],
+                uploads: [...updatedImages[existingDateIndex].uploads, ...newImages]
               };
+            } else {
+              // Create new date entry
+              updatedImages.push({
+                date: dateObj.toISOString(),
+                uploads: newImages
+              });
             }
-            return group;
-          });
 
-          return { ...prev, uploadedImages: updatedImages };
+            return { ...prev, uploadedImages: updatedImages };
+          });
+        }
+
+        toast({
+          title: "Images Uploaded",
+          description: `New images uploaded by ${data.uploadedByRole}`,
         });
       }
-      
-      toast({
-        title: "Image Deleted",
-        description: `Image deleted by ${data.deletedByRole}`,
-      });
-    }
-  };
+    };
 
-  // Register all event listeners
-  socket.on('workSchedule:task_created', handleTaskCreated);
-  socket.on('workSchedule:task_updated', handleTaskUpdated);
-  socket.on('workSchedule:task_deleted', handleTaskDeleted);
-  socket.on('workSchedule:image_uploaded', handleImageUploaded);
-  socket.on('workSchedule:image_deleted', handleImageDeleted);
+    // 5. Image Deleted from Task
+    const handleImageDeleted = (data: {
+      scheduleId: string;
+      taskId: string;
+      date: string;
+      imageId: string;
+      remainingImages: any[];
+      deletedBy: string;
+      deletedByRole: string;
+    }) => {
+      const { taskId, date, remainingImages, deletedBy } = data;
 
-  
-  // Cleanup function
-  return () => {
-    socket.off('workSchedule:task_created', handleTaskCreated);
-    socket.off('workSchedule:task_updated', handleTaskUpdated);
-    socket.off('workSchedule:task_deleted', handleTaskDeleted);
-    socket.off('workSchedule:image_uploaded', handleImageUploaded);
-    socket.off('workSchedule:image_deleted', handleImageDeleted);
-  };
-}, [organizationId, currentUser?.id, selectedTask, scheduleData, showTaskList]);
+      // Only update if someone else deleted the image
+      if (deletedBy !== currentUser?.id) {
+        // Update selectedTask if it matches
+        if (selectedTask && selectedTask._id === taskId) {
+          setSelectedTask(prev => {
+            if (!prev) return prev;
+
+            const updatedImages = prev.uploadedImages?.map((group) => {
+              if (group.date.split("T")[0] === date) {
+                return {
+                  ...group,
+                  uploads: remainingImages // Use the remaining images from backend
+                };
+              }
+              return group;
+            });
+
+            return { ...prev, uploadedImages: updatedImages };
+          });
+        }
+
+        toast({
+          title: "Image Deleted",
+          description: `Image deleted by ${data.deletedByRole}`,
+        });
+      }
+    };
+
+    // Register all event listeners
+    socket.on('workSchedule:task_created', handleTaskCreated);
+    socket.on('workSchedule:task_updated', handleTaskUpdated);
+    socket.on('workSchedule:task_deleted', handleTaskDeleted);
+    socket.on('workSchedule:image_uploaded', handleImageUploaded);
+    socket.on('workSchedule:image_deleted', handleImageDeleted);
 
 
-
-useEffect(() => {
-  socket.on('workSchedule:task_created', (data) => {
-    console.log('🎯 Received task_created:', data);
-    toast({title:"success", description:"created task for socket chekcing in the chrom "})
-  });
-}, []);
-
-// useEffect(() => {
-//   if (!socket || !organizationId) return;
-// console.log("📡 Sending 'join_project' for project:", organizationId);
-//   socket.emit("join_project", { organizationId });
-// }, [socket, organizationId]);
+    // Cleanup function
+    return () => {
+      socket.off('workSchedule:task_created', handleTaskCreated);
+      socket.off('workSchedule:task_updated', handleTaskUpdated);
+      socket.off('workSchedule:task_deleted', handleTaskDeleted);
+      socket.off('workSchedule:image_uploaded', handleImageUploaded);
+      socket.off('workSchedule:image_deleted', handleImageDeleted);
+    };
+  }, [organizationId, currentUser?.id, selectedTask, scheduleData, showTaskList]);
 
 
-  // const getTasksForDate = (date: Date) => {
-  //   const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
-  //   const allTasks = scheduleData.flatMap((doc: any) => doc.dailyTasks || []);
-
-
-  //   return allTasks.filter((task: any) => {
-  //     const taskDateStr =
-  //       typeof task.datePlanned === "string"
-  //         ? task.datePlanned.split("T")[0]
-  //         : new Date(task.datePlanned).toISOString().split("T")[0];
-  //     return taskDateStr === dateStr;
-  //   });
-  // };
-
-  // const handleDateClick = (date: Date) => {
-  //   const tasks = getTasksForDate(date)
-  //   setSelectedDate(date)
-  //   setTasksForSelectedDate(tasks)
-
-  //   if (tasks.length === 1) {
-  //     setSelectedTask(tasks[0])
-  //     setShowTaskList(false)
-  //   } else if (tasks.length > 1) {
-  //     setShowTaskList(true)
-  //     setSelectedTask(null)
-  //   }
-  // }
 
   const formatLocalDate = (d: Date) => {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -1599,6 +1561,11 @@ useEffect(() => {
     }
   };
 
+
+  const handleCreateReport = (scheduleId: string) => {
+    setSelectedScheduleIdForWr(scheduleId);
+    setShowWorkReport(true);
+  };
 
 
   // use thi for updating the tasks
@@ -1800,6 +1767,12 @@ useEffect(() => {
     )
   }
 
+
+  const child = location.pathname.includes("workreport")
+  if (child) {
+    return <Outlet />
+  }
+
   return (
     <div className="max-h-full overflow-y-auto bg-gray-50">
       <div className=" mx-auto px-4 py-8">
@@ -1812,13 +1785,24 @@ useEffect(() => {
               back
             </button>
             <h1 className="text-3xl font-bold text-gray-800">Work Schedule Calendar</h1>
-            <button
-              onClick={() => setShowTaskForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2"
-            >
-              <i className="fas fa-plus"></i>
-              Add Events
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowTaskForm(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2"
+              >
+                <i className="fas fa-plus"></i>
+                Add Events
+              </button>
+
+
+              <button className="bg-gray-100 rounded-lg px-2 py-1 cursor-pointer" onClick={() => {
+                navigate(`workreport`)
+              }}>
+                <i className="fas fas-file-lines mr-1 "></i>
+                Work Report Lists
+              </button>
+
+            </div>
           </div>
 
           <div className="flex justify-between items-center mb-4">
@@ -2046,58 +2030,58 @@ useEffect(() => {
                                 </div>
                             )} */}
 
-{(() => {
-  const groups = (selectedTask?.uploadedImages || []).reduce(
-    (acc: Record<string, any[]>, imgGroup: any) => {
-      if (!Array.isArray(imgGroup?.uploads) || imgGroup.uploads.length === 0) return acc;
+                            {(() => {
+                              const groups = (selectedTask?.uploadedImages || []).reduce(
+                                (acc: Record<string, any[]>, imgGroup: any) => {
+                                  if (!Array.isArray(imgGroup?.uploads) || imgGroup.uploads.length === 0) return acc;
 
-      // Normalize dateKey from imgGroup.date -> "YYYY-MM-DD" (fallback to raw value)
-      let dateKey = "Unknown Date";
-      if (imgGroup?.date) {
-        const parsed = new Date(imgGroup.date);
-        dateKey = !isNaN(parsed.getTime()) ? parsed.toISOString().split("T")[0] : String(imgGroup.date);
-      }
+                                  // Normalize dateKey from imgGroup.date -> "YYYY-MM-DD" (fallback to raw value)
+                                  let dateKey = "Unknown Date";
+                                  if (imgGroup?.date) {
+                                    const parsed = new Date(imgGroup.date);
+                                    dateKey = !isNaN(parsed.getTime()) ? parsed.toISOString().split("T")[0] : String(imgGroup.date);
+                                  }
 
-      if (!acc[dateKey]) acc[dateKey] = [];
-      acc[dateKey].push(...imgGroup.uploads); // merge uploads for same date
-      return acc;
-    },
-    {}
-  );
+                                  if (!acc[dateKey]) acc[dateKey] = [];
+                                  acc[dateKey].push(...imgGroup.uploads); // merge uploads for same date
+                                  return acc;
+                                },
+                                {}
+                              );
 
-  const dateKeys = Object.keys(groups);
-  if (dateKeys.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
-        <i className="fas fa-images text-3xl mb-2" />
-        <p>No images uploaded for this task</p>
-      </div>
-    );
-  }
+                              const dateKeys = Object.keys(groups);
+                              if (dateKeys.length === 0) {
+                                return (
+                                  <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                                    <i className="fas fa-images text-3xl mb-2" />
+                                    <p>No images uploaded for this task</p>
+                                  </div>
+                                );
+                              }
 
-  // // Optional: sort newest-first. Remove or change comparator if you want another order.
-  // dateKeys.sort((a, b) => {
-  //   const da = new Date(a).getTime();
-  //   const db = new Date(b).getTime();
-  //   // if either is Invalid Date (NaN), keep original order by falling back to string compare
-  //   if (isNaN(da) || isNaN(db)) return a.localeCompare(b);
-  //   return db - da;
-  // });
+                              // // Optional: sort newest-first. Remove or change comparator if you want another order.
+                              // dateKeys.sort((a, b) => {
+                              //   const da = new Date(a).getTime();
+                              //   const db = new Date(b).getTime();
+                              //   // if either is Invalid Date (NaN), keep original order by falling back to string compare
+                              //   if (isNaN(da) || isNaN(db)) return a.localeCompare(b);
+                              //   return db - da;
+                              // });
 
-  return dateKeys.map((dateKey) => (
-    <div key={dateKey} className="mb-4">
-      {/* <h3 className="text-sm font-semibold text-gray-600 mb-2">{dateKey}</h3> */}
-      <ImageGalleryExample
-        imageFiles={groups[dateKey]}
-        handleDeleteFile={(imgId: string) => handleImageDelete(imgId!, selectedTask)}
-        refetch={refetch}
-        height={120}
-        minWidth={120}
-        maxWidth={140}
-      />
-    </div>
-  ));
-})()}
+                              return dateKeys.map((dateKey) => (
+                                <div key={dateKey} className="mb-4">
+                                  {/* <h3 className="text-sm font-semibold text-gray-600 mb-2">{dateKey}</h3> */}
+                                  <ImageGalleryExample
+                                    imageFiles={groups[dateKey]}
+                                    handleDeleteFile={(imgId: string) => handleImageDelete(imgId!, selectedTask)}
+                                    refetch={refetch}
+                                    height={120}
+                                    minWidth={120}
+                                    maxWidth={140}
+                                  />
+                                </div>
+                              ));
+                            })()}
 
 
                           </div>
@@ -2126,6 +2110,7 @@ useEffect(() => {
 
 
                         <Button onClick={() => handleEnableEditTask((selectedTask as any).scheduleId)}>Edit Task</Button>
+                        <Button onClick={() => handleCreateReport((selectedTask as any).scheduleId)}>Create Report</Button>
                       </div>
                     </div>
                   </div>
@@ -2146,6 +2131,44 @@ useEffect(() => {
               >
                 <i className="fas fa-chevron-right"></i>
               </button>
+            </div>
+          )}
+
+
+          {showWorkReport && selectedScheduleIdForWr && (
+            <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+              <div
+                onClick={() => {
+                  setShowWorkReport(false);
+                  setSelectedScheduleIdForWr(null);
+                }}
+                className="absolute inset-0"
+              />
+
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="relative z-10 bg-white rounded-lg shadow-lg max-w-4xl w-full mx-auto max-h-[90vh] overflow-y-auto p-6"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-blue-700">Create Work Report</h2>
+                  <button
+                    className="text-gray-500 hover:text-red-600 text-xl"
+                    onClick={() => {
+                      setShowWorkReport(false);
+                      setSelectedScheduleIdForWr(null);
+                    }}
+                  >
+                    <i className="fas fa-times" />
+                  </button>
+                </div>
+
+                <CreateWorkReport
+                  dailyScheduleId={selectedScheduleIdForWr}
+                  key={selectedScheduleIdForWr} // will re-initialize on reopen
+                  date={selectedTask?.datePlanned!}
+                  dailyTaskId={selectedTask?._id!}
+                />
+              </div>
             </div>
           )}
 

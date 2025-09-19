@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
-import {  lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { RootState } from './store/store';
 import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
@@ -8,11 +8,12 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import QuotePdfMain from './Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain';
 import ShortListReferenceDesignMain from './Pages/Stage Pages/Sample design/ShortListReference Pages/ShortListReferenceDesignMain';
-const QuoteGenerateVariantSub = lazy(() => import( './Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub '));
-const RateConfigAdminMain  = lazy(() => import(  './Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain'));
-const RateConfigSub  = lazy(() => import(  './Pages/Quote Pages/RateConfig Pages/RateConfigSub'));
-const QuoteGenerateMain  = lazy(() => import(  './Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/QuoteGeenrateMain'));
-const QuoteVariantGenerateMain = lazy(() => import( './Pages/Quote Pages/Quote VariantGenerate Pages/QuoteVariantGenerateMain'));
+import WorkReportMain from './Pages/Stage Pages/WorkReport Pages/WorkReportMain';
+const QuoteGenerateVariantSub = lazy(() => import('./Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub '));
+const RateConfigAdminMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain'));
+const RateConfigSub = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigSub'));
+const QuoteGenerateMain = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/QuoteGeenrateMain'));
+const QuoteVariantGenerateMain = lazy(() => import('./Pages/Quote Pages/Quote VariantGenerate Pages/QuoteVariantGenerateMain'));
 // const QuoteGenerateVariantSub = lazy(() => import( './Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub'));
 const LogisticsMain = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsMain'));
 const LogisticsSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsSingle'));
@@ -146,35 +147,35 @@ function App() {
   }, [organizationId]);
 
 
-  
-// interface ErrorBoundaryProps {
-//   children: React.ReactNode;
-// }
-// interface ErrorBoundaryState {
-//   hasError: boolean;
-// }
-// class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-//   constructor(props: ErrorBoundaryProps) {
-//     super(props);
-//     this.state = { hasError: false };
-//   }
 
-//   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-//     console.log(error)
-//     return { hasError: true };
-//   }
+  // interface ErrorBoundaryProps {
+  //   children: React.ReactNode;
+  // }
+  // interface ErrorBoundaryState {
+  //   hasError: boolean;
+  // }
+  // class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  //   constructor(props: ErrorBoundaryProps) {
+  //     super(props);
+  //     this.state = { hasError: false };
+  //   }
 
-//   componentDidCatch(error: Error, info: React.ErrorInfo) {
-//     console.error("Error boundary caught an error:", error, info);
-//   }
+  //   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+  //     console.log(error)
+  //     return { hasError: true };
+  //   }
 
-//   render() {
-//     if (this.state.hasError) {
-//       return <h1>Something went wrong from error boudary.</h1>;
-//     }
-//     return this.props.children;
-//   }
-// }
+  //   componentDidCatch(error: Error, info: React.ErrorInfo) {
+  //     console.error("Error boundary caught an error:", error, info);
+  //   }
+
+  //   render() {
+  //     if (this.state.hasError) {
+  //       return <h1>Something went wrong from error boudary.</h1>;
+  //     }
+  //     return this.props.children;
+  //   }
+  // }
 
 
   if (loading) <MaterialOverviewLoading />;
@@ -346,7 +347,7 @@ function App() {
               </ProtectedRoutes>} />
             </Route>
 
-               <Route path="shortlistdesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="shortlistdesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <ShortListReferenceDesignMain />
             </ProtectedRoutes>} >
             </Route>
@@ -380,7 +381,7 @@ function App() {
               <RateConfigAdminMain />
             </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO",  "staff"]}>
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <RateConfigSub />
               </ProtectedRoutes>} />
             </Route>
@@ -601,10 +602,10 @@ function App() {
             </Route>
 
 
-             <Route path="quotepdf" element={
+            <Route path="quotepdf" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
-                <QuotePdfMain  />
+                <QuotePdfMain />
               </ProtectedRoutes>
 
             } ></Route>
@@ -653,11 +654,22 @@ function App() {
                   <WorkSchedulePage />
                 </ProtectedRoutes>
               } /> */}
+
               <Route path="dailyschedule/:sectionId" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
                   <DailySchedulePage />
                 </ProtectedRoutes>
-              } />
+              } >
+                
+                <Route path="workreport" element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+                    <WorkReportMain />
+                  </ProtectedRoutes>
+                } />
+
+              </Route>
+
+
             </Route>
 
             <Route path="installation" element={

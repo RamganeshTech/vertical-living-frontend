@@ -34,6 +34,21 @@ export const createMaterialQuote = async ({
 
 
 
+export const editMaterialQuote = async ({
+    api,
+    organizationId,
+    id,
+    projectId,
+    formData
+}: CreateQuotePayload & { api: AxiosInstance, id: string }) => {
+    const res = await api.put(`/quote/quotegenerate/editquote/${organizationId}/${projectId}/${id}`, formData);
+
+    if (!res.data.ok) throw new Error(res.data.message || "Failed to create quote.");
+    return res.data.data;
+};
+
+
+
 
 export const useCreateMaterialQuote = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
@@ -48,11 +63,33 @@ export const useCreateMaterialQuote = () => {
             return await createMaterialQuote({ api, organizationId, projectId, formData });
         },
         onSuccess: (_, { organizationId }) => {
-          queryClient.invalidateQueries({queryKey: ["quote-material-items", organizationId] });
+            queryClient.invalidateQueries({ queryKey: ["quote-material-items", organizationId] });
         },
     });
 };
 
+
+export const useEditMaterialQuote = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ organizationId, projectId, formData, id }: {
+            organizationId: string,
+            projectId: string,
+            formData: any, id: string
+        }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
+            if (!api) throw new Error("API instance for role not found");
+
+            return await editMaterialQuote({ api, organizationId, projectId, formData, id });
+        },
+        onSuccess: (_, { organizationId }) => {
+            queryClient.invalidateQueries({ queryKey: ["quote-material-items", organizationId] });
+        },
+    });
+};
 
 
 
@@ -69,7 +106,7 @@ export const getMaterialItemsByCategory = async ({
 }) => {
     const { data } = await api.get(`/materials/${organizationId}/${category}`);
     if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
-    return data.data; 
+    return data.data;
 };
 
 
