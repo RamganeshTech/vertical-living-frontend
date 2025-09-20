@@ -15,7 +15,7 @@ type Props = {
         projectId: string;
         projectName: string;
     }>>
-        setEditQuoteNo: React.Dispatch<React.SetStateAction<string | null>>
+    setEditQuoteNo: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 
@@ -137,7 +137,7 @@ const QuoteGenerateList: React.FC<Props> = ({ setFurnitures, setEditQuoteNo, set
                             {quotes.map((quote: any) => (
                                 <>
                                     <QuoteGenerateCard setEditQuoteNo={setEditQuoteNo} setFurnitures={setFurnitures} setIsEditingId={setIsEditingId} setQuoteType={setQuoteType} setFiltersMain={setFiltersMain} key={quote._id} quote={quote} organizationId={organizationId!} />
-                                    </>
+                                </>
                             ))}
                         </div>
                     )}
