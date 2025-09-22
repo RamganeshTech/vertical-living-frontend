@@ -13,9 +13,11 @@ export const getAccountingAllApi = async ({
   organizationId,
   api,
   filters,
+  search,
 }: {
   organizationId: string;
   api: AxiosInstance;
+  search?: string, 
   filters?: { projectId?: string; fromDept?: string; status?: string };
 }) => {
   const params = new URLSearchParams();
@@ -23,6 +25,7 @@ export const getAccountingAllApi = async ({
   if (filters?.projectId) params.append("projectId", filters.projectId);
   if (filters?.fromDept) params.append("fromDept", filters.fromDept);
   if (filters?.status) params.append("status", filters.status);
+  if (search) params.append("search", search);
 
   const { data } = await api.get(
     `/department/accounting/getaccountingall?${params.toString()}`
@@ -82,17 +85,18 @@ export const deleteAccountingApi = async ({
 
 export const useGetAccountingAll = (
   organizationId: string,
-  filters?: { projectId?: string; fromDept?: string; status?: string }
+  filters?: { projectId?: string; fromDept?: string; status?: string },
+  search?: string
 ) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
   return useQuery({
-    queryKey: ["accounting", "all", organizationId, filters],
+    queryKey: ["accounting", "all", organizationId, filters, search],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
       if (!api) throw new Error("API instance not found for role");
-      return await getAccountingAllApi({ organizationId, api, filters });
+      return await getAccountingAllApi({ organizationId, api, filters, search });
     },
     enabled: !!organizationId && !!role && !!api,
   });

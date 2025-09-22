@@ -13,6 +13,7 @@ export const SIDEBAR_LABELS = {
   RATECONIG: "Rate Config",
   INTERNALQUOTE: "Internal Quote",
   QUOTEVARIENT: "Project Cost Rate Config",
+  STAFFTASK: "Staff Tasks"
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",
@@ -32,6 +33,7 @@ export const SIDEBAR_ICONS = {
   RATECONIG: "fas fa-money-bill-wave text-2xl",
   INTERNALQUOTE: "fas fa-file text-2xl",
   QUOTEVARIENT: "fas fa-file-invoice text-2xl",
+  STAFFTASK: "fas fa-object-group text-2xl"
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",
   // TASKS: "fa-solid fa-list text-2xl",

@@ -6,9 +6,12 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-import QuotePdfMain from './Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain';
-import ShortListReferenceDesignMain from './Pages/Stage Pages/Sample design/ShortListReference Pages/ShortListReferenceDesignMain';
-import WorkReportMain from './Pages/Stage Pages/WorkReport Pages/WorkReportMain';
+import StaffAssignTaskMain from './Pages/Staff Tasks Pages/StaffAssignTaskMain';
+const QuotePdfMain = lazy(() => import('./Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain'));
+const ShortListReferenceDesignMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortListReference Pages/ShortListReferenceDesignMain'));
+const WorkReportMain = lazy(() => import('./Pages/Stage Pages/WorkReport Pages/WorkReportMain'));
+const StaffTasksListMain = lazy(() => import('./Pages/Staff Tasks Pages/StaffTasksListMain'));
+const TaskViewMain = lazy(() => import('./Pages/Staff Tasks Pages/TaskViewMain'));
 const QuoteGenerateVariantSub = lazy(() => import('./Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub '));
 const RateConfigAdminMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain'));
 const RateConfigSub = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigSub'));
@@ -404,6 +407,26 @@ function App() {
 
             </Route>
 
+
+
+            <Route path="stafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <StaffTasksListMain />
+            </ProtectedRoutes>} >
+
+
+              <Route
+                path="single/:id"
+                element={<TaskViewMain />}
+              />
+
+
+              <Route
+                path="addtask"
+                element={<StaffAssignTaskMain />}
+              />
+
+            </Route>
+
           </Route>
 
           <Route path='/:organizationId/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner", "client", "CTO", "worker", "staff"]}>
@@ -660,7 +683,7 @@ function App() {
                   <DailySchedulePage />
                 </ProtectedRoutes>
               } >
-                
+
                 <Route path="workreport" element={
                   <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
                     <WorkReportMain />

@@ -38,6 +38,10 @@ const AccountingMain: React.FC = () => {
     const { organizationId } = useParams<{ organizationId: string }>();
     const navigate = useNavigate();
 
+
+ const [searchInput, setSearchInput] = useState("");     // user typing
+    const [searchTerm, setSearchTerm] = useState<string>(""); // value used for sending to the api
+
     const [filters, setFilters] = useState<{
         status?: string;
         projectId?: string;
@@ -49,7 +53,7 @@ const AccountingMain: React.FC = () => {
     // console.log("data", data)
     const projects = data?.map((project: AvailableProjetType) => ({ _id: project._id, projectName: project.projectName }))
 
-    const { data: records, isLoading, error, isError, refetch } = useGetAccountingAll(organizationId!, filters);
+    const { data: records, isLoading, error, isError, refetch } = useGetAccountingAll(organizationId!, filters, searchTerm);
 
     const activeFiltersCount = Object.values(filters).filter(Boolean).length;
 
@@ -75,6 +79,31 @@ const AccountingMain: React.FC = () => {
                     </h1>
                     <p className="text-gray-600 mt-1">
                         Manage your project’s financial transactions and accounting records                    </p>
+                </div>
+
+
+                <div className="flex gap-2  w-[300px] md:w-[400px]">
+
+                    <input
+                        type="text"
+                        placeholder="Search By transNo, notes, department"
+                        value={searchInput}
+                        autoFocus
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                setSearchTerm(searchInput);  // ✅ Only triggers on Enter
+                            }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    />
+
+                    <Button
+                        onClick={() => setSearchTerm(searchInput)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                        <i className="fas fa-search"> </i>
+                    </Button>
                 </div>
             </div>
 

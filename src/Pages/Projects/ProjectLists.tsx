@@ -38,6 +38,7 @@ const ProjectLists = () => {
   let { data: getProjects, refetch, isPending, error, isLoading } = useGetProjects(organizationId!)
 
   const allowedRoles = ["owner", "CTO", "staff"]
+  
   const handleEdit = useCallback((project: IProject, id: string) => {
     const projectInput = mapProjectToProjectInput(project);
     setEditForm(projectInput);
