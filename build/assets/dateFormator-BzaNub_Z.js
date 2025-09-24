@@ -1,1 +1,0 @@
-function r(t){if(!t)return"N/A";const e=new Date(t).getFullYear(),n=new Date(t).getMonth()+1;return`${new Date(t).getDate()}-${n}-${e}`}function i(t){return(typeof t=="string"?new Date(t):t).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!0})}export{r as d,i as f};

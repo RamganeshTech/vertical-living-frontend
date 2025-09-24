@@ -6,7 +6,8 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-import StaffAssignTaskMain from './Pages/Staff Tasks Pages/StaffAssignTaskMain';
+import StaffAssignTaskMain from './Pages/Staff Tasks Pages/Create Task Pages/StaffAssignTaskMain';
+import SingleStaffList from './Pages/Staff Tasks Pages/SingleStaffs Task Pages/SingleStaffList';
 const QuotePdfMain = lazy(() => import('./Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain'));
 const ShortListReferenceDesignMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortListReference Pages/ShortListReferenceDesignMain'));
 const WorkReportMain = lazy(() => import('./Pages/Stage Pages/WorkReport Pages/WorkReportMain'));
@@ -409,7 +410,7 @@ function App() {
 
 
 
-            <Route path="stafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="stafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}>
               <StaffTasksListMain />
             </ProtectedRoutes>} >
 
@@ -425,6 +426,17 @@ function App() {
                 element={<StaffAssignTaskMain />}
               />
 
+            </Route>
+
+             <Route path="associatedstafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <SingleStaffList />
+            </ProtectedRoutes>} >
+
+             <Route
+                path="single/:id"
+                element={<TaskViewMain />}
+              />
+            
             </Route>
 
           </Route>

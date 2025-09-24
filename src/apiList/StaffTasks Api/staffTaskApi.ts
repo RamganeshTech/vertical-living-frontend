@@ -26,16 +26,31 @@ export const createStaffTasks = async ({
   return data.data;
 };
 
+
+export const getSuggestedSubtasks = async ({
+  title,
+  api,
+}: {
+  title: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.get(`/stafftasks/suggest/subtasks?title=${encodeURIComponent(title)}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.steps; // expected to be: string[]
+};
+
 // 2. GET TASKS
 export const getAllTasks = async ({
   filters,
   api,
+  organizationId
 }: {
   filters?: Record<string, string | boolean | null>;
   api: AxiosInstance;
+  organizationId:string
 }) => {
   const searchParams = new URLSearchParams(filters as any).toString();
-  const { data } = await api.get(`/stafftasks/tasks?${searchParams}`);
+  const { data } = await api.get(`/stafftasks/${organizationId}/tasks?${searchParams}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -51,6 +66,22 @@ const getSingleTask = async ({
   api: AxiosInstance;
 }) => {
   const { data } = await api.get(`/stafftasks/singletask/${id}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+const getAllAssociatedStaffsTask = async ({
+  organizationId,
+  filters,
+  api,
+}: {
+  organizationId: string;
+  filters?: Record<string, string | boolean | null>;
+  api: AxiosInstance;
+}) => {
+  const searchParams = new URLSearchParams(filters as any).toString();
+  const { data } = await api.get(`/stafftasks/associatedstaffstask/${organizationId}?${searchParams}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -166,16 +197,35 @@ export const useCreateStaffTasks = () => {
   });
 };
 
+
+
+// export const useSuggestSubtasks = (title: string) => {
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+
+//   return useQuery({
+//     queryKey: ['suggested-subtasks', title],
+//     queryFn: async () => {
+//       if (!title || title.length <= 3) return [];
+//       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+//       if (!api) throw new Error("Not Authenticated");
+
+//       return await getSuggestedSubtasks({ title, api });
+//     },
+//     enabled: !!title && title.length > 3 && !!role,
+//   });
+// };
+
 // 2. Get tasks with filters
-export const useGetAllStaffTasks = (filters?: Record<string, string | boolean | null>) => {
+export const useGetAllStaffTasks = (organizationId:string, filters?: Record<string, string | boolean | null> ) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   return useQuery({
-    queryKey: ["stafftasks", filters],
+    queryKey: ["stafftasks", organizationId, filters],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
        if (!api) throw new Error("Not Authenticated");
-      return getAllTasks({ filters, api });
+      return getAllTasks({ filters, api, organizationId });
     },
     enabled: !!role
   });
@@ -193,6 +243,21 @@ export const useSingleStaffTask = (id: string) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
        if (!api) throw new Error("Not Authenticated");
       return getSingleTask({ id, api });
+    },
+    enabled: !!role
+  });
+};
+
+
+export const useGetAssociatedStaffTask = (organizationId:string, filters?: Record<string, string | boolean | null> ) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  return useQuery({
+    queryKey: ["associatedstafftasks", organizationId, filters],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+       if (!api) throw new Error("Not Authenticated");
+      return getAllAssociatedStaffsTask({ filters, api, organizationId });
     },
     enabled: !!role
   });
@@ -273,7 +338,7 @@ export const useUpdateTaskHistory = () => {
       return await updateTaskHistory({ mainTaskId, subTaskId, status, subTask, api });
     },
     onSuccess: (_, { mainTaskId }) => {
-      queryClient.invalidateQueries({ queryKey: ["stafftasks", mainTaskId] });
+      queryClient.invalidateQueries({ queryKey: ["singlestafftasks", mainTaskId] });
     }
   });
 };

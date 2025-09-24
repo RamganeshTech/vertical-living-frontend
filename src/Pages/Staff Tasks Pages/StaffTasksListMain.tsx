@@ -19,7 +19,8 @@ import StaffTaskCard from "./StaffTaskCard"
 import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading"
 
 // Types
-type FilterType = {
+export type FilterType = {
+    dependecies?: boolean
     status?: string
     priority?: string
     department?: string
@@ -28,6 +29,7 @@ type FilterType = {
     projectId?: string
     projectName?: string
     overdue?: boolean
+    createdAt?: string
 }
 
 const statusOptions = ["queued", "in_progress", "paused", "done"]
@@ -40,7 +42,8 @@ export const StaffTasksListMain: React.FC = () => {
     const navigate = useNavigate()
     const location = useLocation()
 
-    const { data: tasks, isLoading, isError, error, refetch } = useGetAllStaffTasks(filters)
+
+    const { data: tasks, isLoading, isError, error, refetch } = useGetAllStaffTasks(organizationId, filters)
 
     const { data } = useGetProjects(organizationId!)
     const { data: staffList } = useGetAllUsers(organizationId!, "staff");
@@ -68,7 +71,7 @@ export const StaffTasksListMain: React.FC = () => {
     }
 
     return (
-       
+
 
         <div className="p-2 h-full ">
             <header className="flex justify-between items-center w-full">
@@ -97,9 +100,9 @@ export const StaffTasksListMain: React.FC = () => {
             <section className="py-2 flex w-full gap-6 flex-col lg:flex-row items-start h-[90%]">
 
                 {/* Filter Panel - LEFT (30%) */}
-                <div className="lg:w-1/3 xl:w-1/4 w-full">
+                <div className="lg:w-1/3 xl:w-1/4 w-full  h-full overflow-y-auto custom-scrollbar">
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center justify-between mb-3">
                             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                                 <i className="fas fa-filter mr-2 text-blue-600" />
                                 Filters
@@ -114,8 +117,43 @@ export const StaffTasksListMain: React.FC = () => {
                             )}
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="space-y-2">
                             {/* Status Filter */}
+
+                            <div className="w-full flex gap-2 justify-center items-center">
+
+                                <button
+                                    onClick={() =>
+                                        setFilters((prev) => ({ ...prev, dependecies: !prev.dependecies }))
+                                    }
+                                    className={` w-full cursor-pointer  px-4 py-2 rounded-xl text-sm font-medium
+        transition-all duration-200 ease-in-out
+        flex items-center justify-center border
+        ${filters?.dependecies
+                                            ? "bg-blue-100 border-blue-600 text-blue-800 shadow-sm"
+                                            : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200"
+                                        }`}
+                                >
+                                    Dependencies
+                                </button>
+
+                                <button
+                                    onClick={() =>
+                                        setFilters((prev) => ({ ...prev, overdue: !prev.overdue }))
+                                    }
+                                    className={`w-full  cursor-pointer px-4 py-2 rounded-xl text-sm font-medium
+        transition-all duration-200 ease-in-out
+        flex items-center justify-center border
+        ${filters?.overdue
+                                            ? "bg-yellow-100 border-yellow-600 text-yellow-800 shadow-sm"
+                                            : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200"
+                                        }`}
+                                >
+                                    Overdue
+                                </button>
+                            </div>
+
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                                 <Select
@@ -153,6 +191,22 @@ export const StaffTasksListMain: React.FC = () => {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+
+
+
+
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Date
+                                </label>
+                                <input
+                                    type="date"
+                                    onChange={(e) => setFilters((f) => ({ ...f, createdAt: e.target.value }))}
+                                    value={filters.createdAt}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
                             </div>
 
                             {/* Department */}
@@ -221,27 +275,7 @@ export const StaffTasksListMain: React.FC = () => {
                                 </select>
                             </div>
 
-                            {/* Overdue */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Overdue</label>
-                                <Select
-                                    value={filters.overdue?.toString() || ""}
-                                    onValueChange={(val: any) => {
-                                        setFilters(prev => ({
-                                            ...prev,
-                                            overdue: val === "true"
-                                        }))
-                                    }}
-                                >
-                                    <SelectTrigger className="bg-white w-full">
-                                        <SelectValue placeholder="Overdue?" selectedValue={filters.overdue?.toString()} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="false">No</SelectItem>
-                                        <SelectItem value="true">Yes</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -275,7 +309,7 @@ export const StaffTasksListMain: React.FC = () => {
                         </div>)}
 
                     {!isLoading && !isError && tasks?.length === 0 && (
-                       
+
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
                             <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Tasks Found</h3>
@@ -286,11 +320,11 @@ export const StaffTasksListMain: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {!isLoading && !isError && <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {tasks?.map((task: any) => (
                             <StaffTaskCard key={task._id} task={task} />
                         ))}
-                    </div>
+                    </div>}
                 </div>
             </section>
 

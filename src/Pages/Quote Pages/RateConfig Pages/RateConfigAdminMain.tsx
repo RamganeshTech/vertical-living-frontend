@@ -113,7 +113,7 @@ export default function RateConfigAdminMain() {
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                         <i className="fas fa-cubes mr-3 text-blue-600" />
-                        Rate Configurations
+                        Rate Configuration Materials
                     </h1>
                     <p className="text-gray-600 mt-1">
                         Manage your organization's material categories and configurable fields

@@ -64,7 +64,7 @@ const internalQuoteNavigate = ()=>{
             <header className="flex justify-between items-center">
                 <div className="flex gap-2">
                     <i className="fas fa-file-invoice text-4xl text-blue-600" />
-                    <h1 className="text-2xl font-bold mb-4">Project Cost Rate Config</h1>
+                    <h1 className="text-2xl font-bold mb-4">Quote Varient generator</h1>
                 </div>
 
 

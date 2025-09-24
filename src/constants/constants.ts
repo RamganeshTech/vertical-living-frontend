@@ -1,6 +1,6 @@
 import noimg from '../assets/no image.jpeg'
 
-export const SIDEBAR_LABELS = {
+export const SIDEBAR_LABELS:Record<string, string> = {
   //   DASHBOARD: "Dashboard",
   PROJECTS: "Projects",
   SHORTLIST: "Reference Design",
@@ -10,10 +10,12 @@ export const SIDEBAR_LABELS = {
   LOGISTICS: "Logistics",
   PROCUREMENT: "Procurement",
   ACCOUNTING: "Accounting",
-  RATECONIG: "Rate Config",
+  RATECONIG: "Rate Config (Material)",
+  RATECONIGSTAFF: "Rate Config (Staff)",
   INTERNALQUOTE: "Internal Quote",
-  QUOTEVARIENT: "Project Cost Rate Config",
-  STAFFTASK: "Staff Tasks"
+  QUOTEVARIENT: "Quote Varient",
+  STAFFTASK: "Staff Tasks",
+  SINGLESTAFFTASK: "Tasks"
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",
@@ -21,7 +23,7 @@ export const SIDEBAR_LABELS = {
   // PHASES: "Phases",
 };
 
-export const SIDEBAR_ICONS = {
+export const SIDEBAR_ICONS:Record<string, string> = {
   PROJECTS: "fa-solid fa-diagram-project text-2xl",
   SHORTLIST: "fa-solid fa-object-group text-2xl",
   ORGANIZATION: "fa-solid fa-building text-2xl",
@@ -30,10 +32,12 @@ export const SIDEBAR_ICONS = {
   LOGISTICS: "fa-solid fa-dolly text-2xl",
   PROCUREMENT: "fa-solid fa-box-open text-2xl",
   ACCOUNTING: "fas fa-money-bill-wave text-2xl",
-  RATECONIG: "fas fa-money-bill-wave text-2xl",
+  RATECONIG: "fas fa-box-archive text-2xl",
+  RATECONIGSTAFF: "fa-solid fa-person-digging text-2xl",
   INTERNALQUOTE: "fas fa-file text-2xl",
   QUOTEVARIENT: "fas fa-file-invoice text-2xl",
-  STAFFTASK: "fas fa-object-group text-2xl"
+  STAFFTASK: "fas fa-object-group text-2xl",
+  SINGLESTAFFTASK: "fas fa-object-group text-2xl"
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",
   // TASKS: "fa-solid fa-list text-2xl",
