@@ -44,6 +44,7 @@ export type FurnitureBlock = {
 type Props = {
   index: number;
   data: FurnitureBlock;
+  labourCost:number;
   updateFurniture?: (updatedFurniture: FurnitureBlock) => void;
   removeFurniture?: () => void;
 };
@@ -77,14 +78,17 @@ const emptySimpleItem = (): SimpleItemRow => ({
 
 
 export const calculateCoreMaterialCosts = (
-    coreRows: CoreMaterialRow[]
+    coreRows: CoreMaterialRow[],
+    labourCost:number
   ): CoreMaterialRow[] => {
     if (coreRows.length === 0) return [];
 
     const totalRows = coreRows.length;
 
     const base = coreRows[0];
-    const totalLabour = base.carpenters * base.days * RATES.labour;
+     // changed for labour cost
+    // const totalLabour = base.carpenters * base.days * RATES.labour;
+    const totalLabour = base.carpenters * base.days * labourCost;
     const labourWithProfit = totalLabour * (1 + (base.profitOnLabour || 0) / 100);
     const labourPerRow = labourWithProfit / totalRows;
 
@@ -110,6 +114,7 @@ export const calculateCoreMaterialCosts = (
 const FurnitureForm: React.FC<Props> = ({
   // index,
   data,
+  labourCost,
   updateFurniture,
   removeFurniture,
 }) => {
@@ -150,43 +155,6 @@ const FurnitureForm: React.FC<Props> = ({
     };
   };
 
-  // Handlers ----------------------------------------
-  // const handleCoreChange = (rowIndex: number, key: keyof CoreMaterialRow, value: any) => {
-  //   const updated: any = [...data.coreMaterials];
-  //   if (key === "imageUrl") {
-  //     updated[rowIndex].imageUrl = value;
-  //     updated[rowIndex].previewUrl = URL.createObjectURL(value);
-  //   } else {
-  //     updated[rowIndex][key] = value;
-  //   }
-
-  //   updated[rowIndex].rowTotal = calculateCoreRowTotal(updated[rowIndex]);
-
-
-  //    // 👉 Automatically add a new row if typing in the last one
-  // const isLastRow = rowIndex === updated.length - 1;
-  // const isNotEmpty = Object.values(updated[rowIndex]).some(v => {
-  //   if (typeof v === "object" && v !== null && "quantity" in v) {
-  //     return v.quantity || (v as any).thickness;
-  //   }
-  //   return v !== "" && v !== 0 && v !== null;
-  // });
-
-  // if (isLastRow && isNotEmpty) {
-  //   updated.push(emptyCoreMaterial());
-  // }
-
-  //   const updatedFurniture: FurnitureBlock = {
-  //     ...data,
-  //     coreMaterials: updated,
-  //   };
-  //   updatedFurniture.totals = computeTotals(updatedFurniture);
-  //   updateFurniture && updateFurniture(updatedFurniture);
-  // };
-
-
-  
-
 
   const handleCoreChange = (rowIndex: number, key: keyof CoreMaterialRow, value: any) => {
     const updated: any = [...data.coreMaterials];
@@ -203,7 +171,7 @@ const FurnitureForm: React.FC<Props> = ({
       updated[rowIndex][key] = value;
     }
 
-    const updatedRows = calculateCoreMaterialCosts(updated);
+    const updatedRows = calculateCoreMaterialCosts(updated, labourCost);
 
 
 
@@ -284,19 +252,7 @@ const FurnitureForm: React.FC<Props> = ({
               <tr key={i}
                 className="group relative border-none !border-b-1 px-4 py-2 transition-all duration-150 hover:bg-gray-50"
               >
-                {/* <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" >
-                  <input
-                    type="file"
-                    onChange={(e) =>
-                      handleCoreChange(i, "imageUrl", e.target.files?.[0])
-                    }
-                    className="w-full px-2 py-3 text-center outline-none"
-
-                  />
-                  {row.previewUrl && (
-                    <img src={row.previewUrl} className="h-10 mx-auto mt-1" />
-                  )}
-                </td> */}
+                
 
                 {i === 0 && (
                   <td rowSpan={data.coreMaterials.length}>
@@ -410,7 +366,7 @@ const FurnitureForm: React.FC<Props> = ({
                     onClick={() => {
                       const updated = [...data.coreMaterials];
                       updated.splice(i, 1);
-                      const recalculated = calculateCoreMaterialCosts(updated);
+                      const recalculated = calculateCoreMaterialCosts(updated, labourCost);
 
                       const updatedFurniture: FurnitureBlock = {
                         ...data,
@@ -433,7 +389,7 @@ const FurnitureForm: React.FC<Props> = ({
         <Button
           onClick={() => {
             const updated = [...data.coreMaterials, emptyCoreMaterial()];
-            const updatedRows = calculateCoreMaterialCosts(updated);
+            const updatedRows = calculateCoreMaterialCosts(updated, labourCost);
 
             const updatedFurniture: FurnitureBlock = {
               ...data,
@@ -479,7 +435,7 @@ const FurnitureForm: React.FC<Props> = ({
                   className="p-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
-                    value={row.itemName}
+                    value={row.itemName || ""}
                     placeholder="Item Name"
                     onChange={(e) =>
                       handleSimpleChange(kind, i, "itemName", e.target.value)

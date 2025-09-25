@@ -8,6 +8,8 @@ import { toast } from "../../utils/toast";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 
+
+type NewItem= { itemName: string; quantity: number; unit: string }
 const RoomPage: React.FC = () => {
 
     const { projectId, roomId } = useParams() as { roomId: string, projectId: string }
@@ -17,23 +19,17 @@ const RoomPage: React.FC = () => {
     const { mutateAsync } = useUpdateRequirementRoomItem()
     const { mutateAsync: deleteMutate, isPending: deletePending } = useDeleteRoomItems()
 
-
-    // const [editData, setEditData] = useState<Record<string, { itemName: string; quantity: number }>>({});
-    // const [editingId, setEditingId] = useState<string | null>(null);
     const [editData, setEditData] = useState<
         Record<string, { id: string; itemName: string; quantity: number; unit: string }>
     >({});
 
 
     const [isAdding, setIsAdding] = useState(false);
-    // const [newItem, setNewItem] = useState({ itemName: "", quantity: 0 });
-    const [newItems, setNewItems] = useState<
-        { itemName: string; quantity: number; unit: string }[]
-    >([
-        { itemName: "", quantity: 1, unit: "" } // start with 1 row
+    const [newItems, setNewItems] = useState<NewItem[]>([
+        { itemName: "", quantity: 1, unit: "unit" } // start with 1 row
     ]);
 
-    const UNIT_OPTIONS = ["sqft", "cm", "mm", "length", "nos"];
+    const UNIT_OPTIONS = ["unit", "sqft", "cm", "mm", "length", "nos"];
 
     // Initialize editData when room data loads
     useEffect(() => {
@@ -48,7 +44,7 @@ const RoomPage: React.FC = () => {
                     id: item._id,
                     itemName: item.itemName || "",
                     quantity: item.quantity || 0,
-                    unit: item.unit || "mm",
+                    unit: item.unit || "unit",
                 }
             })
 
@@ -56,94 +52,22 @@ const RoomPage: React.FC = () => {
         }
     }, [data])
 
-    // Handle input changes locally
-    // OLD WAY
-    // const handleChange = (
-    //     itemId: string,
-    //     field: "itemName" | "quantity",
-    //     value: string | number
-    // ) => {
-    //     setEditData((prev) => ({
-    //         ...prev,
-    //         [itemId]: {
-    //             ...prev[itemId],
-    //             [field]: field === "quantity" ? Number(value) : value,
-    //         },
-    //     }));
-    // };
-
-
-    // OLD WAY
-
-    // const handleSubmit = async (itemId: string | null, isNew = false) => {
-    //     if (!projectId || !roomId) {
-    //         toast({ title: "Error", description: "Missing required data", variant: "destructive" });
-    //         return;
-    //     }
-    //     try {
-    //         let payload;
-    //         if (isNew) {
-
-    //             if (!newItem.itemName.trim()) {
-    //                 throw new Error("Item Name is required")
-    //             }
-
-    //             if (newItem.quantity <= 0) {
-    //                 throw new Error("Quantity cannot be zero or in negative")
-    //             }
-
-    //             payload = { itemName: newItem.itemName, quantity: newItem.quantity };
-    //         } else {
-    //             if (!itemId) return;
-
-
-    //             if (!editData[itemId].itemName.trim()) {
-    //                 throw new Error("Item Name is required")
-    //             }
-
-
-    //             if (editData[itemId].quantity <= 0) {
-    //                 throw new Error("Quantity cannot be zero or in negative")
-    //             }
-
-    //             payload = {
-    //                 itemName: editData[itemId].itemName,
-    //                 quantity: editData[itemId].quantity,
-    //             };
-    //         }
-    //         await mutateAsync({ projectId, roomId, itemId: isNew ? null : itemId, payload });
-
-    //         toast({ title: "Success", description: "Room data updated successfully" });
-    //         // refetch()
-
-    //         if (isNew) {
-    //             setIsAdding(false);
-    //             setNewItem({ itemName: "", quantity: 0 });
-    //         } else {
-    //             setEditingId(null);
-    //         }
-    //     } catch (error: any) {
-    //         toast({
-    //             title: "Error",
-    //             description:
-    //                 error?.response?.data?.message || error?.message || "Failed to update room data",
-    //             variant: "destructive",
-    //         });
-    //     }
-    // };
-
 
     // Handle change in any field
     const handleNewItemChange = (index: number, field: "itemName" | "quantity" | "unit", value: string | number) => {
-        setNewItems((prev) => {
+        setNewItems((prev:NewItem[]) => {
             const updated = prev.map((item, i) =>
-                i === index ? { ...item, [field]: field === "quantity" ? Number(value) : value } : item
+                i === index ? { ...item, 
+                    [field]: field === "quantity" ? Number(value) : value, 
+                    unit: field === "unit" ? String(value) : (item?.unit || "unit"),
+                 } 
+                 : item
             );
 
             // If user typed something in the last row, add a new empty one automatically
             const last = updated[updated.length - 1];
             if (last.itemName.trim() !== "" && !updated.some((i) => i.itemName === "")) {
-                updated.push({ itemName: "", quantity: 1, unit: "" });
+                updated.push({ itemName: "", quantity: 1, unit: "unit" });
             }
 
             if (
@@ -154,6 +78,8 @@ const RoomPage: React.FC = () => {
                 updated.pop();
             }
 
+
+            console.log("updated", updated)
             return updated;
         });
     };
@@ -183,6 +109,7 @@ const RoomPage: React.FC = () => {
 
     // Save all rows
     const handleSaveAll = async () => {
+        console.log("newItems", newItems)
         const validItems = newItems.filter((i) => i.itemName.trim() !== "" && i.quantity > 0 && i.unit !== "");
         console.log(validItems)
         if (validItems.length === 0) {
@@ -190,19 +117,29 @@ const RoomPage: React.FC = () => {
         }
 
         try {
-            await Promise.all(
-                validItems.map((item) =>
-                    mutateAsync({
-                        projectId,
-                        roomId,
-                        itemId: null,
-                        payload: { itemName: item.itemName, quantity: item.quantity, unit: item.unit },
-                    })
-                )
-            );
+            // await Promise.all(
+            //     validItems.map((item) =>
+            //         mutateAsync({
+            //             projectId,
+            //             roomId,
+            //             itemId: null,
+            //             payload: { itemName: item.itemName, quantity: item.quantity, unit: item.unit },
+            //         })
+            //     )
+            // );
+
+            for (const item of validItems) {
+                await mutateAsync({
+                    projectId,
+                    roomId,
+                    itemId: null,
+                    payload: { itemName: item.itemName, quantity: item.quantity, unit: item.unit },
+                });
+            }
+
 
             toast({ title: "Success", description: "All items saved successfully" });
-            setNewItems([{ itemName: "", quantity: 1, unit: "" }]); // reset
+            setNewItems([{ itemName: "", quantity: 1, unit: "unit" }]); // reset
             setIsAdding(false)
         } catch (error: any) {
             toast({
@@ -221,7 +158,7 @@ const RoomPage: React.FC = () => {
         quantity: number;
         unit: string;
     }) => {
-        console.log("ediData", editData)
+        // console.log("ediData", editData)
 
         if (!editData.itemName.trim() || editData.quantity <= 0 || !editData.unit) {
             return toast({
@@ -338,78 +275,7 @@ const RoomPage: React.FC = () => {
                                 <p className="text-sm text-slate-500">Manage quantities and specifications <span>(Click to Edit, Press Enter to save)</span></p>
                             </div>
                         </div>
-
-                        {/* Add Item Button */}
-                        {/* {!isAdding && (
-                            <Button
-                                onClick={() => setIsAdding(true)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center space-x-2 transition-colors duration-200 shadow-sm hover:shadow-md"
-                            >
-                                <i className="fas fa-plus text-sm" />
-                                <span>Add Item</span>
-                            </Button>
-                        )} */}
                     </div>
-
-                    {/* Add New Item Form */}
-                    {/*{isAdding && (
-                        // <div className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-dashed border-blue-200">
-                        //     <div className="flex items-center space-x-2 mb-6">
-                        //         <i className="fas fa-plus-circle text-blue-600 text-lg" />
-                        //         <h3 className="text-lg font-medium text-slate-800">Add New Item</h3>
-                        //     </div>
-
-                        //     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        //         <div>
-                        //             <label className="block text-sm font-medium text-slate-700 mb-3">
-                        //                 <i className="fas fa-tag mr-2 text-blue-500" />
-                        //                 Item Name
-                        //             </label>
-                        //             <Input
-                        //                 value={newItem.itemName}
-                        //                 onChange={(e) => setNewItem((prev) => ({ ...prev, itemName: e.target.value }))}
-                        //                 placeholder="Wardrobe, ShoeRack ..."
-                        //                 className="w-full h-12 text-base"
-                        //             />
-                        //         </div>
-                        //         <div>
-                        //             <label className="block text-sm font-medium text-slate-700 mb-3">
-                        //                 <i className="fas fa-calculator mr-2 text-green-500" />
-                        //                 Quantity
-                        //             </label>
-                        //             <Input
-                        //                 type="number"
-                        //                 value={newItem.quantity}
-                        //                 onChange={(e) => setNewItem((prev) => ({ ...prev, quantity: Number(e.target.value) }))}
-                        //                 placeholder="0"
-                        //                 className="w-full h-12 text-base"
-                        //             />
-                        //         </div>
-                        //     </div>
-
-                        //     <div className="flex flex-col sm:flex-row gap-3">
-                        //         <Button
-                        //             onClick={() => handleSubmit(null, true)}
-                        //             disabled={isPending || !newItem.itemName.trim()}
-                        //             className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2 shadow-sm hover:shadow-md transition-all duration-200"
-                        //         >
-                        //             <i className="fas fa-check text-sm" />
-                        //             <span>{isPending ? "Saving..." : "Save Item"}</span>
-                        //         </Button>
-                        //         <Button
-                        //             onClick={() => {
-                        //                 setIsAdding(false)
-                        //                 setNewItem({ itemName: "", quantity: 0 })
-                        //             }}
-                        //             variant="danger"
-                        //             className=" bg-red-600 te text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors duration-200"
-                        //         >
-                        //             <i className="fas fa-times text-sm" />
-                        //             <span>Cancel</span>
-                        //         </Button>
-                        //     </div>
-                        // </div>
-                    )} */}
 
 
 
@@ -436,290 +302,57 @@ const RoomPage: React.FC = () => {
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {/*data?.items?.map((item: any) => (
-                                    // <>
-                                         
-                                            // <div
-                                            //     key={item._id}
-                                            //     className="border border-slate-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all duration-200 bg-white"
-                                            // >
-                                            //      {editingId === item._id ? ( 
-                                            // <div className="p-4">
-                                            //     <div className="flex items-center space-x-2 mb-4">
-                                            //         <i className="fas fa-edit text-blue-600" />
-                                            //         <h3 className="font-medium text-slate-800">Edit Item #{index + 1}</h3>
-                                            //     </div>
-
-                                            //     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                            //         <div>
-                                            //             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                            //                 <i className="fas fa-tag mr-2 text-blue-500" />
-                                            //                 Item Name
-                                            //             </label>
-                                            //             <Input
-                                            //                 value={editData[item._id]?.itemName || ""}
-                                            //                 onChange={(e) => handleChange(item._id, "itemName", e.target.value)}
-                                            //                 className="w-full h-10"
-                                            //             />
-                                            //         </div>
-                                            //         <div>
-                                            //             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                            //                 <i className="fas fa-calculator mr-2 text-green-500" />
-                                            //                 Quantity
-                                            //             </label>
-                                            //             <Input
-                                            //                 type="number"
-                                            //                 value={editData[item._id]?.quantity || 0}
-                                            //                 onChange={(e) => handleChange(item._id, "quantity", e.target.value)}
-                                            //                 className="w-full h-10"
-                                            //             />
-                                            //         </div>
-                                            //     </div>
-
-                                            //     <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
-                                            //         <Button
-                                            //             onClick={() => handleSubmit(item._id)}
-                                            //             disabled={isPending}
-                                            //             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2"
-                                            //         >
-                                            //             <i className="fas fa-check text-sm" />
-                                            //             <span>{isPending ? "Saving..." : "Save Changes"}</span>
-                                            //         </Button>
-                                            //         <Button
-                                            //             onClick={() => setEditingId(null)}
-                                            //             className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2"
-                                            //             variant="danger"
-
-
-                                            //         >
-                                            //             <i className="fas fa-times text-sm" />
-                                            //             <span>Cancel</span>
-                                            //         </Button>
-                                            //     </div>
-                                            // </div>
-                                            //     ) : (
-                                            //      <div className="p-4">
-                                            //          <div className="flex items-center justify-between">
-                                            //              <div className="flex items-center space-x-4 flex-1">
-                                            //                  <div className="flex items-center justify-center w-10 h-10 bg-blue-50 rounded-lg border border-blue-200">
-                                            //                      <i className="fas fa-cube text-blue-600" />
-                                            //                  </div>
-
-                                            //                  <div className="flex-1 min-w-0">
-                                            //                      <div className="flex items-center space-x-3 mb-1">
-                                            //                          <h3 className="font-semibold text-slate-800 text-lg truncate">{item.itemName}</h3>
-                                            //                          <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-                                            //                              #{index + 1}
-                                            //                          </span>
-                                            //                      </div>
-                                            //                      <div className="flex items-center space-x-4 text-sm text-slate-600">
-                                            //                          <span className="flex items-center space-x-1">
-                                            //                              <i className="fas fa-calculator text-green-500" />
-                                            //                              <span>Quantity:</span>
-                                            //                              <span className="font-medium text-slate-800">{item.quantity}</span>
-                                            //                          </span>
-                                            //                      </div>
-                                            //                  </div>
-                                            //              </div>
-
-                                            //              <div>
-                                            //                  <Button
-                                            //                      onClick={() => setEditingId(item._id)}
-                                            //                      className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200 border border-blue-200 hover:border-blue-300 ml-4"
-                                            //                  >
-                                            //                      <i className="fas fa-edit text-sm" />
-                                            //                      <span className="hidden sm:inline">Edit</span>
-                                            //                  </Button>
-
-
-                                            //                  <Button
-                                            //                      onClick={() => handleDeleteItem(item._id)}
-                                            //                      className="bg-red-600  text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200 border border-blue-200 hover:border-blue-300 ml-4"
-                                            //                      isLoading={deletePending}
-                                            //                      variant="danger"
-                                            //                  >
-                                            //                      <i className="fas fa-trash text-sm" />
-                                            //                      <span className="hidden sm:inline">Delete</span>
-                                            //                  </Button>
-                                            //              </div>
-                                            //          </div>
-                                            //      </div>
-                                            //  )}
-
-                                            //  }
-                                            // </div>
-                                        //}
-
-                                        // <div
-                                        //     key={item._id}
-                                        //     className="flex items-center gap-3  p-3 rounded-lg bg-white"
-                                        // >
-
-
-                                        //     <Input
-                                        //         placeholder="Item name"
-                                        //         value={editData[item._id]?.itemName ?? item.itemName ?? ""}
-                                        //         onChange={(e) => handleEditChange(item._id, "itemName", e.target.value)}
-                                        //         onKeyDown={(e) => {
-                                        //             if (e.key === "Enter") {
-                                        //                 handleSaveEdit(editData[item._id] ?? item);
-                                        //             }
-                                        //         }}
-                                        //         className="flex-1"
-                                        //     />
-
-                                        //     <Input
-                                        //         type="number"
-                                        //         placeholder="Qty"
-                                        //         value={editData[item._id]?.quantity ?? item.quantity ?? 0}
-                                        //         onChange={(e) => handleEditChange(item._id, "quantity", e.target.value)}
-                                        //         onKeyDown={(e) => {
-                                        //             if (e.key === "Enter") {
-                                        //                 handleSaveEdit(
-                                        //                     editData[item._id] ?? item
-                                        //                 );
-                                        //             }
-                                        //         }}
-                                        //         className="w-24"
-                                        //     />
-
-                                        //     <select
-                                        //         value={editData[item._id]?.unit ?? item.unit ?? ""}
-                                        //         onChange={(e) => {
-                                        //             handleEditChange(item._id, "unit", e.target.value)
-                                        //             handleSaveEdit(
-                                        //                 editData[item._id] ?? item
-                                        //             );
-                                        //         }}
-                                               
-                                //                 className="border px-2 py-1 rounded"
-                                //             >
-                                //                 <option value="">Unit</option>
-                                //                 {UNIT_OPTIONS.map((u) => (
-                                //                     <option key={u} value={u}>
-                                //                         {u}
-                                //                     </option>
-                                //                 ))}
-                                //             </select>
-
-                                //             <Button
-                                //                 onClick={() => handleDeleteItem(item._id)}
-                                //                 disabled={deletePending}
-                                //                 className="bg-red-600 hover:bg-red-700 text-white"
-                                //             >
-                                //                 {deletePending ? "Deleting..." : "Delete"}
-                                //             </Button>
-
-
-                                //         </div>
-                                //     </>
-                                // ))}
-                                /*}
-
 
 
                                 <div className="overflow-x-auto">
                                     {/* Header */}
-                                <div className="min-w-[600px] grid grid-cols-4 gap-3 px-3 py-2 bg-gray-100 text-sm font-semibold rounded-t-lg">
-                                    <p className="text-center">Item Name</p>
-                                    <p className="text-center">Quantity</p>
-                                    <p className="text-center">Unit</p>
-                                    <p className="text-center">Action</p>
-                                </div>
+                                    <div className="min-w-[600px] grid grid-cols-4 gap-3 px-3 py-2 bg-gray-100 text-sm font-semibold rounded-t-lg">
+                                        <p className="text-center">Item Name</p>
+                                        <p className="text-center">Quantity</p>
+                                        <p className="text-center">Unit</p>
+                                        <p className="text-center">Action</p>
+                                    </div>
 
-                                {/* Existing items */}
-                                <div className="space-y-2">
-                                    {data?.items?.map((item: any) => (
-                                        <div
-                                            key={item._id}
-                                            className="min-w-[600px] grid grid-cols-4 gap-3 items-center px-3 py-2 border-b bg-white "
-                                        >
-                                            {/* Item Name */}
-                                            <Input
-                                                placeholder="Item name"
-                                                value={editData[item._id]?.itemName ?? item.itemName ?? ""}
-                                                onChange={(e) => handleEditChange(item._id, "itemName", e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter") handleSaveEdit(editData[item._id] ?? item);
-                                                }}
-                                                className="!border-none focus:ring-0 text-center"
-
-                                            />
-
-                                            {/* Quantity */}
-                                            <Input
-                                                type="number"
-                                                placeholder="Qty"
-                                                value={editData[item._id]?.quantity ?? item.quantity ?? 0}
-                                                onChange={(e) => handleEditChange(item._id, "quantity", e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter") handleSaveEdit(editData[item._id] ?? item);
-                                                }}
-                                                className="!border-none focus:ring-0  text-center"
-
-                                            />
-
-                                            {/* Unit */}
-                                            <select
-                                                value={editData[item._id]?.unit ?? item.unit ?? ""}
-                                                onChange={(e) => {
-                                                    handleEditChange(item._id, "unit", e.target.value);
-                                                    handleSaveEdit(editData[item._id] ?? item);
-                                                }}
-                                                className="border px-2 py-1 rounded"
-                                            >
-                                                <option value="">Unit</option>
-                                                {UNIT_OPTIONS.map((u) => (
-                                                    <option key={u} value={u}>
-                                                        {u}
-                                                    </option>
-                                                ))}
-                                            </select>
-
-                                            {/* Action */}
-                                            <div className="flex justify-center">
-                                                <Button
-                                                    onClick={() => handleDeleteItem(item._id)}
-                                                    disabled={deletePending}
-                                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1"
-                                                >
-                                                    {deletePending ? "Deleting..." : "Delete"}
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* New Items Section */}
-                                {isAdding ? (
-                                    <div className="space-y-2 mt-4">
-                                        {newItems?.map((item, idx) => (
+                                    {/* Existing items */}
+                                    <div className="space-y-2">
+                                        {data?.items?.map((item: any) => (
                                             <div
-                                                key={idx}
-                                                className="min-w-[600px] grid grid-cols-4 gap-3 items-center  border-b bg-white "
+                                                key={item._id}
+                                                className="min-w-[600px] grid grid-cols-4 gap-3 items-center px-3 py-2 border-b bg-white "
                                             >
+                                                {/* Item Name */}
                                                 <Input
                                                     placeholder="Item name"
-                                                    value={item.itemName}
-                                                    onChange={(e) => handleNewItemChange(idx, "itemName", e.target.value)}
-                                                    className="!border-none focus:ring-0  text-center"
-                                                    autoFocus={idx===0}
+                                                    value={editData[item._id]?.itemName ?? item.itemName ?? ""}
+                                                    onChange={(e) => handleEditChange(item._id, "itemName", e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter") handleSaveEdit(editData[item._id] ?? item);
+                                                    }}
+                                                    className="!border-none focus:ring-0 text-center"
 
                                                 />
 
+                                                {/* Quantity */}
                                                 <Input
                                                     type="number"
                                                     placeholder="Qty"
-                                                    value={item.quantity}
-                                                    onChange={(e) => handleNewItemChange(idx, "quantity", e.target.value)}
+                                                    value={editData[item._id]?.quantity ?? item.quantity ?? 0}
+                                                    onChange={(e) => handleEditChange(item._id, "quantity", e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter") handleSaveEdit(editData[item._id] ?? item);
+                                                    }}
                                                     className="!border-none focus:ring-0  text-center"
+
                                                 />
 
+                                                {/* Unit */}
                                                 <select
-                                                    value={item.unit}
-                                                    onChange={(e) => handleNewItemChange(idx, "unit", e.target.value)}
+                                                    value={editData[item._id]?.unit ?? item.unit ?? ""}
+                                                    onChange={(e) => {
+                                                        handleEditChange(item._id, "unit", e.target.value);
+                                                        handleSaveEdit(editData[item._id] ?? item);
+                                                    }}
                                                     className="border px-2 py-1 rounded"
-
                                                 >
                                                     <option value="">Unit</option>
                                                     {UNIT_OPTIONS.map((u) => (
@@ -729,114 +362,103 @@ const RoomPage: React.FC = () => {
                                                     ))}
                                                 </select>
 
+                                                {/* Action */}
                                                 <div className="flex justify-center">
                                                     <Button
-                                                        onClick={() => handleRemoveRow(idx)}
-                                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 mx-auto"
+                                                        onClick={() => handleDeleteItem(item._id)}
+                                                        disabled={deletePending}
+                                                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1"
                                                     >
-                                                        Remove
+                                                        {deletePending ? "Deleting..." : "Delete"}
                                                     </Button>
                                                 </div>
                                             </div>
                                         ))}
+                                    </div>
 
-                                        <div className="flex justify-end mt-3">
+                                    {/* New Items Section */}
+                                    {isAdding ? (
+                                        <div className="space-y-2 mt-4">
+                                            {newItems?.map((item, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="min-w-[600px] grid grid-cols-4 gap-3 items-center  border-b bg-white "
+                                                >
+                                                    <Input
+                                                        placeholder="Item name"
+                                                        value={item.itemName}
+                                                        onChange={(e) => handleNewItemChange(idx, "itemName", e.target.value)}
+                                                        className="!border-none focus:ring-0  text-center"
+                                                        autoFocus={idx === 0}
+
+                                                    />
+
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Qty"
+                                                        value={item.quantity}
+                                                        onChange={(e) => handleNewItemChange(idx, "quantity", e.target.value)}
+                                                        className="!border-none focus:ring-0  text-center"
+                                                    />
+
+                                                    <select
+                                                        value={item.unit}
+                                                        onChange={(e) => handleNewItemChange(idx, "unit", e.target.value)}
+                                                        className="border px-2 py-1 rounded"
+
+                                                    >
+                                                        {/* <option value="">Unit</option> */}
+                                                        {UNIT_OPTIONS.map((u) => (
+                                                            <option key={u} value={u}>
+                                                                {u}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+
+                                                    <div className="flex justify-center">
+                                                        <Button
+                                                            onClick={() => handleRemoveRow(idx)}
+                                                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 mx-auto"
+                                                        >
+                                                            Remove
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ))}
+
+                                            <div className="flex justify-end mt-3">
+                                                <Button
+                                                    onClick={handleSaveAll}
+                                                    disabled={newItems.every((item) =>
+                                                        Object.entries(item).every(([k, v]) => k === "itemName" && !v ? false : true)
+                                                    )}
+
+                                                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
+                                                >
+                                                    Save All Items
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="w-full  flex justify-end">
                                             <Button
-                                                onClick={handleSaveAll}
-                                                disabled={newItems.every((item) =>
-                                                    Object.entries(item).every(([k, v]) => k === "itemName" && !v ? false : true)
-                                                )}
-
-                                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
+                                                onClick={() => {
+                                                    setIsAdding(true);
+                                                    setNewItems([{ itemName: "", quantity: 1, unit: "unit" }]);
+                                                }}
+                                                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg  "
                                             >
-                                                Save All Items
+                                                + Add Item
                                             </Button>
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className="w-full  flex justify-end">
-                                        <Button
-                                            onClick={() => {
-                                                setIsAdding(true);
-                                                setNewItems([{ itemName: "", quantity: 1, unit: "" }]);
-                                            }}
-                                            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg  "
-                                        >
-                                            + Add Item
-                                        </Button>
-                                    </div>
 
-                                )}
+                                    )}
+                                </div>
+
                             </div>
-
-                            // </div>
                         )}
                     </div>
 
-                    {/* Add New Item Form */}
-
-                    {/* {!isAdding ?
-                        <Button
-                            onClick={() => {
-                                setIsAdding(true)
-
-                                setNewItems([{ itemName: "", quantity: 1, unit: "" }])
-                            }
-                            }
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center space-x-2 transition-colors duration-200 shadow-sm hover:shadow-md"
-                        >
-                            <i className="fas fa-plus text-sm" />
-                            <span>Add Item</span>
-                        </Button>
-                        :
-                        <div className="space-y-3">
-                            {newItems?.map((item, idx) => (
-                                <div key={idx} className="flex items-center gap-3  p-3 rounded-lg bg-white">
-                                    <Input
-                                        placeholder="Item name"
-                                        value={item.itemName}
-                                        onChange={(e) => handleNewItemChange(idx, "itemName", e.target.value)}
-                                        className="flex-1"
-                                    />
-
-                                    <Input
-                                        type="number"
-                                        placeholder="Qty"
-                                        value={item.quantity}
-                                        onChange={(e) => handleNewItemChange(idx, "quantity", e.target.value)}
-                                        className="w-24"
-                                    />
-
-                                    <select
-                                        value={item.unit}
-                                        onChange={(e) => handleNewItemChange(idx, "unit", e.target.value)}
-                                        className="border px-2 py-1 rounded"
-                                    >
-                                        <option value="">Unit</option>
-                                        {UNIT_OPTIONS.map((u) => (
-                                            <option key={u} value={u}>{u}</option>
-                                        ))}
-                                    </select>
-
-                                    <Button
-                                        onClick={() => handleRemoveRow(idx)}
-                                        variant="danger"
-                                        className="bg-red-500 text-white"
-                                    >
-                                        remove
-                                    </Button>
-                                </div>
-                            ))}
-
-                            <Button
-                                onClick={handleSaveAll}
-                                disabled={newItems.every(item => Object.values(item).every(item => !item))}
-                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
-                            >
-                                Save All Items
-                            </Button>
-                        </div>
-                        } */}
 
                 </div>
 

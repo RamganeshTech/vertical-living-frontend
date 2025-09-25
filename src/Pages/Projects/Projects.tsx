@@ -27,6 +27,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     PROCUREMENT: `/organizations/${organizationId}/projects/procurement`,
     ACCOUNTING: `/organizations/${organizationId}/projects/accounting`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
+    RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
     INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
     QUOTEVARIENT: `/organizations/${organizationId}/projects/quotevariant`,
     STAFFTASK: `/organizations/${organizationId}/projects/stafftask`,

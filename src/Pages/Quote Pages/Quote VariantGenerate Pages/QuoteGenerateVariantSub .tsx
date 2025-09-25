@@ -1,7 +1,7 @@
 import React, { createRef, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGenerateQuotePdf, useGetMaterialBrands, useGetMaterialQuoteSingleEntry } from "../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
-import { RATES, type FurnitureBlock } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
+import {  type FurnitureBlock } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
 import FurnitureQuoteVariantForm, { getRateForThickness, type FurnitureQuoteRef } from "./FurnitureQuoteVariantForm";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
@@ -9,6 +9,7 @@ import { Button } from "../../../components/ui/Button";
 import { downloadImage } from "../../../utils/downloadFile";
 import SearchSelect from "../../../components/ui/SearchSelect";
 import { Card } from "../../../components/ui/Card";
+import { useGetSingleLabourCost } from "../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 
 export const DEFAULT_LAMINATE_RATE_PER_SQFT = 10;
 
@@ -19,6 +20,7 @@ const QuoteGenerateVariantSub = () => {
     const { data: quote, isLoading: quoteLoading } = useGetMaterialQuoteSingleEntry(organizationId!, quoteId!);
     let { data: materialBrands, isLoading: loadingBrands } = useGetMaterialBrands(organizationId!, "plywood");
     let { data: laminateBrands } = useGetMaterialBrands(organizationId!, "Laminate");
+    let { data: labourCost = 0 } = useGetSingleLabourCost(organizationId!);
 
     const { mutateAsync: generateQuote, isPending: quotePending } = useGenerateQuotePdf()
     const furnitureRefs = useRef<Array<React.RefObject<FurnitureQuoteRef | null>>>([]);
@@ -142,7 +144,9 @@ const QuoteGenerateVariantSub = () => {
             // labour info is based on the first core row
             const coreRows = furniture.coreMaterials;
             const base = coreRows[0];
-            const totalLabourCost = (base?.carpenters || 0) * (base?.days || 0) * RATES.labour;
+            // changed for labour cost
+            // const totalLabourCost = (base?.carpenters || 0) * (base?.days || 0) * RATES.labour;
+            const totalLabourCost = (base?.carpenters || 0) * (base?.days || 0) * labourCost;
             const labourPerRow = coreRows.length > 0 ? totalLabourCost / coreRows.length : 0;
 
             coreRows.forEach(row => {
@@ -533,7 +537,7 @@ const QuoteGenerateVariantSub = () => {
                 </div>
 
                 {/* Mobile Financial Summary - Only visible on smaller screens */}
-                <div className=" grid grid-cols-3 gap-2">
+                <div className=" grid grid-cols-4 gap-2">
                     <Card className="px-2 py-4 border-l-4 border-blue-600">
                         <div className="text-center">
                             {/* <p className="text-xs text-gray-600">Cost</p> */}
@@ -564,6 +568,17 @@ const QuoteGenerateVariantSub = () => {
                             
                         </div>
                     </Card>
+
+                    <Card className="px-2 py-4 border-l-4 border-orange-600">
+                        <div className="text-center">
+                            <p className="text-md text-gray-600">Single Labour Cost</p>
+                            <p className="text-md font-bold text-orange-600">₹{labourCost}
+                            
+                            </p>
+                             
+                            
+                        </div>
+                    </Card>
                 </div>
             </header>
 
@@ -577,6 +592,7 @@ const QuoteGenerateVariantSub = () => {
                                 key={index}
                                 index={index}
                                 data={furniture}
+                                labourCost={labourCost}
                                 ref={furnitureRefs.current[index] as React.RefObject<FurnitureQuoteRef>} // 🔄 Pass the ref down
                                 // selectedBrandRates={selectedBrand ? brandRatesByName[selectedBrand] || [] : []}
                                 // selectedLaminateRates={selectedLaminateBrand ? laminateRatesByBrand[selectedLaminateBrand] || [] : []}

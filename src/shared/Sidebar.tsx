@@ -18,7 +18,9 @@ import { resetStaffProfile } from '../features/staffSlices'
 import { logout } from '../features/authSlice'
 import type { RootState } from '../store/store'
 import { toast } from '../utils/toast'
-import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
+// import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
+import { useGetProjectDetails } from '../apiList/currentActiveStage api/currentActiveStageApi'
+// import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
 
 
 type SidebarProp = {
@@ -61,7 +63,7 @@ export const getSidebarConfig = (
             "SAMPLEDESIGN",
             "WORKSCHEDULE",
             "TECHNICALCONSULTANT", // Insert after this
-            "SELECTSTAGE", // Remove this later if needed
+            // "SELECTSTAGE",
             "PAYMENTCONFIRMATION",
             "QUOTEPDF",
             "ORDERMATERIALS",
@@ -145,7 +147,8 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
     const { role } = useSelector((state: RootState) => state.authStore)
     const [activeSidebar, setActiveSidebar] = useState<string>('');
 
-    const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
+    // const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
+    const { data: projectDetails, isLoading: projectDetailPending } = useGetProjectDetails(projectId)
     // console.log("stageSelectinDate", stageSelectionData)
     const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending, } = useLogoutCTO()
     const { mutateAsync: ClientLogoutAsync, isPending: isClientPending, } = useLogoutClient()
@@ -155,11 +158,11 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
 
     useEffect(() => {
         if (setProjectName) {
-            if (stageSelectionData && stageSelectionData.projectName) {
-                setProjectName(stageSelectionData.projectName || "Project")
+            if (projectDetails && projectDetails.projectName && !projectDetailPending) {
+                setProjectName(projectDetails?.projectName || "Project")
             }
         }
-    }, [stageSelectionData])
+    }, [projectDetails, projectDetailPending])
 
 
     const handleSideBarClose = () => {
@@ -170,8 +173,8 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
         setShowSideBar(true)
     }
 
-       
-        const isProjectDetailRoute = pathArray[2] === "projectdetails"
+
+    const isProjectDetailRoute = pathArray[2] === "projectdetails"
 
     useEffect(() => {
         const pathArray = location.pathname.split('/')
@@ -186,9 +189,10 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
 
     useSidebarShortcut(handleSideBarOpen, handleSideBarClose);
 
-    const stageType = !selectStagePending && stageSelectionData?.mode; // "Manual Flow" | "Modular Units" | null
+    // const stageType = !selectStagePending && stageSelectionData?.mode; // "Manual Flow" | "Modular Units" | null
 
-    let { filteredLabels, filteredIcons, filteredPaths } = getSidebarConfig(stageType, labels, path, pathArray, icons);
+    // IF YOU WANT TO USE THE FILTERED LABEL WITH SELECT STAGE PATHS THNE PLESE UN COMMENT THE BLEOW ONES ADN USE THE filteredLabels, filteredIcons, filteredPaths,inseted of labels, path, icons
+    // let { filteredLabels, filteredIcons, filteredPaths } = getSidebarConfig(stageType, labels, path, pathArray, icons);
 
 
 
@@ -255,11 +259,11 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                         </div>
 
                         <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
-                            {Object.entries(filteredLabels).map(([key, value]) => {
+                            {Object.entries(labels).map(([key, value]) => {
                                 const isActive = activeSidebar === value;
 
                                 // <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
-                                return (filteredPaths[key] && <Link key={value as string} to={filteredPaths[key]} className='outline-none'>
+                                return (path[key] && <Link key={value as string} to={path[key]} className='outline-none'>
                                     <div
                                         onClick={() => setActiveSidebar(value as string)}
                                         className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar === value ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
@@ -319,11 +323,11 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                         <div className='flex items-center flex-col justify-between w-full'>
 
                             {/* <SidebarIcons path icons={icons} activeSidebar={activeSidebar} setActiveSidebar={setActiveSidebar} /> */}
-                            {Object.entries(filteredIcons).map(([key, value]) => {
+                            {Object.entries(icons).map(([key, value]) => {
                                 const isActive = activeSidebar?.toLowerCase() === key.toLowerCase();
 
-                                return (filteredPaths[key] ?
-                                    <Link key={key} to={filteredPaths[key]} className={`${filteredPaths[key] ? "" : "cursor-not-allowed"}`}>
+                                return (path[key] ?
+                                    <Link key={key} to={path[key]} className={`${path[key] ? "" : "cursor-not-allowed"}`}>
                                         <div
                                             onClick={() => setActiveSidebar(key)}
                                             className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${activeSidebar?.toLowerCase() === key.toLowerCase() ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'

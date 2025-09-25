@@ -19,7 +19,7 @@ import { downloadImage } from "../../../utils/downloadFile";
 import type { IConsultationMessage, ITechnicalConsultation } from "../../../types/types";
 import { Badge } from "../../../components/ui/Badge";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
-import { useGetStageSelection } from "../../../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi";
+// import { useGetStageSelection } from "../../../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -33,7 +33,7 @@ const TechnicalConsultant: React.FC = () => {
     const { role, _id: userId } = useGetRole();
     const navigate = useNavigate()
 
-    const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId!)
+    // const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId!)
 
     const [text, setText] = useState("");
     const [attachments, setAttachments] = useState<File[]>([]);
@@ -56,19 +56,20 @@ const TechnicalConsultant: React.FC = () => {
             await updateCompletionStatus.mutateAsync({ projectId: projectId! });
             toast({ description: 'Completion status updated successfully', title: "Success" });
 
-            if (!selectStagePending) {
-                if (!stageSelectionData.mode) {
-                    navigate('../selectstage')
-                }
-                else if (stageSelectionData && stageSelectionData.mode === "Manual Flow") {
-                    navigate('../materialselection')
+            // if (!selectStagePending) {
+            //     if (!stageSelectionData.mode) {
+            //         navigate('../selectstage')
+            //     }
+            //     else if (stageSelectionData && stageSelectionData.mode === "Manual Flow") {
+            //         navigate('../materialselection')
 
-                } else if (stageSelectionData && stageSelectionData?.mode === "Modular Units") {
-                    navigate('../modularunits')
-                }
-            } else {
-                alert("Please navigate to next stage manually , you havet selected the stage yet")
-            }
+            //     } else if (stageSelectionData && stageSelectionData?.mode === "Modular Units") {
+            //         navigate('../modularunits')
+            //     }
+            // } else {
+            //     alert("Please navigate to next stage manually , you havet selected the stage yet")
+            // }
+            navigate('../paymentconfirmation')
         } catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
         }

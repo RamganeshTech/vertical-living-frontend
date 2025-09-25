@@ -8,6 +8,7 @@ import { Button } from "../../../../components/ui/Button";
 import FurnitureForm from "./FurnitureForm";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/Select";
 import QuoteGenerateList from "../QuoteGenerateList";
+import { useGetSingleLabourCost } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 
 
 type CoreMaterialRow = {
@@ -54,6 +55,8 @@ const QuoteGenerateMain = () => {
 
     const { organizationId } = useParams() as { organizationId: string }
     const { data: projectData } = useGetProjects(organizationId);
+        let { data: labourCost = 0 } = useGetSingleLabourCost(organizationId!);
+    
     const projects: AvailableProjetType[] = useMemo(
         () =>
             projectData?.map((p: any) => ({
@@ -259,16 +262,25 @@ const QuoteGenerateMain = () => {
         }
     };
 
+
+
+    // console.log("labor cost", labourCost)
+
     return (
         <div className={`h-full mx-auto max-h-full ${editingId ? "overflow-y-auto" : ""} `}>
 
 
             <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-1 border-b-1 border-[#818283]">
-                <div>
+                <div >
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                         <i className="fas fa-file mr-3 text-blue-600" />
                         Internal Quote Entry
                     </h1>
+                   
+                    {furnitures?.length > 0 &&  
+                        <p className="ml-[30px] mt-[5px] block text-[15px] text-gray-800">
+                           Single Labour cost:  <span className="text-black font-semibold">₹{labourCost}</span>
+                            </p>}
                 </div>
 
 
@@ -396,6 +408,7 @@ const QuoteGenerateMain = () => {
                     <FurnitureForm
                         key={index}
                         index={index}
+                        labourCost={labourCost}
                         data={furniture}
                         updateFurniture={(updated) => {
                             const updatedArr = [...furnitures];

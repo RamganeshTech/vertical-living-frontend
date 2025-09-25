@@ -16,7 +16,7 @@ import { resetStaffProfile } from "../features/staffSlices";
 import { COMPANY_DETAILS } from "../constants/constants";
 import type { RootState } from "../store/store";
 import { toast } from "../utils/toast";
-import { useGetStageSelection } from "../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi";
+// import { useGetStageSelection } from "../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi";
 
 
 
@@ -30,11 +30,15 @@ type MobileSidebarProps = {
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, path }) => {
 
   const navigate = useNavigate()
-  const { organizationId, projectId } = useParams() as { organizationId: string, projectId: string }
+  const { organizationId, 
+    // projectId 
+  } = useParams() as { organizationId: string,
+      //  projectId: string 
+      }
   const dispatch = useDispatch();
   const { role } = useSelector((state: RootState) => state.authStore)
 
-  const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
+  // const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
 
   const { mutateAsync: CTOLogoutAsync, isPending: isCTOPending } = useLogoutCTO();
   const { mutateAsync: ClientLogoutAsync, isPending: isClientPending } = useLogoutClient();
@@ -81,37 +85,37 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose, labels, 
 
   const pathArray = location.pathname.split('/')
   const isInStageNavBar = pathArray[2] === "projectdetails"
-  const isInProjectDetails = pathArray.includes("projectdetails");
+  
+  
+  // const isInProjectDetails = pathArray.includes("projectdetails");
+  // if (isInProjectDetails && !selectStagePending) {
+  //   const selection = stageSelectionData.mode;
 
-
-  if (isInProjectDetails && !selectStagePending) {
-    const selection = stageSelectionData.mode;
-
-    labelEntries = labelEntries.filter(([key]) => {
-      if (!selection) {
-        // No selection made yet → only show SELECTSTAGE
-        return (
-          key !== "MODULARUNIT" &&
-          key !== "MATERIALSELECTION" &&
-          key !== "COSTESTIMATION"
-        );
-      } else if (selection === "Modular Units") {
-        // Modular flow → hide MATERIAL_SELECTION and COST_ESTIMATION
-        return (
-          key !== "MATERIALSELECTION" &&
-          key !== "COSTESTIMATION" &&
-          key !== "SELECTSTAGE"
-        );
-      } else if (selection === "Manual Flow") {
-        // Manual flow → hide modular unit stages
-        return (
-          key !== "MODULARUNIT" &&
-          key !== "SELECTSTAGE"
-        );
-      }
-      return true;
-    });
-  }
+  //   labelEntries = labelEntries.filter(([key]) => {
+  //     if (!selection) {
+  //       // No selection made yet → only show SELECTSTAGE
+  //       return (
+  //         key !== "MODULARUNIT" &&
+  //         key !== "MATERIALSELECTION" &&
+  //         key !== "COSTESTIMATION"
+  //       );
+  //     } else if (selection === "Modular Units") {
+  //       // Modular flow → hide MATERIAL_SELECTION and COST_ESTIMATION
+  //       return (
+  //         key !== "MATERIALSELECTION" &&
+  //         key !== "COSTESTIMATION" &&
+  //         key !== "SELECTSTAGE"
+  //       );
+  //     } else if (selection === "Manual Flow") {
+  //       // Manual flow → hide modular unit stages
+  //       return (
+  //         key !== "MODULARUNIT" &&
+  //         key !== "SELECTSTAGE"
+  //       );
+  //     }
+  //     return true;
+  //   });
+  // }
 
 
   const handleNav = () => {

@@ -43,8 +43,7 @@ const PaymentConfirmationStage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { data, isLoading, isError: getAllError, refetch } = useGetPaymentConfirmation(projectId!);
-
+  const { data, isLoading, isError: getAllError, refetch, error } = useGetPaymentConfirmation(projectId!);
   const { mutateAsync: completeStage, isPending: completePending } = useCompletePaymentConfirmation();
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetPaymentConfirmationDeadline();
 
@@ -141,8 +140,8 @@ const PaymentConfirmationStage: React.FC = () => {
             ⚠️ Error Occurred
           </div>
           <p className="text-red-500 text-sm mb-4">
-            {(getAllError as any)?.response?.data?.message ||
-              (getAllError as any)?.message ||
+            {(error as any)?.response?.data?.message ||
+              (error as any)?.message ||
               "Failed to load payment confirmation data"}
           </p>
           <Button

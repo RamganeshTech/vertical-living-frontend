@@ -8,6 +8,8 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import StaffAssignTaskMain from './Pages/Staff Tasks Pages/Create Task Pages/StaffAssignTaskMain';
 import SingleStaffList from './Pages/Staff Tasks Pages/SingleStaffs Task Pages/SingleStaffList';
+import LabourRateConfigMain from './Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigMain';
+// import LabourRateConfigSingle from './Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigSingle';
 const QuotePdfMain = lazy(() => import('./Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain'));
 const ShortListReferenceDesignMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortListReference Pages/ShortListReferenceDesignMain'));
 const WorkReportMain = lazy(() => import('./Pages/Stage Pages/WorkReport Pages/WorkReportMain'));
@@ -27,16 +29,16 @@ const AccountingMain = lazy(() => import('./Pages/Department Pages/Accounting Pa
 const AccountingSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/AccountingSingle'));
 // import LogisticsVehicle from './Pages/Department Pages/Logistics Pages/LogisticsVehicle';
 const InventoryMain = lazy(() => import('./Pages/Stage Pages/Inventory Main/InventoryMain'));
-const ExternalMain = lazy(() => import('./Pages/External Units/ExternalMain'));
-const WardrobeExternal = lazy(() => import('./Pages/External Units/WardrobeExternal'));
-const SelectedExternalUnits = lazy(() => import('./Pages/External Units/SelectedExternal Units/SelectedExternalUnits'));
+// const ExternalMain = lazy(() => import('./Pages/External Units/ExternalMain'));
+// const WardrobeExternal = lazy(() => import('./Pages/External Units/WardrobeExternal'));
+// const SelectedExternalUnits = lazy(() => import('./Pages/External Units/SelectedExternal Units/SelectedExternalUnits'));
 // const ProcurementMain = lazy(() => import('./Pages/Department Pages/Procurement/ProcurementMain'));
 const HrSingleEmployeeDetail = lazy(() => import('./Pages/Department Pages/Hr Pages/HrSingleEmployeeDetail'));
 const RoomPage = lazy(() => import('./Pages/RequirementForm/RoomPage'));
 const HRMainPage = lazy(() => import('./Pages/Department Pages/Hr Pages/HRMainPage'));
 const CommonOrdersMain = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrdersMain'));
 const CommonOrderProject = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrderProject'));
-const RoomDetailCardNew = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCardNew"));
+// const RoomDetailCardNew = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCardNew"));
 // const RoomDetailCardNew = 
 
 const ForgotPassword = lazy(() => import('./Pages/Forgot Password/ForgotPassword'));
@@ -75,11 +77,11 @@ const RequriementForm = lazy(() => import("./Pages/RequirementForm/RequriementFo
 const SiteMeasurement = lazy(() => import("./Pages/Stage Pages/Site Measurement/SiteMeasurement"));
 const SampleDesign = lazy(() => import("./Pages/Stage Pages/Sample design/SampleDesign"));
 const TechnicalConsultant = lazy(() => import("./Pages/Stage Pages/Technical Consultant/TechnicalConsultant"));
-const MaterialRoomOverview = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/MaterialOverview"));
-// const RoomDetailCard = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/OldVersion/RoomDetailCard"));
-const CostEstimationContainer = lazy(() => import("./Pages/Stage Pages/Cost Estimation/CostEstimationContainer"));
-const CostEstimationRoomDetails = lazy(() => import("./Pages/Stage Pages/Cost Estimation/CostEstimationRoomDetails"));
-const LabourEstimateContainer = lazy(() => import("./Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer"));
+// const MaterialRoomOverview = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/MaterialOverview"));
+// // const RoomDetailCard = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/OldVersion/RoomDetailCard"));
+// const CostEstimationContainer = lazy(() => import("./Pages/Stage Pages/Cost Estimation/CostEstimationContainer"));
+// const CostEstimationRoomDetails = lazy(() => import("./Pages/Stage Pages/Cost Estimation/CostEstimationRoomDetails"));
+// const LabourEstimateContainer = lazy(() => import("./Pages/Stage Pages/Cost Estimation/LabourEstimate/LabourEstimateContainer"));
 const OrderMaterialOverview = lazy(() => import("./Pages/Stage Pages/Ordering Materials/OrderMaterialOverview"));
 // const OrderMaterialOverview = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/OrderMaterialOverview"));
 // const OrderMaterialRoomDetails = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/OrderMaterialRoomDetails"));
@@ -113,11 +115,11 @@ const SubscriptionParent = lazy(() => import("./Pages/Subscription Payment/Subsc
 const MaterialOverviewLoading = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading"));
 const UserProfileDetails = lazy(() => import("./Pages/UserProfile/UserProfileDetails"));
 const PrerequisitesPage = lazy(() => import("./Pages/PreRequireties Pages/PreRequiretiesMain"));
-const ModularUnitMain = lazy(() => import("./Pages/Modular Units/ModularUnitMain"));
-const AddModularUnit = lazy(() => import("./Pages/Modular Units/AddModularUnit"));
-const ModularUnitCategoryPage = lazy(() => import("./Pages/Modular Units/ModularUnitCategoryPage"));
-const SelectStage = lazy(() => import("./Pages/Stage Pages/SelectStage/SelectStage"));
-const SelectedUnits = lazy(() => import("./Pages/Modular Units/Selected Units/SelectedUnits"));
+// const ModularUnitMain = lazy(() => import("./Pages/Modular Units/ModularUnitMain"));
+// const AddModularUnit = lazy(() => import("./Pages/Modular Units/AddModularUnit"));
+// const ModularUnitCategoryPage = lazy(() => import("./Pages/Modular Units/ModularUnitCategoryPage"));
+// const SelectStage = lazy(() => import("./Pages/Stage Pages/SelectStage/SelectStage"));
+// const SelectedUnits = lazy(() => import("./Pages/Modular Units/Selected Units/SelectedUnits"));
 const DocumentationMain = lazy(() => import("./Pages/Documentation/DocumentationMain"));
 const SingleStageDocument = lazy(() => import("./Pages/Documentation/SingleStageDocument"));
 
@@ -267,7 +269,7 @@ function App() {
 
 
 
-            <Route path="modularunits" element={
+            {/* <Route path="modularunits" element={
               <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
                 <ModularUnitMain />
               </ProtectedRoutes>
@@ -294,7 +296,7 @@ function App() {
                 <WardrobeExternal />
               </ProtectedRoutes>} />
 
-            </Route>
+            </Route> */}
 
 
             {/* <Route path="procurement" element={
@@ -388,6 +390,15 @@ function App() {
               <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <RateConfigSub />
               </ProtectedRoutes>} />
+            </Route>
+
+             <Route path="labourrateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <LabourRateConfigMain />
+            </ProtectedRoutes>} >
+
+              {/* <Route path="laboursingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <LabourRateConfigSingle />
+              </ProtectedRoutes>} /> */}
             </Route>
 
             <Route path="internalquote" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
@@ -538,7 +549,7 @@ function App() {
 
 
 
-            <Route path="selectstage" element={
+            {/* <Route path="selectstage" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
 
                 <SelectStage />
@@ -606,7 +617,7 @@ function App() {
                   <LabourEstimateContainer />
                 </ProtectedRoutes>
               } />
-            </Route>
+            </Route> */}
 
 
             <Route path="paymentconfirmation" element={
