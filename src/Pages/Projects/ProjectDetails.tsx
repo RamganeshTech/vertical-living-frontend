@@ -69,7 +69,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     // MATERIALSELECTION: projectId ? `/${organizationId}/projectdetails/${projectId}/materialselection` : "",
     // COSTESTIMATION: projectId ? `/${organizationId}/projectdetails/${projectId}/costestimation` : "",
     PAYMENTCONFIRMATION: projectId ? `/${organizationId}/projectdetails/${projectId}/paymentconfirmation` : "",
-    QUOTEPDF: projectId ? `/${organizationId}/projectdetails/${projectId}/quotepdf` : "",
+    // QUOTEPDF: projectId ? `/${organizationId}/projectdetails/${projectId}/quotepdf` : "",
     ORDERMATERIALS: projectId ? `/${organizationId}/projectdetails/${projectId}/ordermaterial` : "",
     MATERIALARRIVED: projectId ? `/${organizationId}/projectdetails/${projectId}/materialarrival` : "",
     INSTALLATION: projectId ? `/${organizationId}/projectdetails/${projectId}/installation` : "",

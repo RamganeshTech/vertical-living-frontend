@@ -6,9 +6,13 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-import StaffAssignTaskMain from './Pages/Staff Tasks Pages/Create Task Pages/StaffAssignTaskMain';
-import SingleStaffList from './Pages/Staff Tasks Pages/SingleStaffs Task Pages/SingleStaffList';
-import LabourRateConfigMain from './Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigMain';
+const StaffAssignTaskMain = lazy(()=> import( './Pages/Staff Tasks Pages/Create Task Pages/StaffAssignTaskMain'));
+const SingleStaffList = lazy(()=> import( './Pages/Staff Tasks Pages/SingleStaffs Task Pages/SingleStaffList'));
+const LabourRateConfigMain = lazy(()=> import( './Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigMain'));
+const ClientQuoteMain = lazy(()=> import( './Pages/Quote Pages/ClientQuote Pages/ClientQuoteMain'));
+const ClientQuoteSingle = lazy(()=> import( './Pages/Quote Pages/ClientQuote Pages/ClientSingle Pages/ClientQuoteSingle'));
+const QuotePaymentMain = lazy(()=> import( './Pages/Stage Pages/PaymentConfirmation Pages/QuotePayment pages/QuotePaymentMain'));
+const QuotePaymentChild = lazy(()=> import( './Pages/Stage Pages/PaymentConfirmation Pages/QuotePayment pages/QuotePaymentChild'));
 // import LabourRateConfigSingle from './Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigSingle';
 const QuotePdfMain = lazy(() => import('./Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain'));
 const ShortListReferenceDesignMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortListReference Pages/ShortListReferenceDesignMain'));
@@ -20,7 +24,6 @@ const RateConfigAdminMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pa
 const RateConfigSub = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigSub'));
 const QuoteGenerateMain = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/QuoteGeenrateMain'));
 const QuoteVariantGenerateMain = lazy(() => import('./Pages/Quote Pages/Quote VariantGenerate Pages/QuoteVariantGenerateMain'));
-// const QuoteGenerateVariantSub = lazy(() => import( './Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub'));
 const LogisticsMain = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsMain'));
 const LogisticsSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsSingle'));
 const ProcurementSub = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/ProcurementSub'));
@@ -39,8 +42,6 @@ const HRMainPage = lazy(() => import('./Pages/Department Pages/Hr Pages/HRMainPa
 const CommonOrdersMain = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrdersMain'));
 const CommonOrderProject = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrderProject'));
 // const RoomDetailCardNew = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCardNew"));
-// const RoomDetailCardNew = 
-
 const ForgotPassword = lazy(() => import('./Pages/Forgot Password/ForgotPassword'));
 const ResetPassword = lazy(() => import('./Pages/Forgot Password/ResetPassword'));
 const ShortlistMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortList/ShortListMain'));
@@ -151,38 +152,6 @@ function App() {
       socket.emit("leave_organization", { organizationId: organizationId });
     };
   }, [organizationId]);
-
-
-
-  // interface ErrorBoundaryProps {
-  //   children: React.ReactNode;
-  // }
-  // interface ErrorBoundaryState {
-  //   hasError: boolean;
-  // }
-  // class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  //   constructor(props: ErrorBoundaryProps) {
-  //     super(props);
-  //     this.state = { hasError: false };
-  //   }
-
-  //   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-  //     console.log(error)
-  //     return { hasError: true };
-  //   }
-
-  //   componentDidCatch(error: Error, info: React.ErrorInfo) {
-  //     console.error("Error boundary caught an error:", error, info);
-  //   }
-
-  //   render() {
-  //     if (this.state.hasError) {
-  //       return <h1>Something went wrong from error boudary.</h1>;
-  //     }
-  //     return this.props.children;
-  //   }
-  // }
-
 
   if (loading) <MaterialOverviewLoading />;
   return (
@@ -420,6 +389,22 @@ function App() {
             </Route>
 
 
+             <Route path="clientquotes" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ClientQuoteMain />
+            </ProtectedRoutes>} >
+
+
+              <Route
+                path="single/:quoteId"
+                element={<ClientQuoteSingle />}
+              />
+
+            </Route>
+
+            
+            
+
+
 
             <Route path="stafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}>
               <StaffTasksListMain />
@@ -644,6 +629,21 @@ function App() {
                 </ProtectedRoutes>
 
               } />
+
+               <Route path="quotes" element={
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff" ]}>
+                  <QuotePaymentMain />
+                </ProtectedRoutes>
+
+              } >
+
+                 <Route path="single/:id" element={
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                  <QuotePaymentChild />
+                </ProtectedRoutes>
+
+              } />
+              </Route>
 
             </Route>
 

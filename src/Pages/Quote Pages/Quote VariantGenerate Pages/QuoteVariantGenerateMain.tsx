@@ -39,9 +39,9 @@ const QuoteGenerateVariantMain = () => {
 
 
 
-const internalQuoteNavigate = ()=>{
-    navigate(`../internalquote`)
-}
+    const internalQuoteNavigate = () => {
+        navigate(`../internalquote`)
+    }
 
 
 
@@ -68,7 +68,7 @@ const internalQuoteNavigate = ()=>{
                 </div>
 
 
-                <div className="flex gap-2">
+                {/* <div className="flex gap-2">
 
                     <input
                         type="text"
@@ -90,7 +90,7 @@ const internalQuoteNavigate = ()=>{
                     >
                         <i className="fas fa-search"> </i>
                     </Button>
-                </div>
+                </div> */}
             </header>
 
 
@@ -133,6 +133,35 @@ const internalQuoteNavigate = ()=>{
                                 </div> */}
 
 
+                            <div className="">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Search By Quote No
+                                </label>
+                                <div className="flex gap-2">
+
+                                    <input
+                                        type="text"
+                                        placeholder="Search and Press Enter"
+                                        value={searchInput}
+                                        autoFocus
+                                        onChange={(e) => setSearchInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                setSearchTerm(searchInput);  // ✅ Only triggers on Enter
+                                            }
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                    />
+
+                                    <Button
+                                        onClick={() => setSearchTerm(searchInput)}
+                                        className="bg-blue-600 text-white px-4 py-2 rounded"
+                                    >
+                                        <i className="fas fa-search"> </i>
+                                    </Button>
+                                </div>
+
+                            </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -201,7 +230,7 @@ const internalQuoteNavigate = ()=>{
                             {quotes.map((quote: any) => (
                                 <>
                                     <QuoteVarientCard key={quote._id} quote={quote} organizationId={organizationId!} />
-                                     </>
+                                </>
                             ))}
                         </div>
                     )}

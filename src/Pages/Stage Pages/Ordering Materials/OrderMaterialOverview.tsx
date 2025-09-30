@@ -1165,7 +1165,7 @@ const OrderMaterialOverview = () => {
     const { mutateAsync: updateDelivery } = useUpdateDeliveryLocation();
     const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
     const { mutateAsync: updateShop } = useUpdateShopDetails();
-    const { mutateAsync: deleteAllSubItems, isPending:deleteAllPending } = useDeleteAllSubItems();
+    const { mutateAsync: deleteAllSubItems, isPending: deleteAllPending } = useDeleteAllSubItems();
 
 
 
@@ -1277,11 +1277,11 @@ const OrderMaterialOverview = () => {
     };
 
 
-     const handleDeleteAllSubItems = async () => {
+    const handleDeleteAllSubItems = async () => {
         try {
-            if(!window.confirm("Are you sure need to perform this operation?")){
-                return 
-            } 
+            if (!window.confirm("Are you sure need to perform this operation?")) {
+                return
+            }
             await deleteAllSubItems({ projectId: projectId! });
             toast({ description: 'All Sub Items successfully', title: "Success" });
 
@@ -1723,21 +1723,21 @@ const OrderMaterialOverview = () => {
                                             {hasUnits ? `${selectedUnits.length} items purchased` : 'No orders yet'}
                                         </p> */}
                                     </div>
-                                   <div className="flex gap-2">
+                                    <div className="flex gap-2">
 
-                                    <Button variant="danger" className="bg-red-600 text-white" 
-                                    isLoading={deleteAllPending} onClick={handleDeleteAllSubItems}>
+                                        <Button variant="danger" className="bg-red-600 text-white"
+                                            isLoading={deleteAllPending} onClick={handleDeleteAllSubItems}>
                                             <i className="fas fa-trash !mr-2"></i>
-                                        Delete All SubItems
-                                    </Button>
+                                            Delete All SubItems
+                                        </Button>
 
-                                     {hasUnits && (
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-gray-500 text-sm">Total:</span>
-                                            <span className="text-xl font-bold text-blue-600">₹{totalCost.toFixed(2)}</span>
-                                        </div>
-                                    )}
-                                   </div>
+                                        {hasUnits && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-gray-500 text-sm">Total:</span>
+                                                <span className="text-xl font-bold text-blue-600">₹{totalCost.toFixed(2)}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -1747,8 +1747,26 @@ const OrderMaterialOverview = () => {
                                         {selectedUnits.map((unit: any, idx: number) => (
                                             <div
                                                 key={unit._id || idx}
-                                                className="group relative p-5 bg-white rounded-xl border border-gray-100 hover:border-blue-100 transition-all shadow-[0_3px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]"
+                                                // className={`group relative p-5
+
+                                                //     ${expandedUnitId === unit._id ?
+                                                //         'border-blue-600 border-2 shadow-md bg-blue-50' :
+                                                //         'border border-blue-500 hover:border-blue-100'
+                                                //     }
+                                                //     bg-white rounded-xl transition-all shadow-[0_3px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]`}
+                                                className={`group relative p-5 transition-all duration-200
+                    ${expandedUnitId === unit._id
+                                                        ? "border-2 border-blue-500 shadow-lg bg-gradient-to-r from-blue-50 to-blue-50 ring-2 ring-blue-200"
+                                                        : "border-l-4 border-blue-600 hover:border-blue-600 hover:shadow-md bg-white"
+                                                    }
+                    rounded-xl shadow-[0_3px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)]`}
                                             >
+
+                                                {/* {expandedUnitId === unit._id && (
+                                                    <div className="absolute -top-2 z-[999] -left-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                                                        <i className="fa fa-check text-white text-xs"></i>
+                                                    </div>
+                                                )} */}
                                                 <div className="flex flex-col md:flex-row gap-5">
                                                     {/* Product Image */}
                                                     <div className="relative w-full md:w-32 h-32 bg-gray-50 rounded-lg overflow-hidden">
@@ -1757,7 +1775,11 @@ const OrderMaterialOverview = () => {
                                                             alt={unit.customId || "Product image"}
                                                             className="w-full h-full object-contain p-3"
                                                         />
-                                                        <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
+                                                        <div
+                                                            className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"
+                                                            // className={`absolute top-2 right-2 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"
+                                                                // }`}
+                                                        >
                                                             ×{unit.quantity}
                                                         </div>
                                                     </div>
@@ -1766,18 +1788,36 @@ const OrderMaterialOverview = () => {
                                                     <div className="flex-1 flex flex-col">
                                                         <div className="flex-1">
                                                             <div className="flex items-center justify-between">
-                                                                <h3 className="text-lg font-semibold text-gray-800 mb-1.5">
+                                                                <h3
+                                                                    // className="text-lg font-semibold text-gray-800 mb-1.5"
+                                                                    className={`text-lg font-semibold mb-1.5 ${expandedUnitId === unit._id ? "text-blue-800" : "text-gray-800"
+                                                                        }`}
+                                                                >
                                                                     {unit.unitName}
                                                                 </h3>
                                                                 <div className="flex gap-2 items-center">
-                                                                    <span className="flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"> Total Sub Items : <span className="">{unit?.subItems?.length || 0}</span></span>
+                                                                    <span 
+                            // className="flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                            className={`flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                    expandedUnitId === unit._id
+                      ? "text-blue-700 bg-blue-100 hover:bg-blue-200"
+                      : "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                  }`}
+                            
+                            
+                            > Total Sub Items : <span className="">{unit?.subItems?.length || 0}</span></span>
                                                                     <button
                                                                         onClick={() =>
                                                                             setExpandedUnitId(
                                                                                 expandedUnitId === unit._id ? null : unit._id
                                                                             )
                                                                         }
-                                                                        className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                                                        // className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                                                        className={`flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    expandedUnitId === unit._id
+                      ? "text-white bg-blue-600 hover:bg-blue-700 shadow-md"
+                      : "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                  }`}
                                                                     >
                                                                         <span className="hidden sm:inline">
                                                                             {/* {expandedUnitId === unit._id ? 'Hide' : 'Show'} Sub Items */}
@@ -1794,7 +1834,12 @@ const OrderMaterialOverview = () => {
                                                             </div>
 
                                                             <div className="flex items-center gap-2 mb-3">
-                                                                <span className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                                                                <span 
+                                                                // className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
+                                                                className={`px-2.5 py-1 text-xs font-medium rounded-full ${
+                  expandedUnitId === unit._id ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
+                }`}
+                                                                >
                                                                     {unit.category || "Generic"}
                                                                 </span>
                                                             </div>
@@ -1832,16 +1877,22 @@ const OrderMaterialOverview = () => {
                                                 </div>
 
                                                 {expandedUnitId === unit._id && (
-                                                    <div className="mt-6 pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-4">
+                                                    <div 
+                                                    // className="mt-6 pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-4"
+                                                    className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
+                                                    
+                                                    >
                                                         <div className="flex items-center gap-2 mb-4">
                                                             <i className="fa-solid fa-list text-blue-600"></i>
-                                                            <h4 className="font-semibold text-gray-800">Sub Items</h4>
+                                                            <h4 className="font-semibold text-blue-800">Sub Items</h4>
                                                             <span className="text-sm text-gray-500">(Click to edit, changes save by clicking Enter)</span>
                                                         </div>
 
                                                         {/* Spreadsheet Header */}
-                                                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                                                            <div className="grid grid-cols-17 gap-0 bg-gray-100 border-b border-gray-200">
+                                                        <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
+                                                            <div 
+                                                            className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
+                                                            >
                                                                 <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
                                                                     Ref ID
                                                                 </div>
@@ -1863,14 +1914,14 @@ const OrderMaterialOverview = () => {
                                                             {unit.subItems && unit.subItems.length > 0 && unit.subItems.map((sub: SubItem) => (
                                                                 <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-gray-100 hover:bg-gray-50">
                                                                     {/* Item Name Cell */}
-                                                                    <div className="col-span-3 border-r border-gray-200">
+                                                                    <div className="col-span-3 border-r border-blue-200">
 
                                                                         <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
                                                                             {sub?.refId || "N/A"}
                                                                         </div>
                                                                     </div>
 
-                                                                    <div className="col-span-8 border-r border-gray-200">
+                                                                    <div className="col-span-8 border-r border-blue-200">
                                                                         {editingCell?.subItemId === sub._id && editingCell?.field === 'name' ? (
                                                                             <input
                                                                                 ref={inputRef}
@@ -1903,7 +1954,7 @@ const OrderMaterialOverview = () => {
                                                                     </div>
 
                                                                     {/* Quantity Cell */}
-                                                                    <div className="col-span-2 border-r border-gray-200">
+                                                                    <div className="col-span-2 border-r border-blue-200">
                                                                         {editingCell?.subItemId === sub._id && editingCell?.field === 'quantity' ? (
                                                                             <input
                                                                                 ref={inputRef}
@@ -1936,7 +1987,7 @@ const OrderMaterialOverview = () => {
                                                                     </div>
 
                                                                     {/* Unit Cell */}
-                                                                    <div className="col-span-3 border-r border-gray-200">
+                                                                    <div className="col-span-3 border-r border-blue-200">
                                                                         {editingCell?.subItemId === sub._id && editingCell?.field === 'unit' ? (
                                                                             <div className="p-2 relative z-50">
                                                                                 <select

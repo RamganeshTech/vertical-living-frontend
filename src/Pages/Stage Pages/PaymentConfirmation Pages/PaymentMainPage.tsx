@@ -35,6 +35,13 @@ const sectionCards = [
     icon: "💳",
     path: "transaction",
   },
+
+   {
+    title: "Client Quotes",
+    description: "Get the Quotation that is approved by client",
+    icon: "📄",
+    path: "quotes",
+  },
 ];
 
 const PaymentConfirmationStage: React.FC = () => {
@@ -51,7 +58,8 @@ const PaymentConfirmationStage: React.FC = () => {
   if (
     location.pathname.includes("/consent") ||
     location.pathname.includes("/schedule") ||
-    location.pathname.includes("/transaction")
+    location.pathname.includes("/transaction") ||
+    location.pathname.includes("/quotes")
   ) {
     return <Outlet />;
   }
@@ -183,7 +191,7 @@ const PaymentConfirmationStage: React.FC = () => {
               Total Payment Amount
             </div>
             <p className="text-3xl text-blue-700 mt-2 font-bold">
-              ₹ {totalAmount?.toLocaleString() || 0}
+              ₹ {totalAmount?.toLocaleString("en-in") || 0}
             </p>
           </Card>
 

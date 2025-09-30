@@ -50,13 +50,17 @@ type FurnitureBlock = {
 
 
 
-
+export const filterValidSimpleRows = (rows: SimpleItemRow[]) => {
+    return rows.filter(row =>
+        Boolean(row.itemName?.trim()) || Boolean(row.description?.trim())
+    );
+};
 const QuoteGenerateMain = () => {
 
     const { organizationId } = useParams() as { organizationId: string }
     const { data: projectData } = useGetProjects(organizationId);
-        let { data: labourCost = 0 } = useGetSingleLabourCost(organizationId!);
-    
+    let { data: labourCost = 0 } = useGetSingleLabourCost(organizationId!);
+
     const projects: AvailableProjetType[] = useMemo(
         () =>
             projectData?.map((p: any) => ({
@@ -97,7 +101,7 @@ const QuoteGenerateMain = () => {
     }
 
     useEffect(() => {
-        
+
         if (quoteType === "single" && !editingId) {
             setFurnitures([])
             addFurniture("Common Category")
@@ -149,6 +153,7 @@ const QuoteGenerateMain = () => {
 
 
     const grandTotal = furnitures?.reduce((sum, f) => sum + f.totals.furnitureTotal, 0);
+
     const handleSubmit = async () => {
         try {
 
@@ -170,9 +175,12 @@ const QuoteGenerateMain = () => {
                                 return rest;
                             }
                         }),
-                        fittingsAndAccessories: f.fittingsAndAccessories,
-                        glues: f.glues,
-                        nonBrandMaterials: f.nonBrandMaterials,
+                        // fittingsAndAccessories: f.fittingsAndAccessories,
+                        // glues: f.glues,
+                        // nonBrandMaterials: f.nonBrandMaterials,
+                        fittingsAndAccessories: filterValidSimpleRows(f.fittingsAndAccessories),
+                        glues: filterValidSimpleRows(f.glues),
+                        nonBrandMaterials: filterValidSimpleRows(f.nonBrandMaterials),
                         coreMaterialsTotal: f.totals.core,
                         fittingsAndAccessoriesTotal: f.totals.fittings,
                         gluesTotal: f.totals.glues,
@@ -228,9 +236,12 @@ const QuoteGenerateMain = () => {
                             imageUrl: cm.imageUrl || null, // preserve uploaded image
                         };
                     }),
-                    fittingsAndAccessories: f.fittingsAndAccessories,
-                    glues: f.glues,
-                    nonBrandMaterials: f.nonBrandMaterials,
+                    // fittingsAndAccessories: f.fittingsAndAccessories,
+                    // glues: f.glues,
+                    // nonBrandMaterials: f.nonBrandMaterials,
+                    fittingsAndAccessories: filterValidSimpleRows(f.fittingsAndAccessories),
+                    glues: filterValidSimpleRows(f.glues),
+                    nonBrandMaterials: filterValidSimpleRows(f.nonBrandMaterials),
                     coreMaterialsTotal: f.totals.core,
                     fittingsAndAccessoriesTotal: f.totals.fittings,
                     gluesTotal: f.totals.glues,
@@ -276,11 +287,11 @@ const QuoteGenerateMain = () => {
                         <i className="fas fa-file mr-3 text-blue-600" />
                         Internal Quote Entry
                     </h1>
-                   
-                    {furnitures?.length > 0 &&  
+
+                    {furnitures?.length > 0 &&
                         <p className="ml-[30px] mt-[5px] block text-[15px] text-gray-800">
-                           Single Labour cost:  <span className="text-black font-semibold">₹{labourCost}</span>
-                            </p>}
+                            Single Labour cost:  <span className="text-black font-semibold">₹{labourCost}</span>
+                        </p>}
                 </div>
 
 
@@ -326,13 +337,13 @@ const QuoteGenerateMain = () => {
                         </select>
                     </div>
 
-                   {furnitures.length> 0 &&  <div className="text-right flex gap-2 items-center">
+                    {furnitures.length > 0 && <div className="text-right flex gap-2 items-center">
                         <div className="text-xs text-gray-600 uppercase tracking-widest">Grand Total</div>
                         <div className="text-xl font-semibold text-green-600">₹{grandTotal.toLocaleString("en-IN")}</div>
                     </div>
-}
+                    }
 
-                 <Button className="flex items-center" onClick={() => {
+                    <Button className="flex items-center" onClick={() => {
                         setModalOpen(true)
                         // setQuoteType("single")
                     }}><i className="fas fa-add mr-1"> </i> Product</Button>
@@ -401,7 +412,7 @@ const QuoteGenerateMain = () => {
                 )} */}
 
             {furnitures.length > 0 && <section className="shadow overflow-y-auto max-h-[86%]">
-               {!editingId &&  <h1 className="text-2xl text-gray-500">
+                {!editingId && <h1 className="text-2xl text-gray-500">
                     {handleQuoteName()}
                 </h1>}
                 {furnitures.map((furniture, index) => (
@@ -435,7 +446,7 @@ const QuoteGenerateMain = () => {
                 {!editingId && <Button
                     variant="secondary"
                     onClick={() => {
-                       
+
                         setFurnitures([])
                         setQuoteType(null)
 

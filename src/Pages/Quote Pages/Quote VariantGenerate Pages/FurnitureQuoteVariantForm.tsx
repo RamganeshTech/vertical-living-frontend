@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import {  type CoreMaterialRow, type FurnitureBlock, type SimpleItemRow } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
+import { type CoreMaterialRow, type FurnitureBlock, type SimpleItemRow } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
 import { NO_IMAGE } from "../../../constants/constants";
 import { DEFAULT_LAMINATE_RATE_PER_SQFT } from "./QuoteGenerateVariantSub ";
 import SearchSelect from "../../../components/ui/SearchSelect";
@@ -70,6 +70,9 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
   const prevPlywoodProp = useRef(selectedBrand);
 
   const [coreMaterials, setCoreMaterials] = useState<CoreMaterialRow[]>(data?.coreMaterials || []);
+  const [fittings, setFittings] = useState(data?.fittingsAndAccessories || []);
+  const [glues, setGlues] = useState(data?.glues || []);
+  const [nbms, setNbms] = useState(data?.nonBrandMaterials || []);
 
   useEffect(() => {
     setCoreMaterials(data?.coreMaterials || []);
@@ -112,7 +115,7 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
 
   const calculateFurnitureRawCost = () => {
     const SHEET_SQFT = 32;
-    const labourRate = 1300;
+    // const labourRate = 1300;
 
     let totalRawCost = 0;
 
@@ -121,7 +124,8 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
 
     const coreRows = coreMaterials;
     const baseRow = coreRows[0];
-    const totalLabour = (baseRow?.carpenters || 0) * (baseRow?.days || 0) * labourRate;
+    // const totalLabour = (baseRow?.carpenters || 0) * (baseRow?.days || 0) * labourRate;
+    const totalLabour = (baseRow?.carpenters || 0) * (baseRow?.days || 0) * labourCost;
     const labourPerRow = coreRows.length > 0 ? totalLabour / coreRows.length : 0;
 
     for (const row of coreRows) {
@@ -187,7 +191,7 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
     const totalRows = coreRows.length;
 
     const base = coreRows[0];
-     // changed for labour cost
+    // changed for labour cost
     // const totalLabourCost = base.carpenters * base.days * RATES.labour;
     const totalLabourCost = base.carpenters * base.days * labourCost;
     const labourWithProfit = totalLabourCost * (1 + (base.profitOnLabour || 0) / 100);
@@ -204,84 +208,128 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
     return Math.round(total);
   };
 
+  // const calculateSimpleRowTotal = (row: SimpleItemRow,) => {
+  //   return row.quantity * row.cost;
+  // };
 
 
-
-  const calculateSimpleRowTotal = (row: SimpleItemRow,) => {
-    return row.quantity * row.cost;
-  };
-
-
-  const calculateGlueRowTotal = (row: SimpleItemRow) => {
-    return row.cost;
-  };
+  // const calculateGlueRowTotal = (row: SimpleItemRow) => {
+  //   return row.cost;
+  // };
 
   const coreTotal = coreMaterials.reduce((sum, row) => sum + calculateRowTotal(row, coreMaterials), 0);
-  const fittingsTotal = data.fittingsAndAccessories.reduce((sum, r) => sum + calculateSimpleRowTotal(r), 0);
-  const gluesTotal = data.glues.reduce((sum, r) => sum + calculateGlueRowTotal(r), 0);
-  const nbmsTotal = data.nonBrandMaterials.reduce((sum, r) => sum + calculateSimpleRowTotal(r), 0);
+  // const fittingsTotal = data.fittingsAndAccessories.reduce((sum, r) => sum + calculateSimpleRowTotal(r), 0);
+  // const gluesTotal = data.glues.reduce((sum, r) => sum + calculateGlueRowTotal(r), 0);
+  // const nbmsTotal = data.nonBrandMaterials.reduce((sum, r) => sum + calculateSimpleRowTotal(r), 0);
+  const fittingsTotal = fittings.reduce((sum, r) => {
+    const base = (r.quantity || 0) * (r.cost || 0);
+    const profit = base * ((r.profitOnMaterial || 0) / 100);
+    return sum + base + profit;
+  }, 0);
+
+  const gluesTotal = glues.reduce((sum, r) => {
+    const base = r.cost || 0;
+    const profit = base * ((r.profitOnMaterial || 0) / 100);
+    return sum + base + profit;
+  }, 0);
+
+  const nbmsTotal = nbms.reduce((sum, r) => {
+    const base = (r.quantity || 0) * (r.cost || 0);
+    const profit = base * ((r.profitOnMaterial || 0) / 100);
+    return sum + base + profit;
+  }, 0);
   const furnitureTotal = coreTotal + fittingsTotal + gluesTotal + nbmsTotal;
 
   useImperativeHandle(ref, () => ({
-    getUpdatedFurniture:() => {
+    getUpdatedFurniture: () => {
 
 
-        const updatedCoreMaterials = coreMaterials.map(row => ({
-      ...row,
-      rowTotal: calculateRowTotal(row, coreMaterials), // ✅ fresh calc
-    }));
-
-    const coreTotalLocal = updatedCoreMaterials.reduce((sum, row) => sum + (row.rowTotal || 0), 0);
-    const fittingsTotalLocal = data.fittingsAndAccessories.reduce((sum, r) => sum + (r.quantity || 0) * (r.cost || 0), 0);
-    const gluesTotalLocal = data.glues.reduce((sum, r) => sum + (r.cost || 0), 0);
-    const nbmsTotalLocal = data.nonBrandMaterials.reduce((sum, r) => sum + (r.quantity || 0) * (r.cost || 0), 0);
-
-    const furnitureTotalLocal = coreTotalLocal + fittingsTotalLocal + gluesTotalLocal + nbmsTotalLocal;
-      
-     return { furnitureName: data.furnitureName, // Original data (with ids etc)
-
-      plywoodBrand: coreSelectedBrand,
-      laminateBrand: coreSelectedLaminateBrand,
-
-      coreMaterials: coreMaterials.map(row => ({
+      const updatedCoreMaterials = coreMaterials.map(row => ({
         ...row,
-        rowTotal: calculateRowTotal(row, coreMaterials),
-      })),
-      fittingsAndAccessories: data.fittingsAndAccessories, // ✅ make sure you track this in child state
-      glues: data.glues,                                   // ✅ child state or empty []
-      nonBrandMaterials: data.nonBrandMaterials,           // ✅ child state or empty []
+        rowTotal: calculateRowTotal(row, coreMaterials), // ✅ fresh calc
+      }));
 
-      // coreMaterialsTotal: coreTotal,
-      // fittingsAndAccessoriesTotal: fittingsTotal,
-      // gluesTotal,
-      // nonBrandMaterialsTotal: nbmsTotal,
-      // furnitureTotal,
 
-      // totals: {
-      //   core: coreTotal,
-      //   fittings: fittingsTotal,
-      //   glues: gluesTotal,
-      //   nbms: nbmsTotal,
-      //   furnitureTotal,
-      // },
+      const updatedFittings = [...fittings];
+      const updatedGlues = [...glues];
+      const updatedNbms = [...nbms];
+
+      // 👇 Totals for calculations ONLY (numbers)
+      const fittingsTotalLocal = updatedFittings.reduce((sum, r) => {
+        const base = (r.quantity || 0) * (r.cost || 0);
+        const profit = base * ((r.profitOnMaterial || 0) / 100);
+        return sum + base + profit;
+      }, 0);
+
+      const gluesTotalLocal = updatedGlues.reduce((sum, r) => {
+        const base = r.cost || 0;
+        const profit = base * ((r.profitOnMaterial || 0) / 100);
+        return sum + base + profit;
+      }, 0);
+
+      const nbmsTotalLocal = updatedNbms.reduce((sum, r) => {
+        const base = (r.quantity || 0) * (r.cost || 0);
+        const profit = base * ((r.profitOnMaterial || 0) / 100);
+        return sum + base + profit;
+      }, 0);
+
+      const coreTotalLocal = updatedCoreMaterials.reduce((sum, row) => sum + (row.rowTotal || 0), 0);
+      // const fittingsTotalLocal = data.fittingsAndAccessories.reduce((sum, r) => sum + (r.quantity || 0) * (r.cost || 0), 0);
+      // const gluesTotalLocal = data.glues.reduce((sum, r) => sum + (r.cost || 0), 0);
+      // const nbmsTotalLocal = data.nonBrandMaterials.reduce((sum, r) => sum + (r.quantity || 0) * (r.cost || 0), 0);
+
+      const furnitureTotalLocal = coreTotalLocal + fittingsTotalLocal + gluesTotalLocal + nbmsTotalLocal;
+
+      return {
+        furnitureName: data.furnitureName, // Original data (with ids etc)
+
+        plywoodBrand: coreSelectedBrand,
+        laminateBrand: coreSelectedLaminateBrand,
+
+        coreMaterials: coreMaterials.map(row => ({
+          ...row,
+          rowTotal: calculateRowTotal(row, coreMaterials),
+        })),
+        // fittingsAndAccessories: data.fittingsAndAccessories, // ✅ make sure you track this in child state
+        // glues: data.glues,                                   // ✅ child state or empty []
+        // nonBrandMaterials: data.nonBrandMaterials,           // ✅ child state or empty []
+        fittingsAndAccessories: updatedFittings,
+        glues: updatedGlues,
+        nonBrandMaterials: updatedNbms,
+
+
+        // coreMaterialsTotal: coreTotal,
+        // fittingsAndAccessoriesTotal: fittingsTotal,
+        // gluesTotal,
+        // nonBrandMaterialsTotal: nbmsTotal,
+        // furnitureTotal,
+
+        // totals: {
+        //   core: coreTotal,
+        //   fittings: fittingsTotal,
+        //   glues: gluesTotal,
+        //   nbms: nbmsTotal,
+        //   furnitureTotal,
+        // },
 
 
         coreMaterialsTotal: coreTotalLocal,
-      fittingsAndAccessoriesTotal: fittingsTotalLocal,
-      gluesTotal: gluesTotalLocal,
-      nonBrandMaterialsTotal: nbmsTotalLocal,
-      furnitureTotal: furnitureTotalLocal,
-
-      totals: {
-        core: coreTotalLocal,
-        fittings: fittingsTotalLocal,
-        glues: gluesTotalLocal,
-        nbms: nbmsTotalLocal,
+        fittingsAndAccessoriesTotal: fittingsTotalLocal,
+        gluesTotal: gluesTotalLocal,
+        nonBrandMaterialsTotal: nbmsTotalLocal,
         furnitureTotal: furnitureTotalLocal,
-      },
-    }
 
-  }}));
+        totals: {
+          core: coreTotalLocal,
+          fittings: fittingsTotalLocal,
+          glues: gluesTotalLocal,
+          nbms: nbmsTotalLocal,
+          furnitureTotal: furnitureTotalLocal,
+        },
+      }
+
+    }
+  }));
 
 
 
@@ -289,7 +337,40 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
     const updated = [...coreMaterials];
     updated[rowIndex] = { ...updated[rowIndex], profitOnMaterial: (newProfit || 0) };
     setCoreMaterials(updated);
-      onFurnitureChange?.(); // trigger parent recalculation
+
+
+    // ✅ ONLY TRIGGER INHERIT IF 0-th ROW IS BEING CHANGED
+    if (rowIndex !== 0) {
+      onFurnitureChange?.();
+      return; // 🚫 Do NOT proceed to sync
+    }
+
+    const inheritedProfit = newProfit;
+
+    const recalculateSimpleRows = (
+      rows: SimpleItemRow[],
+      isGlue: boolean = false
+    ): SimpleItemRow[] => {
+      return rows.map((item) => {
+        // if (item.wasManuallyEdited) return item; // skip manually changed
+        const base = isGlue
+          ? item.cost || 0
+          : (item.quantity || 0) * (item.cost || 0);
+        const profit = base * ((inheritedProfit || 0) / 100);
+        return {
+          ...item,
+          profitOnMaterial: inheritedProfit,
+          rowTotal: Math.round(base + profit),
+        };
+      });
+    };
+
+    setFittings((prev) => recalculateSimpleRows(prev));
+    setGlues((prev) => recalculateSimpleRows(prev, true));
+    setNbms((prev) => recalculateSimpleRows(prev));
+
+
+    onFurnitureChange?.(); // trigger parent recalculation
   };
 
 
@@ -298,13 +379,88 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
     const updated = [...coreMaterials];
     updated[0] = { ...updated[0], profitOnLabour: (newProfit || 0) };
     setCoreMaterials(updated);
-      onFurnitureChange?.(); // trigger parent recalculation
+    onFurnitureChange?.(); // trigger parent recalculation
+  };
+
+
+  // const handleProfitChangeInSimpleRow = (section: string, index: number, newProfit: number) => {
+  //   if (section === "Fittings & Accessories") {
+  //     const updated = [...fittings];
+  //     updated[index] = {
+  //       ...updated[index],
+  //       profitOnMaterial: newProfit || 0,
+  //     };
+  //     setFittings(updated);
+  //   }
+
+  //   if (section === "Glues") {
+  //     const updated = [...glues];
+  //     updated[index] = {
+  //       ...updated[index],
+  //       profitOnMaterial: newProfit || 0,
+  //     };
+  //     setGlues(updated);
+  //   }
+
+  //   if (section === "Non-Branded Materials") {
+  //     const updated = [...nbms];
+  //     updated[index] = {
+  //       ...updated[index],
+  //       profitOnMaterial: newProfit || 0,
+  //     };
+  //     setNbms(updated);
+  //   }
+
+  //   onFurnitureChange?.();
+  // };
+
+  const handleProfitChangeInSimpleRow = (section: string, index: number, newProfit: number) => {
+    if (section === "Fittings & Accessories") {
+      const updated = [...fittings];
+      const base = (updated[index].quantity || 0) * (updated[index].cost || 0);
+      const profit = base * ((newProfit || 0) / 100);
+      updated[index] = {
+        ...updated[index],
+        // wasManuallyEdited: true,
+        profitOnMaterial: newProfit,
+        rowTotal: Math.round(base + profit),
+      };
+      setFittings(updated);
+    }
+
+    if (section === "Glues") {
+      const updated = [...glues];
+      const base = updated[index].cost || 0;
+      const profit = base * ((newProfit || 0) / 100);
+      updated[index] = {
+        ...updated[index],
+        // wasManuallyEdited: true,
+        profitOnMaterial: newProfit,
+        rowTotal: Math.round(base + profit),
+      };
+      setGlues(updated);
+    }
+
+    if (section === "Non-Branded Materials") {
+      const updated = [...nbms];
+      const base = (updated[index].quantity || 0) * (updated[index].cost || 0);
+      const profit = base * ((newProfit || 0) / 100);
+      updated[index] = {
+        ...updated[index],
+        // wasManuallyEdited: true,
+        profitOnMaterial: newProfit,
+        rowTotal: Math.round(base + profit),
+      };
+      setNbms(updated);
+    }
+
+    onFurnitureChange?.();
   };
 
 
   useEffect(() => {
     onFurnitureChange?.(); // tell parent something changed
-  }, [coreSelectedBrand, coreSelectedLaminateBrand, coreMaterials,  data.fittingsAndAccessories, data.glues]);
+  }, [coreSelectedBrand, coreSelectedLaminateBrand, coreMaterials, data.fittingsAndAccessories, data.glues]);
 
   const renderCoreMaterials = () => (
     <div className="mt-6">
@@ -394,13 +550,18 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
 
   const sectionTotal = (sectionTitle: "Fittings & Accessories" | "Glues" | "Non-Branded Materials" | string) => {
     if (sectionTitle === "Fittings & Accessories") {
-      return fittingsTotal
+      // return fittingsTotal
+      return Math.round(fittingsTotal)
     }
     else if (sectionTitle === "Glues") {
-      return gluesTotal
+      // return gluesTotal
+      return Math.round(gluesTotal)
+
     }
     else if (sectionTitle === "Non-Branded Materials") {
-      return nbmsTotal
+      // return nbmsTotal
+      return Math.round(nbmsTotal)
+
     }
     return 0
   }
@@ -421,6 +582,7 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
             <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
             <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
             <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th>
+            <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Profit On Materials</th>
             <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Total</th>
             <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Actions</th>
           </tr>
@@ -432,14 +594,28 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
               <td className="text-center border p-2">{item?.description || "—"}</td>
               <td className="text-center border p-2">{item?.quantity || 0}</td>
               <td className="text-center border p-2">{item?.cost || 0}</td>
-              {sectionTitle === "Fittings & Accessories" || sectionTitle === "Non-Branded Materials" ?
+              {/* <td className="text-center border p-2">{item?.profitOnMaterial || 0}</td> */}
+              <td className="text-center border p-2">
+                <input
+                  type="number"
+                  value={item.profitOnMaterial || 0}
+                  onChange={(e) => handleProfitChangeInSimpleRow(sectionTitle, i, parseFloat(e.target.value))}
+                  className="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm"
+                />
+              </td>
+              {/* {sectionTitle === "Fittings & Accessories" || sectionTitle === "Non-Branded Materials" ?
                 <td className="text-center border p-2 text-green-700 font-bold">₹{calculateSimpleRowTotal(item).toLocaleString("en-IN")}</td>
                 :
                 <td className="text-center border p-2 text-green-700 font-bold">₹{calculateGlueRowTotal(item).toLocaleString("en-IN")}</td>
-              }
+              } */}
+
+              <td className="text-center border p-2 text-green-700 font-bold">
+                ₹{(item.rowTotal || 0).toLocaleString("en-IN")}
+              </td>
               <td className="text-center border p-2">—</td>
             </tr>
           ))}
+
         </tbody>
       </table>
     </div>
@@ -564,9 +740,13 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
         </div>
       </div>
       {renderCoreMaterials()}
-      {renderSimpleSection("Fittings & Accessories", data.fittingsAndAccessories)}
-      {renderSimpleSection("Glues", data.glues)}
-      {renderSimpleSection("Non-Branded Materials", data.nonBrandMaterials)}
+      {/* {renderSimpleSection("Fittings & Accessories", data?.fittingsAndAccessories)}
+      {renderSimpleSection("Glues", data?.glues)}
+      {renderSimpleSection("Non-Branded Materials", data?.nonBrandMaterials)} */}
+
+      {renderSimpleSection("Fittings & Accessories", fittings)}
+      {renderSimpleSection("Glues", glues)}
+      {renderSimpleSection("Non-Branded Materials", nbms)}
 
 
     </div>
@@ -574,3 +754,5 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>(({
 }
 );
 export default FurnitureQuoteVariantForm;
+
+

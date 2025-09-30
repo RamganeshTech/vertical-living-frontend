@@ -30,6 +30,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
     INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
     QUOTEVARIENT: `/organizations/${organizationId}/projects/quotevariant`,
+    "QUOTES (CLIENT)": `/organizations/${organizationId}/projects/clientquotes`,
     STAFFTASK: `/organizations/${organizationId}/projects/stafftask`,
     SINGLESTAFFTASK: `/organizations/${organizationId}/projects/associatedstafftask`,
     // PROCUREMENT: `/organizations/${organizationId}/procurement`

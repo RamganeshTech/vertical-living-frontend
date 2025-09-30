@@ -1,7 +1,7 @@
 import React, { createRef, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGenerateQuotePdf, useGetMaterialBrands, useGetMaterialQuoteSingleEntry } from "../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
-import {  type FurnitureBlock } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
+import { type FurnitureBlock } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
 import FurnitureQuoteVariantForm, { getRateForThickness, type FurnitureQuoteRef } from "./FurnitureQuoteVariantForm";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
@@ -111,6 +111,7 @@ const QuoteGenerateVariantSub = () => {
             (sum, f) => sum + f.totals.furnitureTotal,
             0
         );
+
         console.log("total", total)
         setGrandTotal(total);
         setRawCostWithoutProfit(calculateCostWithoutProfit()); // 👈 Add this line
@@ -165,6 +166,33 @@ const QuoteGenerateVariantSub = () => {
             const fittingsTotal = furniture.fittingsAndAccessories.reduce((sum, r) => sum + getSimpleRowTotal(r), 0);
             const gluesTotal = furniture.glues.reduce((sum, r) => sum + (r.cost || 0), 0);
             const nbmsTotal = furniture.nonBrandMaterials.reduce((sum, r) => sum + getSimpleRowTotal(r), 0);
+
+
+            // 🔁 Fittings, Glues, NBMs — need to REMOVE profitOnMaterial (if any)
+
+            // const getBaseCostWithoutProfit = (quantity: number, cost: number, profit: number = 0) => {
+            //     const gross = quantity * cost;
+            //     return gross / (1 + (profit / 100));
+            // };
+
+            // const getBaseGlueCostWithoutProfit = (cost: number, profit: number = 0) => {
+            //     return cost / (1 + profit / 100);
+            // };
+
+            // const fittingsTotal = (furniture.fittingsAndAccessories || []).reduce((sum, item) =>
+            //     sum + getBaseCostWithoutProfit(item.quantity || 0, item.cost || 0, item.profitOnMaterial || 0),
+            //     0
+            // );
+
+            // const gluesTotal = (furniture.glues || []).reduce((sum, item) =>
+            //     sum + getBaseGlueCostWithoutProfit(item.cost || 0, item.profitOnMaterial || 0),
+            //     0
+            // );
+
+            // const nbmsTotal = (furniture.nonBrandMaterials || []).reduce((sum, item) =>
+            //     sum + getBaseCostWithoutProfit(item.quantity || 0, item.cost || 0, item.profitOnMaterial || 0),
+            //     0
+            // );
 
             totalRawCost += fittingsTotal + gluesTotal + nbmsTotal;
         });
@@ -225,7 +253,7 @@ const QuoteGenerateVariantSub = () => {
             })
             // console.log("reso", res)
             downloadImage({ src: res.url, alt: res.fileName })
-            toast({ title: "success", description: "scuesssfully vrated" })
+            toast({ title: "success", description: "Successfully created, check it in the Quote for clients section"})
         }
         catch (error: any) {
             toast({
@@ -304,181 +332,6 @@ const QuoteGenerateVariantSub = () => {
 
     return (
         <div className="p-2 max-h-full overflow-y-auto">
-            {/* <header className="flex justify-between items-center mb-6">
-                <div className="flex gap-2 items-center">
-                    <div onClick={() => navigate(-1)}
-                        className='bg-slate-50 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
-                        <i className='fas fa-arrow-left'></i></div>
-                    <div>
-
-                        <h1 className="text-md font-bold text-gray-500">Project Name: <strong className="text-black">{quote?.projectId?.projectName || "Project"}</strong></h1>
-                        <h1 className="text-md font-bold text-gray-500">Quote:  <strong className="text-black">#{quote?.quoteNo || "View"}</strong></h1>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-3 justify-end ">
-
-                    <div className="text-right mr-6">
-                        <p className="text-md text-gray-600">Project Cost <br /><span className="font-bold">(without profit)</span></p>
-                        <p className="text-xl font-semibold text-blue-600">
-                            ₹{rawCostWithoutProfit.toLocaleString("en-IN")}
-                        </p>
-                    </div>
-
-                    <p className="text-right text-green-700">
-                        <p className="text-md text-gray-600">Client Quote Amount <br /><span className="font-bold">(with profit)</span></p>
-                        <p className="text-xl font-semibold text-blue-600">
-                            ₹{grandTotal.toLocaleString("en-IN")}
-                        </p>
-                    </p>
-
-
-                    <p className="text-right text-green-700">
-                        <p className="text-md text-gray-600"> Extra Profit</p>
-                        <p className="text-xl font-semibold text-blue-600">
-                            ₹{profitDifference.toLocaleString("en-IN")}
-                                <br />
-                             <span className="text-blue-700 !text-[12px] font-semibold">
-                            {profitPercentage.toFixed(2)}%
-                        </span>
-                        </p>
-                    </p>
-
-                    <div>
-                        <Button isLoading={quotePending} onClick={() => { handleGenerateQuote() }}>Generate Quote</Button>
-                    </div>
-
-
-                    <div className="max-w-[40%]">
-                        <label className="font-medium text-gray-700">Select Common Plwyood Brand:</label>
-
-                        <SearchSelect
-                            options={brandOptions}
-                            placeholder="-- Choose Plwyood Brand --"
-                            searchPlaceholder="Search Plywood brands..."
-                            onSelect={setSelectedBrand}
-                            selectedValue={selectedBrand || ""}
-                            className="mt-1"
-                        />
-                    </div>
-
-                    <div className="max-w-[40%]">
-                        <label className="font-medium text-gray-700">Select Common Laminate Brand:</label>
-
-                        <SearchSelect
-                            options={laminateBrandOptions}
-                            placeholder="-- Choose Laminate Brand --"
-                            searchPlaceholder="Search laminate brands..."
-                            onSelect={setSelectedLaminateBrand}
-                            selectedValue={selectedLaminateBrand || ""}
-                            className="mt-1"
-                        />
-                    </div>
-
-                </div>
-            </header> */}
-
-
-            {/* <div className="h-[200px] border w-full">
-
-            </div> */}
-
-
-            {/* <header className="bg-white mb-6 border-b pb-4">
-  <div className="flex flex-wrap items-start justify-between gap-6 xl:gap-10 px-2">
-
-    <div className="flex items-start gap-3 min-w-[220px]">
-      <div
-        onClick={() => navigate(-1)}
-        className="bg-slate-50 hover:bg-slate-300 flex items-center justify-center w-8 h-8 border border-gray-300 text-sm cursor-pointer rounded-md"
-        title="Go back"
-      >
-        <i className="fas fa-arrow-left"></i>
-      </div>
-
-      <div className="text-sm leading-tight">
-        <p className="text-gray-500 font-semibold">
-          Project Name:{" "}
-          <span className="text-black">{quote?.projectId?.projectName || "Project"}</span>
-        </p>
-        <p className="text-gray-500 font-semibold">
-          Quote:{" "}
-          <span className="text-black">#{quote?.quoteNo || "-"}</span>
-        </p>
-      </div>
-    </div>
-
-    <div className="flex flex-wrap items-center justify-start gap-6 text-right">
-      <div>
-        <p className="text-sm text-gray-600 font-medium">
-          Project Cost <br />
-          <span className="font-bold">(without profit)</span>
-        </p>
-        <p className="text-xl font-semibold text-blue-600">
-          ₹{rawCostWithoutProfit.toLocaleString("en-IN")}
-        </p>
-      </div>
-
-      <div>
-        <p className="text-sm text-gray-600 font-medium">
-          Client Quote Amount <br />
-          <span className="font-bold">(with profit)</span>
-        </p>
-        <p className="text-xl font-semibold text-blue-600">
-          ₹{grandTotal.toLocaleString("en-IN")}
-        </p>
-      </div>
-
-      <div>
-        <p className="text-sm text-gray-600 font-medium">Extra Profit</p>
-        <p className="text-xl font-semibold text-blue-600">
-          ₹{profitDifference.toLocaleString("en-IN")}
-        </p>
-        <span className="text-blue-700 text-xs font-medium">
-          ({profitPercentage.toFixed(2)}%)
-        </span>
-      </div>
-    </div>
-
-    <div className="flex flex-wrap items-center gap-4 justify-end">
-
-      <div>
-        <Button isLoading={quotePending} onClick={handleGenerateQuote}>
-          Generate Quote
-        </Button>
-      </div>
-
-      <div className="flex flex-col min-w-[200px]">
-        <label className="font-medium text-sm text-gray-700 mb-1">
-          Select Common Plywood Brand:
-        </label>
-        <SearchSelect
-          options={brandOptions}
-          placeholder="-- Choose Plywood Brand --"
-          searchPlaceholder="Search Plywood brands..."
-          onSelect={setSelectedBrand}
-          selectedValue={selectedBrand || ""}
-          className=""
-        />
-      </div>
-
-      <div className="flex flex-col min-w-[200px]">
-        <label className="font-medium text-sm text-gray-700 mb-1">
-          Select Common Laminate Brand:
-        </label>
-        <SearchSelect
-          options={laminateBrandOptions}
-          placeholder="-- Choose Laminate Brand --"
-          searchPlaceholder="Search laminate brands..."
-          onSelect={setSelectedLaminateBrand}
-          selectedValue={selectedLaminateBrand || ""}
-          className=""
-        />
-      </div>
-    </div>
-  </div>
-</header> */}
-
 
             <header className="bg-white border-b border-gray-200 pb-4 space-y-3">
                 {/* Top Row - Project Info, Financial Summary, and Generate Button */}
@@ -495,7 +348,7 @@ const QuoteGenerateVariantSub = () => {
                             <h1 className="text-lg font-semibold text-gray-900 truncate">
                                 {quote?.projectId?.projectName || "Project"}
                             </h1>
-                            <p className="text-md text-gray-500">Quote: #{quote?.quoteNo || "-"}</p>
+                            <p className="text-md text-gray-500">{quote?.quoteNo ? `Quote: #${quote?.quoteNo}` : ""}</p>
                         </div>
                     </div>
 
@@ -559,13 +412,13 @@ const QuoteGenerateVariantSub = () => {
                         <div className="text-center">
                             <p className="text-md text-gray-600">Profit Amount</p>
                             <p className="text-md font-bold text-violet-600">₹{profitDifference.toLocaleString("en-IN")}
-                            {" "}
+                                {" "}
                                 <span className="text-black !text-[12px] ml-[5px] font-semibold">
-                            ({profitPercentage.toFixed(2)}%)
-                        </span>
+                                    ({profitPercentage.toFixed(2)}%)
+                                </span>
                             </p>
-                             
-                            
+
+
                         </div>
                     </Card>
 
@@ -573,10 +426,10 @@ const QuoteGenerateVariantSub = () => {
                         <div className="text-center">
                             <p className="text-md text-gray-600">Single Labour Cost</p>
                             <p className="text-md font-bold text-orange-600">₹{labourCost}
-                            
+
                             </p>
-                             
-                            
+
+
                         </div>
                     </Card>
                 </div>

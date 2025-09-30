@@ -1,10 +1,10 @@
 import React, { memo, useState } from "react";
-import type { ProjectInput } from "../components/CreateProject";
+// import type { ProjectInput } from "../components/CreateProject";
 
 
 type TaginputProp = {
   tags: string[],
-  setState: React.Dispatch<React.SetStateAction<ProjectInput>>
+  setState: React.Dispatch<React.SetStateAction<string[]>>
 
 }
 
@@ -15,16 +15,20 @@ const TagInput: React.FC<TaginputProp> = ({ tags, setState }) => {
     if ((e.key === "Enter" || e.key === ",") && input.trim()) {
       e.preventDefault();
       if (!tags.includes(input.trim())) {
-        setState(p => ({ ...p, "tags": [...tags, input.trim()] }));
+        // setState(p => ({ ...p, "tags": [...tags, input.trim()] }));
+        setState([...tags, input.trim()]);  // ✅ fixed here
       }
       setInput("");
     } else if (e.key === "Backspace" && !input) {
-      setState(p => ({ ...p, "tags": tags.slice(0, -1) }));
+      // setState(p => ({ ...p, "tags": tags.slice(0, -1) }));
+      setState(tags.slice(0, -1));  // ✅ fixed here
     }
   };
 
   const removeTag = (indexToRemove: number) => {
-    setState(p => ({ ...p, "tags": tags.filter((_, index) => index !== indexToRemove) }));
+    // setState(p => ({ ...p, "tags": tags.filter((_, index) => index !== indexToRemove) }));
+        setState(tags.filter((_, index) => index !== indexToRemove));  // ✅ fixed here
+
   };
 
   return (

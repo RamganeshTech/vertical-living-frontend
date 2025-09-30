@@ -22,6 +22,9 @@ export type SimpleItemRow = {
   quantity: number;
   cost: number;
   rowTotal: number;
+  profitOnMaterial?: number
+  wasManuallyEdited?: boolean; // 🆕
+
 };
 
 export type FurnitureBlock = {
@@ -44,7 +47,7 @@ export type FurnitureBlock = {
 type Props = {
   index: number;
   data: FurnitureBlock;
-  labourCost:number;
+  labourCost: number;
   updateFurniture?: (updatedFurniture: FurnitureBlock) => void;
   removeFurniture?: () => void;
 };
@@ -78,37 +81,37 @@ const emptySimpleItem = (): SimpleItemRow => ({
 
 
 export const calculateCoreMaterialCosts = (
-    coreRows: CoreMaterialRow[],
-    labourCost:number
-  ): CoreMaterialRow[] => {
-    if (coreRows.length === 0) return [];
+  coreRows: CoreMaterialRow[],
+  labourCost: number
+): CoreMaterialRow[] => {
+  if (coreRows.length === 0) return [];
 
-    const totalRows = coreRows.length;
+  const totalRows = coreRows.length;
 
-    const base = coreRows[0];
-     // changed for labour cost
-    // const totalLabour = base.carpenters * base.days * RATES.labour;
-    const totalLabour = base.carpenters * base.days * labourCost;
-    const labourWithProfit = totalLabour * (1 + (base.profitOnLabour || 0) / 100);
-    const labourPerRow = labourWithProfit / totalRows;
+  const base = coreRows[0];
+  // changed for labour cost
+  // const totalLabour = base.carpenters * base.days * RATES.labour;
+  const totalLabour = base.carpenters * base.days * labourCost;
+  const labourWithProfit = totalLabour * (1 + (base.profitOnLabour || 0) / 100);
+  const labourPerRow = labourWithProfit / totalRows;
 
-    return coreRows.map((row) => {
-      const plywoodQty = row.plywoodNos?.quantity || 0;
-      const laminateQty = row.laminateNos?.quantity || 0;
+  return coreRows.map((row) => {
+    const plywoodQty = row.plywoodNos?.quantity || 0;
+    const laminateQty = row.laminateNos?.quantity || 0;
 
-      // Material cost and margin per row
-      const materialCost =
-        (plywoodQty * RATES.plywood + laminateQty * RATES.laminate) *
-        (1 + (row.profitOnMaterial || 0) / 100);
+    // Material cost and margin per row
+    const materialCost =
+      (plywoodQty * RATES.plywood + laminateQty * RATES.laminate) *
+      (1 + (row.profitOnMaterial || 0) / 100);
 
-        // console.log("console.log", materialCost)
+    // console.log("console.log", materialCost)
 
-      return {
-        ...row,
-        rowTotal: Math.round(materialCost + labourPerRow),
-      };
-    });
-  };
+    return {
+      ...row,
+      rowTotal: Math.round(materialCost + labourPerRow),
+    };
+  });
+};
 
 // Component ----------------------------------------
 const FurnitureForm: React.FC<Props> = ({
@@ -120,26 +123,6 @@ const FurnitureForm: React.FC<Props> = ({
 }) => {
 
 
-
-  // const calculateCoreRowTotal = (row: CoreMaterialRow) => {
-  //   const plywoodQty = row.plywoodNos?.quantity || 0;
-  //   const laminateQty = row.laminateNos?.quantity || 0;
-  //   const carpenters = row.carpenters || 0;
-  //   const days = row.days || 0;
-
-  //   // 🔹 Step 1: Material Cost
-  //   const materialCost = (plywoodQty * RATES.plywood) + (laminateQty * RATES.laminate);
-
-  //   // 🔹 Step 2: Labour Cost
-  //   const labourCost = carpenters * days * RATES.labour;
-
-  //   // 🔹 Step 3: Apply profit margins
-  //   const materialWithProfit = materialCost * (1 + (row.profitOnMaterial || 0) / 100);
-  //   const labourWithProfit = labourCost * (1 + (row.profitOnLabour || 0) / 100);
-
-  //   // 🔹 Step 4: Row total
-  //   return Math.round(materialWithProfit + labourWithProfit);
-  // };
 
   const computeTotals = (fb: FurnitureBlock) => {
     const totalCore = fb.coreMaterials.reduce((sum, row) => sum + row.rowTotal, 0);
@@ -174,15 +157,52 @@ const FurnitureForm: React.FC<Props> = ({
     const updatedRows = calculateCoreMaterialCosts(updated, labourCost);
 
 
+    const inheritedProfit = updatedRows?.[0]?.profitOnMaterial || 0;
+
+    const applyProfitAndRecalculate = (rows: SimpleItemRow[], isGlue = false): SimpleItemRow[] =>
+      rows.map(item => {
+        // if (item.wasManuallyEdited) return item;
+
+        const profitOnMaterial = inheritedProfit;
+        const base = isGlue
+          ? item.cost || 0
+          : (item.quantity || 0) * (item.cost || 0);
+
+        const profit = base * (profitOnMaterial / 100);
+        const rowTotal = Math.round(base + profit);
+
+        return {
+          ...item,
+          profitOnMaterial,
+          rowTotal,
+        };
+      });
+
+
 
     const updatedFurniture: FurnitureBlock = {
       ...data,
       coreMaterials: updatedRows,
+      // fittingsAndAccessories: mapSimpleWithProfit(data.fittingsAndAccessories),
+      // glues: mapSimpleWithProfit(data.glues),
+      // nonBrandMaterials: mapSimpleWithProfit(data.nonBrandMaterials),
+
+      fittingsAndAccessories: applyProfitAndRecalculate(data.fittingsAndAccessories),      // false = not glue
+      glues: applyProfitAndRecalculate(data.glues, true),                                  // glue = needs special calc
+      nonBrandMaterials: applyProfitAndRecalculate(data.nonBrandMaterials),                // false = not glue
     };
+
+
+
+    // const updatedFurniture: FurnitureBlock = {
+    //   ...data,
+    //   coreMaterials: updatedRows,
+    // };
 
     updatedFurniture.totals = computeTotals(updatedFurniture);
     updateFurniture?.(updatedFurniture);
   };
+
 
 
   const handleSimpleChange = (
@@ -193,12 +213,26 @@ const FurnitureForm: React.FC<Props> = ({
   ) => {
     const section: any = [...data[kind]];
     section[i][key] = value;
+    // if (kind !== "glues") {
+    //   section[i].rowTotal = section[i].quantity * section[i].cost;
+    // }
+    // else {
+    //   section[i].rowTotal = section[i].cost;
+    // }
+
     if (kind !== "glues") {
-      section[i].rowTotal = section[i].quantity * section[i].cost;
+      const base = (section[i].quantity || 0) * (section[i].cost || 0);
+      const profit = base * ((section[i].profitOnMaterial || 0) / 100);
+      section[i].rowTotal = Math.round(base + profit);
+    } else {
+      const base = section[i].cost || 0;
+      const profit = base * ((section[i].profitOnMaterial || 0) / 100);
+      section[i].rowTotal = Math.round(base + profit);
     }
-    else {
-      section[i].rowTotal = section[i].cost;
-    }
+
+    // if (key === "profitOnMaterial") {
+    //   section[i].wasManuallyEdited = true; // ✅ track override
+    // }
 
     // 👉 Automatically add new row on typing in last row
     const isLastRow = i === section.length - 1;
@@ -252,7 +286,7 @@ const FurnitureForm: React.FC<Props> = ({
               <tr key={i}
                 className="group relative border-none !border-b-1 px-4 py-2 transition-all duration-150 hover:bg-gray-50"
               >
-                
+
 
                 {i === 0 && (
                   <td rowSpan={data.coreMaterials.length}>
@@ -422,6 +456,7 @@ const FurnitureForm: React.FC<Props> = ({
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Profit %</th>
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -483,6 +518,19 @@ const FurnitureForm: React.FC<Props> = ({
                       handleSimpleChange(kind, i, "cost", Number(e.target.value))
                     }
                     className="w-full px-2 py-1 text-center outline-none"
+                  />
+                </td>
+                <td 
+                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                
+                >
+                  <input
+                    type="number"
+                    value={row.profitOnMaterial ?? 0}
+                    onChange={(e) =>
+                      handleSimpleChange(kind, i, "profitOnMaterial", Number(e.target.value))
+                    }
+                    className="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm"
                   />
                 </td>
                 <td

@@ -6,6 +6,9 @@ import { useParams } from "react-router-dom";
 import MaterialOverviewLoading from "../../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/Card";
 import { Button } from "../../../../components/ui/Button";
+// import TagInput from "../../../../shared/TagInput";
+import SmartTagInput from "../../../../shared/SmartTagInput";
+import { fetchSuggestions } from "../ShortList/ShortListMain";
 
 
 const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -18,10 +21,11 @@ export default function ShortListReferenceDesignMain() {
         organizationId,
     });
 
-    const { mutateAsync: uploadImages, } = useUploadReferenceDesigns();
+    const { mutateAsync: uploadImages, isPending:uploadPending } = useUploadReferenceDesigns();
     const { mutateAsync: deleteImage, } = useDeleteReferenceDesign();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [tags, setTags] = useState<string[]>([]);
 
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +47,8 @@ export default function ShortListReferenceDesignMain() {
             files.forEach((file) => {
                 formData.append("files", file); // assuming your multer/express handler uses `images` as the field
             });
+
+            formData.append("tags", JSON.stringify(tags));
 
             await uploadImages({ organizationId, formData });
             toast({ title: "Success", description: "Image(s) uploaded successfully." });
@@ -99,46 +105,24 @@ export default function ShortListReferenceDesignMain() {
                 <h1 className="text-2xl font-semibold text-gray-800">
                     <i className="fa-solid fa-object-group text-2xl text-blue-600 mr-2"></i>
                     Reference Designs
-                    
-                    </h1>
-                {/* <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 text-sm">
-                    {isUploading ? "Uploading..." : "Upload Images"}
-                    <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        multiple
-                        ref={fileInputRef}
-                        onChange={handleImageChange}
-                        className="hidden"
-                        disabled={isUploading}
-                    />
-                </label> */}
+                </h1>
             </div>
 
 
-            {/* <div
-                ref={dropRef}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                className={`w-full p-10 border-2 border-dashed rounded-md text-center transition-all duration-300
-          ${isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-gray-50"}
-        `}
-            >
-                <p className="text-gray-600">
-{isDragging
-                            ? "Drop files here..."
-                            : "Drag and drop image files here or "}
-                    <span
-                        className="text-blue-600 underline cursor-pointer"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        browse
-                    </span>{" "}
-                    to upload.
-                </p>
-            </div> */}
+            <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Enter Categories</label>
+                {/* <TagInput
+                    tags={tags}
+                    setState={setTags}
+                /> */}
+
+                <SmartTagInput
+                            tags={tags}
+                            setState={setTags}
+                            suggestionFetcher={fetchSuggestions}
+                          />
+                
+            </div>
 
 
             <Card className="">
@@ -147,8 +131,8 @@ export default function ShortListReferenceDesignMain() {
                         {isDragging
                             ? "Drop files here..."
                             : "Drag and drop image files here or "}
-                        <Button variant="outline" size="sm" className="text-blue-600 bg-transparent">
-                            Upload reference images, and can be used to compare in the projects
+                        <Button variant="outline"  size="sm" className="text-blue-600 bg-transparent">
+                           { uploadPending ? <>Loading <i className="fas fa-spinner ml-2 animate-spin"></i></> : "Upload reference images, and can be used to compare in the projects"}
                         </Button>
                     </CardTitle>
                 </CardHeader>
@@ -184,29 +168,29 @@ export default function ShortListReferenceDesignMain() {
 
                 <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images</h1>
 
-            {isFetching ? (
-                <div className="text-center text-gray-600">
-                    <MaterialOverviewLoading />
-                </div>
-            ) : (
-               imageData?.referenceImages.length ?
-                <ImageGalleryExample
-                    imageFiles={imageData?.referenceImages || []}
-                    refetch={refetch}
-                    handleDeleteFile={handleDelete}
-                    height={190}
-                    minWidth={156}
-                    maxWidth={200}
-                />
-                : <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
+                {isFetching ? (
+                    <div className="text-center text-gray-600">
+                        <MaterialOverviewLoading />
+                    </div>
+                ) : (
+                    imageData?.referenceImages.length ?
+                        <ImageGalleryExample
+                            imageFiles={imageData?.referenceImages || []}
+                            refetch={refetch}
+                            handleDeleteFile={handleDelete}
+                            height={190}
+                            minWidth={156}
+                            maxWidth={200}
+                        />
+                        : <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
                             <i className="fas fa-image text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Images Found</h3>
                             <p className="text-sm text-gray-500">
-                                Please upload images 
+                                Please upload images
                             </p>
                         </div>
-            
-            )}
+
+                )}
             </div>
 
         </div>

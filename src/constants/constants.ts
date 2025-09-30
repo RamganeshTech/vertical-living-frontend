@@ -14,6 +14,7 @@ export const SIDEBAR_LABELS:Record<string, string> = {
   RATECONIGSTAFF: "Rate Config (Staff)",
   INTERNALQUOTE: "Internal Quote",
   QUOTEVARIENT: "Quote Varient",
+  "QUOTES (CLIENT)": "Quotes for Clients",
   STAFFTASK: "Staff Tasks",
   SINGLESTAFFTASK: "Tasks"
 
@@ -36,6 +37,7 @@ export const SIDEBAR_ICONS:Record<string, string> = {
   RATECONIGSTAFF: "fa-solid fa-person-digging text-2xl",
   INTERNALQUOTE: "fas fa-file text-2xl",
   QUOTEVARIENT: "fas fa-file-invoice text-2xl",
+  "QUOTES (CLIENT)": "fas fa-users text-2xl",
   STAFFTASK: "fas fa-object-group text-2xl",
   SINGLESTAFFTASK: "fas fa-object-group text-2xl"
   // ISSUES: "fa-solid fa-bug text-2xl",
@@ -104,7 +106,7 @@ export const PROJECTS_LABELS = {
   // MATERIALSELECTION: "Material Selection",
   // COSTESTIMATION: "Cost Estimation",
   PAYMENTCONFIRMATION: "Payment Stage",
-  QUOTEPDF: "Quote Pdfs",
+  // QUOTEPDF: "Quote Pdfs",
   ORDERMATERIALS: "Ordering Material",
   MATERIALARRIVED: "Material Arrival",
   INSTALLATION: "Installation & execution",
@@ -134,7 +136,7 @@ export const PROJECTS_ICONS = {
   // MATERIALSELECTION: "fas fa-box text-2xl",
   // COSTESTIMATION: "fa-solid fa-money-bill-1-wave text-2xl",
   PAYMENTCONFIRMATION: "fa-solid fa-money-bill-wave text-2xl",
-  QUOTEPDF: "fas fa-file-invoice text-2xl",
+  // QUOTEPDF: "fas fa-file-invoice text-2xl",
   ORDERMATERIALS: "fa-solid fa-shopping-cart text-2xl",
   MATERIALARRIVED: "fa-solid fa-receipt text-2xl",
   INSTALLATION: "fas fa-tools text-2xl",

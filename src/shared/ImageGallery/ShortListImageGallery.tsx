@@ -59,7 +59,7 @@ export function ShortListImageGallerySub({
     showSiteSelectButton,
     onSiteImageConfirm,
     onPopupOpenChange
-
+    
 
 }: ImageGalleryProps) {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
@@ -93,9 +93,6 @@ export function ShortListImageGallerySub({
         onPopupOpenChange?.(false); // 👈 Notify parent
 
     }
-
-
-
 
     const goToPrevious = () => {
         if (selectedImageIndex !== null) {
@@ -190,7 +187,7 @@ export function ShortListImageGallerySub({
             <div
                 className={`gap-1 flex flex-wrap ${className}`}
             >
-                {images.map((image, index) => {
+                {images?.map((image, index) => {
                     const height = imageHeights[image._id] || 200
                     return (
                         <>

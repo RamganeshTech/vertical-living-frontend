@@ -1,5 +1,5 @@
 import React, { memo, useState, type ChangeEvent, type FormEvent } from "react";
-import TagInput from "../shared/TagInput";
+// import TagInput from "../shared/TagInput";
 import { useCreateProject, useUpdateProject } from "../apiList/projectApi";
 import ErrorComponent from "./ErrorComponent";
 import { handleProjectValidate } from "../utils/validation";
@@ -273,14 +273,14 @@ const CreateProject: React.FC<CreateProjectProp> = ({ onClose, refetch, setShowF
               className="input outline-none w-full border border-gray-300 rounded-md px-3 py-2 resize-none"
             />
           </div>
-
+{/* 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
             <TagInput
               tags={isEditing ? editForm.tags : formData.tags}
               setState={isEditing ? setEditForm : setFormData}
             />
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
