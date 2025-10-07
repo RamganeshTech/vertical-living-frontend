@@ -15,7 +15,7 @@ export interface SearchSelectProps {
   onValueChange: (value: string | null) => void;
   value?: string;
   className?: string;
-  searchBy?: 'name' | 'email' | 'both'; // Control what to search by
+  searchBy?: 'name' | 'email' | 'both' ; // Control what to search by
   displayFormat?: 'simple' | 'detailed'; // Control display format
 }
 // Helper function to normalize options

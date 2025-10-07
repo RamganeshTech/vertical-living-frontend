@@ -404,7 +404,6 @@ export default function WorkerRegister() {
               >
                 {registerWorker.isPending ? (
                   <>
-                    <i className="fas fa-spinner fa-spin mr-2"></i>
                     Registering...
                   </>
                 ) : (

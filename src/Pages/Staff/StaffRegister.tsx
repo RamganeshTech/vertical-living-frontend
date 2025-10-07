@@ -371,7 +371,6 @@ export default function StaffRegister() {
               >
                 {registerStaff.isPending ? (
                   <>
-                    <i className="fas fa-spinner fa-spin mr-2"></i>
                     Registering...
                   </>
                 ) : (

@@ -3,7 +3,7 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { getSuggestedSubtasks, useCreateStaffTasks, useGetAllStaffTasks } from "../../../apiList/StaffTasks Api/staffTaskApi"
+import { getSuggestedSubtasks, useCreateStaffTasks, useCreateStaffTasksFromWork, useGetAllStaffTasks } from "../../../apiList/StaffTasks Api/staffTaskApi"
 import { useGetProjects } from "../../../apiList/projectApi"
 import { useGetAllUsers } from "../../../apiList/getAll Users Api/getAllUsersApi"
 import type { AvailableProjetType } from "../../Department Pages/Logistics Pages/LogisticsShipmentForm"
@@ -18,10 +18,12 @@ import useGetRole from "../../../Hooks/useGetRole"
 import { getApiForRole } from "../../../utils/roleCheck"
 import { formatDateForInput } from "../../../utils/dateFormator"
 import DependentTaskList from "./DependentTaskList"
+import { useGetAllWorkLibraries } from "../../../apiList/workLibrary Api/workLibraryApi"
+import type { ITask, IWorkLibrary } from "../../Work Library Pages/WorkLibraryMain"
 
 const allowedRoles = ["owner", "staff", "CTO"];
 
-interface SubtaskForm {
+export interface SubtaskForm {
     _id?: string
     taskName: string
 }
@@ -44,8 +46,16 @@ export interface MainTaskForm {
     status: "in_progress" | "queued" | "done" | "paused",
     tasks: SubtaskForm[]
     history?: any[]
+    images: File[]
+    previewUrls: string[]
 }
 
+
+
+export type searchSelectOptions = {
+    value: string,
+    label: string
+}
 
 
 export function debounce<T extends (...args: any[]) => void>(fn: T, delay: number): T {
@@ -56,29 +66,41 @@ export function debounce<T extends (...args: any[]) => void>(fn: T, delay: numbe
     } as T;
 }
 
+
+
 export const StaffAssignTaskMain: React.FC = () => {
+
     const { organizationId } = useParams() as { organizationId: string }
     const [enableDependent, setEnableDependent] = useState<boolean>(false)
-    const [taskList, setTaskList] = useState<MainTaskForm[]>([
-        {
-            title: "",
-            description: "",
-            due: formatDateForInput(new Date()), // ✅ properly formatted
-            priority: "medium" as const,
-            department: "site" as const,
-            assigneeId: "",
-            assigneeName: "",
-            projectId: "",
-            projectName: "",
-            organizationId,
-            status: "queued",
-            tasks: [{ taskName: "" }]
-        }
-    ])
+
+
+    const defaultTaskList = {
+        images: [],
+        previewUrls: [],
+        title: "",
+        description: "",
+        due: formatDateForInput(new Date()), // ✅ properly formatted
+        priority: "medium" as const,
+        department: "site" as const,
+        assigneeId: "",
+        assigneeName: "",
+        projectId: "",
+        projectName: "",
+        organizationId,
+        status: "queued" as const,
+        tasks: [{ taskName: "" }]
+    }
+
+
+    const [taskList, setTaskList] = useState<MainTaskForm[]>([defaultTaskList])
     const { role } = useGetRole();
     const api = getApiForRole(role!);
+    const [selectedWork, setSelectedWork] = useState<string | null>(null);
+    const [createdFromWork, setCreatedFromWork] = useState<boolean>(false);
 
     const { data: tasks } = useGetAllStaffTasks(organizationId)
+    const { data: works = [] } = useGetAllWorkLibraries(organizationId);
+
 
     // const [debouncedTitles, setDebouncedTitles] = useState<string[]>(taskList?.map(() => ""));
     const [debouncedTitles, setDebouncedTitles] = useState<string[]>(() =>
@@ -147,6 +169,11 @@ export const StaffAssignTaskMain: React.FC = () => {
         label: project.projectName
     }))
 
+    const workOptions = (works || [])?.map((work: IWorkLibrary) => ({
+        label: work.workName,
+        value: (work as any)._id,
+    }))
+
 
 
     const debounceTimeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -164,25 +191,29 @@ export const StaffAssignTaskMain: React.FC = () => {
     };
 
     const { mutateAsync: createTasks, isPending } = useCreateStaffTasks()
+    const { mutateAsync: createTasksFromWorkMutate, isPending:workPending } = useCreateStaffTasksFromWork()
 
     const handleAddMainTask = () => {
         setTaskList(prev => {
             const updated = [
                 ...prev,
-                {
-                    title: "",
-                    description: "",
-                    due: formatDateForInput(new Date()), // ✅ properly formatted
-                    priority: "medium" as const,
-                    department: "site" as const,
-                    assigneeId: "",
-                    assigneeName: "",
-                    projectId: "",
-                    projectName: "",
-                    organizationId,
-                    status: "queued" as const,
-                    tasks: [{ taskName: "" }]
-                }
+                // {
+                //     images: [],
+                //     previewUrls: [],
+                //     title: "",
+                //     description: "",
+                //     due: formatDateForInput(new Date()), // ✅ properly formatted
+                //     priority: "medium" as const,
+                //     department: "site" as const,
+                //     assigneeId: "",
+                //     assigneeName: "",
+                //     projectId: "",
+                //     projectName: "",
+                //     organizationId,
+                //     status: "queued" as const,
+                //     tasks: [{ taskName: "" }]
+                // }
+                defaultTaskList
             ];
             setDebouncedTitles(updated.map(task => task.title || ""));
             return updated;
@@ -194,11 +225,22 @@ export const StaffAssignTaskMain: React.FC = () => {
     };
 
 
+    // old one
+    // const handleMainChange = (index: number, updates: Partial<MainTaskForm>) => {
+    //     const updated = [...taskList]
+    //     updated[index] = { ...updated[index], ...updates }
+    //     setTaskList(updated)
+    // }
+
+
     const handleMainChange = (index: number, updates: Partial<MainTaskForm>) => {
-        const updated = [...taskList]
-        updated[index] = { ...updated[index], ...updates }
-        setTaskList(updated)
-    }
+        setTaskList(prev => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], ...updates };
+            return updated;
+        });
+    };
+
 
     const handleAssigneeChange = (index: number, value: string | null) => {
         const selectedAssignee = staffList?.find((staff: any) => staff._id === value)
@@ -223,6 +265,55 @@ export const StaffAssignTaskMain: React.FC = () => {
             projectName: selectedProject?.projectName || ""
         })
     }
+
+
+
+    const handleWorkChange = (selectedWorkId: string | null) => {
+        if (!selectedWorkId) return;
+
+        const selectedWork = works.find((work: any) => work._id === selectedWorkId);
+
+        if (!selectedWork) {
+            return toast({ title: "Error", description: "No work Available", variant: "destructive" })
+        };
+
+        // Start from current time
+        let currentDue = new Date();
+        console.log("selected work", selectedWork)
+
+        const generatedTasks: MainTaskForm[] = selectedWork?.tasks.map((task: ITask) => {
+
+            const dueTime = formatDateForInput(new Date(currentDue)); // set current time as due
+
+            const estimatedMinutes = task.estimatedTimeInMinutes || 0;
+
+            // Add estimated minutes to the currentDue for the next task
+            currentDue = new Date(currentDue.getTime() + estimatedMinutes * 60000);
+
+            return {
+                title: task.title,
+                due: dueTime,
+                description: "",
+                tasks: (task.subtasks || []).map(sub => ({
+                    taskName: sub.title
+                })),
+                images: [],
+                previewUrls: [],
+                priority: "medium" as const,
+                department: "site" as const,
+                assigneeId: "",
+                assigneeName: "",
+                projectId: "",
+                projectName: "",
+                organizationId,
+                status: "queued" as const,
+            }
+        });
+
+        setSelectedWork(selectedWork?.workName || null)
+        setTaskList(generatedTasks);
+        setCreatedFromWork(true); // <-- Track that it's from the template
+    };
 
     const handleSubChange = (index: number, subIndex: number, value: string) => {
         const updated = [...taskList]
@@ -257,10 +348,20 @@ export const StaffAssignTaskMain: React.FC = () => {
             };
         });
         try {
-            await createTasks({
-                assigneRole: "staff",
-                tasks: updatedTasksList
-            })
+            if (!createdFromWork) {
+                await createTasks({
+                    assigneRole: "staff",
+                    tasks: updatedTasksList
+                })
+            }
+            else {
+                await createTasksFromWorkMutate({
+                    assigneRole: "staff",
+                    tasks: updatedTasksList
+                })
+            }
+
+            setTaskList([defaultTaskList])
             toast({ description: 'Task Created Successfully', title: "Success" });
         } catch (error: any) {
             toast({
@@ -273,7 +374,7 @@ export const StaffAssignTaskMain: React.FC = () => {
 
     return (
         <div className="space-y-6 text-blue-900 overflow-y-auto max-h-full">
-            <header className="flex justify-between items-center w-full  sticky top-0 bg-white pb-5  border-b-1 border-gray-300 ">
+            <header className="flex justify-between items-center w-full  sticky z-[999] top-0 bg-white pb-5  border-b-1 border-gray-300 ">
 
                 <div className="flex items-center gap-4 w-full">
                     <div onClick={() => navigate(-1)}
@@ -289,7 +390,7 @@ export const StaffAssignTaskMain: React.FC = () => {
                 </div>
 
 
-                <div className="flex  gap-4">
+                <div className="flex justify-end md:w-[90%]  items-center gap-4">
                     <Button
                         type="button"
                         onClick={handleAddMainTask}
@@ -302,11 +403,30 @@ export const StaffAssignTaskMain: React.FC = () => {
                         type="button"
                         onClick={handleSubmit}
                         className="bg-blue-600 text-white hover:bg-blue-700"
-                        disabled={isPending}
+                        isLoading={workPending|| isPending}
                     >
                         <i className="fa fa-paper-plane mr-1" /> Submit All Tasks
                     </Button>
+
+
+                      <div >
+                    <Label>Select Work from work library</Label>
+                    <SearchSelectNew
+                        options={workOptions}
+                        placeholder="Select Work"
+                        searchPlaceholder="Search Works..."
+                        value={selectedWork || undefined}
+                        onValueChange={(value) => handleWorkChange(value)}
+                        searchBy="name"
+                        displayFormat="simple"
+                        className="w-full"
+                    />
                 </div>
+                </div>
+
+
+
+              
             </header >
 
             {
@@ -324,7 +444,51 @@ export const StaffAssignTaskMain: React.FC = () => {
                             </Button>
                         </section>
 
+
+                        {/* images */}
+
+                        <Input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={(e) => {
+                                const files = Array.from(e.target.files || []);
+                                const previews = files.map(file => URL.createObjectURL(file));
+                                handleMainChange(index, { images: files, previewUrls: previews });
+                            }}
+                        // className=""
+                        />
+
+
+                        {task?.previewUrls && <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mt-3">
+                            {task?.previewUrls?.length > 0 && task.previewUrls.map((url, imgIndex) => (
+                                <div key={imgIndex} className="w-50 h-50 relative group aspect-square rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                                    <img
+                                        src={url}
+                                        className="w-full h-full object-cover group-hover:opacity-80 transition"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const updatedImages = [...task.images];
+                                            const updatedPreviews = [...task.previewUrls];
+                                            updatedImages.splice(imgIndex, 1);
+                                            updatedPreviews.splice(imgIndex, 1);
+                                            handleMainChange(index, {
+                                                images: updatedImages,
+                                                previewUrls: updatedPreviews,
+                                            });
+                                        }}
+                                        className="absolute top-1 right-1 bg-black/70 text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-600 transition"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            ))}
+                        </div>}
+
                         <div className="grid sm:grid-cols-2 gap-4">
+
                             {/* Title */}
                             <div>
                                 <Label htmlFor={`title-${index}`}>Task Title</Label>
@@ -394,6 +558,9 @@ export const StaffAssignTaskMain: React.FC = () => {
                                 )}
                             </div>
 
+
+
+
                             {/* Priority */}
                             <div>
                                 <Label>Priority</Label>
@@ -424,7 +591,7 @@ export const StaffAssignTaskMain: React.FC = () => {
                             </div>
 
 
-                            <div>
+                            {/* <div>
                                 <Label>Status</Label>
                                 <select
                                     value={task.status}
@@ -435,7 +602,7 @@ export const StaffAssignTaskMain: React.FC = () => {
                                     <option value="in_progress">In Progress</option>
                                     <option value="done">Done</option>
                                 </select>
-                            </div>
+                            </div> */}
 
                             {/* Description */}
                             <div className="col-span-full">
@@ -515,3 +682,5 @@ export const StaffAssignTaskMain: React.FC = () => {
 }
 
 export default StaffAssignTaskMain
+
+

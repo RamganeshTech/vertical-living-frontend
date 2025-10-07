@@ -12,8 +12,7 @@ import {
 import { Button } from "../../components/ui/Button"
 import { useUpdateTaskHistory } from "../../apiList/StaffTasks Api/staffTaskApi"
 import { toast } from "../../utils/toast"
-import { isBlockedByDependencies } from "./TaskViewMain"
-import type { MainTaskForm } from "./Create Task Pages/StaffAssignTaskMain"
+import { isBlockedByDependencies, type SingleMainTaskForm } from "./TaskViewMain"
 
 interface TaskHistory {
     subTask: string | null
@@ -31,7 +30,7 @@ interface Props {
     onClose: () => void
     mainTaskId: string
     subtasks: Subtask[]
-    task: MainTaskForm
+    task: SingleMainTaskForm
     history: TaskHistory[]
     role: string | null
 }

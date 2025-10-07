@@ -175,7 +175,7 @@ export default function ShortlistMain() {
   return (
     <div className="max-w-full overflow-y-auto max-h-full px-4 mx-auto py-2">
       <header className="flex gap-2 items-center justify-between">
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <div
             onClick={() => navigate(-1)}
             className="flex bg-gray-200 h-fit rounded-full items-center gap-2 backdrop-blur-sm px-4 py-2 cursor-pointer"

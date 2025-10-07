@@ -6,13 +6,17 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-const StaffAssignTaskMain = lazy(()=> import( './Pages/Staff Tasks Pages/Create Task Pages/StaffAssignTaskMain'));
-const SingleStaffList = lazy(()=> import( './Pages/Staff Tasks Pages/SingleStaffs Task Pages/SingleStaffList'));
-const LabourRateConfigMain = lazy(()=> import( './Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigMain'));
-const ClientQuoteMain = lazy(()=> import( './Pages/Quote Pages/ClientQuote Pages/ClientQuoteMain'));
-const ClientQuoteSingle = lazy(()=> import( './Pages/Quote Pages/ClientQuote Pages/ClientSingle Pages/ClientQuoteSingle'));
-const QuotePaymentMain = lazy(()=> import( './Pages/Stage Pages/PaymentConfirmation Pages/QuotePayment pages/QuotePaymentMain'));
-const QuotePaymentChild = lazy(()=> import( './Pages/Stage Pages/PaymentConfirmation Pages/QuotePayment pages/QuotePaymentChild'));
+import WorkLibraryMain from './Pages/Work Library Pages/WorkLibraryMain';
+import WorkLibrarySingle from './Pages/Work Library Pages/WorkLibrarySingle';
+const ShortlistMicaMain = lazy(() => import( './Pages/Stage Pages/Sample design/ShortList/ShortListMicaMain'));
+const ShortListMicaReferenceDesignMain = lazy(() => import( './Pages/Stage Pages/Sample design/ShortListReference Pages/ShortlListMicaDesignMain'));
+const StaffAssignTaskMain = lazy(() => import('./Pages/Staff Tasks Pages/Create Task Pages/StaffAssignTaskMain'));
+const SingleStaffList = lazy(() => import('./Pages/Staff Tasks Pages/SingleStaffs Task Pages/SingleStaffList'));
+const LabourRateConfigMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigMain'));
+const ClientQuoteMain = lazy(() => import('./Pages/Quote Pages/ClientQuote Pages/ClientQuoteMain'));
+const ClientQuoteSingle = lazy(() => import('./Pages/Quote Pages/ClientQuote Pages/ClientSingle Pages/ClientQuoteSingle'));
+const QuotePaymentMain = lazy(() => import('./Pages/Stage Pages/PaymentConfirmation Pages/QuotePayment pages/QuotePaymentMain'));
+const QuotePaymentChild = lazy(() => import('./Pages/Stage Pages/PaymentConfirmation Pages/QuotePayment pages/QuotePaymentChild'));
 // import LabourRateConfigSingle from './Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigSingle';
 const QuotePdfMain = lazy(() => import('./Pages/Stage Pages/QuoteProjectPdfs/QuotePdfMain'));
 const ShortListReferenceDesignMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortListReference Pages/ShortListReferenceDesignMain'));
@@ -327,6 +331,11 @@ function App() {
             </ProtectedRoutes>} >
             </Route>
 
+             <Route path="shortlistmicadesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ShortListMicaReferenceDesignMain />
+            </ProtectedRoutes>} >
+            </Route>
+
 
             <Route path="accounting" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <AccountingMain />
@@ -361,7 +370,7 @@ function App() {
               </ProtectedRoutes>} />
             </Route>
 
-             <Route path="labourrateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="labourrateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <LabourRateConfigMain />
             </ProtectedRoutes>} >
 
@@ -389,7 +398,7 @@ function App() {
             </Route>
 
 
-             <Route path="clientquotes" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="clientquotes" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <ClientQuoteMain />
             </ProtectedRoutes>} >
 
@@ -401,9 +410,25 @@ function App() {
 
             </Route>
 
-            
-            
 
+
+            <Route path="worklibrary" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <WorkLibraryMain />
+            </ProtectedRoutes>} >
+
+
+              <Route
+                path="single/:id"
+                element={<WorkLibrarySingle />}
+              />
+
+
+              {/* <Route
+                path="addtask"
+                element={<StaffAssignTaskMain />}
+              /> */}
+
+            </Route>
 
 
             <Route path="stafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}>
@@ -424,16 +449,19 @@ function App() {
 
             </Route>
 
-             <Route path="associatedstafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="associatedstafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <SingleStaffList />
             </ProtectedRoutes>} >
 
-             <Route
+              <Route
                 path="single/:id"
                 element={<TaskViewMain />}
               />
-            
+
             </Route>
+
+
+
 
           </Route>
 
@@ -521,6 +549,11 @@ function App() {
               <Route path="shortlist" element={
                 <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
                   <ShortlistMain />
+                </ProtectedRoutes>} />
+
+              <Route path="shortlistmica" element={
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                  <ShortlistMicaMain />
                 </ProtectedRoutes>} />
 
             </Route>
@@ -630,19 +663,19 @@ function App() {
 
               } />
 
-               <Route path="quotes" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff" ]}>
+              <Route path="quotes" element={
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                   <QuotePaymentMain />
                 </ProtectedRoutes>
 
               } >
 
-                 <Route path="single/:id" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-                  <QuotePaymentChild />
-                </ProtectedRoutes>
+                <Route path="single/:id" element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                    <QuotePaymentChild />
+                  </ProtectedRoutes>
 
-              } />
+                } />
               </Route>
 
             </Route>

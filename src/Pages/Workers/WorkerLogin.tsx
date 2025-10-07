@@ -209,7 +209,6 @@ export default function WorkerLogin() {
               >
                 {loginWorker.isPending ? (
                   <>
-                    <i className="fas fa-spinner fa-spin mr-2"></i>
                     Signing in...
                   </>
                 ) : (

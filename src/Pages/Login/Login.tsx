@@ -267,7 +267,6 @@ const LoginPage = () => {
                             >
                                 {isPending ? (
                                     <>
-                                        <i className="fas fa-spinner fa-spin mr-2"></i>
                                         Signing in...
                                     </>
                                 ) : (
@@ -480,7 +479,6 @@ const LoginPage = () => {
                             >
                                 {registerPending ? (
                                     <>
-                                        <i className="fas fa-spinner fa-spin mr-2"></i>
                                         Registering...
                                     </>
                                 ) : (

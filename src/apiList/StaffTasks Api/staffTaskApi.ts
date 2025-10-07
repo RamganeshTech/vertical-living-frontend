@@ -18,10 +18,86 @@ export const createStaffTasks = async ({
   assigneRole: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.post("/stafftasks/tasks/bulk", {
-    tasks,
-    assigneRole,
+
+   const formData = new FormData();
+
+  // Convert task JSON to string
+  formData.append("tasks", JSON.stringify(tasks));
+  formData.append("assigneRole", assigneRole);
+
+  // Collect and append files (optional)
+  // each task may have multiple images
+  tasks.forEach((task) => {
+    if (task.images && Array.isArray(task.images)) {
+      task.images.forEach((file: File) => {
+        // ensure file is a File object (from input)
+        if (file instanceof File) {
+          formData.append("files", file);
+        }
+      });
+    }
   });
+
+
+  // const { data } = await api.post("/stafftasks/tasks/bulk", {
+  //   tasks,
+  //   assigneRole,
+  // });
+
+
+    const { data } = await api.post("/stafftasks/tasks/bulk", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+const createStaffTasksFromWork = async ({
+  tasks,
+  assigneRole,
+  api,
+}: {
+  tasks: any[];
+  assigneRole: string;
+  api: AxiosInstance;
+}) => {
+
+   const formData = new FormData();
+
+  // Convert task JSON to string
+  formData.append("tasks", JSON.stringify(tasks));
+  formData.append("assigneRole", assigneRole);
+
+  // Collect and append files (optional)
+  // each task may have multiple images
+  tasks.forEach((task) => {
+    if (task.images && Array.isArray(task.images)) {
+      task.images.forEach((file: File) => {
+        // ensure file is a File object (from input)
+        if (file instanceof File) {
+          formData.append("files", file);
+        }
+      });
+    }
+  });
+
+
+  // const { data } = await api.post("/stafftasks/tasks/bulk", {
+  //   tasks,
+  //   assigneRole,
+  // });
+
+
+    const { data } = await api.post("/stafftasks/tasks/taskfromwork", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -137,6 +213,27 @@ export const updateSubTaskName = async ({
   return data.data;
 };
 
+
+// 7. UPDATE SUB TASK COMMENTS
+export const updateSubTaskComment = async ({
+  mainTaskId,
+  subTaskId,
+  comment,
+  api,
+}: {
+  mainTaskId: string;
+  subTaskId: string;
+    comment: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.patch(
+    `/stafftasks/tasks/${mainTaskId}/${subTaskId}/updatecomments`,
+    {   comment }
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
 // 6. DELETE SUB-TASK
 export const deleteSubTask = async ({
   mainTaskId,
@@ -197,6 +294,23 @@ export const useCreateStaffTasks = () => {
   });
 };
 
+
+// create task form workopitons
+
+export const useCreateStaffTasksFromWork = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  return useMutation({
+    mutationFn: async ({ tasks, assigneRole }: { tasks: any[]; assigneRole: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("Not Authenticated");
+      return await createStaffTasksFromWork({ tasks, assigneRole, api });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stafftasks"] });
+    }
+  });
+};
 
 
 // export const useSuggestSubtasks = (title: string) => {
@@ -279,6 +393,8 @@ export const useUpdateMainTask = () => {
   });
 };
 
+
+
 // 4. Delete main task
 export const useDeleteMainTask = () => {
   const { role } = useGetRole();
@@ -310,6 +426,26 @@ export const useUpdateSubTaskName = () => {
     }
   });
 };
+
+
+
+
+// 5. update comments sub tasks
+export const useUpdateSubTaskComments = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  return useMutation({
+    mutationFn: async ({ mainTaskId, subTaskId, comment }: { mainTaskId: string; subTaskId: string; comment: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("Not Authenticated");
+      return await updateSubTaskComment({ mainTaskId, subTaskId, comment, api });
+    },
+    onSuccess: (_, { mainTaskId }) => {
+      queryClient.invalidateQueries({ queryKey: ["stafftasks", mainTaskId] });
+    }
+  });
+};
+
 
 // 6. Delete subtask
 export const useDeleteSubTask = () => {

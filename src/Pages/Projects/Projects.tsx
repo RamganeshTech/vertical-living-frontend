@@ -21,6 +21,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     PROJECTS: `/organizations/${organizationId}/projects`,
     ORGANIZATION: `/organizations/${organizationId}/invitecto`,
     SHORTLIST: `/organizations/${organizationId}/projects/shortlistdesign`,
+    // SHORTLISTMICA: `/organizations/${organizationId}/projects/shortlistmicadesign`,
     COMMONORDER: `/organizations/${organizationId}/projects/commonorder`,
     HR: `/organizations/${organizationId}/projects/hr`,
     LOGISTICS: `/organizations/${organizationId}/projects/logistics`,
@@ -31,6 +32,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
     QUOTEVARIENT: `/organizations/${organizationId}/projects/quotevariant`,
     "QUOTES (CLIENT)": `/organizations/${organizationId}/projects/clientquotes`,
+    WORKLIBRARY: `/organizations/${organizationId}/projects/worklibrary`,
     STAFFTASK: `/organizations/${organizationId}/projects/stafftask`,
     SINGLESTAFFTASK: `/organizations/${organizationId}/projects/associatedstafftask`,
     // PROCUREMENT: `/organizations/${organizationId}/procurement`

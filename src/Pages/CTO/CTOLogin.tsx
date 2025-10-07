@@ -217,7 +217,6 @@ export default function CTOLogin() {
               >
                 {loginCTO.isPending ? (
                   <>
-                    <i className="fas fa-spinner fa-spin mr-2"></i>
                     Signing in...
                   </>
                 ) : (

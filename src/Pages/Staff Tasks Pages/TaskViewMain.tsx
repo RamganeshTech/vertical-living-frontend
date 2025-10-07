@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, {  useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
@@ -8,7 +8,8 @@ import {
     useSingleStaffTask,
     useUpdateMainTask,
     useUpdateSubTaskName,
-    useDeleteSubTask
+    useDeleteSubTask,
+    useUpdateSubTaskComments
 } from "../../apiList/StaffTasks Api/staffTaskApi"
 import SubtaskStatusModal from "./SubtaskStatusModal"
 import { dateFormate, formatDateForInput, formatTime } from './../../utils/dateFormator'
@@ -21,7 +22,7 @@ import { useGetProjects } from "../../apiList/projectApi"
 import type { AvailableProjetType } from "../Department Pages/Logistics Pages/LogisticsShipmentForm"
 import useGetRole from "../../Hooks/useGetRole"
 import { Textarea } from "../../components/ui/TextArea"
-import type { MainTaskForm } from "./Create Task Pages/StaffAssignTaskMain"
+import type { SubtaskForm } from "./Create Task Pages/StaffAssignTaskMain"
 import { Badge } from "../../components/ui/Badge"
 
 const statusOptions = ["queued", "in_progress", "paused", "done"]
@@ -30,31 +31,59 @@ const departmentOptions = ["site", "procurement", "design", "accounts"]
 
 
 type DependentTask = {
-  _id?: string;
-  title?: string;
-  due?: string;
-  status?: string;
-  assigneeId?: {
-    staffName?: string;
-    _id?:string
-  };
+    _id?: string;
+    title?: string;
+    due?: string;
+    status?: string;
+    assigneeId?: {
+        staffName?: string;
+        _id?: string
+    };
 };
 
+
+type TaskImage = {
+    type: "image" | "pdf";
+    url: string;
+    originalName: string;
+    uploadedAt: Date;
+
+}
+
 interface FormData {
-  title: string;
-  description: string;
-  due: string;
-  status: string;
-  department: string;
-  priority: string;
-  assigneeId: string;
-  assigneeName: string;
-  projectId: string;
-  projectName: string;
-  dependentTaskId: DependentTask[] | undefined | null;   // ✅ array, not undefined
+    images: TaskImage[]
+    title: string;
+    description: string;
+    due: string;
+    status: string;
+    department: string;
+    priority: string;
+    assigneeId: string;
+    assigneeName: string;
+    projectId: string;
+    projectName: string;
+    dependentTaskId: DependentTask[] | undefined | null;   // ✅ array, not undefined
 }
 
 
+export interface SingleMainTaskForm {
+    _id?: string
+    title: string
+    description: string
+    due: string
+    priority: "low" | "medium" | "high"
+    department: "site" | "procurement" | "design" | "accounts"
+    assigneeId: string
+    assigneeName: string
+    projectId: string
+    projectName: string
+    organizationId?: string
+    dependentTaskId?: string[]
+    status: "in_progress" | "queued" | "done" | "paused",
+    tasks: SubtaskForm[]
+    history?: any[]
+    images: TaskImage[]
+}
 
 export const isBlockedByDependencies = (
     dependentTaskId: any[] | null,
@@ -77,14 +106,18 @@ export const isBlockedByDependencies = (
 };
 
 
+
+
+
 export const TaskViewMain: React.FC = () => {
     const { id, organizationId } = useParams() as { id: string, organizationId: string }
     const { role } = useGetRole()
     const isStaff = role === "staff"
 
     const navigate = useNavigate()
-    const { data: task, isLoading, refetch } = useSingleStaffTask(id) as { data: MainTaskForm, isLoading: boolean, refetch: any }
+    const { data: task, isLoading, refetch } = useSingleStaffTask(id) as { data: SingleMainTaskForm, isLoading: boolean, refetch: any }
     const [formData, setFormData] = useState<FormData>({
+        images: [],
         title: "",
         description: "",
         due: "",
@@ -103,6 +136,7 @@ export const TaskViewMain: React.FC = () => {
     const { mutateAsync: updateMainTask } = useUpdateMainTask()
     const { mutateAsync: updateSubTask } = useUpdateSubTaskName()
     const { mutateAsync: deleteSubTask } = useDeleteSubTask()
+    const { mutateAsync: updateSubTaskComment, isPending: commentPending } = useUpdateSubTaskComments()
 
     const { data: projectList } = useGetProjects(organizationId!)
     const { data: staffList } = useGetAllUsers(organizationId!, "staff")
@@ -121,6 +155,7 @@ export const TaskViewMain: React.FC = () => {
     useEffect(() => {
         if (task) {
             setFormData({
+                images: task.images ? task.images : [],
                 title: task?.title || "",
                 description: task?.description || "",
                 due: formatDateForInput(new Date(task?.due)),
@@ -143,18 +178,18 @@ export const TaskViewMain: React.FC = () => {
 
 
     const handleRemoveDependent = (
-  i: number,
-  dependents: DependentTask[] | undefined | null
-) => {
-  if (!dependents) return;
+        i: number,
+        dependents: DependentTask[] | undefined | null
+    ) => {
+        if (!dependents) return;
 
-  const updated = dependents.filter((_, index) => index !== i);
+        const updated = dependents.filter((_, index) => index !== i);
 
-  setFormData((prev) => ({
-    ...prev,
-    dependentTaskId: updated.length > 0 ? updated : undefined, // can be null too, if you prefer
-  }));
-};
+        setFormData((prev) => ({
+            ...prev,
+            dependentTaskId: updated.length > 0 ? updated : undefined, // can be null too, if you prefer
+        }));
+    };
 
     const handleStatuschangeStaff = async (name: string, value: string) => {
         setFormData((prev) => ({ ...prev, [name]: value }))
@@ -240,6 +275,21 @@ export const TaskViewMain: React.FC = () => {
         }
     }
 
+
+    const handleUpdateSubTaskComment = async ({ subtaskId, comment }: { subtaskId: string, comment: string }) => {
+        try {
+            if (!task) return
+            await updateSubTaskComment({ mainTaskId: task._id!, subTaskId: subtaskId, comment })
+            toast({ description: 'Subtask deleted', title: "Success" })
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message || "Failed to delete subtask",
+                variant: "destructive"
+            })
+        }
+    }
+
     if (!isLoading && !task) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
@@ -254,7 +304,7 @@ export const TaskViewMain: React.FC = () => {
 
     return (
         <div className="p-2 overflow-y-auto max-h-full">
-            <section className="flex items-start justify-between">
+            <section className="flex items-start justify-between border-b border-gray-300 pb-3">
                 <div className="flex gap-2 items-center">
                     <div onClick={() => navigate(-1)} className='bg-blue-50 hover:bg-slate-300 flex items-center justify-center w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
                         <i className='fas fa-arrow-left'></i>
@@ -287,19 +337,19 @@ export const TaskViewMain: React.FC = () => {
 
 
             {formData?.dependentTaskId && Array.isArray(formData?.dependentTaskId) && formData.dependentTaskId.length > 0 && (
-                <div className="mt-6">
+                <div className="!mt-3">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">
                         Dependent Tasks
                     </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {formData.dependentTaskId.map((dep: any, i:number) => (
+                        {formData.dependentTaskId.map((dep: any, i: number) => (
                             <div
                                 key={dep._id}
                                 className="p-4 relative border border-gray-200 rounded-lg bg-gray-50 shadow-sm"
                             >
 
-                               {!isStaff && <Button size="sm" variant="danger" className="absolute top-[10px] !right-[10px] bg-red-600 text-white" onClick={()=> handleRemoveDependent(i, formData.dependentTaskId)}>
+                                {!isStaff && <Button size="sm" variant="danger" className="absolute top-[10px] !right-[10px] bg-red-600 text-white" onClick={() => handleRemoveDependent(i, formData.dependentTaskId)}>
                                     <i className="fas fa-trash-alt"></i>
                                 </Button>}
                                 {/* Title */}
@@ -349,6 +399,31 @@ export const TaskViewMain: React.FC = () => {
                     </div>
                 </div>
             )}
+
+
+            {task?.images && task.images.length > 0 && (
+                <section className="ml-6 my-4 text-2xl text-gray-800">
+                    <h3 className=""></h3>
+                    <Label className="!mb-3 !text-2xl font-semibold">Images</Label>
+
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        {task.images.map((img, imgIndex) => (
+                            <div
+                                key={imgIndex}
+                                className=" size-50 relative aspect-square rounded-lg overflow-hidden border border-gray-200 shadow-sm group"
+                            >
+                                <img
+                                    src={img?.url || ""}
+                                    alt={`Task image ${imgIndex + 1}`}
+                                    className="w-full h-full object-cover transition group-hover:opacity-80"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
 
             <Card className="mt-4">
                 {/* <CardHeader>
@@ -434,7 +509,7 @@ export const TaskViewMain: React.FC = () => {
                         </div>
                     )}
 
-                    {!isStaff && <div>
+                    {/* {!isStaff && <div>
                         <Label>Status</Label>
                         <Select
                             value={formData.status === "in_progress" ? "In progress" : formData.status}
@@ -451,7 +526,7 @@ export const TaskViewMain: React.FC = () => {
                                 ))}
                             </SelectContent>
                         </Select>
-                    </div>}
+                    </div>} */}
 
                     {/* Priority */}
                     {isStaff ? (
@@ -550,20 +625,65 @@ export const TaskViewMain: React.FC = () => {
                     <CardDescription>{task.tasks?.length || 0} subtasks</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {task.tasks.map((subtask: any) => (
-                        isStaff ? (
-                            <div key={subtask._id} className="p-3 bg-gray-50 rounded border text-blue-800 font-medium">
-                                • {subtask.taskName}
-                            </div>
-                        ) : (
-                            <SubTaskEditor
-                                key={subtask._id}
-                                subtask={subtask}
-                                onSave={(val) => handleEditSubtask(subtask._id, val)}
-                                onDelete={() => handleDeleteSubtask(subtask._id)}
-                            />
-                        )
-                    ))}
+                    <ul className="mt-4 space-y-4">
+                        {task.tasks.map((subtask: any) => (
+                            isStaff ? (
+                                <div key={subtask._id}>
+                                    <div className="p-3 bg-gray-50 rounded border text-blue-800 font-medium">
+                                        • {subtask.taskName}
+                                    </div>
+
+                                    <div>
+                                        <Label className="text-sm font-medium text-gray-600">Comments  {" "}
+                                            <span className="!text-[12px] font-normal">(Press Ctrl + Enter to save and for new line press Enter key)
+                                                {commentPending && <span className="!bg-gray-100 py-[3px] !px-[5px] !ml-2 rounded-md"> <i className="fa fa-spinner animate-spin"></i> Loading </span>}
+                                            </span>
+                                        </Label>
+
+
+
+                                        <Textarea
+                                            placeholder="Enter reason if not completed..."
+                                            defaultValue={subtask?.comments || ""}
+                                            // onBlur={async (e) => {
+                                            //     const newComment = e.target.value.trim();
+                                            //     await handleUpdateSubTaskComment({ subtaskId: subtask._id, comment: newComment })
+                                            // }}
+                                            onKeyDown={async (e) => {
+                                                if (e.key === "Enter" && e.ctrlKey) {
+                                                    e.preventDefault()
+                                                    const newComment = (e.target as HTMLTextAreaElement).value.trim();
+                                                    await handleUpdateSubTaskComment({ subtaskId: subtask._id, comment: newComment })
+                                                }
+                                            }}
+                                            className="mt-1"
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <li
+                                    key={subtask._id}
+                                    className="flex items-start gap-3 bg-gray-50 border border-gray-200 rounded-md p-4"
+                                >
+                                        <div className="mt-4 h-2 w-2 border rounded-full bg-blue-600 flex-shrink-0" />
+                                        <div className="flex-1 space-y-2">
+                                            <SubTaskEditor
+                                                subtask={subtask}
+                                                onSave={(val) => handleEditSubtask(subtask._id, val)}
+                                                onDelete={() => handleDeleteSubtask(subtask._id)}
+                                            />
+
+                                            <div className="">
+                                                <p className="text-md font-medium text-blue-800">Note:</p>
+                                                <p className="text-gray-900 text-sm mt-1 !ml-3 whitespace-pre-wrap text-nowrap break-words">
+                                                    {subtask?.comments || <span className="text-gray-400 italic">No comments</span>}
+                                                </p>
+                                            </div>
+                                        </div>
+                                </li>
+                            )
+                        ))}
+                    </ul>
                 </CardContent>
             </Card>
 

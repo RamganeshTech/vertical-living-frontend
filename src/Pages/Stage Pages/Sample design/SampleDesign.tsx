@@ -232,6 +232,16 @@ const SampleDesignModule: React.FC = () => {
            </Link>
           </Card>
 
+
+           {/* <Card className="mb-6  text-blue-600 border-l-4 border-1 border-blue-600">
+           <Link to={`shortlistmica`}>
+            <div className="py-4 ml-2 flex justify-between items-center">
+              <p className="text-md sm:text-xl">Sample Mica Designs</p>
+              <i className="mr-4 fas fa-arrow-right text-blue-600"></i>
+            </div>
+           </Link>
+          </Card> */}
+
           {/* Rooms Content */}
           {(!sampleDesign?.rooms || sampleDesign.rooms.length === 0) ? (
             <div className="text-center py-10 sm:py-16 bg-white rounded-lg shadow-sm">

@@ -8,6 +8,8 @@ import { useGetProjects } from '../../../apiList/projectApi'
 import type { AvailableProjetType } from '../../Department Pages/Logistics Pages/LogisticsShipmentForm'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/Select'
 import MaterialOverviewLoading from '../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../../store/store'
 
 
 
@@ -20,6 +22,8 @@ const SingleStaffList = () => {
     const { organizationId } = useParams() as { organizationId: string }
     const [filters, setFilters] = useState<FilterType>({})
     const location = useLocation()
+
+    const { staffName } = useSelector((state: RootState) => state.staffProfileStore)
 
     const { data: tasks, isLoading, isError, error, refetch } = useGetAssociatedStaffTask(organizationId, filters)
 
@@ -53,15 +57,17 @@ const SingleStaffList = () => {
     return (
         <div className="p-2 h-full ">
             <header className="flex justify-between items-center w-full border-b border-gray-300 mb-2">
-                <div>
-                    <h2 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-dolly mr-3 text-blue-600"></i>
-                        Tasks
+                <div className='flex items-center'>
+                    <i className="fas fa-dolly mr-3 text-blue-600 text-3xl"></i>
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900 flex items-center">
+                            {staffName ? <>Hi  {staffName} <i className="text-blue-600 fa-solid fa-hand text-2xl ml-3 rotate-50"></i></> : "Tasks"}
 
-                    </h2>
-                    {/* <p className="text-gray-600 mt-1 ml-12">
-                        Get your tasks here
-                    </p> */}
+                        </h2>
+                        <p className="text-gray-600 mt-1 ">
+                            Get your tasks here
+                        </p>
+                    </div>
                 </div>
 
             </header>
@@ -90,7 +96,7 @@ const SingleStaffList = () => {
                             {/* Status Filter */}
 
 
-                             <div className="w-full flex gap-2 justify-center items-center">
+                            <div className="w-full flex gap-2 justify-center items-center">
 
                                 <button
                                     onClick={() =>
@@ -166,7 +172,7 @@ const SingleStaffList = () => {
                                 </Select>
                             </div>
 
-                          
+
 
 
                             <div>

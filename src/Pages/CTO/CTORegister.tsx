@@ -363,7 +363,6 @@ export default function CTORegister() {
                             >
                                 {registerCTO.isPending ? (
                                     <>
-                                        <i className="fas fa-spinner fa-spin mr-2"></i>
                                         Registering...
                                     </>
                                 ) : (

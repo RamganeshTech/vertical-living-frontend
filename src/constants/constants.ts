@@ -4,6 +4,7 @@ export const SIDEBAR_LABELS:Record<string, string> = {
   //   DASHBOARD: "Dashboard",
   PROJECTS: "Projects",
   SHORTLIST: "Reference Design",
+  // SHORTLISTMICA: "Mica Designs",
   ORGANIZATION: "Organization",
   COMMONORDER: "Common Order",
   HR: "HR Dept",
@@ -15,6 +16,7 @@ export const SIDEBAR_LABELS:Record<string, string> = {
   INTERNALQUOTE: "Internal Quote",
   QUOTEVARIENT: "Quote Varient",
   "QUOTES (CLIENT)": "Quotes for Clients",
+  WORKLIBRARY: "Work Library",
   STAFFTASK: "Staff Tasks",
   SINGLESTAFFTASK: "Tasks"
 
@@ -27,6 +29,7 @@ export const SIDEBAR_LABELS:Record<string, string> = {
 export const SIDEBAR_ICONS:Record<string, string> = {
   PROJECTS: "fa-solid fa-diagram-project text-2xl",
   SHORTLIST: "fa-solid fa-object-group text-2xl",
+  // SHORTLISTMICA: "fa-solid fa-object-group text-2xl",
   ORGANIZATION: "fa-solid fa-building text-2xl",
   COMMONORDER: "fa-solid fa-box text-2xl",
   HR: "fa-solid fa-users text-2xl",
@@ -38,6 +41,7 @@ export const SIDEBAR_ICONS:Record<string, string> = {
   INTERNALQUOTE: "fas fa-file text-2xl",
   QUOTEVARIENT: "fas fa-file-invoice text-2xl",
   "QUOTES (CLIENT)": "fas fa-users text-2xl",
+  WORKLIBRARY: "fas fa-code-fork text-2xl",
   STAFFTASK: "fas fa-object-group text-2xl",
   SINGLESTAFFTASK: "fas fa-object-group text-2xl"
   // ISSUES: "fa-solid fa-bug text-2xl",

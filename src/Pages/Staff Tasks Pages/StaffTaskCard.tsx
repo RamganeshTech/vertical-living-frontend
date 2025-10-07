@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card'
+import { Card, CardContent,  CardHeader, CardTitle } from '../../components/ui/Card'
 import { useDeleteMainTask } from '../../apiList/StaffTasks Api/staffTaskApi'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/ui/Button'
@@ -30,8 +30,8 @@ const StaffTaskCard:React.FC<Props> = ({task}) => {
   return (
     <Card key={task._id} className="p-0 border-l-4 border-blue-600">
                                     <CardHeader>
-                                        <CardTitle>{task.title}</CardTitle>
-                                        <CardDescription className="text-xs mt-1">{task.description}</CardDescription>
+                                        <CardTitle>{task?.title.trim() || "No title"}</CardTitle>
+                                        {/* <CardDescription className="text-xs mt-1">{task.description}</CardDescription> */}
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                         <p className="text-sm">
