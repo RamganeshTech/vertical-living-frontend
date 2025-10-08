@@ -64,12 +64,14 @@ export const getAllWorkLibraries = async ({
 // ❌ Delete Work Library
 export const deleteWorkLibrary = async ({
   workId,
+  organizationId,
   api,
 }: {
   workId: string;
+  organizationId: string;
   api: any;
 }) => {
-  const { data } = await api.delete(`/worklib/delete/${workId}`);
+  const { data } = await api.delete(`/worklib/delete/${organizationId}/${workId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -152,10 +154,10 @@ export const useDeleteWorkLibrary = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ workId }: { workId: string }) => {
+    mutationFn: async ({ workId, organizationId }: { workId: string , organizationId:string}) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
       if (!api) throw new Error("API not found");
-      return await deleteWorkLibrary({ workId, api });
+      return await deleteWorkLibrary({ workId,organizationId, api });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workLibraries"] });

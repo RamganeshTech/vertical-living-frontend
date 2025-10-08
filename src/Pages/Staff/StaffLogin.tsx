@@ -90,7 +90,7 @@ export default function StaffLogin() {
 
       toast({
         title: "Success",
-        description: "Registration successful",
+        description: "login successful",
       })
 
       navigate("/organizations")

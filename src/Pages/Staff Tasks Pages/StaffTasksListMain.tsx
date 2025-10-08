@@ -73,7 +73,7 @@ export const StaffTasksListMain: React.FC = () => {
     return (
 
 
-        <div className="p-2 h-full ">
+        <div className="p-2 h-full overflow-y-auto ">
             <header className="flex justify-between items-center w-full">
 
 
@@ -97,10 +97,10 @@ export const StaffTasksListMain: React.FC = () => {
                 </Button>
             </header>
 
-            <section className="py-2 flex w-full gap-6 flex-col lg:flex-row items-start h-[90%]">
+            <section className="py-2 flex w-full gap-6 flex-col lg:flex-row items-start lg:h-[90%]">
 
                 {/* Filter Panel - LEFT (30%) */}
-                <div className="lg:w-1/3 xl:w-1/4 w-full  h-full overflow-y-auto custom-scrollbar">
+                <div className="md:w-full lg:w-1/4 xl:w-1/4 w-full  h-full overflow-y-auto custom-scrollbar">
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                         <div className="flex items-center justify-between mb-3">
                             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -120,7 +120,7 @@ export const StaffTasksListMain: React.FC = () => {
                         <div className="space-y-2">
                             {/* Status Filter */}
 
-                            <div className="w-full flex gap-2 justify-center items-center">
+                            <div className="w-full flex gap-2 justify-center items-center flex-row lg:flex-col xl:flex-row">
 
                                 <button
                                     onClick={() =>
@@ -282,13 +282,7 @@ export const StaffTasksListMain: React.FC = () => {
 
                 {/* Cards / Results - RIGHT (70%) */}
                 <div className="flex-1 w-full overflow-y-auto  h-[100%]">
-                    {/* <header className="mb-6 flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-blue-900">Task List</h2>
-                        <Button onClick={() => navigate("addtask")} className="bg-blue-600">
-                            + Add Task
-                        </Button>
-                    </header> */}
-
+                   
                     {isLoading && <MaterialOverviewLoading />}
 
 
@@ -320,7 +314,7 @@ export const StaffTasksListMain: React.FC = () => {
                         </div>
                     )}
 
-                    {!isLoading && !isError && <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {!isLoading && !isError && <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {tasks?.map((task: any) => (
                             <StaffTaskCard key={task._id} task={task} />
                         ))}
