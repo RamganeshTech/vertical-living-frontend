@@ -4,6 +4,7 @@ import { Button } from '../../../components/ui/Button'
 import { useDeleteQuote } from '../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi'
 import { toast } from '../../../utils/toast'
 import { useNavigate } from 'react-router-dom'
+import { dateFormate, formatTime } from '../../../utils/dateFormator'
 
 
 type Props = {
@@ -59,7 +60,8 @@ const QuoteVarientCard: React.FC<Props> = ({ quote, organizationId }) => {
 
 
                         <p className="text-xs text-gray-500 ">
-                            Created on: {new Date(quote.createdAt).toLocaleString()}
+                            {/* Created on: {new Date(quote.createdAt).toLocaleString()} */}
+                            Created on: {dateFormate(quote.createdAt)} - {formatTime(quote.createdAt)}
                         </p>
                     </div>
                     <i className="fas fa-file-alt text-gray-400 text-xl" />

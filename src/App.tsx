@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
+import MaterialInventoryMain from './Pages/Material Inventory Pages/MaterialInventoryMain';
+import MaterialInventorySingle from './Pages/Material Inventory Pages/MaterialInventorySingle';
 const  WorkLibraryMain = lazy(() => import(  './Pages/Work Library Pages/WorkLibraryMain'));
 const  WorkLibrarySingle = lazy(() => import(  './Pages/Work Library Pages/WorkLibrarySingle'));
 const ShortlistMicaMain = lazy(() => import( './Pages/Stage Pages/Sample design/ShortList/ShortListMicaMain'));
@@ -456,6 +458,18 @@ function App() {
               <Route
                 path="single/:id"
                 element={<TaskViewMain />}
+              />
+
+            </Route>
+
+
+             <Route path="materialinventory" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <MaterialInventoryMain />
+            </ProtectedRoutes>} >
+
+              <Route
+                path="single/:id"
+                element={<MaterialInventorySingle />}
               />
 
             </Route>

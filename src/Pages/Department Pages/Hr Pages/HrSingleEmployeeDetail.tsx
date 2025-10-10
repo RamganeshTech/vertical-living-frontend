@@ -87,9 +87,9 @@ const HrSingleEmployeeDetail = () => {
               };
             
               const handleSaveEmployee = async () => {
+                  try {
                 if (!editData || !selectedEmployee) return;
             
-                try {
                   await updateEmployeeMutation.mutateAsync({
                     empId: selectedEmployee._id!,
                     updates: editData

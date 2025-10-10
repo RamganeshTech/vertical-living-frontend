@@ -35,3 +35,7 @@ export const formatDateForInput = (date: Date) => {
     const minutes = pad(date.getMinutes());
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
+
+
+
+export const truncate = (str: string, n = 18) => str && str.length > n ? str.slice(0, n) + "..." : str;

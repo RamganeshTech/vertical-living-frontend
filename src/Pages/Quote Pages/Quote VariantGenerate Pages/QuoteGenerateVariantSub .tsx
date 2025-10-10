@@ -354,7 +354,7 @@ const QuoteGenerateVariantSub = () => {
 
                     {/* Right - Generate Button */}
                     <Button onClick={handleGenerateQuote} disabled={quotePending} className="flex-shrink-0">
-                        {quotePending ? "Generating..." : "Generate Quote"}
+                        {quotePending ? "Generating..." : "Generate Quote for Client"}
                     </Button>
                 </div>
 
