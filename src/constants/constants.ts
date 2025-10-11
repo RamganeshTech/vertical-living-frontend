@@ -19,7 +19,7 @@ export const SIDEBAR_LABELS:Record<string, string> = {
   WORKLIBRARY: "Work Library",
   STAFFTASK: "Staff Tasks",
   SINGLESTAFFTASK: "Tasks",
-  MATERIALINVENTORY: "Material Inventory"
+  MATERIALINVENTORY: "Product Inventory"
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",

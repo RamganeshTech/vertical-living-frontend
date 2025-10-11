@@ -12,7 +12,15 @@ import { useInfiniteMaterialInventories, useCreateMaterialInventory, useUpdateMa
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { truncate } from "../../utils/dateFormator";
 import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { useDebounce } from "../../Hooks/useDebounce";
+import { MATINVENTORY_FILTER_OPTIONS } from "./materialInventoryDetails";
+import { useGetProjects } from "../../apiList/projectApi";
+import type { AvailableProjetType } from "../Department Pages/Logistics Pages/LogisticsShipmentForm";
+import { useAddToCart, useGetCart, useRemoveCartItem, useUpdateCartItemQuantity } from "../../apiList/MaterialInventory Api/MaterialInventoryCartApi";
 
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
+import SearchSelectNew from "../../components/ui/SearchSelectNew";
 
 
 const MaterialInventoryMain: React.FC = () => {
@@ -22,6 +30,7 @@ const MaterialInventoryMain: React.FC = () => {
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
     const [subcategory, setSubcategory] = useState("");
+    const [brand, setBrand] = useState("");
     const [model, setModel] = useState("");
     const [watt, setWatt] = useState("");
     const [itemCode, setItemCode] = useState("");
@@ -31,18 +40,66 @@ const MaterialInventoryMain: React.FC = () => {
     const [editItem, setEditItem] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
 
+    const [selectedProjectId, setSelectedProjectId] = useState("");
+
+
+
+
+    // Debounced values - 500ms delay for search, 800ms for price inputs
+    const debouncedSearch = useDebounce(search, 500);
+    const debouncedMinMrp = useDebounce(minMrp, 800);
+    const debouncedMaxMrp = useDebounce(maxMrp, 800);
+
+
+
+
+    // Get projects
+    const { data: projectsData } = useGetProjects(organizationId);
+    const projects = projectsData?.map((project: AvailableProjetType) => ({
+        _id: project._id,
+        projectName: project.projectName
+    }));
+
+    const projectOptions = (projectsData || [])?.map((project: AvailableProjetType) => ({
+        value: project._id,
+        label: project.projectName
+    }))
+
+    // Auto-select first project if available
+    useEffect(() => {
+        if (projects && projects.length > 0 && !selectedProjectId) {
+            setSelectedProjectId(projects[0]._id);
+        }
+    }, [projects, selectedProjectId]);
+
+    // Get cart data
+    const { data: cartData, refetch: refetchCart } = useGetCart({
+        organizationId,
+        projectId: selectedProjectId
+    });
+
+    // Cart mutations
+    const addToCartMutation = useAddToCart();
+    const updateCartQuantityMutation = useUpdateCartItemQuantity();
+    const removeFromCartMutation = useRemoveCartItem();
+
+
+
     // Infinite query
     const filters = useMemo(() => ({
-        search,
+        search: debouncedSearch,
         category,
         subcategory,
         model,
         watt,
         itemCode,
-        minMrp: minMrp ? Number(minMrp): undefined,
-        maxMrp: maxMrp ? Number(maxMrp): undefined,
-    }), [search, category, subcategory, model, watt, itemCode,  minMrp,
-        maxMrp]);
+        minMrp: debouncedMinMrp ? Number(debouncedMinMrp) : undefined,
+        maxMrp: debouncedMaxMrp ? Number(debouncedMaxMrp) : undefined,
+        brand
+    }), [debouncedSearch, category, subcategory, model, watt, itemCode, debouncedMinMrp, brand, debouncedMaxMrp]);
+
+
+
     const {
         data,
         isLoading,
@@ -63,10 +120,110 @@ const MaterialInventoryMain: React.FC = () => {
         refetch: () => void;
     };
 
+
+
     // Mutations
     const createMutation = useCreateMaterialInventory();
     const updateMutation = useUpdateMaterialInventory();
     const deleteMutation = useDeleteMaterialInventory();
+
+
+
+
+
+
+    // CART HANDLERS
+
+    // Helper function to get cart item quantity
+    const getCartItemQuantity = (productId: string): number => {
+        if (!cartData?.items) return 0;
+        const cartItem = cartData.items.find((item: any) => item.productId === productId);
+        return cartItem ? cartItem.quantity : 0;
+    };
+
+    // Add to Cart Handler
+    const handleAddToCart = async (item: any) => {
+        if (!selectedProjectId) {
+            toast({
+                title: "Error",
+                description: "Please select a project first",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        try {
+            await addToCartMutation.mutateAsync({
+                organizationId,
+                projectId: selectedProjectId,
+                productId: item._id,
+                quantity: 1,
+                specification: item.specification
+            });
+            toast({
+                title: "Success",
+                description: "Item added to cart successfully"
+            });
+            refetchCart();
+        } catch (e: any) {
+            toast({
+                title: "Error",
+                description: e?.response?.data?.message || "Failed to add item to cart",
+                variant: "destructive"
+            });
+        }
+    };
+
+    // Update Cart Quantity Handler
+    const handleUpdateCartQuantity = async (productId: string, newQuantity: number) => {
+        if (!cartData?._id) return;
+
+        // If quantity becomes 0, remove the item
+        if (newQuantity === 0) {
+            try {
+                await removeFromCartMutation.mutateAsync({
+                    cartId: cartData._id,
+                    productId,
+                    // organizationId,
+                    // projectId: selectedProjectId
+                });
+                toast({
+                    title: "Success",
+                    description: "Item removed from cart"
+                });
+                refetchCart();
+            } catch (e: any) {
+                toast({
+                    title: "Error",
+                    description: e?.response?.data?.message || "Failed to remove item from cart",
+                    variant: "destructive"
+                });
+            }
+            return;
+        }
+
+        try {
+            await updateCartQuantityMutation.mutateAsync({
+                cartId: cartData._id,
+                productId,
+                quantity: newQuantity,
+                // organizationId,
+                // projectId: selectedProjectId
+            });
+            toast({
+                title: "Success",
+                description: "Cart updated successfully"
+            });
+            refetchCart();
+        } catch (e: any) {
+            toast({
+                title: "Error",
+                description: e?.response?.data?.message || "Failed to update cart",
+                variant: "destructive"
+            });
+        }
+    };
+
 
     // Handlers
     const handleAdd = async (specification: any) => {
@@ -104,28 +261,16 @@ const MaterialInventoryMain: React.FC = () => {
 
     // Infinite scroll
     const listRef = useRef<HTMLDivElement>(null);
-    // React.useEffect(() => {
-    //     const handleScroll = () => {
-    //         if (!listRef.current || isFetchingNextPage || !hasNextPage) return;
-    //         const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-    //         if (scrollTop + clientHeight >= scrollHeight - 100) {
-    //             fetchNextPage();
-    //         }
-    //     };
-    //     const ref = listRef.current;
-    //     if (ref) ref.addEventListener("scroll", handleScroll);
-    //     return () => { if (ref) ref.removeEventListener("scroll", handleScroll); };
-    // }, [fetchNextPage, isFetchingNextPage, hasNextPage]);
-
+   
     useEffect(() => {
         const handleScroll = () => {
             if (!listRef.current || isFetchingNextPage || !hasNextPage) return;
-            
+
             const container = listRef.current;
             const { scrollTop, scrollHeight, clientHeight } = container;
-            
+
             // Trigger when user scrolls to within 200px of bottom
-            if (scrollTop + clientHeight >= scrollHeight - 200) {
+            if (scrollTop + clientHeight >= scrollHeight - 300) {
                 console.log('Fetching next page...'); // Debug log
                 fetchNextPage();
             }
@@ -138,6 +283,43 @@ const MaterialInventoryMain: React.FC = () => {
         }
     }, [fetchNextPage, isFetchingNextPage, hasNextPage]);
 
+
+
+
+
+    // SLIDER UTILS
+
+    // const maxPrice = useMemo(() => {
+    //     // console.log(maxPrice)
+    //     return data?.pages ? data?.pages?.length > 0
+    //         ? Math.max(...data?.pages?.map((p: any) => p?.specification?.mrp))
+    //         : 100000 : 100000  // Default max if no products are there
+    // }, [data]);
+
+
+    // const minPrice = useMemo(() => 0, [])
+
+    // const handleRangeChange = useCallback((value: number | number[]) => {
+       
+
+    //     if (Array.isArray(value) && value.length === 2) {
+    //         const [min, max] = value as [number, number];
+    //         setMinMrp(String(min)); // Update your existing state
+    //         setMaxMrp(String(max)); // Update your existing state
+    //     }
+    // }, [maxPrice]);
+
+
+    // Show loading indicator when values are being debounced
+    const isDebouncing = search !== debouncedSearch ||
+        minMrp !== debouncedMinMrp ||
+        maxMrp !== debouncedMaxMrp;
+
+    const isSubPage = location.pathname.includes("single") || location.pathname.includes("cart");
+
+    if (isSubPage) return <Outlet />; // subpage like /vehicles
+
+
     // Render helpers
     // Helper to truncate long text
 
@@ -145,6 +327,13 @@ const MaterialInventoryMain: React.FC = () => {
     const renderItem = (item: any) => {
         const spec = item.specification || {};
         const img = spec.imageUrl || spec.image || null;
+
+
+        const cartQuantity = getCartItemQuantity(item._id);
+        const isInCart = cartQuantity > 0;
+        const isUpdatingCart = addToCartMutation.isPending || updateCartQuantityMutation.isPending || removeFromCartMutation.isPending;
+
+
         return (
             <Card key={item._id} className="mb-4 shadow-xl border border-gray-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -197,7 +386,9 @@ const MaterialInventoryMain: React.FC = () => {
                         {spec.mrp && <div className="text-blue-700 font-bold ml-auto text-[16px]">₹{spec.mrp}</div>}
                     </div>
 
-                    <div className="mt-4 flex justify-end gap-2">
+<section className="flex justify-between items-center mt-4">
+
+                    <div className="flex justify-end gap-2">
                         <Button
                             size="sm"
                             variant="primary"
@@ -209,7 +400,7 @@ const MaterialInventoryMain: React.FC = () => {
                         <Button
                             size="sm"
                             variant="secondary"
-                           onClick={() => setEditItem(item)}
+                            onClick={() => setEditItem(item)}
                         >
                             <i className="fas fa-edit mr-1" />
                             Edit
@@ -225,15 +416,58 @@ const MaterialInventoryMain: React.FC = () => {
                             Delete
                         </Button>
                     </div>
+
+
+                    {/* Add to Cart / Quantity Controls */}
+                    <div className="flex gap-2 items-center">
+                        {!isInCart ? (
+                            <Button
+                                size="sm"
+                                variant="primary"
+                                onClick={() => handleAddToCart(item)}
+                                isLoading={isUpdatingCart}
+                                disabled={!selectedProjectId || isUpdatingCart}
+                                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                            >
+                                <i className="fas fa-cart-plus mr-1" />
+                                Add to Cart
+                            </Button>
+                        ) : (
+                            <div className="flex items-center gap-2 bg-green-50 rounded-lg p-1 border border-green-200">
+                                <Button
+                                    size="sm"
+                                    onClick={() => handleUpdateCartQuantity(item._id, cartQuantity - 1)}
+                                    disabled={isUpdatingCart}
+                                variant="danger"
+
+                                    className="w-8 h-8 p-0 bg-red-600 text-white rounded-md shadow-sm"
+                                >
+                                    <i className="fas fa-minus text-sm"></i>
+                                </Button>
+
+                                <span className="w-10 text-center font-bold text-green-700">
+                                    {cartQuantity}
+                                </span>
+
+                                <Button
+                                    size="sm"
+                                variant="primary"
+
+                                    onClick={() => handleUpdateCartQuantity(item._id, cartQuantity + 1)}
+                                    disabled={isUpdatingCart}
+                                    className="w-8 h-8 p-0  rounded-md shadow-sm"
+                                >
+                                    <i className="fas fa-plus text-sm"></i>
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+</section>
+
                 </CardContent>
             </Card>
         );
     };
-
-
-    const isSubPage = location.pathname.includes("single");
-
-    if (isSubPage) return <Outlet />; // subpage like /vehicles
 
 
 
@@ -253,10 +487,63 @@ const MaterialInventoryMain: React.FC = () => {
                             </p>
                         </div>
 
-                        <div>
-
+                        <div className="flex gap-2">
+                            {/* Debouncing indicator */}
+                            {isDebouncing && (
+                                <div className="flex items-center gap-2 text-sm text-amber-600">
+                                    <i className="fas fa-clock animate-pulse"></i>
+                                    <span>Updating results...</span>
+                                </div>
+                            )}
                             {/* <Button onClick={() => setShowAddModal(true)} variant="primary" className="w-full">Add Material</Button> */}
+
+
+                            {/* Project Selection */}
+                            <div className="w-full sm:w-64">
+                                {/* <select
+                                    value={selectedProjectId}
+                                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm text-sm"
+                                >
+                                    <option value="">Select Project...</option>
+                                    {projects?.map((project: any) => (
+                                        <option key={project._id} value={project._id}>
+                                            {project.projectName}
+                                        </option>
+                                    ))}
+                                </select> */}
+
+
+                                <SearchSelectNew
+                                    options={projectOptions}
+                                    placeholder="Select project"
+                                    searchPlaceholder="Search projects..."
+                                    value={selectedProjectId || undefined}
+                                    onValueChange={(value) => setSelectedProjectId(value || "")}
+                                    searchBy="name"
+                                    displayFormat="simple"
+                                    className="w-full"
+                                />
+                            </div>
+
+
+                            <Button
+                                onClick={() => navigate("cart")}
+                                variant="primary"
+                                className="relative w-full sm:w-auto"
+                            >
+                                <i className="fas fa-shopping-cart text-xl"></i>
+                                {cartData && cartData.items?.length > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                                        {cartData.items.length}
+                                    </span>
+                                )}
+                            </Button>
+
+
                         </div>
+
+
 
                     </div>
                 </div>
@@ -272,21 +559,28 @@ const MaterialInventoryMain: React.FC = () => {
                                     <i className="fas fa-filter mr-2 text-blue-600"></i>
                                     Filters
                                 </h3>
-                                {(category || subcategory || model || watt || itemCode ||  minMrp ||
-        maxMrp || search) && (
-                                    <button
-                                        onClick={() => { setCategory(""); setSubcategory(""); setModel(""); setWatt(""); setItemCode(""); setMaxMrp("100000"); setMinMrp("0"); setSearch(""); }}
-                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                                    >
-                                        Clear All
-                                    </button>
-                                )}
+                                {(category || subcategory || model || watt || itemCode || minMrp ||
+                                    maxMrp || search) && (
+                                        <button
+                                            onClick={() => { setCategory(""); setSubcategory(""); setModel(""); setWatt(""); setItemCode(""); setMaxMrp("100000"); setMinMrp("0"); setSearch(""); }}
+                                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                            Clear All
+                                        </button>
+                                    )}
                             </div>
-                            <div className="space-y-6">
+                            <div className="space-y-2">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Search
+                                        {search !== debouncedSearch && (
+                                            <span className="ml-2 text-xs text-amber-600">
+                                                <i className="fas fa-circle animate-pulse"></i>
+                                            </span>
+                                        )}
+                                    </label>
                                     <Input
-                                        placeholder="Search by Item Code, Subcategory, Model..."
+                                        placeholder="Search by Brand, Subcategory, Model, ItemCode..."
                                         value={search}
                                         onChange={e => setSearch(e.target.value.trim())}
                                     />
@@ -298,10 +592,30 @@ const MaterialInventoryMain: React.FC = () => {
                                         onChange={e => setCategory(e.target.value)}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option value="">All Categories</option>
-                                        <option value="light">Light</option>
+                                        {MATINVENTORY_FILTER_OPTIONS.categories.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
+
+                                 <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
+                                    <select
+                                        value={brand}
+                                        onChange={e => setBrand(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        {MATINVENTORY_FILTER_OPTIONS.brand.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory</label>
                                     <select
@@ -309,15 +623,11 @@ const MaterialInventoryMain: React.FC = () => {
                                         onChange={e => setSubcategory(e.target.value)}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option value="">All Subcategories</option>
-                                        <option value="Downlights">Downlights</option>
-                                        <option value="COB Downlights">COB Downlights</option>
-                                        <option value="Designer Lights">Designer Lights</option>
-                                        <option value="Panels">Panels</option>
-                                        <option value="Battens-Tubes">Battens-Tubes</option>
-                                        <option value="Magnetic Lights">Magnetic Lights</option>
-                                        <option value="Retail Lights">Retail Lights</option>
-                                        <option value="Industrial Lights">Industrial Lights</option>
+                                        {MATINVENTORY_FILTER_OPTIONS.subcategories.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>
@@ -327,127 +637,136 @@ const MaterialInventoryMain: React.FC = () => {
                                         onChange={e => setModel(e.target.value)}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option value="">All Models</option>
-                                        <option value="ENSAVE PLUS">ENSAVE PLUS</option>
-                                        <option value="AREVA PRIME">AREVA PRIME</option>
-                                        <option value="NERO SURFACE">NERO SURFACE</option>
-                                        <option value="LUCENT">LUCENT</option>
-                                        <option value="LUCENT SQUARE">LUCENT SQUARE</option>
-                                        <option value="2 IN 1 STANDALONE">2 IN 1 STANDALONE</option>
-                                        <option value="ERIS FIXED (LOW BORDER DEEP RECESSED)">ERIS FIXED (LOW BORDER DEEP RECESSED)</option>
-                                        <option value="ESTUS SWIVEL">ESTUS SWIVEL</option>
-                                        <option value="ERIS SWIVEL">ERIS SWIVEL</option>
-                                        <option value="ERIS REFLECTO">ERIS REFLECTO</option>
-                                        <option value="ERIS FIXED">ERIS FIXED</option>
-                                        <option value="EMINA">EMINA</option>
-                                        <option value="EMINA TILTABLE">EMINA TILTABLE</option>
-                                        <option value="DIMAS">DIMAS</option>
-                                        <option value="GLIDE">GLIDE</option>
-                                        <option value="ERIS SURFACE ROUND">ERIS SURFACE ROUND</option>
-                                        <option value="EPITO">EPITO</option>
-                                        <option value="EMPHA">EMPHA</option>
-                                        <option value="RENE">RENE</option>
-                                        <option value="CYNO">CYNO</option>
-                                        <option value="ULTIMA SLIM">ULTIMA SLIM</option>
-                                        <option value="ACCESSORIES FOR ULTIMA SLIM">ACCESSORIES FOR ULTIMA SLIM</option>
-                                        <option value="ULTIMA ULTRA SLIM 1x4">ULTIMA ULTRA SLIM 1x4</option>
-                                        <option value="ULTIMA ULTRA SLIM 1x1">ULTIMA ULTRA SLIM 1x1</option>
-                                        <option value="ULTIMA ULTRA PRO (2x2)">ULTIMA ULTRA PRO (2x2)</option>
-                                        <option value="ULTIMA MULTI-COLOUR">ULTIMA MULTI-COLOUR</option>
-                                        <option value="GLAZE">GLAZE</option>
-                                        <option value="GLAZE ULTRA ALUMINIUM">GLAZE ULTRA ALUMINIUM</option>
-                                        <option value="KUBIK SMART">KUBIK SMART</option>
-                                        <option value="KUBIK ULTRA">KUBIK ULTRA</option>
-                                        <option value="T8 RETRO">T8 RETRO</option>
-                                        <option value="T8 RETRO ACCESSSORIES">T8 RETRO ACCESSSORIES</option>
-                                        <option value="PRIDE">PRIDE</option>
-                                        <option value="ORELLI SLIM">ORELLI SLIM</option>
-                                        <option value="ORELLI SLIM HANGING">ORELLI SLIM HANGING</option>
-                                        <option value="INSTARAY SLIM LINEAR WITH LENS">INSTARAY SLIM LINEAR WITH LENS</option>
-                                        <option value="INSTARAY SLIM LINEAR">INSTARAY SLIM LINEAR</option>
-                                        <option value="INSTARAY ROUND SLIM">INSTARAY ROUND SLIM</option>
-                                        <option value="INSTARAY SLIM LINEAR DIFFUSED">INSTARAY SLIM LINEAR DIFFUSED</option>
-                                        <option value="INSTARAY SLIM TILTABLE & DIFFUSED">INSTARAY SLIM TILTABLE & DIFFUSED</option>
-                                        <option value="MAGNETIC TRACK LIGHT ACCESSORIES">MAGNETIC TRACK LIGHT ACCESSORIES</option>
-                                        <option value="MULTIBLE ZOOM LIGHT">MULTIBLE ZOOM LIGHT</option>
-                                        <option value="TRACK LIGHT WHITE">TRACK LIGHT WHITE</option>
-                                        <option value="TRACK LIGHT BLACK">TRACK LIGHT BLACK</option>
-                                        <option value="TRACK LIGHT ACCESSORIES">TRACK LIGHT ACCESSORIES</option>
-                                        <option value="IP20 STRIP LIGHT (24V DC)">IP20 STRIP LIGHT (24V DC)</option>
-                                        <option value="IP65 STRIP LIGHT (24V DC)">IP65 STRIP LIGHT (24V DC)</option>
-                                        <option value="COB STRIP LIGHT">COB STRIP LIGHT</option>
-                                        <option value="POWER SUPPLY FOR IP20 STRIP LIGHT">POWER SUPPLY FOR IP20 STRIP LIGHT</option>
-                                        <option value="POWER SUPPLY FOR IP65 STRIP LIGHT">POWER SUPPLY FOR IP65 STRIP LIGHT</option>
-                                        <option value="BULK HEAD">BULK HEAD</option>
-                                        <option value="PIT LIGHT">PIT LIGHT</option>
-                                        <option value="WELL GLASS">WELL GLASS</option>
-                                        <option value="HIGHBAY (>100 Lm/W)">HIGHBAY (&gt;100 Lm/W)</option>
-                                        <option value="ULTRALITE HIGHBAY (>130 Lm/W)">ULTRALITE HIGHBAY (&gt;130 Lm/W)</option>
+                                        {MATINVENTORY_FILTER_OPTIONS.models.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Watt</label>
-                                    <select
-                                        value={watt}
-                                        onChange={e => setWatt(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    >
-                                        <option value="">All Watt</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Item Code</label>
-                                    <select
-                                        value={itemCode}
-                                        onChange={e => setItemCode(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    >
-                                        <option value="">All Item Codes</option>
-                                    </select>
-                                </div> */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">MRP</label>
-                                   <Input className="" type="number" value={minMrp} onChange={e => setMinMrp(e.target.value)} />
-                                   <Input className=""  type="number" value={maxMrp} onChange={e => setMaxMrp(e.target.value)} />
+
+                                <div className="">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Price Range
+                                        {/* {(minMrp !== debouncedMinMrp || maxMrp !== debouncedMaxMrp) && (
+                                            <span className="ml-2 text-xs text-amber-600">
+                                                <i className="fas fa-circle animate-pulse"></i>
+                                            </span>
+                                        )} */}
+                                    </label>
+
+
+                                    {/* Range Slider */}
+                                    <div className="px-2 mb-3">
+                                        <Slider
+                                            range
+                                            min={0}
+                                            max={100000}
+                                            step={500}
+                                            value={[Number(minMrp), Number(maxMrp)]} // Use your existing states
+                                            onChange={(value) => {
+                                                const [min, max] = value as [number, number];
+                                                setMinMrp(String(min)); // Update your existing state
+                                                setMaxMrp(String(max)); // Update your existing state
+                                            }}
+                                            trackStyle={[{ backgroundColor: '#3b82f6', height: 6 }]}
+                                            handleStyle={[
+                                                {
+                                                    borderColor: '#3b82f6',
+                                                    backgroundColor: '#fff',
+                                                    boxShadow: '0 2px 6px rgba(59, 130, 246, 0.4)',
+                                                    width: 18,
+                                                    height: 18,
+                                                    marginTop: -6
+                                                },
+                                                {
+                                                    borderColor: '#3b82f6',
+                                                    backgroundColor: '#fff',
+                                                    boxShadow: '0 2px 6px rgba(59, 130, 246, 0.4)',
+                                                    width: 18,
+                                                    height: 18,
+                                                    marginTop: -6
+                                                }
+                                            ]}
+                                            railStyle={{ backgroundColor: '#e5e7eb', height: 6 }}
+                                        />
+                                    </div>
+
+                                    {/* Display Values */}
+                                    <div className="flex justify-between items-center gap-2 text-sm">
+                                        <div className="flex-1">
+                                            <span className="text-xs text-gray-500 block mb-1">Min</span>
+                                            <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+                                                ₹{Number(minMrp).toLocaleString('en-IN')}
+                                            </div>
+                                        </div>
+                                        <div className="text-gray-400 mt-5">—</div>
+                                        <div className="flex-1">
+                                            <span className="text-xs text-gray-500 block mb-1">Max</span>
+                                            <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+                                                ₹{Number(maxMrp).toLocaleString('en-IN')}
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div className="flex flex-col gap-3 items-center mt-2">
+
+                                        <Input className="" type="number" value={minMrp} onChange={e => setMinMrp(e.target.value)} />
+                                        <Input className="" type="number" value={maxMrp} onChange={e => setMaxMrp(e.target.value)} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     {/* Main Content */}
-                    <div className="flex-1  !max-h-[80vh] overflow-y-auto custom-scrollbar">
-                          <div 
+                    <div className="flex-1 !max-h-[95vh] overflow-y-auto custom-scrollbar">
+                        <div
                             ref={listRef}
                             className="h-full overflow-y-auto custom-scrollbar pr-2"
                         >
-                        {/* Error state */}
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-4 flex items-center justify-between">
-                                <div><i className="fas fa-exclamation-triangle mr-2"></i>{error}</div>
-                                <button onClick={() => setError(null)} className="ml-4 text-red-400 hover:text-red-700"><i className="fas fa-times"></i></button>
-                            </div>
-                        )}
-                        {isError && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-4 flex items-center justify-between">
-                                <div><i className="fas fa-exclamation-triangle mr-2"></i>{queryError?.message || "Failed to load data"}</div>
-                                <button onClick={() => refetch()} className="ml-4 text-red-400 hover:text-red-700"><i className="fas fa-redo"></i></button>
-                            </div>
-                        )}
-                        {/* List/empty/loading state */}
-                        <div  className="max-h-[100%]  pr-2">
-                            {isLoading ? (
-                                // <div className="flex justify-center items-center h-full">
-                                //     <i className="fas fa-spinner fa-spin text-2xl text-blue-500"></i>
-                                // </div>
-                                <MaterialOverviewLoading />
-                            ) : !data?.pages?.length || !data.pages[0]?.data?.length ? (
-                                <EmptyState message="No material inventory found." icon="box" color="gray" />
-                            ) : (
-                                data.pages.map((page: any) => page.data.map(renderItem))
+
+                            {!selectedProjectId && (
+                                <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 mb-4 flex items-center">
+                                    <i className="fas fa-exclamation-triangle mr-3 text-xl"></i>
+                                    <div>
+                                        <p className="font-semibold">Select a project to add items to cart</p>
+                                        <p className="text-sm">Choose a project from the dropdown above to enable cart functionality</p>
+                                    </div>
+                                </div>
                             )}
-                            {isFetchingNextPage && <div className="flex justify-center py-2">
-                                <i className="fas fa-spinner fa-spin text-lg text-blue-400"></i>
-                            </div>}
-                        </div>
+
+
+
+                            {/* Error state */}
+                            {error && (
+                                <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-4 flex items-center justify-between">
+                                    <div><i className="fas fa-exclamation-triangle mr-2"></i>{error}</div>
+                                    <button onClick={() => setError(null)} className="ml-4 text-red-400 hover:text-red-700"><i className="fas fa-times"></i></button>
+                                </div>
+                            )}
+                            {isError && (
+                                <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-4 flex items-center justify-between">
+                                    <div><i className="fas fa-exclamation-triangle mr-2"></i>{queryError?.message || "Failed to load data"}</div>
+                                    <button onClick={() => refetch()} className="ml-4 text-red-400 hover:text-red-700"><i className="fas fa-redo"></i></button>
+                                </div>
+                            )}
+                            {/* List/empty/loading state */}
+                            <div className="max-h-[110%]  pr-2">
+                                {isLoading ? (
+                                    // <div className="flex justify-center items-center h-full">
+                                    //     <i className="fas fa-spinner fa-spin text-2xl text-blue-500"></i>
+                                    // </div>
+                                    <MaterialOverviewLoading />
+                                ) : !data?.pages?.length || !data.pages[0]?.data?.length ? (
+                                    <EmptyState message="No material inventory found." icon="box" color="gray" />
+                                ) : (
+                                    data.pages.map((page: any) => page.data.map(renderItem))
+                                )}
+                                {isFetchingNextPage && <div className="flex justify-center py-2">
+                                    <i className="fas fa-spinner fa-spin text-lg text-blue-400"></i>
+                                </div>}
+                            </div>
                         </div>
                     </div>
                 </div>
