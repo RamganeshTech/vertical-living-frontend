@@ -30,6 +30,9 @@ const MaterialInventoryMain: React.FC = () => {
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
     const [subcategory, setSubcategory] = useState("");
+
+    const [type, setType] = useState(""); // For switches/sockets/regulators
+
     const [brand, setBrand] = useState("");
     const [model, setModel] = useState("");
     const [watt, setWatt] = useState("");
@@ -84,19 +87,109 @@ const MaterialInventoryMain: React.FC = () => {
     const removeFromCartMutation = useRemoveCartItem();
 
 
+    useEffect(() => {
+        setSubcategory("");
+        setType("");
+    }, [category]);
 
-    // Infinite query
-    const filters = useMemo(() => ({
+
+    // Determine if current category uses variants (switches/sockets/regulators)
+
+    const isLightCategory = category && category.toLowerCase() === "light";
+const isSwitchOrSocketCategory = category && ["switches", "socket"].includes(category.toLowerCase());
+const isRegulatorCategory = category && category.toLowerCase() === "regulator";
+const noCategorySelected = !category || category === "";
+
+
+// Show specific filters based on category
+const showTypeFilter = isSwitchOrSocketCategory;
+const showSubcategoryAndModel = isLightCategory || noCategorySelected; // Show when light OR no category
+
+// Reset irrelevant filters when category changes
+useEffect(() => {
+    if (isLightCategory) {
+        // Reset type when switching to light category
+        setType("");
+    } else if (isSwitchOrSocketCategory) {
+        // Reset subcategory and model when switching to switch/socket
+        setSubcategory("");
+        setModel("");
+    } else if (isRegulatorCategory) {
+        // Reset all category-specific filters for regulator
+        setType("");
+        setSubcategory("");
+        setModel("");
+    } else if (noCategorySelected) {
+        // Reset type when no category is selected (show subcategory and model)
+        setType("");
+    }
+}, [category]); // Only run when category changes
+
+// Build filters based on category
+const filters = useMemo(() => {
+    const baseFilters = {
         search: debouncedSearch,
         category,
-        subcategory,
-        model,
-        watt,
-        itemCode,
         minMrp: debouncedMinMrp ? Number(debouncedMinMrp) : undefined,
         maxMrp: debouncedMaxMrp ? Number(debouncedMaxMrp) : undefined,
-        brand
-    }), [debouncedSearch, category, subcategory, model, watt, itemCode, debouncedMinMrp, brand, debouncedMaxMrp]);
+        brand,
+        watt,
+        itemCode,
+    };
+
+    // Add category-specific filters
+    if (isLightCategory || noCategorySelected) {
+        // Light or No Category: show subcategory and model
+        return {
+            ...baseFilters,
+            subcategory,
+            model,
+        };
+    } else if (isSwitchOrSocketCategory) {
+        // Switch/Socket: show type
+        return {
+            ...baseFilters,
+            type,
+        };
+    } else if (isRegulatorCategory) {
+        // Regulator: no additional type/subcategory/model filters
+        return baseFilters;
+    }
+
+    return baseFilters;
+}, [
+    debouncedSearch,
+    category,
+    subcategory,
+    type,
+    model,
+    watt,
+    itemCode,
+    debouncedMinMrp,
+    debouncedMaxMrp,
+    brand,
+    isLightCategory,
+    isSwitchOrSocketCategory,
+    isRegulatorCategory,
+    noCategorySelected
+]);
+    
+
+    // const isVariantCategory = category && ["switches", "socket", "regulator"].includes(category.toLowerCase());
+
+    // Infinite query
+    // const filters = useMemo(() => ({
+    //     search: debouncedSearch,
+    //     category,
+    //     subcategory,
+    //     ...(isVariantCategory ? { type } : { subcategory }),
+    //     model,
+    //     watt,
+    //     itemCode,
+    //     minMrp: debouncedMinMrp ? Number(debouncedMinMrp) : undefined,
+    //     maxMrp: debouncedMaxMrp ? Number(debouncedMaxMrp) : undefined,
+    //     brand
+    // }), [debouncedSearch, category, subcategory, type, model, watt, itemCode, debouncedMinMrp, brand, debouncedMaxMrp]);
 
 
 
@@ -129,7 +222,77 @@ const MaterialInventoryMain: React.FC = () => {
 
 
 
+    // Helper function to get display data for an item
 
+    const getDisplayData = (item: any) => {
+        const spec = item?.specification || {};
+
+        // Check if this item has variants (switches/sockets/regulators)
+        if (spec?.variants && Array.isArray(spec?.variants) && spec?.variants?.length > 0) {
+            const firstVariant = spec?.variants[0];
+            return {
+                image: firstVariant?.image || null,
+                mrp: firstVariant?.mrp || 0,
+                itemCode: firstVariant?.itemCode || "",
+                color: firstVariant.color || "",
+                hasVariants: true,
+                variants: spec?.variants
+            };
+        }
+
+        // Light category - direct properties
+        return {
+            image: spec.imageUrl || spec.image || null,
+            mrp: spec.mrp || 0,
+            itemCode: spec.itemCode || "",
+            color: null,
+            hasVariants: false,
+            variants: []
+        };
+    };
+
+
+    // Helper function to get specification for cart
+const getSpecificationForCart = (item: any): any => {
+    // If product has variants, use first variant's data
+    if (item?.specification?.variants && item?.specification?.variants?.length > 0) {
+        const firstVariant = item?.specification?.variants[0];
+        return {
+            itemCode: firstVariant?.itemCode,
+            mrp: firstVariant?.mrp,
+            color: firstVariant?.color,
+            // size: firstVariant.size,
+            image: firstVariant.images?.[0] || firstVariant.image,
+            // Include other variant fields
+            ...firstVariant,
+            // Also include base product info
+            hsn: item?.specification?.HSN || "",
+            brand:item?.specification?.brand || "",
+            description: item?.specification?.description || "", 
+            styleType: item?.specification?.styleType || "",
+            type: item?.specification?.type || "",
+            materialType: item?.specification?.materialType || "",
+            category: item?.specification?.category || item?.category || "",
+            subcategory: item?.specification?.subcategory || item?.subcategory || "",
+            model: item?.specification?.model || item.model || "",
+            // name: item?.specification?.name || item.name,
+        };
+    }
+    // Otherwise use product's specification
+    return item.specification;
+};
+
+
+
+    // Helper function to get itemCode from product
+    const getItemCodeFromProduct = (item: any): string => {
+        // If product has variants, return first variant's itemCode
+        if (item?.specification?.variants && item?.specification?.variants?.length > 0) {
+            return item?.specification?.variants[0]?.itemCode;
+        }
+        // Otherwise return product's itemCode
+        return item?.specification?.itemCode || item?.itemCode;
+    };
 
 
     // CART HANDLERS
@@ -153,12 +316,14 @@ const MaterialInventoryMain: React.FC = () => {
         }
 
         try {
+              const specification = getSpecificationForCart(item);
+
             await addToCartMutation.mutateAsync({
                 organizationId,
                 projectId: selectedProjectId,
                 productId: item._id,
                 quantity: 1,
-                specification: item.specification
+                specification: specification
             });
             toast({
                 title: "Success",
@@ -175,7 +340,7 @@ const MaterialInventoryMain: React.FC = () => {
     };
 
     // Update Cart Quantity Handler
-    const handleUpdateCartQuantity = async (productId: string, newQuantity: number) => {
+    const handleUpdateCartQuantity = async (itemCode: string, newQuantity: number) => {
         if (!cartData?._id) return;
 
         // If quantity becomes 0, remove the item
@@ -183,7 +348,7 @@ const MaterialInventoryMain: React.FC = () => {
             try {
                 await removeFromCartMutation.mutateAsync({
                     cartId: cartData._id,
-                    productId,
+                    itemCode,
                     // organizationId,
                     // projectId: selectedProjectId
                 });
@@ -205,7 +370,7 @@ const MaterialInventoryMain: React.FC = () => {
         try {
             await updateCartQuantityMutation.mutateAsync({
                 cartId: cartData._id,
-                productId,
+                itemCode,
                 quantity: newQuantity,
                 // organizationId,
                 // projectId: selectedProjectId
@@ -261,17 +426,24 @@ const MaterialInventoryMain: React.FC = () => {
 
     // Infinite scroll
     const listRef = useRef<HTMLDivElement>(null);
-   
+
     useEffect(() => {
         const handleScroll = () => {
+            console.log("has next page", hasNextPage)
             if (!listRef.current || isFetchingNextPage || !hasNextPage) return;
+
 
             const container = listRef.current;
             const { scrollTop, scrollHeight, clientHeight } = container;
 
-            // Trigger when user scrolls to within 200px of bottom
-            if (scrollTop + clientHeight >= scrollHeight - 300) {
-                console.log('Fetching next page...'); // Debug log
+            // Trigger when user scrolls to within 300px of bottom
+            // if (scrollTop + clientHeight >= scrollHeight - 300) {
+            //     console.log('Fetching next page...'); // Debug log
+            //     fetchNextPage();
+            // }
+
+            if (scrollHeight > clientHeight + 50 && scrollTop + clientHeight >= scrollHeight - 300) {
+                console.log('Fetching next page...');
                 fetchNextPage();
             }
         };
@@ -300,7 +472,7 @@ const MaterialInventoryMain: React.FC = () => {
     // const minPrice = useMemo(() => 0, [])
 
     // const handleRangeChange = useCallback((value: number | number[]) => {
-       
+
 
     //     if (Array.isArray(value) && value.length === 2) {
     //         const [min, max] = value as [number, number];
@@ -326,8 +498,12 @@ const MaterialInventoryMain: React.FC = () => {
     // Render a card for each item, dynamic fields
     const renderItem = (item: any) => {
         const spec = item.specification || {};
-        const img = spec.imageUrl || spec.image || null;
+        const displayData = getDisplayData(item);
+        // const img = spec.imageUrl || spec.image || null;
 
+          // Get itemCode for this item (first variant if has variants, else product itemCode)
+    const itemCode = getItemCodeFromProduct(item);
+    
 
         const cartQuantity = getCartItemQuantity(item._id);
         const isInCart = cartQuantity > 0;
@@ -338,15 +514,28 @@ const MaterialInventoryMain: React.FC = () => {
             <Card key={item._id} className="mb-4 shadow-xl border border-gray-100">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <div className="flex items-center gap-4">
-                        {img && <img src={img} alt="img" className="w-16 h-16 object-cover rounded-lg border border-gray-400" />}
+                        {/* {img && <img src={img} alt="img" className="w-16 h-16 object-cover rounded-lg border border-gray-400" />} */}
+                        {displayData.image && (
+                            <img
+                                src={displayData?.image}
+                                alt="img"
+                                className="w-16 h-16 object-cover rounded-lg border border-gray-400"
+                            />
+                        )}
                         <div>
                             <CardTitle className="text-lg font-bold text-blue-900">
-                                {truncate(spec.subcategory || spec.name || spec.model || "Unnamed", 22)}
+                                {truncate(spec?.subcategory || spec.name || spec.model || spec?.category || "Unnamed", 22)}
                             </CardTitle>
                             <CardDescription className="text-xs text-gray-500 mt-1">
-                                {spec.category && <span className="mr-2"><Badge>{spec.category}</Badge></span>}
-                                {spec.model && <span className="mr-2">Model: <span className="font-semibold">{truncate(spec.model, 14)}</span></span>}
-                                {spec.itemCode && <span className="mr-2">Code: <span className="font-semibold">{spec.itemCode}</span></span>}
+                                {spec?.category && <span className="mr-2"><Badge>{spec.category}</Badge></span>}
+                                {spec?.model && <span className="mr-2">Model: <span className="font-semibold">{truncate(spec.model, 14)}</span></span>}
+                                {displayData.hasVariants && displayData.color && (
+                                    <span className="mr-2">
+                                        <Badge variant="secondary">{displayData.color}</Badge>
+                                    </span>
+                                )}
+                                {displayData?.itemCode && <span className="mr-2">Code: <span className="font-semibold">{displayData.itemCode}</span></span>}
+                                {spec?.itemCode && <span className="mr-2">Code: <span className="font-semibold">{spec.itemCode}</span></span>}
                             </CardDescription>
                         </div>
                     </div>
@@ -363,7 +552,7 @@ const MaterialInventoryMain: React.FC = () => {
                 <CardContent>
                     <div className="flex flex-wrap gap-3 text-xs text-gray-700">
                         {Object.entries(spec).map(([key, value]) => {
-                            if (["image", "imageUrl", "_id", "organizationId", "series", "cct", "mrp", "itemCode"].includes(key)) return null;
+                            if (["image", "imageUrl", "_id", "organizationId", "series", "cct", "mrp", "itemCode", "variants"].includes(key)) return null;
                             if (typeof value === "object" || value === undefined || value === null) return null;
 
                             // This assumes 'key' and 'value' are defined in the surrounding scope (e.g., a map callback)
@@ -383,86 +572,102 @@ const MaterialInventoryMain: React.FC = () => {
                                 )
                             );
                         })}
-                        {spec.mrp && <div className="text-blue-700 font-bold ml-auto text-[16px]">₹{spec.mrp}</div>}
+
+
+                        {/* {spec.mrp && <div className="text-blue-700 font-bold ml-auto text-[16px]">₹{spec.mrp}</div>} */}
+
+                        {displayData.hasVariants && displayData.variants.length > 1 && (
+                            <div className="bg-blue-50 rounded px-2 py-1 border border-blue-200">
+                                <span className="font-semibold">Variants:</span> {displayData.variants.length} colors available
+                            </div>
+                        )}
+
+                        {displayData.mrp && (
+                            <div className="text-blue-700 font-bold ml-auto text-[16px]">
+                                ₹{displayData.mrp}
+                            </div>
+                        )}
+
+
                     </div>
 
-<section className="flex justify-between items-center mt-4">
+                    <section className="flex justify-between items-center mt-4">
 
-                    <div className="flex justify-end gap-2">
-                        <Button
-                            size="sm"
-                            variant="primary"
-                            onClick={() => navigate(`single/${(item as any)._id}`)}
-                        >
-                            <i className="fas fa-eye mr-1" />
-                            View
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => setEditItem(item)}
-                        >
-                            <i className="fas fa-edit mr-1" />
-                            Edit
-                        </Button>
-                        <Button
-                            size="sm"
-                            isLoading={deleteMutation.isPending}
-                            variant="danger"
-                            onClick={() => handleDelete(item._id)}
-                            className='text-white bg-red-600'
-                        >
-                            <i className="fas fa-trash mr-1" />
-                            Delete
-                        </Button>
-                    </div>
-
-
-                    {/* Add to Cart / Quantity Controls */}
-                    <div className="flex gap-2 items-center">
-                        {!isInCart ? (
+                        <div className="flex justify-end gap-2">
                             <Button
                                 size="sm"
                                 variant="primary"
-                                onClick={() => handleAddToCart(item)}
-                                isLoading={isUpdatingCart}
-                                disabled={!selectedProjectId || isUpdatingCart}
-                                className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                                onClick={() => navigate(`single/${(item as any)._id}`)}
                             >
-                                <i className="fas fa-cart-plus mr-1" />
-                                Add to Cart
+                                <i className="fas fa-eye mr-1" />
+                                View
                             </Button>
-                        ) : (
-                            <div className="flex items-center gap-2 bg-green-50 rounded-lg p-1 border border-green-200">
-                                <Button
-                                    size="sm"
-                                    onClick={() => handleUpdateCartQuantity(item._id, cartQuantity - 1)}
-                                    disabled={isUpdatingCart}
+                            {/* <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => setEditItem(item)}
+                            >
+                                <i className="fas fa-edit mr-1" />
+                                Edit
+                            </Button> */}
+                            <Button
+                                size="sm"
+                                isLoading={deleteMutation.isPending}
                                 variant="danger"
+                                onClick={() => handleDelete(item._id)}
+                                className='text-white bg-red-600'
+                            >
+                                <i className="fas fa-trash mr-1" />
+                                Delete
+                            </Button>
+                        </div>
 
-                                    className="w-8 h-8 p-0 bg-red-600 text-white rounded-md shadow-sm"
-                                >
-                                    <i className="fas fa-minus text-sm"></i>
-                                </Button>
 
-                                <span className="w-10 text-center font-bold text-green-700">
-                                    {cartQuantity}
-                                </span>
-
+                        {/* Add to Cart / Quantity Controls */}
+                        <div className="flex gap-2 items-center">
+                            {!isInCart ? (
                                 <Button
                                     size="sm"
-                                variant="primary"
-
-                                    onClick={() => handleUpdateCartQuantity(item._id, cartQuantity + 1)}
-                                    disabled={isUpdatingCart}
-                                    className="w-8 h-8 p-0  rounded-md shadow-sm"
+                                    variant="primary"
+                                    onClick={() => handleAddToCart(item)}
+                                    isLoading={isUpdatingCart}
+                                    disabled={!selectedProjectId || isUpdatingCart}
+                                    className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
                                 >
-                                    <i className="fas fa-plus text-sm"></i>
+                                    <i className="fas fa-cart-plus mr-1" />
+                                    Add to Cart
                                 </Button>
-                            </div>
-                        )}
-                    </div>
-</section>
+                            ) : (
+                                <div className="flex items-center gap-2 bg-green-50 rounded-lg p-1 border border-green-200">
+                                    <Button
+                                        size="sm"
+                                        onClick={() => handleUpdateCartQuantity(itemCode, cartQuantity - 1)}
+                                        disabled={isUpdatingCart}
+                                        variant="danger"
+
+                                        className="w-8 h-8 p-0 bg-red-600 text-white rounded-md shadow-sm"
+                                    >
+                                        <i className="fas fa-minus text-sm"></i>
+                                    </Button>
+
+                                    <span className="w-10 text-center font-bold text-green-700">
+                                        {cartQuantity}
+                                    </span>
+
+                                    <Button
+                                        size="sm"
+                                        variant="primary"
+
+                                        onClick={() => handleUpdateCartQuantity(itemCode, cartQuantity + 1)}
+                                        disabled={isUpdatingCart}
+                                        className="w-8 h-8 p-0  rounded-md shadow-sm"
+                                    >
+                                        <i className="fas fa-plus text-sm"></i>
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    </section>
 
                 </CardContent>
             </Card>
@@ -560,9 +765,9 @@ const MaterialInventoryMain: React.FC = () => {
                                     Filters
                                 </h3>
                                 {(category || subcategory || model || watt || itemCode || minMrp ||
-                                    maxMrp || search) && (
+                                    maxMrp || search || type) && (
                                         <button
-                                            onClick={() => { setCategory(""); setSubcategory(""); setModel(""); setWatt(""); setItemCode(""); setMaxMrp("100000"); setMinMrp("0"); setSearch(""); }}
+                                            onClick={() => { setCategory(""); setType(""); setSubcategory(""); setModel(""); setWatt(""); setItemCode(""); setMaxMrp("100000"); setMinMrp("0"); setSearch(""); }}
                                             className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                                         >
                                             Clear All
@@ -600,7 +805,7 @@ const MaterialInventoryMain: React.FC = () => {
                                     </select>
                                 </div>
 
-                                 <div>
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
                                     <select
                                         value={brand}
@@ -616,34 +821,136 @@ const MaterialInventoryMain: React.FC = () => {
                                 </div>
 
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory</label>
-                                    <select
-                                        value={subcategory}
-                                        onChange={e => setSubcategory(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    >
-                                        {MATINVENTORY_FILTER_OPTIONS.subcategories.map(option => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
-                                    <select
-                                        value={model}
-                                        onChange={e => setModel(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    >
-                                        {MATINVENTORY_FILTER_OPTIONS.models.map(option => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                              
+                                {/* Conditional filter: Subcategory for lights, Type for switches/sockets/regulators */}
+                                {/* {!isVariantCategory ? (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory</label>
+                                            <select
+                                                value={subcategory}
+                                                onChange={e => setSubcategory(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                {MATINVENTORY_FILTER_OPTIONS.subcategories.map(option => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                                            <select
+                                                value={model}
+                                                onChange={e => setModel(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                {MATINVENTORY_FILTER_OPTIONS.models.map(option => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                                        <select
+                                            value={type}
+                                            onChange={e => setType(e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        >
+                                            <option value="">All Types</option>
+                                            {MATINVENTORY_FILTER_OPTIONS.types?.map(option => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )} */}
+
+
+ {showSubcategoryAndModel && (
+        <>
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Subcategory
+                </label>
+                <select
+                    value={subcategory}
+                    onChange={e => setSubcategory(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                    {MATINVENTORY_FILTER_OPTIONS.subcategories.map(option => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Model
+                </label>
+                <select
+                    value={model}
+                    onChange={e => setModel(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                    {MATINVENTORY_FILTER_OPTIONS.models.map(option => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        </>
+    )}
+
+    {/* Show Type only for Switch/Socket Categories */}
+    {showTypeFilter && (
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+                Type
+            </label>
+            <select
+                value={type}
+                onChange={e => setType(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+                <option value="">All Types</option>
+                {MATINVENTORY_FILTER_OPTIONS.types?.map(option => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </select>
+        </div>
+    )}
+
+    {/* Info message for Regulator Category */}
+    {/* {isRegulatorCategory && (
+        <div className="col-span-full p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-700 flex items-center">
+                <i className="fa-solid fa-info-circle mr-2"></i>
+                Showing all regulators. Use brand, price range, or search to filter results.
+            </p>
+        </div>
+    )}
+
+    {noCategorySelected && (
+        <div className="col-span-full p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <p className="text-sm text-gray-600 flex items-center">
+                <i className="fa-solid fa-filter mr-2"></i>
+                Showing all products. Select a category for more specific filters.
+            </p>
+        </div>
+    )} */}
 
                                 <div className="">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -656,7 +963,7 @@ const MaterialInventoryMain: React.FC = () => {
                                     </label>
 
 
-                                    {/* Range Slider */}
+
                                     <div className="px-2 mb-3">
                                         <Slider
                                             range
@@ -724,6 +1031,11 @@ const MaterialInventoryMain: React.FC = () => {
                         <div
                             ref={listRef}
                             className="h-full overflow-y-auto custom-scrollbar pr-2"
+                            // style={{
+                            //     maxHeight: 'calc(100vh - 200px)',
+                            //     overscrollBehavior: 'contain'
+                            // }}
+                            // className="flex-1 overflow-y-auto custom-scrollbar rounded-lg"
                         >
 
                             {!selectedProjectId && (

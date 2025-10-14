@@ -73,15 +73,17 @@ interface CartItemProps {
         singleItemCost: number;
         orderedBefore: boolean;
     };
-    onUpdateQuantity: (productId: string, newQuantity: number) => void;
-    onRemoveItem: (productId: string) => void;
+    onUpdateQuantity: (itemCode: string, newQuantity: number) => void;
+    onRemoveItem: (itemCode: string) => void;
     isUpdating: boolean;
     isRemoving: boolean;
 }
 
 const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isRemoving }) => {
-    const spec = item.specification || {};
+    const spec = item?.specification || {};
     const img = spec.imageUrl || spec.image || null;
+
+    const itemCode = spec?.itemCode
 
     return (
         <Card className="mb-4 shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow">
@@ -97,9 +99,9 @@ const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemoveIte
                     <div className="flex-1 min-w-0">
                         <div className="flex items-start gap-2 flex-wrap">
                             <CardTitle className="text-base sm:text-lg font-bold text-blue-900">
-                                {truncate(spec.subcategory || spec.name || spec.model || "Unnamed", 30)}
+                                {truncate(spec.subcategory || spec.name || spec.model || spec.category || "Unnamed", 30)}
                             </CardTitle>
-                            {item.orderedBefore && (
+                            {item?.orderedBefore && (
                                 <Badge className="bg-blue-100 text-blue-700 text-xs whitespace-nowrap">
                                     <i className="fa-solid fa-clock-rotate-left mr-1"></i>
                                     Reorder
@@ -118,7 +120,8 @@ const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemoveIte
                 {/* Product Details */}
                 <div className="flex flex-wrap gap-3 text-xs text-gray-700 mb-4">
                     {Object.entries(spec).map(([key, value]) => {
-                        if (["image", "imageUrl", "_id", "organizationId", "series", "cct", "mrp", "itemCode", "name", "subcategory", "category", "model"].includes(key)) return null;
+                        if (["image", "imageUrl", "_id", "organizationId", "series", "cct", "mrp", "itemCode",
+                             "name", "subcategory", "category", "model", "hasVariants"].includes(key)) return null;
                         if (typeof value === "object" || value === undefined || value === null) return null;
 
                         return (
@@ -148,7 +151,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemoveIte
                         {/* Quantity Controls */}
                         <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 border border-gray-200">
                             <Button
-                                onClick={() => onUpdateQuantity(item.productId, Math.max(1, item.quantity - 1))}
+                                onClick={() => onUpdateQuantity(itemCode, Math.max(1, item.quantity - 1))}
                                 className="w-8 h-8 p-0 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-sm"
                                 variant='danger'
                                 disabled={isUpdating || item.quantity <= 1}
@@ -162,7 +165,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemoveIte
                             </span>
 
                             <Button
-                                onClick={() => onUpdateQuantity(item.productId, item.quantity + 1)}
+                                onClick={() => onUpdateQuantity(itemCode, item.quantity + 1)}
                                 variant='primary'
                                 className="w-8 h-8 p-0 bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm"
                                 disabled={isUpdating}
@@ -174,7 +177,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemoveIte
 
                         {/* Remove Button */}
                         <Button
-                            onClick={() => onRemoveItem(item.productId)}
+                            onClick={() => onRemoveItem(itemCode)}
                             variant='danger'
                             className="w-10 h-10 p-0 bg-red-600 hover:bg-red-700 text-white rounded-lg"
                             disabled={isRemoving}
@@ -233,13 +236,13 @@ const MaterialInventoryCartMain = () => {
     const { mutateAsync: removeItem, isPending: isRemoving } = useRemoveCartItem();
     const { mutateAsync: generatePdf, isPending: isGenerating } = useGenrateMaterialInventCartPdf();
 
-    const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
+    const handleUpdateQuantity = async (itemCode: string, newQuantity: number) => {
         if (!cart?._id || isUpdating) return;
 
         try {
             await updateQuantity({
                 cartId: cart._id,
-                productId,
+                itemCode,
                 quantity: newQuantity,
                 // organizationId: organizationId!,
                 // projectId: selectedProjectId
@@ -258,13 +261,13 @@ const MaterialInventoryCartMain = () => {
         }
     };
 
-    const handleRemoveItem = async (productId: string) => {
+    const handleRemoveItem = async (itemCode: string) => {
         if (!cart?._id || isRemoving) return;
 
         try {
             await removeItem({
                 cartId: cart._id,
-                productId,
+                itemCode,
                 // organizationId: organizationId!,
                 // projectId: selectedProjectId
             });

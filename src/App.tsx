@@ -6,13 +6,13 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-const MaterialInventoryMain = lazy(() => import( './Pages/Material Inventory Pages/MaterialInventoryMain'));
-const MaterialInventorySingle = lazy(() => import( './Pages/Material Inventory Pages/MaterialInventorySingle'));
-const MaterialInventoryCartMain  = lazy(() => import( './Pages/Material Inventory Pages/Material Inventory Cart/MaterialInventoryCartMain'));
-const  WorkLibraryMain = lazy(() => import(  './Pages/Work Library Pages/WorkLibraryMain'));
-const  WorkLibrarySingle = lazy(() => import(  './Pages/Work Library Pages/WorkLibrarySingle'));
-const ShortlistMicaMain = lazy(() => import( './Pages/Stage Pages/Sample design/ShortList/ShortListMicaMain'));
-const ShortListMicaReferenceDesignMain = lazy(() => import( './Pages/Stage Pages/Sample design/ShortListReference Pages/ShortlListMicaDesignMain'));
+const MaterialInventoryMain = lazy(() => import('./Pages/Material Inventory Pages/MaterialInventoryMain'));
+const MaterialInventorySingle = lazy(() => import('./Pages/Material Inventory Pages/MaterialInventorySingle'));
+const MaterialInventoryCartMain = lazy(() => import('./Pages/Material Inventory Pages/Material Inventory Cart/MaterialInventoryCartMain'));
+const WorkLibraryMain = lazy(() => import('./Pages/Work Library Pages/WorkLibraryMain'));
+const WorkLibrarySingle = lazy(() => import('./Pages/Work Library Pages/WorkLibrarySingle'));
+const ShortlistMicaMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortList/ShortListMicaMain'));
+const ShortListMicaReferenceDesignMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortListReference Pages/ShortlListMicaDesignMain'));
 const StaffAssignTaskMain = lazy(() => import('./Pages/Staff Tasks Pages/Create Task Pages/StaffAssignTaskMain'));
 const SingleStaffList = lazy(() => import('./Pages/Staff Tasks Pages/SingleStaffs Task Pages/SingleStaffList'));
 const LabourRateConfigMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigMain'));
@@ -334,7 +334,7 @@ function App() {
             </ProtectedRoutes>} >
             </Route>
 
-             <Route path="shortlistmicadesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="shortlistmicadesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <ShortListMicaReferenceDesignMain />
             </ProtectedRoutes>} >
             </Route>
@@ -464,7 +464,7 @@ function App() {
             </Route>
 
 
-             <Route path="materialinventory" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="materialinventory" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <MaterialInventoryMain />
             </ProtectedRoutes>} >
 

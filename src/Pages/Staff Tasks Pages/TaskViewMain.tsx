@@ -1,4 +1,4 @@
-import React, {  useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
@@ -314,7 +314,7 @@ export const TaskViewMain: React.FC = () => {
                     </h1>
                 </div>
 
-                {isStaff && <div>
+                {isStaff ? <div>
                     <Label>Update Status of Task</Label>
                     <Select
                         value={formData.status === "in_progress" ? "In progress" : formData.status}
@@ -331,7 +331,17 @@ export const TaskViewMain: React.FC = () => {
                             ))}
                         </SelectContent>
                     </Select>
-                </div>}
+                </div>
+                    :
+                    <div className="flex gap-2 items-center ">
+                        <Label className="!text-xl">Task Status: </Label>
+
+                        <div >
+                            <Badge variant="default" className="!text-[18px]">{task?.status}</Badge>
+                        </div>
+                    </div>
+
+                }
             </section>
 
 
@@ -665,21 +675,21 @@ export const TaskViewMain: React.FC = () => {
                                     key={subtask._id}
                                     className="flex items-start gap-3 bg-gray-50 border border-gray-200 rounded-md p-4"
                                 >
-                                        <div className="mt-4 h-2 w-2 border rounded-full bg-blue-600 flex-shrink-0" />
-                                        <div className="flex-1 space-y-2">
-                                            <SubTaskEditor
-                                                subtask={subtask}
-                                                onSave={(val) => handleEditSubtask(subtask._id, val)}
-                                                onDelete={() => handleDeleteSubtask(subtask._id)}
-                                            />
+                                    <div className="mt-4 h-2 w-2 border rounded-full bg-blue-600 flex-shrink-0" />
+                                    <div className="flex-1 space-y-2">
+                                        <SubTaskEditor
+                                            subtask={subtask}
+                                            onSave={(val) => handleEditSubtask(subtask._id, val)}
+                                            onDelete={() => handleDeleteSubtask(subtask._id)}
+                                        />
 
-                                            <div className="">
-                                                <p className="text-md font-medium text-blue-800">Note:</p>
-                                                <p className="text-gray-900 text-sm mt-1 !ml-3 whitespace-pre-wrap text-nowrap break-words">
-                                                    {subtask?.comments || <span className="text-gray-400 italic">No comments</span>}
-                                                </p>
-                                            </div>
+                                        <div className="">
+                                            <p className="text-md font-medium text-blue-800">Note:</p>
+                                            <p className="text-gray-900 text-sm mt-1 !ml-3 whitespace-pre-wrap text-nowrap break-words">
+                                                {subtask?.comments || <span className="text-gray-400 italic">No comments</span>}
+                                            </p>
                                         </div>
+                                    </div>
                                 </li>
                             )
                         ))}

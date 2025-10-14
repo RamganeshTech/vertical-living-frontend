@@ -132,8 +132,28 @@ export const useInfiniteMaterialInventories = (organizationId: string, filters: 
       if (!api) throw new Error("API instance not found for role");
       return await getMaterialInventories({ organizationId, pageParam, filters, api });
     },
+    // getNextPageParam: (lastPage) => {
+    //   return lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined;
+    // },
+   
     getNextPageParam: (lastPage) => {
-      return lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined;
+      console.log('🔍 Last page received:', lastPage);
+      console.log('🔍 Available properties:', Object.keys(lastPage));
+
+      const currentPage = lastPage.page;
+      const totalPages = lastPage.totalPages;
+
+      console.log('🔍 Pagination calculation:', {
+        currentPage,
+        totalPages,
+        condition: `${currentPage} < ${totalPages}`,
+        result: currentPage < totalPages
+      });
+
+      const nextPage = currentPage < totalPages ? currentPage + 1 : undefined;
+      console.log('🔍 Next page will be:', nextPage);
+
+      return nextPage;
     },
     retry: false,
     refetchOnWindowFocus: false,

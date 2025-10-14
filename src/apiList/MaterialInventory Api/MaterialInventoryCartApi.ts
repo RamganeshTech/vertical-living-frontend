@@ -61,28 +61,28 @@ const getCart = async ({ organizationId, projectId, api }: {
     return response.data.data;
 };
 
-const updateCartItemQuantity = async ({ cartId, productId, quantity, api }: {
+const updateCartItemQuantity = async ({ cartId, itemCode, quantity, api }: {
     cartId: string;
-    productId: string;
+    itemCode: string;
     quantity: number;
     api: AxiosInstance;
 }): Promise<Cart> => {
     const response = await api.put<ApiResponse<Cart>>('/materialinventory/cart/update-quantity', {
         cartId,
-        productId,
+        itemCode,
         quantity
     });
     if (!response.data.ok) throw new Error(response.data.message);
     return response.data.data;
 };
 
-const removeCartItem = async ({ cartId, productId, api }: {
+const removeCartItem = async ({ cartId, itemCode, api }: {
     cartId: string;
-    productId: string;
+    itemCode: string;
     api: AxiosInstance;
 }): Promise<Cart> => {
     const response = await api.delete<ApiResponse<Cart>>('/materialinventory/cart/remove-item', {
-        data: { cartId, productId }
+        data: { cartId, itemCode }
     });
     if (!response.data.ok) throw new Error(response.data.message);
     return response.data.data;
@@ -167,7 +167,7 @@ export const useUpdateCartItemQuantity = () => {
         Error,
         {
             cartId: string;
-            productId: string;
+            itemCode: string;
             quantity: number;
         }
     >({
@@ -191,7 +191,7 @@ export const useRemoveCartItem = () => {
         Error,
         {
             cartId: string;
-            productId: string;
+            itemCode: string;
         }
     >({
         mutationFn: async (params) => {

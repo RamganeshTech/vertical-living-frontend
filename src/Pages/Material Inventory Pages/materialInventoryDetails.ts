@@ -1,7 +1,7 @@
 // Define constants at the top of the file or in a separate constants file
 export const MATINVENTORY_FILTER_OPTIONS = {
 
-     brand: [
+    brand: [
         { value: "", label: "All Brand" },
         { value: "jaquar", label: "Jaquar" }
     ],
@@ -9,9 +9,12 @@ export const MATINVENTORY_FILTER_OPTIONS = {
 
     categories: [
         { value: "", label: "All Categories" },
-        { value: "light", label: "Light" }
+        { value: "light", label: "Light" },
+        { value: "socket", label: "Socket" },
+        { value: "switches", label: "Switch" },
+        { value: "regulator", label: "Regulators" },
     ],
-    
+
     subcategories: [
         { value: "", label: "All Subcategories" },
         { value: "Downlights", label: "Downlights" },
@@ -23,7 +26,24 @@ export const MATINVENTORY_FILTER_OPTIONS = {
         { value: "Retail Lights", label: "Retail Lights" },
         { value: "Industrial Lights", label: "Industrial Lights" }
     ],
-    
+
+    types: [
+        { value: "", label: "All Types" },
+        { value: "socket", label: "socket" },
+        { value: "card-switch", label: "card-switch" },
+        { value: "computer-socket", label: "computer-socket" },
+        { value: "dimmer-switch", label: "dimmer-switch" },
+        { value: "doorbell", label: "doorbell" },
+        { value: "motion-sensor-switch", label: "motion-sensor-switch" },
+        { value: "notify-switch", label: "notify-switch" },
+        { value: "regulator", label: "regulator" },
+        { value: "switch", label: "switch" },
+        { value: "telephone-socket", label: "telephone-socket" },
+        { value: "television-computer-socket", label: "television-computer-socket" },
+        { value: "television-socket", label: "television-socket" },
+        { value: "television-telephone-socket", label: "television-telephone-socket" },
+    ],
+
     models: [
         { value: "", label: "All Models" },
         { value: "ENSAVE PLUS", label: "ENSAVE PLUS" },
