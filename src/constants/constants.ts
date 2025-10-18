@@ -19,7 +19,8 @@ export const SIDEBAR_LABELS:Record<string, string> = {
   WORKLIBRARY: "Work Library",
   STAFFTASK: "Staff Tasks",
   SINGLESTAFFTASK: "Tasks",
-  MATERIALINVENTORY: "Product Inventory"
+  MATERIALINVENTORY: "Product Inventory",
+  NOTIFICATION: "Notification",
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",
@@ -45,7 +46,9 @@ export const SIDEBAR_ICONS:Record<string, string> = {
   WORKLIBRARY: "fas fa-code-fork text-2xl",
   STAFFTASK: "fas fa-object-group text-2xl",
   SINGLESTAFFTASK: "fas fa-object-group text-2xl",
-  MATERIALINVENTORY: "fa-solid fa-object-group text-2xl"
+  MATERIALINVENTORY: "fa-solid fa-object-group text-2xl",
+  NOTIFICATION: "fas fa-message",
+
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",
   // TASKS: "fa-solid fa-list text-2xl",

@@ -6,8 +6,9 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
+const NotificationMain = lazy(() => import( './Pages/Notificaition Page/NotificationMain'));
 const MaterialInventoryMain = lazy(() => import('./Pages/Material Inventory Pages/MaterialInventoryMain'));
-const MaterialInventorySingle = lazy(() => import('./Pages/Material Inventory Pages/MaterialInventorySingle'));
+const MaterialInventorySingle = lazy(() => import('./Pages/Material Inventory Pages/Material Inventory Single/MaterialInventorySingle'));
 const MaterialInventoryCartMain = lazy(() => import('./Pages/Material Inventory Pages/Material Inventory Cart/MaterialInventoryCartMain'));
 const WorkLibraryMain = lazy(() => import('./Pages/Work Library Pages/WorkLibraryMain'));
 const WorkLibrarySingle = lazy(() => import('./Pages/Work Library Pages/WorkLibrarySingle'));
@@ -481,6 +482,13 @@ function App() {
 
             </Route>
 
+             <Route path="notification" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <NotificationMain />
+            </ProtectedRoutes>} />
+
+             
+            
+
 
 
 
@@ -789,7 +797,7 @@ function App() {
                 <QualityCheckOverview />
               </ProtectedRoutes>
             } >
-              <Route path="qualitycheckroom/:roomkey" element={
+              <Route path="qualitycheckroom/:roomName" element={
                 <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
                   <QualityCheckRoomDetails />
                 </ProtectedRoutes>

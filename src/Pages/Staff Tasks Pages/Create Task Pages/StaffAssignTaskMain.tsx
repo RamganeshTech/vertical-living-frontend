@@ -80,7 +80,7 @@ export const StaffAssignTaskMain: React.FC = () => {
         title: "",
         description: "",
         due: formatDateForInput(new Date()), // ✅ properly formatted
-        priority: "medium" as const,
+        priority: "high" as const,
         department: "site" as const,
         assigneeId: "",
         assigneeName: "",
@@ -203,7 +203,7 @@ export const StaffAssignTaskMain: React.FC = () => {
                 //     title: "",
                 //     description: "",
                 //     due: formatDateForInput(new Date()), // ✅ properly formatted
-                //     priority: "medium" as const,
+                //     priority: "high" as const,
                 //     department: "site" as const,
                 //     assigneeId: "",
                 //     assigneeName: "",
@@ -299,7 +299,7 @@ export const StaffAssignTaskMain: React.FC = () => {
                 })),
                 images: [],
                 previewUrls: [],
-                priority: "medium" as const,
+                priority: "high" as const,
                 department: "site" as const,
                 assigneeId: "",
                 assigneeName: "",

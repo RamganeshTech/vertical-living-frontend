@@ -3,10 +3,11 @@ import type React from "react"
 interface CardProps {
   className?: string
   children: React.ReactNode
+  onClick?:()=> any
 }
 
-export const Card: React.FC<CardProps> = ({ className = "", children }) => {
-  return <div className={`bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-lg ${className}`}>{children}</div>
+export const Card: React.FC<CardProps> = ({ className = "", children, onClick }) => {
+  return <div onClick={onClick} className={`bg-white/70 backdrop-blur-sm border-0 rounded-2xl shadow-lg ${className}`}>{children}</div>
 }
 
 export const CardHeader: React.FC<CardProps> = ({ className = "", children }) => {

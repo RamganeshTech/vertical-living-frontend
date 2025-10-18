@@ -1,6 +1,7 @@
-import { forwardRef, useImperativeHandle, 
+import {
+  forwardRef, useImperativeHandle,
   // useEffect, useImperativeHandle, useRef, useState
- } from "react";
+} from "react";
 import { type FurnitureBlock, type SimpleItemRow } from "../../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
 import { NO_IMAGE } from "../../../../constants/constants";
 // import SearchSelect from "../../../../components/ui/SearchSelect";
@@ -29,6 +30,7 @@ type Props = {
   // }[]>
 
   isBlurred: boolean;
+  templateType?: "type 1" | "type 2" | "type 3"
   // onFurnitureChange: () => any
 };
 
@@ -60,10 +62,39 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
   // labourCost,
   // selectedBrand, selectedLaminateBrand, 
   // onFurnitureChange, 
+  templateType,
   isBlurred },
-   ref
-  ) => {
+  ref
+) => {
 
+
+  // const shouldBlurSection = (section: "core" | "fittings" | "glues" | "nbms") => {
+  //   if (templateType === "type 1") return false // Show everything
+  //   if (templateType === "type 2") {
+  //     // Show core materials, blur others
+  //     return section !== "core"
+  //   }
+  //   if (templateType === "type 3") {
+  //     // Show only totals and images, blur details
+  //     return true // All sections get blurred details
+  //   }
+  //   return false
+  // }
+
+  // const shouldBlurRowDetails = (section: "core" | "fittings" | "glues" | "nbms") => {
+  //   if (templateType === "type 1") return false
+  //   if (templateType === "type 2") return section !== "core"
+  //   if (templateType === "type 3") return true
+  //   return false
+  // }
+
+  // const shouldHideRowTotal = () => {
+  //   return templateType === "type 3"
+  // }
+
+  // const shouldHideItemName = () => {
+  //   return templateType === "type 3"
+  // }
 
   // const [coreSelectedBrand, setCoreSelectedBrand] = useState<string | null>(null);
   // const [coreSelectedLaminateBrand, setCoreSelectedLaminateBrand] = useState<string | null>(null);
@@ -292,7 +323,7 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
         //   furnitureTotal: furnitureTotalLocal,
         // },
 
-         furnitureName: data.furnitureName, // Original data (with ids etc)
+        furnitureName: data.furnitureName, // Original data (with ids etc)
 
         plywoodBrand: "",
         laminateBrand: "",
@@ -431,23 +462,28 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
           <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
             <tr>
               <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-              <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
-              <th colSpan={2} className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">Plywood</th>
-              <th colSpan={2} className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">Laminate</th>
-              <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Carpenters / Day</th>
-              <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Days</th>
-              {/* <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Profit % Material</th>
+              {templateType !== "type 3" &&
+                <>
+                  <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+                  {templateType !== "type 2" && <>
+                    <th colSpan={2} className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">Plywood</th>
+                    <th colSpan={2} className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">Laminate</th>
+                    <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Carpenters / Day</th>
+                    <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Days</th>
+                    {/* <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Profit % Material</th>
               <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Profit % Labour</th>
               <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Remarks</th> */}
-              <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-              <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </>}
+                  <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                  {templateType !== "type 2" && <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>}
+                </>}
             </tr>
-            <tr>
+            {templateType !== "type 3" && templateType !== "type 2" && <tr>
               <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
               <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Thk</th>
               <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
               <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Thk</th>
-            </tr>
+            </tr>}
           </thead>
           <tbody>
             {/* {coreMaterials?.length > 0 && coreMaterials?.map((row, i) => { */}
@@ -458,56 +494,59 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
                   {i === 0 && (
                     <td rowSpan={data?.coreMaterials?.length} className="text-center border-r-1 p-2">{row?.imageUrl ? <img src={row?.imageUrl || NO_IMAGE} className="h-10 mx-auto" /> : <>—</>}</td>
                   )}
-                  <td className="text-center border-r-1 p-2">
-                    <span className={isBlurred ? "blur-sm select-none" : ""}>
-                      {row?.itemName || "—"}
-                    </span>
+                  {templateType !== "type 3" && (
+                    <>
+                      <td className="text-center border-r-1 p-2">
+                        <span className={isBlurred ? "blur-sm select-none" : ""}>
+                          {row?.itemName || "—"}
+                        </span>
 
-                  </td>
-                  <td className="text-center border-r-1 p-2">
-                    <span className={isBlurred ? "blur-sm select-none" : ""}>
-                      {row?.plywoodNos?.quantity ?? 0}
-                    </span>
+                      </td>
+                      {templateType !== "type 2" && <>
+                        <td className="text-center border-r-1 p-2">
+                          <span className={isBlurred ? "blur-sm select-none" : ""}>
+                            {row?.plywoodNos?.quantity ?? 0}
+                          </span>
 
-                  </td>
-                  <td className="text-center border-r-1 p-2">
-                    <span className={isBlurred ? "blur-sm select-none" : ""}>
-                      {row?.plywoodNos?.thickness ?? 0}
-                    </span>
+                        </td>
+                        <td className="text-center border-r-1 p-2">
+                          <span className={isBlurred ? "blur-sm select-none" : ""}>
+                            {row?.plywoodNos?.thickness ?? 0}
+                          </span>
 
-                  </td>
-                  <td className="text-center border-r-1 p-2">
-                    <span className={isBlurred ? "blur-sm select-none" : ""}>
+                        </td>
+                        <td className="text-center border-r-1 p-2">
+                          <span className={isBlurred ? "blur-sm select-none" : ""}>
 
-                      {row?.laminateNos?.quantity ?? 0}
-                    </span>
+                            {row?.laminateNos?.quantity ?? 0}
+                          </span>
 
-                  </td>
-                  <td className="text-center border-r-1 p-2">
-                    <span className={isBlurred ? "blur-sm select-none" : ""}>
-                      {row?.laminateNos?.thickness ?? 0}
-                    </span>
+                        </td>
+                        <td className="text-center border-r-1 p-2">
+                          <span className={isBlurred ? "blur-sm select-none" : ""}>
+                            {row?.laminateNos?.thickness ?? 0}
+                          </span>
 
-                  </td>
-                  {i === 0 && (<>
+                        </td>
+                        {i === 0 && (<>
 
-                    <td rowSpan={data?.coreMaterials?.length} className="text-center border-r-1 p-2">
-                      <span className={isBlurred ? "blur-sm select-none" : ""}>
-                        {row?.carpenters || 0}
-                      </span>
+                          <td rowSpan={data?.coreMaterials?.length} className="text-center border-r-1 p-2">
+                            <span className={isBlurred ? "blur-sm select-none" : ""}>
+                              {row?.carpenters || 0}
+                            </span>
 
-                    </td>
-                    <td rowSpan={data?.coreMaterials?.length} className="text-center border-r-1 p-2">
-                      <span className={isBlurred ? "blur-sm select-none" : ""}>
-                        {row?.days || 0}
-                      </span>
+                          </td>
+                          <td rowSpan={data?.coreMaterials?.length} className="text-center border-r-1 p-2">
+                            <span className={isBlurred ? "blur-sm select-none" : ""}>
+                              {row?.days || 0}
+                            </span>
 
-                    </td>
-                  </>
-                  )}
+                          </td>
+                        </>
+                        )}
 
 
-                  {/* <td className="text-center border-r-1 p-2">
+                        {/* <td className="text-center border-r-1 p-2">
                     <span className={isBlurred ? "blur-sm select-none" : ""}>
                       <input
                         type="number"
@@ -535,22 +574,27 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
                     </td>
                   )} */}
 
-                  {/* <td className="text-center border-r-1 p-2">
+                        {/* <td className="text-center border-r-1 p-2">
                     <span className={isBlurred ? "blur-sm select-none" : ""}>
                       {row?.remarks || "—"}
                     </span>
                   </td> */}
-                  <td className="text-center border-r-1 p-2 text-green-700 font-bold">
-                    <span className={isBlurred ? "blur-sm select-none" : ""}>
-                      {/* ₹{rowTotal?.toLocaleString("en-IN")} */}
-                      ₹{row?.rowTotal?.toLocaleString("en-IN")}
-                    </span>
-                  </td>
-                  <td className="text-center border-r-1 p-2">
-                    <span className={isBlurred ? "blur-sm select-none" : ""}>
-                      —
-                    </span>
-                  </td>
+                      </>}
+                      <td className="text-center border-r-1 p-2 text-green-700 font-bold">
+                        <span className={isBlurred ? "blur-sm select-none" : ""}>
+                          {/* ₹{rowTotal?.toLocaleString("en-IN")} */}
+                          ₹{row?.rowTotal?.toLocaleString("en-IN")}
+                        </span>
+                      </td>
+
+                      {templateType !== "type 2" && <td className="text-center border-r-1 p-2">
+                        <span className={isBlurred ? "blur-sm select-none" : ""}>
+                          —
+                        </span>
+                      </td>
+                      }
+                    </>
+                  )}
                 </tr>
               );
             })}
@@ -561,23 +605,6 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
   );
 
 
-  // const sectionTotal = (sectionTitle: "Fittings & Accessories" | "Glues" | "Non-Branded Materials" | string) => {
-  //   if (sectionTitle === "Fittings & Accessories") {
-  //     // return fittingsTotal
-  //     return Math.round(fittingsTotal)
-  //   }
-  //   else if (sectionTitle === "Glues") {
-  //     // return gluesTotal
-  //     return Math.round(gluesTotal)
-
-  //   }
-  //   else if (sectionTitle === "Non-Branded Materials") {
-  //     // return nbmsTotal
-  //     return Math.round(nbmsTotal)
-
-  //   }
-  //   return 0
-  // }
 
   const sectionTotal = (sectionTitle: "Fittings & Accessories" | "Glues" | "Non-Branded Materials" | string) => {
     if (sectionTitle === "Fittings & Accessories") {
@@ -597,55 +624,63 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
   const renderSimpleSection = (
     sectionTitle: string,
     rows: SimpleItemRow[],
-  ) => (
-    <div className="mt-4">
-      <h3 className="font-semibold text-md mb-2 text-gray-800">{sectionTitle}
+    // sectionKey: "fittings" | "glues" | "nbms",
+  ) => {
+    // const isSectionBlurred = shouldBlurSection(sectionKey)
 
-        (Total: ₹{sectionTotal(sectionTitle).toLocaleString("en-IN")})
-      </h3>
-      <table className="min-w-full text-sm bg-white shadow-sm">
-        <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
-          <tr>
-            <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
-            <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
-            <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
-            <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th>
-            {/* <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Profit On Materials</th> */}
-            <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Total</th>
-            <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.length > 0 && rows.map((item, i) => (
-            <tr key={i} className="border-b">
-              <td className="text-center border p-2">
-                <span className={isBlurred ? "blur-sm select-none" : ""}>
+    return (
+      // <div className="mt-4">
+      // <div className={`mt-4 ${isSectionBlurred ? "blur-sm" : ""}`}>
+      <>
+        {templateType !== "type 2" && <div className={`mt-4`}>
 
-                  {item?.itemName || "—"}
-                </span>
+          <h3 className="font-semibold text-md mb-2 text-gray-800">{sectionTitle}
 
-              </td>
-              <td className="text-center border p-2">
-                <span className={isBlurred ? "blur-sm select-none" : ""}>
-                  {item?.description || "—"}
-                </span>
+            (Total: ₹{sectionTotal(sectionTitle).toLocaleString("en-IN")})
+          </h3>
+          {(templateType !== "type 3") && (<table className="min-w-full text-sm bg-white shadow-sm">
+            <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
+              <tr>
+                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
+                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
+                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
+                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th>
+                {/* <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Profit On Materials</th> */}
+                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Total</th>
+                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.length > 0 && rows.map((item, i) => (
+                <tr key={i} className="border-b">
+                  <td className="text-center border p-2">
+                    <span className={isBlurred ? "blur-sm select-none" : ""}>
 
-              </td>
-              <td className="text-center border p-2">
-                <span className={isBlurred ? "blur-sm select-none" : ""}>
+                      {item?.itemName || "—"}
+                    </span>
 
-                  {item?.quantity || 0}
-                </span>
+                  </td>
+                  <td className="text-center border p-2">
+                    <span className={isBlurred ? "blur-sm select-none" : ""}>
+                      {item?.description || "—"}
+                    </span>
 
-              </td>
-              <td className="text-center border p-2">
-                <span className={isBlurred ? "blur-sm select-none" : ""}>
+                  </td>
+                  <td className="text-center border p-2">
+                    <span className={isBlurred ? "blur-sm select-none" : ""}>
 
-                  {item?.cost || 0}
-                </span>
+                      {item?.quantity || 0}
+                    </span>
 
-              </td>
-              {/* <td className="text-center border p-2">
+                  </td>
+                  <td className="text-center border p-2">
+                    <span className={isBlurred ? "blur-sm select-none" : ""}>
+
+                      {item?.cost || 0}
+                    </span>
+
+                  </td>
+                  {/* <td className="text-center border p-2">
                 <span className={isBlurred ? "blur-sm select-none" : ""}>
 
                   <input
@@ -658,21 +693,24 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
 
               </td> */}
 
-              <td className="text-center border p-2 text-green-700 font-bold">
-                <span className={isBlurred ? "blur-sm select-none" : ""}>
-                  ₹{(item.rowTotal || 0).toLocaleString("en-IN")}
-                </span>
+                  <td className="text-center border p-2 text-green-700 font-bold">
+                    <span className={isBlurred ? "blur-sm select-none" : ""}>
+                      ₹{(item.rowTotal || 0).toLocaleString("en-IN")}
+                    </span>
 
 
-              </td>
-              <td className="text-center border p-2">—</td>
-            </tr>
-          ))}
+                  </td>
+                  <td className="text-center border p-2">—</td>
+                </tr>
+              ))}
 
-        </tbody>
-      </table>
-    </div>
-  );
+            </tbody>
+          </table>
+          )}
+        </div>}
+      </>
+    )
+  }
 
   return (
     <div className="shadow-md p-4 my-4 border rounded-lg bg-white">
@@ -802,9 +840,9 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
 
 
       {renderSimpleSection("Fittings & Accessories", data.fittingsAndAccessories)}
-  {renderSimpleSection("Glues", data?.glues)}
-      {renderSimpleSection("Non-Branded Materials", data?.nonBrandMaterials)} 
-           
+      {renderSimpleSection("Glues", data?.glues)}
+      {renderSimpleSection("Non-Branded Materials", data?.nonBrandMaterials)}
+
 
 
     </div>

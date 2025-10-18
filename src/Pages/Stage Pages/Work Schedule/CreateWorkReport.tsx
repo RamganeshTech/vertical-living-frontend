@@ -128,52 +128,10 @@ const CreateWorkReport: React.FC<Props> = ({ dailyScheduleId, date, dailyTaskId 
 
     };
 
-
-    // const handleSubmit = async () => {
-    //     try {
-    //         const node = document.getElementById("report-preview");
-    //         if (!node) throw new Error("Preview element not found");
-
-    //         // 1️⃣ Convert DOM to PNG
-    //         const dataUrl = await toPng(node);
-    //         const blob = await (await fetch(dataUrl)).blob();
-
-    //         // 2️⃣ Download PNG locally
-    //         downloadImage({ src: dataUrl, alt: "Work Report" });
-
-    //         // 3️⃣ Prepare formData to upload to backend
-    //         const formData = new FormData();
-    //         formData.append("file", new File([blob], "work-report.png", { type: "image/png" }));
-
-    //         // 4️⃣ Append all form fields
-    //         Object.entries(form).forEach(([key, value]) => {
-    //             formData.append(key, value);
-    //         });
-
-    //         // 5️⃣ Append embedded work images (array)
-    //         formData.append("images", JSON.stringify(images));
-
-    //         // 6️⃣ Upload using Axios hook
-    //         await createReport({
-    //             projectId: projectId!,
-    //             organizationId: organizationId!,
-    //             payload: formData // note: we're sending actual formData now
-    //         });
-
-    //         toast({ title: "Success", description: "Created report successfully" });
-    //     } catch (error: any) {
-    //         toast({
-    //             title: "Error",
-    //             description: error?.response?.data?.message || error?.message || "Report not created",
-    //         });
-    //     }
-    // };
-
-
     return (
         <>
             <div className="p-4 border rounded-md bg-white space-y-4">
-                <h2 className="text-lg font-bold text-blue-700">Create Work Report</h2>
+                {/* <h2 className="text-lg font-bold text-blue-700">Create Work Report</h2> */}
 
 
 

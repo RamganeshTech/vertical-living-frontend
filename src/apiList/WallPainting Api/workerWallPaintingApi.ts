@@ -107,7 +107,7 @@ export const useGetWorkerStepDetails = (projectId: string, stepId: string) => {
 export const useUploadWorkerInitialFiles = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowed = ["worker", "staff"];
+  const allowed = ["worker", "staff", "owner", "CTO"];
   return useMutation({
     mutationFn: async ({
       projectId,
@@ -131,7 +131,7 @@ export const useUploadWorkerInitialFiles = () => {
 export const useUploadWorkerCorrectionFiles = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
-  const allowed = ["worker", "staff"];
+  const allowed = ["worker", "staff",  "owner", "CTO"];
   return useMutation({
     mutationFn: async ({
       projectId,

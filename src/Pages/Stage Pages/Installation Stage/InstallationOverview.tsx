@@ -45,9 +45,7 @@ export default function InstallationOverview() {
   const location = useLocation();
   const navigate = useNavigate()
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
-  // const [showImagePreview, setShowImagePreview] = useState(false)
-  // const [previewImage, setPreviewImage] = useState<string>("")
-
+ 
   const isChildRoute = location.pathname.includes("/installationroom");
 
   const {
@@ -200,28 +198,10 @@ export default function InstallationOverview() {
                   />
                 </Card>
 
-                {/* Responsive Room List */}
-                {/* <div className="sm:max-h-[47vh] lg:max-h-[55vh] xl:max-h-[70vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {roomKeys.map((room) => (
-                    <Link
-                      key={room}
-                      to={`installationroom/${room}`}
-                      className="border-l-4 border-blue-600 p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer bg-white"
-                    >
-                      <h3 className="text-md font-semibold capitalize text-blue-800">{room}</h3>
-                      <p className="text-xs text-gray-500">{data?.[room]?.length || 0} work items</p>
-                      <p className="text-xs text-gray-400">Tap to view details</p>
-                    </Link>
-                  ))}
-                </div> */}
-
-
-
-
-
+              
                 {/* Installation Images Gallery */}
                 {data?.tasks && data?.tasks.length > 0 ? (
-                  <Card className="p-6 mb-6 w-full shadow border-l-4 border-blue-600 bg-white">
+                  <Card className="p-2 mb-6 w-full shadow  bg-white">
                     <div className="flex items-center gap-3 text-blue-700 text-lg font-semibold mb-6">
                       <i className="fa-solid fa-images text-blue-500 text-xl" />
                       <span>Installation Progress Gallery</span>
@@ -231,8 +211,8 @@ export default function InstallationOverview() {
                       {data.tasks.map((task: any, taskIndex: number) => {
 
                         return (
-                          <div key={taskIndex} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
-                            {/* Task Header */}
+                          <div key={taskIndex} className="p-3 border-b-1 border-b-gray-300 border-l-4 border-blue-600 rounded-2xl pb-6 last:border-b-0 last:pb-0">
+                            {/* Task Header2  */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                               <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -275,7 +255,7 @@ export default function InstallationOverview() {
                                     <SelectTrigger className="w-40 rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500 bg-white">
                                       <SelectValue placeholder="Select status" selectedValue={task.status || ""} />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="!min-w-[120px] border-black">
                                       <SelectItem value="pending">
                                         <div className="flex items-center gap-2">
                                           <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
@@ -306,33 +286,6 @@ export default function InstallationOverview() {
                               </div>
                             </div>
 
-                            {/* Images Grid */}
-                            {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                              {task.images.map((image: any, imageIndex: number) => (
-                                <div
-                                  key={image._id || imageIndex}
-                                  className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
-                                  onClick={() => {setPreviewImage(image?.url)
-
-                                    setShowImagePreview(true)
-                                  }
-                                  }
-                                >
-                                  <img
-                                    src={image.url || NO_IMAGE}
-                                    alt={`${task.workName} - Image ${imageIndex + 1}`}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                    loading="lazy"
-                                  />
-
-                                  <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full">
-                                    {imageIndex + 1}
-                                  </div>
-                                </div>
-                              ))}
-                            </div> */}
-
-
                             {/* Image Number Badge */}
                             <h2 className="text-lg text-gray-500 font-semibold ">Images</h2>
                             <ImageGalleryExample
@@ -345,7 +298,7 @@ export default function InstallationOverview() {
                             />
 
                             {/* Empty State for Task with No Images */}
-                            {task.images.length === 0 && (
+                            {task?.images?.length === 0 && (
                               <div className="text-center py-8 text-gray-500">
                                 <i className="fa-solid fa-image text-3xl mb-2 opacity-50" />
                                 <p className="text-sm">No images uploaded for this task yet</p>
@@ -372,32 +325,7 @@ export default function InstallationOverview() {
                     <h3 className="text-lg font-medium mb-2">No Installation Images Yet</h3>
                     <p className="text-sm">Images will appear here once they are uploaded to installation tasks</p>
                   </div>
-
                 }
-
-
-
-                {/* {showImagePreview && previewImage && (
-                  <div
-                    onClick={() => setShowImagePreview(false)}
-                    className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[60]"
-                  >
-                    <div className="relative max-w-4xl max-h-[80%]">
-                      <button
-                        onClick={() => setShowImagePreview(false)}
-                        className="absolute -top-12 right-0 text-white hover:text-gray-300 text-xl"
-                      >
-                        <i className="fas fa-times"></i>
-                      </button>
-                      <img
-                        src={previewImage || NO_IMAGE}
-                        alt={"preveiw image"}
-                        className="max-w-full max-h-[80vh] object-contain rounded-lg"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                  </div>
-                )} */}
               </>
             )
           )}

@@ -8,6 +8,9 @@ import {
   useUploadAdminCorrectionRound,
 } from "../../../apiList/WallPainting Api/adminWallPaintingApi"
 import { downloadImage } from "../../../utils/downloadFile"
+import { toast } from "../../../utils/toast"
+import { Button } from "../../../components/ui/Button"
+import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading"
 
 export default function AdminWallStepPage() {
   const { projectId, stepId, stepNumber } = useParams<{ projectId: string; stepNumber: string; stepId: string }>()
@@ -17,8 +20,8 @@ export default function AdminWallStepPage() {
   const [previewImage, setPreviewImage] = useState<{ url: string; alt: string } | null>(null)
   // const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
 
-  const { mutate: approveStep } = useApproveAdminStep()
-  const { mutate: uploadCorrection } = useUploadAdminCorrectionRound()
+  const { mutateAsync: approveStep, isPending: approvalStatusPending, variables } = useApproveAdminStep()
+  const { mutateAsync: uploadCorrection, isPending: uploadPending } = useUploadAdminCorrectionRound()
   const { data: stepData, isLoading } = useGetAdminStepDetails(projectId!, stepId!)
 
   const step = ADMIN_WALL_PAINTING_STEPS.find((s) => s.stepNumber === Number(stepNumber))
@@ -39,34 +42,58 @@ export default function AdminWallStepPage() {
     setPreviewImage(null)
   }
 
-  const handleSubmit = () => {
-    if ((!files || files?.length === 0) && !note) {
-      alert("Please select files or write something in notes")
-      return
-    }
-    const formData = new FormData()
-    if (files && files.length) {
-      for (let i = 0; i < files.length; i++) {
-        formData.append("files", files[i])
+  const handleSubmit = async () => {
+    try {
+      if ((!files || files?.length === 0) && !note) {
+        alert("Please select files or write something in notes")
+        return
       }
-    }
+      const formData = new FormData()
+      if (files && files.length) {
+        for (let i = 0; i < files.length; i++) {
+          formData.append("files", files[i])
+        }
+      }
 
-    formData.append("adminNote", note)
-    uploadCorrection({
-      projectId: projectId!,
-      stepNumber: stepNumber!,
-      formData,
-    })
+      formData.append("adminNote", note)
+      await uploadCorrection({
+        projectId: projectId!,
+        stepNumber: stepNumber!,
+        formData,
+      })
+
+      toast({ description: 'images uploaded successfully', title: "Success" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to upload image",
+        variant: "destructive"
+      });
+    }
+  }
+
+
+  const handleApprovalStatus = async ({ status }: { status: "approved" | "rejected" }) => {
+    try {
+      await approveStep({
+        projectId: projectId!,
+        stepId: stepId!,
+        payload: { status }
+      })
+
+      toast({ description: 'status updated successfully', title: "Success" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to update status",
+        variant: "destructive"
+      });
+    }
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-full flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-blue-600 text-lg font-medium">Loading step details...</p>
-        </div>
-      </div>
+      <MaterialOverviewLoading />
     )
   }
 
@@ -106,7 +133,7 @@ export default function AdminWallStepPage() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            downloadImage({src, alt});
+            downloadImage({ src, alt });
           }}
           className="absolute cursor-pointer bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-blue-600 text-white p-2 rounded-full shadow hover:bg-blue-700"
           title="Download"
@@ -125,7 +152,7 @@ export default function AdminWallStepPage() {
     <div className="min-h-[80%] bg-gray-50 rounded-xl">
       {/* Image Preview Modal */}
       {previewImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/70  flex items-center justify-center z-50 p-4">
           <div className="relative max-w-4xl max-h-full">
             <button
               onClick={closeImagePreview}
@@ -150,7 +177,7 @@ export default function AdminWallStepPage() {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {/* Header */}
           <div className="bg-white px-2 py-3 sm:px-6 sm:py-4">
-             {/* {isMobile && (
+            {/* {isMobile && (
                 <button
                   onClick={openMobileSidebar}
                   className="mr-2 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
@@ -164,6 +191,33 @@ export default function AdminWallStepPage() {
               Admin Review - Step {stepNumber}
             </p> */}
           </div>
+
+
+                        {/* Action Buttons Section */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 !w-[96%] mx-auto">
+                <h2 className="text-xl font-semibold text-blue-800 mb-4 flex items-center">
+                  <span className="mr-2">⚡</span>
+                  Review Actions
+                </h2>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    isLoading={approvalStatusPending && variables?.payload?.status === "approved"}
+                    onClick={() => handleApprovalStatus({ status: "approved" })}
+                    className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md flex items-center justify-center"
+                  >
+                    <span className="mr-2">✅</span>
+                    Approve Step
+                  </Button>
+                  <Button
+                    isLoading={approvalStatusPending &&  variables?.payload?.status === "rejected"}
+                    onClick={() => handleApprovalStatus({ status: "rejected" })}
+                    className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md flex items-center justify-center"
+                  >
+                    <span className="mr-2">❌</span>
+                    Reject Step
+                  </Button>
+                </div>
+              </div>
 
           {/* Content Container with max height and scroll */}
           <div className="sm:max-h-[calc(100vh-150px)] max-h-[calc(100vh-85px)]  overflow-y-auto custom-scrollbar">
@@ -235,41 +289,7 @@ export default function AdminWallStepPage() {
                 )}
               </div>
 
-              {/* Action Buttons Section */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-blue-800 mb-4 flex items-center">
-                  <span className="mr-2">⚡</span>
-                  Review Actions
-                </h2>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <button
-                    onClick={() =>
-                      approveStep({
-                        projectId: projectId!,
-                        stepId: stepId!,
-                        payload: { status: "approved" },
-                      })
-                    }
-                    className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md flex items-center justify-center"
-                  >
-                    <span className="mr-2">✅</span>
-                    Approve Step
-                  </button>
-                  <button
-                    onClick={() =>
-                      approveStep({
-                        projectId: projectId!,
-                        stepId: stepId!,
-                        payload: { status: "approved" },
-                      })
-                    }
-                    className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md flex items-center justify-center"
-                  >
-                    <span className="mr-2">❌</span>
-                    Reject Step
-                  </button>
-                </div>
-              </div>
+
 
               {/* Correction Section */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -301,12 +321,13 @@ export default function AdminWallStepPage() {
                         onChange={(e) => setFiles(e.target.files)}
                         className="flex-1 text-sm text-blue-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 file:cursor-pointer border border-blue-200 rounded-lg"
                       />
-                      <button
+                      <Button
                         onClick={handleSubmit}
+                        isLoading={uploadPending}
                         className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
                       >
                         Submit Correction
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>

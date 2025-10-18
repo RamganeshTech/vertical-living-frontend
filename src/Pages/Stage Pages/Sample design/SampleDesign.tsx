@@ -117,7 +117,6 @@ const SampleDesignModule: React.FC = () => {
     <div className="container mx-auto max-h-full overflow-y-auto max-w-full min-h-full">
       {/* Responsive Header */}
 
-
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
           {isMobile && (

@@ -28,7 +28,7 @@ const StaffTaskCard:React.FC<Props> = ({task}) => {
 
 
   return (
-    <Card key={task._id} className="p-0 border-l-4 border-blue-600">
+    <Card key={task._id} onClick={() => handleView(task._id)} className="cursor-pointer p-0 border-l-4 border-blue-600">
                                     <CardHeader>
                                         <CardTitle>{task?.title.trim() || "No title"}</CardTitle>
                                         {/* <CardDescription className="text-xs mt-1">{task.description}</CardDescription> */}

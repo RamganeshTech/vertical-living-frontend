@@ -121,7 +121,7 @@ const CartItem: React.FC<CartItemProps> = ({ item, onUpdateQuantity, onRemoveIte
                 <div className="flex flex-wrap gap-3 text-xs text-gray-700 mb-4">
                     {Object.entries(spec).map(([key, value]) => {
                         if (["image", "imageUrl", "_id", "organizationId", "series", "cct", "mrp", "itemCode",
-                             "name", "subcategory", "category", "model", "hasVariants"].includes(key)) return null;
+                            "name", "subcategory", "category", "model", "hasVariants"].includes(key)) return null;
                         if (typeof value === "object" || value === undefined || value === null) return null;
 
                         return (
@@ -225,7 +225,7 @@ const MaterialInventoryCartMain = () => {
     }
     ), [selectedProjectId])
 
-    console.log("currentProjectName", currentProjectName)
+    // console.log("currentProjectName", currentProjectName)
 
     const { data: cart, isLoading: isCartLoading, error: cartError, refetch } = useGetCart({
         organizationId: organizationId!,
@@ -311,7 +311,9 @@ const MaterialInventoryCartMain = () => {
 
     // Loading State
     if (isCartLoading) {
-        return <MaterialOverviewLoading />;
+        return <div className='max-h-full overflow-y-auto'>
+            <MaterialOverviewLoading />
+        </div>
     }
 
     // Error State
@@ -560,7 +562,7 @@ const MaterialInventoryCartMain = () => {
 
                         {/* Additional Info Card - Space reserved for future use */}
                         <div className="mt-6">
-                            <OrderInformation />
+                            {/* <OrderInformation /> */}
                             {/* Uncomment above component when needed - it will fit perfectly here */}
                         </div>
                     </>

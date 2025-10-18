@@ -87,6 +87,8 @@ export default function QualityCheckOverview() {
 
   if (isLoading) return <MaterialOverviewLoading />;
 
+  console.log("data", data)
+
   return (
     <main className="w-full h-full  overflow-y-auto custom-scrollbar">
       {/* 🔵 Header Details - Always Visible */}
@@ -186,17 +188,17 @@ export default function QualityCheckOverview() {
               {/* 🗂️ Room Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mb-10">
                 {data?.rooms?.length > 0 ?
-                  data?.room?.map((room: { _id: string, roomName: string, tasks: any }) => (
+                  data?.rooms?.map((room: { _id: string, roomName: string, tasks: any }) => (
                     <Link
                       key={room._id}
-                      to={`qualitycheckroom/${room}`}
+                      to={`qualitycheckroom/${room.roomName?.replace(/([A-Z])/g, " $1").trim()}`}
                       className="border-l-4 border-blue-600 p-4 rounded-xl bg-white shadow hover:shadow-lg transition cursor-pointer"
                     >
                       <h3 className="text-md font-semibold text-blue-800 capitalize mb-1">
-                        {room.roomName.replace(/([A-Z])/g, " $1").trim()}
+                        {room?.roomName?.replace(/([A-Z])/g, " $1").trim()}
                       </h3>
                       <p className="text-xs text-gray-500">
-                        {room.tasks?.length || 0} works completed
+                        {room?.tasks?.length || 0} works completed
                       </p>
                       <p className="text-xs text-gray-400">Click to view details</p>
                     </Link>

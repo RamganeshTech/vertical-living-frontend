@@ -248,7 +248,6 @@ const QuoteGenerateVariantSub = () => {
                     grandTotal: updatedGrandTotal,
                     // grandTotal: calculatedVariantGrandTotal,
                     notes: "Generated with brand variant",
-
                 }
             })
             // console.log("reso", res)

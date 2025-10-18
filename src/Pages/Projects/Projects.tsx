@@ -36,6 +36,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     STAFFTASK: `/organizations/${organizationId}/projects/stafftask`,
     SINGLESTAFFTASK: `/organizations/${organizationId}/projects/associatedstafftask`,
     MATERIALINVENTORY: `/organizations/${organizationId}/projects/materialinventory`,
+    NOTIFICATION: `/organizations/${organizationId}/projects/notification`,
     // PROCUREMENT: `/organizations/${organizationId}/procurement`
     // ISSUES: "/issues",
     // COLLABORATION: "/collaboration",

@@ -7,6 +7,8 @@ import {
   useUploadWorkerCorrectionFiles,
 } from "../../../apiList/WallPainting Api/workerWallPaintingApi"
 import { downloadImage } from "../../../utils/downloadFile"
+import { toast } from "../../../utils/toast"
+import { Button } from "../../../components/ui/Button"
 
 export default function WorkerWallStepPage() {
   const { projectId, stepId, stepNumber } = useParams<{
@@ -20,9 +22,9 @@ export default function WorkerWallStepPage() {
   const [loadingImages, setLoadingImages] = useState<boolean>(false)
   const [previewImage, setPreviewImage] = useState<{ url: string; alt: string } | null>(null)
 
-  const { data: stepData, isLoading } = useGetWorkerStepDetails(projectId!, stepId!)
-  const { mutate: uploadInitial } = useUploadWorkerInitialFiles()
-  const { mutate: uploadCorrection } = useUploadWorkerCorrectionFiles()
+  const { data: stepData, isLoading, refetch } = useGetWorkerStepDetails(projectId!, stepId!)
+  const { mutateAsync: uploadInitial,isPending: initialPending } = useUploadWorkerInitialFiles()
+  const { mutateAsync: uploadCorrection ,isPending: correctionPending} = useUploadWorkerCorrectionFiles()
 
   const step = WORKER_WALL_PAINTING_STEPS.find((s) => s.stepNumber === Number(stepNumber))
 
@@ -65,40 +67,64 @@ export default function WorkerWallStepPage() {
     )
   }
 
-  const handleInitialUpload = () => {
-    if (!initialFiles || initialFiles.length === 0) {
-      alert("Please select files for initial upload.")
-      return
+  const handleInitialUpload = async () => {
+    try {
+
+      if (!initialFiles || initialFiles.length === 0) {
+        alert("Please select files for initial upload.")
+        return
+      }
+      const formData = new FormData()
+      for (let i = 0; i < initialFiles.length; i++) {
+        formData.append("files", initialFiles[i])
+      }
+      await uploadInitial({
+        projectId: projectId!,
+        stepNumber: stepNumber!,
+        formData,
+      })
+      refetch()
+
+      toast({ description: 'images uploaded successfully', title: "Success" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || error?.message || "Failed to upload image",
+        variant: "destructive"
+      });
     }
-    const formData = new FormData()
-    for (let i = 0; i < initialFiles.length; i++) {
-      formData.append("files", initialFiles[i])
-    }
-    uploadInitial({
-      projectId: projectId!,
-      stepNumber: stepNumber!,
-      formData,
-    })
+
   }
 
-  const handleCorrectionUpload = (correctionRound: string) => {
-    if (!correctionFiles || correctionFiles.length === 0) {
-      alert("Please select files for correction upload.")
-      return
+  const handleCorrectionUpload = async (correctionRound: string) => {
+    try {
+
+      if (!correctionFiles || correctionFiles.length === 0) {
+        alert("Please select files for correction upload.")
+        return
+      }
+      const formData = new FormData()
+      for (let i = 0; i < correctionFiles.length; i++) {
+        formData.append("files", correctionFiles[i])
+      }
+      await uploadCorrection({
+        projectId: projectId!,
+        stepNumber: stepNumber!,
+        correctionRound: correctionRound,
+        formData,
+      })
+      refetch()
+      toast({ description: 'images uploaded successfully', title: "Success" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Failed to upload image",
+        variant: "destructive"
+      });
     }
-    const formData = new FormData()
-    for (let i = 0; i < correctionFiles.length; i++) {
-      formData.append("files", correctionFiles[i])
-    }
-    uploadCorrection({
-      projectId: projectId!,
-      stepNumber: stepNumber!,
-      correctionRound: correctionRound,
-      formData,
-    })
   }
 
-  const ImageWithBlur = ({ src, alt }: { src: string; alt: string;  }) => {
+  const ImageWithBlur = ({ src, alt }: { src: string; alt: string; }) => {
     return (
       <div className="relative group cursor-pointer" onClick={() => openImagePreview(src, alt)}>
         {loadingImages && (
@@ -232,12 +258,13 @@ export default function WorkerWallStepPage() {
                       onChange={(e) => setInitialFiles(e.target.files)}
                       className="flex-1 text-sm text-blue-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer border border-blue-200 rounded-lg"
                     />
-                    <button
-                      onClick={handleInitialUpload}
+                    <Button
+                    isLoading={initialPending}
+                      onClick={() => handleInitialUpload()}
                       className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
                     >
                       Upload Files
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -335,12 +362,13 @@ export default function WorkerWallStepPage() {
                               onChange={(e) => setCorrectionFiles(e.target.files)}
                               className="flex-1 text-sm text-blue-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 file:cursor-pointer border border-blue-200 rounded-lg"
                             />
-                            <button
+                            <Button
+                            isLoading={correctionPending}
                               onClick={() => handleCorrectionUpload(round?.roundNumber)}
                               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
                             >
                               Upload Corrections
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       </div>

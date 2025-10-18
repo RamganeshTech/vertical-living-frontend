@@ -21,6 +21,7 @@ import { useAddToCart, useGetCart, useRemoveCartItem, useUpdateCartItemQuantity 
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import SearchSelectNew from "../../components/ui/SearchSelectNew";
+import { Label } from "../../components/ui/Label";
 
 
 const MaterialInventoryMain: React.FC = () => {
@@ -54,8 +55,6 @@ const MaterialInventoryMain: React.FC = () => {
     const debouncedMaxMrp = useDebounce(maxMrp, 800);
 
 
-
-
     // Get projects
     const { data: projectsData } = useGetProjects(organizationId);
     const projects = projectsData?.map((project: AvailableProjetType) => ({
@@ -63,10 +62,11 @@ const MaterialInventoryMain: React.FC = () => {
         projectName: project.projectName
     }));
 
-    const projectOptions = (projectsData || [])?.map((project: AvailableProjetType) => ({
+    const projectOptions = useMemo(()=> (projectsData || [])?.map((project: AvailableProjetType) => ({
         value: project._id,
         label: project.projectName
     }))
+        , [projectsData])
 
     // Auto-select first project if available
     useEffect(() => {
@@ -96,84 +96,84 @@ const MaterialInventoryMain: React.FC = () => {
     // Determine if current category uses variants (switches/sockets/regulators)
 
     const isLightCategory = category && category.toLowerCase() === "light";
-const isSwitchOrSocketCategory = category && ["switches", "socket"].includes(category.toLowerCase());
-const isRegulatorCategory = category && category.toLowerCase() === "regulator";
-const noCategorySelected = !category || category === "";
+    const isSwitchOrSocketCategory = category && ["switches", "socket"].includes(category.toLowerCase());
+    const isRegulatorCategory = category && category.toLowerCase() === "regulator";
+    const noCategorySelected = !category || category === "";
 
 
-// Show specific filters based on category
-const showTypeFilter = isSwitchOrSocketCategory;
-const showSubcategoryAndModel = isLightCategory || noCategorySelected; // Show when light OR no category
+    // Show specific filters based on category
+    const showTypeFilter = isSwitchOrSocketCategory;
+    const showSubcategoryAndModel = isLightCategory || noCategorySelected; // Show when light OR no category
 
-// Reset irrelevant filters when category changes
-useEffect(() => {
-    if (isLightCategory) {
-        // Reset type when switching to light category
-        setType("");
-    } else if (isSwitchOrSocketCategory) {
-        // Reset subcategory and model when switching to switch/socket
-        setSubcategory("");
-        setModel("");
-    } else if (isRegulatorCategory) {
-        // Reset all category-specific filters for regulator
-        setType("");
-        setSubcategory("");
-        setModel("");
-    } else if (noCategorySelected) {
-        // Reset type when no category is selected (show subcategory and model)
-        setType("");
-    }
-}, [category]); // Only run when category changes
+    // Reset irrelevant filters when category changes
+    useEffect(() => {
+        if (isLightCategory) {
+            // Reset type when switching to light category
+            setType("");
+        } else if (isSwitchOrSocketCategory) {
+            // Reset subcategory and model when switching to switch/socket
+            setSubcategory("");
+            setModel("");
+        } else if (isRegulatorCategory) {
+            // Reset all category-specific filters for regulator
+            setType("");
+            setSubcategory("");
+            setModel("");
+        } else if (noCategorySelected) {
+            // Reset type when no category is selected (show subcategory and model)
+            setType("");
+        }
+    }, [category]); // Only run when category changes
 
-// Build filters based on category
-const filters = useMemo(() => {
-    const baseFilters = {
-        search: debouncedSearch,
+    // Build filters based on category
+    const filters = useMemo(() => {
+        const baseFilters = {
+            search: debouncedSearch,
+            category,
+            minMrp: debouncedMinMrp ? Number(debouncedMinMrp) : undefined,
+            maxMrp: debouncedMaxMrp ? Number(debouncedMaxMrp) : undefined,
+            brand,
+            watt,
+            itemCode,
+        };
+
+        // Add category-specific filters
+        if (isLightCategory || noCategorySelected) {
+            // Light or No Category: show subcategory and model
+            return {
+                ...baseFilters,
+                subcategory,
+                model,
+            };
+        } else if (isSwitchOrSocketCategory) {
+            // Switch/Socket: show type
+            return {
+                ...baseFilters,
+                type,
+            };
+        } else if (isRegulatorCategory) {
+            // Regulator: no additional type/subcategory/model filters
+            return baseFilters;
+        }
+
+        return baseFilters;
+    }, [
+        debouncedSearch,
         category,
-        minMrp: debouncedMinMrp ? Number(debouncedMinMrp) : undefined,
-        maxMrp: debouncedMaxMrp ? Number(debouncedMaxMrp) : undefined,
-        brand,
+        subcategory,
+        type,
+        model,
         watt,
         itemCode,
-    };
+        debouncedMinMrp,
+        debouncedMaxMrp,
+        brand,
+        isLightCategory,
+        isSwitchOrSocketCategory,
+        isRegulatorCategory,
+        noCategorySelected
+    ]);
 
-    // Add category-specific filters
-    if (isLightCategory || noCategorySelected) {
-        // Light or No Category: show subcategory and model
-        return {
-            ...baseFilters,
-            subcategory,
-            model,
-        };
-    } else if (isSwitchOrSocketCategory) {
-        // Switch/Socket: show type
-        return {
-            ...baseFilters,
-            type,
-        };
-    } else if (isRegulatorCategory) {
-        // Regulator: no additional type/subcategory/model filters
-        return baseFilters;
-    }
-
-    return baseFilters;
-}, [
-    debouncedSearch,
-    category,
-    subcategory,
-    type,
-    model,
-    watt,
-    itemCode,
-    debouncedMinMrp,
-    debouncedMaxMrp,
-    brand,
-    isLightCategory,
-    isSwitchOrSocketCategory,
-    isRegulatorCategory,
-    noCategorySelected
-]);
-    
 
     // const isVariantCategory = category && ["switches", "socket", "regulator"].includes(category.toLowerCase());
 
@@ -253,34 +253,34 @@ const filters = useMemo(() => {
 
 
     // Helper function to get specification for cart
-const getSpecificationForCart = (item: any): any => {
-    // If product has variants, use first variant's data
-    if (item?.specification?.variants && item?.specification?.variants?.length > 0) {
-        const firstVariant = item?.specification?.variants[0];
-        return {
-            itemCode: firstVariant?.itemCode,
-            mrp: firstVariant?.mrp,
-            color: firstVariant?.color,
-            // size: firstVariant.size,
-            image: firstVariant.images?.[0] || firstVariant.image,
-            // Include other variant fields
-            ...firstVariant,
-            // Also include base product info
-            hsn: item?.specification?.HSN || "",
-            brand:item?.specification?.brand || "",
-            description: item?.specification?.description || "", 
-            styleType: item?.specification?.styleType || "",
-            type: item?.specification?.type || "",
-            materialType: item?.specification?.materialType || "",
-            category: item?.specification?.category || item?.category || "",
-            subcategory: item?.specification?.subcategory || item?.subcategory || "",
-            model: item?.specification?.model || item.model || "",
-            // name: item?.specification?.name || item.name,
-        };
-    }
-    // Otherwise use product's specification
-    return item.specification;
-};
+    const getSpecificationForCart = (item: any): any => {
+        // If product has variants, use first variant's data
+        if (item?.specification?.variants && item?.specification?.variants?.length > 0) {
+            const firstVariant = item?.specification?.variants[0];
+            return {
+                itemCode: firstVariant?.itemCode,
+                mrp: firstVariant?.mrp,
+                color: firstVariant?.color,
+                // size: firstVariant.size,
+                image: firstVariant.images?.[0] || firstVariant.image,
+                // Include other variant fields
+                ...firstVariant,
+                // Also include base product info
+                hsn: item?.specification?.HSN || "",
+                brand: item?.specification?.brand || "",
+                description: item?.specification?.description || "",
+                styleType: item?.specification?.styleType || "",
+                type: item?.specification?.type || "",
+                materialType: item?.specification?.materialType || "",
+                category: item?.specification?.category || item?.category || "",
+                subcategory: item?.specification?.subcategory || item?.subcategory || "",
+                model: item?.specification?.model || item.model || "",
+                // name: item?.specification?.name || item.name,
+            };
+        }
+        // Otherwise use product's specification
+        return item.specification;
+    };
 
 
 
@@ -316,7 +316,7 @@ const getSpecificationForCart = (item: any): any => {
         }
 
         try {
-              const specification = getSpecificationForCart(item);
+            const specification = getSpecificationForCart(item);
 
             await addToCartMutation.mutateAsync({
                 organizationId,
@@ -501,9 +501,9 @@ const getSpecificationForCart = (item: any): any => {
         const displayData = getDisplayData(item);
         // const img = spec.imageUrl || spec.image || null;
 
-          // Get itemCode for this item (first variant if has variants, else product itemCode)
-    const itemCode = getItemCodeFromProduct(item);
-    
+        // Get itemCode for this item (first variant if has variants, else product itemCode)
+        const itemCode = getItemCodeFromProduct(item);
+
 
         const cartQuantity = getCartItemQuantity(item._id);
         const isInCart = cartQuantity > 0;
@@ -705,20 +705,10 @@ const getSpecificationForCart = (item: any): any => {
 
                             {/* Project Selection */}
                             <div className="w-full sm:w-64">
-                                {/* <select
-                                    value={selectedProjectId}
-                                    onChange={(e) => setSelectedProjectId(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm text-sm"
-                                >
-                                    <option value="">Select Project...</option>
-                                    {projects?.map((project: any) => (
-                                        <option key={project._id} value={project._id}>
-                                            {project.projectName}
-                                        </option>
-                                    ))}
-                                </select> */}
 
 
+                                {/* <div className="relative min-w-[250px]"> */}
+                                <Label>Select project for the displaying the cart items</Label>
                                 <SearchSelectNew
                                     options={projectOptions}
                                     placeholder="Select project"
@@ -729,6 +719,7 @@ const getSpecificationForCart = (item: any): any => {
                                     displayFormat="simple"
                                     className="w-full"
                                 />
+                                {/* </div> */}
                             </div>
 
 
@@ -821,7 +812,7 @@ const getSpecificationForCart = (item: any): any => {
                                 </div>
 
 
-                              
+
                                 {/* Conditional filter: Subcategory for lights, Type for switches/sockets/regulators */}
                                 {/* {!isVariantCategory ? (
                                     <>
@@ -874,67 +865,67 @@ const getSpecificationForCart = (item: any): any => {
                                 )} */}
 
 
- {showSubcategoryAndModel && (
-        <>
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Subcategory
-                </label>
-                <select
-                    value={subcategory}
-                    onChange={e => setSubcategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                    {MATINVENTORY_FILTER_OPTIONS.subcategories.map(option => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
-            </div>
+                                {showSubcategoryAndModel && (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Subcategory
+                                            </label>
+                                            <select
+                                                value={subcategory}
+                                                onChange={e => setSubcategory(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                {MATINVENTORY_FILTER_OPTIONS.subcategories.map(option => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
 
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Model
-                </label>
-                <select
-                    value={model}
-                    onChange={e => setModel(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                    {MATINVENTORY_FILTER_OPTIONS.models.map(option => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
-            </div>
-        </>
-    )}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Model
+                                            </label>
+                                            <select
+                                                value={model}
+                                                onChange={e => setModel(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                {MATINVENTORY_FILTER_OPTIONS.models.map(option => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </>
+                                )}
 
-    {/* Show Type only for Switch/Socket Categories */}
-    {showTypeFilter && (
-        <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type
-            </label>
-            <select
-                value={type}
-                onChange={e => setType(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-                <option value="">All Types</option>
-                {MATINVENTORY_FILTER_OPTIONS.types?.map(option => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </select>
-        </div>
-    )}
+                                {/* Show Type only for Switch/Socket Categories */}
+                                {showTypeFilter && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Type
+                                        </label>
+                                        <select
+                                            value={type}
+                                            onChange={e => setType(e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        >
+                                            <option value="">All Types</option>
+                                            {MATINVENTORY_FILTER_OPTIONS.types?.map(option => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
 
-    {/* Info message for Regulator Category */}
-    {/* {isRegulatorCategory && (
+                                {/* Info message for Regulator Category */}
+                                {/* {isRegulatorCategory && (
         <div className="col-span-full p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-700 flex items-center">
                 <i className="fa-solid fa-info-circle mr-2"></i>
@@ -1031,11 +1022,11 @@ const getSpecificationForCart = (item: any): any => {
                         <div
                             ref={listRef}
                             className="h-full overflow-y-auto custom-scrollbar pr-2"
-                            // style={{
-                            //     maxHeight: 'calc(100vh - 200px)',
-                            //     overscrollBehavior: 'contain'
-                            // }}
-                            // className="flex-1 overflow-y-auto custom-scrollbar rounded-lg"
+                        // style={{
+                        //     maxHeight: 'calc(100vh - 200px)',
+                        //     overscrollBehavior: 'contain'
+                        // }}
+                        // className="flex-1 overflow-y-auto custom-scrollbar rounded-lg"
                         >
 
                             {!selectedProjectId && (

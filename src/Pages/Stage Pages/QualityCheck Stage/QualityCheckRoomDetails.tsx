@@ -1,6 +1,6 @@
 import  { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetQualityCheckup, useCreateQualityCheckItem, useEditQualityCheckItem, useDeleteQualityCheckItem, } from "../../../apiList/Stage Api/qualityCheckApi";
+import {  useCreateQualityCheckItem, useEditQualityCheckItem, useDeleteQualityCheckItem, useGetQualityCheckRoomItems, } from "../../../apiList/Stage Api/qualityCheckApi";
 import { Input } from "../../../components/ui/Input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "../../../components/ui/Select";
 import { toast } from "../../../utils/toast";
@@ -123,12 +123,14 @@ import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadin
 // }
 
 export default function QualityCheckRoomDetails() {
-  const { roomkey, projectId, organizationId } = useParams() as { roomkey: string; projectId: string, organizationId: string };
+  const { roomName, projectId, organizationId } = useParams() as { roomName: string; projectId: string, organizationId: string };
+  const decodedRoomName = decodeURIComponent(roomName);
+
   const navigate = useNavigate();
 
   const [popupImage, setPopupImage] = useState<string | null>(null);
 
-  const { data, isLoading, error, isError, refetch } = useGetQualityCheckup(projectId);
+  const { data, isLoading, error, isError, refetch } = useGetQualityCheckRoomItems(projectId, decodedRoomName);
   const { mutateAsync: createItem, isPending: createPending } = useCreateQualityCheckItem();
   const { mutateAsync: editItem, isPending: editPending } = useEditQualityCheckItem();
   const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteQualityCheckItem();
@@ -145,7 +147,7 @@ export default function QualityCheckRoomDetails() {
 
   // if (isLoading) return <MaterialOverviewLoading />;
 
-  const items: any[] = data?.[roomkey] || [];
+  const items: any[] = data?.tasks || [];
 
   const handleAdd = async () => {
     try {
@@ -160,7 +162,7 @@ export default function QualityCheckRoomDetails() {
       if (form.remarks) formData.append("remarks", form.remarks);
       if (form.file) formData.append("file", form.file);
 
-      await createItem({ projectId, roomName: roomkey, formData });
+      await createItem({ projectId, roomName: decodedRoomName, formData });
       toast({ description: "Created successfully", title: "Success" });
       resetForm();
       refetch()
@@ -190,7 +192,7 @@ export default function QualityCheckRoomDetails() {
       if (form.file) formData.append("file", form.file);
 
       await editItem(
-        { projectId, roomName: roomkey, formData, itemId: itemId },
+        { projectId, roomName: decodedRoomName, formData, itemId: itemId },
         {
           onSuccess: () => {
             resetForm();
@@ -212,7 +214,7 @@ export default function QualityCheckRoomDetails() {
 
   const handleDelete = async (itemId: string) => {
     try {
-      await deleteItem({ projectId, roomName: roomkey, itemId });
+      await deleteItem({ projectId, roomName: decodedRoomName, itemId });
       toast({ description: "Deleted successfully", title: "Success" });
       refetch()
     } catch (error: any) {
@@ -258,7 +260,7 @@ export default function QualityCheckRoomDetails() {
     <div className="w-full h-full">
       <div className="flex justify-between">
 
-        <h1 className="text-xl font-bold mb-4">Room: {roomkey}</h1>
+        <h1 className="text-xl font-bold mb-4">Room: {roomName}</h1>
         <Button variant="primary" className="h-10" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/qualitycheck`)}>
           Go Back
         </Button>

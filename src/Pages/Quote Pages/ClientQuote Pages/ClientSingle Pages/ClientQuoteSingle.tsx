@@ -1,5 +1,5 @@
-import React, { createRef, useEffect,  useRef, useState } from "react";
-import {  useNavigate, useParams } from "react-router-dom";
+import React, { createRef, useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 // import { useGetMaterialBrands, useGetMaterialQuoteSingleEntry } from "../../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
 import { type FurnitureBlock } from "../../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
 // import FurnitureQuoteVariantForm, { getRateForThickness, type FurnitureQuoteRef } from "./FurnitureQuoteVariantForm";
@@ -13,6 +13,7 @@ import ClientFurnitures, { type FurnitureQuoteRef } from "./ClientFurnitures";
 import { useGetSingleClientQuote, useSendQuoteToPaymentStage } from "../../../../apiList/Quote Api/ClientQuote/clientQuoteApi";
 // import { Input } from "../../../../components/ui/Input";
 import { Label } from './../../../../components/ui/Label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/Select";
 
 export const DEFAULT_LAMINATE_RATE_PER_SQFT = 10;
 
@@ -35,6 +36,7 @@ const ClientQuoteSingle = () => {
 
     // const [isBlured, setIsBlured] = useState<boolean>(quote?.isBlured || false);
     const [isBlured, setIsBlured] = useState<boolean>(true);
+    const [templateType, setTemplateType] = useState<"type 1" | "type 2" | "type 3">("type 1");
 
 
     // Extract all unique brand names from materialBrands data
@@ -122,7 +124,7 @@ const ClientQuoteSingle = () => {
     // };
 
 
-    useEffect(()=>{
+    useEffect(() => {
         setGrandTotal(quote?.grandTotal);
     }, [quote])
 
@@ -432,9 +434,24 @@ const ClientQuoteSingle = () => {
                                 </div>
                             </label>
                             {/* <label className="text-sm font-medium text-gray-700">This work is required for the project</label> */}
-                        {/* </div> */}
+                            {/* </div> */}
                             <Label htmlFor="blurinput" className=" cursor-pointer flex flex-4/2" >Show Stats</Label>
 
+                        </div>
+
+                        <div className="w-full">
+                            <Select onValueChange={(val: any) => setTemplateType(val)}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select Template Type" selectedValue={templateType} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {["type 1", "type 2", "type 3"].map((option) => (
+                                        <SelectItem key={option} value={option.toString()}>
+                                            {option}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 
@@ -533,6 +550,7 @@ const ClientQuoteSingle = () => {
                                     // brandOptions={brandOptions}
                                     // laminateBrandOptions={laminateBrandOptions}
                                     // onFurnitureChange={updateGrandTotal}
+                                    templateType={templateType}
                                     isBlurred={isBlured}
 
                                 />
