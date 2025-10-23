@@ -62,7 +62,7 @@ const MaterialInventoryMain: React.FC = () => {
         projectName: project.projectName
     }));
 
-    const projectOptions = useMemo(()=> (projectsData || [])?.map((project: AvailableProjetType) => ({
+    const projectOptions = useMemo(() => (projectsData || [])?.map((project: AvailableProjetType) => ({
         value: project._id,
         label: project.projectName
     }))
@@ -765,7 +765,7 @@ const MaterialInventoryMain: React.FC = () => {
                                         </button>
                                     )}
                             </div>
-                            <div className="space-y-2">
+                            <section className="space-y-2">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Search
@@ -1014,7 +1014,7 @@ const MaterialInventoryMain: React.FC = () => {
                                         <Input className="" type="number" value={maxMrp} onChange={e => setMaxMrp(e.target.value)} />
                                     </div>
                                 </div>
-                            </div>
+                            </section>
                         </div>
                     </div>
                     {/* Main Content */}

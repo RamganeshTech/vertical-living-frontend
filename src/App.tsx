@@ -6,7 +6,13 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-const NotificationMain = lazy(() => import( './Pages/Notificaition Page/NotificationMain'));
+const InvoiceAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Invoice Account/InvoiceAccountMain'));
+const InvoiceAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Invoice Account/InvoiceAccSingle'));
+const CreateInvoiceAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Invoice Account/CreateInvoiceAcc'));
+const CustomerAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Customer Account/CustomerAccountsMain'));
+const CustomerAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Customer Account/CustomerAccSingle'));
+const CreateCustomerAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Customer Account/CreateCustomerAcc'));
+const NotificationMain = lazy(() => import('./Pages/Notificaition Page/NotificationMain'));
 const MaterialInventoryMain = lazy(() => import('./Pages/Material Inventory Pages/MaterialInventoryMain'));
 const MaterialInventorySingle = lazy(() => import('./Pages/Material Inventory Pages/Material Inventory Single/MaterialInventorySingle'));
 const MaterialInventoryCartMain = lazy(() => import('./Pages/Material Inventory Pages/Material Inventory Cart/MaterialInventoryCartMain'));
@@ -352,6 +358,35 @@ function App() {
 
             </Route>
 
+            <Route path="customermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <CustomerAccountsMain />
+            </ProtectedRoutes>} >
+
+              <Route path="customersingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CustomerAccSingle />
+              </ProtectedRoutes>} />
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateCustomerAcc />
+              </ProtectedRoutes>} />
+            </Route>
+
+            <Route path="invoicemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <InvoiceAccountsMain />
+            </ProtectedRoutes>} >
+
+              <Route path="invoicesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <InvoiceAccSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateInvoiceAcc />
+              </ProtectedRoutes>} />
+
+
+            </Route>
+
 
             <Route path="commonorder" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <CommonOrdersMain />
@@ -482,15 +517,9 @@ function App() {
 
             </Route>
 
-             <Route path="notification" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            {/* <Route path="notification" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <NotificationMain />
-            </ProtectedRoutes>} />
-
-             
-            
-
-
-
+            </ProtectedRoutes>} /> */}
 
           </Route>
 
@@ -849,6 +878,13 @@ function App() {
 
           <Route path="/workers" element={<ProtectedRoutes allowedRoles={["staff"]} >
             <Workers />
+          </ProtectedRoutes>} />
+
+
+
+          {/*NOTIFICAITON navigation  */}
+          <Route path="/:organizationId/notification" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <NotificationMain />
           </ProtectedRoutes>} />
 
 

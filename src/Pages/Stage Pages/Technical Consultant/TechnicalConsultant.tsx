@@ -130,7 +130,7 @@ const TechnicalConsultant: React.FC = () => {
 
     if (getMessageLoading) return <MaterialOverviewLoading />
 
-    console.log("techDoc", techDoc)
+    // console.log("techDoc", techDoc)
 
 
     const getName = (role: string, sender: any) => {
@@ -266,7 +266,7 @@ const TechnicalConsultant: React.FC = () => {
                                 ?.slice()
                                 .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                                 .map((msg: IConsultationMessage) => {
-                                    console.log("messge", msg)
+                                    // console.log("messge", msg)
                                     return (
                                         <div key={(msg)._id} className="bg-blue-50 w-full group px-4 py-[5px] rounded-lg shadow flex flex-col">
                                             <div className="flex justify-between items-center">

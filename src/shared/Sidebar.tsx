@@ -20,6 +20,7 @@ import type { RootState } from '../store/store'
 import { toast } from '../utils/toast'
 // import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
 import { useGetProjectDetails } from '../apiList/currentActiveStage api/currentActiveStageApi'
+import NotificationIcon from './Notifcation/NotificaitonIcon'
 // import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
 
 
@@ -211,6 +212,9 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
     }
 
 
+    const showNotifications = role && ['owner', 'CTO', 'staff'].includes(role);
+    // const isNotificationActive = pathArray[pathArray.length - 1] === 'notification';
+
     const handleLogout = async () => {
         try {
             if (role === "CTO") {
@@ -246,6 +250,8 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
     };
 
 
+
+
     return (
         <>
             {showSideBar ?
@@ -256,6 +262,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                             <div className='w-[30px] h-[30px]' >
                                 <img className='w-full h-full' src={COMPANY_DETAILS.COMPANY_LOGO} alt="LOGO" />
                             </div>
+
                         </div>
 
                         <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
@@ -307,12 +314,23 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                         </Button>
                         }
 
-                        <button
+                        {/* <button
                             title="Ctrl+] to close"
                             onClick={handleSideBarClose}
                             className="mt-2 flex items-center justify-center outline-none border border-blue-600 text-blue-500 hover:bg-[#3a3b45] rounded-lg w-full py-2">
                             <i className="fa-solid fa-chevron-left"></i>
-                        </button>
+                        </button> */}
+
+
+                        <div className='mt-2'>
+                            {showNotifications && (
+                                <NotificationIcon
+                                    isExpanded={false}
+                                    isActive={false}
+                                />
+                            )}
+                        </div>
+
                     </div>
 
 
@@ -353,6 +371,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                             }
                             )}
 
+
                         </div>
 
                     </div>
@@ -385,12 +404,18 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
 
                         }
 
-                        <button
+                        {/* <button
                             title="Ctrl+[ to open"
                             onClick={handleSideBarOpen}
                             className="mt-2 cursor-pointer outline-none border-[#9ca3af] h-[40px] w-[40px] flex items-center justify-center border rounded-lg">
                             <i className="fa-solid fa-chevron-right text-[#4a86f7]"></i>
-                        </button>
+                        </button> */}
+                        {showNotifications && (
+                            <NotificationIcon
+                                isExpanded={false}
+                                isActive={false}
+                            />
+                        )}
                     </div>
                 </aside>
             }

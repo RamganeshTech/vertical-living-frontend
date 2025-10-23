@@ -1,6 +1,6 @@
 import noimg from '../assets/no image.jpeg'
 
-export const SIDEBAR_LABELS:Record<string, string> = {
+export const SIDEBAR_LABELS: Record<string, string> = {
   //   DASHBOARD: "Dashboard",
   PROJECTS: "Projects",
   SHORTLIST: "Reference Design",
@@ -11,6 +11,8 @@ export const SIDEBAR_LABELS:Record<string, string> = {
   LOGISTICS: "Logistics",
   PROCUREMENT: "Procurement",
   ACCOUNTING: "Accounting",
+  CUSTOMERACCOUNT: "Customer",
+  INVOICEACCOUNT: "Invoice",
   RATECONIG: "Rate Config (Material)",
   RATECONIGSTAFF: "Rate Config (Staff)",
   INTERNALQUOTE: "Internal Quote",
@@ -20,7 +22,7 @@ export const SIDEBAR_LABELS:Record<string, string> = {
   STAFFTASK: "Staff Tasks",
   SINGLESTAFFTASK: "Tasks",
   MATERIALINVENTORY: "Product Inventory",
-  NOTIFICATION: "Notification",
+  // NOTIFICATION: "Notification",
 
   // ISSUES: "Issues",
   // COLLABORATION: "Collaboration",
@@ -28,7 +30,7 @@ export const SIDEBAR_LABELS:Record<string, string> = {
   // PHASES: "Phases",
 };
 
-export const SIDEBAR_ICONS:Record<string, string> = {
+export const SIDEBAR_ICONS: Record<string, string> = {
   PROJECTS: "fa-solid fa-diagram-project text-2xl",
   SHORTLIST: "fa-solid fa-object-group text-2xl",
   // SHORTLISTMICA: "fa-solid fa-object-group text-2xl",
@@ -38,6 +40,8 @@ export const SIDEBAR_ICONS:Record<string, string> = {
   LOGISTICS: "fa-solid fa-dolly text-2xl",
   PROCUREMENT: "fa-solid fa-box-open text-2xl",
   ACCOUNTING: "fas fa-money-bill-wave text-2xl",
+  CUSTOMERACCOUNT: "fas fa-user text-2xl",
+  INVOICEACCOUNT: "fas fa-note text-2xl",
   RATECONIG: "fas fa-box-archive text-2xl",
   RATECONIGSTAFF: "fa-solid fa-person-digging text-2xl",
   INTERNALQUOTE: "fas fa-file text-2xl",
@@ -47,7 +51,7 @@ export const SIDEBAR_ICONS:Record<string, string> = {
   STAFFTASK: "fas fa-object-group text-2xl",
   SINGLESTAFFTASK: "fas fa-object-group text-2xl",
   MATERIALINVENTORY: "fa-solid fa-object-group text-2xl",
-  NOTIFICATION: "fas fa-message",
+  // NOTIFICATION: "fas fa-message",
 
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",

@@ -1,8 +1,9 @@
 
 import type React from "react"
 import { Link } from "react-router-dom"
+import { Button } from "../../components/ui/Button"
 
-interface NotificationCardProps {
+export interface NotificationCardProps {
   notification: {
     _id: string
     message: string
@@ -14,12 +15,13 @@ interface NotificationCardProps {
     }
     createdAt: string
   }
-  onMarkAsRead: (id: string) => void
+  // onMarkAsRead: (id: string) => void
   onDelete: (id: string) => void
-  frontendUrl: string
+  frontendUrl: string,
+  deleteMutation:any
 }
 
-const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onMarkAsRead, onDelete, frontendUrl }) => {
+const NotificationCard: React.FC<NotificationCardProps> = ({ deleteMutation, notification, onDelete, frontendUrl }) => {
   const getTypeConfig = (type: string) => {
     switch (type) {
       case "warning":
@@ -117,7 +119,8 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onMar
                 // target="_blank"
                 // rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                onClick={() => onMarkAsRead(notification._id)}
+                // onClick={() => onMarkAsRead(notification._id)}
+                onClick={() =>  onDelete(notification._id)}
               >
                 {notification.navigation?.label || "View Details"}
                 <i className="fas fa-arrow-right text-xs"></i>
@@ -136,13 +139,16 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onMar
               <i className="fas fa-check text-sm"></i>
             </button>
           )} */}
-          <button
+          <Button
+          variant="danger"
+          isLoading={deleteMutation.isPending && deleteMutation.variables.notificationId === notification._id}
             onClick={() => onDelete(notification._id)}
-            className="p-1.5 text-slate-400 hover:text-red-600 transition-colors rounded hover:bg-white"
+            className="!p-1 px-2  bg-red-600 !text-white hover:bg-red-600 transition-colors rounded"
             title="Delete notification"
+            size="sm"
           >
-            <i className="fas fa-trash text-sm"></i>
-          </button>
+            <i className="fas fa-xmark text-sm"></i>
+          </Button>
         </div>
       </div>
     </div>

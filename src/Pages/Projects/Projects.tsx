@@ -27,6 +27,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     LOGISTICS: `/organizations/${organizationId}/projects/logistics`,
     PROCUREMENT: `/organizations/${organizationId}/projects/procurement`,
     ACCOUNTING: `/organizations/${organizationId}/projects/accounting`,
+    CUSTOMERACCOUNT: `/organizations/${organizationId}/projects/customermain`,
+    INVOICEACCOUNT: `/organizations/${organizationId}/projects/invoicemain`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
     INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
@@ -36,7 +38,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     STAFFTASK: `/organizations/${organizationId}/projects/stafftask`,
     SINGLESTAFFTASK: `/organizations/${organizationId}/projects/associatedstafftask`,
     MATERIALINVENTORY: `/organizations/${organizationId}/projects/materialinventory`,
-    NOTIFICATION: `/organizations/${organizationId}/projects/notification`,
+    // NOTIFICATION: `/organizations/${organizationId}/projects/notification`,
     // PROCUREMENT: `/organizations/${organizationId}/procurement`
     // ISSUES: "/issues",
     // COLLABORATION: "/collaboration",

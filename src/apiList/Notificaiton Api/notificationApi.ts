@@ -125,59 +125,6 @@ export interface NotificationPageResponse {
     message: string;
 }
 
-
-/**
- * Get all notifications with pagination
-//  */
-// export const useInfiniteNotifications = (limit: number = 20) => {
-//     const { role } = useGetRole();
-//     const api = getApiForRole(role!);
-
-//     return useInfiniteQuery<
-//         NotificationPageResponse,
-//         Error,
-//         NotificationPageResponse,
-//         [string, string, number],
-//         number
-//     >({
-//         queryKey: ["notifications", "infinite", limit],
-//         enabled: !!role && !!api && allowedRoles.includes(role),
-//         initialPageParam: 1,
-//         queryFn: async ({ pageParam = 1 }) => {
-//             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
-//             if (!api) throw new Error("API instance not found for role");
-            
-//             console.log('🔔 Fetching notifications page:', pageParam);
-//             return await getAllNotifications({ page: pageParam, limit, api });
-//         },
-//         getNextPageParam: (lastPage) => {
-//             console.log('🔍 Last page received:', lastPage);
-//             console.log('🔍 Available properties:', Object.keys(lastPage));
-
-//             const currentPage = lastPage.page;
-//             const totalPages = lastPage.totalPages;
-
-//             console.log('🔍 Pagination calculation:', {
-//                 currentPage,
-//                 totalPages,
-//                 notificationsCount: lastPage.notifications.length,
-//                 total: lastPage.total,
-//                 condition: `${currentPage} < ${totalPages}`,
-//                 result: currentPage < totalPages
-//             });
-
-//             const nextPage = currentPage < totalPages ? currentPage + 1 : undefined;
-//             console.log('🔍 Next page will be:', nextPage);
-
-//             return nextPage;
-//         },
-//         retry: false,
-//         refetchOnWindowFocus: false,
-//         staleTime: 1000 * 60 * 2, // 2 minutes
-//     });
-// };
-
-
 /**
  * Get all notifications with infinite scroll
  */
@@ -258,8 +205,6 @@ export const useGetUnreadCount = () => {
             return await getUnreadCount({ api });
         },
         enabled: !!role && !!api && allowedRoles.includes(role),
-        refetchInterval: 1000 * 60 * 2, // Refetch every 2 minutes
-        staleTime: 1000 * 60 * 1, // 1 minute
     });
 };
 

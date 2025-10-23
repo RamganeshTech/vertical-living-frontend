@@ -440,12 +440,25 @@ const ClientQuoteSingle = () => {
                         </div>
 
                         <div className="w-full">
-                            <Select onValueChange={(val: any) => setTemplateType(val)}>
+                            <Select onValueChange={(val: any) => {
+                                let type: any = "type 1";
+                                if (val === "template 1") {
+                                    type = "type 1"
+                                }
+                                else if (val === "template 2") {
+                                    type = "type 2"
+                                }
+                                else if (val === "template 3") {
+                                    type = "type 3"
+
+                                }
+                                setTemplateType(type)
+                            }}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select Template Type" selectedValue={templateType} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {["type 1", "type 2", "type 3"].map((option) => (
+                                    {["template 1", "template 2", "template 3"].map((option) => (
                                         <SelectItem key={option} value={option.toString()}>
                                             {option}
                                         </SelectItem>
