@@ -428,7 +428,7 @@
 //                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
 //                     {unit.image ? (
 //                       <img
-//                         src={unit.image || "/placeholder.svg"}
+//                         src={unit.image || NO_IMAGE}
 //                         alt={unit.unitName || 'Unit'}
 //                         className="w-full h-full object-cover"
 //                       />
@@ -577,6 +577,7 @@
 import { useState } from 'react'
 import { useGetOrderPublicDetails } from '../../../apiList/Stage Api/orderMaterialHistoryApi'
 import { useParams } from 'react-router-dom'
+import { NO_IMAGE } from '../../../constants/constants'
 
 interface OrderSubItem {
   _id: string
@@ -697,7 +698,7 @@ export default function PublicOrderHistory() {
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                       {unit.image ? (
                         <img
-                          src={unit.image || "/placeholder.svg"}
+                          src={unit.image || NO_IMAGE}
                           alt={unit.unitName || 'Unit'}
                           className="w-full h-full object-cover"
                         />

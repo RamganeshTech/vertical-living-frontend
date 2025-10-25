@@ -17,6 +17,7 @@ import {
 } from "react-icons/fi"
 
 import { useNavigate } from "react-router-dom";
+import { NO_IMAGE } from "../constants/constants";
 
 interface OrganizationCardProps {
   organization: {
@@ -60,7 +61,7 @@ export default function OrganizationCard({ organization }: OrganizationCardProps
             <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
               {organization?.logoUrl ? (
                 <img
-                  src={organization.logoUrl || "/placeholder.svg"}
+                  src={organization.logoUrl || NO_IMAGE}
                   alt={organization.organizationName}
                   className="w-8 h-8 rounded-lg object-cover"
                 />

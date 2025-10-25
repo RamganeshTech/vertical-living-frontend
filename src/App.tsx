@@ -6,6 +6,12 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
+const ModularUnitMainNew = lazy(()=> import('./Pages/Modular Units/Modular Units New/ModularUnitMainNew'));
+const CreateModularUnitNew = lazy(()=> import('./Pages/Modular Units/Modular Units New/CreateModularUnitNew'));
+const ModularUnitSingleNew = lazy(()=> import('./Pages/Modular Units/Modular Units New/ModularUnitSingleNew'));
+const RetailInvoiceAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Retail Invoice Account/RetailInvoiceAccountMain'));
+const RetailCreateInvoiceAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Retail Invoice Account/CreateRetailInvoiceAcc'));
+const RetailInvoiceAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Retail Invoice Account/RetailInvoiceAccSingle'));
 const InvoiceAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Invoice Account/InvoiceAccountMain'));
 const InvoiceAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Invoice Account/InvoiceAccSingle'));
 const CreateInvoiceAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Invoice Account/CreateInvoiceAcc'));
@@ -282,6 +288,25 @@ function App() {
             </Route> */}
 
 
+            <Route path="modularunits" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                <ModularUnitMainNew />
+              </ProtectedRoutes>
+            } >
+
+              <Route path="create" element={
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                  <CreateModularUnitNew />
+                </ProtectedRoutes>} />
+
+              <Route path="single/:unitId" element={
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                  <ModularUnitSingleNew />
+                </ProtectedRoutes>} />
+            </Route>
+
+
+
             {/* <Route path="procurement" element={
               <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
                 <ProcurementMain />
@@ -382,6 +407,22 @@ function App() {
 
               <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <CreateInvoiceAcc />
+              </ProtectedRoutes>} />
+
+
+            </Route>
+
+            <Route path="retailinvoicemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <RetailInvoiceAccountsMain />
+            </ProtectedRoutes>} >
+
+              <Route path="retailinvoicesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <RetailInvoiceAccSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <RetailCreateInvoiceAcc />
               </ProtectedRoutes>} />
 
 

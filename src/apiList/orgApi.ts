@@ -50,7 +50,7 @@ const updateOrganizationName = async ({
 
 // 4) deleteOrganization
 const deleteOrganization = async (orgId: string, api: AxiosInstance) => {
-  const { data } = await api.put(`/orgs/deleteorganization/${orgId}`);
+  const { data } = await api.delete(`/orgs/deleteorganization/${orgId}`);
   if (!data.ok) throw new Error(data.message);
   return data;
 };

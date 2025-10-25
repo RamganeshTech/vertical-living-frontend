@@ -33,7 +33,7 @@ const OrganizationChildrens:React.FC<OrganizationChildrenProps> = ({setOrganizat
         PLAN: `/organizations/${organizationId}/subscriptionplan`,
         PROFILE: `/organizations/${organizationId}/userprofile`,
         MODULAR: `/organizations/${organizationId}/modularunits`,
-        EXTERNAL: `/organizations/${organizationId}/externalunits`,
+        // EXTERNAL: `/organizations/${organizationId}/externalunits`,
     }
 
 

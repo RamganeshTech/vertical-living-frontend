@@ -11,8 +11,8 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   LOGISTICS: "Logistics",
   PROCUREMENT: "Procurement",
   ACCOUNTING: "Accounting",
-  CUSTOMERACCOUNT: "Customer",
-  INVOICEACCOUNT: "Invoice",
+  // CUSTOMERACCOUNT: "Customer",
+  // INVOICEACCOUNT: "Invoice",
   RATECONIG: "Rate Config (Material)",
   RATECONIGSTAFF: "Rate Config (Staff)",
   INTERNALQUOTE: "Internal Quote",
@@ -40,8 +40,8 @@ export const SIDEBAR_ICONS: Record<string, string> = {
   LOGISTICS: "fa-solid fa-dolly text-2xl",
   PROCUREMENT: "fa-solid fa-box-open text-2xl",
   ACCOUNTING: "fas fa-money-bill-wave text-2xl",
-  CUSTOMERACCOUNT: "fas fa-user text-2xl",
-  INVOICEACCOUNT: "fas fa-note text-2xl",
+  // CUSTOMERACCOUNT: "fas fa-user text-2xl",
+  // INVOICEACCOUNT: "fas fa-note text-2xl",
   RATECONIG: "fas fa-box-archive text-2xl",
   RATECONIGSTAFF: "fa-solid fa-person-digging text-2xl",
   INTERNALQUOTE: "fas fa-file text-2xl",
@@ -83,7 +83,7 @@ export const ORGANIZATION_ICONS = {
   PROJECTS: "fa-solid fa-diagram-project  text-2xl",
   PLAN: "fa-solid fa-wallet  text-2xl",
   PROFILE: "fa-solid fa-user-gear  text-2xl",
-  // MODULAR: "fa-solid fa-box  text-2xl",
+  MODULAR: "fa-solid fa-box  text-2xl",
   // EXTERNAL: "fa-solid fa-boxes-stacked text-2xl",
 }
 
@@ -94,7 +94,7 @@ export const ORGANIZATION_LABELS = {
   PROJECTS: "Projects",
   PLAN: "Upgrade Plan",
   PROFILE: "User Profile",
-  // MODULAR: "Modular Units",
+  MODULAR: "Modular Units",
   // EXTERNAL: "External Units",
 
 }

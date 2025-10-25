@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import type { RootState } from "../../store/store";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { COMPANY_DETAILS, plans } from "../../constants/constants";
+import { COMPANY_DETAILS, NO_IMAGE, plans } from "../../constants/constants";
 
 interface ImageWithBlurProps {
   src: string
@@ -558,7 +558,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <ImageWithBlur
-                  src={COMPANY_DETAILS.COMPANY_LOGO || "/placeholder.svg"}
+                  src={COMPANY_DETAILS.COMPANY_LOGO || NO_IMAGE}
                   alt="Vertical Living Logo"
                   className="w-8 h-8 rounded-lg"
                   width={32}

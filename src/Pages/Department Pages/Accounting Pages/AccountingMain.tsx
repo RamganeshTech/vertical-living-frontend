@@ -7,11 +7,14 @@ import { useGetProjects } from "../../../apiList/projectApi";
 import type { AvailableProjetType } from "../Logistics Pages/LogisticsShipmentForm";
 import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import NavigationDropdown, { type NavigationSection } from "../../../shared/NavigationDropDown";
+
 
 // interface AvailableProjectType {
 //     _id: string;
 //     projectName: string;
 // }
+
 
 export interface IAccounting {
     _id?: string;
@@ -38,8 +41,33 @@ const AccountingMain: React.FC = () => {
     const { organizationId } = useParams<{ organizationId: string }>();
     const navigate = useNavigate();
 
+    // Define navigation items
+    const navigationItems: NavigationSection[] = [{
+        title:"Accounts section",
+        items: [{
+            label: 'Customer',
+            path: `/organizations/${organizationId}/projects/customermain`,
+            icon: 'fas fa-users text-blue-600',
+            onClick: () => navigate(`/organizations/${organizationId}/projects/customermain`)
+        },
+        {
+            label: 'Invoice',
+            path: `/organizations/${organizationId}/projects/invoicemain`,
+            icon: 'fas fa-file-invoice text-blue-600',
+            onClick: () => navigate(`/organizations/${organizationId}/projects/invoicemain`)
+        },
+        {
+            label: 'Retail Invoice',
+            path: `/organizations/${organizationId}/projects/retailinvoicemain`,
+            icon: 'fas fa-receipt text-blue-600',
+            onClick: () => navigate(`/organizations/${organizationId}/projects/retailinvoicemain`)
+        },]
+    }]
 
- const [searchInput, setSearchInput] = useState("");     // user typing
+    // Add this state for controlling the dropdown
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const [searchInput, setSearchInput] = useState("");     // user typing
     const [searchTerm, setSearchTerm] = useState<string>(""); // value used for sending to the api
 
     const [filters, setFilters] = useState<{
@@ -69,8 +97,17 @@ const AccountingMain: React.FC = () => {
 
     return (
         <div className="p-2 space-y-6 h-full overflow-y-auto">
+            {/* Navigation Dropdown */}
+            <NavigationDropdown
+                isOpen={isDropdownOpen}
+                onClose={() => setIsDropdownOpen(false)}
+                sections={navigationItems}
+                
+            />
 
-            <div className="flex justify-between items-center">
+
+
+            <header className="flex justify-between items-center">
 
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center">
@@ -83,6 +120,15 @@ const AccountingMain: React.FC = () => {
 
 
                 <div className="flex gap-2  w-[300px] md:w-[400px]">
+
+
+                    <button
+                        onClick={() => setIsDropdownOpen(true)}
+                        className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                        title="Quick Navigation"
+                    >
+                        <i className="fas fa-plus text-lg"></i>
+                    </button>
 
                     <input
                         type="text"
@@ -105,7 +151,7 @@ const AccountingMain: React.FC = () => {
                         <i className="fas fa-search"> </i>
                     </Button>
                 </div>
-            </div>
+            </header>
 
             {isLoading ? (
                 <MaterialOverviewLoading />

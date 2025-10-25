@@ -9,6 +9,7 @@ import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/Select"
+import { NO_IMAGE } from "../../constants/constants"
 
 const WardrobeExternal: React.FC = () => {
   const [search, setSearch] = useState("")
@@ -374,7 +375,7 @@ const WardrobeExternal: React.FC = () => {
                   <div className="relative overflow-hidden">
                     {unit.image ? (
                       <img
-                        src={unit.image.url || "/placeholder.svg"}
+                        src={unit.image.url || NO_IMAGE}
                         alt={unit.image.originalName}
                         className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                       />

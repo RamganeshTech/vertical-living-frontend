@@ -9,7 +9,7 @@ import {
   useGetSingleOrganization,
   useUpdateOrganizationName,
 } from "../../apiList/orgApi"
-import { COMPANY_DETAILS, } from "../../constants/constants"
+import { COMPANY_DETAILS, NO_IMAGE, } from "../../constants/constants"
 import { useState } from "react"
 import { useGetAllUsers } from "../../apiList/getAll Users Api/getAllUsersApi"
 import RoleCard from "./RoleCard"
@@ -286,7 +286,7 @@ export default function OrganizationDetails() {
                     />
                   ) : (
                     <img
-                      src={COMPANY_DETAILS.COMPANY_LOGO || "/placeholder.svg"}
+                      src={COMPANY_DETAILS.COMPANY_LOGO || NO_IMAGE}
                       alt="Company Logo"
                       className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg object-cover"
                     />

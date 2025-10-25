@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom"
-import { WORKER_WALL_PAINTING_STEPS } from "../../../constants/constants"
+import { NO_IMAGE, WORKER_WALL_PAINTING_STEPS } from "../../../constants/constants"
 import { useState } from "react"
 import {
   useGetWorkerStepDetails,
@@ -178,7 +178,7 @@ export default function WorkerWallStepPage() {
               </svg>
             </button>
             <img
-              src={previewImage.url || "/placeholder.svg"}
+              src={previewImage.url || NO_IMAGE}
               alt={previewImage.alt}
               className="max-w-full max-h-full object-contain rounded-lg"
               onClick={(e) => e.stopPropagation()}
@@ -233,7 +233,7 @@ export default function WorkerWallStepPage() {
                         <>
                           <ImageWithBlur
                             key={idx}
-                            src={file?.url || "/placeholder.svg"}
+                            src={file?.url || NO_IMAGE}
                             alt={`Initial Upload ${idx + 1}`}
                           />
 
@@ -311,7 +311,7 @@ export default function WorkerWallStepPage() {
                                   <>
                                     <ImageWithBlur
                                       key={idx}
-                                      src={file.url || "/placeholder.svg"}
+                                      src={file.url || NO_IMAGE}
                                       alt={`Admin Upload ${idx + 1}`}
                                     />
 
@@ -333,7 +333,7 @@ export default function WorkerWallStepPage() {
                                   <>
                                     <ImageWithBlur
                                       key={idx}
-                                      src={file.url || "/placeholder.svg"}
+                                      src={file.url || NO_IMAGE}
                                       alt={`Worker Correction ${idx + 1}`}
                                     />
 

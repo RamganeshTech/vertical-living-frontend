@@ -187,3 +187,4 @@ export const CustomerAccCard: React.FC<CustomerCardProps> = ({ customer, onView,
         </Card>
     );
 };
+

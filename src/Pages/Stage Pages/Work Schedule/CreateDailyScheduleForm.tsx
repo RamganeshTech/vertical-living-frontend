@@ -806,6 +806,7 @@ import { useCurrentSupervisor } from "../../../Hooks/useCurrentSupervisor"
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 import { useParams } from "react-router-dom"
 import { socket } from "../../../lib/socket"
+import { NO_IMAGE } from "../../../constants/constants"
 // import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 // import { NO_IMAGE } from "../../../constants/constants"
 
@@ -2753,7 +2754,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                             style={{ width: `${sliderPosition}%` }}
                                         >
                                             {/* <img
-                                                src={plannedImage.url || "/placeholder.svg"}
+                                                src={plannedImage.url || NO_IMAGE}
                                                 alt="Planned"
                                                 className="h-full object-cover"
                                                 style={{
@@ -2792,7 +2793,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                             style={{ width: `${100 - sliderPosition}%` }}
                                         >
                                             <img
-                                                src={actualImage.url || "/placeholder.svg"}
+                                                src={actualImage.url || NO_IMAGE}
                                                 alt="Actual"
                                                 className="h-full object-cover"
                                                 style={{

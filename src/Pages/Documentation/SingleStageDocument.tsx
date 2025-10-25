@@ -17,6 +17,7 @@ import {
   useManuallyGenerateStagePdf,
 } from "../../apiList/Documentation Api/documentationApi"
 import { downloadImage } from "../../utils/downloadFile"
+import { NO_IMAGE } from "../../constants/constants"
 
 // Image Modal Component
 const ImageModal: React.FC<{
@@ -76,7 +77,7 @@ const ImageModal: React.FC<{
           <div className="flex-1 flex items-center justify-center p-4 sm:p-6 bg-gray-100 overflow-hidden">
             <div className="max-w-full max-h-full flex items-center justify-center">
               <img
-                src={imageUrl || "/placeholder.svg"}
+                src={imageUrl || NO_IMAGE}
                 alt={imageName}
                 className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
                 style={{ maxHeight: "calc(100vh - 200px)" }}
@@ -519,7 +520,7 @@ const SingleStageDocument: React.FC = () => {
                         >
                           <div className="aspect-square relative overflow-hidden bg-gray-100">
                             <img
-                              src={file.url || "/placeholder.svg"}
+                              src={file.url || NO_IMAGE}
                               alt={file.originalName}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />

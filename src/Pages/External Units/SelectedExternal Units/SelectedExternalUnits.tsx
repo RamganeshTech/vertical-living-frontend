@@ -9,6 +9,7 @@ import {
     useSelectedExternalUnitComplete,
 } from "../../../apiList/ExternalUnit Api/selectedExternalApi"
 import type { DisplaySingleExternalUnit } from "../../../types/types"
+import { NO_IMAGE } from "../../../constants/constants"
 
 const SelectedExternalUnits = () => {
     const { projectId } = useParams<{ projectId: string }>()
@@ -202,7 +203,7 @@ const SelectedExternalUnits = () => {
                                     <div className="relative overflow-hidden">
                                         {unit.image ? (
                                             <img
-                                                src={unit.image.url || "/placeholder.svg"}
+                                                src={unit.image.url || NO_IMAGE}
                                                 alt={unit.image.originalName}
                                                 className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                                             />
@@ -531,7 +532,7 @@ export default SelectedExternalUnits
 //                   <div className="relative overflow-hidden">
 //                     {unit.image ? (
 //                       <img
-//                         src={unit.image.url || "/placeholder.svg"}
+//                         src={unit.image.url || NO_IMAGE}
 //                         alt={unit.image.originalName}
 //                         className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
 //                       />

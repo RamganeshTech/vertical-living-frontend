@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { Input } from "../../../components/ui/Input";
 
 import RoomImage from "./RoomImage";
+import { NO_IMAGE } from "../../../constants/constants";
 
 interface RoomCardProps {
   room: SiteRooms;
@@ -207,7 +208,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomL
               <i className="fas fa-times text-sm" />
             </button>
             <img
-              src={previewImage || "/placeholder.svg"}
+              src={previewImage || NO_IMAGE}
               alt="Preview"
               className="w-full max-h-[80vh] object-contain mx-auto rounded-lg"
             />

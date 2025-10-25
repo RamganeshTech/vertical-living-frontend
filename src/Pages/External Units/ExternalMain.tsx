@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Link, Outlet, useLocation, useOutletContext } from "react-router-dom"
 import { useGetWardrobeUnitsInfinite } from "../../apiList/ExternalUnit Api/ExternalUnitAPi"
 import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren"
+import { NO_IMAGE } from "../../constants/constants"
 
 // Define categories type
 type Category = {
@@ -201,7 +202,7 @@ const ExternalMain: React.FC = () => {
                     <div className="relative overflow-hidden">
                       {unit.image ? (
                         <img
-                          src={unit.image.url || "/placeholder.svg"}
+                          src={unit.image.url || NO_IMAGE}
                           alt={unit.image.originalName}
                           className="w-full h-32 sm:h-40 object-cover group-hover:scale-105 transition-transform duration-300"
                         />

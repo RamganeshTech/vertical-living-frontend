@@ -306,7 +306,7 @@ export default function Workers() {
                       >
                         <div className="flex items-center space-x-4 min-w-0 flex-1">
                           <Avatar className="w-12 h-12 border-2 border-blue-200 flex-shrink-0">
-                            {/* <AvatarImage src={worker?.avatarUrl || "/placeholder.svg"} /> */}
+                            {/* <AvatarImage src={worker?.avatarUrl || NO_IMAGE} /> */}
                             <AvatarFallback className="bg-gradient-to-br from-orange-500 to-red-600 text-white font-semibold">
                               {getInitials(worker?.workerName)}
                             </AvatarFallback>

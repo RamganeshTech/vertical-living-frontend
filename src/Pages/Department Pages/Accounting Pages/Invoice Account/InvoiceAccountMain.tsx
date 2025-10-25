@@ -5,6 +5,7 @@ import { Button } from '../../../../components/ui/Button';
 import { useGetAllInvoices, useDeleteInvoice } from '../../../../apiList/Department Api/Accounting Api/invoiceApi';
 import { toast } from '../../../../utils/toast';
 import InvoiceAccList from './InvoiceAccList';
+import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
 // import { Breadcrumb } from '../../Breadcrumb';
 
 const InvoiceAccountsMain = () => {
@@ -12,6 +13,12 @@ const InvoiceAccountsMain = () => {
     const location = useLocation();
     const { organizationId } = useParams();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+
+    const paths: BreadcrumbItem[] = [
+        { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
+        { label: "Invoice", path: `/organizations/${organizationId}/projects/invoicemain` },
+    ];
 
     // Check if we're on a child route
     const isDetailView = location.pathname.includes('/invoicesingle') || location.pathname.includes('/create');
@@ -122,7 +129,7 @@ const InvoiceAccountsMain = () => {
     }
 
     return (
-        <div className="space-y-4 h-full">
+        <div className="space-y-0 h-full">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
@@ -130,10 +137,10 @@ const InvoiceAccountsMain = () => {
                         <i className="fas fa-file-invoice mr-3 text-blue-600"></i>
                         Invoice Accounts
                     </h1>
-                    <p className="text-gray-600 mt-1">
+                    {/* <p className="text-gray-600 mt-1">
                         Manage your organization invoices
-                    </p>
-                    {/* <Breadcrumb /> */}
+                    </p> */}
+                    <Breadcrumb paths={paths} />
 
                 </div>
 
@@ -288,52 +295,7 @@ const InvoiceAccountsMain = () => {
                             </p>
                         </div>
                     ) : (
-                        // <div
-                        //     ref={scrollContainerRef}
-                        //     className="flex-1 !max-h-[100%] overflow-y-auto"
-                        // >
-                        //     <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-2">
-                        //         {invoices.map((invoice: any) => (
-                        //             <InvoiceAccCard
-                        //                 key={invoice._id}
-                        //                 invoice={invoice}
-                        //                 onView={() => handleView(invoice._id)}
-                        //                 onDelete={() => handleDelete(invoice._id)}
-                        //                 isDeleting={deleteInvoiceMutation.isPending}
-                        //             />
-                        //         ))}
-                        //     </div>
-
-                        //     {/* Loading indicator at the bottom */}
-                        //     {isFetchingNextPage && (
-                        //         <div className="flex justify-center py-8">
-                        //             <div className="flex items-center gap-2 text-blue-600">
-                        //                 <i className="fas fa-spinner fa-spin text-2xl"></i>
-                        //                 <span className="text-sm font-medium">Loading more invoices...</span>
-                        //             </div>
-                        //         </div>
-                        //     )}
-
-                        //     {/* End of list indicator */}
-                        //     {!hasNextPage && invoices.length > 0 && (
-                        //         <div className="flex justify-center py-6">
-                        //             <p className="text-gray-400 text-sm font-medium">
-                        //                 <i className="fas fa-check-circle mr-2"></i>
-                        //                 You've reached the end of the list
-                        //             </p>
-                        //         </div>
-                        //     )}
-
-                        //     {/* Total count */}
-                        //     {invoices.length > 0 && (
-                        //         <div className="flex justify-center py-4">
-                        //             <p className="text-gray-500 text-sm">
-                        //                 Showing {invoices.length} of {totalInvoices} invoices
-                        //             </p>
-                        //         </div>
-                        //     )}
-                        // </div>
-
+                       
                         <div
                             ref={scrollContainerRef}
                             className="flex-1 !max-h-[100%] overflow-y-auto"
@@ -354,7 +316,7 @@ const InvoiceAccountsMain = () => {
                             {/* Table Body */}
                             <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
                                 {invoices.map((invoice: any, index: number) => (
-                                        <InvoiceAccList key={invoice._id} invoice={invoice} index={index} handleView={handleView} handleDelete={handleDelete} deleteInvoiceMutation={deleteInvoiceMutation} />
+                                    <InvoiceAccList key={invoice._id} invoice={invoice} index={index} handleView={handleView} handleDelete={handleDelete} deleteInvoiceMutation={deleteInvoiceMutation} />
                                 ))}
                             </div>
 
