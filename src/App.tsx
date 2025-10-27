@@ -6,9 +6,10 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-const ModularUnitMainNew = lazy(()=> import('./Pages/Modular Units/Modular Units New/ModularUnitMainNew'));
-const CreateModularUnitNew = lazy(()=> import('./Pages/Modular Units/Modular Units New/CreateModularUnitNew'));
-const ModularUnitSingleNew = lazy(()=> import('./Pages/Modular Units/Modular Units New/ModularUnitSingleNew'));
+const SelectedModularUnitsNew = lazy(() => import( './Pages/Modular Units/Selected Units New/SelectedModularUnitNew'));
+const ModularUnitMainNew = lazy(() => import('./Pages/Modular Units/Modular Units New/ModularUnitMainNew'));
+const CreateModularUnitNew = lazy(() => import('./Pages/Modular Units/Modular Units New/CreateModularUnitNew'));
+const ModularUnitSingleNew = lazy(() => import('./Pages/Modular Units/Modular Units New/ModularUnitSingleNew'));
 const RetailInvoiceAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Retail Invoice Account/RetailInvoiceAccountMain'));
 const RetailCreateInvoiceAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Retail Invoice Account/CreateRetailInvoiceAcc'));
 const RetailInvoiceAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Retail Invoice Account/RetailInvoiceAccSingle'));
@@ -707,6 +708,8 @@ function App() {
 
             </Route>
 
+            
+
             <Route path="materialselection" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}>
                 <MaterialRoomOverview />
@@ -735,6 +738,26 @@ function App() {
                 </ProtectedRoutes>
               } />
             </Route> */}
+
+
+            <Route path="modularunitsnew" element={
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                <ModularUnitMainNew />
+              </ProtectedRoutes>
+            } >
+
+
+              <Route path="selectedunitsnew" element={
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                  <SelectedModularUnitsNew />
+                </ProtectedRoutes>} />
+
+              {/* <Route path="category/:unitType" element={
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client"]}>
+                  <ModularUnitCategoryPage />
+                </ProtectedRoutes>} /> */}
+
+            </Route>
 
 
             <Route path="paymentconfirmation" element={

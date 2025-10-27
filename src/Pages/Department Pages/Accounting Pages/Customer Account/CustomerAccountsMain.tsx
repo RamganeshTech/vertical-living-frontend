@@ -326,7 +326,7 @@ const CustomerAccountsMain = () => {
                                         <div className="col-span-2 text-center">Email</div>
                                         <div className="col-span-2 text-center">Phone</div>
                                         <div className="col-span-2 text-center">Created At</div>
-                                        <div className="col-span-1 text-center">Actions</div>
+                                        <div className="col-span-2 text-center">Actions</div>
                                     </div>
                                 </div>
 

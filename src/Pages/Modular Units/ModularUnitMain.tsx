@@ -1,11 +1,10 @@
-"use client"
 
 import { useState } from "react"
 import { Link, Outlet, useLocation, useNavigate, useOutletContext, useParams } from "react-router-dom"
 import { useGetAllMixedUnits } from "../../apiList/Modular Unit Api/ModularUnitApi"
 import { modularUnitFieldConfig } from "../../utils/Modular Units/fieldConfigs"
 import { Button } from "../../components/ui/Button"
-import SingleModularUnitCard from "./SingleModularUnitCard"
+import SingleModularUnitCard from "./Selected Units/SingleModularUnitCard"
 import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren"
 import { useGetSelectedModularUnits } from "../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi"
 

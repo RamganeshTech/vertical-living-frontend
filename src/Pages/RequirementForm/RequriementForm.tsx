@@ -182,7 +182,6 @@ export default function RequirementForm() {
   // }
 
   const handleFormCompletion = async () => {
-    if (!window.confirm("Are you sure want to mark it as completed?")) return
     try {
       if (!completePending) {
         await completeFormMutate({ formId: formData._id, projectId })

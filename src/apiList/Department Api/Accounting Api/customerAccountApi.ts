@@ -463,58 +463,11 @@ export const useDeleteCustomer = () => {
             }
             return await deleteCustomer({ customerId, api });
         },
-        onSuccess: (_, customerId) => {
-            // Remove the deleted customer from cache
-            queryClient.removeQueries({ 
-                queryKey: ["customers", "single", customerId] 
-            });
+        onSuccess: () => {
             // Invalidate all customer list queries
             queryClient.invalidateQueries({ 
                 queryKey: ["customers", "list"] 
             });
         }
-    });
-};
-
-/**
- * Hook to get customers filtered by organization
- */
-export const useGetCustomersByOrganization = (
-    organizationId: string, 
-    additionalParams?: Omit<GetCustomersParams, 'organizationId' | 'page'>
-) => {
-    return useGetAllCustomers({
-        organizationId,
-        ...additionalParams
-    });
-};
-
-/**
- * Hook to get customers filtered by project
- */
-export const useGetCustomersByProject = (
-    organizationId: string,
-    projectId: string,
-    additionalParams?: Omit<GetCustomersParams, 'organizationId' | 'projectId' | 'page'>
-) => {
-    return useGetAllCustomers({
-        organizationId,
-        projectId,
-        ...additionalParams
-    });
-};
-
-/**
- * Hook to search customers
- */
-export const useSearchCustomers = (
-    organizationId: string,
-    searchQuery: string,
-    additionalParams?: Omit<GetCustomersParams, 'organizationId' | 'search' | 'page'>
-) => {
-    return useGetAllCustomers({
-        organizationId,
-        search: searchQuery,
-        ...additionalParams
     });
 };

@@ -3,14 +3,15 @@ import { dateFormate } from '../../../../utils/dateFormator'
 type Props = {
     invoice: any,
     index: number,
-    handleView: (id:string) => any,
-    handleDelete: (id:string) => any,
+    handleView: (id: string) => any,
+    handleDelete: (id: string) => any,
     deleteInvoiceMutation: any
 }
-const RetailInvoiceAccList:React.FC<Props> = ({ invoice, index, handleView, handleDelete, deleteInvoiceMutation }) => {
+const RetailInvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDelete, deleteInvoiceMutation }) => {
     return (
         <div
-            className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-blue-50 transition-colors items-center last:border-b-0"
+            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-blue-50 transition-colors items-center last:border-b-0"
+            onClick={() => handleView(invoice._id)}
         >
             {/* S.No */}
             <div className="col-span-1 text-center text-gray-600 font-medium">
@@ -54,15 +55,18 @@ const RetailInvoiceAccList:React.FC<Props> = ({ invoice, index, handleView, hand
 
             {/* Actions */}
             <div className="col-span-1 flex justify-center gap-2">
-                <button
+                {/* <button
                     onClick={() => handleView(invoice._id)}
                     className="p-2 cursor-pointer text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                     title="View Invoice"
                 >
                     <i className="fas fa-eye"></i>
-                </button>
+                </button> */}
                 <button
-                    onClick={() => handleDelete(invoice._id)}
+                    onClick={(e) =>{
+                        e.stopPropagation()
+                        handleDelete(invoice._id)
+                    }}
                     disabled={deleteInvoiceMutation.isPending}
                     className="p-2 cursor-pointer text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Delete Invoice"

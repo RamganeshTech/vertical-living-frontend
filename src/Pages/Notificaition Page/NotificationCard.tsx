@@ -18,7 +18,7 @@ export interface NotificationCardProps {
   // onMarkAsRead: (id: string) => void
   onDelete: (id: string) => void
   frontendUrl: string,
-  deleteMutation:any
+  deleteMutation: any
 }
 
 const NotificationCard: React.FC<NotificationCardProps> = ({ deleteMutation, notification, onDelete, frontendUrl }) => {
@@ -52,6 +52,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ deleteMutation, not
     }
   }
 
+  // const navigate = useNavigate()
   const config = getTypeConfig(notification.type)
 
   const formatDate = (dateString: string) => {
@@ -75,7 +76,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ deleteMutation, not
   }
 
   const getFullUrl = () => {
-    if (!notification.navigation?.url) return null
+    if (!notification?.navigation?.url) return null
     const baseUrl = frontendUrl.endsWith("/") ? frontendUrl.slice(0, -1) : frontendUrl
     const path = notification.navigation.url.startsWith("/")
       ? notification.navigation.url
@@ -86,51 +87,63 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ deleteMutation, not
   const fullUrl = getFullUrl()
 
   return (
-    <div
-      className={`${config.bgColor} border-l-4 ${config.borderColor} rounded-lg p-4 mb-3 transition-all duration-200 hover:shadow-md ${
-        !notification.isRead ? "ring-1 ring-blue-200" : ""
-      }`}
+    <Link
+      to={fullUrl || ""}
+      // target="_blank"
+      // rel="noopener noreferrer"
+      // className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+      // onClick={() => onMarkAsRead(notification._id)}
+      onClick={() => onDelete(notification._id)}
     >
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 pt-1">
-          <i className={`fas ${config.icon} text-lg ${config.badgeText}`}></i>
-        </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-slate-900 leading-relaxed">{notification.message}</p>
-              <p className="text-xs text-slate-500 mt-1">{formatDate(notification.createdAt)}</p>
-            </div>
+      <div
+        className={`${config.bgColor} cursor-pointer border-l-4 ${config.borderColor} rounded-lg p-4 mb-3 transition-all duration-200 hover:shadow-md ${!notification.isRead ? "ring-1 ring-blue-200" : ""
+          }`}
+      // onClick={(e) => {
+      //   e.stopPropagation();
+      //   onDelete(notification._id)
+      // }}
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 pt-1">
+            <i className={`fas ${config.icon} text-lg ${config.badgeText}`}></i>
+          </div>
 
-            {/* {!notification.isRead && (
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-slate-900 leading-relaxed">{notification.message}</p>
+                <p className="text-xs text-slate-500 mt-1">{formatDate(notification.createdAt)}</p>
+              </div>
+
+              {/* {!notification.isRead && (
               <span
                 className={`${config.badgeBg} ${config.badgeText} text-xs font-semibold px-2 py-1 rounded-full flex-shrink-0`}
               >
                 New
               </span>
             )} */}
+            </div>
+
+            {fullUrl && (
+              <div className="mt-3 flex gap-2">
+                <Link
+                  to={fullUrl}
+                  // target="_blank"
+                  // rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  // onClick={() => onMarkAsRead(notification._id)}
+                  onClick={() => onDelete(notification._id)}
+                >
+                  {notification.navigation?.label || "View Details"}
+                  <i className="fas fa-arrow-right text-xs"></i>
+                </Link>
+              </div>
+            )}
           </div>
 
-          {fullUrl && (
-            <div className="mt-3 flex gap-2">
-              <Link
-                to={fullUrl}
-                // target="_blank"
-                // rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                // onClick={() => onMarkAsRead(notification._id)}
-                onClick={() =>  onDelete(notification._id)}
-              >
-                {notification.navigation?.label || "View Details"}
-                <i className="fas fa-arrow-right text-xs"></i>
-              </Link>
-            </div>
-          )}
-        </div>
-
-        <div className="flex-shrink-0 flex gap-2">
-          {/* {!notification.isRead && (
+          <div className="flex-shrink-0 flex gap-2">
+            {/* {!notification.isRead && (
             <button
               onClick={() => onMarkAsRead(notification._id)}
               className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors rounded hover:bg-white"
@@ -139,19 +152,24 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ deleteMutation, not
               <i className="fas fa-check text-sm"></i>
             </button>
           )} */}
-          <Button
-          variant="danger"
-          isLoading={deleteMutation.isPending && deleteMutation.variables.notificationId === notification._id}
-            onClick={() => onDelete(notification._id)}
-            className="!p-1 px-2  bg-red-600 !text-white hover:bg-red-600 transition-colors rounded"
-            title="Delete notification"
-            size="sm"
-          >
-            <i className="fas fa-xmark text-sm"></i>
-          </Button>
+            <Button
+              variant="danger"
+              isLoading={deleteMutation.isPending && deleteMutation.variables.notificationId === notification._id}
+              onClick={(e) => {
+                e.preventDefault();     // ✅ stop link navigation
+                e.stopPropagation();
+                onDelete(notification._id)
+              }}
+              className="!p-1 px-2  bg-red-600 !text-white hover:bg-red-600 transition-colors rounded"
+              title="Delete notification"
+              size="sm"
+            >
+              <i className="fas fa-xmark text-sm"></i>
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 

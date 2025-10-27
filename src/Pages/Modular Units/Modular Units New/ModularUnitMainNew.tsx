@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Outlet, useNavigate, useParams, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useParams, useLocation, useOutletContext, Link } from "react-router-dom";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { useDeleteModularUnitNew, useGetAllModularUnitsNew } from "../../../apiList/Modular Unit Api/modularUnitNewApi";
@@ -8,16 +8,29 @@ import { Input } from "../../../components/ui/Input";
 import { toast } from "../../../utils/toast";
 import ModularUnitCardNew from "./ModularUnitCardNew";
 import { useDebounce } from "../../../Hooks/useDebounce";
+import type { OrganizationOutletTypeProps } from "../../Organization/OrganizationChildren";
+import { useAddSelectedUnitNew, useGetSelectedUnitsByProjectNew } from "../../../apiList/Modular Unit Api/Selected Modular Api copy New/selectedModularUnitNewApi";
+import type { ISelectedModularUnit, ISelectedUnit } from "../Selected Units New/SelectedModularUnitNew";
 
 const ModularUnitMainNew = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { organizationId } = useParams<{ organizationId: string }>();
+    const { organizationId, projectId } = useParams() as { organizationId: string, projectId: string }
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const { isMobile, openMobileSidebar } = useOutletContext<OrganizationOutletTypeProps>()
+
+    const { data: selectedModularUnits } = useGetSelectedUnitsByProjectNew(projectId!) as {
+        data: ISelectedModularUnit,
+        // isLoading: boolean;
+        // error: unknown;
+        // refetch: () => void;
+    }
+
+    const isProjectDetails = location.pathname.includes("projectdetails")
 
     // Check if on child route
     const isChildRoute =
-        location.pathname.includes("/create") || location.pathname.includes("/single");
+        location.pathname.includes("/create") || location.pathname.includes("/single") || location.pathname.includes("/selectedunitsnew");
 
     // Filter States
     const [filters, setFilters] = useState({
@@ -86,7 +99,6 @@ const ModularUnitMainNew = () => {
 
     // Flatten all pages data
     const allUnits = data?.pages.flatMap((page) => page.units) || [];
-
     // Count active filters
     const activeFiltersCount = Object.values(filters).filter(
         (val) => val !== "" && val !== "createdAt" && val !== "desc" && val !== "0" && val !== "100000"
@@ -104,10 +116,42 @@ const ModularUnitMainNew = () => {
         });
     };
 
-    // Handle delete
-    const handleDelete = async (id: string, name: string) => {
-        if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
 
+    const { mutateAsync: addToCart, isPending: isAddingToCart , variables} = useAddSelectedUnitNew();
+    const { data: selectedUnits } = useGetSelectedUnitsByProjectNew(projectId!);
+
+    const handleAddToCart = async (e:React.FormEvent, unit: any, quantity: number) => {
+        e.stopPropagation()
+        try {
+            await addToCart({
+                projectId: projectId!,
+                quantity,
+                singleUnitCost: unit.price,
+                product: unit
+            });
+            toast({
+                title: "Success",
+                description: `${unit.productName} updated to cart`,
+            });
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message || "Failed to update cart",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const getCartQuantity = (unitId: string) => {
+        const cartItem = selectedUnits?.selectedUnits?.find(
+            (item: any) => item.productId.toString() === unitId.toString()
+        );
+        return cartItem?.quantity || 0;
+    };
+
+
+    // Handle delete
+    const handleDelete = async (id: string) => {
         try {
             await deleteMutation.mutateAsync({ unitId: id });
             toast({ title: "Success", description: "Product deleted successfully" });
@@ -127,14 +171,26 @@ const ModularUnitMainNew = () => {
 
     // If on detail view, show only the Outlet
     if (isChildRoute) {
-        return <Outlet />;
+        return <Outlet context={{ isMobile, openMobileSidebar }} />;
     }
+
+
 
     return (
         <div className="space-y-4 h-full p-2">
             {/* Header */}
-            <header className="flex justify-between items-center p-2">
+            <header className="flex justify-between items-center p-0 px-2">
                 <div>
+                    {isMobile && (
+                        <button
+                            onClick={openMobileSidebar}
+                            className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                            title="Open Menu"
+                        >
+                            <i className="fa-solid fa-bars"></i>
+                        </button>
+                    )}
+
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                         <i className="fas fa-cubes mr-3 text-blue-600"></i>
                         Modular Units
@@ -144,10 +200,20 @@ const ModularUnitMainNew = () => {
                     </p> */}
                 </div>
 
-                <Button onClick={() => navigate("create")}>
-                    <i className="fas fa-plus mr-2" />
-                    Add Product
-                </Button>
+                {!isProjectDetails ?
+                    <Button onClick={() => navigate("create")}>
+                        <i className="fas fa-plus mr-2" />
+                        Add Product
+                    </Button> :
+                    <Link to={`/${organizationId}/projectdetails/${projectId}/modularunitsnew/selectedunitsnew`}>
+                        <div className="p-2 relative border-2 border-gray-300 rounded-lg">
+                            <div className="w-6 justify-center items-center flex absolute top-[-12px] right-[-10px] h-6 rounded-full bg-gray-200 text-black">
+                                <p className="text-gray-600 font-medium">{selectedModularUnits?.selectedUnits?.length ?? 0}</p>
+                            </div>
+                            <i className="fas fa-shopping-cart text-xl text-blue-600 "></i>
+                        </div>
+                    </Link>
+                }
             </header>
 
             {/* Loading State */}
@@ -158,7 +224,7 @@ const ModularUnitMainNew = () => {
             ) : isError ? (
                 <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
                     <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
-                        ⚠️ Error Occurred 
+                        ⚠️ Error Occurred
                     </div>
                     <p className="text-red-500 mb-4 text-lg sm:text-xl">
                         {(error as any)?.message || "Failed to load products"}
@@ -208,7 +274,7 @@ const ModularUnitMainNew = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Category
                                     </label>
-                                     <input
+                                    <input
                                         type="text"
                                         placeholder="Wardrobe, Cabinet..."
                                         value={filters.category}
@@ -351,21 +417,29 @@ const ModularUnitMainNew = () => {
                                     ? "Try adjusting your filters to find products."
                                     : "Looks like there are no products yet."}
                                 <br />
-                                Click on <strong>"Add Product"</strong> to get started 🚀
+                                {isProjectDetails ? 
+                                <>
+                                    click on <Button onClick={()=> navigate(`/organizations/${organizationId}/modularunits`)}>Add Product</Button> to add products
+                                </> : <>click on <strong>"Add Product"</strong> to get started 🚀 </>}
                             </p>
                         </div>
                     ) : (
                         <div ref={scrollContainerRef} className="flex-1 max-h-[100%] overflow-y-auto">
                             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-                                {allUnits.map((unit) => (
+                                {allUnits.map((unit:ISelectedUnit) => (
                                     <ModularUnitCardNew
                                         key={unit._id}
                                         unit={unit}
-                                        onView={() => handleView(unit._id)}
+                                        onView={() => handleView(unit._id!)}
                                         onDelete={() =>
-                                            handleDelete(unit._id, unit.productName || "Untitled Product")
+                                            handleDelete(unit._id!)
                                         }
                                         isDeleting={deleteMutation.isPending}
+                                        isCartUpdating={isAddingToCart && variables.product._id === unit._id}
+                                        onAddToCart={handleAddToCart}
+                                        isProjectDetails={isProjectDetails}
+                                        cartQuantity={getCartQuantity(unit._id!)}
+                                        isAddingToCart={isAddingToCart}
                                     />
                                 ))}
                             </div>

@@ -25,7 +25,11 @@ const CustomerAccList: React.FC<Props> = ({
         customer.customerType === "business" ? "Business" : "Individual";
 
     return (
-        <div className="grid grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-blue-50 items-center transition-colors last:border-b-0">
+        <div
+            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-blue-50 items-center transition-colors last:border-b-0"
+            onClick={() => onView(customer._id)}
+
+        >
             {/* Serial No */}
             <div className="col-span-1 text-center text-gray-600 font-medium">
                 {index + 1}
@@ -70,16 +74,19 @@ const CustomerAccList: React.FC<Props> = ({
             </div>
 
             {/* Actions */}
-            <div className="col-span-1 flex justify-center gap-2">
-                <button
+            <div className="col-span-2 flex justify-center gap-2">
+                {/* <button
                     onClick={() => onView(customer._id)}
                     className="p-2 text-blue-600 hover:bg-blue-100 rounded transition"
                     title="View Customer"
                 >
                     <i className="fas fa-eye" />
-                </button>
+                </button> */}
                 <button
-                    onClick={() => onDelete(customer._id)}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        onDelete(customer._id)
+                    }}
                     className="p-2 text-red-600 hover:bg-red-100 rounded transition"
                     disabled={isDeleting}
                     title="Delete Customer"

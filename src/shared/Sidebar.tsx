@@ -174,7 +174,6 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
         setShowSideBar(true)
     }
 
-
     const isProjectDetailRoute = pathArray[2] === "projectdetails"
 
     useEffect(() => {
@@ -210,7 +209,6 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
             navigate(`/organizations`)
         }
     }
-
 
     const showNotifications = role && ['owner', 'CTO', 'staff'].includes(role);
     // const isNotificationActive = pathArray[pathArray.length - 1] === 'notification';
@@ -248,9 +246,6 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
             toast({ title: "Error", description: error?.response?.data?.message || "Failed to logout", variant: "destructive" })
         }
     };
-
-
-
 
     return (
         <>

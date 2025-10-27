@@ -55,14 +55,14 @@ const StaffTaskCard:React.FC<Props> = ({task}) => {
     
                                         {/* Actions */}
                                         <div className="flex gap-2 mt-3 justify-end">
-                                            <Button
+                                            {/* <Button
                                             size='sm'
                                                 onClick={() => handleView(task._id)}
                                                 className=""
                                             >
                                                 <i className="fa-solid fa-eye mr-1" />
                                                 View
-                                            </Button>
+                                            </Button> */}
 
                                             {!isStaff && <Button
                                             size='sm'
