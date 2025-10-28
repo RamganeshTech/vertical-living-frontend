@@ -191,46 +191,23 @@ export const StaffAssignTaskMain: React.FC = () => {
     };
 
     const { mutateAsync: createTasks, isPending } = useCreateStaffTasks()
-    const { mutateAsync: createTasksFromWorkMutate, isPending:workPending } = useCreateStaffTasksFromWork()
+    const { mutateAsync: createTasksFromWorkMutate, isPending: workPending } = useCreateStaffTasksFromWork()
 
     const handleAddMainTask = () => {
         setTaskList(prev => {
             const updated = [
                 ...prev,
-                // {
-                //     images: [],
-                //     previewUrls: [],
-                //     title: "",
-                //     description: "",
-                //     due: formatDateForInput(new Date()), // ✅ properly formatted
-                //     priority: "high" as const,
-                //     department: "site" as const,
-                //     assigneeId: "",
-                //     assigneeName: "",
-                //     projectId: "",
-                //     projectName: "",
-                //     organizationId,
-                //     status: "queued" as const,
-                //     tasks: [{ taskName: "" }]
-                // }
                 defaultTaskList
             ];
             setDebouncedTitles(updated.map(task => task.title || ""));
             return updated;
         });
+        setCreatedFromWork(false); // 👈 show due date again for manually added tasks
     };
 
     const handleDeleteMainTask = (index: number) => {
-        setTaskList(prev => prev.filter((_, i) => i !== index));
+        setTaskList(prev => prev.filter((_, i) => i !== index));        
     };
-
-
-    // old one
-    // const handleMainChange = (index: number, updates: Partial<MainTaskForm>) => {
-    //     const updated = [...taskList]
-    //     updated[index] = { ...updated[index], ...updates }
-    //     setTaskList(updated)
-    // }
 
 
     const handleMainChange = (index: number, updates: Partial<MainTaskForm>) => {
@@ -278,21 +255,21 @@ export const StaffAssignTaskMain: React.FC = () => {
         };
 
         // Start from current time
-        let currentDue = new Date();
-        console.log("selected work", selectedWork)
+        // let currentDue = new Date();
+        // console.log("selected work", selectedWork)
 
         const generatedTasks: MainTaskForm[] = selectedWork?.tasks.map((task: ITask) => {
 
-            const dueTime = formatDateForInput(new Date(currentDue)); // set current time as due
+            // const dueTime = formatDateForInput(new Date(currentDue)); // set current time as due
 
             const estimatedMinutes = task.estimatedTimeInMinutes || 0;
 
             // Add estimated minutes to the currentDue for the next task
-            currentDue = new Date(currentDue.getTime() + estimatedMinutes * 60000);
+            // currentDue = new Date(currentDue.getTime() + estimatedMinutes * 60000);
 
             return {
                 title: task.title,
-                due: dueTime,
+                due: estimatedMinutes,
                 description: "",
                 tasks: (task.subtasks || []).map(sub => ({
                     taskName: sub.title
@@ -360,7 +337,8 @@ export const StaffAssignTaskMain: React.FC = () => {
                     tasks: updatedTasksList
                 })
             }
-
+            
+            setCreatedFromWork(false); // 👈 show due date again for manually added tasks
             setTaskList([defaultTaskList])
             toast({ description: 'Task Created Successfully', title: "Success" });
         } catch (error: any) {
@@ -403,30 +381,31 @@ export const StaffAssignTaskMain: React.FC = () => {
                         type="button"
                         onClick={handleSubmit}
                         className="bg-blue-600 text-white hover:bg-blue-700"
-                        isLoading={workPending|| isPending}
+                        isLoading={workPending || isPending}
+                        disabled={taskList.length === 0}
                     >
                         <i className="fa fa-paper-plane mr-1" /> Submit All Tasks
                     </Button>
 
 
-                      <div >
-                    <Label>Select Work from work library</Label>
-                    <SearchSelectNew
-                        options={workOptions}
-                        placeholder="Select Work"
-                        searchPlaceholder="Search Works..."
-                        value={selectedWork || undefined}
-                        onValueChange={(value) => handleWorkChange(value)}
-                        searchBy="name"
-                        displayFormat="simple"
-                        className="w-full"
-                    />
+                    <div >
+                        <Label>Select Work from work library</Label>
+                        <SearchSelectNew
+                            options={workOptions}
+                            placeholder="Select Work"
+                            searchPlaceholder="Search Works..."
+                            value={selectedWork || undefined}
+                            onValueChange={(value) => handleWorkChange(value)}
+                            searchBy="name"
+                            displayFormat="simple"
+                            className="w-full"
+                        />
+                    </div>
                 </div>
-                </div>
 
 
 
-              
+
             </header >
 
             {
@@ -438,7 +417,8 @@ export const StaffAssignTaskMain: React.FC = () => {
                             <Button
                                 onClick={() => handleDeleteMainTask(index)}
                                 variant="danger"
-                                className="text-white bg-red-500 "
+                                className={`text-white bg-red-500 ${taskList.length === 1 ? "!cursor-not-allowed" : "cursor-pointer"}`}
+                                disabled={taskList.length === 1}
                             >
                                 <i className="fas fa-trash-alt mr-1"></i> Remove Task
                             </Button>
@@ -512,15 +492,17 @@ export const StaffAssignTaskMain: React.FC = () => {
                             </div>
 
                             {/* Due Date */}
-                            <div>
-                                <Label htmlFor={`due-${index}`}>Due Date</Label>
-                                <Input
-                                    id={`due-${index}`}
-                                    type="datetime-local"
-                                    value={task.due}
-                                    onChange={(e) => handleMainChange(index, { due: e.target.value })}
-                                />
-                            </div>
+                            {!createdFromWork && (
+                                <div>
+                                    <Label htmlFor={`due-${index}`}>Due Date</Label>
+                                    <Input
+                                        id={`due-${index}`}
+                                        type="datetime-local"
+                                        value={task.due}
+                                        onChange={(e) => handleMainChange(index, { due: e.target.value })}
+                                    />
+                                </div>
+                            )}
 
                             {/* Assignee Select */}
                             <div >

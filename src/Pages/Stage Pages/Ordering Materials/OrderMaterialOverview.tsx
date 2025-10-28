@@ -1135,7 +1135,10 @@ const UNIT_OPTIONS = [
     "sqmm",
     "packet",
     "roll",
-    "sheet"
+    "sheet",
+    "set",
+    "coil",
+    "pair"
 ];
 
 

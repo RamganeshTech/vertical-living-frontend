@@ -60,6 +60,8 @@ const InvoiceAccountsMain = () => {
         limit: 10,
         date: filters.date || undefined,
         search: debouncedSearch || undefined,
+        sortBy: filters.sortBy || undefined,
+        sortOrder: filters.sortOrder || undefined,
     });
 
 

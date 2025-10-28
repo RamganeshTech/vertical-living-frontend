@@ -43,7 +43,7 @@ const AccountingMain: React.FC = () => {
 
     // Define navigation items
     const navigationItems: NavigationSection[] = [{
-        title:"Accounts section",
+        title: "Accounts section",
         items: [{
             label: 'Customer',
             path: `/organizations/${organizationId}/projects/customermain`,
@@ -61,6 +61,12 @@ const AccountingMain: React.FC = () => {
             path: `/organizations/${organizationId}/projects/retailinvoicemain`,
             icon: 'fas fa-receipt text-blue-600',
             onClick: () => navigate(`/organizations/${organizationId}/projects/retailinvoicemain`)
+        },
+        {
+            label: 'Sales Order',
+            path: `/organizations/${organizationId}/projects/salesordermain`,
+            icon: 'fas fa-shopping-cart text-blue-600',
+            onClick: () => navigate(`/organizations/${organizationId}/projects/salesordermain`)
         },]
     }]
 
@@ -102,7 +108,7 @@ const AccountingMain: React.FC = () => {
                 isOpen={isDropdownOpen}
                 onClose={() => setIsDropdownOpen(false)}
                 sections={navigationItems}
-                
+
             />
 
 

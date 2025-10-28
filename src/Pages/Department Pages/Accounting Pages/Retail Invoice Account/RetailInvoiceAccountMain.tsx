@@ -18,8 +18,8 @@ const RetailInvoiceAccountsMain = () => {
 
 
     const paths: BreadcrumbItem[] = [
-            { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
-            { label: "RetailInvoice", path: `/organizations/${organizationId}/projects/retailinvoice` },
+        { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
+        { label: "RetailInvoice", path: `/organizations/${organizationId}/projects/retailinvoice` },
     ];
 
     // Filter states
@@ -59,6 +59,8 @@ const RetailInvoiceAccountsMain = () => {
         limit: 10,
         date: filters.date || undefined,
         search: debouncedSearch || undefined,
+        sortBy: filters.sortBy || undefined,
+        sortOrder: filters.sortOrder || undefined,
     });
 
 
@@ -84,26 +86,26 @@ const RetailInvoiceAccountsMain = () => {
     // }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     useEffect(() => {
-  const container = scrollContainerRef.current;
-  if (!container) return;
+        const container = scrollContainerRef.current;
+        if (!container) return;
 
-  const handleScroll = () => {
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    console.log("📦 Scroll Info =>", { scrollTop, scrollHeight, clientHeight });
+        const handleScroll = () => {
+            const { scrollTop, scrollHeight, clientHeight } = container;
+            console.log("📦 Scroll Info =>", { scrollTop, scrollHeight, clientHeight });
 
-    if (
-      scrollHeight - scrollTop - clientHeight < 100 &&
-      hasNextPage &&
-      !isFetchingNextPage
-    ) {
-      console.log("📜 Loading more invoices...");
-      fetchNextPage();
-    }
-  };
+            if (
+                scrollHeight - scrollTop - clientHeight < 100 &&
+                hasNextPage &&
+                !isFetchingNextPage
+            ) {
+                console.log("📜 Loading more invoices...");
+                fetchNextPage();
+            }
+        };
 
-  container.addEventListener("scroll", handleScroll);
-  return () => container.removeEventListener("scroll", handleScroll);
-}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+        container.addEventListener("scroll", handleScroll);
+        return () => container.removeEventListener("scroll", handleScroll);
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const handleDelete = async (invoiceId: string) => {
         try {

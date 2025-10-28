@@ -6,6 +6,9 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
+const SalesOrderAccountMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/Sales Account/SalesOrderAccountMain'));
+const SalesOrderAccSingle = lazy(() => import( './Pages/Department Pages/Accounting Pages/Sales Account/SalesOrderAccSingle'));
+const CreateSalesOrderAcc = lazy(() => import( './Pages/Department Pages/Accounting Pages/Sales Account/CreateSalerOrderAcc'));
 const SelectedModularUnitsNew = lazy(() => import( './Pages/Modular Units/Selected Units New/SelectedModularUnitNew'));
 const ModularUnitMainNew = lazy(() => import('./Pages/Modular Units/Modular Units New/ModularUnitMainNew'));
 const CreateModularUnitNew = lazy(() => import('./Pages/Modular Units/Modular Units New/CreateModularUnitNew'));
@@ -424,6 +427,22 @@ function App() {
 
               <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <RetailCreateInvoiceAcc />
+              </ProtectedRoutes>} />
+
+
+            </Route>
+
+             <Route path="salesordermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <SalesOrderAccountMain />
+            </ProtectedRoutes>} >
+
+              <Route path="salessingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <SalesOrderAccSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateSalesOrderAcc />
               </ProtectedRoutes>} />
 
 

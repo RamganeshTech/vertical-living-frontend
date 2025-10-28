@@ -6,22 +6,26 @@ import { getApiForRole } from "../../../utils/roleCheck";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../../../QueryClient/queryClient";
 
-const getAllRetailInvoices = async ({ 
-    organizationId, 
-    customerId, 
-    page, 
-    limit, 
-    date, 
+const getAllRetailInvoices = async ({
+    organizationId,
+    customerId,
+    page,
+    limit,
+    date,
     search,
-    api 
-}: { 
-    organizationId?: string; 
-    customerId?: string; 
-    page?: number; 
-    limit?: number; 
-    date?: string; 
-        search?: string; 
-    api: AxiosInstance 
+    api,
+    sortBy,
+    sortOrder
+}: {
+    organizationId?: string;
+    customerId?: string;
+    page?: number;
+    limit?: number;
+    date?: string;
+    search?: string;
+    api: AxiosInstance,
+    sortBy?: string;
+    sortOrder?: string;
 }) => {
     const params = new URLSearchParams();
     if (organizationId) params.append('organizationId', organizationId);
@@ -29,30 +33,32 @@ const getAllRetailInvoices = async ({
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
     if (date) params.append('date', date);
- if (search) params.append('search', search);
+    if (sortBy) params.append('sortBy', sortBy);
+    if (sortOrder) params.append('sortOrder', sortOrder);
+    if (search) params.append('search', search);
 
     const { data } = await api.get(`/department/accounting/retailinvoice/getallinvoice?${params.toString()}`);
     if (!data.ok) throw new Error(data.message);
     return data;
 };
 
-const createRetailInvoice = async ({ 
-    invoiceData, 
-    api 
-}: { 
-    invoiceData: any; 
-    api: AxiosInstance 
+const createRetailInvoice = async ({
+    invoiceData,
+    api
+}: {
+    invoiceData: any;
+    api: AxiosInstance
 }) => {
     const { data } = await api.post(`/department/accounting/retailinvoice/createinvocie`, invoiceData);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
 
-const deleteRetailInvoice = async ({ 
-    invoiceId, 
-    api 
-}: { 
-    invoiceId: string; 
+const deleteRetailInvoice = async ({
+    invoiceId,
+    api
+}: {
+    invoiceId: string;
     api: AxiosInstance
 }) => {
     const { data } = await api.delete(`/department/accounting/retailinvoice/deleteinvoice/${invoiceId}`);
@@ -60,12 +66,12 @@ const deleteRetailInvoice = async ({
     return data.data;
 };
 
-const getSingleRetailInvoice = async ({ 
-    invoiceId, 
-    api 
-}: { 
-    invoiceId: string; 
-    api: AxiosInstance 
+const getSingleRetailInvoice = async ({
+    invoiceId,
+    api
+}: {
+    invoiceId: string;
+    api: AxiosInstance
 }) => {
     const { data } = await api.get(`/department/accounting/retailinvoice/getsingleinvoice/${invoiceId}`);
     if (!data.ok) throw new Error(data.message);
@@ -76,25 +82,29 @@ const getSingleRetailInvoice = async ({
 // ==================== REACT QUERY HOOKS ====================
 
 // Update the hook to use useInfiniteQuery
-export const useGetRetailAllInvoices = ({ 
-    organizationId, 
-    customerId, 
-    limit = 10, 
+export const useGetRetailAllInvoices = ({
+    organizationId,
+    customerId,
+    limit = 10,
     search,
-    date 
-}: { 
-    organizationId?: string; 
-    customerId?: string; 
-    limit?: number; 
-    search?: string; 
-    date?: string 
+    date,
+    sortBy,
+    sortOrder
+}: {
+    organizationId?: string;
+    customerId?: string;
+    limit?: number;
+    search?: string;
+    date?: string,
+    sortBy?: string;
+    sortOrder?: string;
 }) => {
     const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["retailinvoices", organizationId, customerId, limit, date, search],
+        queryKey: ["retailinvoices", organizationId, customerId, limit, date, search, sortBy, sortOrder],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -102,14 +112,16 @@ export const useGetRetailAllInvoices = ({
             if (!api) {
                 throw new Error("API instance not found for role");
             }
-            return await getAllRetailInvoices({ 
-                organizationId, 
-                customerId, 
-                page: pageParam, 
-                limit, 
-                date, 
+            return await getAllRetailInvoices({
+                organizationId,
+                customerId,
+                page: pageParam,
+                limit,
+                date,
                 search,
-                api 
+                api,
+                sortBy,
+                sortOrder
             });
         },
         getNextPageParam: (lastPage) => {
