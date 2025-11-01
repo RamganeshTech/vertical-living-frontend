@@ -162,6 +162,24 @@ const getAllAssociatedStaffsTask = async ({
   return data.data;
 };
 
+
+
+const getOtherStaffPendingTask = async ({
+  organizationId,
+  filters,
+  api,
+}: {
+  organizationId: string;
+  filters?: Record<string, string | boolean | null>;
+  api: AxiosInstance;
+}) => {
+  const searchParams = new URLSearchParams(filters as any).toString();
+  const { data } = await api.get(`/stafftasks/otherpendingstafftask/${organizationId}?${searchParams}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
 // 3. UPDATE MAIN TASK
 export const updateMainTask = async ({
   mainTaskId,
@@ -376,6 +394,24 @@ export const useGetAssociatedStaffTask = (organizationId:string, filters?: Recor
     enabled: !!role
   });
 };
+
+
+
+export const useGetOtherStaffPendingTask = (organizationId:string,  showPendingTask:boolean , filters?: Record<string, string | boolean | null>,  ) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  return useQuery({
+    queryKey: ["pending-stafftasks", organizationId, filters],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+       if (!api) throw new Error("Not Authenticated");
+      return getOtherStaffPendingTask({ filters, api, organizationId });
+    },
+    enabled: !!role && showPendingTask
+  });
+};
+
+
 
 // 3. Update main task
 export const useUpdateMainTask = () => {

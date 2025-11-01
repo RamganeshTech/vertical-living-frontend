@@ -563,7 +563,7 @@
 // }
 
 // //  Added predefined unit options for the select dropdown
-// const UNIT_OPTIONS = [
+// const ORDERMATERIAL_OUNIT_OPTIONS = [
 //     "nos",
 //     "pieces",
 //     "litre",
@@ -916,7 +916,7 @@
 //                                                                                             <SelectValue placeholder="Unit" selectedValue={editUnit} />
 //                                                                                         </SelectTrigger>
 //                                                                                         <SelectContent>
-//                                                                                             {UNIT_OPTIONS.map((unit) => (
+//                                                                                             {ORDERMATERIAL_OUNIT_OPTIONS.map((unit) => (
 //                                                                                                 <SelectItem key={unit} value={unit}>
 //                                                                                                     {unit}
 //                                                                                                 </SelectItem>
@@ -1028,7 +1028,7 @@
 //                                                                         <SelectValue placeholder="Select unit" selectedValue={newSubItemUnit} />
 //                                                                     </SelectTrigger>
 //                                                                     <SelectContent className="max-h-48 overflow-y-auto custom-scrollbar">
-//                                                                         {UNIT_OPTIONS.map((unit) => (
+//                                                                         {ORDERMATERIAL_OUNIT_OPTIONS.map((unit) => (
 //                                                                             <SelectItem key={unit} value={unit}>
 //                                                                                 {unit}
 //                                                                             </SelectItem>
@@ -1094,7 +1094,7 @@
 
 
 
-import { useParams, useOutletContext, useNavigate } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate, useLocation, Outlet } from "react-router-dom";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import { Card, CardContent } from "../../../components/ui/Card";
@@ -1114,6 +1114,9 @@ import { useEffect, useRef, useState } from "react";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
 import { Input } from "../../../components/ui/Input";
 import { downloadImage } from "../../../utils/downloadFile";
+import { useGetShopLib } from "../../../apiList/Stage Api/shopLibDetailApi";
+import SearchSelectNew from "../../../components/ui/SearchSelectNew";
+
 
 interface ProjectDetailsOutlet {
     isMobile: boolean;
@@ -1121,7 +1124,7 @@ interface ProjectDetailsOutlet {
 }
 
 //  Added predefined unit options for the select dropdown
-const UNIT_OPTIONS = [
+export const ORDERMATERIAL_UNIT_OPTIONS = [
     "nos",
     "pieces",
     "litre",
@@ -1155,6 +1158,9 @@ const OrderMaterialOverview = () => {
     const { projectId, organizationId } = useParams() as { projectId: string, organizationId: string };
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
     const navigate = useNavigate()
+    const location = useLocation();
+
+
     const { data, isLoading, isError, error: getAllError, refetch } = useGetAllOrderingMaterialHistory(projectId!);
     const { mutateAsync: generateLink, isPending: generatePending } = useOrderHistoryGenerateLink()
     const { mutateAsync: updatePdfStatus } = useUpdatePdfStatus()
@@ -1165,10 +1171,14 @@ const OrderMaterialOverview = () => {
 
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetOrderingMaterialHistoryDeadline()
     const { mutateAsync: completionStatus, isPending: completePending } = useCompleteOrderingMaterialHistoryStage()
+
     const { mutateAsync: updateDelivery } = useUpdateDeliveryLocation();
-    const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
     const { mutateAsync: updateShop } = useUpdateShopDetails();
+
+    const { data: shops } = useGetShopLib(organizationId);
+
     const { mutateAsync: deleteAllSubItems, isPending: deleteAllPending } = useDeleteAllSubItems();
+    const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
 
 
 
@@ -1176,8 +1186,30 @@ const OrderMaterialOverview = () => {
     const [deliveryForm, setDeliveryForm] = useState<any>({});
     const [editShop, setEditShop] = useState(false);
     const [shopForm, setShopForm] = useState<any>({});
+    const [selectedShop, setSelectedShop] = useState<{
+        selectedId: string | null,
+        shopName: string | null
+    }>({
+        selectedId: null,
+        shopName: null
+    })
 
 
+
+    useEffect(() => {
+        if (selectedShop.selectedId) {
+            const shop = shops?.find((shop: any) => shop._id === selectedShop.selectedId)
+            console.log("shop", shop)
+            if (shop) {
+                setShopForm(shop)
+            }
+        }
+    }, [selectedShop.selectedId, shops])
+
+    const shopLibOptions = (shops || [])?.map((shop: any) => ({
+        value: shop._id,
+        label: shop.shopName
+    }))
 
 
     const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
@@ -1195,78 +1227,6 @@ const OrderMaterialOverview = () => {
     }>({});
 
     const inputRef = useRef<HTMLInputElement>(null);
-
-
-    // const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
-    // const [newSubItemName, setNewSubItemName] = useState("");
-    // const [newSubItemQty, setNewSubItemQty] = useState<number>(1);
-    // const [newSubItemUnit, setNewSubItemUnit] = useState("");
-    // const [editSubItemId, setEditSubItemId] = useState<string | null>(null);
-    // const [editName, setEditName] = useState("");
-    // const [editQty, setEditQty] = useState<number>(1);
-    // const [editUnit, setEditUnit] = useState("");
-
-    // // ... existing code ...
-
-    // const selectedUnits = data?.selectedUnits || [];
-    // const totalCost = data?.totalCost || 0;
-    // const hasUnits = selectedUnits.length > 0;
-
-
-
-
-
-    // const handleAddSubItem = async (unitId: string) => {
-    //     try {
-    //         if (!newSubItemName.trim()) return;
-    //         await addSubItem({
-    //             projectId,
-    //             unitId,
-    //             subItemName: newSubItemName,
-    //             quantity: newSubItemQty,
-    //             unit: newSubItemUnit,
-    //         });
-    //         setNewSubItemName("");
-    //         setNewSubItemQty(1);
-    //         setNewSubItemUnit("");
-    //         toast({ title: "Success", description: "item created successfully" })
-    //     }
-    //     catch (error: any) {
-    //         toast({ title: "error", description: error?.response?.data?.message || "failed to create item", variant: "destructive" })
-    //     }
-    // };
-
-    // const handleUpdateSubItem = async (unitId: string) => {
-    //     try {
-    //         if (!editSubItemId) return;
-    //         await updateSubItem({
-    //             projectId,
-    //             unitId,
-    //             subItemId: editSubItemId,
-    //             subItemName: editName,
-    //             quantity: editQty,
-    //             unit: editUnit,
-    //         });
-    //         setEditSubItemId(null);
-    //         setEditName("");
-    //         setEditQty(1);
-    //         setEditUnit("");
-    //         toast({ title: "Success", description: "item updated successfully" })
-    //     }
-    //     catch (error: any) {
-    //         toast({ title: "error", description: error?.response?.data?.message || "failed to update item", variant: "destructive" })
-    //     }
-    // };
-
-    // const handleDeleteSubItem = async (unitId: string, subItemId: string) => {
-    //     try {
-    //         await deleteSubItem({ projectId, unitId, subItemId });
-    //         toast({ title: "Success", description: "item deleted successfully" })
-    //     }
-    //     catch (error: any) {
-    //         toast({ title: "error", description: error?.response?.data?.message || "failed to deleted item", variant: "destructive" })
-    //     }
-    // };
 
     const handleCompletionStatus = async () => {
         try {
@@ -1484,6 +1444,12 @@ const OrderMaterialOverview = () => {
         }
     };
 
+    const isChild = location.pathname.includes("siteorders") || location.pathname.includes("shoplib");
+
+    if (isChild) {
+        return <Outlet />
+    }
+
     if (isLoading) return <MaterialOverviewLoading />;
 
     // ... existing code ...
@@ -1590,11 +1556,52 @@ const OrderMaterialOverview = () => {
 
 
                             {/* Shop Details */}
-                            <div className="border-l-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                                <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
-                                    <i className="fa-solid fa-store"></i>
-                                    Shop Details
-                                </h2>
+                            <section className="border-l-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
+                                <div className="flex justify-between items-center w-full">
+                                    <div>
+                                        <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
+                                            <i className="fa-solid fa-store"></i>
+                                            Shop Details
+                                        </h2>
+                                    </div>
+
+                                    {!editShop ?  <div className="gap-2 flex">
+
+                                        <Button onClick={() => navigate("shoplib")}>
+                                            <i className="fas fa-shop mr-2"></i>
+                                            Shop Library
+                                        </Button>
+
+                                        <button
+                                            onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
+                                            // className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
+                                            className=" text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
+
+                                        >
+                                            <i className="fa-solid fa-edit mr-1"></i>Edit
+                                        </button>
+                                    </div>
+                                    :
+
+                                    <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
+                                            <SearchSelectNew
+                                                options={shopLibOptions}
+                                                placeholder="Select Shop"
+                                                searchPlaceholder="Search by shop name..."
+                                                value={selectedShop.selectedId || ''}
+                                                onValueChange={(value) => {
+                                                    const shopFound = shops?.find((s: any) => s._id === value)
+                                                    // console.log("sop", shopFound)
+                                                    setSelectedShop(({selectedId: shopFound._id, shopName: shopFound.shopName}))
+                                                }}
+                                                searchBy="name"
+                                                displayFormat="detailed"
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    }
+                                </div>
                                 {editShop ? (
                                     <div className="space-y-3">
                                         <Input
@@ -1643,16 +1650,11 @@ const OrderMaterialOverview = () => {
                                         <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
                                         <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
 
-                                        <button
-                                            onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
-                                            className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-                                        >
-                                            <i className="fa-solid fa-edit mr-1"></i>Edit
-                                        </button>
+
 
                                     </div>
                                 )}
-                            </div>
+                            </section>
 
                             <div className="border-l-4 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
                                 <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
@@ -1728,6 +1730,13 @@ const OrderMaterialOverview = () => {
                                     </div>
                                     <div className="flex gap-2">
 
+
+                                        <Button variant="primary" className=""
+                                            onClick={() => navigate('siteorders')}>
+                                            <i className="fas fa-box-archive !mr-2"></i>
+                                            View Orders from Site
+                                        </Button>
+
                                         <Button variant="danger" className="bg-red-600 text-white"
                                             isLoading={deleteAllPending} onClick={handleDeleteAllSubItems}>
                                             <i className="fas fa-trash !mr-2"></i>
@@ -1780,8 +1789,8 @@ const OrderMaterialOverview = () => {
                                                         />
                                                         <div
                                                             className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"
-                                                            // className={`absolute top-2 right-2 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"
-                                                                // }`}
+                                                        // className={`absolute top-2 right-2 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"
+                                                        // }`}
                                                         >
                                                             ×{unit.quantity}
                                                         </div>
@@ -1799,16 +1808,15 @@ const OrderMaterialOverview = () => {
                                                                     {unit.unitName}
                                                                 </h3>
                                                                 <div className="flex gap-2 items-center">
-                                                                    <span 
-                            // className="flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-                            className={`flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                    expandedUnitId === unit._id
-                      ? "text-blue-700 bg-blue-100 hover:bg-blue-200"
-                      : "text-blue-600 bg-blue-50 hover:bg-blue-100"
-                  }`}
-                            
-                            
-                            > Total Sub Items : <span className="">{unit?.subItems?.length || 0}</span></span>
+                                                                    <span
+                                                                        // className="flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                                                        className={`flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${expandedUnitId === unit._id
+                                                                            ? "text-blue-700 bg-blue-100 hover:bg-blue-200"
+                                                                            : "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                                                            }`}
+
+
+                                                                    > Total Sub Items : <span className="">{unit?.subItems?.length || 0}</span></span>
                                                                     <button
                                                                         onClick={() =>
                                                                             setExpandedUnitId(
@@ -1816,11 +1824,10 @@ const OrderMaterialOverview = () => {
                                                                             )
                                                                         }
                                                                         // className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-                                                                        className={`flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    expandedUnitId === unit._id
-                      ? "text-white bg-blue-600 hover:bg-blue-700 shadow-md"
-                      : "text-blue-600 bg-blue-50 hover:bg-blue-100"
-                  }`}
+                                                                        className={`flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${expandedUnitId === unit._id
+                                                                            ? "text-white bg-blue-600 hover:bg-blue-700 shadow-md"
+                                                                            : "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                                                            }`}
                                                                     >
                                                                         <span className="hidden sm:inline">
                                                                             {/* {expandedUnitId === unit._id ? 'Hide' : 'Show'} Sub Items */}
@@ -1837,11 +1844,10 @@ const OrderMaterialOverview = () => {
                                                             </div>
 
                                                             <div className="flex items-center gap-2 mb-3">
-                                                                <span 
-                                                                // className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
-                                                                className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                  expandedUnitId === unit._id ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
-                }`}
+                                                                <span
+                                                                    // className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
+                                                                    className={`px-2.5 py-1 text-xs font-medium rounded-full ${expandedUnitId === unit._id ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
+                                                                        }`}
                                                                 >
                                                                     {unit.category || "Generic"}
                                                                 </span>
@@ -1880,10 +1886,10 @@ const OrderMaterialOverview = () => {
                                                 </div>
 
                                                 {expandedUnitId === unit._id && (
-                                                    <div 
-                                                    // className="mt-6 pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-4"
-                                                    className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
-                                                    
+                                                    <div
+                                                        // className="mt-6 pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-4"
+                                                        className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
+
                                                     >
                                                         <div className="flex items-center gap-2 mb-4">
                                                             <i className="fa-solid fa-list text-blue-600"></i>
@@ -1893,8 +1899,8 @@ const OrderMaterialOverview = () => {
 
                                                         {/* Spreadsheet Header */}
                                                         <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
-                                                            <div 
-                                                            className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
+                                                            <div
+                                                                className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
                                                             >
                                                                 <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
                                                                     Ref ID
@@ -1955,7 +1961,6 @@ const OrderMaterialOverview = () => {
                                                                             </div>
                                                                         )}
                                                                     </div>
-
                                                                     {/* Quantity Cell */}
                                                                     <div className="col-span-2 border-r border-blue-200">
                                                                         {editingCell?.subItemId === sub._id && editingCell?.field === 'quantity' ? (
@@ -2002,7 +2007,7 @@ const OrderMaterialOverview = () => {
                                                                                     className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
                                                                                 >
                                                                                     <option value="" disabled>Selected unit</option>
-                                                                                    {UNIT_OPTIONS.map((unitOption) => (
+                                                                                    {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
                                                                                         <option key={unitOption} value={unitOption}>
                                                                                             {unitOption}
                                                                                         </option>
@@ -2132,7 +2137,7 @@ const OrderMaterialOverview = () => {
                                                                             className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
                                                                         >
                                                                             <option value="">Selected unit</option>
-                                                                            {UNIT_OPTIONS.map((unitOption) => (
+                                                                            {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
                                                                                 <option key={unitOption} value={unitOption}>
                                                                                     {unitOption}
                                                                                 </option>
@@ -2393,7 +2398,8 @@ const OrderMaterialOverview = () => {
                         </div>
                     </section>
                 </div>
-            )}
+            )
+            }
         </div >
     )
 }

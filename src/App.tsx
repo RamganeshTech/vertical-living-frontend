@@ -6,10 +6,15 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-const SalesOrderAccountMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/Sales Account/SalesOrderAccountMain'));
-const SalesOrderAccSingle = lazy(() => import( './Pages/Department Pages/Accounting Pages/Sales Account/SalesOrderAccSingle'));
-const CreateSalesOrderAcc = lazy(() => import( './Pages/Department Pages/Accounting Pages/Sales Account/CreateSalerOrderAcc'));
-const SelectedModularUnitsNew = lazy(() => import( './Pages/Modular Units/Selected Units New/SelectedModularUnitNew'));
+const ShopDetailSingle  = lazy(() => import( './Pages/Stage Pages/Ordering Materials/ShopLib Details Pages/ShopLibDetailSingle'));
+const ShopLibDetailsMain  = lazy(() => import( './Pages/Stage Pages/Ordering Materials/ShopLib Details Pages/ShopLibDetailsMain'));
+const PublicOrgOrderMaterialSetup = lazy(() => import('./Pages/Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrgOrderMaterialSetup'));
+const PublicOrderMaterialMain = lazy(() => import('./Pages/Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrderMaterialMain'));
+const PublicOrderMatStaffView = lazy(() => import('./Pages/Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrderMatStaffView'));
+const SalesOrderAccountMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Sales Account/SalesOrderAccountMain'));
+const SalesOrderAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Sales Account/SalesOrderAccSingle'));
+const CreateSalesOrderAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Sales Account/CreateSalerOrderAcc'));
+const SelectedModularUnitsNew = lazy(() => import('./Pages/Modular Units/Selected Units New/SelectedModularUnitNew'));
 const ModularUnitMainNew = lazy(() => import('./Pages/Modular Units/Modular Units New/ModularUnitMainNew'));
 const CreateModularUnitNew = lazy(() => import('./Pages/Modular Units/Modular Units New/CreateModularUnitNew'));
 const ModularUnitSingleNew = lazy(() => import('./Pages/Modular Units/Modular Units New/ModularUnitSingleNew'));
@@ -114,7 +119,7 @@ const OrderMaterialOverview = lazy(() => import("./Pages/Stage Pages/Ordering Ma
 // const MaterialArrivalRoomDetail = lazy(() => import("./Pages/Stage Pages/MaterialArrival/MaterialArrivalRoomDetail"));
 const PublicMaterialArrival = lazy(() => import("./Pages/Stage Pages/MaterialArrival/PublicMaterialArrival"));
 // const PublicOrderMaterial = lazy(() => import("./Pages/Stage Pages/Ordering Materials/Old Version/PublicOrderMaterial"));
-const PublicOrderHistoryDetails = lazy(() => import("./Pages/Stage Pages/Ordering Materials/PublicOrderHistory"))
+const PublicOrderHistory = lazy(() => import("./Pages/Stage Pages/Ordering Materials/PublicOrderHistory"))
 const WorkMainOverview = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkMainOverView"));
 // const WorkSchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/WorkSchedulePage"));
 const DailySchedulePage = lazy(() => import("./Pages/Stage Pages/Work Schedule/DailySchedulePage"));
@@ -432,7 +437,7 @@ function App() {
 
             </Route>
 
-             <Route path="salesordermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="salesordermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <SalesOrderAccountMain />
             </ProtectedRoutes>} >
 
@@ -845,6 +850,35 @@ function App() {
                 </ProtectedRoutes>
 
               } /> */}
+
+              <Route path="siteorders" element={
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+
+                  <PublicOrderMatStaffView />
+                </ProtectedRoutes>
+
+              } />
+
+
+              <Route path="shoplib" element={
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+
+                  <ShopLibDetailsMain />
+                </ProtectedRoutes>
+
+              }>
+
+                <Route path="single/:shopId" element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+
+                    <ShopDetailSingle />
+                  </ProtectedRoutes>
+
+                } />
+
+              </Route>
+
+
             </Route>
 
 
@@ -865,7 +899,7 @@ function App() {
             </Route>
 
             <Route path="workmainschedule" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
                 <WorkMainOverview />
               </ProtectedRoutes>
             } >
@@ -876,13 +910,13 @@ function App() {
               } /> */}
 
               <Route path="dailyschedule/:sectionId" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
                   <DailySchedulePage />
                 </ProtectedRoutes>
               } >
 
                 <Route path="workreport" element={
-                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker",]}>
                     <WorkReportMain />
                   </ProtectedRoutes>
                 } />
@@ -974,9 +1008,11 @@ function App() {
           {/* REQUIREMENT FORM LINK */}
 
           <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
-          <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderHistoryDetails />} />
+          <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderHistory />} />
           <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
           <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
+          <Route path='/ordermaterial/setup' element={<PublicOrgOrderMaterialSetup />} />
+          <Route path='/:organizationId/ordermaterial' element={<PublicOrderMaterialMain />} />
 
 
           <Route path="*" element={<NotFound />} />

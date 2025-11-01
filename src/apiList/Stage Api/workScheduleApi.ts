@@ -10,7 +10,7 @@ import axios from "axios";
 
 // 🗂️ GET APIs
 export const getWorkMainStageApi = async (projectId: string, api: AxiosInstance)=> {
-  const res = await api.get(`/worktasks/getworktaksmain/${projectId}`);
+  const res = await api.get(`/worktasks/getworktaskmain/${projectId}`);
   return res.data.data;
 };
 
@@ -142,7 +142,7 @@ const generateWorkPdfLink = async ({
 };
 
 export const getProjectAssigneDetails = async (projectId: string, api: AxiosInstance) => {
-  const res = await api.get(`/worktasks/getprojectassigne/${projectId}`);
+  const res = await api.get(`/worktasks/getprojectwork/${projectId}`);
   return res.data.data;
 };
 

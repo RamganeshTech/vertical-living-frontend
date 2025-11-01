@@ -30,7 +30,7 @@ export interface SubtaskForm {
 
 
 
-export interface MainTaskForm {
+export interface MainStaffTaskForm {
     _id?: string
     title: string
     description: string
@@ -92,7 +92,7 @@ export const StaffAssignTaskMain: React.FC = () => {
     }
 
 
-    const [taskList, setTaskList] = useState<MainTaskForm[]>([defaultTaskList])
+    const [taskList, setTaskList] = useState<MainStaffTaskForm[]>([defaultTaskList])
     const { role } = useGetRole();
     const api = getApiForRole(role!);
     const [selectedWork, setSelectedWork] = useState<string | null>(null);
@@ -210,7 +210,7 @@ export const StaffAssignTaskMain: React.FC = () => {
     };
 
 
-    const handleMainChange = (index: number, updates: Partial<MainTaskForm>) => {
+    const handleMainChange = (index: number, updates: Partial<MainStaffTaskForm>) => {
         setTaskList(prev => {
             const updated = [...prev];
             updated[index] = { ...updated[index], ...updates };
@@ -258,7 +258,7 @@ export const StaffAssignTaskMain: React.FC = () => {
         // let currentDue = new Date();
         // console.log("selected work", selectedWork)
 
-        const generatedTasks: MainTaskForm[] = selectedWork?.tasks.map((task: ITask) => {
+        const generatedTasks: MainStaffTaskForm[] = selectedWork?.tasks.map((task: ITask) => {
 
             // const dueTime = formatDateForInput(new Date(currentDue)); // set current time as due
 
@@ -548,7 +548,7 @@ export const StaffAssignTaskMain: React.FC = () => {
                                 <Label>Priority</Label>
                                 <select
                                     value={task.priority}
-                                    onChange={(e) => handleMainChange(index, { priority: e.target.value as MainTaskForm["priority"] })}
+                                    onChange={(e) => handleMainChange(index, { priority: e.target.value as MainStaffTaskForm["priority"] })}
                                     className="w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                 >
                                     <option value="low">Low</option>
@@ -562,7 +562,7 @@ export const StaffAssignTaskMain: React.FC = () => {
                                 <Label>Department</Label>
                                 <select
                                     value={task.department}
-                                    onChange={(e) => handleMainChange(index, { department: e.target.value as MainTaskForm["department"] })}
+                                    onChange={(e) => handleMainChange(index, { department: e.target.value as MainStaffTaskForm["department"] })}
                                     className="w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                 >
                                     <option value="site">Site</option>
@@ -577,7 +577,7 @@ export const StaffAssignTaskMain: React.FC = () => {
                                 <Label>Status</Label>
                                 <select
                                     value={task.status}
-                                    onChange={(e) => handleMainChange(index, { status: e.target.value as MainTaskForm["status"] })}
+                                    onChange={(e) => handleMainChange(index, { status: e.target.value as MainStaffTaskForm["status"] })}
                                     className="w-full border border-blue-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
                                 >
                                     <option value="queued">Queued</option>

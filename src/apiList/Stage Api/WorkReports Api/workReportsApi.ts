@@ -43,16 +43,16 @@ const getWorkReportImage  = async ({
   projectId,
   id,
   dailyTaskId,
-  date,
+  // date,
   api,
 }: {
   projectId: string;
   id: string;
   dailyTaskId: string;
-  date: string;
+  // date: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.get(`/workreports/workimages/${projectId}/${id}/${date}/${dailyTaskId}`);
+  const { data } = await api.get(`/workreports/workimages/${projectId}/${id}/${dailyTaskId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -139,7 +139,9 @@ export const useDeleteWorkReportById = () => {
 
 
 
-export const useGetWorkReportImages = (projectId: string, id:string, date:string, dailyTaskId:string) => {
+export const useGetWorkReportImages = (projectId: string, id:string,
+  //  date:string,
+    dailyTaskId:string) => {
   const allowedRoles = ["owner", "staff", "CTO", "client"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
@@ -150,7 +152,7 @@ export const useGetWorkReportImages = (projectId: string, id:string, date:string
       if (!role || !allowedRoles.includes(role))
         throw new Error("not allowed to fetch this data");
       if (!api) throw new Error("API instance not found for role");
-      return await getWorkReportImage({ projectId, id, date, dailyTaskId,  api });
+      return await getWorkReportImage({ projectId, id, dailyTaskId,  api });
     },
     enabled: !!projectId && !!role,
   });

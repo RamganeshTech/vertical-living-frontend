@@ -57,14 +57,14 @@ const deleteSelectedUnitNew = async ({
 };
 
 // COMPLETE MODULAR UNIT SELECTION
-const completeModularUnitSelection = async ({
+const generateModularPdf = async ({
     projectId,
     api
 }: {
     projectId: string;
     api: AxiosInstance;
 }) => {
-    const { data } = await api.post(`/selectedmodularunitsnew/projects/${projectId}/modular-unit/complete`);
+    const { data } = await api.post(`/selectedmodularunitsnew/${projectId}/pdfgenerate`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
@@ -159,8 +159,8 @@ export const useDeleteSelectedUnitNew = () => {
     });
 };
 
-// HOOK: COMPLETE MODULAR UNIT SELECTION
-export const useCompleteModularUnitSelection = () => {
+// HOOK: used to generate the pdf of he selected modular units
+export const useGeneratePdfModularUnits = () => {
     const allowedRoles = ["owner", "CTO", "staff"];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
@@ -172,7 +172,7 @@ export const useCompleteModularUnitSelection = () => {
             }
             if (!api) throw new Error("API instance not found for role");
             
-            return await completeModularUnitSelection({ projectId, api });
+            return await generateModularPdf({ projectId, api });
         },
         onSuccess: (_, { projectId }) => {
             queryClient.invalidateQueries({

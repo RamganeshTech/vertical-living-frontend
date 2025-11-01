@@ -1,8 +1,9 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../shared/Sidebar";
 import MobileSidebar from "../../shared/MobileSidebar";
-import {  LOGIN_ICONS_LOGIN_GROUP, LOGIN_LABELS } from "../../constants/constants";
+import { LOGIN_ICONS_LOGIN_GROUP, LOGIN_LABELS } from "../../constants/constants";
+import { LOCAL_KEY } from "../Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrgOrderMaterialSetup";
 
 // Define your paths as an object
 const path = {
@@ -10,27 +11,28 @@ const path = {
     CTO: `/login/cto`,
     STAFF: `/login/staff`,
     WORKER: `/login/worker`,
-    CLIENT: `/login/client`
+    CLIENT: `/login/client`,
+    PUBLICORDERS: `/ordermaterial/setup`,
 };
 
-
-// Map labels & icons in same order
-// const loginKeys = Object.keys(path) as Array<keyof typeof path>;
-// const loginIcons = [
-//     "fa-user-tie",
-//     "fa-user-gear",
-//     "fa-users-gear",
-//     "fa-hard-hat",
-//     "fa-user"
-// ];
 
 export default function LoginGroup() {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
-    
-    const openMobileSidebar = ()=>{
+
+    const openMobileSidebar = () => {
         setIsMobileSidebarOpen(true)
     }
+
+
+      
+    const orgId = localStorage.getItem(LOCAL_KEY)
+
+    if (orgId) {
+        path.PUBLICORDERS = `/${JSON.parse(orgId)}/ordermaterial`
+    }
+
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -39,6 +41,9 @@ export default function LoginGroup() {
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+    // console.log("shallow paths", currentPath)
+    // console.log("orgId", orgId)
 
     return (
         <div className="flex w-full h-full">
@@ -49,18 +54,18 @@ export default function LoginGroup() {
                     isOpen={isMobileSidebarOpen}
                     onClose={() => setIsMobileSidebarOpen(false)}
                 />
-            ) :  (
-                    <Sidebar
-                      path={path}
-                      labels={LOGIN_LABELS}
-                      icons={LOGIN_ICONS_LOGIN_GROUP}
-                    />
-                  )
-                }
+            ) : (
+                <Sidebar
+                    path={path}
+                    labels={LOGIN_LABELS}
+                    icons={LOGIN_ICONS_LOGIN_GROUP}
+                />
+            )
+            }
 
             <main className="flex-1 relative">
-               
-                <Outlet context={{isMobile, openMobileSidebar}} />
+
+                <Outlet context={{ isMobile, openMobileSidebar }} />
             </main>
         </div>
     );

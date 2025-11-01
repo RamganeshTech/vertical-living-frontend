@@ -58,11 +58,11 @@ const ProcurementNewMain: React.FC = () => {
 
 
     const { data: procurements, isLoading, isError, error, refetch } = useGetProcurementNewDetails(organizationId!, filters);
-    const { mutate: deleteProcurement } = useDeleteProcurement();
+    const { mutateAsync: deleteProcurement, isPending:deletePending, variables } = useDeleteProcurement();
 
-    const handleDeleteProcurement = ({ id }: { id: string }) => {
+    const handleDeleteProcurement = async ({ id }: { id: string }) => {
         try {
-            deleteProcurement({ id })
+           await deleteProcurement({ id })
             toast({ title: "Success", description: "Deleted Successfully" });
         }
         catch (error: any) {
@@ -237,7 +237,12 @@ const ProcurementNewMain: React.FC = () => {
                                             totalCost={po.totalCost}
                                             refPdfId={po.refPdfId}
                                             onView={() => navigate(`sub/${po._id}`)}
-                                            onDelete={() => handleDeleteProcurement({id:po._id!})}
+                                            onDelete={(e:any) => {
+                                                e.stopPropagation();
+                                               handleDeleteProcurement({id:po._id!})
+                                            }
+                                            }
+                                            deletePending={deletePending && variables.id === po._id! }
                                         />
                                     </>
                                 ))}

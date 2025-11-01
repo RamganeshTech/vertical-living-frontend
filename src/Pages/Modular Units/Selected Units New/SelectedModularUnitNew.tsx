@@ -7,19 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import {
     useGetSelectedUnitsByProjectNew,
     useDeleteSelectedUnitNew,
-    useCompleteModularUnitSelection,
-    useAddSelectedUnitNew
+    useAddSelectedUnitNew,
+    useGeneratePdfModularUnits
 } from "../../../apiList/Modular Unit Api/Selected Modular Api copy New/selectedModularUnitNewApi"
 import type { OrganizationOutletTypeProps } from "../../Organization/OrganizationChildren";
 import { NO_IMAGE } from "../../../constants/constants";
 import { useState } from "react";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { downloadImage } from "../../../utils/downloadFile";
+import { dateFormate, formatTime } from './../../../utils/dateFormator';
 
 interface IModularUnitUpload {
-    type: "image";
+    type: "image" | "pdf";
     url: string | null;
     originalName: string;
-    uploadedAt: Date;
+    uploadedAt: Date | string;
 }
 
 interface IDimension {
@@ -53,6 +55,7 @@ export interface ISelectedModularUnit {
     _id?: string;
     projectId: string;
     selectedUnits: ISelectedUnit[];
+    pdfList: IModularUnitUpload[]
     totalCost: number;
     status: "pending" | "completed";
 }
@@ -71,7 +74,7 @@ export default function SelectedModularUnitsNew() {
         refetch: () => void;
     }
     const { mutateAsync: deleteUnit, isPending: isDeleting, variables } = useDeleteSelectedUnitNew()
-    const { mutateAsync: completeSelection, isPending: isCompleting } = useCompleteModularUnitSelection()
+    const { mutateAsync: generatePdf, isPending: isCompleting } = useGeneratePdfModularUnits()
     const { mutateAsync: updateUnit, isPending: isUpdating } = useAddSelectedUnitNew()
 
     const handleDeleteUnit = async (unitId: string) => {
@@ -139,12 +142,14 @@ export default function SelectedModularUnitsNew() {
         }
     }
 
-    const handleCompleteSelection = async () => {
+    const handleGeneratePdf = async () => {
         try {
-            await completeSelection({ projectId: projectId! })
+            const res = await generatePdf({ projectId: projectId! })
+
+            await downloadImage({ src: res?.pdfData?.url, alt: res?.pdfData?.originalName || "modular unit pdf" })
             toast({
                 title: "Success",
-                description: "Selection completed successfully",
+                description: "Pdf Generated successfully",
             })
             // Navigate to next stage or wherever needed
         } catch (error: any) {
@@ -253,7 +258,7 @@ export default function SelectedModularUnitsNew() {
     }
 
     return (
-        <div className="max-h-full h-full overflow-y-auto w-full flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="h-full overflow-y-auto w-full flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
             {/* Fixed Header with Total and Complete Button */}
             <header className="bg-white w-full shadow-sm border-b border-slate-200 px-4 py-4 flex-shrink-0">
                 <div className="flex w-full items-center justify-between flex-wrap gap-4">
@@ -303,24 +308,24 @@ export default function SelectedModularUnitsNew() {
                         </div>
                         <Button
                             isLoading={isCompleting}
-                            onClick={handleCompleteSelection}
+                            onClick={handleGeneratePdf}
                             disabled={isCompleting || !hasUnits}
                             className="px-4 md:px-6 bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-400"
                         >
                             <i className="fas fa-check-circle mr-2" />
-                            {isMobile ? "Generate" : "Generate Bill"}
+                            {isMobile ? "Generate" : "Generate PDf"}
                         </Button>
                     </div>
                 </div>
             </header>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1  overflow-y-auto custom-scrollbar">
+            <div className="flex-1  ">
                 <div className="p-4 md:p-6">
-                    <div className="max-w-full mx-auto">
+                    <div className="max-w-full  mx-auto">
                         {/* Empty State */}
                         {!hasUnits ? (
-                            <div className="h-full text-center py-16">
+                            <div className="h-full min-h-[60vh] text-center py-16">
                                 <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-100 rounded-full mb-6">
                                     <i className="fas fa-shopping-cart text-6xl text-slate-400" />
                                 </div>
@@ -577,6 +582,128 @@ export default function SelectedModularUnitsNew() {
                     </div>
                 </div>
             </div>
+
+
+            <div className="space-y-6 px-3">
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                    <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                            Export Order Material
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                            Generate a PDF document of your order materials
+                        </p>
+                    </div>
+
+                    {/* <Button
+                        onClick={handleGeneratePdf}
+                        isLoading={isCompleting}
+                        className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                    >
+                        <i className="fas fa-file-pdf"></i>
+                        Generate PDF
+                    </Button> */}
+                </div>
+
+                {selectedModularUnits?.pdfList && selectedModularUnits?.pdfList?.length > 0 ?
+
+                    selectedModularUnits?.pdfList?.map((ele: IModularUnitUpload) => (
+                        <Card key={(ele as any)._id} className="border-green-200 bg-green-50 ">
+                            <CardContent className="p-6">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                    <div className="flex items-center gap-3 flex-1">
+                                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <i className="fas fa-check-circle text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-green-900 mb-1">
+                                                {/* PDF Generated Successfully */}
+                                                {ele.originalName}
+                                            </h4>
+                                            <span className="text-sm">Created At: {`${dateFormate(ele.uploadedAt as string)} - ${formatTime(ele.uploadedAt)}` || "N/A"}</span>
+                                            <p className="text-sm text-green-700">
+                                                Your order material PDF is ready to view or download
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto ">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => window.open(ele.url!, "_blank")}
+                                            className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                        >
+                                            <i className="fas mr-2 fa-external-link-alt"></i>
+                                            View in New Tab
+                                        </Button>
+
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => downloadImage({ src: ele.url!, alt: "order material" })}
+                                            className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                        >
+                                            Download PDF
+                                        </Button>
+
+
+                                        {/* <div className="relative  min-w-[160px]">
+                                                            <label
+                                                                htmlFor={`pdf-status-${ele._id}`}
+                                                                className="hidden md:block mb-1 text-sm font-medium text-gray-600 absolute top-[-20px]"
+                                                            >
+                                                                Order Status
+                                                            </label>
+                                                            <select
+                                                                id={`pdf-status-${ele._id}`}
+                                                                value={ele.status || "pending"}
+                                                                onChange={async (e) => {
+                                                                    const val = e.target.value;
+                                                                    await handleUpdatePdfStatus(ele._id, val);
+                                                                }}
+                                                                className="
+                                                                                    w-full h-[45px] px-3 py-2 text-md  bg-white border  rounded-xl shadow 
+                                                                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                                                                    disabled:opacity-50 appearance-none transition ease-in-out
+                                                                                    border-blue-300 text-blue-800  hover:border-blue-400
+                                                                                    "
+                                                            >
+                                                                {["pending", "delivered", "shipped", "ordered", "cancelled"].map((status) => (
+                                                                    <option key={status} value={status}>
+                                                                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+
+                                                            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                                                                <i className="fas fa-chevron-down text-xs"></i>
+                                                            </div>
+                                                        </div> */}
+
+                                        {/* <Button
+                                                            variant="danger"
+                                                            isLoading={deletePdfLoading}
+                                                            onClick={() => handleDeletePdf(ele._id)}
+                                                            className="border-red-300 bg-red-600 text-white hover:bg-red-600 hover:border-red-400"
+                                                        >
+                                                            Delete PDF
+                                                        </Button> */}
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
+                    :
+                    <>
+                        <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+                            <i className="fa-solid fa-file-lines text-5xl text-blue-300 mb-4" />
+                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Pdf Found</h3>
+                            <p className="text-sm text-gray-500">
+                                No PDF Generated</p>
+                        </div>
+                    </>
+                }
+            </div>
+
         </div>
     )
 }

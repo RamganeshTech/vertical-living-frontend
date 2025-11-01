@@ -21,7 +21,7 @@ export const editCommonProjectApi = async (
   payload: { projectName: string },
   api: AxiosInstance
 ) => {
-  const { data } = await api.put(`/commonorder/editcoommonproject/${id}`, payload);
+  const { data } = await api.put(`/commonorder/editcommonproject/${id}`, payload);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };

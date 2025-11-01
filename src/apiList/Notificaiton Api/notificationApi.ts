@@ -21,7 +21,7 @@ export const getAllNotifications = async ({
     limit?: number;
     api: AxiosInstance;
 }) => {
-    const { data } = await api.get(`/notification/getAllNotificaiton?page=${page}&limit=${limit}`);
+    const { data } = await api.get(`/notification/getAllNotification?page=${page}&limit=${limit}`);
     if (!data.ok) throw new Error(data.message);
 
     // Return in the format expected by infinite query

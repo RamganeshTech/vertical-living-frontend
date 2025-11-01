@@ -11,7 +11,7 @@ import { downloadImage } from "../../../utils/downloadFile";
 
 interface Props {
     dailyScheduleId: string;
-    date: string
+    date?: string
     dailyTaskId: string
 }
 
@@ -23,7 +23,7 @@ type UploadItem = {
 };
 
 
-const CreateWorkReport: React.FC<Props> = ({ dailyScheduleId, date, dailyTaskId }) => {
+const CreateWorkReport: React.FC<Props> = ({ dailyScheduleId,   dailyTaskId }) => {
     const { projectId, organizationId } = useParams<{
         projectId: string;
         organizationId: string;
@@ -44,7 +44,7 @@ const CreateWorkReport: React.FC<Props> = ({ dailyScheduleId, date, dailyTaskId 
 
     const [images, setImages] = useState<UploadItem[]>([]);
 
-    const { data: fetchedImages } = useGetWorkReportImages(projectId!, dailyScheduleId, date, dailyTaskId);
+    const { data: fetchedImages } = useGetWorkReportImages(projectId!, dailyScheduleId, dailyTaskId);
     const { mutateAsync: createReport, isPending } = useCreateWorkReport();
     console.log("fetchedimages", fetchedImages)
 

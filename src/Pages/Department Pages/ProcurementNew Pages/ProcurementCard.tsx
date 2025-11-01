@@ -8,8 +8,9 @@ interface Props {
   siteDetails: OrderMaterialSiteDetail;
   totalCost: number;
   onView: () => void;
-  onDelete: () => void;
+  onDelete: (e:any) => void;
   refPdfId: string
+  deletePending: boolean
 }
 
 
@@ -20,9 +21,10 @@ const ProcurementCard: React.FC<Props> = ({
   onView,
   onDelete,
   refPdfId,
+  deletePending
 }) => {
   return (
-    <Card className="w-full border-l-4 border-blue-600 shadow-sm">
+    <Card onClick={onView} className="w-full cursor-pointer border-l-4 border-blue-600 shadow-sm">
       <CardContent className="p-4 space-y-3">
         {/* Header: PDF Reference ID */}
         <div className="flex justify-between items-center">
@@ -49,11 +51,11 @@ const ProcurementCard: React.FC<Props> = ({
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-2 pt-3">
-          <Button size="sm" variant="secondary" onClick={onView}>
+          {/* <Button size="sm" variant="secondary" onClick={onView}>
             <i className="fas fa-eye mr-1" />
             View
-          </Button>
-          <Button size="sm" variant="danger" onClick={onDelete}
+          </Button> */}
+          <Button size="sm" variant="danger" isLoading={deletePending} onClick={onDelete}
            className='text-white bg-red-600'
           >
             <i className="fas fa-trash mr-1" />

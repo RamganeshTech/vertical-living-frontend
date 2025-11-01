@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useGetAssociatedStaffTask } from '../../../apiList/StaffTasks Api/staffTaskApi'
+import { useGetAssociatedStaffTask, useGetOtherStaffPendingTask } from '../../../apiList/StaffTasks Api/staffTaskApi'
 import { Outlet, useLocation, useParams } from 'react-router-dom'
 import type { FilterType } from '../StaffTasksListMain'
 import StaffTaskCard from '../StaffTaskCard'
@@ -21,14 +21,19 @@ const departmentOptions = ["site", "procurement", "design", "accounts"]
 const SingleStaffList = () => {
     const { organizationId } = useParams() as { organizationId: string }
     const [filters, setFilters] = useState<FilterType>({})
+    const [showPendingTask, setShowPendingTask] = useState<boolean>(false)
     const location = useLocation()
+
 
     const { staffName } = useSelector((state: RootState) => state.staffProfileStore)
 
     const { data: tasks, isLoading, isError, error, refetch } = useGetAssociatedStaffTask(organizationId, filters)
-
+    const { data: pendingTasks, isLoading: PendingTaskLoading, isError: pendingTaskIsError, error: pendingTaskError, refetch: pendingRefetch } = useGetOtherStaffPendingTask(organizationId, showPendingTask, filters)
 
     const { data } = useGetProjects(organizationId!)
+
+
+
     // const { data: staffList } = useGetAllUsers(organizationId!, "staff");
 
     // const staffOptions = (staffList || [])?.map((staff: { _id: string, email: string, staffName: string }) => ({
@@ -45,6 +50,17 @@ const SingleStaffList = () => {
 
     const clearFilters = () => setFilters({})
     const activeFiltersCount = Object.values(filters).filter(Boolean).length
+
+    const handleShowPendingTask = () => {
+        setShowPendingTask(p => !p)
+    }
+
+    // Determine which dataset and states to use
+    const activeData = showPendingTask ? pendingTasks : tasks;
+    const activeLoading = showPendingTask ? PendingTaskLoading : isLoading;
+    const activeError = showPendingTask ? pendingTaskIsError : isError;
+    const activeErrorObj = showPendingTask ? pendingTaskError : error;
+    const activeRefetch = showPendingTask ? pendingRefetch : refetch;
 
 
     let isChild = location.pathname.includes("single") || location.pathname.includes("addtask")
@@ -82,14 +98,58 @@ const SingleStaffList = () => {
                                 <i className="fas fa-filter mr-2 text-blue-600" />
                                 Filters
                             </h3>
-                            {activeFiltersCount > 0 && (
-                                <button
-                                    onClick={clearFilters}
-                                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                                >
-                                    Clear All ({activeFiltersCount})
-                                </button>
-                            )}
+                            <div className='flex gap-2'>
+
+                                {/* <div className='flex gap-2'>
+                                    <input id='showpending' type="checkbox" onChange={handleShowPendingTask} checked={showPendingTask} />
+                                    <label
+                                        htmlFor='showpending'
+                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                    >
+                                        show pending Task
+                                    </label>
+                                </div> */}
+
+                                <div className="flex items-center justify-between gap-3">
+                                    {/* Pending Task Toggle */}
+                                    <label
+                                        htmlFor="showpending"
+                                        className="flex items-center gap-2 cursor-pointer select-none"
+                                    >
+                                        <input
+                                            id="showpending"
+                                            type="checkbox"
+                                            checked={showPendingTask}
+                                            onChange={handleShowPendingTask}
+                                            className="w-4 h-4 accent-blue-600 cursor-pointer"
+                                        />
+                                        <span className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                            Show Pending Tasks
+                                        </span>
+                                    </label>
+
+                                    {/* Clear Filters Button */}
+                                    {activeFiltersCount > 0 && (
+                                        <button
+                                            onClick={clearFilters}
+                                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                        >
+                                            Clear All ({activeFiltersCount})
+                                        </button>
+                                    )}
+                                </div>
+
+
+                                {activeFiltersCount > 0 && (
+                                    <button
+                                        onClick={clearFilters}
+                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                    >
+                                        Clear All ({activeFiltersCount})
+                                    </button>
+                                )}
+                            </div>
+
                         </div>
 
                         <div className="space-y-2">
@@ -266,19 +326,19 @@ const SingleStaffList = () => {
                         </Button>
                     </header> */}
 
-                    {isLoading && <MaterialOverviewLoading />}
+                    {activeLoading && <MaterialOverviewLoading />}
 
 
-                    {isError && (
+                    {activeError && (
                         <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
                             <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
                                 ⚠️ Error Occurred
                             </div>
                             <p className="text-red-500  mb-4 text-lg sm:text-xl">
-                                {(error as any)?.response?.data?.message || "Failed to load data"}
+                                {(activeErrorObj as any)?.response?.data?.message || "Failed to load data"}
                             </p>
                             <Button
-                                onClick={() => refetch()}
+                                onClick={() => activeRefetch()}
                                 className="bg-red-600 text-white px-4 py-2"
                             >
                                 Retry
@@ -297,7 +357,7 @@ const SingleStaffList = () => {
                     )}
 
                     {!isLoading && !isError && <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {tasks?.map((task: any) => (
+                        {activeData?.map((task: any) => (
                             <StaffTaskCard key={task._id} task={task} />
                         ))}
                     </div>}

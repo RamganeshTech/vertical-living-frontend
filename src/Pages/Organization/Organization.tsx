@@ -8,6 +8,7 @@ import Sidebar from "../../shared/Sidebar"
 import {LOGIN_ICONS_LOGIN_GROUP, LOGIN_LABELS } from "../../constants/constants"
 import MobileSidebar from "../../shared/MobileSidebar"
 import { useNavigate } from "react-router-dom"
+import { LOCAL_KEY } from "../Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrgOrderMaterialSetup"
 
 
 export default function Organization() {
@@ -25,8 +26,19 @@ export default function Organization() {
     STAFF: `/login/staff`,
     CTO: `/login/cto`,
     WORKER: `/login/worker`,
-    CLIENT: `/login/client`
+    CLIENT: `/login/client`,
+    PUBLICORDERS: `/ordermaterial/setup`,
   }
+
+
+  
+        
+      const orgId = localStorage.getItem(LOCAL_KEY)
+  
+      if (orgId) {
+          path.PUBLICORDERS = `/${JSON.parse(orgId)}/ordermaterial`
+      }
+  
 
 
   const openMobileSidebar = () => {

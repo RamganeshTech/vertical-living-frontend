@@ -65,7 +65,9 @@ export const LOGIN_ICONS_LOGIN_GROUP = {
   STAFF: "fas fa-user-gear text-2xl",
   CTO: "fas fa-users-gear text-2xl",
   WORKER: "fas fa-hard-hat text-2xl",
-  CLIENT: "fas fa-user text-2xl"
+  CLIENT: "fas fa-user text-2xl",
+  PUBLICORDERS: `fas fa-box text-2xl`,
+
 }
 
 export const LOGIN_LABELS = {
@@ -73,7 +75,8 @@ export const LOGIN_LABELS = {
   STAFF: `Staff Login`,
   CTO: `CTO Login`,
   WORKER: `Worker Login`,
-  CLIENT: `Client Login`
+  CLIENT: `Client Login`,
+  PUBLICORDERS: `Public Orders`,
 }
 
 export const ORGANIZATION_ICONS = {
