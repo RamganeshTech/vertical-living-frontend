@@ -6,6 +6,12 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
+const ExpenseAccountSingle = lazy(()=>  import( './Pages/Department Pages/Accounting Pages/Expense Accounts Page/ExpenseAccountsSingle'));
+const ExpenseAccountMain = lazy(()=>  import( './Pages/Department Pages/Accounting Pages/Expense Accounts Page/ExpenseAccountsMain'));
+const CreateExpense = lazy(()=>  import( './Pages/Department Pages/Accounting Pages/Expense Accounts Page/CreateExpense'));
+const VendorAccountsMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/Vendor Account/VendorAccountsMain'));
+const VendorAccSingle = lazy(() => import( './Pages/Department Pages/Accounting Pages/Vendor Account/VendorAccSingle'));
+const CreateVendorAcc = lazy(() => import( './Pages/Department Pages/Accounting Pages/Vendor Account/CreateVendorAcc'));
 const ShopDetailSingle  = lazy(() => import( './Pages/Stage Pages/Ordering Materials/ShopLib Details Pages/ShopLibDetailSingle'));
 const ShopLibDetailsMain  = lazy(() => import( './Pages/Stage Pages/Ordering Materials/ShopLib Details Pages/ShopLibDetailsMain'));
 const PublicOrgOrderMaterialSetup = lazy(() => import('./Pages/Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrgOrderMaterialSetup'));
@@ -452,6 +458,35 @@ function App() {
 
 
             </Route>
+
+
+            <Route path="vendormain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <VendorAccountsMain />
+            </ProtectedRoutes>} >
+
+              <Route path="vendorsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <VendorAccSingle />
+              </ProtectedRoutes>} />
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateVendorAcc />
+              </ProtectedRoutes>} />
+            </Route>
+
+            <Route path="expensemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ExpenseAccountMain />
+            </ProtectedRoutes>} >
+
+              <Route path="expensesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <ExpenseAccountSingle />
+              </ProtectedRoutes>} />
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateExpense />
+              </ProtectedRoutes>} />
+            </Route>
+
+
 
 
             <Route path="commonorder" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>

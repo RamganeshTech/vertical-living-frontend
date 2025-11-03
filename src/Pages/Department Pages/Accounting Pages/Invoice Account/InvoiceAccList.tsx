@@ -10,7 +10,7 @@ type Props = {
 const InvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDelete, deleteInvoiceMutation }) => {
     return (
         <div
-            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-blue-50 transition-colors items-center last:border-b-0"
+            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
             onClick={() => handleView(invoice._id)}
         >
             {/* S.No */}

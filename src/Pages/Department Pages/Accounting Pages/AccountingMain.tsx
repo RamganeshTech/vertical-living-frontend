@@ -67,7 +67,21 @@ const AccountingMain: React.FC = () => {
             path: `/organizations/${organizationId}/projects/salesordermain`,
             icon: 'fas fa-shopping-cart text-blue-600',
             onClick: () => navigate(`/organizations/${organizationId}/projects/salesordermain`)
-        },]
+        },
+        {
+            label: 'Vendor',
+            path: `/organizations/${organizationId}/projects/vendormain`,
+            icon: 'fas fa-user text-blue-600',
+            onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
+        },
+    
+    //  {
+    //         label: 'Expense',
+    //         path: `/organizations/${organizationId}/projects/expensemain`,
+    //         icon: 'fas fa-money-bill text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
+    //     },
+    ]
     }]
 
     // Add this state for controlling the dropdown

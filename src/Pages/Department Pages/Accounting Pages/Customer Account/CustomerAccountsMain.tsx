@@ -60,7 +60,7 @@ const CustomerAccountsMain = () => {
         projectId: filters.projectId || undefined,
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
-        limit: 9
+        limit: 20
     });
 
     const deleteCustomerMutation = useDeleteCustomer();
@@ -197,6 +197,7 @@ const CustomerAccountsMain = () => {
                                         </label>
                                         <input
                                             type="text"
+                                            autoFocus
                                             placeholder="Name, email, phone..."
                                             value={filters.search}
                                             onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}

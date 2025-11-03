@@ -159,25 +159,6 @@ const defaultFormData = {
         }));
     };
 
-
-    // const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
-    //     setFormData(prev => {
-    //         const newItems = [...prev.items];
-    //         const item = { ...newItems[index] };
-
-    //         if (field === 'itemName') {
-    //             item.itemName = value as string;
-    //         } else if (field === 'quantity' || field === 'rate') {
-    //             const numValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
-    //             item[field] = numValue < 0 ? 0 : numValue;
-    //             item.totalCost = item.quantity * item.rate;
-    //         }
-
-    //         newItems[index] = item;
-    //         return { ...prev, items: newItems };
-    //     });
-    // };
-
     const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
         setFormData(prev => {
             const newItems = [...prev.items];
@@ -282,33 +263,7 @@ const defaultFormData = {
         setFormData(defaultFormData)
     };
 
-    // const handleEdit = () => {
-    //     setCurrentMode('edit');
-    // };
-
-    // const handleCancelEdit = () => {
-    //     setCurrentMode('view');
-    //     // Reset form data to original
-    //     if (initialData) {
-    //         setFormData({
-    //             customerId: initialData.customerId || '',
-    //             customerName: initialData.customerName || '',
-    //             orderNumber: initialData.orderNumber || '',
-    //             accountsReceivable: initialData.accountsReceivable || '',
-    //             salesPerson: initialData.salesPerson || '',
-    //             subject: initialData.subject || '',
-    //             invoiceDate: initialData.invoiceDate ? new Date(initialData.invoiceDate).toISOString().split('T')[0] : '',
-    //             terms: initialData.terms || '',
-    //             dueDate: initialData.dueDate ? new Date(initialData.dueDate).toISOString().split('T')[0] : '',
-    //             items: initialData.items || [],
-    //             discountPercentage: initialData.discountPercentage || 0,
-    //             taxPercentage: initialData.taxPercentage || 0,
-    //             customerNotes: initialData.customerNotes || '',
-    //             termsAndConditions: initialData.termsAndConditions || ''
-    //         });
-    //     }
-    // };
-
+    
     const isReadOnly = currentMode === 'view';
     const isCreateMode = currentMode === 'create';
     const isEditMode = currentMode === 'edit';
@@ -365,56 +320,6 @@ const defaultFormData = {
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Customer Information */}
-                {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-user mr-2 text-blue-600"></i>
-                        Customer Information
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        <div>
-                            <Label>Customer</Label>
-                            <SearchSelectNew
-                                options={customerOptions}
-                                placeholder="Select Customer"
-                                searchPlaceholder="Search Customer..."
-                                value={formData?.customerId || undefined}
-                                onValueChange={(value) => handleCustomerChange(value)}
-                                searchBy="name"
-                                displayFormat="simple"
-                                className="w-full"
-                            />
-                        </div>
-
-
-                        <div className=''>
-                            <div>
-                                <input type="checkbox" checked={enableCustomerInput} id="enableName" onChange={() => setEnableCustomerInput((p) => (!p))} />
-                                <Label htmlFor='enableName'>click the check box to enter the name manually, if not available from the drop down</Label>
-
-                            </div>
-                            <input
-                                type="text"
-                                name="customerName"
-                                value={
-                                    enableCustomerInput
-                                        ? formData.customerName // user can edit manually
-                                        :  "" // show from formData but not editable
-                                }
-                                onChange={(e) => {
-                                    if (enableCustomerInput) handleInputChange(e); // only update if manual input is enabled
-                                }}
-                                disabled={isReadOnly || !enableCustomerInput} // only enable if checkbox is checked
-
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="Enter customer name"
-                            />
-                        </div>
-                    </div>
-                </div> */}
-
                 {/* Invoice Details */}
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
@@ -422,35 +327,6 @@ const defaultFormData = {
                         Invoice Details
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Order Number
-                            </label>
-                            <input
-                                type="text"
-                                name="orderNumber"
-                                value={formData.orderNumber}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="Enter order number"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Accounts Receivable
-                            </label>
-                            <input
-                                type="text"
-                                name="accountsReceivable"
-                                value={formData.accountsReceivable}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="Enter accounts receivable"
-                            />
-                        </div> */}
-
                         <div>
                             <Label>Customer</Label>
                             <SearchSelectNew
@@ -544,124 +420,10 @@ const defaultFormData = {
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                             />
                         </div>
-                        {/* <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Terms
-                            </label>
-                            <input
-                                type="text"
-                                name="terms"
-                                value={formData.terms}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="Payment terms (e.g., Net 30)"
-                            />
-                        </div> */}
                     </div>
                 </div>
 
                 {/* Items Section */}
-                {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                            <i className="fas fa-list mr-2 text-blue-600"></i>
-                            Invoice Items <span className="text-red-500 ml-1">*</span>
-                        </h2>
-                        {!isReadOnly && (
-                            <Button
-                                type="button"
-                                onClick={handleAddItem}
-                                className="bg-green-600 text-white text-sm"
-                            >
-                                <i className="fas fa-plus mr-2"></i>
-                                Add Item
-                            </Button>
-                        )}
-                    </div>
-
-                    {formData.items.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
-                            <i className="fas fa-inbox text-4xl mb-2"></i>
-                            <p>No items added yet. Click "Add Item" to get started.</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {formData.items.map((item, index) => (
-                                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <h3 className="font-medium text-gray-900">Item #{index + 1}</h3>
-                                        {!isReadOnly && (
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveItem(index)}
-                                                className="text-red-600 hover:text-red-800"
-                                            >
-                                                <i className="fas fa-trash"></i>
-                                            </button>
-                                        )}
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Item Name <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={item.itemName}
-                                                onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
-                                                disabled={isReadOnly}
-                                                required
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                placeholder="Enter item name"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Quantity
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={item.quantity}
-                                                onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                                                disabled={isReadOnly}
-                                                min="0"
-                                                step="1"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Rate <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={item.rate}
-                                                onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
-                                                disabled={isReadOnly}
-                                                min="0"
-                                                step="1"
-                                                required
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="mt-3 flex justify-end">
-                                        <div className="text-right">
-                                            <span className="text-sm text-gray-600">Total: </span>
-                                            <span className="text-lg font-semibold text-gray-900">
-                                                ₹{item.totalCost.toFixed(2)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div> */}
-
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-900 flex items-center">
@@ -900,20 +662,7 @@ const defaultFormData = {
                                 placeholder="Add any notes for the customer..."
                             />
                         </div>
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Terms and Conditions
-                            </label>
-                            <textarea
-                                name="termsAndConditions"
-                                value={formData.termsAndConditions}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                rows={4}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none"
-                                placeholder="Add terms and conditions..."
-                            />
-                        </div> */}
+                       
                     </div>
                 </div>
 

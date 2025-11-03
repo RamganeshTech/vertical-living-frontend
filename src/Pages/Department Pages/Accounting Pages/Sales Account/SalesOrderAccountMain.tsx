@@ -204,6 +204,7 @@ const SalesOrderAccountMain = () => {
                                     </label>
                                     <input
                                         type="text"
+                                        autoFocus
                                         placeholder="customer name"
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}

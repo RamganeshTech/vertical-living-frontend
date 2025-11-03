@@ -26,7 +26,7 @@ const CustomerAccList: React.FC<Props> = ({
 
     return (
         <div
-            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-blue-50 items-center transition-colors last:border-b-0"
+            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] items-center transition-colors last:border-b-0"
             onClick={() => onView(customer._id)}
 
         >

@@ -203,6 +203,7 @@ const InvoiceAccountsMain = () => {
                                     </label>
                                     <input
                                         type="text"
+                                            autoFocus
                                         placeholder="Invoice number, customer name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}

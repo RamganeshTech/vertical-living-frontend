@@ -511,7 +511,7 @@ const CustomerAccountForm: React.FC<CustomerAccountFormProps> = ({
                                     <label htmlFor="file-upload" className="cursor-pointer">
                                         <i className="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2 block"></i>
                                         <p className="text-sm text-gray-600 mb-1">
-                                            Click to upload or drag and drop
+                                            Click to upload
                                         </p>
                                         <p className="text-xs text-gray-500">
                                             PDF, PNG, JPG, JPEG (MAX. 10MB per file)
