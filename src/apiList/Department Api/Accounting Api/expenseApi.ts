@@ -46,9 +46,8 @@ interface UpdateExpenseInput {
 interface GetAllExpensesParams {
     organizationId: string;
     vendorId?: string;
-    invoiceNumber?: string;
-    startDate?: string;
-    endDate?: string;
+    search?: string;
+    date?:string,
     minAmount?: number;
     maxAmount?: number;
     paidThrough?: string;
@@ -91,7 +90,7 @@ const createExpense = async ({
     api: AxiosInstance;
 }) => {
     const { data } = await api.post("/department/accounting/expense/create", expenseData);
-    if (!data.success) throw new Error(data.message);
+    if (!data.ok) throw new Error(data.message);
     return data.data as IExpense;
 };
 
@@ -106,7 +105,7 @@ const updateExpense = async ({
     api: AxiosInstance;
 }) => {
     const { data } = await api.put(`/department/accounting/expense/update/${id}`, expenseData);
-    if (!data.success) throw new Error(data.message);
+    if (!data.ok) throw new Error(data.message);
     return data.data as IExpense;
 };
 
@@ -119,7 +118,7 @@ const deleteExpense = async ({
     api: AxiosInstance;
 }) => {
     const { data } = await api.delete(`/department/accounting/expense/delete/${id}`);
-    if (!data.success) throw new Error(data.message);
+    if (!data.ok) throw new Error(data.message);
     return data;
 };
 
@@ -132,7 +131,7 @@ const getExpenseById = async ({
     api: AxiosInstance;
 }) => {
     const { data } = await api.get(`/department/accounting/expense/getsingle/${id}`);
-    if (!data.success) throw new Error(data.message);
+    if (!data.ok) throw new Error(data.message);
     return data.data as IExpense;
 };
 
@@ -145,7 +144,7 @@ const getAllExpenses = async ({
     api: AxiosInstance;
 }) => {
     const { data } = await api.get("/department/accounting/expense/getall", { params });
-    if (!data.success) throw new Error(data.message);
+    if (!data.ok) throw new Error(data.message);
     return data as {
         data: IExpense[];
         pagination: {
@@ -168,7 +167,7 @@ const getExpenseStatistics = async ({
     api: AxiosInstance;
 }) => {
     const { data } = await api.get("/department/accounting/expense/getstatistics", { params });
-    if (!data.success) throw new Error(data.message);
+    if (!data.ok) throw new Error(data.message);
     return data.data as ExpenseStatistics;
 };
 

@@ -9,6 +9,10 @@ import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
 import { toast } from '../../../../utils/toast';
 import { useDeleteExpense, useGetAllExpenses } from '../../../../apiList/Department Api/Accounting Api/expenseApi';
 import ExpenseList from './ExpenseList';
+import Slider from 'rc-slider';
+import "rc-slider/assets/index.css";
+
+import { useDebounce } from '../../../../Hooks/useDebounce';
 
 const ExpenseAccountsMain = () => {
     const navigate = useNavigate();
@@ -17,10 +21,8 @@ const ExpenseAccountsMain = () => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // Check if we're on a child route
-    const isDetailView = location.pathname.includes('/expensesingle') || 
-                        location.pathname.includes('/create') || 
-                        location.pathname.includes('/edit');
-
+    const isDetailView = location.pathname.includes('/expensesingle') ||
+        location.pathname.includes('/create')
     const paths: BreadcrumbItem[] = [
         { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
         { label: "Expenses", path: `/organizations/${organizationId}/projects/expensemain` },
@@ -30,25 +32,29 @@ const ExpenseAccountsMain = () => {
     const [filters, setFilters] = useState({
         search: '',
         vendorId: '',
-        startDate: '',
-        endDate: '',
-        minAmount: '',
-        maxAmount: '',
+        date: "",
+        minAmount: 0,
+        maxAmount: 100000,
         paidThrough: '',
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc'
     });
 
     // Debounced search
-    const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
+    // const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearch(filters.search);
-        }, 500);
+    const debouncedMinAmount = useDebounce(filters.minAmount, 800);
+        const debouncedMaxAmount = useDebounce(filters.maxAmount, 800);
+    const debouncedSearch = useDebounce(filters.search, 500);
+    
 
-        return () => clearTimeout(timer);
-    }, [filters.search]);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         setDebouncedSearch(filters.search);
+    //     }, 500);
+
+    //     return () => clearTimeout(timer);
+    // }, [filters.search]);
 
     // Infinite query
     const {
@@ -62,12 +68,14 @@ const ExpenseAccountsMain = () => {
         refetch
     } = useGetAllExpenses({
         organizationId: organizationId || '',
-        invoiceNumber: debouncedSearch,
+        search: debouncedSearch,
         vendorId: filters.vendorId || undefined,
-        startDate: filters.startDate || undefined,
-        endDate: filters.endDate || undefined,
-        minAmount: filters.minAmount ? parseFloat(filters.minAmount) : undefined,
-        maxAmount: filters.maxAmount ? parseFloat(filters.maxAmount) : undefined,
+        // startDate: filters.startDate || undefined,
+        // endDate: filters.endDate || undefined,
+        date: filters.date || undefined,
+        minAmount: debouncedMinAmount ?  Number(debouncedMinAmount) : undefined,
+        maxAmount: debouncedMaxAmount ?  Number(debouncedMaxAmount) : undefined,
+        // maxAmount: filters.maxAmount ? filters.maxAmount : undefined,
         paidThrough: filters.paidThrough || undefined,
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
@@ -97,9 +105,9 @@ const ExpenseAccountsMain = () => {
 
     const handleDelete = async (expenseId: string) => {
         try {
-            await deleteExpenseMutation.mutateAsync({ 
-                id: expenseId, 
-                _organizationId: organizationId || '' 
+            await deleteExpenseMutation.mutateAsync({
+                id: expenseId,
+                _organizationId: organizationId || ''
             });
             toast({ title: "Success", description: "Expense deleted successfully" });
         } catch (error: any) {
@@ -115,23 +123,24 @@ const ExpenseAccountsMain = () => {
         navigate(`expensesingle/${expenseId}`);
     };
 
-    const handleEdit = (expenseId: string) => {
-        navigate(`edit/${expenseId}`);
-    };
+    // const handleEdit = (expenseId: string) => {
+    //     navigate(`edit/${expenseId}`);
+    // };
 
     // Count active filters
     const activeFiltersCount = Object.values(filters).filter(
-        (val) => val !== '' && val !== 'createdAt' && val !== 'desc'
+        (val) => val !== '' && val !== 0 && val !== 100000 && val !== 'createdAt' && val !== 'desc'
     ).length;
 
     const clearFilters = () => {
         setFilters({
             search: '',
             vendorId: '',
-            startDate: '',
-            endDate: '',
-            minAmount: '',
-            maxAmount: '',
+            // startDate: '',
+            // endDate: '',
+            date: "",
+            minAmount: 0,
+            maxAmount: 100000,
             paidThrough: '',
             sortBy: 'createdAt',
             sortOrder: 'desc'
@@ -142,8 +151,8 @@ const ExpenseAccountsMain = () => {
     const expenses = data?.pages.flatMap(page => page.data) || [];
 
     // Calculate total stats from first page
-    const totalExpenses = data?.pages[0]?.pagination?.total || 0;
-    const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+    // const totalExpenses = data?.pages[0]?.pagination?.total || 0;
+    // const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
     // If on detail view, show only the Outlet
     if (isDetailView) {
@@ -163,13 +172,13 @@ const ExpenseAccountsMain = () => {
                 </div>
 
                 <div className="flex gap-3">
-                    <Button
+                    {/* <Button
                         onClick={() => navigate('statistics')}
                         variant="outline"
                     >
                         <i className="fas fa-chart-bar mr-2" />
                         Statistics
-                    </Button>
+                    </Button> */}
                     <Button onClick={() => navigate('create')}>
                         <i className="fas fa-plus mr-2" />
                         Add Expense
@@ -178,7 +187,7 @@ const ExpenseAccountsMain = () => {
             </div>
 
             {/* Summary Cards */}
-            {!isLoading && expenses.length > 0 && (
+            {/* {!isLoading && expenses.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
                         <div className="flex items-center justify-between">
@@ -210,7 +219,7 @@ const ExpenseAccountsMain = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* Loading State */}
             {isLoading ? (
@@ -233,9 +242,9 @@ const ExpenseAccountsMain = () => {
                     </Button>
                 </div>
             ) : (
-                <main className="flex gap-2 !max-h-[90%]">
+                <main className="flex gap-2 !max-h-[88%]">
                     {/* Filters Sidebar */}
-                    <div className="xl:w-80 flex-shrink-0">
+                    <div className="xl:w-80 flex-shrink-0 !max-h-[90%] overflow-y-auto ">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -257,12 +266,12 @@ const ExpenseAccountsMain = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-search mr-2"></i>
-                                        Invoice Number
+                                        Search
                                     </label>
                                     <input
                                         type="text"
                                         autoFocus
-                                        placeholder="Search by invoice..."
+                                        placeholder="Search by vendor name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -270,7 +279,7 @@ const ExpenseAccountsMain = () => {
                                 </div>
 
                                 {/* Date Range */}
-                                <div>
+                                {/* <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         Date Range
@@ -291,10 +300,10 @@ const ExpenseAccountsMain = () => {
                                             placeholder="End Date"
                                         />
                                     </div>
-                                </div>
+                                </div> */}
 
                                 {/* Amount Range */}
-                                <div>
+                                {/* <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-dollar-sign mr-2"></i>
                                         Amount Range
@@ -317,6 +326,108 @@ const ExpenseAccountsMain = () => {
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                             min="0"
                                             step="0.01"
+                                        />
+                                    </div>
+                                </div> */}
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        Payment Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.date}
+                                        onChange={(e) => setFilters(f => ({ ...f, date: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Select Date"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Amount Range
+                                    </label>
+
+                                    {/* Slider */}
+                                    <div className="px-2 mb-3">
+                                        <Slider
+                                            range
+                                            min={0}
+                                            max={100000}
+                                            step={500}
+                                            value={[Number(filters.minAmount), Number(filters.maxAmount)]}
+                                            onChange={(value) => {
+                                                const [min, max] = value as [number, number];
+                                                setFilters((f) => ({
+                                                    ...f,
+                                                    minAmount: min,
+                                                    maxAmount: max,
+                                                }));
+                                            }}
+                                            trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+                                            handleStyle={[
+                                                {
+                                                    borderColor: "#3b82f6",
+                                                    backgroundColor: "#fff",
+                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    width: 18,
+                                                    height: 18,
+                                                    marginTop: -6,
+                                                },
+                                                {
+                                                    borderColor: "#3b82f6",
+                                                    backgroundColor: "#fff",
+                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    width: 18,
+                                                    height: 18,
+                                                    marginTop: -6,
+                                                },
+                                            ]}
+                                            railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+                                        />
+                                    </div>
+
+                                    {/* Display Values */}
+                                    <div className="flex justify-between items-center gap-2 text-sm">
+                                        <div className="flex-1">
+                                            <span className="text-xs text-gray-500 block mb-1">Min</span>
+                                            <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+                                                ₹{Number(filters.minAmount).toLocaleString("en-IN")}
+                                            </div>
+                                        </div>
+                                        <div className="text-gray-400 mt-5">—</div>
+                                        <div className="flex-1">
+                                            <span className="text-xs text-gray-500 block mb-1">Max</span>
+                                            <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+                                                ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Manual Input Fields */}
+                                    <div className="flex gap-3 items-center mt-3">
+                                        <input
+                                            type="number"
+                                            value={filters.minAmount}
+                                            onChange={(e) =>
+                                                setFilters((f) => ({ ...f, minAmount: +e.target.value }))
+                                            }
+                                            placeholder="Min Amount"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            min="0"
+                                            step="500"
+                                        />
+                                        <input
+                                            type="number"
+                                            value={filters.maxAmount}
+                                            onChange={(e) =>
+                                                setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
+                                            }
+                                            placeholder="Max Amount"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            min="0"
+                                            step="500"
                                         />
                                     </div>
                                 </div>
@@ -358,7 +469,7 @@ const ExpenseAccountsMain = () => {
                                         <option value="dateOfPayment">Payment Date</option>
                                         <option value="amount">Amount</option>
                                         <option value="vendorName">Vendor Name</option>
-                                        <option value="invoiceNumber">Invoice Number</option>
+                                        {/* <option value="invoiceNumber">Invoice Number</option> */}
                                     </select>
                                 </div>
 
@@ -420,9 +531,12 @@ const ExpenseAccountsMain = () => {
                                         expense={expense}
                                         index={index}
                                         onView={() => handleView(expense._id)}
-                                        onEdit={() => handleEdit(expense._id)}
-                                        onDelete={() => handleDelete(expense._id)}
-                                        isDeleting={deleteExpenseMutation.isPending}
+                                        // onEdit={() => handleEdit(expense._id)}
+                                        onDelete={(e:any) => {
+                                            e.stopPropagation()
+                                            handleDelete(expense._id)
+                                        }}
+                                        isDeleting={deleteExpenseMutation.isPending && deleteExpenseMutation.variables.id === expense._id}
                                     />
                                 ))}
                             </div>

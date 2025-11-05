@@ -4,9 +4,8 @@ import { toast } from "../../../../utils/toast";
 import { useGetVendorForDropDown } from "../../../../apiList/Department Api/Accounting Api/vendorAccApi";
 import { Label } from "../../../../components/ui/Label";
 import SearchSelectNew from "../../../../components/ui/SearchSelectNew";
-
-
-
+import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+// import { useNavigate } from "react-router-dom";
 
 export type ExpenseFormMode = "create" | "edit" | "view";
 
@@ -25,6 +24,8 @@ interface ExpenseFormProps {
     organizationId: string;
     expenseId?: string;
     onSuccess?: () => void;
+    onEdit?: () => void;
+    isEditing?: boolean;
     onCancel?: () => void;
 }
 
@@ -33,26 +34,32 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
     organizationId,
     expenseId,
     onSuccess,
-    onCancel
+    onCancel,
+    onEdit,
+    isEditing
 }) => {
     // Hooks
     const createExpense = useCreateExpense();
-    
+
     const updateExpense = useUpdateExpense();
-    
+
+    // const navigate = useNavigate()
+    const [enableVendorInput, setEnableVendorInput] = useState<boolean>(false)
+
+
     const { data: existingExpense, isLoading: isLoadingExpense } = useGetExpenseById(
         expenseId || "",
         mode !== "create" && !!expenseId
     );
 
-     const { data: vendorData } = useGetVendorForDropDown(organizationId)
-    
-    
-        const vendorOption = (vendorData || [])?.map((vendor: { _id: string; email: string; vendorName: string }) => ({
-            value: vendor._id,
-            label: vendor.vendorName,
-            email: vendor.email
-        }))
+    const { data: vendorData } = useGetVendorForDropDown(organizationId)
+
+
+    const vendorOption = (vendorData || [])?.map((vendor: { _id: string; email: string; vendorName: string }) => ({
+        value: vendor._id,
+        label: vendor.vendorName,
+        email: vendor.email
+    }))
 
 
     // Form state
@@ -85,18 +92,18 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
     const validateForm = (): boolean => {
         const newErrors: Partial<Record<keyof ExpenseFormData, string>> = {};
 
-        if (!formData.vendorId.trim()) {
-            newErrors.vendorId = "Vendor is required";
-        }
+        // if (!formData.vendorId.trim()) {
+        //     newErrors.vendorId = "Vendor is required";
+        // }
         if (!formData.vendorName.trim()) {
             newErrors.vendorName = "Vendor name is required";
         }
         if (formData.amount <= 0) {
             newErrors.amount = "Amount must be greater than 0";
         }
-        if (!formData.paidThrough.trim()) {
-            newErrors.paidThrough = "Payment method is required";
-        }
+        // if (!formData.paidThrough.trim()) {
+        //     newErrors.paidThrough = "Payment method is required";
+        // }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -126,57 +133,55 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
     };
 
 
-     const handleVendorChange = (value: string | null) => {
-            const selectedVendor = vendorData?.find((vendor: any) => vendor._id === value)
-            setFormData((prev) => ({
-                ...prev,
-                vendorId: value || "",
-                vendorName: selectedVendor?.vendorName || ""
-            }))
-        }
-    
+    const handleVendorChange = (value: string | null) => {
+        const selectedVendor = vendorData?.find((vendor: any) => vendor._id === value)
+        setFormData((prev) => ({
+            ...prev,
+            vendorId: value || "",
+            vendorName: selectedVendor?.vendorName || ""
+        }))
+    }
+
 
     // Handle submit
     const handleSubmit = async (e: React.FormEvent) => {
-         e.preventDefault();
+        e.preventDefault();
 
-    if (mode === "view") return;
+        if (mode === "view") return;
 
-    if (!validateForm()) {
-        toast({ title: "Error", description: "Please fix the errors in the form" });
-        return;
-    }
-
-    try {
-        if (mode === "create") {
-            await createExpense.mutateAsync({
-                organizationId,
-                ...formData
-            });
-
-            toast({ title: "Success", description: "Expense created successfully!" });
-            onSuccess?.();
-        } else if (mode === "edit" && expenseId) {
-            await updateExpense.mutateAsync({
-                id: expenseId,
-                ...formData
-            });
-
-            toast({ title: "Success", description: "Expense updated successfully!" });
-            onSuccess?.();
+        if (!validateForm()) {
+            toast({ title: "Error", description: "Please fix the errors in the form" , variant:"destructive"});
+            return;
         }
-    } catch (error: any) {
-        toast({ title: "Error", description: error.message || "Failed to submit expense" });
-        throw error;
-    }
+
+        try {
+            if (mode === "create") {
+                await createExpense.mutateAsync({
+                    organizationId,
+                    ...formData
+                });
+
+                toast({ title: "Success", description: "Expense created successfully!" });
+                onSuccess?.();
+            } else if (mode === "edit" && expenseId) {
+                await updateExpense.mutateAsync({
+                    id: expenseId,
+                    ...formData,
+                    vendorId: (formData.vendorId as any)._id,
+                });
+
+                toast({ title: "Success", description: "Expense updated successfully!" });
+                onSuccess?.();
+            }
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to submit expense" , variant:"destructive"});
+        }
     };
 
     // Loading state
     if (mode !== "create" && isLoadingExpense) {
         return (
-            <div className="flex items-center justify-center p-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
+            <MaterialOverviewLoading />
         );
     }
 
@@ -186,22 +191,41 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Header */}
-            <div className="border-b pb-4">
-                <h2 className="text-2xl font-bold text-gray-900">
-                    {mode === "create" && "Create New Expense"}
-                    {mode === "edit" && "Edit Expense"}
-                    {mode === "view" && "Expense Details"}
-                </h2>
-                {mode === "view" && existingExpense && (
-                    <p className="text-sm text-gray-500 mt-1">
-                        Invoice: {existingExpense.invoiceNumber}
-                    </p>
-                )}
-            </div>
+            <header className="border-b pb-4 flex justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 flex gap-2">
+                        <div onClick={onCancel}
+                            className='bg-blue-50 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
+                            <i className='fas fa-arrow-left'></i>
+                        </div>
+                        {mode === "create" && "Create New Expense"}
+                        {mode === "edit" && "Edit Expense"}
+                        {mode === "view" && "Expense Details"}
+                    </h2>
+                    {mode === "view" && existingExpense && (
+                        <p className="text-sm text-gray-500 mt-1">
+                            Invoice: {existingExpense?.invoiceNumber}
+                        </p>
+                    )}
+                </div>
+
+                <button
+                type="button"
+                    onClick={onEdit}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 
+                                            transition-colors flex items-center gap-2"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    {isEditing ? "Cancel" : "Edit"} Expense
+                </button>
+            </header>
 
             {/* Vendor ID */}
-           <div>
-                <Label>Label</Label>
+            <div>
+                <Label>Vendor</Label>
                 <SearchSelectNew
                     options={vendorOption}
                     placeholder="Select Vendor"
@@ -214,8 +238,32 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
                 />
             </div>
 
+            <div className=''>
+                <div className='flex items-center gap-1'>
+                    <input type="checkbox" className='cursor-pointer' checked={enableVendorInput} id="enableName" onChange={() => setEnableVendorInput((p) => (!p))} />
+                    <Label htmlFor='enableName' className='cursor-pointer'>Click the check box to enter the name manually, if not available from the drop down</Label>
+                </div>
+                <input
+                    type="text"
+                    name="vendorName"
+                    value={
+                        enableVendorInput
+                            ? formData.vendorName // user can edit manually
+                            : "" // show from formData but not editable
+                    }
+                    onChange={(e) => {
+                        if (enableVendorInput) handleChange(e); // only update if manual input is enabled
+                    }}
+                    disabled={!enableVendorInput} // only enable if checkbox is checked
+
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    placeholder="Enter customer name"
+                />
+            </div>
+
             {/* Vendor Name */}
-            <div>
+            {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                     Vendor Name <span className="text-red-500">*</span>
                 </label>
@@ -233,7 +281,7 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
                 {errors.vendorName && (
                     <p className="mt-1 text-sm text-red-500">{errors.vendorName}</p>
                 )}
-            </div>
+            </div> */}
 
             {/* Amount */}
             <div>
@@ -241,14 +289,14 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
                     Amount <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                    <span className="absolute left-4 top-2.5 text-gray-500">$</span>
+                    <span className="absolute left-4 top-2.5 text-gray-500">₹</span>
                     <input
                         type="number"
                         name="amount"
                         value={formData.amount}
                         onChange={handleChange}
                         disabled={isViewMode}
-                        step="0.01"
+                        step="1"
                         min="0"
                         className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 
                             ${errors.amount ? "border-red-500" : "border-gray-300"}
@@ -279,7 +327,8 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
             {/* Paid Through */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Paid Through <span className="text-red-500">*</span>
+                    Paid Through
+                    {/* <span className="text-red-500">*</span> */}
                 </label>
                 <select
                     name="paidThrough"
@@ -324,18 +373,20 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
             {/* Action Buttons */}
             <div className="flex gap-4 pt-4 border-t">
                 {!isViewMode && (
+                <div className="w-full flex justify-between space-x-3 ">
+
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 
+                        className="flex-1  bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 
                             disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                         {isSubmitting ? (
                             <span className="flex items-center justify-center gap-2">
                                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" 
+                                    <circle className="opacity-25" cx="12" cy="12" r="10"
                                         stroke="currentColor" strokeWidth="4" fill="none" />
-                                    <path className="opacity-75" fill="currentColor" 
+                                    <path className="opacity-75" fill="currentColor"
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                 </svg>
                                 {mode === "create" ? "Creating..." : "Updating..."}
@@ -344,16 +395,21 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
                             mode === "create" ? "Create Expense" : "Update Expense"
                         )}
                     </button>
-                )}
-                
+
+                    
                 <button
                     type="button"
-                    onClick={onCancel}
-                    className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg 
+                    onClick={onEdit}
+                    className="flex-1  bg-gray-200 text-gray-700 py-2 px-4 rounded-lg 
                         hover:bg-gray-300 transition-colors"
                 >
                     {isViewMode ? "Close" : "Cancel"}
                 </button>
+
+                </div>
+
+                )}
+
             </div>
         </form>
     );

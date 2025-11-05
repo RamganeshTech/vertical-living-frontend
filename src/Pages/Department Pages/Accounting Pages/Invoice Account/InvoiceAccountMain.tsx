@@ -57,7 +57,7 @@ const InvoiceAccountsMain = () => {
     } = useGetAllInvoices({
         organizationId: organizationId || '',
         customerId: filters.customerId || undefined,
-        limit: 10,
+        limit: 20,
         date: filters.date || undefined,
         search: debouncedSearch || undefined,
         sortBy: filters.sortBy || undefined,

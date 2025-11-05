@@ -6,14 +6,20 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-const ExpenseAccountSingle = lazy(()=>  import( './Pages/Department Pages/Accounting Pages/Expense Accounts Page/ExpenseAccountsSingle'));
-const ExpenseAccountMain = lazy(()=>  import( './Pages/Department Pages/Accounting Pages/Expense Accounts Page/ExpenseAccountsMain'));
-const CreateExpense = lazy(()=>  import( './Pages/Department Pages/Accounting Pages/Expense Accounts Page/CreateExpense'));
-const VendorAccountsMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/Vendor Account/VendorAccountsMain'));
-const VendorAccSingle = lazy(() => import( './Pages/Department Pages/Accounting Pages/Vendor Account/VendorAccSingle'));
-const CreateVendorAcc = lazy(() => import( './Pages/Department Pages/Accounting Pages/Vendor Account/CreateVendorAcc'));
-const ShopDetailSingle  = lazy(() => import( './Pages/Stage Pages/Ordering Materials/ShopLib Details Pages/ShopLibDetailSingle'));
-const ShopLibDetailsMain  = lazy(() => import( './Pages/Stage Pages/Ordering Materials/ShopLib Details Pages/ShopLibDetailsMain'));
+const BillAccountsMain  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/BillAccountMain'));
+const BillAccSingle  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/BillAccSingle'));
+const CreateBillAcc  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/CreateBillAcc'));
+const PurchaseAccountsMain  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Purchase Pages/PurchaseAccountMain'));
+const PurchasesAccSingle  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Purchase Pages/PurchaseAccSingle'));
+const CreatePurchaseAcc  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Purchase Pages/CreatePurchaseAcc'));
+const ExpenseAccountSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Expense Accounts Page/ExpenseAccountsSingle'));
+const ExpenseAccountMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Expense Accounts Page/ExpenseAccountsMain'));
+const CreateExpense = lazy(() => import('./Pages/Department Pages/Accounting Pages/Expense Accounts Page/CreateExpense'));
+const VendorAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Account/VendorAccountsMain'));
+const VendorAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Account/VendorAccSingle'));
+const CreateVendorAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Account/CreateVendorAcc'));
+const ShopDetailSingle = lazy(() => import('./Pages/Stage Pages/Ordering Materials/ShopLib Details Pages/ShopLibDetailSingle'));
+const ShopLibDetailsMain = lazy(() => import('./Pages/Stage Pages/Ordering Materials/ShopLib Details Pages/ShopLibDetailsMain'));
 const PublicOrgOrderMaterialSetup = lazy(() => import('./Pages/Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrgOrderMaterialSetup'));
 const PublicOrderMaterialMain = lazy(() => import('./Pages/Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrderMaterialMain'));
 const PublicOrderMatStaffView = lazy(() => import('./Pages/Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrderMatStaffView'));
@@ -486,6 +492,38 @@ function App() {
               </ProtectedRoutes>} />
             </Route>
 
+
+            <Route path="billmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <BillAccountsMain />
+            </ProtectedRoutes>} >
+
+              <Route path="billsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <BillAccSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateBillAcc />
+              </ProtectedRoutes>} />
+
+
+            </Route>
+
+              <Route path="purchasemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <PurchaseAccountsMain />
+            </ProtectedRoutes>} >
+
+              <Route path="purchasesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <PurchasesAccSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreatePurchaseAcc />
+              </ProtectedRoutes>} />
+
+
+            </Route>
 
 
 

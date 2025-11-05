@@ -74,13 +74,25 @@ const AccountingMain: React.FC = () => {
             icon: 'fas fa-user text-blue-600',
             onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
         },
-    
-    //  {
-    //         label: 'Expense',
-    //         path: `/organizations/${organizationId}/projects/expensemain`,
-    //         icon: 'fas fa-money-bill text-blue-600',
-    //         onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
-    //     },
+     {
+            label: 'Expense',
+            path: `/organizations/${organizationId}/projects/expensemain`,
+            icon: 'fas fa-money-bill text-blue-600',
+            onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
+        },
+
+         {
+            label: 'Bills',
+            path: `/organizations/${organizationId}/projects/billmain`,
+            icon: 'fas fa-receipt text-blue-600',
+            onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
+        },
+        // {
+        //     label: 'Purchase Orders',
+        //     path: `/organizations/${organizationId}/projects/purchasemain`,
+        //     icon: 'fas fa-wallet text-blue-600',
+        //     onClick: () => navigate(`/organizations/${organizationId}/projects/purchasemain`)
+        // },
     ]
     }]
 

@@ -12,11 +12,11 @@ const CreateExpense: React.FC = () => {
     // };
 
     const handleCancel = () => {
-        navigate("/expensemain");
+        navigate(-1);
     };
 
     return (
-        <div className="min-h-full bg-gray-50 py-2">
+        <div className="min-h-full overflow-y-auto bg-gray-50 py-2">
             <div className="max-w-full mx-auto px-2">
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <ExpenseForm
