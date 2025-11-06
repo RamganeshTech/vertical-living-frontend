@@ -6,6 +6,9 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
+const VendorPaymentAccMain = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentAccMain'));
+const VendorPaymentSingle = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentSingle'));
+const CreateVendorPaymentAcc = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/CreateVendorPaymentAcc'));
 const BillAccountsMain  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/BillAccountMain'));
 const BillAccSingle  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/BillAccSingle'));
 const CreateBillAcc  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/CreateBillAcc'));
@@ -523,6 +526,20 @@ function App() {
               </ProtectedRoutes>} />
 
 
+            </Route>
+
+             <Route path="vendorpaymentmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <VendorPaymentAccMain />
+            </ProtectedRoutes>} >
+
+              <Route path="vendorpaymentsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <VendorPaymentSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateVendorPaymentAcc />
+              </ProtectedRoutes>} />
             </Route>
 
 

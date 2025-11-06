@@ -7,7 +7,8 @@ import { useGetProjects } from "../../../apiList/projectApi";
 import type { AvailableProjetType } from "../Logistics Pages/LogisticsShipmentForm";
 import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
-import NavigationDropdown, { type NavigationSection } from "../../../shared/NavigationDropDown";
+// import { type NavigationSection } from "../../../shared/NavigationDropDown";
+import NavigationDDWithHeading, { type NavigationSection } from "../../../shared/NavigationDDWithHeading";
 
 
 // interface AvailableProjectType {
@@ -42,59 +43,148 @@ const AccountingMain: React.FC = () => {
     const navigate = useNavigate();
 
     // Define navigation items
-    const navigationItems: NavigationSection[] = [{
-        title: "Accounts section",
-        items: [{
-            label: 'Customer',
-            path: `/organizations/${organizationId}/projects/customermain`,
-            icon: 'fas fa-users text-blue-600',
-            onClick: () => navigate(`/organizations/${organizationId}/projects/customermain`)
+    // const navigationItems: NavigationSection[] = [{
+    //     title: "Accounts section",
+    //     items: [{
+    //         label: 'Customer',
+    //         path: `/organizations/${organizationId}/projects/customermain`,
+    //         icon: 'fas fa-users text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/customermain`)
+    //     },
+    //     {
+    //         label: 'Invoice',
+    //         path: `/organizations/${organizationId}/projects/invoicemain`,
+    //         icon: 'fas fa-file-invoice text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/invoicemain`)
+    //     },
+    //     {
+    //         label: 'Retail Invoice',
+    //         path: `/organizations/${organizationId}/projects/retailinvoicemain`,
+    //         icon: 'fas fa-receipt text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/retailinvoicemain`)
+    //     },
+    //     {
+    //         label: 'Sales Order',
+    //         path: `/organizations/${organizationId}/projects/salesordermain`,
+    //         icon: 'fas fa-shopping-cart text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/salesordermain`)
+    //     },
+    //     {
+    //         label: 'Vendor',
+    //         path: `/organizations/${organizationId}/projects/vendormain`,
+    //         icon: 'fas fa-user text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
+    //     },
+    //     {
+    //         label: 'Expense',
+    //         path: `/organizations/${organizationId}/projects/expensemain`,
+    //         icon: 'fas fa-money-bill text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
+    //     },
+
+    //     {
+    //         label: 'Bills',
+    //         path: `/organizations/${organizationId}/projects/billmain`,
+    //         icon: 'fas fa-receipt text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
+    //     },
+    //     {
+    //         label: 'Purchase Orders',
+    //         path: `/organizations/${organizationId}/projects/purchasemain`,
+    //         icon: 'fas fa-wallet text-blue-600',
+    //         onClick: () => navigate(`/organizations/${organizationId}/projects/purchasemain`)
+    //     },
+
+    //         //     {
+    //         //         label: 'Vendor Payments',
+    //         //         path: `/organizations/${organizationId}/projects/vendorpaymentmain`,
+    //         //         icon: 'fas fa-credit-card text-blue-600',
+    //         //         onClick: () => navigate(`/organizations/${organizationId}/projects/vendorpaymentmain`)
+    //         //     },
+    //     ]
+    // }]
+
+
+    // ddummy version
+
+    const navigationItemNew: NavigationSection[] = [
+
+        {
+            title: "Sales Transactions",
+            items: [
+                {
+                    label: 'Invoice',
+                    path: `/organizations/${organizationId}/projects/invoicemain`,
+                    icon: 'fas fa-file-invoice text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/invoicemain`)
+                },
+                {
+                    label: 'Retail Invoice',
+                    path: `/organizations/${organizationId}/projects/retailinvoicemain`,
+                    icon: 'fas fa-receipt text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/retailinvoicemain`)
+                },
+                {
+                    label: 'Sales Order',
+                    path: `/organizations/${organizationId}/projects/salesordermain`,
+                    icon: 'fas fa-shopping-cart text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/salesordermain`)
+                },
+                {
+                    label: 'Purchase Orders',
+                    path: `/organizations/${organizationId}/projects/purchasemain`,
+                    icon: 'fas fa-wallet text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/purchasemain`)
+                },
+
+            ]
         },
         {
-            label: 'Invoice',
-            path: `/organizations/${organizationId}/projects/invoicemain`,
-            icon: 'fas fa-file-invoice text-blue-600',
-            onClick: () => navigate(`/organizations/${organizationId}/projects/invoicemain`)
-        },
-        {
-            label: 'Retail Invoice',
-            path: `/organizations/${organizationId}/projects/retailinvoicemain`,
-            icon: 'fas fa-receipt text-blue-600',
-            onClick: () => navigate(`/organizations/${organizationId}/projects/retailinvoicemain`)
-        },
-        {
-            label: 'Sales Order',
-            path: `/organizations/${organizationId}/projects/salesordermain`,
-            icon: 'fas fa-shopping-cart text-blue-600',
-            onClick: () => navigate(`/organizations/${organizationId}/projects/salesordermain`)
-        },
-        {
-            label: 'Vendor',
-            path: `/organizations/${organizationId}/projects/vendormain`,
-            icon: 'fas fa-user text-blue-600',
-            onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
-        },
-     {
-            label: 'Expense',
-            path: `/organizations/${organizationId}/projects/expensemain`,
-            icon: 'fas fa-money-bill text-blue-600',
-            onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
+            title: "Expense Transactions",
+            items: [
+                {
+                    label: 'Expense',
+                    path: `/organizations/${organizationId}/projects/expensemain`,
+                    icon: 'fas fa-money-bill text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
+                },
+
+                {
+                    label: 'Bills',
+                    path: `/organizations/${organizationId}/projects/billmain`,
+                    icon: 'fas fa-receipt text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
+                },
+                // {
+                //     label: 'Vendor Payments',
+                //     path: `/organizations/${organizationId}/projects/vendorpaymentmain`,
+                //     icon: 'fas fa-credit-card text-blue-600',
+                //     onClick: () => navigate(`/organizations/${organizationId}/projects/vendorpaymentmain`)
+                // },
+            ]
         },
 
-         {
-            label: 'Bills',
-            path: `/organizations/${organizationId}/projects/billmain`,
-            icon: 'fas fa-receipt text-blue-600',
-            onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
-        },
-        // {
-        //     label: 'Purchase Orders',
-        //     path: `/organizations/${organizationId}/projects/purchasemain`,
-        //     icon: 'fas fa-wallet text-blue-600',
-        //     onClick: () => navigate(`/organizations/${organizationId}/projects/purchasemain`)
-        // },
-    ]
-    }]
+        {
+            title: "Office Records",
+            items: [
+                {
+                    label: 'Customer',
+                    path: `/organizations/${organizationId}/projects/customermain`,
+                    icon: 'fas fa-users text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/customermain`)
+                },
+                {
+                    label: 'Vendor',
+                    path: `/organizations/${organizationId}/projects/vendormain`,
+                    icon: 'fas fa-user text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
+                },
+            ]
+        }
+
+    ];
+
+
 
     // Add this state for controlling the dropdown
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -130,12 +220,21 @@ const AccountingMain: React.FC = () => {
     return (
         <div className="p-2 space-y-6 h-full overflow-y-auto">
             {/* Navigation Dropdown */}
-            <NavigationDropdown
+            {/* <NavigationDropdown
                 isOpen={isDropdownOpen}
                 onClose={() => setIsDropdownOpen(false)}
                 sections={navigationItems}
-
+                    noOfRows={3}
             />
+            
+            */}
+
+            <NavigationDDWithHeading
+                isOpen={isDropdownOpen}
+                onClose={() => setIsDropdownOpen(false)}
+                heading="Accounts"
+                // subHeading="Select a module to continue"
+                sections={navigationItemNew} />
 
 
 

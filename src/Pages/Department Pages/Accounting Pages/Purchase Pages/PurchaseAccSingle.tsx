@@ -4,6 +4,7 @@ import { toast } from '../../../../utils/toast';
 import type { PayloadPurchase } from './CreatePurchaseAcc';
 import { useGetSinglePurchase } from '../../../../apiList/Department Api/Accounting Api/purchaseAccApi';
 import PurchaseAccForm from './PurchaseAccForm';
+import MaterialOverviewLoading from '../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 
 const PurchasesAccSingle = () => {
     const { id } = useParams<{ id: string }>();
@@ -27,13 +28,21 @@ const PurchasesAccSingle = () => {
         }
     };
 
-    if (isLoading) {
+    // if (isLoading) {
+    //     return (
+    //         <div className="flex justify-center items-center min-h-screen">
+    //             <div className="text-center">
+    //                 <i className="fas fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
+    //                 <p className="text-gray-600">Loading purchase...</p>
+    //             </div>
+    //         </div>
+    //     );
+    // }
+
+       if (isLoading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-center">
-                    <i className="fas fa-spinner fa-spin text-blue-600 text-4xl mb-4"></i>
-                    <p className="text-gray-600">Loading purchase...</p>
-                </div>
+            <div className='max-h-full overflow-y-auto'>
+                <MaterialOverviewLoading />
             </div>
         );
     }
