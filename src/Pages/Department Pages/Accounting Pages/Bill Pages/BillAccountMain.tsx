@@ -29,6 +29,10 @@ const BillAccountsMain = () => {
         search: '',
         vendorId: '',
         date: '',
+        billToDate: "",
+        billFromDate: "",
+        createdFromDate: "",
+        createdToDate: "",
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc',
     });
@@ -52,6 +56,10 @@ const BillAccountsMain = () => {
         vendorId: filters.vendorId || undefined,
         limit: 20,
         date: filters.date || undefined,
+        billToDate: filters.billToDate || undefined,
+        billFromDate: filters.billFromDate || undefined,
+        createdFromDate: filters.createdFromDate || undefined,
+        createdToDate: filters.createdToDate || undefined,
         search: debouncedSearch || undefined,
         sortBy: filters.sortBy || undefined,
         sortOrder: filters.sortOrder || undefined,
@@ -109,6 +117,10 @@ const BillAccountsMain = () => {
             search: '',
             vendorId: '',
             date: '',
+            billToDate: "",
+            billFromDate: "",
+            createdFromDate: "",
+            createdToDate: "",
             sortBy: 'createdAt',
             sortOrder: 'desc'
         });
@@ -170,7 +182,7 @@ const BillAccountsMain = () => {
             ) : (
                 <main className="flex gap-2 !max-h-[90%]">
                     {/* Filters Sidebar */}
-                    <div className="xl:w-80 flex-shrink-0">
+                    <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -196,7 +208,7 @@ const BillAccountsMain = () => {
                                     </label>
                                     <input
                                         type="text"
-                                            autoFocus
+                                        autoFocus
                                         placeholder="Bill number, vendor name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
@@ -208,17 +220,65 @@ const BillAccountsMain = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
-                                        Created Date
+                                        From CreatedAt Date
                                     </label>
                                     <input
                                         type="date"
-                                        value={filters.date}
+                                        value={filters.createdFromDate}
                                         onChange={(e) => {
-                                            setFilters(f => ({ ...f, date: e.target.value }));
+                                            setFilters(f => ({ ...f, createdFromDate: e.target.value }));
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.billToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From Bill Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.billFromDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, billFromDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To Bill Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.billToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, billToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+
 
                                 {/* Vendor ID Filter */}
                                 {/* <div>
@@ -291,17 +351,18 @@ const BillAccountsMain = () => {
                             </p>
                         </div>
                     ) : (
-                       
+
                         <div
                             ref={scrollContainerRef}
                             className="flex-1 !max-h-[100%] overflow-y-auto"
                         >
                             {/* Table Header */}
                             <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
-                                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+                                <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
                                     <div className="col-span-1 text-center">S.No</div>
                                     <div className="col-span-3">Vendor Name</div>
                                     <div className="col-span-2">Bill Number</div>
+                                    <div className="col-span-2">Bill Date</div>
                                     <div className="col-span-2">Created At</div>
                                     <div className="col-span-2">Grand Total</div>
                                     <div className="col-span-1 text-center">Items</div>
@@ -313,10 +374,10 @@ const BillAccountsMain = () => {
                             <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
                                 {bills.map((bill: CreateBillPayload, index: number) => (
                                     <BillAccList key={bill._id}
-                                     bill={bill} index={index} handleView={handleView} 
-                                     handleDelete={handleDelete} 
-                                     deletePending={deleteBillMutation.isPending && deleteBillMutation.variables.billId === bill._id}
-                                     />
+                                        bill={bill} index={index} handleView={handleView}
+                                        handleDelete={handleDelete}
+                                        deletePending={deleteBillMutation.isPending && deleteBillMutation.variables.billId === bill._id}
+                                    />
                                 ))}
                             </div>
 

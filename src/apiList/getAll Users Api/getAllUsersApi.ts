@@ -12,8 +12,8 @@ export const getUsersApi  = async (
   return res.data.data;
 };
 
-
-export const useGetAllUsers = (organizationId: string, roleToFetch: string) => {
+type staffOptions = "staff" | "owner" | "CTO" | "worker" | "client"
+export const useGetAllUsers = (organizationId: string, roleToFetch: staffOptions ) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO"];

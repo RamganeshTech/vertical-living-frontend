@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
+const IssueDiscussionPage = lazy(()=> import(  './Pages/Stage Pages/Issue Discussion Pages/IssueDiscussionPage'));
 const VendorPaymentAccMain = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentAccMain'));
 const VendorPaymentSingle = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentSingle'));
 const CreateVendorPaymentAcc = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/CreateVendorPaymentAcc'));
@@ -752,6 +753,8 @@ function App() {
               </ProtectedRoutes>
             } />
 
+            
+
             <Route path="sampledesign" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
 
@@ -776,6 +779,14 @@ function App() {
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
 
                 <TechnicalConsultant />
+              </ProtectedRoutes>
+            } />
+
+            
+            <Route path="issuediscussion" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+
+                <IssueDiscussionPage />
               </ProtectedRoutes>
             } />
 

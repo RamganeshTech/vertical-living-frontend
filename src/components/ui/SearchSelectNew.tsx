@@ -17,6 +17,7 @@ export interface SearchSelectProps {
   className?: string;
   searchBy?: 'name' | 'email' | 'both' ; // Control what to search by
   displayFormat?: 'simple' | 'detailed'; // Control display format
+  enabled?:boolean,
 }
 // Helper function to normalize options
 const normalizeOptions = (options: SelectOption[] | string[]): SelectOption[] => {
@@ -54,7 +55,8 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
   value,
   className = "",
   searchBy = 'name', // Default to search by name only
-  displayFormat = 'detailed' // Default to detailed display
+  displayFormat = 'detailed', // Default to detailed display
+  enabled = true
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -100,8 +102,10 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
   };
 
   const handleInputClick = () => {
-    setIsOpen(true);
-    setSearchTerm("");
+    if(enabled){
+      setIsOpen(true);
+      setSearchTerm("");
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

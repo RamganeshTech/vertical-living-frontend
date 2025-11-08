@@ -142,7 +142,7 @@ const RequirementFormPublic: React.FC = () => {
       toast({ title: "Success", description: "form data submitted successfully" })
     }
     catch (error: any) {
-      toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to generate invitation link", variant: "destructive" })
+      toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to save the data", variant: "destructive" })
     }
   };
 

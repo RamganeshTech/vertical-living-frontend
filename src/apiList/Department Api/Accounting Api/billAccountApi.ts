@@ -12,6 +12,10 @@ const getAllBills = async ({
     page,
     limit,
     date,
+    billToDate,
+    billFromDate,
+    createdFromDate,
+    createdToDate,
     search,
     sortBy,
     sortOrder,
@@ -22,6 +26,10 @@ const getAllBills = async ({
     page?: number;
     limit?: number;
     date?: string;
+    billToDate?: string
+    billFromDate?: string
+    createdFromDate?: string,
+    createdToDate?: string,
     search?: string;
     api: AxiosInstance,
     sortBy?: string;
@@ -36,6 +44,10 @@ const getAllBills = async ({
     if (sortBy) params.append('sortBy', sortBy);
     if (sortOrder) params.append('sortOrder', sortOrder);
     if (search) params.append('search', search);
+    if (billToDate) params.append('billToDate', billToDate);
+    if (billFromDate) params.append('billFromDate', billFromDate);
+    if (createdFromDate) params.append('createdFromDate', createdFromDate);
+    if (createdToDate) params.append('createdToDate', createdToDate);
 
     const { data } = await api.get(`/department/accounting/bill/getallbill?${params.toString()}`);
     if (!data.ok) throw new Error(data.message);
@@ -88,6 +100,10 @@ export const useGetAllBill = ({
     limit = 10,
     search,
     date,
+    billToDate,
+    billFromDate,
+    createdFromDate,
+    createdToDate,
     sortBy,
     sortOrder
 }: {
@@ -96,6 +112,10 @@ export const useGetAllBill = ({
     limit?: number;
     search?: string;
     date?: string
+    billToDate?: string
+    billFromDate?: string
+    createdFromDate?: string
+    createdToDate?: string
     sortBy?: string;
     sortOrder?: string;
 }) => {
@@ -104,7 +124,7 @@ export const useGetAllBill = ({
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["bills", organizationId, vendorId, limit, date, search, sortBy, sortOrder],
+        queryKey: ["bills", organizationId, vendorId, limit, date, search, sortBy, sortOrder, billToDate, billFromDate, createdFromDate, createdToDate],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -118,6 +138,10 @@ export const useGetAllBill = ({
                 page: pageParam,
                 limit,
                 date,
+                billToDate,
+                billFromDate,
+                createdFromDate,
+                createdToDate,
                 search,
                 sortBy,
                 sortOrder,

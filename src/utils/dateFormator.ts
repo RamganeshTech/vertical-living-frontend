@@ -1,4 +1,4 @@
-export function dateFormate (date:string){
+export function dateFormate (date:string | Date){
 
     if(!date){
         return "N/A"

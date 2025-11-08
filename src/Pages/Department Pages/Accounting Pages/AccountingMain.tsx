@@ -155,12 +155,12 @@ const AccountingMain: React.FC = () => {
                     icon: 'fas fa-receipt text-blue-600',
                     onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
                 },
-                // {
-                //     label: 'Vendor Payments',
-                //     path: `/organizations/${organizationId}/projects/vendorpaymentmain`,
-                //     icon: 'fas fa-credit-card text-blue-600',
-                //     onClick: () => navigate(`/organizations/${organizationId}/projects/vendorpaymentmain`)
-                // },
+                {
+                    label: 'Vendor Payments',
+                    path: `/organizations/${organizationId}/projects/vendorpaymentmain`,
+                    icon: 'fas fa-credit-card text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/vendorpaymentmain`)
+                },
             ]
         },
 

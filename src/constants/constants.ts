@@ -115,7 +115,8 @@ export const PROJECTS_LABELS = {
   SITEMEASUREMENT: "Site Measurement",
   SAMPLEDESIGN: "Sample Designs",
   WORKSCHEDULE: "Work Schedule",
-  TECHNICALCONSULTANT: "Technical consultant",
+  TECHNICALCONSULTANT: "Technical consultantation",
+  TICKETOPERATIONS: "Ticket Operations",
   // SELECTSTAGE: "Select Stage",
   // EXTERNAL: "External Units",
   // MATERIALSELECTION: "Material Selection",
@@ -146,6 +147,8 @@ export const PROJECTS_ICONS = {
   SAMPLEDESIGN: "fa-solid fa-object-group text-2xl",
   WORKSCHEDULE: "fas fa-digging text-2xl",
   TECHNICALCONSULTANT: "fa-solid fa-comments text-2xl",
+  TICKETOPERATIONS: "fas fa-ticket text-2xl",
+
   // SELECTSTAGE: "fa-solid fa-square-check text-2xl",
   // EXTERNAL: "fa-solid fa-boxes-stacked text-2xl",
   // MATERIALSELECTION: "fas fa-box text-2xl",

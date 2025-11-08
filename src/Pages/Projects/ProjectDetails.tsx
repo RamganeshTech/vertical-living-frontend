@@ -63,6 +63,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     SAMPLEDESIGN: projectId ? `/${organizationId}/projectdetails/${projectId}/sampledesign` : "",
     WORKSCHEDULE: projectId ? `/${organizationId}/projectdetails/${projectId}/workmainschedule` : "",
     TECHNICALCONSULTANT: projectId ? `/${organizationId}/projectdetails/${projectId}/technicalconsultant` : "",
+    TICKETOPERATIONS: projectId ? `/${organizationId}/projectdetails/${projectId}/issuediscussion` : "",
     // SELECTSTAGE: projectId ? `/${organizationId}/projectdetails/${projectId}/selectstage` : "",
     // EXTERNAL: projectId ? `/${organizationId}/projectdetails/${projectId}/externalunits` : "",
     // MODULARUNIT: projectId ? `/${organizationId}/projectdetails/${projectId}/modularunits` : "",
