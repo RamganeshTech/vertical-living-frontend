@@ -11,7 +11,10 @@ const getAllPurchases = async ({
     vendorId,
     page,
     limit,
-    date,
+    fromPurchaseDate,
+    toPurchaseDate,
+    createdFromDate,
+    createdToDate,
     search,
     sortBy,
     sortOrder,
@@ -21,8 +24,11 @@ const getAllPurchases = async ({
     vendorId?: string;
     page?: number;
     limit?: number;
-    date?: string;
-    search?: string;
+  fromPurchaseDate?: string
+    toPurchaseDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
+        search?: string;
     api: AxiosInstance,
     sortBy?: string;
     sortOrder?: string;
@@ -32,7 +38,11 @@ const getAllPurchases = async ({
     if (vendorId) params.append('vendorId', vendorId);
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
-    if (date) params.append('date', date);
+     if (fromPurchaseDate) params.append('fromPurchaseDate', fromPurchaseDate);
+    if (toPurchaseDate) params.append('toPurchaseDate', toPurchaseDate);
+    if (createdFromDate) params.append('createdFromDate', createdFromDate);
+    if (createdToDate) params.append('createdToDate', createdToDate);
+
     if (sortBy) params.append('sortBy', sortBy);
     if (sortOrder) params.append('sortOrder', sortOrder);
     if (search) params.append('search', search);
@@ -87,7 +97,10 @@ export const useGetAllPurchase = ({
     vendorId,
     limit = 10,
     search,
-    date,
+    fromPurchaseDate,
+    toPurchaseDate,
+    createdFromDate,
+    createdToDate,
     sortBy,
     sortOrder
 }: {
@@ -95,7 +108,11 @@ export const useGetAllPurchase = ({
     vendorId?: string;
     limit?: number;
     search?: string;
-    date?: string
+    // date?: string
+    fromPurchaseDate?: string
+    toPurchaseDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
     sortBy?: string;
     sortOrder?: string;
 }) => {
@@ -104,7 +121,10 @@ export const useGetAllPurchase = ({
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["purchases", organizationId, vendorId, limit, date, search, sortBy, sortOrder],
+        queryKey: ["purchases", organizationId, vendorId, limit,  fromPurchaseDate,
+    toPurchaseDate,
+    createdFromDate,
+    createdToDate, search, sortBy, sortOrder],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -117,7 +137,10 @@ export const useGetAllPurchase = ({
                 vendorId,
                 page: pageParam,
                 limit,
-                date,
+                fromPurchaseDate,
+                toPurchaseDate,
+                createdFromDate,
+                createdToDate,
                 search,
                 sortBy,
                 sortOrder,

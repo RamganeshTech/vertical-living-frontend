@@ -11,8 +11,10 @@ const getAllSalesOrder = async ({
     customerId,
     page,
     limit,
-    date,
-    salesOrderDate,
+    fromSalesOrderDate,
+    toSalesOrderDate,
+    createdFromDate,
+    createdToDate,
     search,
     api,
     sortBy,
@@ -22,8 +24,11 @@ const getAllSalesOrder = async ({
     customerId?: string;
     page?: number;
     limit?: number;
-    date?: string;
-    salesOrderDate?: string;
+    fromSalesOrderDate?: string
+    toSalesOrderDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
+
     search?: string;
     api: AxiosInstance;
     sortBy?: string;
@@ -34,10 +39,12 @@ const getAllSalesOrder = async ({
     if (customerId) params.append('customerId', customerId);
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
-    if (date) params.append('date', date);
-    if (salesOrderDate) params.append('salesOrderDate', salesOrderDate);
+    if (fromSalesOrderDate) params.append('fromSalesOrderDate', fromSalesOrderDate);
+    if (toSalesOrderDate) params.append('toSalesOrderDate', toSalesOrderDate);
+    if (createdFromDate) params.append('createdFromDate', createdFromDate);
+    if (createdToDate) params.append('createdToDate', createdToDate);
     if (search) params.append('search', search);
-     if (sortOrder) params.append('sortOrder', sortOrder);
+    if (sortOrder) params.append('sortOrder', sortOrder);
     if (sortBy) params.append('sortBy', sortBy);
 
 
@@ -92,8 +99,10 @@ export const useGetAllSalesOrders = ({
     customerId,
     limit = 10,
     search,
-    salesOrderDate,
-    date,
+    fromSalesOrderDate,
+    toSalesOrderDate,
+    createdFromDate,
+    createdToDate,
     sortBy,
     sortOrder
 }: {
@@ -101,8 +110,11 @@ export const useGetAllSalesOrders = ({
     customerId?: string;
     limit?: number;
     search?: string;
-    date?: string
-    salesOrderDate?: string;
+    fromSalesOrderDate?: string
+    toSalesOrderDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
+
     sortBy?: string;
     sortOrder?: string;
 }) => {
@@ -111,7 +123,7 @@ export const useGetAllSalesOrders = ({
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["salesorder", organizationId, customerId, limit, date, search, salesOrderDate, sortBy, sortOrder],
+        queryKey: ["salesorder", organizationId, customerId, limit, search , sortBy, sortOrder, fromSalesOrderDate, toSalesOrderDate, createdFromDate, createdToDate],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -124,8 +136,10 @@ export const useGetAllSalesOrders = ({
                 customerId,
                 page: pageParam,
                 limit,
-                date,
-                salesOrderDate,
+                fromSalesOrderDate,
+                toSalesOrderDate,
+                createdFromDate,
+                createdToDate,
                 search,
                 api,
                 sortBy,

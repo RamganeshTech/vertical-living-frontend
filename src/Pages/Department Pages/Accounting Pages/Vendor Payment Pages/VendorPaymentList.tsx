@@ -11,7 +11,7 @@ type Props = {
 const VendorPaymentList: React.FC<Props> = ({ vendor, index, handleView, handleDelete, deletePending }) => {
     return (
         <div
-            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
+            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
             onClick={() => handleView(vendor._id!)}
         >
             {/* S.No */}
@@ -34,6 +34,12 @@ const VendorPaymentList: React.FC<Props> = ({ vendor, index, handleView, handleD
                 <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
                     {vendor.paymentNumber || 'N/A'}
                 </span>
+            </div>
+
+
+             <div className="col-span-2 text-gray-600 text-sm">
+                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+                {dateFormate(vendor.paymentDate!)}
             </div>
 
             {/* Created At */}

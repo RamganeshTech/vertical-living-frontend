@@ -36,6 +36,12 @@ const PurchaseAccList: React.FC<Props> = ({ purchase, index, handleView, handleD
                 </span>
             </div>
 
+
+              <div className="col-span-2 text-gray-600 text-sm">
+                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+                {dateFormate(purchase.purchaseDate!)}
+            </div>
+
             {/* Created At */}
             <div className="col-span-2 text-gray-600 text-sm">
                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>

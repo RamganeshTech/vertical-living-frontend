@@ -11,8 +11,11 @@ const getAllRetailInvoices = async ({
     customerId,
     page,
     limit,
-    date,
-    search,
+fromInvoiceDate,
+    toInvoiceDate,
+    createdFromDate,
+    createdToDate,
+        search,
     api,
     sortBy,
     sortOrder
@@ -21,8 +24,11 @@ const getAllRetailInvoices = async ({
     customerId?: string;
     page?: number;
     limit?: number;
-    date?: string;
-    search?: string;
+ fromInvoiceDate?: string
+    toInvoiceDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
+        search?: string;
     api: AxiosInstance,
     sortBy?: string;
     sortOrder?: string;
@@ -32,7 +38,10 @@ const getAllRetailInvoices = async ({
     if (customerId) params.append('customerId', customerId);
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
-    if (date) params.append('date', date);
+ if (fromInvoiceDate) params.append('fromInvoiceDate', fromInvoiceDate);
+    if (toInvoiceDate) params.append('toInvoiceDate', toInvoiceDate);
+    if (createdFromDate) params.append('createdFromDate', createdFromDate);
+    if (createdToDate) params.append('createdToDate', createdToDate);
     if (sortBy) params.append('sortBy', sortBy);
     if (sortOrder) params.append('sortOrder', sortOrder);
     if (search) params.append('search', search);
@@ -87,16 +96,22 @@ export const useGetRetailAllInvoices = ({
     customerId,
     limit = 10,
     search,
-    date,
-    sortBy,
+fromInvoiceDate,
+    toInvoiceDate,
+    createdFromDate,
+    createdToDate,
+        sortBy,
     sortOrder
 }: {
     organizationId?: string;
     customerId?: string;
     limit?: number;
     search?: string;
-    date?: string,
-    sortBy?: string;
+ fromInvoiceDate?: string
+    toInvoiceDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
+        sortBy?: string;
     sortOrder?: string;
 }) => {
     const allowedRoles = ["owner", "staff", "CTO"];
@@ -104,7 +119,10 @@ export const useGetRetailAllInvoices = ({
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["retailinvoices", organizationId, customerId, limit, date, search, sortBy, sortOrder],
+        queryKey: ["retailinvoices", organizationId, customerId, limit,  fromInvoiceDate,
+            toInvoiceDate,
+            createdFromDate,
+            createdToDate, search, sortBy, sortOrder],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -117,8 +135,11 @@ export const useGetRetailAllInvoices = ({
                 customerId,
                 page: pageParam,
                 limit,
-                date,
-                search,
+ fromInvoiceDate,
+                toInvoiceDate,
+                createdFromDate,
+                createdToDate,
+                                search,
                 api,
                 sortBy,
                 sortOrder

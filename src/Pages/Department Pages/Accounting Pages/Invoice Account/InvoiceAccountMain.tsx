@@ -27,7 +27,11 @@ const InvoiceAccountsMain = () => {
     const [filters, setFilters] = useState({
         search: '',
         customerId: '',
-        date: '',
+        // date: '',
+        fromInvoiceDate: "",
+        toInvoiceDate: "",
+        createdFromDate: "",
+        createdToDate: "",
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc',
     });
@@ -58,7 +62,10 @@ const InvoiceAccountsMain = () => {
         organizationId: organizationId || '',
         customerId: filters.customerId || undefined,
         limit: 20,
-        date: filters.date || undefined,
+        fromInvoiceDate: filters.fromInvoiceDate || undefined,
+        toInvoiceDate: filters.toInvoiceDate || undefined,
+        createdFromDate: filters.createdFromDate || undefined,
+        createdToDate: filters.createdToDate || undefined,
         search: debouncedSearch || undefined,
         sortBy: filters.sortBy || undefined,
         sortOrder: filters.sortOrder || undefined,
@@ -115,8 +122,10 @@ const InvoiceAccountsMain = () => {
         setFilters({
             search: '',
             customerId: '',
-            date: '',
-            sortBy: 'createdAt',
+            fromInvoiceDate: "",
+            toInvoiceDate: "",
+            createdFromDate: "",
+            createdToDate: "", sortBy: 'createdAt',
             sortOrder: 'desc'
         });
     };
@@ -177,7 +186,7 @@ const InvoiceAccountsMain = () => {
             ) : (
                 <main className="flex gap-2 !max-h-[90%]">
                     {/* Filters Sidebar */}
-                    <div className="xl:w-80 flex-shrink-0">
+                    <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -203,7 +212,7 @@ const InvoiceAccountsMain = () => {
                                     </label>
                                     <input
                                         type="text"
-                                            autoFocus
+                                        autoFocus
                                         placeholder="Invoice number, customer name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
@@ -212,7 +221,7 @@ const InvoiceAccountsMain = () => {
                                 </div>
 
                                 {/* Date Filter */}
-                                <div>
+                                {/* <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         Filter by Date
@@ -222,6 +231,68 @@ const InvoiceAccountsMain = () => {
                                         value={filters.date}
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, date: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div> */}
+
+
+                                 <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdFromDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From Invoice Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.fromInvoiceDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, fromInvoiceDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To Invoice Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.toInvoiceDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, toInvoiceDate: e.target.value }));
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
@@ -243,6 +314,9 @@ const InvoiceAccountsMain = () => {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div> */}
+
+
+
 
                                 {/* Sort By */}
                                 <div>
@@ -290,7 +364,7 @@ const InvoiceAccountsMain = () => {
                             <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Invoices Found</h3>
                             <p className="text-sm text-gray-500">
-                                {filters.search || filters.customerId || filters.date
+                                {filters.search || filters.customerId
                                     ? 'Try adjusting your filters to find invoices.'
                                     : 'Looks like there are no invoices yet.'}
                                 <br />
@@ -298,17 +372,18 @@ const InvoiceAccountsMain = () => {
                             </p>
                         </div>
                     ) : (
-                       
+
                         <div
                             ref={scrollContainerRef}
                             className="flex-1 !max-h-[100%] overflow-y-auto"
                         >
                             {/* Table Header */}
                             <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
-                                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+                                <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
                                     <div className="col-span-1 text-center">S.No</div>
                                     <div className="col-span-3">Customer Name</div>
                                     <div className="col-span-2">Invoice Number</div>
+                                    <div className="col-span-2">Invoice Date</div>
                                     <div className="col-span-2">Created At</div>
                                     <div className="col-span-2">Grand Total</div>
                                     <div className="col-span-1 text-center">Items</div>

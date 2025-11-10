@@ -29,7 +29,11 @@ const VendorPaymentAccMain = () => {
     const [filters, setFilters] = useState({
         search: '',
         vendorId: '',
-        date: '',
+        // date: '',
+        paymentFromDate: "",
+        paymentToDate: "",
+        createdFromDate: "",
+        createdToDate: "",
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc',
     });
@@ -52,7 +56,11 @@ const VendorPaymentAccMain = () => {
         organizationId: organizationId || '',
         vendorId: filters.vendorId || undefined,
         limit: 9,
-        date: filters.date || undefined,
+        // date: filters.date || undefined,
+        paymentFromDate: filters.paymentFromDate || undefined,
+        paymentToDate: filters.paymentToDate || undefined,
+        createdFromDate: filters.createdFromDate || undefined,
+        createdToDate: filters.createdToDate || undefined,
         search: debouncedSearch || undefined,
         sortBy: filters.sortBy || undefined,
         sortOrder: filters.sortOrder || undefined,
@@ -109,7 +117,10 @@ const VendorPaymentAccMain = () => {
         setFilters({
             search: '',
             vendorId: '',
-            date: '',
+            paymentFromDate: "",
+            paymentToDate: "",
+            createdFromDate: "",
+            createdToDate: "",
             sortBy: 'createdAt',
             sortOrder: 'desc'
         });
@@ -170,7 +181,7 @@ const VendorPaymentAccMain = () => {
             ) : (
                 <main className="flex gap-2 !max-h-[90%]">
                     {/* Filters Sidebar */}
-                    <div className="xl:w-80 flex-shrink-0">
+                    <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -196,7 +207,7 @@ const VendorPaymentAccMain = () => {
                                     </label>
                                     <input
                                         type="text"
-                                            autoFocus
+                                        autoFocus
                                         placeholder="payment number, vendor name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
@@ -205,7 +216,7 @@ const VendorPaymentAccMain = () => {
                                 </div>
 
                                 {/* Date Filter */}
-                                <div>
+                                {/* <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         Created At
@@ -218,7 +229,72 @@ const VendorPaymentAccMain = () => {
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
+                                </div> */}
+
+
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdFromDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
                                 </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From Payment Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.paymentFromDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, paymentFromDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To Payment Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.paymentToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, paymentToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+
 
                                 {/* Vendor ID Filter */}
                                 {/* <div>
@@ -282,7 +358,7 @@ const VendorPaymentAccMain = () => {
                             <i className="fas fa-wallet text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No vendorPayments Found</h3>
                             <p className="text-sm text-gray-500">
-                                {filters.search || filters.vendorId || filters.date
+                                {filters.search || filters.vendorId
                                     ? 'Try adjusting your filters to find vendorPayment.'
                                     : 'Looks like there are no vendorPayment yet.'}
                                 <br />
@@ -290,17 +366,18 @@ const VendorPaymentAccMain = () => {
                             </p>
                         </div>
                     ) : (
-                       
+
                         <div
                             ref={scrollContainerRef}
                             className="flex-1 !max-h-[100%] overflow-y-auto"
                         >
                             {/* Table Header */}
                             <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
-                                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+                                <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
                                     <div className="col-span-1 text-center">S.No</div>
                                     <div className="col-span-3">Vendor Name</div>
                                     <div className="col-span-2">Payment Order No</div>
+                                    <div className="col-span-2">Payment Date</div>
                                     <div className="col-span-2">Created At</div>
                                     <div className="col-span-2">Total Amount</div>
                                     <div className="col-span-1 text-center">Items</div>
@@ -310,13 +387,13 @@ const VendorPaymentAccMain = () => {
 
                             {/* Table Body */}
                             <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
-                                {vendorPayment.map((vendor: CreateVendorPaymentPayload , index: number) => (
-                                    
+                                {vendorPayment.map((vendor: CreateVendorPaymentPayload, index: number) => (
+
                                     <VendorPaymentList key={vendor._id}
-                                     vendor={vendor} index={index} handleView={handleView} 
-                                     handleDelete={handleDelete} 
-                                     deletePending={deleteVendorPaymentMutation.isPending && deleteVendorPaymentMutation.variables.vendorpaymentsId === vendor._id}
-                                     />
+                                        vendor={vendor} index={index} handleView={handleView}
+                                        handleDelete={handleDelete}
+                                        deletePending={deleteVendorPaymentMutation.isPending && deleteVendorPaymentMutation.variables.vendorpaymentsId === vendor._id}
+                                    />
                                 ))}
                             </div>
 

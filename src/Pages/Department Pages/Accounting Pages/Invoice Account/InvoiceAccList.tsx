@@ -1,7 +1,8 @@
 import React from 'react'
 import { dateFormate } from '../../../../utils/dateFormator'
+import type { CreateInvoicePayload } from './CreateInvoiceAcc'
 type Props = {
-    invoice: any,
+    invoice: CreateInvoicePayload,
     index: number,
     handleView: (id: string) => any,
     handleDelete: (id: string) => any,
@@ -10,8 +11,8 @@ type Props = {
 const InvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDelete, deleteInvoiceMutation }) => {
     return (
         <div
-            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
-            onClick={() => handleView(invoice._id)}
+            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
+            onClick={() => handleView(invoice._id!)}
         >
             {/* S.No */}
             <div className="col-span-1 text-center text-gray-600 font-medium">
@@ -31,14 +32,19 @@ const InvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDel
             {/* Invoice Number */}
             <div className="col-span-2">
                 <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
-                    {invoice.invoiceNumber || 'N/A'}
+                    {(invoice as any).invoiceNumber || 'N/A'}
                 </span>
+            </div>
+
+  <div className="col-span-2 text-gray-600 text-sm">
+                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+                {dateFormate(invoice.invoiceDate)}
             </div>
 
             {/* Created At */}
             <div className="col-span-2 text-gray-600 text-sm">
                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
-                {dateFormate(invoice.createdAt)}
+                {dateFormate((invoice as any).createdAt)}
             </div>
 
             {/* Grand Total */}
@@ -56,7 +62,7 @@ const InvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDel
             {/* Actions */}
             <div className="col-span-1 flex justify-center gap-2">
                 {/* <button
-                    onClick={() => handleView(invoice._id)}
+                    onClick={() => handleView(invoice._id!)}
                     className="p-2 cursor-pointer text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
                     title="View Invoice"
                 >
@@ -65,7 +71,7 @@ const InvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDel
                 <button
                     onClick={(e) => {
                         e.stopPropagation()
-                        handleDelete(invoice._id)
+                        handleDelete(invoice._id!)
                     }}
                     disabled={deleteInvoiceMutation.isPending}
                     className="p-2 cursor-pointer text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

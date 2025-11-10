@@ -456,7 +456,7 @@ const PurchaseAccForm: React.FC<PurchaseAccFormProps> = ({
                     {(formData?.items?.length === 0 && initialMode === "view") ? (
                         <div className="text-center py-8 text-gray-500">
                             <i className="fas fa-inbox text-4xl mb-2"></i>
-                            <p>No items added yet. Start typing to add items.</p>
+                            <p>No items added yet.</p>
                             {/* <Button
                                 type="button"
                                 onClick={handleAddItem}

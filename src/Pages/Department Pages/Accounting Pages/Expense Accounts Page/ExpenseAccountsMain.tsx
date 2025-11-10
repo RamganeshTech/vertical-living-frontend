@@ -32,7 +32,10 @@ const ExpenseAccountsMain = () => {
     const [filters, setFilters] = useState({
         search: '',
         vendorId: '',
-        date: "",
+        dateOfPaymentToDate: "",
+        dateOfPaymentFromDate: "",
+        createdFromDate: "",
+        createdToDate: "",
         minAmount: 0,
         maxAmount: 100000,
         paidThrough: '',
@@ -44,9 +47,9 @@ const ExpenseAccountsMain = () => {
     // const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
 
     const debouncedMinAmount = useDebounce(filters.minAmount, 800);
-        const debouncedMaxAmount = useDebounce(filters.maxAmount, 800);
+    const debouncedMaxAmount = useDebounce(filters.maxAmount, 800);
     const debouncedSearch = useDebounce(filters.search, 500);
-    
+
 
     // useEffect(() => {
     //     const timer = setTimeout(() => {
@@ -70,11 +73,12 @@ const ExpenseAccountsMain = () => {
         organizationId: organizationId || '',
         search: debouncedSearch,
         vendorId: filters.vendorId || undefined,
-        // startDate: filters.startDate || undefined,
-        // endDate: filters.endDate || undefined,
-        date: filters.date || undefined,
-        minAmount: debouncedMinAmount ?  Number(debouncedMinAmount) : undefined,
-        maxAmount: debouncedMaxAmount ?  Number(debouncedMaxAmount) : undefined,
+        dateOfPaymentToDate: filters.dateOfPaymentToDate || undefined,
+        dateOfPaymentFromDate: filters.dateOfPaymentFromDate || undefined,
+        createdFromDate: filters.createdFromDate || undefined,
+        createdToDate: filters.createdToDate || undefined,
+        minAmount: debouncedMinAmount ? Number(debouncedMinAmount) : undefined,
+        maxAmount: debouncedMaxAmount ? Number(debouncedMaxAmount) : undefined,
         // maxAmount: filters.maxAmount ? filters.maxAmount : undefined,
         paidThrough: filters.paidThrough || undefined,
         sortBy: filters.sortBy,
@@ -138,7 +142,10 @@ const ExpenseAccountsMain = () => {
             vendorId: '',
             // startDate: '',
             // endDate: '',
-            date: "",
+            dateOfPaymentToDate: "",
+            dateOfPaymentFromDate: "",
+            createdFromDate: "",
+            createdToDate: "",
             minAmount: 0,
             maxAmount: 100000,
             paidThrough: '',
@@ -333,14 +340,61 @@ const ExpenseAccountsMain = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
-                                        Payment Date
+                                        From CreatedAt Date
                                     </label>
                                     <input
                                         type="date"
-                                        value={filters.date}
-                                        onChange={(e) => setFilters(f => ({ ...f, date: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Select Date"
+                                        value={filters.createdFromDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From Date of Payment
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.dateOfPaymentFromDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, dateOfPaymentFromDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To Date of Payment
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.dateOfPaymentToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, dateOfPaymentToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
 
@@ -532,7 +586,7 @@ const ExpenseAccountsMain = () => {
                                         index={index}
                                         onView={() => handleView(expense._id)}
                                         // onEdit={() => handleEdit(expense._id)}
-                                        onDelete={(e:any) => {
+                                        onDelete={(e: any) => {
                                             e.stopPropagation()
                                             handleDelete(expense._id)
                                         }}

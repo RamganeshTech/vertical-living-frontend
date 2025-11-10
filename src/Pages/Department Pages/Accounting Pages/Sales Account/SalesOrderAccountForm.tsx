@@ -519,15 +519,15 @@ const SalesOrderAccountForm: React.FC<SalesOrderAccountFormProps> = ({
                     {formData.items.length === 0 ? (
                         <div className="text-center py-8 text-gray-500">
                             <i className="fas fa-inbox text-4xl mb-2"></i>
-                            <p>No items added yet. Start typing to add items.</p>
-                            <Button
+                            <p>No items added yet.</p>
+                            {/* <Button
                                 type="button"
                                 onClick={handleAddItem}
                                 className="mt-4 bg-blue-600 text-white"
                             >
                                 <i className="fas fa-plus mr-2"></i>
                                 Add First Item
-                            </Button>
+                            </Button> */}
                         </div>
                     ) : (
                         <div className="overflow-x-auto">

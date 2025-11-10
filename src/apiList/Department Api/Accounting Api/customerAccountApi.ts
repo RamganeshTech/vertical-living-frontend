@@ -68,6 +68,8 @@ export interface GetCustomersParams {
     lastName?: string;
     customerType?: "business" | "individual";
     search?: string;
+    createdFromDate?: string
+    createdToDate?: string,
     sortBy?: string;
     sortOrder?: "asc" | "desc";
 }
@@ -314,7 +316,7 @@ export const useGetAllCustomers = (params: Omit<GetCustomersParams, 'page'>) => 
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["customers", "list", params.organizationId, params.projectId, params.customerType, params.search, params.sortBy, params.sortOrder],
+        queryKey: ["customers", "list", params.organizationId, params.projectId, params.customerType, params.search, params.sortBy, params.sortOrder, params.createdFromDate, params.createdToDate],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
                 throw new Error("Not allowed to make this API call");

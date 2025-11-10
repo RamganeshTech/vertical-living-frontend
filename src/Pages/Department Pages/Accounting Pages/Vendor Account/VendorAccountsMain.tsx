@@ -27,6 +27,8 @@ const VendorAccountsMain = () => {
     const [filters, setFilters] = useState({
         search: '',
         // projectId: '',
+        createdFromDate: "",
+        createdToDate: "",
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc'
     });
@@ -56,6 +58,8 @@ const VendorAccountsMain = () => {
         organizationId: organizationId || '',
         search: debouncedSearch,
         // projectId: filters.projectId || undefined,
+         createdFromDate: filters.createdFromDate || undefined,
+        createdToDate: filters.createdToDate || undefined,
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
         limit: 9
@@ -108,6 +112,8 @@ const VendorAccountsMain = () => {
         const clearFilters = () => {
             setFilters({
                 search: '',
+                createdFromDate: "",
+        createdToDate: "",
                 // projectId: '',
                 sortBy: 'createdAt',
                 sortOrder: 'desc'
@@ -168,7 +174,7 @@ const VendorAccountsMain = () => {
                 ) : (
                     <main className="flex gap-2 !max-h-[90%]">
                         {/* Filters Sidebar */}
-                        <div className="xl:w-80 flex-shrink-0">
+                        <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
                             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -201,6 +207,37 @@ const VendorAccountsMain = () => {
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         />
                                     </div>
+
+                                    <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdFromDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
 
                                     {/* vendor Type */}
                                     {/* <div>

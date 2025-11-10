@@ -47,7 +47,10 @@ interface GetAllExpensesParams {
     organizationId: string;
     vendorId?: string;
     search?: string;
-    date?:string,
+    dateOfPaymentToDate?: string
+    dateOfPaymentFromDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
     minAmount?: number;
     maxAmount?: number;
     paidThrough?: string;
@@ -191,12 +194,12 @@ export const useCreateExpense = () => {
         },
         onSuccess: (data) => {
             // Invalidate all expenses list for this organization
-            queryClient.invalidateQueries({ 
-                queryKey: ["expenses", "list", data.organizationId] 
+            queryClient.invalidateQueries({
+                queryKey: ["expenses", "list", data.organizationId]
             });
             // Invalidate statistics
-            queryClient.invalidateQueries({ 
-                queryKey: ["expenses", "statistics", data.organizationId] 
+            queryClient.invalidateQueries({
+                queryKey: ["expenses", "statistics", data.organizationId]
             });
         }
     });
@@ -218,16 +221,16 @@ export const useUpdateExpense = () => {
         },
         onSuccess: (data, variables) => {
             // Invalidate the specific expense
-            queryClient.invalidateQueries({ 
-                queryKey: ["expenses", "detail", variables.id] 
+            queryClient.invalidateQueries({
+                queryKey: ["expenses", "detail", variables.id]
             });
             // Invalidate all expenses list
-            queryClient.invalidateQueries({ 
-                queryKey: ["expenses", "list", data.organizationId] 
+            queryClient.invalidateQueries({
+                queryKey: ["expenses", "list", data.organizationId]
             });
             // Invalidate statistics
-            queryClient.invalidateQueries({ 
-                queryKey: ["expenses", "statistics", data.organizationId] 
+            queryClient.invalidateQueries({
+                queryKey: ["expenses", "statistics", data.organizationId]
             });
         }
     });
@@ -240,13 +243,13 @@ export const useDeleteExpense = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({ 
-            id ,
-            _organizationId:_unused 
-            
-        }: { 
-            id: string; 
-            _organizationId:string
+        mutationFn: async ({
+            id,
+            _organizationId: _unused
+
+        }: {
+            id: string;
+            _organizationId: string
         }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to delete expense");
@@ -256,16 +259,16 @@ export const useDeleteExpense = () => {
         },
         onSuccess: (_, variables) => {
             // Invalidate the specific expense
-            queryClient.invalidateQueries({ 
-                queryKey: ["expenses", "detail", variables.id] 
+            queryClient.invalidateQueries({
+                queryKey: ["expenses", "detail", variables.id]
             });
             // Invalidate all expenses list
-            queryClient.invalidateQueries({ 
-                queryKey: ["expenses", "list", variables._organizationId] 
+            queryClient.invalidateQueries({
+                queryKey: ["expenses", "list", variables._organizationId]
             });
             // Invalidate statistics
-            queryClient.invalidateQueries({ 
-                queryKey: ["expenses", "statistics", variables._organizationId] 
+            queryClient.invalidateQueries({
+                queryKey: ["expenses", "statistics", variables._organizationId]
             });
         }
     });
@@ -306,22 +309,22 @@ export const useGetAllExpenses = (
                 throw new Error("Not allowed to view expenses");
             }
             if (!api) throw new Error("API instance not found for role");
-            
-            return await getAllExpenses({ 
-                params: { ...params, page: pageParam }, 
-                api 
+
+            return await getAllExpenses({
+                params: { ...params, page: pageParam },
+                api
             });
         },
         getNextPageParam: (lastPage) => {
             // Return next page number if there's a next page, otherwise undefined
-            return lastPage.pagination.hasNextPage 
-                ? lastPage.pagination.page + 1 
+            return lastPage.pagination.hasNextPage
+                ? lastPage.pagination.page + 1
                 : undefined;
         },
         getPreviousPageParam: (firstPage) => {
             // Return previous page number if there's a previous page, otherwise undefined
-            return firstPage.pagination.hasPrevPage 
-                ? firstPage.pagination.page - 1 
+            return firstPage.pagination.hasPrevPage
+                ? firstPage.pagination.page - 1
                 : undefined;
         },
         initialPageParam: 1,

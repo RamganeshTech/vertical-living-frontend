@@ -5,6 +5,7 @@ import RetailInvoiceAccountForm from './RetailInvoiceAccountForm';
 import { useCreateRetailInvoice } from '../../../../apiList/Department Api/Accounting Api/retailinvoiceApi';
 
 export interface RetailCreateInvoicePayload {
+    _id?:string,
     customerId: string;
     organizationId: string;
     customerName: string;

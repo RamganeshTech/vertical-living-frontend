@@ -11,7 +11,8 @@ const getAllVendorPayment = async ({
     vendorId,
     page,
     limit,
-    date,
+    // date,
+    paymentFromDate, paymentToDate,createdFromDate,createdToDate,
     search,
     sortBy,
     sortOrder,
@@ -21,7 +22,11 @@ const getAllVendorPayment = async ({
     vendorId?: string;
     page?: number;
     limit?: number;
-    date?: string;
+    // date?: string;
+     paymentFromDate?: string
+    paymentToDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
     search?: string;
     api: AxiosInstance,
     sortBy?: string;
@@ -32,7 +37,10 @@ const getAllVendorPayment = async ({
     if (vendorId) params.append('vendorId', vendorId);
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
-    if (date) params.append('date', date);
+    if (paymentFromDate) params.append('paymentFromDate', paymentFromDate);
+    if (paymentToDate) params.append('paymentToDate', paymentToDate);
+    if (createdFromDate) params.append('createdFromDate', createdFromDate);
+    if (createdToDate) params.append('createdToDate', createdToDate);
     if (sortBy) params.append('sortBy', sortBy);
     if (sortOrder) params.append('sortOrder', sortOrder);
     if (search) params.append('search', search);
@@ -87,7 +95,10 @@ export const useGetAllVendorPayments = ({
     vendorId,
     limit = 10,
     search,
-    date,
+    paymentFromDate,
+    paymentToDate,
+    createdFromDate,
+    createdToDate,
     sortBy,
     sortOrder
 }: {
@@ -95,7 +106,11 @@ export const useGetAllVendorPayments = ({
     vendorId?: string;
     limit?: number;
     search?: string;
-    date?: string
+    // date?: string
+    paymentFromDate?: string
+    paymentToDate?: string
+    createdFromDate?: string
+    createdToDate?: string,
     sortBy?: string;
     sortOrder?: string;
 }) => {
@@ -104,7 +119,7 @@ export const useGetAllVendorPayments = ({
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["VendorPayment", organizationId, vendorId, limit, date, search, sortBy, sortOrder],
+        queryKey: ["VendorPayment", organizationId, vendorId, limit, paymentFromDate, paymentToDate, createdFromDate, createdToDate, search, sortBy, sortOrder],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -117,7 +132,7 @@ export const useGetAllVendorPayments = ({
                 vendorId,
                 page: pageParam,
                 limit,
-                date,
+                paymentFromDate, paymentToDate, createdFromDate, createdToDate,
                 search,
                 sortBy,
                 sortOrder,

@@ -36,16 +36,19 @@ const BillAccList: React.FC<Props> = ({ bill, index, handleView, handleDelete, d
                 </span>
             </div>
 
+
+               <div className="col-span-2 text-gray-600 text-sm">
+                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+                {dateFormate(bill.billDate!)}
+            </div>
+
             {/* Created At */}
             <div className="col-span-2 text-gray-600 text-sm">
                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
                 {dateFormate(bill.createdAt!)}
             </div>
 
-                <div className="col-span-2 text-gray-600 text-sm">
-                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
-                {dateFormate(bill.billDate!)}
-            </div>
+             
 
             {/* Grand Total */}
             <div className="col-span-2 font-semibold text-green-600">

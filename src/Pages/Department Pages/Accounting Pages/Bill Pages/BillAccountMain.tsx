@@ -239,7 +239,7 @@ const BillAccountsMain = () => {
                                     </label>
                                     <input
                                         type="date"
-                                        value={filters.billToDate}
+                                        value={filters.createdToDate}
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdToDate: e.target.value }));
                                         }}

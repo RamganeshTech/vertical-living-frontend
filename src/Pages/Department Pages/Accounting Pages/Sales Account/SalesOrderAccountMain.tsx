@@ -25,8 +25,10 @@ const SalesOrderAccountMain = () => {
     const [filters, setFilters] = useState({
         search: '',
         customerId: '',
-        date: '',
-        salesOrderDate: '',
+        fromSalesOrderDate: "",
+toSalesOrderDate: "",
+createdFromDate: "",
+createdToDate: "",
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc',
     });
@@ -57,8 +59,10 @@ const SalesOrderAccountMain = () => {
         organizationId: organizationId || '',
         customerId: filters.customerId || undefined,
         limit: 10,
-        date: filters.date || undefined,
-        salesOrderDate: filters.salesOrderDate || undefined,
+        fromSalesOrderDate: filters.fromSalesOrderDate || undefined,
+        toSalesOrderDate: filters.toSalesOrderDate || undefined,
+        createdFromDate: filters.createdFromDate || undefined,
+        createdToDate: filters.createdToDate || undefined,
         search: debouncedSearch || undefined,
         sortBy: filters.sortBy || undefined,
         sortOrder: filters.sortOrder || undefined,
@@ -115,8 +119,10 @@ const SalesOrderAccountMain = () => {
         setFilters({
             search: '',
             customerId: '',
-            date: '',
-            salesOrderDate: '',
+            fromSalesOrderDate: "",
+toSalesOrderDate: "",
+createdFromDate: "",
+createdToDate: "",
             sortBy: 'createdAt',
             sortOrder: 'desc'
         });
@@ -178,7 +184,7 @@ const SalesOrderAccountMain = () => {
             ) : (
                 <main className="flex gap-2 !max-h-[90%]">
                     {/* Filters Sidebar */}
-                    <div className="xl:w-80 flex-shrink-0">
+                    <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -213,7 +219,7 @@ const SalesOrderAccountMain = () => {
                                 </div>
 
                                 {/* Date Filter */}
-                                <div>
+                                {/* <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         Filter by Created At
@@ -241,7 +247,70 @@ const SalesOrderAccountMain = () => {
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
+                                </div> */}
+
+  <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdFromDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
                                 </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To CreatedAt Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.createdToDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, createdToDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        From Sales Order Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.fromSalesOrderDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, fromSalesOrderDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-calendar mr-2"></i>
+                                        To Sales Order Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={filters.toSalesOrderDate}
+                                        onChange={(e) => {
+                                            setFilters(f => ({ ...f, toSalesOrderDate: e.target.value }));
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                
 
                                 {/* Customer ID Filter */}
                                 {/* <div>
@@ -305,7 +374,7 @@ const SalesOrderAccountMain = () => {
                             <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Sales Order Found</h3>
                             <p className="text-sm text-gray-500">
-                                {filters.search || filters.customerId || filters.date
+                                {filters.search || filters.customerId
                                     ? 'Try adjusting your filters to find orders.'
                                     : 'Looks like there are no orders yet.'}
                                 <br />

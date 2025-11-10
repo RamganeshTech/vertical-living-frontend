@@ -66,6 +66,8 @@ export interface GetVendorsParams {
     projectId?: string;
     firstName?: string;
     lastName?: string;
+     createdFromDate?: string
+    createdToDate?: string,
     // VendorType?: "business" | "individual";
     search?: string;
     sortBy?: string;
@@ -314,7 +316,7 @@ export const useGetAllVendors = (params: Omit<GetVendorsParams, 'page'>) => {
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["vendors", "list", params.organizationId,   params.search, params.sortBy, params.sortOrder],
+        queryKey: ["vendors", "list", params.organizationId,   params.search, params.sortBy, params.sortOrder, params.createdFromDate, params.createdToDate],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
                 throw new Error("Not allowed to make this API call");

@@ -5,6 +5,7 @@ import { useCreateInvoice } from '../../../../apiList/Department Api/Accounting 
 import InvoiceAccountForm from './InvoiceAccountForm';
 
 export interface CreateInvoicePayload {
+    _id?:string,
     customerId: string;
     organizationId: string;
     customerName: string;
