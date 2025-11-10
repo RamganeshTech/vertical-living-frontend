@@ -1,6 +1,7 @@
 // src/components/Department/Accounting/ExpenseAccounts/ExpenseList.tsx
 
 import React from 'react';
+import { dateFormate } from '../../../../utils/dateFormator';
 
 interface ExpenseAccListProps {
     expense: {
@@ -56,11 +57,14 @@ const ExpenseList: React.FC<ExpenseAccListProps> = ({
 
             {/* Payment Date */}
             <div className="col-span-2 text-center text-sm text-gray-600">
-                {new Date(expense.dateOfPayment).toLocaleDateString('en-US', {
+                {/* {new Date(expense.dateOfPayment).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     year: 'numeric'
-                })}
+                })} */}
+                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+
+                {dateFormate(expense.dateOfPayment)}
             </div>
 
             {/* Paid Through */}
@@ -76,11 +80,15 @@ const ExpenseList: React.FC<ExpenseAccListProps> = ({
 
             {/* Created At */}
             <div className="col-span-2 text-center text-sm text-gray-500">
-                {new Date(expense.createdAt).toLocaleDateString('en-US', {
+                {/* {new Date(expense.createdAt).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     year: 'numeric'
-                })}
+                })} */}
+                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+
+                {dateFormate(expense.createdAt)}
+
             </div>
 
             {/* Actions */}

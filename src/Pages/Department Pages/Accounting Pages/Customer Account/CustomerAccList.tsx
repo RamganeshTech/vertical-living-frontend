@@ -68,7 +68,7 @@ const CustomerAccList: React.FC<Props> = ({
             </div>
 
             {/* Created At */}
-            <div className="col-span-2 text-sm text-gray-600 whitespace-nowrap">
+            <div className="col-span-2 text-sm text-gray-600 whitespace-nowrap text-center">
                 <i className="fas fa-calendar-alt mr-2 text-gray-400"></i>
                 {dateFormate(customer.createdAt)}
             </div>

@@ -11,7 +11,7 @@ type Props = {
 const PurchaseAccList: React.FC<Props> = ({ purchase, index, handleView, handleDelete, deletePending }) => {
     return (
         <div
-            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
+            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
             onClick={() => handleView(purchase._id!)}
         >
             {/* S.No */}
