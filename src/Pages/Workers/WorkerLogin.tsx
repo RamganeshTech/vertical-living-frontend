@@ -82,7 +82,8 @@ export default function WorkerLogin() {
       dispatch(setRole({
         role: workerData.role,
         isauthenticated: true,
-        _id: workerData._id
+        _id: workerData._id,
+        userName: workerData?.workerName
       }));
 
       // ✅ 2) Update workerSlice

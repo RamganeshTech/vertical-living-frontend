@@ -16,7 +16,7 @@ const CreateExpense: React.FC = () => {
     };
 
     return (
-        <div className="min-h-full overflow-y-auto bg-gray-50 py-2">
+        <div className="max-h-full overflow-y-auto bg-gray-50 py-2">
             <div className="max-w-full mx-auto px-2">
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <ExpenseForm

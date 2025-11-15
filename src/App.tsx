@@ -6,16 +6,23 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-const IssueDiscussionPage = lazy(()=> import(  './Pages/Stage Pages/Issue Discussion Pages/IssueDiscussionPage'));
-const VendorPaymentAccMain = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentAccMain'));
-const VendorPaymentSingle = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentSingle'));
-const CreateVendorPaymentAcc = lazy(()=> import( './Pages/Department Pages/Accounting Pages/Vendor Payment Pages/CreateVendorPaymentAcc'));
-const BillAccountsMain  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/BillAccountMain'));
-const BillAccSingle  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/BillAccSingle'));
-const CreateBillAcc  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Bill Pages/CreateBillAcc'));
-const PurchaseAccountsMain  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Purchase Pages/PurchaseAccountMain'));
-const PurchasesAccSingle  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Purchase Pages/PurchaseAccSingle'));
-const CreatePurchaseAcc  = lazy(() => import( './Pages/Department Pages/Accounting Pages/Purchase Pages/CreatePurchaseAcc'));
+// import SubContractMain from './Pages/SubContract Pages/SubContractMain';
+// import PublicSubContract from './Pages/SubContract Pages/PublicSubContract';
+// import CreateSubContract from './Pages/SubContract Pages/CreateSubContract';
+const SubContractMain = lazy(() => import( './Pages/SubContract Pages/SubContractNew Pages/SubContractMain'));
+const CreateSubContract = lazy(() => import( './Pages/SubContract Pages/SubContractNew Pages/CreateSubContract'));
+const SingleSubContract = lazy(() => import( './Pages/SubContract Pages/SubContractNew Pages/SingleSubContract'));
+const PublicSubContract = lazy(() => import( './Pages/SubContract Pages/SubContractNew Pages/PublicSubContract'));
+const IssueDiscussionMain = lazy(() => import('./Pages/Stage Pages/Issue Discussion Pages/IssueDiscussionPage'));
+const VendorPaymentAccMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentAccMain'));
+const VendorPaymentSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentSingle'));
+const CreateVendorPaymentAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Payment Pages/CreateVendorPaymentAcc'));
+const BillAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Bill Pages/BillAccountMain'));
+const BillAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Bill Pages/BillAccSingle'));
+const CreateBillAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Bill Pages/CreateBillAcc'));
+const PurchaseAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Purchase Pages/PurchaseAccountMain'));
+const PurchasesAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Purchase Pages/PurchaseAccSingle'));
+const CreatePurchaseAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Purchase Pages/CreatePurchaseAcc'));
 const ExpenseAccountSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Expense Accounts Page/ExpenseAccountsSingle'));
 const ExpenseAccountMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Expense Accounts Page/ExpenseAccountsMain'));
 const CreateExpense = lazy(() => import('./Pages/Department Pages/Accounting Pages/Expense Accounts Page/CreateExpense'));
@@ -191,6 +198,7 @@ function App() {
 
     // ✅ Join organization room once on load
     socket.emit("join_organization", { organizationId: organizationId });
+
     return () => {
       console.log("left 'leav_organizaiton' for project:", organizationId);
 
@@ -233,15 +241,6 @@ function App() {
           <Route path='/forgotpassword/:role' element={<ForgotPassword />} />
 
           <Route path="/subscription" element={<SubscriptionPlans />} />
-
-
-          {/* commented organizaion route */}
-          {/* <Route path="/organizations" element={<ProtectedRoutes allowedRoles={["owner"]} >
-          <Organization />
-        </ProtectedRoutes>} /> */}
-
-
-
 
           <Route path="/organizations" element={
             <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
@@ -513,7 +512,7 @@ function App() {
 
             </Route>
 
-              <Route path="purchasemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="purchasemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <PurchaseAccountsMain />
             </ProtectedRoutes>} >
 
@@ -529,7 +528,7 @@ function App() {
 
             </Route>
 
-             <Route path="vendorpaymentmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="vendorpaymentmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <VendorPaymentAccMain />
             </ProtectedRoutes>} >
 
@@ -541,6 +540,22 @@ function App() {
               <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <CreateVendorPaymentAcc />
               </ProtectedRoutes>} />
+            </Route>
+
+
+            <Route path="subcontractmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <SubContractMain />
+            </ProtectedRoutes>} >
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateSubContract />
+              </ProtectedRoutes>} />
+
+               <Route path="single/:subContractId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <SingleSubContract />
+              </ProtectedRoutes>} />
+              
             </Route>
 
 
@@ -753,7 +768,7 @@ function App() {
               </ProtectedRoutes>
             } />
 
-            
+
 
             <Route path="sampledesign" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
@@ -779,14 +794,6 @@ function App() {
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
 
                 <TechnicalConsultant />
-              </ProtectedRoutes>
-            } />
-
-            
-            <Route path="issuediscussion" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-
-                <IssueDiscussionPage />
               </ProtectedRoutes>
             } />
 
@@ -1105,6 +1112,10 @@ function App() {
             <NotificationMain />
           </ProtectedRoutes>} />
 
+          <Route path="/:organizationId/ticket" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <IssueDiscussionMain />
+          </ProtectedRoutes>} />
+
 
           {/* REQUIREMENT FORM LINK */}
 
@@ -1115,6 +1126,7 @@ function App() {
           <Route path='/ordermaterial/setup' element={<PublicOrgOrderMaterialSetup />} />
           <Route path='/:organizationId/ordermaterial' element={<PublicOrderMaterialMain />} />
 
+          <Route path='/subcontract/share/:subContractId' element={<PublicSubContract />} />
 
           <Route path="*" element={<NotFound />} />
 

@@ -14,6 +14,7 @@ import { useState } from "react"
 import { useGetAllUsers } from "../../apiList/getAll Users Api/getAllUsersApi"
 import RoleCard from "./RoleCard"
 import type { OrganizationOutletTypeProps } from "./OrganizationChildren"
+import { IssueDiscussionPage } from "../Stage Pages/Issue Discussion Pages/IssueDiscussionPage"
 
 export default function OrganizationDetails() {
   const { organizationId } = useParams<{ organizationId: string }>()
@@ -25,10 +26,17 @@ export default function OrganizationDetails() {
   const [editName, setEditName] = useState("")
 
 
+
+  const [showTicketOpr, setShowShowTicketOpr] = useState(true)
   const [editingPhone, setEditingPhone] = useState(false)
   const [editingAddress, setEditingAddress] = useState(false)
   const [tempPhone, setTempPhone] = useState("")
   const [tempAddress, setTempAddress] = useState("")
+
+
+  const handleTicketChange = () => {
+    setShowShowTicketOpr(p => !p)
+  }
 
 
   // Fetch organization and staff data
@@ -495,32 +503,67 @@ export default function OrganizationDetails() {
           </div>
         </div>
 
-        <div className="px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-3  sm:min-h-[65vh] sm:max-h-[100%]">
-          <RoleCard
-            title="Staffs"
-            icon="fa-user-tie"
-            list={staffList}
-            isLoading={staffLoading}
-          />
-          <RoleCard
-            title="CTOs"
-            icon="fa-user-cog"
-            list={ctoList}
-            isLoading={ctoLoading}
-          />
-          <RoleCard
-            title="Workers"
-            icon="fa-user-hard-hat"
-            list={workerList}
-            isLoading={workerLoading}
-          />
-          <RoleCard
-            title="Clients"
-            icon="fa-user-friends"
-            list={clientList}
-            isLoading={clientLoading}
-          />
-        </div>
+        <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <aside className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-100">
+            {showTicketOpr ? (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <i className="fas fa-ticket-alt text-blue-600 text-lg"></i>
+                </div>
+                <h1 className="text-2xl font-bold text-gray-800">Ticket Operations</h1>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <i className="fas fa-users text-blue-600 text-lg"></i>
+                </div>
+                <h1 className="text-2xl font-bold text-gray-800">Employees</h1>
+              </div>
+            )}
+
+            <Button
+              onClick={handleTicketChange}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
+            >
+              <i className={`fas ${showTicketOpr ? 'fa-users' : 'fa-ticket-alt'} text-sm`}></i>
+              Show {showTicketOpr ? "employee list" : "tickets"}
+            </Button>
+          </aside>
+
+          {showTicketOpr ? (
+            <div className="h-full w-full bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+              <IssueDiscussionPage showFilters={true} showFullView={false} showHeader={false} />
+            </div>
+          ) : (
+            <div className="px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-3  sm:min-h-[65vh] sm:max-h-[100%]">
+              <RoleCard
+                title="Staffs"
+                icon="fa-user-tie"
+                list={staffList}
+                isLoading={staffLoading}
+              />
+              <RoleCard
+                title="CTOs"
+                icon="fa-user-cog"
+                list={ctoList}
+                isLoading={ctoLoading}
+              />
+              <RoleCard
+                title="Workers"
+                icon="fa-user-hard-hat"
+                list={workerList}
+                isLoading={workerLoading}
+              />
+              <RoleCard
+                title="Clients"
+                icon="fa-user-friends"
+                list={clientList}
+                isLoading={clientLoading}
+              />
+            </div>
+          )}
+        </section>
+
 
       </div>
     </div>

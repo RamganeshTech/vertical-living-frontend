@@ -68,7 +68,9 @@ const LoginPage = () => {
                     dispatch(setRole({
                         _id: userData?.userId,
                         role: userData?.role,
-                        isauthenticated: true
+                        isauthenticated: true,
+                        userName: userData?.userName
+
                     }));
 
                     // 2️⃣ Update userSlice
@@ -89,7 +91,7 @@ const LoginPage = () => {
             }
         }
         catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message|| error?.message || "Failed to login", variant: "destructive" })
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to login", variant: "destructive" })
         }
     };
 

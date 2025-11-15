@@ -77,7 +77,9 @@ export default function CTOLogin() {
       dispatch(setRole({
         role: CTOData.role,
         isauthenticated: true,
-        _id: CTOData.CTOId // map _id
+        _id: CTOData.CTOId, // map _id
+        userName: CTOData?.CTOName
+
       }));
 
       // ✅ 2) Set CTOSlice
@@ -203,7 +205,7 @@ export default function CTOLogin() {
               </div>
 
 
-              
+
 
               <div className="text-right">
                 <Link to="/forgotpassword/CTO" className="text-blue-600 text-sm font-medium ">forgot Password</Link>

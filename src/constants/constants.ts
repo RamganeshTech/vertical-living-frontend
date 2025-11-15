@@ -1,4 +1,4 @@
-import noimg from '../assets/no image.jpeg'
+  import noimg from '../assets/no image.jpeg'
 
 export const SIDEBAR_LABELS: Record<string, string> = {
   //   DASHBOARD: "Dashboard",
@@ -7,6 +7,7 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   // SHORTLISTMICA: "Mica Designs",
   ORGANIZATION: "Organization",
   COMMONORDER: "Common Order",
+  SUBCONTRACT: `Sub Contract`,
   HR: "HR Dept",
   LOGISTICS: "Logistics",
   PROCUREMENT: "Procurement",
@@ -22,6 +23,7 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   STAFFTASK: "Staff Tasks",
   SINGLESTAFFTASK: "Tasks",
   MATERIALINVENTORY: "Product Inventory",
+
   // NOTIFICATION: "Notification",
 
   // ISSUES: "Issues",
@@ -51,6 +53,7 @@ export const SIDEBAR_ICONS: Record<string, string> = {
   STAFFTASK: "fas fa-object-group text-2xl",
   SINGLESTAFFTASK: "fas fa-object-group text-2xl",
   MATERIALINVENTORY: "fa-solid fa-object-group text-2xl",
+  SUBCONTRACT: "fa-solid fa-person-digging text-2xl",
   // NOTIFICATION: "fas fa-message",
 
   // ISSUES: "fa-solid fa-bug text-2xl",
@@ -116,7 +119,7 @@ export const PROJECTS_LABELS = {
   SAMPLEDESIGN: "Sample Designs",
   WORKSCHEDULE: "Work Schedule",
   TECHNICALCONSULTANT: "Technical consultantation",
-  TICKETOPERATIONS: "Ticket Operations",
+  // TICKETOPERATIONS: "Ticket Operations",
   // SELECTSTAGE: "Select Stage",
   // EXTERNAL: "External Units",
   // MATERIALSELECTION: "Material Selection",
@@ -147,7 +150,7 @@ export const PROJECTS_ICONS = {
   SAMPLEDESIGN: "fa-solid fa-object-group text-2xl",
   WORKSCHEDULE: "fas fa-digging text-2xl",
   TECHNICALCONSULTANT: "fa-solid fa-comments text-2xl",
-  TICKETOPERATIONS: "fas fa-ticket text-2xl",
+  // TICKETOPERATIONS: "fas fa-ticket text-2xl",
 
   // SELECTSTAGE: "fa-solid fa-square-check text-2xl",
   // EXTERNAL: "fa-solid fa-boxes-stacked text-2xl",

@@ -9,6 +9,10 @@ export interface IIssueRaise {
     _id?: string
     selectStaff: IStaffData
     staffSelectedModel: string
+    projectId?: {
+        _id: string,
+        projectName: string
+    },
     raisedBy: IStaffData
     raisedModel: string
     issue: string
@@ -46,7 +50,7 @@ export interface IConvo {
 export interface IIssueDiscussion {
     _id?: string
     organizationId: string
-    projectId: string
+    // projectId: string
     discussion: IConvo[]
     createdAt?: Date
     updatedAt?: Date
@@ -65,13 +69,14 @@ export interface IStaffData {
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import {
     useCreateIssue,
     useProvideSolution,
     useGetProjectDiscussions,
     useDeleteConversation,
-    useForwardIssue
+    useForwardIssue,
+    useMarkAllTicketAsRead
 } from "../../../apiList/Stage Api/issueDiscussionApi"
 import { useGetAllUsers } from "../../../apiList/getAll Users Api/getAllUsersApi"
 import { Button } from "../../../components/ui/Button"
@@ -85,8 +90,12 @@ import { toast } from "../../../utils/toast"
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 import { NO_IMAGE } from "../../../constants/constants"
 import { dateFormate } from "../../../utils/dateFormator"
-
-
+import { useGetProjects } from "../../../apiList/projectApi"
+import type { AvailableProjetType } from "../../Department Pages/Logistics Pages/LogisticsShipmentForm"
+import { Badge } from "../../../components/ui/Badge"
+import { useDebounce } from "../../../Hooks/useDebounce"
+import { useSelector } from "react-redux"
+import type { RootState } from "../../../store/store"
 
 
 // Types
@@ -105,6 +114,8 @@ interface ResponseState {
 interface IssueState {
     issue: string;
     selectedStaff: string;
+    projectId: string
+    projectName: string
     selectStaffRole: string;
     dropdownOptions: string;
     files: File[];
@@ -118,11 +129,45 @@ interface PreviewState {
     url: string
 }
 
-export default function IssueDiscussionPage() {
-    const { projectId, organizationId } = useParams<{
-        projectId: string
-        organizationId: string
-    }>()
+
+export interface IssueDiscussionFilters {
+    search: string;
+    projectId: string;
+    projectName: string;
+    myTickets: boolean;
+    notResponded: boolean;
+    sortBy: string;
+    sortOrder: string;
+}
+
+
+
+type Props = {
+    showHeader?: boolean,
+    showFilters?: boolean,
+    showFullView?: boolean
+
+}
+
+const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = true }) => {
+    const { organizationId } = useParams<{ organizationId: string }>()
+    const navigate = useNavigate()
+    const location = useLocation()
+
+
+    const [filters, setFilters] = useState<IssueDiscussionFilters>({
+        search: "",
+        projectId: "",
+        projectName: "",
+        myTickets: false,
+        notResponded: false,
+        sortBy: "createdAt",
+        sortOrder: "desc"
+    });
+
+
+    let debouncedSearch = useDebounce(filters.search, 500)
+
 
     // Hooks
     const { mutateAsync: createIssue, isPending: isCreating } = useCreateIssue()
@@ -130,23 +175,34 @@ export default function IssueDiscussionPage() {
     const { mutateAsync: deleteConvo, isPending: isDeleteing, variables } = useDeleteConversation()
 
     const { mutateAsync: forwardConvo, isPending: isForwarding } = useForwardIssue();
+    const { mutateAsync: markAllAsRead } = useMarkAllTicketAsRead({ organizationId: organizationId! })
 
     const {
         data: discussionsData,
         isLoading: isLoadingDiscussions,
         hasNextPage,
         fetchNextPage,
+        refetch
     } = useGetProjectDiscussions({
-        projectId: projectId!,
+        organizationId: organizationId!,
         limit: 50,
+        filters: {
+            search: debouncedSearch,
+            projectId: filters.projectId,
+            projectName: filters.projectName,
+            myTickets: filters.myTickets,
+            notResponded: filters.notResponded,
+            sortBy: filters.sortBy,
+            sortOrder: filters.sortOrder
+        }
     })
     const { data: staffList = [] } = useGetAllUsers(organizationId!, "staff")
     const { data: ownerList = [] } = useGetAllUsers(organizationId!, "owner")
     const { data: workerList = [] } = useGetAllUsers(organizationId!, "worker");
     const { data: CTOList = [] } = useGetAllUsers(organizationId!, "CTO");
     // State
-    const [discussions, setDiscussions] = useState<IConvo[]>([])
-    const [selectedIssue, setSelectedIssue] = useState<IConvo | null>(null)
+    const [discussions, setDiscussions] = useState<IIssueDiscussion[]>([])
+    const [selectedIssue, setSelectedIssue] = useState<IIssueDiscussion | null>(null)
     const [showCreateForm, setShowCreateForm] = useState(false)
     const [createFormData, setCreateFormData] = useState<FormState>({
         responseType: "text",
@@ -157,6 +213,8 @@ export default function IssueDiscussionPage() {
     const [createFormValues, setCreateFormValues] = useState<IssueState>({
         issue: "",
         selectedStaff: "",
+        projectId: "",
+        projectName: "",
         selectStaffRole: "",
         dropdownOptions: "",
         files: []
@@ -167,6 +225,7 @@ export default function IssueDiscussionPage() {
         files: [],
         message: "",
     })
+
 
     const [isEnableForwarding, setIsEnableForwarding] = useState<boolean>(false);
     const [forwardToStaff, setForwardToStaff] = useState("");
@@ -185,19 +244,37 @@ export default function IssueDiscussionPage() {
         url: "",
     })
 
+    const { data: projectsData } = useGetProjects(organizationId!);
+    const projects = projectsData?.map((project: AvailableProjetType) => ({
+        _id: project._id,
+        projectName: project.projectName
+    }));
+
+
+    const projectOptions = (projectsData || [])?.map((project: AvailableProjetType) => ({
+        value: project._id,
+        label: project.projectName
+    }))
+
+    useEffect(() => {
+        if (projects && projects.length > 0 && !createFormValues.projectId) {
+            setCreateFormValues(p => ({ ...p, projectId: projects[0]._id }));
+        }
+    }, [projects,]);
+
+
+
 
     // Initialize Socket
     useEffect(() => {
-        if (!socket || !organizationId || !projectId) return
+        if (!socket || !organizationId) return
 
-        console.log("[Socket] Joining discussion room for project:", projectId)
-
+        console.log("[Socket] Joining discussion room for organizationId:", organizationId)
 
         // JOIN THE DISCUSSION ROOM FIRST!
-        socket.emit('join_project_discussion', {
-            projectId,
-            organizationId
-        })
+        // socket.emit('join_ticket_discussion', {
+        //     organizationId
+        // })
 
         // Listen for room join confirmation
         socket.on('recent_discussions', (data) => {
@@ -205,12 +282,15 @@ export default function IssueDiscussionPage() {
         })
 
         // 1. New Issue Created - MATCH BACKEND EVENT NAME
-        const handleNewIssueCreated = (data: {
+        const handleNewIssueCreated = async (data: {
             discussionId: string
-            conversation: IConvo
+            conversation: IIssueDiscussion
             projectId: string
         }) => {
             console.log("[Socket] New issue created:", data)
+
+            const isValidPath = location.pathname
+
             // Add to discussions if not created by current user
             setDiscussions((prev) => {
                 // Check if already exists (to prevent duplicates)
@@ -220,15 +300,22 @@ export default function IssueDiscussionPage() {
                 }
                 return prev
             })
+
+
+            if ((location.pathname.includes("organizations") && isValidPath.split('/').length === 3) || location.pathname.includes("ticket")) {
+                try {
+                    console.log("everything is working",)
+                    await markAllAsRead()
+                } catch (error) {
+                    console.log("error from mark as read ticket", error)
+                }
+            }
         }
-
-
-
 
         const handleIssueResponseAdded = (data: {
             projectId: string;
             convoId: string;
-            conversation?: IConvo; // Full conversation
+            conversation: IIssueDiscussion; // Full conversation
             response?: any; // Just the response
         }) => {
 
@@ -243,57 +330,32 @@ export default function IssueDiscussionPage() {
 
             console.log("[Socket] Response added:", data)
 
+
             // Update discussions list
             setDiscussions((prev) =>
-                prev.map((convo) => {
-                    if (convo._id === data.convoId) {
-                        // If we have the full conversation, use it
-
-                        console.log("data from the upate", data)
-                        if (data.conversation) {
-                            return data.conversation;
-                        }
-                        // Otherwise, just update the response
-                        return {
-                            ...convo,
-                            response: data.response,
-                            status: "responded" as const
-                        };
+                prev.map((doc) => {
+                    if (doc._id === data.conversation._id) {
+                        return data.conversation  // Replace with updated document
                     }
-                    return convo;
+                    return doc
                 })
-            );
+            )
+
 
             console.log("selectedIssue id", selectedIssue?._id)
             console.log("data.convoId", data.convoId)
-            // Update selected issue if it matches
-            // if (selectedIssue?._id === data.convoId) {
-            // ✅ Use functional update to get current state
+
             setSelectedIssue((prev) => {
-                console.log("Current selected:", prev?._id);
-                console.log("Response for:", data.convoId);
-
-                // If no issue selected, auto-select the one that got response
                 if (!prev) {
-                    console.log("✅ Auto-selecting issue that got response");
-                    return data.conversation || null;
+                    return data.conversation  // Auto-select if none selected
                 }
 
-                // If it's the same issue, update it
-                if (prev._id === data.convoId) {
-                    console.log("✅ Same issue - updating");
-                    return data.conversation || {
-                        ...prev,
-                        response: data.response,
-                        status: "responded" as const
-                    };
+                if (prev._id === data.conversation._id) {
+                    return data.conversation  // Update if same issue
                 }
 
-                // Different issue - keep current selection
-                console.log("❌ Different issue - keeping current");
-                return prev;
-            });
-            // }
+                return prev  // Keep current selection
+            })
         }
 
         // 3. Issue Deleted - MATCH BACKEND EVENT NAME
@@ -303,54 +365,48 @@ export default function IssueDiscussionPage() {
         }) => {
             console.log("[Socket] Issue deleted:", data)
 
-            setDiscussions((prev) => prev.filter((convo) => convo._id !== data.convoId))
+            setDiscussions((prev) => prev.filter((convo) => convo._id !== data.discussionId))
 
             setSelectedIssue((prev) => {
                 console.log("Current selected issue:", prev?._id);
                 console.log("Deleted issue:", data.convoId);
+                console.log("discussionId issue:", data.discussionId);
 
-                // If the deleted issue is currently selected, clear it
-                if (prev?._id === data.convoId) {
-                    console.log("✅ Deleted issue was selected - clearing selection");
-                    return null;
+
+                if (prev?._id === data.discussionId) {
+                    return null  // Clear if deleted issue was selected
                 }
-
-                console.log("❌ Deleted issue was not selected - keeping selection");
-                return prev;
+                return prev
             });
         }
 
-
-
         const handleIssueForwarded = (data: {
-            projectId: string;
+            // projectId: string;
+            discussionId: string,
             convoId: string;
-            conversation: IConvo;
-            forwardedFrom: string;
-            forwardedTo: string;
+            conversation: IIssueDiscussion;
+            forwardedBy: string;
+            // forwardedTo: string;
         }) => {
             console.log("[Socket] Issue forwarded:", data);
 
             // Update discussions list
             setDiscussions((prev) =>
-                prev.map((convo) => {
-                    if (convo._id === data.convoId) {
-                        console.log("✅ Updating forwarded issue");
-                        return data.conversation;
+                prev.map((doc) => {
+                    if (doc._id === data.conversation._id) {
+                        return data.conversation  // Replace with updated document
                     }
-                    return convo;
+                    return doc
                 })
-            );
+            )
 
             // Update selected issue if it matches
             setSelectedIssue((prev) => {
-                if (!prev || prev._id !== data.convoId) {
-                    return prev;
+                if (prev?._id === data.conversation._id) {
+                    return data.conversation  // Update if same issue
                 }
-
-                console.log("✅ Updating selected forwarded issue");
-                return data.conversation;
-            });
+                return prev
+            })
         };
 
         // Register event listeners with CORRECT NAMES
@@ -358,14 +414,12 @@ export default function IssueDiscussionPage() {
         socket.on("issue_response_added", handleIssueResponseAdded)
         socket.on("issue_deleted", handleIssueDeleted)
         socket.on("issue_forwarded", handleIssueForwarded);
-
-
         // Cleanup
         return () => {
             console.log("[Socket] Leaving discussion room")
 
             // Leave the room
-            socket.emit('leave_project_discussion', { projectId })
+            // socket.emit('leave_project_discussion', { projectId })
 
             // Remove listeners
             socket.off("new_issue_created", handleNewIssueCreated)
@@ -373,9 +427,9 @@ export default function IssueDiscussionPage() {
             socket.off("issue_deleted", handleIssueDeleted)
             socket.off("issue_forwarded", handleIssueForwarded);
 
-            socket.off("recent_discussions")
+            // socket.off("recent_discussions")
         }
-    }, [organizationId, projectId, currentUser?.id,]) // Remove selectedIssue from dependencies
+    }, [organizationId, currentUser?.id,]) // Remove selectedIssue from dependencies
 
     // Load discussions
     useEffect(() => {
@@ -385,10 +439,26 @@ export default function IssueDiscussionPage() {
         }
     }, [discussionsData])
 
-    // Auto scroll to bottom
+
+
+    const {userName} = useSelector((state:RootState)=> state.authStore)
+
+
+    // ✅ Mark all as read
     useEffect(() => {
-        discussionEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [discussions])
+        const handleMarkAsReadHandler = async () => {
+            await markAllAsRead()
+        }
+        if (discussionsData) {
+            handleMarkAsReadHandler()
+        }
+    }, [discussionsData])
+
+
+    // Auto scroll to bottom
+    // useEffect(() => {
+    //     discussionEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    // }, [discussions])
 
     // Staff options for dropdown
     const staffOptions = (staffList || []).map((staff: any) => ({
@@ -420,17 +490,29 @@ export default function IssueDiscussionPage() {
     }))
 
 
+    // console.log("selectedIssue", selectedIssue)
+
+
     const mergedUsers = [...staffOptions, ...ownerOptions, ...workerOptions, ...CTOOptions]
 
     const availableUsers = mergedUsers.filter(user =>
         user.value !== currentUser?.id &&
-        user.value !== selectedIssue?.issue?.raisedBy?._id
+        user.value !== selectedIssue?.discussion[0]?.issue?.raisedBy?._id
     );
 
     const handleAssigneeChange = (value: string | null) => {
         const selectedAssignee = mergedUsers?.find((user: any) => user?.value === value)
-        console.log("selectedAssignee", selectedAssignee)
+        // console.log("selectedAssignee", selectedAssignee)
         setCreateFormValues((prev) => ({ ...prev, selectedStaff: selectedAssignee?.value, selectStaffRole: selectedAssignee?.role }))
+    }
+
+    const handleProjectChange = (value: string | null) => {
+        const selectedProject = projects?.find((project: any) => project._id === value)
+        setCreateFormValues((prev) => ({
+            ...prev,
+            projectId: value || "",
+            projectName: selectedProject?.customerName || ""
+        }))
     }
 
 
@@ -459,7 +541,7 @@ export default function IssueDiscussionPage() {
             await createIssue(
                 {
                     organizationId: organizationId!,
-                    projectId: projectId!,
+                    projectId: createFormValues.projectId!,
                     selectStaff: createFormValues.selectedStaff,
                     selectStaffRole: createFormValues.selectStaffRole,
                     issue: createFormValues.issue,
@@ -470,7 +552,7 @@ export default function IssueDiscussionPage() {
                 }
             )
 
-            setCreateFormValues({ issue: "", selectedStaff: "", dropdownOptions: "", selectStaffRole: "", files: [] })
+            setCreateFormValues({ issue: "", selectedStaff: "", dropdownOptions: "", selectStaffRole: "", projectId: "", projectName: "", files: [] })
             setCreateFormData({
                 responseType: "text",
                 isMessageRequired: false,
@@ -478,6 +560,7 @@ export default function IssueDiscussionPage() {
             })
             setShowCreateForm(false)
             toast({ title: "Success", description: "Ticket created successfully" })
+            refetch()
         }
         catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to create the ticket", variant: "destructive" })
@@ -488,10 +571,11 @@ export default function IssueDiscussionPage() {
 
     const handleDelete = async (convoId: string) => {
         try {
-            await deleteConvo({ convoId, projectId: projectId! })
+            await deleteConvo({ convoId, organizationId: organizationId! })
             if (selectedIssue?._id === convoId) {
                 setSelectedIssue(null)
             }
+            refetch()
             toast({ title: "Success", description: "Ticket Deleted successfully" })
         }
         catch (error: any) {
@@ -507,8 +591,8 @@ export default function IssueDiscussionPage() {
 
         try {
             await forwardConvo({
-                projectId: projectId!,
-                convoId: selectedIssue!._id,
+                organizationId: organizationId!,
+                convoId: selectedIssue!._id!,
                 forwardToStaff: staffId,
                 forwardToStaffRole: staffRole
             });
@@ -533,19 +617,19 @@ export default function IssueDiscussionPage() {
             if (!selectedIssue) return
 
             // Validation based on response type
-            if (selectedIssue.issue.responseType === "dropdown" && !responseData.content) {
+            if (selectedIssue.discussion[0]?.issue.responseType === "dropdown" && !responseData.content) {
                 setError("Please select an option")
                 return
             }
-            if (selectedIssue.issue.responseType === "text" && !responseData.content?.trim()) {
+            if (selectedIssue.discussion[0]?.issue.responseType === "text" && !responseData.content?.trim()) {
                 setError("Please enter a response")
                 return
             }
-            if (selectedIssue.issue.responseType === "file" && responseData.files.length === 0) {
+            if (selectedIssue.discussion[0]?.issue.responseType === "file" && responseData.files.length === 0) {
                 setError("Please upload at least one file")
                 return
             }
-            if (selectedIssue.issue.isMessageRequired && !responseData.message?.trim()) {
+            if (selectedIssue.discussion[0]?.issue.isMessageRequired && !responseData.message?.trim()) {
                 setError("Please add a message")
                 return
             }
@@ -553,11 +637,11 @@ export default function IssueDiscussionPage() {
             setError(null)
             await provideSolution(
                 {
-                    convoId: selectedIssue._id,
+                    convoId: selectedIssue._id!,
                     responseContent: responseData.content,
                     optionalMessage: responseData.message,
                     files: responseData.files.length > 0 ? responseData.files : undefined,
-                    projectId: projectId!,
+                    organizationId: organizationId!,
                 },
             )
 
@@ -645,18 +729,50 @@ export default function IssueDiscussionPage() {
         }))
     }
 
+
+    const activeFiltersCount = Object.entries(filters).filter(([key, value]) => {
+        if (key === 'sortBy' || key === 'sortOrder') return false;
+        if (key === "myTickets" && value === false) return false;
+        if (key === "notResponded" && value === false) return false;
+        return value !== "";
+    }).length;
+
+
+    const clearFilters = () => {
+        setFilters({
+            search: "",
+            projectId: "",
+            projectName: "",
+            myTickets: false,
+            notResponded: false,
+            sortBy: "createdAt",
+            sortOrder: "desc"
+        });
+        debouncedSearch = ''
+    };
+
+
     // Check if user can respond
     const canRespond =
-        selectedIssue && !selectedIssue.response && selectedIssue.issue.selectStaff._id === currentUser?.id
+        selectedIssue && !selectedIssue.discussion[0]?.response && selectedIssue.discussion[0]?.issue.selectStaff._id === currentUser?.id
 
     return (
-        <main className="h-full max-h-full !overflow-y-auto bg-gradient-to-br from-blue-50 to-white p-2">
+        <main className="h-full w-full !max-w-full !overflow-y-auto bg-gradient-to-br from-blue-50 to-white p-2">
 
 
             <header className=" flex justify-between w-full pb-2 border-b border-b-[#aaaaaa] mb-2">
-                <h1 className="text-3xl font-bold text-blue-600">
-                    <i className="fa-solid fa-ticket mr-3"></i>Ticket Operations
-                </h1>
+                {showHeader && <div className="flex gap-2 items-center">
+                    <button onClick={() => navigate(-1)}
+                        className='bg-blue-50 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
+                        <i className='fas fa-arrow-left'></i>
+                    </button>
+
+                    <h1 className="text-3xl font-bold text-blue-600">
+                        <i className="fa-solid fa-ticket mr-3"></i>Ticket Operations {userName ? userName : null}
+                    </h1>
+
+                </div>}
+
 
 
                 <Button
@@ -664,15 +780,166 @@ export default function IssueDiscussionPage() {
                         setSelectedIssue(null)
                         setShowCreateForm(!showCreateForm)
                     }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className={`bg-blue-600  hover:bg-blue-700 text-white ml-auto `}
                     disabled={isCreating}
                 >
                     <i className="fas fa-plus mr-1"></i>Raise Ticket
                 </Button>
             </header>
 
-            <main className="flex flex-col h-full max-h-[92%] lg:flex-row gap-4">
-                {/* Left Sidebar - Discussions List (70% width) */}
+            <main className="flex flex-col h-full md:flex-row lg:max-h-[92%] lg:flex-row gap-4 overflow-y-auto">
+
+                {/* filters */}
+                {showFilters && <div className="w-full lg:w-1/3 flex flex-col border-r border-blue-200">
+
+                    <div className="flex-shrink-0 !max-h-[100%] overflow-y-auto">
+                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                                    <i className="fas fa-filter mr-2 text-blue-600"></i>
+                                    Filters
+                                </h3>
+                                {activeFiltersCount > 0 && (
+                                    <button
+                                        onClick={clearFilters}
+                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                    >
+                                        Clear All ({activeFiltersCount})
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="space-y-6">
+                                {/* Search */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-search mr-2"></i>
+                                        Search
+                                    </label>
+                                    <input
+                                        type="text"
+                                        autoFocus
+                                        placeholder="description, projects, staff..."
+                                        value={filters.search}
+                                        onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Select Project
+                                    </label>
+
+                                    <select
+                                        value={filters?.projectId || ''}
+                                        onChange={(e) => {
+                                            const selectedProject = projects?.find(
+                                                (p: AvailableProjetType) => p._id === e.target.value
+                                            );
+                                            if (selectedProject) {
+                                                setFilters(prev => ({
+                                                    ...prev,
+                                                    projectId: selectedProject._id,
+                                                    projectName: selectedProject.projectName, // keep name too
+                                                }));
+                                            } else {
+                                                setFilters(prev => ({
+                                                    ...prev,
+                                                    projectId: "",
+                                                    projectName: "", // keep name too
+                                                }));
+                                            }
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option value="">All Projects</option>
+                                        {projects?.map((project: AvailableProjetType) => (
+                                            <option key={project._id} value={project._id}>{project.projectName}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+
+                                <div>
+                                    <label
+                                        htmlFor="myTickets"
+                                        className="flex items-center gap-2 cursor-pointer select-none"
+                                    >
+                                        <input
+                                            id="myTickets"
+                                            type="checkbox"
+                                            checked={filters.myTickets}
+                                            onChange={() => setFilters(p => ({ ...p, myTickets: !filters.myTickets }))}
+                                            className="w-4 h-4 accent-blue-600 cursor-pointer"
+                                        />
+                                        <span className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                            My Tickets
+                                        </span>
+                                    </label>
+
+                                </div>
+
+
+                                <div>
+                                    <label
+                                        htmlFor="notResponded"
+                                        className="flex items-center gap-2 cursor-pointer select-none"
+                                    >
+                                        <input
+                                            id="notResponded"
+                                            type="checkbox"
+                                            checked={filters.notResponded}
+                                            onChange={() => setFilters(p => ({ ...p, notResponded: !filters.notResponded }))}
+                                            className="w-4 h-4 accent-blue-600 cursor-pointer"
+                                        />
+                                        <span className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                            Un Resolved Tasks
+                                        </span>
+                                    </label>
+
+                                </div>
+
+
+
+                                {/* Sort Options */}
+                                {/* <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Sort By
+                                    </label>
+                                    <select
+                                        value={filters.sortBy}
+                                        onChange={(e) => setFilters(f => ({ ...f, sortBy: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        <option value="createdAt">Created Date</option>
+                                        <option value="dateOfCommencement">Commencement Date</option>
+                                        <option value="dateOfCompletion">Completion Date</option>
+                                        <option value="totalCost">Total Cost</option>
+                                        <option value="workerName">Worker Name</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Sort Order
+                                    </label>
+                                    <select
+                                        value={filters.sortOrder}
+                                        onChange={(e) => setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        <option value="desc">Descending</option>
+                                        <option value="asc">Ascending</option>
+                                    </select>
+                                </div> */}
+                            </div>
+                        </div>
+                    </div>
+                </div>}
+
+                {/* Middle Sidebar - Discussions List (70% width) */}
                 <div className="w-full lg:w-1/2 flex flex-col border-r border-blue-200">
                     {/* Discussions List */}
                     <div className="flex-1 overflow-y-auto space-y-3 pr-2">
@@ -690,13 +957,18 @@ export default function IssueDiscussionPage() {
                                 </div>
                             </section>
                         ) : (
-                            discussions.map((convo: IConvo) => (
+                            discussions.map((discussionDoc: IIssueDiscussion) => {
+                                // Extract the single conversation from the discussion array
+                                const convo = discussionDoc.discussion[0];
+                                if (!convo) return null;
+
+                                return (
                                     <div
                                         key={convo._id}
-                                        onClick={() => setSelectedIssue(convo)}
+                                        onClick={() => setSelectedIssue(discussionDoc)}
                                         className={`group relative rounded-xl cursor-pointer border-2 transition-all duration-300 ${selectedIssue?._id === convo._id
-                                                ? "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-500 shadow-lg"
-                                                : "bg-white border-gray-200 hover:border-blue-300 hover:shadow-md"
+                                            ? "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-500 shadow-lg"
+                                            : "bg-white border-gray-200 hover:border-blue-300 hover:shadow-md"
                                             }`}
                                     >
                                         {/* Selected Indicator */}
@@ -720,11 +992,16 @@ export default function IssueDiscussionPage() {
                                                 </div>
 
                                                 <div className="flex gap-2 items-center">
+
+                                                    <Badge variant="success">
+                                                        {convo.issue.projectId?.projectName || "-"}
+                                                    </Badge>
+
                                                     {/* Status Badge */}
                                                     <span
                                                         className={`text-xs px-3 py-1.5 rounded-full font-semibold flex items-center gap-1.5 whitespace-nowrap ${convo.response
-                                                                ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-sm"
-                                                                : "bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm"
+                                                            ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-sm"
+                                                            : "bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-sm"
                                                             }`}
                                                     >
                                                         {convo.response ? (
@@ -746,9 +1023,9 @@ export default function IssueDiscussionPage() {
                                                         className="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all opacity-0 group-hover:opacity-100"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            handleDelete(convo._id)
+                                                            handleDelete(discussionDoc._id!)
                                                         }}
-                                                        isLoading={isDeleteing && variables.convoId === convo._id}
+                                                        isLoading={isDeleteing && variables.convoId === discussionDoc._id}
                                                     >
                                                         <i className="fas fa-trash text-xs"></i>
                                                     </Button>
@@ -813,9 +1090,15 @@ export default function IssueDiscussionPage() {
                                             </div>
                                         </div>
                                     </div>
-                            ))
-                        )}
+                                )
+                            }
+                            )
+
+                        )
+                        }
                         <div ref={discussionEndRef} />
+
+
                     </div>
 
                     {/* Load More */}
@@ -830,11 +1113,9 @@ export default function IssueDiscussionPage() {
                 </div>
 
                 {/* Right Side - Issue Details & Response (30% width) */}
-                <div className="w-full lg:w-1/2 flex flex-col bg-white rounded-lg border border-blue-200  overflow-y-auto">
+                <div className="w-full lg:w-3/4 flex flex-col bg-white rounded-lg border border-blue-200  overflow-y-auto">
 
                     {/* Create Issue Form */}
-                    
-
                     {showCreateForm && (
                         <div className=" bg-white rounded-xl h-full shadow-lg border border-blue-200 overflow-y-scroll">
                             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
@@ -866,6 +1147,24 @@ export default function IssueDiscussionPage() {
                                         displayFormat="detailed"
                                         className="w-full"
                                     />
+                                </div>
+
+
+
+                                <div className="space-y-2">
+
+                                    <Label>Select project</Label>
+                                    <SearchSelectNew
+                                        options={projectOptions}
+                                        placeholder="Select project"
+                                        searchPlaceholder="Search projects..."
+                                        value={createFormValues.projectId || undefined}
+                                        onValueChange={(value) => handleProjectChange(value)}
+                                        searchBy="name"
+                                        displayFormat="simple"
+                                        className="w-full"
+                                    />
+
                                 </div>
 
                                 <div className="space-y-2">
@@ -1100,7 +1399,8 @@ export default function IssueDiscussionPage() {
                                 </Button>
                                 <Button
                                     onClick={() => setShowCreateForm(false)}
-                                    className="flex-1 bg-white hover:bg-gray-100 text-gray-700 font-semibold py-3 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-all"
+                                    variant="secondary"
+                                    className="flex-1 font-semibold py-3 rounded-lg"
                                 >
                                     <i className="fas fa-times-circle mr-2"></i>Cancel
                                 </Button>
@@ -1136,11 +1436,11 @@ export default function IssueDiscussionPage() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className={`px-3 py-1.5 rounded-lg font-semibold text-sm flex items-center gap-2 ${selectedIssue.response
+                                        <div className={`px-3 py-1.5 rounded-lg font-semibold text-sm flex items-center gap-2 ${selectedIssue?.discussion[0]?.response
                                             ? "bg-green-500 text-white"
                                             : "bg-amber-500 text-white"
                                             }`}>
-                                            {selectedIssue.response ? (
+                                            {selectedIssue?.discussion[0]?.response ? (
                                                 <>
                                                     <i className="fas fa-check-circle"></i>
                                                     <span>Resolved</span>
@@ -1168,8 +1468,8 @@ export default function IssueDiscussionPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-gray-500 uppercase tracking-wide">Raised By</p>
-                                                    <p className="text-gray-900 font-semibold">{selectedIssue.issue.raisedBy?.name || "Unknown"}</p>
-                                                    <p className="text-xs text-gray-500">{selectedIssue.issue.raisedBy?.email}</p>
+                                                    <p className="text-gray-900 font-semibold">{selectedIssue.discussion[0]?.issue.raisedBy?.name || "Unknown"}</p>
+                                                    <p className="text-xs text-gray-500">{selectedIssue.discussion[0]?.issue.raisedBy?.email}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1182,8 +1482,8 @@ export default function IssueDiscussionPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-gray-500 uppercase tracking-wide">Assigned To</p>
-                                                    <p className="text-gray-900 font-semibold">{selectedIssue.issue.selectStaff?.name || "Unknown"}</p>
-                                                    <p className="text-xs text-gray-500">{selectedIssue.issue.selectStaff?.email}</p>
+                                                    <p className="text-gray-900 font-semibold">{selectedIssue.discussion[0]?.issue.selectStaff?.name || "Unknown"}</p>
+                                                    <p className="text-xs text-gray-500">{selectedIssue.discussion[0]?.issue.selectStaff?.email}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1192,14 +1492,14 @@ export default function IssueDiscussionPage() {
                                     {/* Response Type Badge */}
                                     <div className="flex items-center gap-2">
                                         <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
-                                            {selectedIssue.issue.responseType === 'dropdown' && <><i className="fas fa-list mr-2"></i>Dropdown Response</>}
-                                            {selectedIssue.issue.responseType === 'text' && <><i className="fas fa-keyboard mr-2"></i>Text Response</>}
-                                            {selectedIssue.issue.responseType === 'file' && <><i className="fas fa-file-upload mr-2"></i>File Upload Response</>}
+                                            {selectedIssue.discussion[0]?.issue.responseType === 'dropdown' && <><i className="fas fa-list mr-2"></i>Dropdown Response</>}
+                                            {selectedIssue.discussion[0]?.issue.responseType === 'text' && <><i className="fas fa-keyboard mr-2"></i>Text Response</>}
+                                            {selectedIssue.discussion[0]?.issue.responseType === 'file' && <><i className="fas fa-file-upload mr-2"></i>File Upload Response</>}
                                         </span>
                                     </div>
 
                                     {/* Forward Section (if applicable) */}
-                                    {selectedIssue.issue.selectStaff._id === currentUser?.id && !selectedIssue.response && (
+                                    {selectedIssue.discussion[0]?.issue.selectStaff._id === currentUser?.id && !selectedIssue.discussion[0]?.response && (
                                         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                                             <div className="flex items-center gap-2 mb-3">
                                                 <i className="fas fa-share text-amber-600"></i>
@@ -1242,33 +1542,33 @@ export default function IssueDiscussionPage() {
                                             <h3 className="font-semibold text-gray-900">Ticket Description</h3>
                                         </div>
                                         <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                            {selectedIssue.issue.issue}
+                                            {selectedIssue.discussion[0]?.issue.issue}
                                         </p>
                                     </div>
 
                                     {/* Issue Attachments (if any) */}
-                                    {selectedIssue?.issue?.files && selectedIssue?.issue?.files?.length > 0 && (
+                                    {selectedIssue?.discussion[0]?.issue?.files && selectedIssue?.discussion[0]?.issue?.files?.length > 0 && (
                                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                                             <div className="flex items-center gap-2 mb-4">
                                                 <i className="fas fa-paperclip text-blue-600"></i>
                                                 <h3 className="font-semibold text-gray-900">Ticket Attachments</h3>
                                                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                                                    {selectedIssue?.issue?.files.length} file{selectedIssue?.issue?.files.length > 1 ? 's' : ''}
+                                                    {selectedIssue?.discussion[0]?.issue?.files.length} file{selectedIssue?.discussion[0]?.issue?.files.length > 1 ? 's' : ''}
                                                 </span>
                                             </div>
 
                                             {/* Images Section */}
-                                            {selectedIssue?.issue?.files.some(file => file.type === "image") && (
+                                            {selectedIssue?.discussion[0]?.issue?.files.some(file => file.type === "image") && (
                                                 <div className="mb-6">
                                                     <div className="flex items-center gap-2 mb-3">
                                                         <i className="fas fa-images text-purple-600"></i>
                                                         <h4 className="font-semibold text-gray-800 text-sm">Images</h4>
                                                         <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                                                            {selectedIssue?.issue?.files.filter(f => f.type === "image").length}
+                                                            {selectedIssue?.discussion[0]?.issue?.files.filter(f => f.type === "image").length}
                                                         </span>
                                                     </div>
                                                     <ImageGalleryExample
-                                                        imageFiles={selectedIssue?.issue?.files.filter(file => file.type === "image")}
+                                                        imageFiles={selectedIssue?.discussion[0]?.issue?.files.filter(file => file.type === "image")}
                                                         height={150}
                                                         minWidth={150}
                                                         maxWidth={200}
@@ -1277,17 +1577,17 @@ export default function IssueDiscussionPage() {
                                             )}
 
                                             {/* PDFs Section */}
-                                            {selectedIssue?.issue?.files.some(file => file.type === "pdf") && (
+                                            {selectedIssue?.discussion[0]?.issue?.files.some(file => file.type === "pdf") && (
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-3">
                                                         <i className="fas fa-file-pdf text-red-600"></i>
                                                         <h4 className="font-semibold text-gray-800 text-sm">Documents</h4>
                                                         <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                                                            {selectedIssue?.issue?.files.filter(f => f.type === "pdf").length}
+                                                            {selectedIssue?.discussion[0]?.issue?.files.filter(f => f.type === "pdf").length}
                                                         </span>
                                                     </div>
                                                     <div className="grid grid-cols-1 gap-3">
-                                                        {selectedIssue?.issue?.files
+                                                        {selectedIssue?.discussion[0]?.issue?.files
                                                             .filter(file => file.type === "pdf")
                                                             .map((file, i) => (
                                                                 <div
@@ -1335,7 +1635,7 @@ export default function IssueDiscussionPage() {
                                     )}
 
                                     {/* Response Section */}
-                                    {selectedIssue.response && (
+                                    {selectedIssue.discussion[0]?.response && (
                                         <div className="bg-gradient-to-br from-blue-50 to-emerald-50 rounded-lg shadow-sm border border-blue-200 p-6">
                                             <div className="flex items-center gap-2 mb-4">
                                                 <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
@@ -1345,7 +1645,7 @@ export default function IssueDiscussionPage() {
                                                     <h3 className="font-bold text-blue-900 text-lg">Response Provided</h3>
                                                     <p className="text-xs text-blue-700">
                                                         <i className="far fa-clock mr-1"></i>
-                                                        {new Date(selectedIssue.response.createdAt!).toLocaleDateString('en-US', {
+                                                        {new Date(selectedIssue.discussion[0]?.response.createdAt!).toLocaleDateString('en-US', {
                                                             month: 'short',
                                                             day: 'numeric',
                                                             hour: '2-digit',
@@ -1364,59 +1664,59 @@ export default function IssueDiscussionPage() {
                                                     </div>
                                                     <div>
                                                         <p className="font-semibold text-gray-900">
-                                                            {selectedIssue.response.responsededBy?.name || "Unknown"}
+                                                            {selectedIssue.discussion[0]?.response.responsededBy?.name || "Unknown"}
                                                         </p>
                                                         <p className="text-xs text-gray-500">
-                                                            {selectedIssue.response.responsededBy?.email}
+                                                            {selectedIssue.discussion[0]?.response.responsededBy?.email}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {/* Dropdown Response */}
-                                            {selectedIssue.response.dropdownResponse && (
+                                            {selectedIssue.discussion[0]?.response.dropdownResponse && (
                                                 <div className="bg-white rounded-lg p-4 mb-4">
                                                     <p className="text-xs text-gray-500 mb-2">Selected Option</p>
                                                     <div className="flex items-center gap-2">
                                                         <i className="fas fa-check-circle text-green-600"></i>
-                                                        <p className="font-bold text-gray-900">{selectedIssue.response.dropdownResponse}</p>
+                                                        <p className="font-bold text-gray-900">{selectedIssue.discussion[0]?.response.dropdownResponse}</p>
                                                     </div>
                                                 </div>
                                             )}
 
                                             {/* Text Response */}
-                                            {selectedIssue.response.textResponse && (
+                                            {selectedIssue.discussion[0]?.response.textResponse && (
                                                 <div className="bg-white rounded-lg p-4 mb-4">
                                                     <p className="text-xs text-gray-500 mb-2">Response Message</p>
                                                     <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                                        {selectedIssue.response.textResponse}
+                                                        {selectedIssue.discussion[0]?.response.textResponse}
                                                     </p>
                                                 </div>
                                             )}
 
                                             {/* File Response */}
-                                            {selectedIssue.response.fileResponse && selectedIssue.response.fileResponse.length > 0 && (
+                                            {selectedIssue.discussion[0]?.response.fileResponse && selectedIssue.discussion[0]?.response.fileResponse.length > 0 && (
                                                 <div className="bg-white rounded-lg p-4 mb-4">
                                                     <div className="flex items-center gap-2 mb-4">
                                                         <i className="fas fa-paperclip text-gray-600"></i>
                                                         <p className="font-semibold text-gray-900">Attached Files</p>
                                                         <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                                                            {selectedIssue.response.fileResponse.length}
+                                                            {selectedIssue.discussion[0]?.response.fileResponse.length}
                                                         </span>
                                                     </div>
 
                                                     {/* Response Images */}
-                                                    {selectedIssue.response.fileResponse.some(file => file.type === "image") && (
+                                                    {selectedIssue.discussion[0]?.response.fileResponse.some(file => file.type === "image") && (
                                                         <div className="mb-6">
                                                             <div className="flex items-center gap-2 mb-3">
                                                                 <i className="fas fa-images text-purple-600"></i>
                                                                 <h5 className="font-semibold text-gray-800 text-sm">Images</h5>
                                                                 <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                                                                    {selectedIssue.response.fileResponse.filter(f => f.type === "image").length}
+                                                                    {selectedIssue.discussion[0]?.response.fileResponse.filter(f => f.type === "image").length}
                                                                 </span>
                                                             </div>
                                                             <ImageGalleryExample
-                                                                imageFiles={selectedIssue.response.fileResponse.filter(file => file.type === "image")}
+                                                                imageFiles={selectedIssue.discussion[0]?.response.fileResponse.filter(file => file.type === "image")}
                                                                 height={120}
                                                                 minWidth={120}
                                                                 maxWidth={140}
@@ -1425,17 +1725,17 @@ export default function IssueDiscussionPage() {
                                                     )}
 
                                                     {/* Response PDFs */}
-                                                    {selectedIssue.response.fileResponse.some(file => file.type === "pdf") && (
+                                                    {selectedIssue.discussion[0]?.response.fileResponse.some(file => file.type === "pdf") && (
                                                         <div>
                                                             <div className="flex items-center gap-2 mb-3">
                                                                 <i className="fas fa-file-pdf text-red-600"></i>
                                                                 <h5 className="font-semibold text-gray-800 text-sm">Documents</h5>
                                                                 <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                                                                    {selectedIssue.response.fileResponse.filter(f => f.type === "pdf").length}
+                                                                    {selectedIssue.discussion[0]?.response.fileResponse.filter(f => f.type === "pdf").length}
                                                                 </span>
                                                             </div>
                                                             <div className="space-y-3">
-                                                                {selectedIssue.response.fileResponse
+                                                                {selectedIssue.discussion[0]?.response.fileResponse
                                                                     .filter(file => file.type === "pdf")
                                                                     .map((file, i) => (
                                                                         <div
@@ -1482,11 +1782,11 @@ export default function IssueDiscussionPage() {
                                             )}
 
                                             {/* Optional Message */}
-                                            {selectedIssue.response.optionalMessage && (
+                                            {selectedIssue.discussion[0]?.response.optionalMessage && (
                                                 <div className="bg-white rounded-lg p-4">
                                                     <p className="text-xs text-gray-500 mb-2">Additional Message</p>
                                                     <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                                        {selectedIssue.response.optionalMessage}
+                                                        {selectedIssue.discussion[0]?.response.optionalMessage}
                                                     </p>
                                                 </div>
                                             )}
@@ -1494,7 +1794,7 @@ export default function IssueDiscussionPage() {
                                     )}
 
                                     {/* Response Form - Only if can respond */}
-                                    {canRespond && !selectedIssue.response && (
+                                    {canRespond && !selectedIssue.discussion[0]?.response && (
                                         <div className="bg-white rounded-lg shadow-lg border border-blue-200 p-6">
                                             <div className="flex items-center gap-2 mb-6">
                                                 <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
@@ -1505,7 +1805,7 @@ export default function IssueDiscussionPage() {
 
                                             <div className="space-y-5">
                                                 {/* Text Response */}
-                                                {selectedIssue.issue.responseType === "text" && (
+                                                {selectedIssue.discussion[0]?.issue.responseType === "text" && (
                                                     <div>
                                                         <Label className="text-gray-700 font-semibold mb-2 block">
                                                             <i className="fas fa-keyboard mr-2 text-blue-600"></i>
@@ -1521,7 +1821,7 @@ export default function IssueDiscussionPage() {
                                                 )}
 
                                                 {/* Dropdown Response */}
-                                                {selectedIssue.issue.responseType === "dropdown" && (
+                                                {selectedIssue.discussion[0]?.issue.responseType === "dropdown" && (
                                                     <div>
                                                         <Label className="text-gray-700 font-semibold mb-2 block">
                                                             <i className="fas fa-list mr-2 text-blue-600"></i>
@@ -1533,7 +1833,7 @@ export default function IssueDiscussionPage() {
                                                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                         >
                                                             <option value="">-- Choose an option --</option>
-                                                            {selectedIssue.issue.dropdownOptions?.map((opt, i) => (
+                                                            {selectedIssue.discussion[0]?.issue.dropdownOptions?.map((opt, i) => (
                                                                 <option key={i} value={opt}>{opt}</option>
                                                             ))}
                                                         </select>
@@ -1541,7 +1841,7 @@ export default function IssueDiscussionPage() {
                                                 )}
 
                                                 {/* File Response */}
-                                                {selectedIssue.issue.responseType === "file" && (
+                                                {selectedIssue.discussion[0]?.issue.responseType === "file" && (
                                                     <div>
                                                         <Label className="text-gray-700 font-semibold mb-2 block">
                                                             <i className="fas fa-upload mr-2 text-blue-600"></i>
@@ -1632,7 +1932,7 @@ export default function IssueDiscussionPage() {
                                                 )}
 
                                                 {/* Optional Message */}
-                                                {selectedIssue.issue.isMessageRequired && (
+                                                {selectedIssue.discussion[0]?.issue.isMessageRequired && (
                                                     <div>
                                                         <Label className="text-gray-700 font-semibold mb-2 block">
                                                             <i className="fas fa-comment mr-2 text-blue-600"></i>
@@ -1681,7 +1981,7 @@ export default function IssueDiscussionPage() {
                                     )}
 
                                     {/* Not Assigned Message */}
-                                    {!canRespond && !selectedIssue.response && (
+                                    {!canRespond && !selectedIssue.discussion[0]?.response && (
                                         <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-lg">
                                             <div className="flex items-start gap-3">
                                                 <i className="fas fa-info-circle text-amber-600 text-xl mt-1"></i>
@@ -1696,7 +1996,7 @@ export default function IssueDiscussionPage() {
                                     )}
 
                                     {/* Already Responded Message */}
-                                    {selectedIssue.response && (
+                                    {selectedIssue.discussion[0]?.response && (
                                         <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
                                             <div className="flex items-start gap-3">
                                                 <i className="fas fa-check-circle text-blue-600 text-xl mt-1"></i>
@@ -1777,8 +2077,21 @@ export default function IssueDiscussionPage() {
                     </div>
                 )}
             </main>
-       
+
         </main>
 
     )
 }
+
+export const IssueDiscussionPage = IssueDiscussion;
+
+
+const IssueDiscussionMain = () => {
+    return (
+        <main className="w-screen h-screen">
+            <IssueDiscussion />
+        </main>
+    )
+}
+
+export default IssueDiscussionMain

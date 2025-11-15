@@ -39,7 +39,7 @@ export const useAuthCheck = () => {
           case "owner":
             res = await Api.get("/auth/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.userId };
+              const info = { role, isauthenticated: true, _id: res.data.data.userId, userName:res.data.data.username };
               dispatch(setRole(info));
               dispatch(setOwnerProfileData(res.data.data));
               // setAuthInfo(info);
@@ -51,7 +51,7 @@ export const useAuthCheck = () => {
           case "staff":
             res = await staffApi.get("/auth/staff/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.staffId };
+              const info = { role, isauthenticated: true, _id: res.data.data.staffId, userName:res.data.data.staffName };
               dispatch(setRole(info));
               dispatch(setStaffProfileData(res.data.data));
               // setAuthInfo(info);
@@ -63,7 +63,7 @@ export const useAuthCheck = () => {
           case "worker":
             res = await workerApi.get("/auth/worker/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.workerId };
+              const info = { role, isauthenticated: true, _id: res.data.data.workerId, userName:res.data.data.workerName };
               dispatch(setRole(info));
               dispatch(setWorkerProfileData(res.data.data));
               setAuthInfo(info);
@@ -76,7 +76,7 @@ export const useAuthCheck = () => {
           case "CTO":
             res = await CTOApi.get("/auth/CTO/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.CTOId };
+              const info = { role, isauthenticated: true, _id: res.data.data.CTOId , userName:res.data.data.CTOName};
               dispatch(setRole(info));
               dispatch(setCTOProfileData(res.data.data));
               // setAuthInfo(info);
@@ -89,7 +89,7 @@ export const useAuthCheck = () => {
           case "client":
             res = await clientApi.get("/auth/client/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.clientId };
+              const info = { role, isauthenticated: true, _id: res.data.data.clientId, userName:res.data.data.clientName };
               dispatch(setRole(info));
               dispatch(setClientProfileData(res.data.data));
               // setAuthInfo(info);
@@ -113,7 +113,7 @@ export const useAuthCheck = () => {
           ]);
 
           if (ownerRes.status === "fulfilled" && ownerRes.value.data.ok) {
-            const info = { role: "owner", isauthenticated: true, _id: ownerRes.value.data.data.userId };
+            const info = { role: "owner", isauthenticated: true, _id: ownerRes.value.data.data.userId ,  userName:ownerRes.value.data.data.username};
             dispatch(setRole(info));
             dispatch(setOwnerProfileData(ownerRes.value.data.data))
             setAuthInfo({ ...info, _id: ownerRes.value.data.data.userId });
@@ -121,7 +121,7 @@ export const useAuthCheck = () => {
           }
 
           if (staffRes.status === "fulfilled" && staffRes.value.data.ok) {
-            const info = { role: "staff", isauthenticated: true, _id: staffRes.value.data.data.staffId };
+            const info = { role: "staff", isauthenticated: true, _id: staffRes.value.data.data.staffId, userName:staffRes.value.data.data.staffName };
             dispatch(setRole(info));
             dispatch(setStaffProfileData(staffRes.value.data.data))
             setAuthInfo({ ...info, _id: staffRes.value.data.data.staffId });
@@ -129,7 +129,7 @@ export const useAuthCheck = () => {
           }
 
           if (workerRes.status === "fulfilled" && workerRes.value.data.ok) {
-            const info = { role: "worker", isauthenticated: true, _id: workerRes.value.data.data.workerId };
+            const info = { role: "worker", isauthenticated: true, _id: workerRes.value.data.data.workerId ,  userName:workerRes.value.data.data.workerName};
             dispatch(setRole(info));
             dispatch(setWorkerProfileData(workerRes.value.data.data))
             setAuthInfo({ ...info, _id: workerRes.value.data.data.workerId });
@@ -137,7 +137,7 @@ export const useAuthCheck = () => {
           }
 
           if (CTORes.status === "fulfilled" && CTORes.value.data.ok) {
-            const info = { role: "CTO", isauthenticated: true, _id: CTORes.value.data.data.CTOId };
+            const info = { role: "CTO", isauthenticated: true, _id: CTORes.value.data.data.CTOId, userName:CTORes.value.data.data.CTOName };
             dispatch(setRole(info));
             dispatch(setCTOProfileData(CTORes.value.data.data))
             setAuthInfo({ ...info, _id: CTORes.value.data.data.CTOId });
@@ -145,7 +145,7 @@ export const useAuthCheck = () => {
           }
 
           if (clientRes.status === "fulfilled" && clientRes.value.data.ok) {
-            const info = { role: "client", isauthenticated: true, _id: clientRes.value.data.data.clientId };
+            const info = { role: "client", isauthenticated: true, _id: clientRes.value.data.data.clientId, userName:clientRes.value.data.data.clientName };
             dispatch(setRole(info));
             dispatch(setClientProfileData(clientRes.value.data.data))
             setAuthInfo({ ...info, _id: clientRes.value.data.data.clientId });

@@ -152,7 +152,8 @@ export default function WorkerRegister() {
       dispatch(setRole({
         role: workerData?.role,
         isauthenticated: true,
-        _id: workerData?._id
+        _id: workerData?._id,
+        userName: workerData?.workerName
       }));
 
       dispatch(setWorkerProfileData({

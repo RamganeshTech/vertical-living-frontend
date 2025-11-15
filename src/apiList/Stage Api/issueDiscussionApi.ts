@@ -1,11 +1,13 @@
 // api/issueDiscussion.api.ts
 
-import { useMutation, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useInfiniteQuery, useQueryClient, useQuery } from '@tanstack/react-query';
 
 
 import { type AxiosInstance } from 'axios';
 import useGetRole from '../../Hooks/useGetRole';
 import { getApiForRole } from '../../utils/roleCheck';
+import { queryClient } from '../../QueryClient/queryClient';
+import type { IssueDiscussionFilters } from '../../Pages/Stage Pages/Issue Discussion Pages/IssueDiscussionPage';
 
 // 1. Create Issue API
 const createIssue = async ({
@@ -102,14 +104,14 @@ const createIssue = async ({
 
 // 2. Provide Solution/Add Response API
 const provideSolution = async ({
-    projectId,
+    organizationId,
     convoId,
     responseContent,
     optionalMessage,
     files,
     api
 }: {
-    projectId: string;
+    organizationId: string;
     convoId: string;
     responseContent?: string;
     optionalMessage?: string;
@@ -131,7 +133,7 @@ const provideSolution = async ({
     }
 
     const { data } = await api.post(
-        `/issuediscussion/providesolution/${projectId}/${convoId}`,
+        `/issuediscussion/providesolution/${organizationId}/${convoId}`,
         formData,
         {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -146,19 +148,19 @@ const provideSolution = async ({
 //  3. Forward the issue to another staff
 
 const forwardIssue = async ({
-    projectId,
+    organizationId,
     convoId,
     forwardToStaff,
     forwardToStaffRole,
     api
 }: {
-    projectId: string;
+    organizationId: string;
     convoId: string;
     forwardToStaff: string;
     forwardToStaffRole: string;
     api: AxiosInstance;
 }) => {
-    const { data } = await api.put(`/issuediscussion/forward/${projectId}/${convoId}`, {
+    const { data } = await api.put(`/issuediscussion/forward/${organizationId}/${convoId}`, {
         forwardToStaff,
         forwardToStaffRole
     });
@@ -169,29 +171,34 @@ const forwardIssue = async ({
 
 // 4. Get All Project Discussions API (with pagination for infinite scroll)
 const getProjectDiscussions = async ({
-    projectId,
+    organizationId,
     page,
     limit,
-    status,
-    assignedToMe,
+    filters,
     api
 }: {
-    projectId: string;
+    organizationId: string;
     page: number;
     limit: number;
-    status?: 'pending' | 'responded';
-    assignedToMe?: boolean;
+    // status?: 'pending' | 'responded';
+    // assignedToMe?: boolean;
     api: AxiosInstance;
+    filters: IssueDiscussionFilters
 }) => {
     const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString()
     });
 
-    if (status) params.append('status', status);
-    if (assignedToMe !== undefined) params.append('assignedToMe', assignedToMe.toString());
+    if (filters.search) params.append("search", filters.search.trim());
+    if (filters.projectId) params.append("projectId", filters.projectId);
+    if (filters.myTickets) params.append("myTickets", "true");
+    if (filters.notResponded) params.append("notResponded", "true");
+    if (filters.sortBy) params.append("sortBy", filters.sortBy);
+    if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
 
-    const { data } = await api.get(`/issuediscussion/getall/${projectId}?${params}`);
+
+    const { data } = await api.get(`/issuediscussion/getall/${organizationId}?${params.toString()}`);
 
     if (!data.ok) throw new Error(data.message || 'Failed to fetch discussions');
     return data.data;
@@ -199,21 +206,48 @@ const getProjectDiscussions = async ({
 
 // 4. Delete Conversation API
 const deleteConversation = async ({
-    projectId,
+    organizationId,
     convoId,
     api
 }: {
-    projectId: string;
+    organizationId: string;
     convoId: string;
     api: AxiosInstance;
 }) => {
-    const { data } = await api.delete(`/issuediscussion/deletemessage/${projectId}/${convoId}`);
+    const { data } = await api.delete(`/issuediscussion/deletemessage/${organizationId}/${convoId}`);
 
     if (!data.ok) throw new Error(data.message || 'Failed to delete conversation');
     return data;
 };
 
 
+// 5. to get the notificaiton for unread things 
+export const getUnreadCount = async ({
+    api,
+    organizationId,
+}: {
+    api: AxiosInstance;
+    organizationId: string,
+}) => {
+    const { data } = await api.get(`/issuediscussion/unread-count/${organizationId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.count;
+};
+
+
+
+export const markAllTicketsAsRead = async ({
+    api,
+    organizationId,
+
+}: {
+    api: AxiosInstance;
+    organizationId: string;
+}) => {
+    const { data } = await api.patch(`/issuediscussion/mark-all-read/${organizationId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data;
+};
 
 
 
@@ -296,13 +330,13 @@ export const useProvideSolution = () => {
             responseContent,
             optionalMessage,
             files,
-            projectId // for cache invalidation
+            organizationId // for cache invalidation
         }: {
             convoId: string;
             responseContent?: string;
             optionalMessage?: string;
             files?: File[];
-            projectId: string;
+            organizationId: string;
         }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -310,7 +344,7 @@ export const useProvideSolution = () => {
             if (!api) throw new Error("API instance not found for role");
 
             return await provideSolution({
-                projectId,
+                organizationId,
                 convoId,
                 responseContent,
                 optionalMessage,
@@ -321,7 +355,7 @@ export const useProvideSolution = () => {
         onSuccess: (_, variables) => {
             // Invalidate discussions list
             queryClient.invalidateQueries({
-                queryKey: ["discussions", variables.projectId]
+                queryKey: ["discussions", variables.organizationId]
             });
 
             // Invalidate user's assigned issues
@@ -350,12 +384,12 @@ export const useForwardIssue = () => {
 
     return useMutation({
         mutationFn: async ({
-            projectId,
+            organizationId,
             convoId,
             forwardToStaff,
             forwardToStaffRole
         }: {
-            projectId: string;
+            organizationId: string;
             convoId: string;
             forwardToStaff: string;
             forwardToStaffRole: string;
@@ -366,7 +400,7 @@ export const useForwardIssue = () => {
             if (!api) throw new Error("API instance not found for role");
 
             return await forwardIssue({
-                projectId,
+                organizationId,
                 convoId,
                 forwardToStaff,
                 forwardToStaffRole,
@@ -375,7 +409,7 @@ export const useForwardIssue = () => {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({
-                queryKey: ["discussions", variables.projectId]
+                queryKey: ["discussions", variables.organizationId]
             });
             queryClient.invalidateQueries({
                 queryKey: ["user-assigned-issues"]
@@ -390,22 +424,24 @@ export const useForwardIssue = () => {
 
 // 4. Hook for Getting Project Discussions (Infinite Query)
 export const useGetProjectDiscussions = ({
-    projectId,
-    status,
-    assignedToMe,
-    limit = 20
+    organizationId,
+    // status,
+    // assignedToMe,
+    limit = 20,
+    filters,
 }: {
-    projectId: string;
-    status?: 'pending' | 'responded';
-    assignedToMe?: boolean;
+    organizationId: string;
+    // status?: 'pending' | 'responded';
+    // assignedToMe?: boolean;
     limit?: number;
+    filters: IssueDiscussionFilters
 }) => {
     const allowedRoles = ["owner", "staff", "CTO", "worker"];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["discussions", projectId, status, assignedToMe],
+        queryKey: ["discussions", organizationId, filters],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -413,11 +449,12 @@ export const useGetProjectDiscussions = ({
             if (!api) throw new Error("API instance not found for role");
 
             return await getProjectDiscussions({
-                projectId,
+                organizationId,
                 page: pageParam,
                 limit,
-                status,
-                assignedToMe,
+                // status,
+                // assignedToMe,
+                filters,
                 api
             });
         },
@@ -434,7 +471,7 @@ export const useGetProjectDiscussions = ({
             }
             return undefined;
         },
-        enabled: !!role && allowedRoles.includes(role) && !!projectId,
+        enabled: !!role && allowedRoles.includes(role) && !!organizationId,
         initialPageParam: 1,
     });
 };
@@ -449,10 +486,10 @@ export const useDeleteConversation = () => {
     return useMutation({
         mutationFn: async ({
             convoId,
-            projectId // for cache invalidation
+            organizationId // for cache invalidation
         }: {
             convoId: string;
-            projectId: string;
+            organizationId: string;
         }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -460,7 +497,7 @@ export const useDeleteConversation = () => {
             if (!api) throw new Error("API instance not found for role");
 
             return await deleteConversation({
-                projectId,
+                organizationId,
                 convoId,
                 api
             });
@@ -468,7 +505,7 @@ export const useDeleteConversation = () => {
         onSuccess: (_, variables) => {
             // Invalidate discussions list
             queryClient.invalidateQueries({
-                queryKey: ["discussions", variables.projectId]
+                queryKey: ["discussions", variables.organizationId]
             });
 
             // Show success message
@@ -479,6 +516,49 @@ export const useDeleteConversation = () => {
         }
     });
 };
+
+
+
+
+export const useGetUnreadTicketCount = ({ organizationId }: { organizationId: string }) => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const allowedRoles = ["owner", "staff", "CTO", "worker"];
+
+    return useQuery({
+        queryKey: ["ticket", "unread-count"],
+        queryFn: async () => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+            return await getUnreadCount({ api, organizationId });
+        },
+        enabled: !!role && !!api && allowedRoles.includes(role),
+    });
+};
+
+/*
+ * Mark all tickets as read
+ */
+export const useMarkAllTicketAsRead = ({ organizationId }: { organizationId: string }) => {
+    const { role } = useGetRole();
+    const allowedRoles = ["owner", "staff", "CTO", "worker"];
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async () => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+            return await markAllTicketsAsRead({ api, organizationId });
+        },
+        onSuccess: () => {
+            // Invalidate all notification queries
+            // queryClient.invalidateQueries({ queryKey: ["ticket"] });
+            queryClient.invalidateQueries({ queryKey: ["ticket", "unread-count"] });
+
+        }
+    });
+};
+
 
 // Additional helper hook for fetching user's assigned issues
 export const useGetUserAssignedIssues = ({

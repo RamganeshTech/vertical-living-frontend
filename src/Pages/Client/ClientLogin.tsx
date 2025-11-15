@@ -75,7 +75,8 @@ export default function ClientLogin() {
       dispatch(setRole({
         role: clientData.role,
         isauthenticated: true,
-        _id: clientData.clientId // or _id
+        _id: clientData.clientId, // or _id
+        userName: clientData?.clientName
       }));
 
       dispatch(setClientProfileData({

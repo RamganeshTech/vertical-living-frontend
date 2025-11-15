@@ -5,7 +5,7 @@ import OrganizationCard from "../../components/OrganizationCard"
 import CreateOrganizationModal from "../../components/CreateOrganizationModal"
 import { Skeleton } from "../../components/ui/Skeleton"
 import Sidebar from "../../shared/Sidebar"
-import {LOGIN_ICONS_LOGIN_GROUP, LOGIN_LABELS } from "../../constants/constants"
+import { LOGIN_ICONS_LOGIN_GROUP, LOGIN_LABELS } from "../../constants/constants"
 import MobileSidebar from "../../shared/MobileSidebar"
 import { useNavigate } from "react-router-dom"
 import { LOCAL_KEY } from "../Stage Pages/Ordering Materials/Public OrderMaterial Page/PublicOrgOrderMaterialSetup"
@@ -31,14 +31,14 @@ export default function Organization() {
   }
 
 
-  
-        
-      const orgId = localStorage.getItem(LOCAL_KEY)
-  
-      if (orgId) {
-          path.PUBLICORDERS = `/${JSON.parse(orgId)}/ordermaterial`
-      }
-  
+
+
+  const orgId = localStorage.getItem(LOCAL_KEY)
+
+  if (orgId) {
+    path.PUBLICORDERS = `/${JSON.parse(orgId)}/ordermaterial`
+  }
+
 
 
   const openMobileSidebar = () => {
@@ -58,7 +58,7 @@ export default function Organization() {
 
 
 
- 
+
 
 
   if (isLoading) {
@@ -105,16 +105,16 @@ export default function Organization() {
           </div>
           <h2 className="text-2xl font-bold text-red-600 mb-2">Error Loading Organizations</h2>
           <p className="text-gray-600 mb-4">{(error as any)?.response?.data?.message || error?.message || "Something happened try again please"}</p>
-        <div className="flex gap-2 justify-center items-center">
+          <div className="flex gap-2 justify-center items-center">
             <Button onClick={() => refetch()} className="bg-blue-600 hover:bg-blue-700 text-white active:scale-95">
-            <i className="fas fa-redo mr-2"></i>
-            Try Again
-          </Button>
-           <Button onClick={() => navigate('/login/staff')} className="bg-blue-600 hover:bg-blue-700 text-white active:scale-95">
-            <i className="fas fa-user mr-2"></i>
-            Login
-          </Button>
-        </div>
+              <i className="fas fa-redo mr-2"></i>
+              Try Again
+            </Button>
+            <Button onClick={() => navigate('/login/staff')} className="bg-blue-600 hover:bg-blue-700 text-white active:scale-95">
+              <i className="fas fa-user mr-2"></i>
+              Login
+            </Button>
+          </div>
         </div>
       </div>
     )
@@ -125,7 +125,7 @@ export default function Organization() {
 
 
   return (
-    <main className="w-screen h-screen flex flex:1">
+    <main className="w-screen h-screen max-h-screen flex flex:1">
 
       {/* <Sidebar labels={LOGIN_LABELS} path={path} icons={LOGIN_ICONS} /> */}
 
@@ -144,8 +144,8 @@ export default function Organization() {
         />
       )}
 
-      {/* HEADER */}
-      <section className="w-full h-full">
+      {/* Main */}
+      <section className="w-full h-full max-h-full  overflow-y-auto">
         <div className="max-w-full min-h-[10%] bg-white/90 backdrop-blur-sm border-b border-blue-200">
           <div className="max-w-full mx-auto px-2 sm:px-6 py-3">
             <div className="flex  sm:flex-row items-center sm:items-center justify-between gap-3 sm:gap-6">
@@ -173,7 +173,7 @@ export default function Organization() {
 
               {/* Stats + Button */}
 
-             {!organizations && <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+              {!organizations && <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                 <Button
                   onClick={() => setIsCreateModalOpen(true)}
                   variant="primary"
@@ -191,22 +191,7 @@ export default function Organization() {
 
         <div className=" min-h-[calc(100vh-10%)] sm:min-h-[calc(100vh-11%)] bg-gradient-to-br from-blue-50 via-white to-blue-100">
           <div className="max-w-full mx-auto px-4 sm:px-6 py-6 relative">
-            {/* Statistics Cards */}
-            {/* <div className="mb-8">
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-200">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-blue-600">Total Organizations</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-blue-900">{totalOrganizations}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                    <i className="fas fa-building text-white text-lg"></i>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div> */}
+
 
             {/* Organizations Grid */}
             {organizations ? (
@@ -270,6 +255,8 @@ export default function Organization() {
               </div>
             )}
 
+
+          
             <CreateOrganizationModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
           </div>
         </div>

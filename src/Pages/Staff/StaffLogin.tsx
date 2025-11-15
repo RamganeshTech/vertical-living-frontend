@@ -77,7 +77,8 @@ export default function StaffLogin() {
       dispatch(setRole({
         _id: staffData.staffId,
         role: staffData.role,
-        isauthenticated: true
+        isauthenticated: true,
+        userName: staffData?.staffName
       }));
       dispatch(setStaffProfileData({
         staffId: staffData.staffId,

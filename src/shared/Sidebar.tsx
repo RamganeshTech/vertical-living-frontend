@@ -21,6 +21,7 @@ import { toast } from '../utils/toast'
 // import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
 import { useGetProjectDetails } from '../apiList/currentActiveStage api/currentActiveStageApi'
 import NotificationIcon from './Notifcation/NotificaitonIcon'
+import TicketOperationIcon from './Ticket Operation Icon/TicketOperationIcon'
 // import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
 
 
@@ -211,6 +212,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
     }
 
     const showNotifications = role && ['owner', 'CTO', 'staff'].includes(role);
+    const showTickets = role && ['owner', 'CTO', 'staff', "worker"].includes(role) && organizationId;
     // const isNotificationActive = pathArray[pathArray.length - 1] === 'notification';
 
     const handleLogout = async () => {
@@ -317,9 +319,16 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                         </button> */}
 
 
-                        <div className='mt-2'>
+                        <div className='mt-2 flex gap-2 w-full'>
                             {showNotifications && (
                                 <NotificationIcon
+                                    isExpanded={false}
+                                    isActive={false}
+                                />
+                            )}
+                       
+                            {showTickets && (
+                                <TicketOperationIcon
                                     isExpanded={false}
                                     isActive={false}
                                 />
@@ -405,12 +414,25 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                             className="mt-2 cursor-pointer outline-none border-[#9ca3af] h-[40px] w-[40px] flex items-center justify-center border rounded-lg">
                             <i className="fa-solid fa-chevron-right text-[#4a86f7]"></i>
                         </button> */}
-                        {showNotifications && (
-                            <NotificationIcon
-                                isExpanded={false}
-                                isActive={false}
-                            />
-                        )}
+
+
+                        <div className=''>
+                            {showNotifications && (
+                                <NotificationIcon
+                                    isExpanded={false}
+                                    isActive={false}
+                                />
+                            )}
+
+
+                            {showTickets && (
+                                <TicketOperationIcon
+                                    isExpanded={false}
+                                    isActive={false}
+                                />
+                            )}
+                        </div>
+
                     </div>
                 </aside>
             }
