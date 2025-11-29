@@ -54,7 +54,7 @@ export interface ILogisticsShipment {
     // coordinates: number[];
   };
   items: IShipmentItem[];
-  status: "pending" | "assigned" | "in_transit" | "delivered" | "cancelled";
+  shipmentStatus: "pending" | "assigned" | "in_transit" | "delivered" | "cancelled";
   scheduledDate: string;
   actualPickupTime: string;
   actualDeliveryTime: string;

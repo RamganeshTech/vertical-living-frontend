@@ -3,21 +3,22 @@ import { useParams, useNavigate } from 'react-router-dom';
 import InvoiceAccountForm from './InvoiceAccountForm';
 import type { CreateInvoicePayload } from './CreateInvoiceAcc';
 import { toast } from '../../../../utils/toast';
-import { useGetSingleInvoice } from '../../../../apiList/Department Api/Accounting Api/invoiceApi';
+import { useGetSingleInvoice, useUpdateInvoice } from '../../../../apiList/Department Api/Accounting Api/invoiceApi';
 
 const InvoiceAccSingle = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { organizationId } = useParams() as { organizationId: string }
-    const { data: invoice, isLoading, isError, error } = useGetSingleInvoice(id || '');
+    const { data: invoice, isLoading, isError, error, refetch } = useGetSingleInvoice(id || '');
+    const updateInvoiceMutation = useUpdateInvoice()
 
-    const handleUpdate = async (_data: CreateInvoicePayload) => {
+    const handleUpdate = async (data: CreateInvoicePayload) => {
         try {
-            // TODO: Implement update mutation when backend is ready
-            // await updateInvoiceMutation.mutateAsync({ invoiceId: id!, invoiceData: data });
 
+            // TODO: Implement update mutation when backend is ready
+            await updateInvoiceMutation.mutateAsync({ invoiceId: id!, invoiceData: {...data, organizationId} });
+            refetch()
             toast({ title: "Success", description: "Invoice updated successfully" });
-            navigate(-1);
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -65,7 +66,7 @@ const InvoiceAccSingle = () => {
                 organizationId={organizationId}
                 initialData={invoice}
                 onSubmit={handleUpdate}
-                isSubmitting={false} // Update when mutation is implemented
+                isSubmitting={updateInvoiceMutation.isPending}// Update when mutation is implemented
             />
         </main>
     );

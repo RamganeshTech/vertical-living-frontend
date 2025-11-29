@@ -17,6 +17,31 @@ import NavigationDDWithHeading, { type NavigationSection } from "../../../shared
 // }
 
 
+
+// export interface IInstallmentAcc {
+//     _id?: string,
+//   amount: number
+//   dueDate: string,
+//   status: string,  // or "paid"
+//   orderId: string,        // Razorpay order ID
+//   paymentId: string
+// }
+
+
+export interface IInstallmentAcc {
+    _id?: string;
+    amount: number;
+    dueDate: string;
+    status: 'pending' | 'processing' | 'paid' | 'failed' | 'cancelled';
+    orderId?: string;        // Razorpay fund_account_id
+    paymentId?: string;      // Razorpay payout_id
+    transactionId?: string;  // UTR number
+    paidAt?: string;
+    failureReason?: string;
+    fees?: number;
+    tax?: number;
+}
+
 export interface IAccounting {
     _id?: string;
     transactionNumber: string | null;
@@ -33,6 +58,7 @@ export interface IAccounting {
     dueDate: string | null;   // use string since dates come as ISO from API
     notes: string;
     paidAt: string | null;
+    installMents?: IInstallmentAcc[]
     // createdAt?: string;
     // updatedAt?: string;
 }
@@ -155,6 +181,22 @@ const AccountingMain: React.FC = () => {
                     icon: 'fas fa-receipt text-blue-600',
                     onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
                 },
+
+                {
+                    label: 'Design Bills',
+                    path: `/organizations/${organizationId}/projects/billnew`,
+                    icon: 'fas fa-file-pdf text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/billnew`)
+                },
+
+
+                // {
+                //     label: 'Bill New',
+                //     path: `/organizations/${organizationId}/projects/billnew`,
+                //     icon: 'fas fa-receipt text-blue-600',
+                //     onClick: () => navigate(`/organizations/${organizationId}/projects/billnew`)
+                // },
+
                 {
                     label: 'Vendor Payments',
                     path: `/organizations/${organizationId}/projects/vendorpaymentmain`,

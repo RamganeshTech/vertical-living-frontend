@@ -1,6 +1,7 @@
 import React from 'react'
 import { dateFormate } from '../../../../utils/dateFormator'
 import type { CreateInvoicePayload } from './CreateInvoiceAcc'
+import { formatCurrency } from '../../../../utils/formatCurrency'
 type Props = {
     invoice: CreateInvoicePayload,
     index: number,
@@ -36,7 +37,7 @@ const InvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDel
                 </span>
             </div>
 
-  <div className="col-span-2 text-gray-600 text-sm">
+            <div className="col-span-2 text-gray-600 text-sm">
                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
                 {dateFormate(invoice.invoiceDate)}
             </div>
@@ -49,7 +50,8 @@ const InvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDel
 
             {/* Grand Total */}
             <div className="col-span-2 font-semibold text-green-600">
-                ₹{invoice.grandTotal?.toFixed(2) || '0.00'}
+                {/* ₹{invoice.grandTotal?.toFixed(2) || '0.00'} */}
+                {formatCurrency(invoice?.grandTotal)}
             </div>
 
             {/* Items Count */}

@@ -1,13 +1,13 @@
 // components/TicketOperationIcon.tsx
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 // import { useGetUnreadCount } from '../../apiList/Notificaiton Api/notificationApi';
 // import { queryClient } from '../../QueryClient/queryClient';
 // import { useCurrentSupervisor } from '../../Hooks/useCurrentSupervisor';
 // import { socket } from '../../lib/socket';
 import { TicketOperationBadge } from './TicketOperationBadge';
-import { useCurrentSupervisor } from '../../Hooks/useCurrentSupervisor';
-import { socket } from '../../lib/socket';
+// import { useCurrentSupervisor } from '../../Hooks/useCurrentSupervisor';
+// import { socket } from '../../lib/socket';
 
 interface TicketOperationIconProps {
   isExpanded?: boolean;
@@ -25,19 +25,21 @@ const TicketOperationIcon: React.FC<TicketOperationIconProps> = ({
 
 
 
-      const currentUser = useCurrentSupervisor();
-  
+  // const currentUser = useCurrentSupervisor();
 
 
 
-  useEffect(() => {
-    const userId = currentUser?.id;
-    if (!socket || !organizationId || !userId) return;
 
-    socket.emit('join_ticket_discussion', { organizationId, userId });
+  // useEffect(() => {
+  //   const userId = currentUser?.id;
+  //   if (!socket || !organizationId || !userId) return;
 
-    // No socket.on here! Only emit to join room
-}, [organizationId, currentUser?.id]);
+  //   socket.emit('join_ticket_discussion', { organizationId, userId });
+
+  //   // No socket.on here! Only emit to join room
+  // }, [organizationId, currentUser?.id]);
+
+
 
 
   const handleNotificationClick = () => {
@@ -92,7 +94,7 @@ const TicketOperationIcon: React.FC<TicketOperationIconProps> = ({
           </span>
         )} */}
         <i className={`fa-solid fa-ticket ${isActive ? 'text-[#4a86f7]' : 'text-[#9ca3af]'}`}></i>
-        <TicketOperationBadge size="small" organizationId={organizationId!}  />
+        <TicketOperationBadge size="small" organizationId={organizationId!} />
       </div>
     </div>
   );

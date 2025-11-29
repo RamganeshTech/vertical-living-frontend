@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useCreateMaterialQuote, useEditMaterialQuote } from "../../../../apiList/Quote Api/QuoteGenerator Api/quoteGenerateApi";
+import { useCreateMaterialQuote, useEditMaterialQuote } from "../../../../apiList/Quote Api/Internal_Quote_Api/quoteGenerateApi";
 import { toast } from "../../../../utils/toast";
 import { useParams } from "react-router-dom";
 import type { AvailableProjetType } from "../../../Department Pages/Logistics Pages/LogisticsShipmentForm";

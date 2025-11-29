@@ -41,6 +41,7 @@ const AccountingCard: React.FC<Props> = ({
     }
 
 
+    const totalAmt = totalAmount?.amount + totalAmount?.taxAmount || 0
     return (
         <Card className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg">
             <CardContent className="p-4 space-y-2">
@@ -49,7 +50,7 @@ const AccountingCard: React.FC<Props> = ({
                 </h3>
 
                 <p className="text-sm text-gray-600 capitalize">Department: <strong>{dept || "N/A"}</strong></p>
-                <p className="text-sm text-gray-800">Amount: ₹ <strong> {totalAmount?.amount + totalAmount?.taxAmount || 0}</strong></p>
+                <p className="text-sm text-gray-800">Amount: ₹ <strong> {totalAmt.toLocaleString("en-in")}</strong></p>
                 <p className="text-sm text-gray-600 capitalize">Status: <strong>{status}</strong></p>
 
                 <div className="flex justify-end gap-2 pt-2">

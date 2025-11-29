@@ -1,4 +1,4 @@
-import { type AxiosInstance } from "axios";
+import axios, { type AxiosInstance } from "axios";
 
 
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -158,6 +158,76 @@ export const getSingleShipment = async ({
   const { data } = await api.get(`/department/logistics/shipment/getsingle/${shipmentId}`);
   if (!data.ok) throw new Error(data.message);
   return data?.data;
+};
+
+
+
+// LIVE TRACKING API
+
+// ============================================
+// 🚀 WITHOUT AUTH - Update Driver Location
+// ============================================
+const updateDriverLocation = async ({
+  shipmentId,
+  latitude,
+  longitude
+}: {
+  shipmentId: string;
+  latitude: number;
+  longitude: number;
+}) => {
+  const response = await axios.post(
+    `${import.meta.env.VITE_API_URL}/api/department/logistics/shipment/${shipmentId}/update-location`,
+    { latitude, longitude }
+  );
+  if (!response.data.ok) throw new Error(response.data.message);
+  return response.data.data;
+};
+
+
+const startTracking = async ({ shipmentId }: { shipmentId: string }) => {
+  const response = await axios.post(
+    `${import.meta.env.VITE_API_URL}/api/department/logistics/shipment/${shipmentId}/start-tracking`
+  );
+  if (!response.data.ok) throw new Error(response.data.message);
+  return response.data.data;
+};
+
+
+
+const getActiveShipmentsWithLocation = async ({
+  organizationId,
+  projectId,
+  api
+}: {
+  organizationId: string;
+  projectId?: string;
+  api: AxiosInstance;
+}) => {
+  const params = new URLSearchParams({ organizationId });
+  if (projectId) params.append('projectId', projectId);
+
+  const { data } = await api.get(
+    `/department/logistics/shipment/active-with-location?${params.toString()}`
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+const getShipmentRouteHistory = async ({
+  shipmentId,
+  api
+}: {
+  shipmentId: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.get(
+    `/department/logistics/shipment/${shipmentId}/route-history`
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
 };
 
 
@@ -349,3 +419,125 @@ const synAccountsFromLogistics = async ({
   const { data } = await api!.post(`/department/logistics/syncaccounting/${organizationId}/${projectId}`, {totalCost, fromDept, upiId});
   return data;
 }
+
+
+
+// LIVE TRACKING HOOKS
+
+
+export const useUpdateDriverLocation = () => {
+  return useMutation({
+    mutationFn: async ({ 
+      shipmentId, 
+      latitude, 
+      longitude 
+    }: { 
+      shipmentId: string; 
+      latitude: number; 
+      longitude: number;
+    }) => {
+      return await updateDriverLocation({ shipmentId, latitude, longitude });
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate active shipments query to refresh dashboard
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'active-shipments'] });
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipment', variables.shipmentId] });
+    }
+  });
+};
+
+
+
+export const useStartTracking = () => {
+  return useMutation({
+    mutationFn: async ({ shipmentId }: { shipmentId: string }) => {
+      return await startTracking({ shipmentId });
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'active-shipments'] });
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipment', variables.shipmentId] });
+    }
+  });
+};
+
+
+
+
+
+
+
+export const useGetActiveShipmentsWithLocation = ({
+  organizationId,
+  projectId,
+  enabled = true
+}: {
+  organizationId: string;
+  projectId?: string;
+  enabled?: boolean;
+}) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ['logistics', 'active-shipments', organizationId, projectId],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("API instance not found for role");
+      return await getActiveShipmentsWithLocation({ organizationId, projectId, api });
+    },
+    enabled: enabled && !!organizationId && !!role && allowedRoles.includes(role),
+    refetchOnMount: true,
+  });
+};
+
+
+// ============================================
+// ✅ WITH AUTH - Get Shipment Route History
+// ============================================
+
+export const useGetShipmentRouteHistory = ({
+  shipmentId,
+  enabled = true
+}: {
+  shipmentId: string;
+  enabled?: boolean;
+}) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ['logistics', 'shipment-route', shipmentId],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("API instance not found for role");
+      return await getShipmentRouteHistory({ shipmentId, api });
+    },
+    enabled: enabled && !!shipmentId && !!role && allowedRoles.includes(role),
+    refetchOnMount: false,
+    });
+};
+
+
+
+
+// ============================================
+// 🚀 PUBLIC - Get Shipment by Token (Driver Tracking)
+// ============================================
+const getShipmentByToken = async ({ token }: { token: string }) => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_API_URL}/api/department/logistics/track/${token}`
+  );
+  if (!response.data.ok) throw new Error(response.data.message);
+  return response.data.data;
+};
+
+export const useGetShipmentByToken = (token: string) => {
+  return useQuery({
+    queryKey: ['logistics', 'driver-tracking', token],
+    queryFn: () => getShipmentByToken({ token }),
+    enabled: !!token, // Only fetch if token exists
+    retry: 1, // Only retry once if failed
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+  });
+};

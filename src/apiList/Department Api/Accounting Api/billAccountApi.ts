@@ -54,14 +54,53 @@ const getAllBills = async ({
     return data;
 };
 
-const createBills = async ({
-    billData,
-    api
-}: {
-    billData: any;
-    api: AxiosInstance
-}) => {
-    const { data } = await api.post(`/department/accounting/bill/createbill`, billData);
+
+// 1. CREATE (Multipart)
+const createBillApi = async ({ billData, files, api }: { billData: any; files: File[]; api: AxiosInstance }) => {
+    const formData = new FormData();
+    const { images, items, ...rest } = billData;
+
+    // Append standard fields
+    Object.entries(rest).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) formData.append(key, String(value));
+    });
+    // Append Items as JSON
+    if (items) formData.append('items', JSON.stringify(items));
+    // Append Files
+    if (files && files.length > 0) {
+        files.forEach((file) => formData.append('files', file));
+    }
+
+    const { data } = await api.post(`/department/accounting/bill/createbill`, formData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+// 2. UPDATE (JSON Only - Updates text & preserves/removes existing images)
+const updateBillApi = async ({ billData, billId, api }: { billData: any; billId: string; api: AxiosInstance }) => {
+    // We send billData as JSON. 
+    // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
+    const { data } = await api.post(`/department/accounting/bill/updatebill/${billId}`, billData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
+const syncAcctoBill = async ({  billId, api }: {  billId: string; api: AxiosInstance }) => {
+    // We send billData as JSON. 
+    // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
+    const { data } = await api.post(`/department/accounting/bill/synctoaccounts/${billId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
+
+// 3. UPLOAD FILES ONLY (Multipart)
+const uploadImagesOnlyApi = async ({ billId, files, api }: { billId: string; files: File[]; api: AxiosInstance }) => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+
+    const { data } = await api.post(`/department/accounting/bill/upload-images/${billId}`, formData);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
@@ -77,6 +116,22 @@ const deleteBill = async ({
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
+
+
+const deleteBillImage = async ({
+    billId,
+    imageId,
+    api
+}: {
+    billId: string;
+    imageId: string;
+    api: AxiosInstance
+}) => {
+    const { data } = await api.delete(`/department/accounting/bill/deleteimage/${billId}/${imageId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
 
 const getSingleBill = async ({
     billId,
@@ -171,16 +226,75 @@ export const useCreateBill = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({ billData }: { billData: any }) => {
+        mutationFn: async ({ billData, files }: { billData: any, files: File[] }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
             if (!api) throw new Error("API instance not found for role");
-            return await createBills({ billData, api });
+
+            return await createBillApi({ billData, files, api });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["bills"] });
         },
     });
 };
+
+
+export const useUpdateBill = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ billData, billId }: { billData: any, billId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await updateBillApi({ billData, billId, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bills"] });
+        },
+    });
+};
+
+
+
+export const useSyncBillToAccounts = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({  billId }: {  billId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await syncAcctoBill({ billId, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bills"] });
+        },
+    });
+};
+
+
+export const useUploadBillImages = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ billId, files }: { billId: string, files: File[] }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+
+            return await uploadImagesOnlyApi({ billId, files, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bills"] });
+        },
+    });
+};
+
+
 
 export const useDeleteBill = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
@@ -193,6 +307,26 @@ export const useDeleteBill = () => {
             if (!api) throw new Error("API instance not found for role");
 
             return await deleteBill({ billId, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bills"] });
+        },
+    });
+};
+
+
+
+export const useDeleteBillImage = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ billId , imageId}: { billId: string , imageId:string}) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+
+            return await deleteBillImage({ billId, api, imageId });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["bills"] });

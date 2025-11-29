@@ -41,6 +41,8 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
 }) => {
 
 
+  
+
   const { mutateAsync: createShipment, isPending: isCreatePending } = useCreateShipment();
   const { mutateAsync: updateShipment, isPending: isUpdatePending } = useUpdateShipment();
 
@@ -56,7 +58,7 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
   const [formData, setFormData] = useState<ILogisticsShipment>({
     // shipmentNumber: "",
     // shipmentType: "delivery",
-    status: "pending",
+    shipmentStatus: "pending",
     vehicleDetails: {
       vehicleNumber: "",
       vehicleType: "truck",
@@ -145,6 +147,22 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
     }
 
   }, [data])
+
+
+  useEffect(() => {
+  const handleEscape = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      onClose(); // call your close function
+    }
+  };
+
+  window.addEventListener("keydown", handleEscape);
+
+  // Cleanup when component unmounts
+  return () => {
+    window.removeEventListener("keydown", handleEscape);
+  };
+}, [onClose]);
 
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -324,10 +342,11 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
                 </select>
               </div> */}
               <div>
-                <Label>Status</Label>
-                <select className="w-full px-3 py-2 border rounded-xl" name="status" value={formData.status} onChange={handleChange}>
+                <Label>shipmentStatus</Label>
+                <select className="w-full px-3 py-2 border rounded-xl" name="shipmentStatus" value={formData.shipmentStatus} onChange={handleChange}>
                   <option value="pending">Pending</option>
                   <option value="assigned">Assigned</option>
+                  <option value="pickedup">Picked Up</option>
                   <option value="in_transit">In Transit</option>
                   <option value="delivered">Delivered</option>
                   <option value="cancelled">Cancelled</option>

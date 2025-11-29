@@ -2,10 +2,10 @@
 
 import { type AxiosInstance } from 'axios';
 
-import { 
-    useInfiniteQuery, 
-    useMutation, 
-    useQuery, 
+import {
+    useInfiniteQuery,
+    useMutation,
+    useQuery,
 } from '@tanstack/react-query';
 import useGetRole from '../../../Hooks/useGetRole';
 import { getApiForRole } from '../../../utils/roleCheck';
@@ -15,10 +15,10 @@ import { queryClient } from '../../../QueryClient/queryClient';
 export interface CreateVendorPayload {
     // VendorType: "business" | "individual";
     organizationId: string;
-    projectId: string;
-    clientId: string;
+    projectId: string | null;
+    clientId: string | null;
     firstName: string | null;
-    lastName: string | null;
+    // lastName: string | null;
     companyName: string | null;
     email: string | null;
     phone: {
@@ -33,6 +33,8 @@ export interface CreateVendorPayload {
     paymentTerms?: string;
     // enablePortal?: boolean;
     files?: File[]; // Add files to payload
+    mainImage?: File; // <--- ADD THIS
+
 }
 
 export interface UpdateVendorPayload {
@@ -66,7 +68,7 @@ export interface GetVendorsParams {
     projectId?: string;
     firstName?: string;
     lastName?: string;
-     createdFromDate?: string
+    createdFromDate?: string
     createdToDate?: string,
     // VendorType?: "business" | "individual";
     search?: string;
@@ -101,6 +103,18 @@ export interface Vendor {
         originalName?: string;
         uploadedAt?: Date;
     }>;
+    location?: {
+        address: string | null,
+        mapUrl: string | null,
+        latitude: number | null
+        longitude: number | null,
+    }
+    mainImage?: {
+        type: "image";
+        url: string;
+        originalName?: string;
+        uploadedAt?: Date;
+    }
     createdAt: string;
     updatedAt: string;
 }
@@ -145,12 +159,12 @@ export const createVendor = async ({
 }: {
     payload: CreateVendorPayload;
     api: AxiosInstance;
-})=> {
-      // Always send as FormData
+}) => {
+    // Always send as FormData
     const formData = new FormData();
 
     // Extract files from payload
-    const { files, phone, ...restPayload } = payload;
+    const { files, phone, mainImage, ...restPayload } = payload;
 
     // Append all string/number fields
     Object.entries(restPayload).forEach(([key, value]) => {
@@ -159,11 +173,16 @@ export const createVendor = async ({
         }
     });
 
+
+
     // Append phone object as JSON string
     if (phone) {
         formData.append('phone', JSON.stringify(phone));
     }
 
+    if (mainImage) {
+        formData.append('mainImage', mainImage);
+    }
     // Append files if present
     if (files && files.length > 0) {
         files.forEach((file) => {
@@ -176,10 +195,36 @@ export const createVendor = async ({
             'Content-Type': 'multipart/form-data'
         }
     });
-    
+
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
+
+export const updateVendorMainImage = async ({
+    vendorId,
+    file,
+    api
+}: {
+    vendorId: string;
+    file: File;
+    api: AxiosInstance;
+}) => {
+    const formData = new FormData();
+    formData.append('mainImage', file);
+
+    const { data } = await api.put(
+        `/department/accounting/vendor/update-main-image/${vendorId}`,
+        formData,
+        {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        }
+    );
+
+    if (!data.ok) throw new Error(data.message);
+    return data.data; // Should return { mainImage: "url..." }
+};
+
+
 
 /**
  * Get all Vendors with pagination and filters
@@ -221,7 +266,7 @@ export const getAllCustomeforDD = async ({
 }) => {
     const { data } = await api.get(`/department/accounting/vendor/getallvendorname/${organizationId}`);
     if (!data.ok) throw new Error(data.message);
-    
+
     return data.data;
 };
 
@@ -244,16 +289,16 @@ export const updateVendor = async ({
 
 
 
-export const updateVendorDocument = async ({api,formData, id}:{api:AxiosInstance, id: string, formData: FormData}) => {
-  const response = await api.put(`/department/accounting/vendor/updatevendor/${id}/document`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
-  return response.data;
+export const updateVendorDocument = async ({ api, formData, id }: { api: AxiosInstance, id: string, formData: FormData }) => {
+    const response = await api.put(`/department/accounting/vendor/updatevendor/${id}/document`,
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+    return response.data;
 };
 
 /**
@@ -298,15 +343,47 @@ export const useCreateVendor = () => {
         },
         onSuccess: (_, variables) => {
             // Invalidate all Vendor queries for this organization
-            queryClient.invalidateQueries({ 
-                queryKey: ["vendors", "list", variables.organizationId] 
+            queryClient.invalidateQueries({
+                queryKey: ["vendors", "list", variables.organizationId]
             });
-            queryClient.invalidateQueries({ 
-                queryKey: ["vendors", "list", variables.organizationId, variables.projectId] 
+            queryClient.invalidateQueries({
+                queryKey: ["vendors", "list", variables.organizationId, variables.projectId]
             });
         }
     });
 };
+
+
+//  update the main image alone
+
+
+export const useUpdateVendorMainImage = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ vendorId, file }: { vendorId: string; file: File }) => {
+            if (!role || !ALLOWED_ROLES.includes(role)) {
+                throw new Error("Not allowed to make this API call");
+            }
+            if (!api) {
+                throw new Error("API instance not found for role");
+            }
+            return await updateVendorMainImage({ vendorId, file, api });
+        },
+        onSuccess: (_, variables) => {
+            // Invalidate specific vendor query so the UI updates instantly
+            queryClient.invalidateQueries({
+                queryKey: ["vendors", "list"] // Adjust based on your query keys
+            });
+            // If you have a single vendor query key:
+            queryClient.invalidateQueries({
+                queryKey: ["vendors", variables.vendorId]
+            });
+        }
+    });
+};
+
 
 /**
  * Hook to get all Vendors with infinite scrolling
@@ -316,7 +393,7 @@ export const useGetAllVendors = (params: Omit<GetVendorsParams, 'page'>) => {
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["vendors", "list", params.organizationId,   params.search, params.sortBy, params.sortOrder, params.createdFromDate, params.createdToDate],
+        queryKey: ["vendors", "list", params.organizationId, params.search, params.sortBy, params.sortOrder, params.createdFromDate, params.createdToDate],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -324,9 +401,9 @@ export const useGetAllVendors = (params: Omit<GetVendorsParams, 'page'>) => {
             if (!api) {
                 throw new Error("API instance not found for role");
             }
-            return await getAllVendors({ 
-                params: { ...params, page: pageParam }, 
-                api 
+            return await getAllVendors({
+                params: { ...params, page: pageParam },
+                api
             });
         },
         getNextPageParam: (lastPage) => {
@@ -399,11 +476,11 @@ export const useUpdateVendor = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({ 
-            vendorId, 
-            payload 
-        }: { 
-            vendorId: string; 
+        mutationFn: async ({
+            vendorId,
+            payload
+        }: {
+            vendorId: string;
             payload: UpdateVendorPayload;
         }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
@@ -416,12 +493,12 @@ export const useUpdateVendor = () => {
         },
         onSuccess: (variables) => {
             // Invalidate single Vendor query
-            queryClient.invalidateQueries({ 
-                queryKey: ["vendors", "single", variables.vendorId] 
+            queryClient.invalidateQueries({
+                queryKey: ["vendors", "single", variables.vendorId]
             });
             // Invalidate all Vendor list queries
-            queryClient.invalidateQueries({ 
-                queryKey: ["vendors", "list"] 
+            queryClient.invalidateQueries({
+                queryKey: ["vendors", "list"]
             });
         }
     });
@@ -435,8 +512,8 @@ export const useUpdateVendorDocument = () => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
-   return useMutation({
-        mutationFn: async ({ id, formData }: {id:string, formData:FormData}) => {
+    return useMutation({
+        mutationFn: async ({ id, formData }: { id: string, formData: FormData }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
                 throw new Error("Not allowed to make this API call");
             }
@@ -467,8 +544,8 @@ export const useDeleteVendor = () => {
         },
         onSuccess: () => {
             // Invalidate all Vendor list queries
-            queryClient.invalidateQueries({ 
-                queryKey: ["vendors", "list"] 
+            queryClient.invalidateQueries({
+                queryKey: ["vendors", "list"]
             });
         }
     });

@@ -13,9 +13,9 @@ import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionL
 
 
 const PaymentTransaction = () => {
-  const { projectId , organizationId} = useParams<{ projectId: string , organizationId:string}>();
+  const { projectId, organizationId } = useParams<{ projectId: string, organizationId: string }>();
   const navigate = useNavigate();
-  const { data, refetch , isError, error :getAllError, isLoading} = useGetPaymentTransaction(projectId!);
+  const { data, refetch, isError, error: getAllError, isLoading } = useGetPaymentTransaction(projectId!);
   const paymentTransaction = data?.paymentTransaction;
   const totalAmount = data?.totalAmount;
 
@@ -25,23 +25,23 @@ const PaymentTransaction = () => {
   const client = useSelector((state: RootState) => state.clientProfileStore);
 
 
-   if (isLoading) return <MaterialOverviewLoading />;
-    if (isError || !data) return  <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
-              <div className="text-red-600 font-semibold mb-2">
-                ⚠️ Error Occurred
-              </div>
-              <p className="text-red-500 text-sm mb-4">
-                {(getAllError as any)?.response?.data?.message || 
-                 (getAllError as any)?.message || 
-                 "Failed to load cost estimation data"}
-              </p>
-              <Button
-                onClick={() => refetch()}
-                className="bg-red-600 text-white px-4 py-2"
-              >
-                Retry
-              </Button>
-            </div> 
+  if (isLoading) return <MaterialOverviewLoading />;
+  if (isError || !data) return <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
+    <div className="text-red-600 font-semibold mb-2">
+      ⚠️ Error Occurred
+    </div>
+    <p className="text-red-500 text-sm mb-4">
+      {(getAllError as any)?.response?.data?.message ||
+        (getAllError as any)?.message ||
+        "Failed to load cost estimation data"}
+    </p>
+    <Button
+      onClick={() => refetch()}
+      className="bg-red-600 text-white px-4 py-2"
+    >
+      Retry
+    </Button>
+  </div>
 
   const handlePayment = async () => {
     try {
@@ -106,7 +106,7 @@ const PaymentTransaction = () => {
       {/* Header Section */}
       <div className="flex-shrink-0 flex justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
         <div className="flex items-center gap-3 justify-between">
-       
+
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700 flex items-center gap-2">
             <i className="fa-solid fa-money-check-dollar" />
             <span className="hidden sm:inline">Payment Transaction</span>
@@ -151,20 +151,18 @@ const PaymentTransaction = () => {
               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                 <div className="flex items-center gap-2">
                   <i
-                    className={`fa-solid ${
-                      paymentTransaction.status === "successful"
+                    className={`fa-solid ${paymentTransaction.status === "successful"
                         ? "fa-circle-check text-green-600"
                         : "fa-circle-xmark text-red-600"
-                    }`}
+                      }`}
                   />
                   <span className="font-medium">Status:</span>
                 </div>
                 <span
-                  className={`font-semibold ${
-                    paymentTransaction.status === "successful"
+                  className={`font-semibold ${paymentTransaction.status === "successful"
                       ? "text-green-700"
                       : "text-red-700"
-                  }`}
+                    }`}
                 >
                   {paymentTransaction.status.toUpperCase()}
                 </span>
@@ -197,13 +195,12 @@ const PaymentTransaction = () => {
             <button
               onClick={handlePayment}
               disabled={isCreating || isVerifying || paymentTransaction?.status === "successful"}
-              className={`w-full py-3 sm:py-4 rounded-md text-white text-base sm:text-lg font-medium transition ${
-                isCreating || isVerifying
+              className={`w-full py-3 sm:py-4 rounded-md text-white text-base sm:text-lg font-medium transition ${isCreating || isVerifying
                   ? "bg-blue-400 cursor-not-allowed"
                   : paymentTransaction?.status === "successful"
-                  ? "bg-green-600 cursor-default"
-                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
-              }`}
+                    ? "bg-green-600 cursor-default"
+                    : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
+                }`}
             >
               {paymentTransaction?.status === "successful" ? (
                 <span className="flex items-center justify-center gap-2">

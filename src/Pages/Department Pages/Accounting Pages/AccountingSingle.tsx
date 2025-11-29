@@ -1,269 +1,1580 @@
+// import React, { useState } from "react";
+// import { useNavigate, useParams } from "react-router-dom";
+
+// import { Card, CardContent } from "../../../components/ui/Card";
+// import { Button } from "../../../components/ui/Button";
+// import { Input } from "../../../components/ui/Input";
+// import { useAddInstallment, useCreateAccountPaymentOrder, useGetSingleAccounting, useUpdateAccounting, useVerifyAccountInstallPayment } from "../../../apiList/Department Api/Accounting Api/accountingApi";
+// import { toast } from "../../../utils/toast";
+// import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+// import type { IAccounting } from "./AccountingMain";
+// import { loadScript } from "../../../utils/loadScript";
+
+// export interface IInstallmentAcc {
+//   _id?: string
+//   amount: number
+//   dueDate: string,
+//   status: string,  // or "paid"
+//   orderId: string,        // Razorpay order ID
+//   paymentId: string
+// }
+
+// const AccountingSingle: React.FC = () => {
+//   const { id } = useParams<{ id: string }>();
+//   const { data, isLoading } = useGetSingleAccounting(id!) as { data: IAccounting, isLoading: boolean };
+//   const { mutateAsync: updateRecord } = useUpdateAccounting();
+//   const { mutateAsync: createOrder } = useCreateAccountPaymentOrder();
+//   const { mutateAsync: verifyPayment } = useVerifyAccountInstallPayment();
+//   const { mutateAsync: installmentAdd } = useAddInstallment();
+//   const navigate = useNavigate()
+
+//   const [formData, setFormData] = useState<any>(data || {});
+//   const [editMode, setEditMode] = useState(false);
+
+
+//   const handleSave = async () => {
+//     try {
+//       await updateRecord({ id: id!, payload: formData });
+
+//       toast({ title: "success", description: "shipment has generated" })
+//       setEditMode(false);
+//     }
+//     catch (error: any) {
+//       toast({
+//         title: "Error",
+//         description: error?.response?.data?.message || "Operation Failed",
+//         variant: "destructive"
+//       });
+//     }
+//   }
+
+
+
+//   const handleInstallmentAdd = async () => {
+//     try {
+//       await installmentAdd({ id: id!, installments: formData.installMents });
+
+//       toast({ title: "success", description: "updated the installments" })
+//       setEditMode(false);
+//     }
+//     catch (error: any) {
+//       toast({
+//         title: "Error",
+//         description: error?.response?.data?.message || "Operation Failed",
+//         variant: "destructive"
+//       });
+//     }
+//   }
+
+
+//   // useEffect(() => {
+//   //     setFormData(data)
+//   // }, [editMode])
+
+//   const handleInstallmentPayment = async (accId: string, installmentId: string) => {
+//     try {
+//       const orderData = await createOrder({ accountingId: accId, installmentId });
+
+//       const sdkLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+//       if (!sdkLoaded) {
+//         toast({
+//           title: "Error",
+//           description: "Failed to load Razorpay SDK!",
+//           variant: "destructive",
+//         });
+//         return;
+//       }
+
+//       const options = {
+//         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+//         amount: orderData.amount,
+//         currency: "INR",
+//         name: "Vertical Living - Installment",
+//         description: "Installment Payment",
+//         order_id: orderData.orderId,
+
+//         handler: async (response: any) => {
+//           await verifyPayment({
+//             accId,
+//             installmentId,
+//             razorpay_order_id: response.razorpay_order_id,
+//             razorpay_payment_id: response.razorpay_payment_id,
+//             razorpay_signature: response.razorpay_signature,
+//           });
+
+//           toast({
+//             title: "Success",
+//             description: "Installment paid successfully!",
+//           });
+//         },
+
+//         theme: { color: "#0050b3" },
+//       };
+
+//       const rzp = new (window as any).Razorpay(options);
+//       rzp.open();
+
+//     } catch (err: any) {
+//       toast({
+//         title: "Error",
+//         description: err?.response?.data?.message || err.message,
+//         variant: "destructive",
+//       });
+//     }
+//   };
+
+//   const preloadFormData = () => {
+//     if (data) {
+//       setFormData(
+//         {
+//           transactionType: data.transactionType,
+//           fromDept: data.fromDept,
+//           totalAmount: {
+//             amount: data.totalAmount?.amount ?? 0,
+//             taxAmount: data.totalAmount?.taxAmount ?? 0,
+//           },
+//           upiId: data?.upiId,
+//           status: data.status,
+//           dueDate: data.dueDate ? new Date(data.dueDate).toISOString().split("T")[0] : "",
+//           notes: data.notes ?? "",
+//           installMents: data?.installMents || []
+//         }
+//       );
+//     }
+//   };
+
+//   const handleToggleEdit = () => {
+//     if (!editMode) {
+//       preloadFormData(); // load latest data before entering edit mode
+//     }
+//     setEditMode((prev) => !prev);
+//   };
+
+//   if (isLoading) return <p className="p-6"><MaterialOverviewLoading /></p>;
+
+//   if (!data) {
+//     <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+//       <i className="fas fa-money-bill-wave text-5xl text-blue-300 mb-4" />
+//       <h3 className="text-lg font-semibold text-blue-800 mb-1">No Records Found</h3>
+//       {/* <p className="text-sm text-gray-500">
+//                                 Looks like there are no Procurements yet for this project.<br />
+//                                 Once you have <strong> generated the Pdf </strong>  items will be listed here  to get started 🚀
+//                             </p> */}
+//     </div>
+//   }
+
+//   return (
+//     <div className="p-4 max-h-full overflow-y-auto max-w-full space-y-6">
+//       <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+//         <div className="flex gap-3 items-center">
+//           <div onClick={() => navigate(-1)}
+//             className="bg-blue-50 hover:bg-slate-300 flex items-center justify-center w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md">
+//             <i className="fas fa-arrow-left" />
+//           </div>
+//           <h1 className="text-2xl sm:text-3xl font-bold text-blue-800">
+//             Transaction: {data?.transactionNumber ?? "N/A"}
+//           </h1>
+//         </div>
+
+//         {!editMode && <Button size="md" variant="primary" onClick={handleToggleEdit}>
+//           <i className="fas fa-edit mr-1" />
+//           {editMode ? "Cancel" : "Edit"}
+//         </Button>}
+//       </div>
+
+//       <Card className="shadow-none">
+//         <CardContent className="p-6 space-y-6 ">
+
+//           {/* Amount + Tax */}
+//           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+//             <div>
+//               <h3 className="text-sm font-semibold text-gray-700 mb-1">Amount</h3>
+//               {editMode ? (
+//                 <Input
+//                   value={formData?.totalAmount?.amount}
+//                   type="number"
+//                   onChange={(e) => {
+//                     const val = +e.target.value;
+//                     if (val >= 0) {
+//                       setFormData((prev: any) => ({
+//                         ...prev,
+//                         totalAmount: {
+//                           ...prev.totalAmount,
+//                           amount: val || 0,
+//                         },
+//                       }));
+//                     }
+//                   }}
+//                 />
+//               ) : (
+//                 <p className="text-lg text-gray-900 font-medium">₹ {data?.totalAmount?.amount}</p>
+//               )}
+//             </div>
+
+//             <div>
+//               <h3 className="text-sm font-semibold text-gray-700 mb-1">Tax</h3>
+//               {editMode ? (
+//                 <Input
+//                   value={formData?.totalAmount?.taxAmount}
+//                   type="number"
+//                   onChange={(e) => {
+//                     const val = +e.target.value;
+//                     if (val >= 0) {
+//                       setFormData((prev: any) => ({
+//                         ...prev,
+//                         totalAmount: {
+//                           ...prev.totalAmount,
+//                           taxAmount: val || 0,
+//                         },
+//                       }));
+//                     }
+//                   }}
+//                 />
+//               ) : (
+//                 <p className="text-lg text-gray-900 font-medium">₹ {data?.totalAmount?.taxAmount}</p>
+//               )}
+//             </div>
+
+//             <div>
+//               <h3 className="text-sm font-semibold text-gray-700 mb-1">Upi ID</h3>
+//               {editMode ? (
+//                 <Input
+//                   value={formData.upiId}
+//                   type="text"
+//                   onChange={(e) =>
+//                     setFormData((prev: any) => ({
+//                       ...prev,
+//                       upiId: e.target.value
+//                     }))
+//                   }
+//                 />
+//               ) : (
+//                 <p className="text-lg text-gray-800">{data?.upiId || "-"}</p>
+//               )}
+//             </div>
+//           </div>
+
+//           {/* Status */}
+//           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//             <div>
+//               <h3 className="text-sm font-semibold text-gray-700 mb-1">Status</h3>
+//               {editMode ? (
+//                 <select
+//                   value={formData.status}
+//                   onChange={(e) =>
+//                     setFormData((prev: any) => ({ ...prev, status: e.target.value }))
+//                   }
+//                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+//                 >
+//                   <option value="pending">Pending</option>
+//                   <option value="paid">Paid</option>
+//                   <option value="cancelled">Cancelled</option>
+//                 </select>
+//               ) : (
+//                 <p className="text-sm font-medium text-blue-700 capitalize">{data.status}</p>
+//               )}
+//             </div>
+
+//             <div>
+//               <h3 className="text-sm font-semibold text-gray-700 mb-1">Due Date</h3>
+//               {editMode ? (
+//                 <Input
+//                   value={formData?.dueDate}
+//                   type="date"
+//                   onChange={(e) =>
+//                     setFormData((prev: any) => ({
+//                       ...prev,
+//                       dueDate: e.target.value
+//                     }))
+//                   }
+//                 />
+//               ) : (
+//                 <p className="text-sm text-gray-800">
+//                   {data?.dueDate ? new Date(data?.dueDate).toLocaleDateString() : "-"}
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+
+//           {/* Notes */}
+//           <div>
+//             <h3 className="text-sm font-semibold text-gray-700 mb-1">Notes</h3>
+//             {editMode ? (
+//               <textarea
+//                 className="w-full px-3 py-2 border rounded-lg"
+//                 value={formData.notes || ""}
+//                 onChange={(e) =>
+//                   setFormData((prev: any) => ({
+//                     ...prev,
+//                     notes: e.target.value,
+//                   }))
+//                 }
+//               />
+//             ) : (
+//               <p className="text-sm text-gray-800">{data.notes || "-"}</p>
+//             )}
+//           </div>
+
+
+//           {/* INSTALLMENTS */}
+//           <div className="mt-8 space-y-6">
+//             <div className="flex items-center justify-between">
+//               <div className="flex items-center gap-3">
+//                 <i className="fas fa-calendar-check text-2xl text-blue-600"></i>
+//                 <h2 className="text-2xl font-bold text-gray-800">Installments</h2>
+//               </div>
+//               {!editMode && data?.installMents && data?.installMents?.length > 0 && (
+//                 <button
+//                   onClick={() => setEditMode(true)}
+//                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+//                 >
+//                   <i className="fas fa-edit"></i>
+//                   Edit Installments
+//                 </button>
+//               )}
+//             </div>
+
+//             {/* EMPTY STATE */}
+//             {!editMode && (!data?.installMents || data?.installMents?.length === 0) && (
+//               <div className="text-center p-12 border-2 border-dashed border-gray-300 rounded-xl bg-gradient-to-br from-gray-50 to-blue-50">
+//                 <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+//                   <i className="fas fa-receipt text-3xl text-blue-600"></i>
+//                 </div>
+//                 <h3 className="text-lg font-semibold text-gray-800 mb-2">No installments created yet</h3>
+//                 <p className="text-gray-600 mb-6">Start by adding installment plans for this agreement</p>
+//                 <button
+//                   onClick={() => setEditMode(true)}
+//                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2 mx-auto"
+//                 >
+//                   <i className="fas fa-plus-circle"></i>
+//                   Add Installments
+//                 </button>
+//               </div>
+//             )}
+
+//             {/* ---------- VIEW MODE - TABLE FORMAT ---------- */}
+//             {!editMode && data?.installMents && data?.installMents?.length > 0 && (
+//               <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+
+//                 {/* Table Header */}
+//                 <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+//                   <div className="grid grid-cols-12 gap-4 px-6 py-4 font-semibold text-sm">
+//                     <div className="col-span-1 flex items-center">
+//                       <i className="fas fa-hashtag mr-2"></i>
+//                       #
+//                     </div>
+//                     <div className="col-span-2 flex items-center">
+//                       <i className="fas fa-indian-rupee-sign mr-2"></i>
+//                       Amount
+//                     </div>
+//                     <div className="col-span-2 flex items-center">
+//                       <i className="fas fa-calendar-alt mr-2"></i>
+//                       Due Date
+//                     </div>
+//                     <div className="col-span-2 flex items-center">
+//                       <i className="fas fa-info-circle mr-2"></i>
+//                       Status
+//                     </div>
+//                     <div className="col-span-2 flex items-center">
+//                       <i className="fas fa-shopping-cart mr-2"></i>
+//                       Order ID
+//                     </div>
+//                     <div className="col-span-2 flex items-center">
+//                       <i className="fas fa-credit-card mr-2"></i>
+//                       Payment ID
+//                     </div>
+//                     <div className="col-span-1 flex items-center justify-center">
+//                       <i className="fas fa-cog"></i>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* Table Body */}
+//                 <div className="bg-white divide-y divide-gray-200">
+//                   {data.installMents.map((inst, index) => (
+//                     <div
+//                       key={inst._id}
+//                       className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors items-center"
+//                     >
+
+//                       {/* Index */}
+//                       <div className="col-span-1">
+//                         <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${inst.status === "paid" ? "bg-green-100 text-green-600" :
+//                           inst.status === "failed" ? "bg-red-100 text-red-600" :
+//                             "bg-orange-100 text-orange-600"
+//                           }`}>
+//                           {index + 1}
+//                         </div>
+//                       </div>
+
+//                       {/* Amount */}
+//                       <div className="col-span-2">
+//                         <div className="flex items-center gap-2">
+//                           {/* <i className="fas fa-rupee-sign text-blue-600"></i> */}
+//                           <span className="text-blue-600 font-bold">₹</span>
+//                           <span className="text-lg font-bold text-gray-900">
+//                             {inst.amount?.toLocaleString()}
+//                           </span>
+//                         </div>
+//                       </div>
+
+//                       {/* Due Date */}
+//                       <div className="col-span-2">
+//                         <div className="flex items-center gap-2">
+//                           <i className="fas fa-calendar text-purple-600"></i>
+//                           <span className="text-sm font-medium text-gray-700">
+//                             {new Date(inst.dueDate).toLocaleDateString('en-IN', {
+//                               day: '2-digit',
+//                               month: 'short',
+//                               year: 'numeric'
+//                             })}
+//                           </span>
+//                         </div>
+//                       </div>
+
+//                       {/* Status */}
+//                       <div className="col-span-2">
+//                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${inst.status === "paid" ? "bg-green-100 text-green-700" :
+//                           inst.status === "failed" ? "bg-red-100 text-red-700" :
+//                             "bg-orange-100 text-orange-700"
+//                           }`}>
+//                           <i className={`fas ${inst.status === "paid" ? "fa-check-circle" :
+//                             inst.status === "failed" ? "fa-times-circle" :
+//                               "fa-clock"
+//                             } mr-2`}></i>
+//                           {inst.status.charAt(0).toUpperCase() + inst.status.slice(1)}
+//                         </span>
+//                       </div>
+
+//                       {/* Order ID */}
+//                       <div className="col-span-2">
+//                         {inst.orderId ? (
+//                           <span className="text-xs text-gray-600 font-mono bg-gray-100 px-2 py-1 rounded truncate block" title={inst.orderId}>
+//                             {inst.orderId.substring(0, 12)}...
+//                           </span>
+//                         ) : (
+//                           <span className="text-xs text-gray-400 italic">Not available</span>
+//                         )}
+//                       </div>
+
+//                       {/* Payment ID */}
+//                       <div className="col-span-2">
+//                         {inst.paymentId ? (
+//                           <span className="text-xs text-gray-600 font-mono bg-gray-100 px-2 py-1 rounded truncate block" title={inst.paymentId}>
+//                             {inst.paymentId.substring(0, 12)}...
+//                           </span>
+//                         ) : (
+//                           <span className="text-xs text-gray-400 italic">Not available</span>
+//                         )}
+//                       </div>
+
+//                       {/* Actions */}
+//                       <div className="col-span-1 flex justify-center">
+//                         {inst.status !== "paid" && (
+//                           <button
+//                             onClick={() => handleInstallmentPayment(data._id!, inst._id!)}
+//                             className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors text-xs font-medium flex items-center gap-1"
+//                             title="Pay Now"
+//                           >
+//                             <i className="fas fa-credit-card"></i>
+//                             Pay
+//                           </button>
+//                         )}
+//                         {inst.status === "paid" && (
+//                           <span className="text-green-600 text-xs font-semibold flex items-center gap-1">
+//                             <i className="fas fa-check-double"></i>
+//                             Paid
+//                           </span>
+//                         )}
+//                       </div>
+
+//                     </div>
+//                   ))}
+//                 </div>
+
+//                 {/* Table Footer */}
+//                 <div className="bg-gray-50 border-t border-gray-200 px-6 py-3">
+//                   <div className="flex items-center justify-between text-sm">
+//                     <span className="text-gray-600">
+//                       <i className="fas fa-list-ol mr-2"></i>
+//                       Total Installments: <span className="font-semibold text-gray-800">{data.installMents.length}</span>
+//                     </span>
+//                     <span className="text-gray-600">
+//                       <i className="fas fa-check-circle text-green-600 mr-2"></i>
+//                       Paid: <span className="font-semibold text-green-700">
+//                         {data.installMents.filter(i => i.status === "paid").length}
+//                       </span>
+//                       <span className="mx-2">|</span>
+//                       <i className="fas fa-clock text-orange-600 mr-2"></i>
+//                       Pending: <span className="font-semibold text-orange-700">
+//                         {data.installMents.filter(i => i.status === "pending").length}
+//                       </span>
+//                     </span>
+//                   </div>
+//                 </div>
+
+//               </div>
+//             )}
+
+//             {/* ---------- EDIT MODE ---------- */}
+//             {editMode && (
+//               <div className="space-y-4">
+//                 <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+//                   <div className="flex items-start gap-3">
+//                     <i className="fas fa-info-circle text-blue-600 mt-1"></i>
+//                     <div>
+//                       <h4 className="font-semibold text-blue-900 mb-1">Edit Mode</h4>
+//                       <p className="text-sm text-blue-800">You can only edit the amount and due date. Status will remain pending for unpaid installments.</p>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* Edit Table */}
+//                 <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+
+//                   {/* Header */}
+//                   <div className="bg-gradient-to-r from-gray-700 to-gray-800 text-white">
+//                     <div className="grid grid-cols-12 gap-4 px-6 py-4 font-semibold text-sm">
+//                       <div className="col-span-1">#</div>
+//                       <div className="col-span-3">
+//                         <i className="fas fa-indian-rupee-sign mr-2"></i>
+//                         Amount
+//                       </div>
+//                       <div className="col-span-3">
+//                         <i className="fas fa-calendar-alt mr-2"></i>
+//                         Due Date
+//                       </div>
+//                       <div className="col-span-3">
+//                         <i className="fas fa-info-circle mr-2"></i>
+//                         Status
+//                       </div>
+//                       <div className="col-span-2 text-center">
+//                         <i className="fas fa-trash-alt mr-2"></i>
+//                         Action
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Body */}
+//                   <div className="bg-white divide-y divide-gray-200">
+//                     {(formData.installMents || []).map((inst: IInstallmentAcc, idx: number) => (
+//                       <div key={idx} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-gray-50">
+
+//                         {/* Index */}
+//                         <div className="col-span-1">
+//                           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+//                             <span className="font-bold text-blue-600 text-sm">{idx + 1}</span>
+//                           </div>
+//                         </div>
+
+//                         {/* Amount Input */}
+//                         <div className="col-span-3">
+//                           <div className="relative">
+//                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+//                               {/* <i className="fas fa-rupee-sign"></i> */}
+//                               <span className="text-gray-600 font-bold">₹</span>
+//                             </span>
+//                             <Input
+//                               type="number"
+//                               placeholder="Enter amount"
+//                               value={inst.amount || ''}
+//                               onChange={(e) => {
+//                                 const updated = [...formData.installMents];
+//                                 updated[idx].amount = Number(e.target.value);
+//                                 setFormData((prev: any) => ({ ...prev, installMents: updated }));
+//                               }}
+//                               className="pl-8 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+//                             />
+//                           </div>
+//                         </div>
+
+//                         {/* Due Date Input */}
+//                         <div className="col-span-3">
+//                           <Input
+//                             type="date"
+//                             value={inst.dueDate?.split("T")[0] || ""}
+//                             onChange={(e) => {
+//                               const updated = [...formData.installMents];
+//                               updated[idx].dueDate = e.target.value;
+//                               setFormData((prev: any) => ({ ...prev, installMents: updated }));
+//                             }}
+//                             className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+//                           />
+//                         </div>
+
+//                         {/* Status (Read-only) */}
+//                         <div className="col-span-3">
+//                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${inst.status === "paid" ? "bg-green-100 text-green-700" :
+//                             inst.status === "failed" ? "bg-red-100 text-red-700" :
+//                               "bg-orange-100 text-orange-700"
+//                             }`}>
+//                             <i className={`fas ${inst.status === "paid" ? "fa-check-circle" :
+//                               inst.status === "failed" ? "fa-times-circle" :
+//                                 "fa-clock"
+//                               } mr-2`}></i>
+//                             {inst.status.charAt(0).toUpperCase() + inst.status.slice(1)}
+//                           </span>
+//                         </div>
+
+//                         {/* Delete Button */}
+//                         <div className="col-span-2 text-center">
+//                           <button
+//                             onClick={() =>
+//                               setFormData((prev: any) => ({
+//                                 ...prev,
+//                                 installMents: prev.installMents.filter((_: IInstallmentAcc, i: number) => i !== idx)
+//                               }))
+//                             }
+//                             className="text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors inline-flex items-center gap-2"
+//                           >
+//                             <i className="fas fa-trash-alt"></i>
+//                             Remove
+//                           </button>
+//                         </div>
+
+//                       </div>
+//                     ))}
+//                   </div>
+
+//                 </div>
+
+//                 {/* Action Buttons */}
+//                 <div className="flex flex-wrap gap-3 pt-4">
+//                   <button
+//                     onClick={() =>
+//                       setFormData((prev: any) => ({
+//                         ...prev,
+//                         installMents: [
+//                           ...(prev.installMents || []),
+//                           {
+//                             amount: 0,
+//                             dueDate: "",
+//                             status: "pending",
+//                             orderId: "",
+//                             paymentId: ""
+//                           }
+//                         ]
+//                       }))
+//                     }
+//                     className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 border-2 border-gray-300"
+//                   >
+//                     <i className="fas fa-plus-circle"></i>
+//                     Add New Installment
+//                   </button>
+
+//                   <button
+//                     onClick={handleInstallmentAdd}
+//                     className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+//                   >
+//                     <i className="fas fa-save"></i>
+//                     Save Changes
+//                   </button>
+
+//                   <button
+//                     onClick={() => setEditMode(false)}
+//                     className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-2"
+//                   >
+//                     <i className="fas fa-times"></i>
+//                     Cancel
+//                   </button>
+//                 </div>
+
+//               </div>
+//             )}
+
+//           </div>
+
+
+//           {/* {read only fields}           */}
+//           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm">
+//             <div>
+//               <span className="block font-medium text-gray-700">From Department</span>
+//               <span className="text-gray-800 capitalize">{data?.fromDept || "-"}</span>
+//             </div>
+//             <div>
+//               <span className="block font-medium text-gray-700">Paid At</span>
+//               <span className="text-gray-800">{data?.paidAt ? new Date(data?.paidAt).toLocaleString() : "-"}</span>
+//             </div>
+//           </div>
+
+//           {editMode && (
+//             <div className="flex justify-end gap-2">
+
+
+//               <Button onClick={handleSave}>
+//                 <i className="fas fa-save mr-1" /> Save Changes
+//               </Button>
+
+//               <Button variant="secondary" onClick={() => setEditMode(false)}>
+//                 <i className="fas fa-save mr-1" />  Cancel
+//               </Button>
+//             </div>
+//           )}
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+
+
+// };
+
+// export default AccountingSingle;
+
+
+
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
-import { useGetSingleAccounting, useUpdateAccounting } from "../../../apiList/Department Api/Accounting Api/accountingApi";
+import { useAddInstallment,  useGetSingleAccounting, usePayInstallment, useUpdateAccounting } from "../../../apiList/Department Api/Accounting Api/accountingApi";
 import { toast } from "../../../utils/toast";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
-import type { IAccounting } from "./AccountingMain";
+import type { IAccounting, IInstallmentAcc } from "./AccountingMain";
+// import { loadScript } from "../../../utils/loadScript";
+
+
+const getStatusConfig = (status: string) => {
+  switch (status) {
+    case 'paid':
+      return {
+        bg: 'bg-green-100',
+        text: 'text-green-700',
+        icon: 'fa-check-circle',
+        badge: 'bg-green-100 text-green-700'
+      };
+    case 'processing':
+      return {
+        bg: 'bg-blue-100',
+        text: 'text-blue-700',
+        icon: 'fa-spinner fa-spin',
+        badge: 'bg-blue-100 text-blue-700'
+      };
+    case 'failed':
+      return {
+        bg: 'bg-red-100',
+        text: 'text-red-700',
+        icon: 'fa-times-circle',
+        badge: 'bg-red-100 text-red-700'
+      };
+    case 'cancelled':
+      return {
+        bg: 'bg-gray-100',
+        text: 'text-gray-700',
+        icon: 'fa-ban',
+        badge: 'bg-gray-100 text-gray-700'
+      };
+    default: // pending
+      return {
+        bg: 'bg-orange-100',
+        text: 'text-orange-700',
+        icon: 'fa-clock',
+        badge: 'bg-orange-100 text-orange-700'
+      };
+  }
+};
+
 
 const AccountingSingle: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const { data, isLoading } = useGetSingleAccounting(id!) as { data: IAccounting, isLoading: boolean };
-    const { mutateAsync: updateRecord } = useUpdateAccounting();
-    const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>();
+  const { data, isLoading, refetch } = useGetSingleAccounting(id!) as { data: IAccounting, isLoading: boolean, refetch: () => any };
+  const { mutateAsync: updateRecord } = useUpdateAccounting();
+  // const { mutateAsync: createOrder } = useCreateAccountPaymentOrder();
+  // const { mutateAsync: verifyPayment } = useVerifyAccountInstallPayment();
+  const { mutateAsync: installmentAdd } = useAddInstallment();
+  const { mutateAsync: payInstallment, isPending: isPaymentLoading } = usePayInstallment();
 
-    const [formData, setFormData] = useState<any>(data || {});
-    const [editMode, setEditMode] = useState(false);
+  const navigate = useNavigate()
+
+  const [formData, setFormData] = useState<any>(data || {});
+  const [editMode, setEditMode] = useState(false);
+  const [newInstallments, setNewInstallments] = useState<IInstallmentAcc[]>([]);
+  const [processingPayments, setProcessingPayments] = useState<Set<string>>(new Set());
 
 
-    const handleSave = async () => {
-        try {
-            await updateRecord({ id: id!, payload: formData });
+  const handleSave = async () => {
+    try {
+      await updateRecord({ id: id!, payload: formData });
 
-            toast({ title: "success", description: "shipment has generated" })
-            setEditMode(false);
-        }
-        catch (error: any) {
-            toast({
-                title: "Error",
-                description: error?.response?.data?.message || "Operation Failed",
-                variant: "destructive"
-            });
-        }
+      toast({ title: "success", description: "shipment has generated" })
+      setEditMode(false);
     }
+    catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Operation Failed",
+        variant: "destructive"
+      });
+    }
+  }
 
-    // useEffect(() => {
-    //     setFormData(data)
-    // }, [editMode])
 
 
+  // ✅ UPDATED: Only send NEW installments to backend
+  const handleInstallmentAdd = async () => {
+    try {
+      if (newInstallments.length === 0) {
+        toast({
+          title: "Info",
+          description: "No new installments to add",
+          variant: "default"
+        });
+        return;
+      }
 
-    const preloadFormData = () => {
-        if (data) {
-            setFormData(
-                {
-                transactionType: data.transactionType,
-                fromDept: data.fromDept,
-                totalAmount: {
-                    amount: data.totalAmount?.amount ?? 0,
-                    taxAmount: data.totalAmount?.taxAmount ?? 0,
-                },
-                upiId: data?.upiId,
-                status: data.status,
-                dueDate: data.dueDate ? new Date(data.dueDate).toISOString().split("T")[0] : "",
-                notes: data.notes ?? "",
-            }
-        );
+      // Only send new installments (without _id)
+      await installmentAdd({
+        id: id!,
+        installments: newInstallments
+      });
+
+      toast({
+        title: "Success",
+        description: `${newInstallments.length} new installment(s) added successfully`
+      });
+
+      setEditMode(false);
+      setNewInstallments([]);
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Operation Failed",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // const handleInstallmentPayment = async (accId: string, installmentId: string) => {
+  //   try {
+  //     const orderData = await createOrder({ accountingId: accId, installmentId });
+
+  //     const sdkLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+  //     if (!sdkLoaded) {
+  //       toast({
+  //         title: "Error",
+  //         description: "Failed to load Razorpay SDK!",
+  //         variant: "destructive",
+  //       });
+  //       return;
+  //     }
+
+  //     const options = {
+  //       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+  //       amount: orderData.amount,
+  //       currency: "INR",
+  //       name: "Vertical Living - Installment",
+  //       description: "Installment Payment",
+  //       order_id: orderData.orderId,
+
+  //       handler: async (response: any) => {
+  //         await verifyPayment({
+  //           accId,
+  //           installmentId,
+  //           razorpay_order_id: response.razorpay_order_id,
+  //           razorpay_payment_id: response.razorpay_payment_id,
+  //           razorpay_signature: response.razorpay_signature,
+  //         });
+
+  //         toast({
+  //           title: "Success",
+  //           description: "Installment paid successfully!",
+  //         });
+  //       },
+
+  //       theme: { color: "#0050b3" },
+  //     };
+
+  //     const rzp = new (window as any).Razorpay(options);
+  //     rzp.open();
+
+  //   } catch (err: any) {
+  //     toast({
+  //       title: "Error",
+  //       description: err?.response?.data?.message || err.message,
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
+
+
+  // ✅ NEW: Handle vendor payout
+
+
+  const handleVendorPayout = async (installmentId: string, amount: number) => {
+    try {
+      if (!data.upiId) {
+        toast({
+          title: "Error",
+          description: "Vendor UPI ID not configured",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setProcessingPayments(prev => new Set(prev).add(installmentId));
+
+       await payInstallment({
+        accountingId: id!,
+        installmentId
+      });
+
+      toast({
+        title: "Success",
+        description: `Payout of ₹${amount.toLocaleString()} initiated successfully`,
+      });
+
+      // Auto-refresh after 3 seconds
+      setTimeout(() => {
+        refetch();
+        setProcessingPayments(prev => {
+          const updated = new Set(prev);
+          updated.delete(installmentId);
+          return updated;
+        });
+      }, 3000);
+
+    } catch (error: any) {
+      setProcessingPayments(prev => {
+        const updated = new Set(prev);
+        updated.delete(installmentId);
+        return updated;
+      });
+
+      toast({
+        title: "Error",
+        description: error?.response?.data?.message || "Payout failed",
+        variant: "destructive"
+      });
+    }
+  };
+
+
+  const preloadFormData = () => {
+    if (data) {
+      setFormData(
+        {
+          transactionType: data.transactionType,
+          fromDept: data.fromDept,
+          totalAmount: {
+            amount: data.totalAmount?.amount ?? 0,
+            taxAmount: data.totalAmount?.taxAmount ?? 0,
+          },
+          upiId: data?.upiId,
+          status: data.status,
+          dueDate: data.dueDate ? new Date(data.dueDate).toISOString().split("T")[0] : "",
+          notes: data.notes ?? "",
+          installMents: data?.installMents || []
         }
-    };
+      );
+    }
+  };
 
-    const handleToggleEdit = () => {
-        if (!editMode) {
-            preloadFormData(); // load latest data before entering edit mode
-        }
-        setEditMode((prev) => !prev);
-    };
+  const handleToggleEdit = () => {
+    if (!editMode) {
+      preloadFormData(); // load latest data before entering edit mode
+    }
+    setEditMode((prev) => !prev);
+  };
 
-    if (isLoading) return <p className="p-6"><MaterialOverviewLoading /></p>;
+  if (isLoading) return <p className="p-6"><MaterialOverviewLoading /></p>;
 
-    if (!data) {
-        <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-            <i className="fas fa-money-bill-wave text-5xl text-blue-300 mb-4" />
-            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Records Found</h3>
-            {/* <p className="text-sm text-gray-500">
+  if (!data) {
+    <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+      <i className="fas fa-money-bill-wave text-5xl text-blue-300 mb-4" />
+      <h3 className="text-lg font-semibold text-blue-800 mb-1">No Records Found</h3>
+      {/* <p className="text-sm text-gray-500">
                                 Looks like there are no Procurements yet for this project.<br />
                                 Once you have <strong> generated the Pdf </strong>  items will be listed here  to get started 🚀
                             </p> */}
-        </div>
-    }
+    </div>
+  }
 
-return (
-  <div className="p-4 max-h-full overflow-y-auto max-w-full space-y-6">
-    <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-      <div className="flex gap-3 items-center">
-        <div onClick={() => navigate(-1)}
-          className="bg-blue-50 hover:bg-slate-300 flex items-center justify-center w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md">
-          <i className="fas fa-arrow-left" />
+  return (
+    <div className="p-4 max-h-full overflow-y-auto max-w-full space-y-6">
+      <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+        <div className="flex gap-3 items-center">
+          <div onClick={() => navigate(-1)}
+            className="bg-blue-50 hover:bg-slate-300 flex items-center justify-center w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md">
+            <i className="fas fa-arrow-left" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-blue-800">
+            Transaction: {data?.transactionNumber ?? "N/A"}
+          </h1>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-800">
-          Transaction: {data?.transactionNumber ?? "N/A"}
-        </h1>
+
+        {!editMode && <Button size="md" variant="primary" onClick={handleToggleEdit}>
+          <i className="fas fa-edit mr-1" />
+          {editMode ? "Cancel" : "Edit"}
+        </Button>}
       </div>
 
-      {!editMode && <Button size="md" variant="primary" onClick={handleToggleEdit}>
-        <i className="fas fa-edit mr-1" />
-        {editMode ? "Cancel" : "Edit"}
-      </Button>}
-    </div>
+      <Card className="shadow-none">
+        <CardContent className="p-6 space-y-6 ">
 
-    <Card>
-      <CardContent className="p-6 space-y-6">
+          {/* Amount + Tax */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Amount</h3>
+              {editMode ? (
+                <Input
+                  value={formData?.totalAmount?.amount}
+                  type="number"
+                  onChange={(e) => {
+                    const val = +e.target.value;
+                    if (val >= 0) {
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        totalAmount: {
+                          ...prev.totalAmount,
+                          amount: val || 0,
+                        },
+                      }));
+                    }
+                  }}
+                />
+              ) : (
+                <p className="text-lg text-gray-900 font-medium">₹ {data?.totalAmount?.amount}</p>
+              )}
+            </div>
 
-        {/* Amount + Tax */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Amount</h3>
-            {editMode ? (
-              <Input
-                value={formData?.totalAmount?.amount}
-                type="number"
-                onChange={(e) => {
-                  const val = +e.target.value;
-                  if (val >= 0) {
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Tax</h3>
+              {editMode ? (
+                <Input
+                  value={formData?.totalAmount?.taxAmount}
+                  type="number"
+                  onChange={(e) => {
+                    const val = +e.target.value;
+                    if (val >= 0) {
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        totalAmount: {
+                          ...prev.totalAmount,
+                          taxAmount: val || 0,
+                        },
+                      }));
+                    }
+                  }}
+                />
+              ) : (
+                <p className="text-lg text-gray-900 font-medium">₹ {data?.totalAmount?.taxAmount}</p>
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Upi ID</h3>
+              {editMode ? (
+                <Input
+                  value={formData.upiId}
+                  type="text"
+                  onChange={(e) =>
                     setFormData((prev: any) => ({
                       ...prev,
-                      totalAmount: {
-                        ...prev.totalAmount,
-                        amount: val || 0,
-                      },
-                    }));
+                      upiId: e.target.value
+                    }))
                   }
-                }}
-              />
-            ) : (
-              <p className="text-lg text-gray-900 font-medium">₹ {data?.totalAmount?.amount}</p>
-            )}
+                />
+              ) : (
+                <p className="text-lg text-gray-800">{data?.upiId || "-"}</p>
+              )}
+            </div>
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Tax</h3>
-            {editMode ? (
-              <Input
-                value={formData?.totalAmount?.taxAmount}
-                type="number"
-                onChange={(e) => {
-                  const val = +e.target.value;
-                  if (val >= 0) {
+          {/* Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Status</h3>
+              {editMode ? (
+                <select
+                  value={formData.status}
+                  onChange={(e) =>
+                    setFormData((prev: any) => ({ ...prev, status: e.target.value }))
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              ) : (
+                <p className="text-sm font-medium text-blue-700 capitalize">{data.status}</p>
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-1">Due Date</h3>
+              {editMode ? (
+                <Input
+                  value={formData?.dueDate}
+                  type="date"
+                  onChange={(e) =>
                     setFormData((prev: any) => ({
                       ...prev,
-                      totalAmount: {
-                        ...prev.totalAmount,
-                        taxAmount: val || 0,
-                      },
-                    }));
+                      dueDate: e.target.value
+                    }))
                   }
-                }}
-              />
-            ) : (
-              <p className="text-lg text-gray-900 font-medium">₹ {data?.totalAmount?.taxAmount}</p>
-            )}
+                />
+              ) : (
+                <p className="text-sm text-gray-800">
+                  {data?.dueDate ? new Date(data?.dueDate).toLocaleDateString() : "-"}
+                </p>
+              )}
+            </div>
           </div>
 
+          {/* Notes */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Upi ID</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-1">Notes</h3>
             {editMode ? (
-              <Input
-                value={formData.upiId}
-                type="text"
+              <textarea
+                className="w-full px-3 py-2 border rounded-lg"
+                value={formData.notes || ""}
                 onChange={(e) =>
                   setFormData((prev: any) => ({
                     ...prev,
-                    upiId: e.target.value
+                    notes: e.target.value,
                   }))
                 }
               />
             ) : (
-              <p className="text-lg text-gray-800">{data?.upiId || "-"}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Status</h3>
-            {editMode ? (
-              <select
-                value={formData.status}
-                onChange={(e) =>
-                  setFormData((prev: any) => ({ ...prev, status: e.target.value }))
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              >
-                <option value="pending">Pending</option>
-                <option value="paid">Paid</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            ) : (
-              <p className="text-sm font-medium text-blue-700 capitalize">{data.status}</p>
+              <p className="text-sm text-gray-800">{data.notes || "-"}</p>
             )}
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Due Date</h3>
-            {editMode ? (
-              <Input
-                value={formData?.dueDate}
-                type="date"
-                onChange={(e) =>
-                  setFormData((prev: any) => ({
-                    ...prev,
-                    dueDate: e.target.value
-                  }))
-                }
-              />
-            ) : (
-              <p className="text-sm text-gray-800">
-                {data?.dueDate ? new Date(data?.dueDate).toLocaleDateString() : "-"}
-              </p>
+
+          {/* INSTALLMENTS */}
+
+
+          <div className="mt-8 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <i className="fas fa-calendar-check text-2xl text-blue-600"></i>
+                <h2 className="text-2xl font-bold text-gray-800">Installments</h2>
+              </div>
+              {!editMode && (
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <i className="fas fa-plus"></i>
+                  Add New Installments
+                </button>
+              )}
+            </div>
+
+            {/* EMPTY STATE */}
+            {!editMode && (!data?.installMents || data?.installMents?.length === 0) && (
+              <div className="text-center p-12 border-2 border-dashed border-gray-300 rounded-xl bg-gradient-to-br from-gray-50 to-blue-50">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                  <i className="fas fa-receipt text-3xl text-blue-600"></i>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">No installments created yet</h3>
+                <p className="text-gray-600 mb-6">Start by adding installment plans for this agreement</p>
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2 mx-auto"
+                >
+                  <i className="fas fa-plus-circle"></i>
+                  Add Installments
+                </button>
+              </div>
+            )}
+
+            {/* ✅ VIEW MODE - EXISTING INSTALLMENTS */}
+            {!editMode && data?.installMents && data?.installMents?.length > 0 && (
+              <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                {/* Table Header */}
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+                  <div className="grid grid-cols-12 gap-4 px-6 py-4 font-semibold text-sm">
+                    <div className="col-span-1">#</div>
+                    <div className="col-span-2">
+                      <i className="fas fa-indian-rupee-sign mr-2"></i>Amount
+                    </div>
+                    <div className="col-span-2">
+                      <i className="fas fa-calendar-alt mr-2"></i>Due Date
+                    </div>
+                    <div className="col-span-2">
+                      <i className="fas fa-info-circle mr-2"></i>Status
+                    </div>
+                    <div className="col-span-2">
+                      <i className="fas fa-receipt mr-2"></i>Payment Info
+                    </div>
+                    <div className="col-span-2">
+                      <i className="fas fa-money-bill-wave mr-2"></i>UTR / Fees
+                    </div>
+                    <div className="col-span-1 text-center">
+                      <i className="fas fa-cog"></i>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table Body */}
+                <div className="bg-white divide-y divide-gray-200">
+                  {data.installMents.map((inst: IInstallmentAcc, index: number) => {
+                    const statusConfig = getStatusConfig(inst.status);
+                    const isProcessing = processingPayments.has(inst._id!);
+
+                    return (
+                      <div
+                        key={inst._id}
+                        className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors items-center"
+                      >
+                        {/* Index */}
+                        <div className="col-span-1">
+                          <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${statusConfig.bg} ${statusConfig.text}`}>
+                            {index + 1}
+                          </div>
+                        </div>
+
+                        {/* Amount */}
+                        <div className="col-span-2">
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="text-blue-600 font-bold">₹</span>
+                              <span className="text-lg font-bold text-gray-900">
+                                {inst.amount?.toLocaleString()}
+                              </span>
+                            </div>
+                            {inst.fees && inst.fees > 0 && (
+                              <span className="text-xs text-gray-500">
+                                Fee: ₹{inst.fees.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Due Date */}
+                        <div className="col-span-2">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <i className="fas fa-calendar text-purple-600"></i>
+                              <span className="text-sm font-medium text-gray-700">
+                                {new Date(inst.dueDate).toLocaleDateString('en-IN', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric'
+                                })}
+                              </span>
+                            </div>
+                            {inst.paidAt && (
+                              <span className="text-xs text-green-600">
+                                <i className="fas fa-check mr-1"></i>
+                                Paid: {new Date(inst.paidAt).toLocaleDateString('en-IN')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Status */}
+                        <div className="col-span-2">
+                          <div className="flex flex-col gap-1">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${statusConfig.badge}`}>
+                              <i className={`fas ${statusConfig.icon} mr-2`}></i>
+                              {inst.status.charAt(0).toUpperCase() + inst.status.slice(1)}
+                            </span>
+                            {inst.failureReason && (
+                              <span className="text-xs text-red-600">
+                                {inst.failureReason}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Payment Info */}
+                        <div className="col-span-2">
+                          <div className="space-y-1">
+                            {inst.paymentId ? (
+                              <div className="text-xs">
+                                <span className="text-gray-500">ID: </span>
+                                <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                                  {inst.paymentId.substring(0, 10)}...
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400 italic">No payment ID</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* UTR / Fees */}
+                        <div className="col-span-2">
+                          {inst.transactionId ? (
+                            <div className="space-y-1">
+                              <div className="text-xs">
+                                <span className="text-gray-500">UTR: </span>
+                                <span className="font-mono bg-green-50 text-green-700 px-2 py-1 rounded font-semibold">
+                                  {inst.transactionId}
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-400 italic">Pending</span>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="col-span-1 flex justify-center">
+                          {inst.status === 'pending' && !isProcessing && (
+                            <button
+                              onClick={() => handleVendorPayout(inst._id!, inst.amount)}
+                              disabled={isPaymentLoading}
+                              className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors text-xs font-medium flex items-center gap-1 disabled:opacity-50"
+                              title="Pay to Vendor"
+                            >
+                              <i className="fas fa-money-bill-wave"></i>
+                              Pay
+                            </button>
+                          )}
+                          {(inst.status === 'processing' || isProcessing) && (
+                            <span className="text-blue-600 text-xs font-semibold flex items-center gap-1">
+                              <i className="fas fa-spinner fa-spin"></i>
+                              Processing
+                            </span>
+                          )}
+                          {inst.status === 'paid' && (
+                            <span className="text-green-600 text-xs font-semibold flex items-center gap-1">
+                              <i className="fas fa-check-double"></i>
+                              Paid
+                            </span>
+                          )}
+                          {inst.status === 'failed' && (
+                            <button
+                              onClick={() => handleVendorPayout(inst._id!, inst.amount)}
+                              className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg transition-colors text-xs font-medium flex items-center gap-1"
+                              title="Retry Payment"
+                            >
+                              <i className="fas fa-redo"></i>
+                              Retry
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Table Footer */}
+                <div className="bg-gray-50 border-t border-gray-200 px-6 py-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">
+                      <i className="fas fa-list-ol mr-2"></i>
+                      Total: <span className="font-semibold text-gray-800">{data.installMents.length}</span>
+                    </span>
+                    <div className="flex gap-4">
+                      <span className="text-green-600">
+                        <i className="fas fa-check-circle mr-1"></i>
+                        Paid: <span className="font-semibold">
+                          {data.installMents.filter(i => i.status === "paid").length}
+                        </span>
+                      </span>
+                      <span className="text-blue-600">
+                        <i className="fas fa-spinner mr-1"></i>
+                        Processing: <span className="font-semibold">
+                          {data.installMents.filter(i => i.status === "processing").length}
+                        </span>
+                      </span>
+                      <span className="text-orange-600">
+                        <i className="fas fa-clock mr-1"></i>
+                        Pending: <span className="font-semibold">
+                          {data.installMents.filter(i => i.status === "pending").length}
+                        </span>
+                      </span>
+                      <span className="text-red-600">
+                        <i className="fas fa-times-circle mr-1"></i>
+                        Failed: <span className="font-semibold">
+                          {data.installMents.filter(i => i.status === "failed").length}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ✅ EDIT MODE - ADD NEW INSTALLMENTS ONLY */}
+            {editMode && (
+              <div className="space-y-4">
+                {/* Info Banner */}
+                <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                  <div className="flex items-start gap-3">
+                    <i className="fas fa-info-circle text-blue-600 mt-1"></i>
+                    <div>
+                      <h4 className="font-semibold text-blue-900 mb-1">Add New Installments</h4>
+                      <p className="text-sm text-blue-800">
+                        Existing installments cannot be edited. You can only add new installments here.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* New Installments Table */}
+                <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                  {/* Header */}
+                  <div className="bg-gradient-to-r from-green-600 to-green-700 text-white">
+                    <div className="grid grid-cols-12 gap-4 px-6 py-4 font-semibold text-sm">
+                      <div className="col-span-1">#</div>
+                      <div className="col-span-4">
+                        <i className="fas fa-indian-rupee-sign mr-2"></i>Amount
+                      </div>
+                      <div className="col-span-4">
+                        <i className="fas fa-calendar-alt mr-2"></i>Due Date
+                      </div>
+                      <div className="col-span-3 text-center">
+                        <i className="fas fa-trash-alt mr-2"></i>Action
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Body */}
+                  <div className="bg-white divide-y divide-gray-200">
+                    {newInstallments.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <i className="fas fa-inbox text-4xl mb-3"></i>
+                        <p>No new installments added yet</p>
+                      </div>
+                    ) : (
+                      newInstallments.map((inst, idx) => (
+                        <div key={idx} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-gray-50">
+                          {/* Index */}
+                          <div className="col-span-1">
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                              <span className="font-bold text-green-600 text-sm">
+                                {(data?.installMents?.length || 0) + idx + 1}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Amount Input */}
+                          <div className="col-span-4">
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">
+                                ₹
+                              </span>
+                              <Input
+                                type="number"
+                                placeholder="Enter amount"
+                                value={inst.amount || ''}
+                                onChange={(e) => {
+                                  const updated = [...newInstallments];
+                                  updated[idx].amount = Number(e.target.value);
+                                  setNewInstallments(updated);
+                                }}
+                                className="pl-8 border-gray-300 focus:border-green-500 focus:ring-green-500"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Due Date Input */}
+                          <div className="col-span-4">
+                            <Input
+                              type="date"
+                              value={inst.dueDate || ""}
+                              onChange={(e) => {
+                                const updated = [...newInstallments];
+                                updated[idx].dueDate = e.target.value;
+                                setNewInstallments(updated);
+                              }}
+                              className="border-gray-300 focus:border-green-500 focus:ring-green-500"
+                            />
+                          </div>
+
+                          {/* Delete Button */}
+                          <div className="col-span-3 text-center">
+                            <button
+                              onClick={() => {
+                                setNewInstallments(prev => prev.filter((_, i) => i !== idx));
+                              }}
+                              className="text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors inline-flex items-center gap-2"
+                            >
+                              <i className="fas fa-trash-alt"></i>
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-3 pt-4">
+                  <button
+                    onClick={() => {
+                      setNewInstallments(prev => [
+                        ...prev,
+                        {
+                          amount: 0,
+                          dueDate: "",
+                          status: "pending"
+                        }
+                      ]);
+                    }}
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 border-2 border-gray-300"
+                  >
+                    <i className="fas fa-plus-circle"></i>
+                    Add Row
+                  </button>
+
+                  <button
+                    onClick={handleInstallmentAdd}
+                    disabled={newInstallments.length === 0}
+                    className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <i className="fas fa-save"></i>
+                    Save {newInstallments.length} New Installment(s)
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setEditMode(false);
+                      setNewInstallments([]);
+                    }}
+                    className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-2"
+                  >
+                    <i className="fas fa-times"></i>
+                    Cancel
+                  </button>
+                </div>
+              </div>
             )}
           </div>
-        </div>
 
-        {/* Notes */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-700 mb-1">Notes</h3>
-          {editMode ? (
-            <textarea
-              className="w-full px-3 py-2 border rounded-lg"
-              value={formData.notes || ""}
-              onChange={(e) =>
-                setFormData((prev: any) => ({
-                  ...prev,
-                  notes: e.target.value,
-                }))
-              }
-            />
-          ) : (
-            <p className="text-sm text-gray-800">{data.notes || "-"}</p>
+
+          {/* {read only fields}           */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm">
+            <div>
+              <span className="block font-medium text-gray-700">From Department</span>
+              <span className="text-gray-800 capitalize">{data?.fromDept || "-"}</span>
+            </div>
+            <div>
+              <span className="block font-medium text-gray-700">Paid At</span>
+              <span className="text-gray-800">{data?.paidAt ? new Date(data?.paidAt).toLocaleString() : "-"}</span>
+            </div>
+          </div>
+
+          {editMode && (
+            <div className="flex justify-end gap-2">
+
+
+              <Button onClick={handleSave}>
+                <i className="fas fa-save mr-1" /> Save Changes
+              </Button>
+
+              <Button variant="secondary" onClick={() => setEditMode(false)}>
+                <i className="fas fa-save mr-1" />  Cancel
+              </Button>
+            </div>
           )}
-        </div>
-
-        {/* Read-Only Fields */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm">
-          <div>
-            <span className="block font-medium text-gray-700">From Department</span>
-            <span className="text-gray-800 capitalize">{data?.fromDept || "-"}</span>
-          </div>
-          <div>
-            <span className="block font-medium text-gray-700">Paid At</span>
-            <span className="text-gray-800">{data?.paidAt ? new Date(data?.paidAt).toLocaleString() : "-"}</span>
-          </div>
-        </div>
-
-        {editMode && (
-          <div className="flex justify-end gap-2">
-
-           
-            <Button onClick={handleSave}>
-              <i className="fas fa-save mr-1" /> Save Changes
-            </Button>
-
-             <Button variant="secondary" onClick={()=> setEditMode(false)}>
-              <i className="fas fa-save mr-1" />  Cancel
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  </div>
-);
+        </CardContent>
+      </Card>
+    </div>
+  );
 
 
 };
 
 export default AccountingSingle;
+
 

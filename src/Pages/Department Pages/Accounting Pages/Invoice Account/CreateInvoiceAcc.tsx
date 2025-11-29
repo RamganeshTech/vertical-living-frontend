@@ -43,6 +43,7 @@ const CreateInvoiceAcc = () => {
                 organizationId: organizationId!,
             };
 
+            
             await createInvoiceMutation.mutateAsync({ invoiceData: payload });
 
             toast({ title: "Success", description: "Invoice created successfully" });

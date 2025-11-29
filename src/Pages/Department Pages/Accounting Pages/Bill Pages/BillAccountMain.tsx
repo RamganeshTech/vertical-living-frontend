@@ -24,18 +24,18 @@ const BillAccountsMain = () => {
     // Check if we're on a child route
     const isDetailView = location.pathname.includes('/billsingle') || location.pathname.includes('/create');
 
-    // Filter states
-    const [filters, setFilters] = useState({
-        search: '',
-        vendorId: '',
-        date: '',
-        billToDate: "",
-        billFromDate: "",
-        createdFromDate: "",
-        createdToDate: "",
-        sortBy: 'createdAt',
-        sortOrder: 'desc' as 'asc' | 'desc',
-    });
+        // Filter states
+        const [filters, setFilters] = useState({
+            search: '',
+            vendorId: '',
+            date: '',
+            billToDate: "",
+            billFromDate: "",
+            createdFromDate: "",
+            createdToDate: "",
+            sortBy: 'createdAt',
+            sortOrder: 'desc' as 'asc' | 'desc',
+        });
 
     // Debounced search
     const debouncedSearch = useDebounce(filters.search, 700)
@@ -138,7 +138,7 @@ const BillAccountsMain = () => {
     return (
         <div className="space-y-0 h-full">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <header className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                         <i className="fas fa-receipt mr-3 text-blue-600"></i>
@@ -157,7 +157,7 @@ const BillAccountsMain = () => {
                     <i className="fas fa-plus mr-2" />
                     Create Bill
                 </Button>
-            </div>
+            </header>
 
             {/* Loading State */}
             {isLoading ? (

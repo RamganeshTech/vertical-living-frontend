@@ -90,10 +90,11 @@ export const SelectTrigger: React.FC<SelectTriggerProps> = ({ className = "", ch
 interface SelectValueProps {
   placeholder?: string
   selectedValue?: string
+  className?: string
 }
 
-export const SelectValue: React.FC<SelectValueProps> = ({ placeholder = "Select...", selectedValue }) => {
-  return <span className="text-gray-900">{selectedValue || placeholder}</span>
+export const SelectValue: React.FC<SelectValueProps> = ({ placeholder = "Select...", selectedValue , className = "text-gray-900"}) => {
+  return <span className={`${className}`}>{selectedValue || placeholder}</span>
 }
 
 interface SelectContentProps {
@@ -130,14 +131,15 @@ export const SelectContent: React.FC<SelectContentProps> = ({
 interface SelectItemProps {
   value: string
   children: ReactNode
+  className?: string,
   onSelect?: (value: string) => void
 }
 
-export const SelectItem: React.FC<SelectItemProps> = ({ value, children, onSelect }) => {
+export const SelectItem: React.FC<SelectItemProps> = ({ value, children, className= "text-gray-700 hover:bg-blue-50 hover:text-blue-700", onSelect }) => {
   return (
     <button
       type="button"
-      className="w-full cursor-pointer text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+      className={`w-full cursor-pointer text-left px-3 py-2 text-sm ${className} `}
       onClick={() => onSelect?.(value)}
     >
       {children}

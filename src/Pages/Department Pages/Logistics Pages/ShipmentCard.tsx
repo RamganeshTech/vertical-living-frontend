@@ -46,7 +46,7 @@ const ShipmentCard:React.FC<ShipmentCardProps> = ({s, organizationId, setEditing
                         <CardContent className="space-y-1 text-sm text-blue-950">
                           <p>
                             <i className="fas fa-stream mr-1 text-gray-500" />
-                            <span className="font-medium text-gray-700">Status:</span> {s.status}
+                            <span className="font-medium text-gray-700">Status:</span> {s.shipmentStatus}
                           </p>
                           <p>
                             <i className="fas fa-truck mr-1 text-gray-500" />

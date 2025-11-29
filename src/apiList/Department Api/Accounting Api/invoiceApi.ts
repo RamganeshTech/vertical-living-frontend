@@ -64,6 +64,19 @@ const createInvoice = async ({
     return data.data;
 };
 
+const updateInvoice = async ({
+    invoiceData,
+    invoiceId,
+    api
+}: {
+    invoiceData: any;
+    invoiceId: any;
+    api: AxiosInstance
+}) => {
+    const { data } = await api.put(`/department/accounting/invoice/updateinvoice/${invoiceId}`, invoiceData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
 const deleteInvoice = async ({
     invoiceId,
     api
@@ -181,6 +194,27 @@ export const useCreateInvoice = () => {
         },
     });
 };
+
+
+
+export const useUpdateInvoice = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ invoiceData, invoiceId }: { invoiceData: any, invoiceId:string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+            return await updateInvoice({ invoiceData, invoiceId ,  api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["invoices"] });
+        },
+    });
+};
+
+
 
 export const useDeleteInvoice = () => {
     const allowedRoles = ["owner", "staff", "CTO"];

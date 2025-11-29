@@ -146,7 +146,6 @@ type Props = {
     showHeader?: boolean,
     showFilters?: boolean,
     showFullView?: boolean
-
 }
 
 const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = true }) => {
@@ -271,9 +270,12 @@ const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = tru
 
         console.log("[Socket] Joining discussion room for organizationId:", organizationId)
 
+        // const userId = currentUser?.id;
+
         // JOIN THE DISCUSSION ROOM FIRST!
         // socket.emit('join_ticket_discussion', {
-        //     organizationId
+        //     organizationId,
+        //     userId: userId
         // })
 
         // Listen for room join confirmation
@@ -429,7 +431,22 @@ const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = tru
 
             // socket.off("recent_discussions")
         }
-    }, [organizationId, currentUser?.id,]) // Remove selectedIssue from dependencies
+    }, [organizationId, currentUser?.id]) // Remove selectedIssue from dependencies
+
+
+
+    // useEffect(() => {
+    //     if (!socket) return;
+    //     socket.on("disconnect", (reason) => {
+    //         console.log("[Socket] DISCONNECTED:", reason);
+    //     });
+
+    //     return () => {
+    //         socket.off("disconnect");
+    //     };
+    // }, [socket]);
+
+
 
     // Load discussions
     useEffect(() => {
@@ -441,7 +458,7 @@ const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = tru
 
 
 
-    const {userName} = useSelector((state:RootState)=> state.authStore)
+    const { userName } = useSelector((state: RootState) => state.authStore)
 
 
     // ✅ Mark all as read
@@ -495,13 +512,22 @@ const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = tru
 
     const mergedUsers = [...staffOptions, ...ownerOptions, ...workerOptions, ...CTOOptions]
 
-    const availableUsers = mergedUsers.filter(user =>
-        user.value !== currentUser?.id &&
-        user.value !== selectedIssue?.discussion[0]?.issue?.raisedBy?._id
-    );
+    const forwardableUsers = mergedUsers.filter(user => {
+        return user.value !== currentUser?.id &&
+            user.value !== selectedIssue?.discussion[0]?.issue?.raisedBy?._id
+    });
+
+
+
+    const staffAssignUser = mergedUsers.filter(user => {
+        return user.value !== currentUser?.id
+    });
+
+
+
 
     const handleAssigneeChange = (value: string | null) => {
-        const selectedAssignee = mergedUsers?.find((user: any) => user?.value === value)
+        const selectedAssignee = staffAssignUser?.find((user: any) => user?.value === value)
         // console.log("selectedAssignee", selectedAssignee)
         setCreateFormValues((prev) => ({ ...prev, selectedStaff: selectedAssignee?.value, selectStaffRole: selectedAssignee?.role }))
     }
@@ -517,7 +543,7 @@ const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = tru
 
 
     const handleForwardChange = async (value: string | null) => {
-        const user = availableUsers.find(u => u.value === value);
+        const user = forwardableUsers.find(u => u.value === value);
         setForwardToStaff(user?.value);
         setForwardToStaffRole(user?.role || "");
         await handleForward(user?.value, user?.role)
@@ -772,7 +798,6 @@ const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = tru
                     </h1>
 
                 </div>}
-
 
 
                 <Button
@@ -1138,7 +1163,7 @@ const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = tru
                                         Select Staff to Respond
                                     </Label>
                                     <SearchSelectNew
-                                        options={mergedUsers}
+                                        options={staffAssignUser}
                                         placeholder="Choose staff member"
                                         searchPlaceholder="Search by name..."
                                         value={createFormValues.selectedStaff}
@@ -1520,7 +1545,7 @@ const IssueDiscussion: React.FC<Props> = ({ showHeader = true, showFilters = tru
                                                 </div>
                                                 {isEnableForwarding && (
                                                     <SearchSelectNew
-                                                        options={availableUsers}
+                                                        options={forwardableUsers}
                                                         placeholder="Choose staff to forward"
                                                         searchPlaceholder="Search by name..."
                                                         value={forwardToStaff}

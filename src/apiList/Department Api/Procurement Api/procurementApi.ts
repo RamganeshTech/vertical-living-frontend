@@ -1,6 +1,6 @@
 // procurementNew.queries.ts
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { type AxiosInstance } from "axios";
+import axios, { type AxiosInstance } from "axios";
 import useGetRole from "../../../Hooks/useGetRole";
 import { getApiForRole } from "../../../utils/roleCheck";
 import { queryClient } from "../../../QueryClient/queryClient";
@@ -70,12 +70,10 @@ export const getProcurementNewDetailsApi = async ({
 // procurementNew.queries.ts
 export const getSingleProcurementDetailsApi = async ({
   id,
-  api,
 }: {
   id: string;
-  api: AxiosInstance;
 }) => {
-  const { data } = await api.get(`/department/procurement/getprocurementsingle/${id}`);
+  const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/department/procurement/getprocurementsingle/${id}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -213,17 +211,14 @@ export const useGetProcurementNewDetails = (organizationId: string, filters?: an
 
 
 export const useGetSingleProcurementDetails = (id: string) => {
-  const { role } = useGetRole();
-  const api = getApiForRole(role!);
-
+ 
   return useQuery({
     queryKey: ["procurement", "single", id],
     queryFn: async () => {
-      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
-      if (!api) throw new Error("API instance not found for role");
-      return await getSingleProcurementDetailsApi({ id, api });
+    
+      return await getSingleProcurementDetailsApi({ id });
     },
-    enabled: !!id && !!role && !!api,
+    enabled: !!id ,
   });
 };
 
@@ -270,6 +265,72 @@ export const useProcurementGeneratePdf = () => {
 
 
 
+
+interface UpdateRatePayload {
+  orderId: string;
+  itemId: string;
+  rate: number;
+}
+
+const updateRateApi = async ({ orderId, itemId, rate }: UpdateRatePayload) => {
+  const { data } = await axios.put(
+    `/api/department/procurement/updaterate/${orderId}/${itemId}`,
+    { rate }
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useUpdateProcurementItemRate = () => {
+  return useMutation({
+    mutationFn: updateRateApi,
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["procurement", "single", variables.orderId],
+      });
+    },
+  });
+};
+
+
+
+// link generateion
+
+
+
+export const generateProcurementSecureTokenApi = async ({
+  orderId,
+  itemId,
+  api
+}: {
+  orderId: string;
+  itemId: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.post(`/department/procurement/generatetoken`, {
+    orderId,
+    itemId
+  });
+  if (!data.ok) throw new Error(data.message);
+  return data.token;
+};
+
+
+
+
+export const useGenerateProcurementToken = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ orderId, itemId }: { orderId: string; itemId: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Access denied");
+      if (!api) throw new Error("API not found for role");
+      return await generateProcurementSecureTokenApi({ orderId, itemId, api });
+    },
+  });
+};
 
 
 

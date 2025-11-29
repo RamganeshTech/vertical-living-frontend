@@ -1,42 +1,42 @@
 import React from 'react'
 import { Card, CardContent } from '../../../components/ui/Card'
 import { Button } from '../../../components/ui/Button'
-import { useDeleteQuote } from '../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi'
-import { toast } from '../../../utils/toast'
+// import { useDeleteQuote } from '../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi'
+// import { toast } from '../../../utils/toast'
 import { useNavigate } from 'react-router-dom'
 import { dateFormate, formatTime } from './../../../utils/dateFormator';
 
 type Props = {
     quote: any
-    organizationId: string
+    organizationId?: string
 }
-const QuoteClientCard: React.FC<Props> = ({ quote, organizationId }) => {
+const QuoteClientCard: React.FC<Props> = ({ quote }) => {
     const navigate = useNavigate();
 
-    const { mutateAsync: deleteQuote, isPending } = useDeleteQuote();
+    // const { mutateAsync: deleteQuote, isPending } = useDeleteQuote();
 
-    const handleDelete = async (id: string) => {
-        try {
+    // const handleDelete = async (id: string) => {
+    //     try {
 
-            await deleteQuote({
-                id: id!,
-                organizationId: organizationId!,
-            });
+    //         await deleteQuote({
+    //             id: id!,
+    //             organizationId: organizationId!,
+    //         });
 
-            toast({
-                title: "Success",
-                description: "Items deleted successfully",
-            });
+    //         toast({
+    //             title: "Success",
+    //             description: "Items deleted successfully",
+    //         });
 
-            // refetch()
-        }
-        catch (error: any) {
-            toast({
-                title: "Error",
-                description: error?.response?.data?.message ?? "Operation failed",
-            });
-        }
-    };
+    //         // refetch()
+    //     }
+    //     catch (error: any) {
+    //         toast({
+    //             title: "Error",
+    //             description: error?.response?.data?.message ?? "Operation failed",
+    //         });
+    //     }
+    // };
 
 
 
@@ -81,7 +81,7 @@ const QuoteClientCard: React.FC<Props> = ({ quote, organizationId }) => {
                     >
                         <i className="fas fa-eye mr-1" /> View
                     </Button>
-                    <Button
+                    {/* <Button
                         size="sm"
                         isLoading={isPending}
                         variant="danger"
@@ -89,7 +89,7 @@ const QuoteClientCard: React.FC<Props> = ({ quote, organizationId }) => {
                         onClick={() => handleDelete(quote._id)}
                     >
                         <i className="fas fa-trash mr-1" /> Delete
-                    </Button>
+                    </Button> */}
 
                 </div>
             </CardContent>

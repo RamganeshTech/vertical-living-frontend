@@ -39,7 +39,9 @@ export const useAuthCheck = () => {
           case "owner":
             res = await Api.get("/auth/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.userId, userName:res.data.data.username };
+              const info = { role, isauthenticated: true, _id: res.data.data.userId, userName:res.data.data.userName };
+            // console.log("11111111", info)
+
               dispatch(setRole(info));
               dispatch(setOwnerProfileData(res.data.data));
               // setAuthInfo(info);
@@ -113,7 +115,8 @@ export const useAuthCheck = () => {
           ]);
 
           if (ownerRes.status === "fulfilled" && ownerRes.value.data.ok) {
-            const info = { role: "owner", isauthenticated: true, _id: ownerRes.value.data.data.userId ,  userName:ownerRes.value.data.data.username};
+            const info = { role: "owner", isauthenticated: true, _id: ownerRes.value.data.data.userId ,  userName:ownerRes.value.data.data.userName};
+            // console.log("22222222", info)
             dispatch(setRole(info));
             dispatch(setOwnerProfileData(ownerRes.value.data.data))
             setAuthInfo({ ...info, _id: ownerRes.value.data.data.userId });

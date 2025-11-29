@@ -10,12 +10,13 @@ const CreateVendorAcc = () => {
     const { organizationId } = useParams();
     const createVendorMutation = useCreateVendor();
 
-    const handleSubmit = async (data: CreateVendorPayload, files?: File[]) => {
+    const handleSubmit = async (data: CreateVendorPayload, files?: File[], mainImage?:File) => {
         try {
             const payload: CreateVendorPayload = {
                 ...data,
                 organizationId: organizationId!,
-                files: files || []
+                files: files || [],
+                mainImage: mainImage // <--- Pass it here
             };
 
             await createVendorMutation.mutateAsync(payload);

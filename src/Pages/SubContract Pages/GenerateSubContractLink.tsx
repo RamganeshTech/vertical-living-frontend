@@ -62,7 +62,7 @@ const GenerateSubContractLink = ({ subContractId }: GenerateSubContractLinkProps
                     {!shareableLink ? (
                         <Button 
                             onClick={handleGenerateLink}
-                            disabled={generateLinkMutation.isPending}
+                            isLoading={generateLinkMutation.isPending}
                             className="w-full"
                         >
                             {generateLinkMutation.isPending ? (

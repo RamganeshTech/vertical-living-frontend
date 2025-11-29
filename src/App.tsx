@@ -6,13 +6,17 @@ import { useSelector } from 'react-redux';
 import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
-// import SubContractMain from './Pages/SubContract Pages/SubContractMain';
-// import PublicSubContract from './Pages/SubContract Pages/PublicSubContract';
-// import CreateSubContract from './Pages/SubContract Pages/CreateSubContract';
-const SubContractMain = lazy(() => import( './Pages/SubContract Pages/SubContractNew Pages/SubContractMain'));
-const CreateSubContract = lazy(() => import( './Pages/SubContract Pages/SubContractNew Pages/CreateSubContract'));
-const SingleSubContract = lazy(() => import( './Pages/SubContract Pages/SubContractNew Pages/SingleSubContract'));
-const PublicSubContract = lazy(() => import( './Pages/SubContract Pages/SubContractNew Pages/PublicSubContract'));
+import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
+
+const  TemplateBillMain  = lazy(()=> import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/TemplateBillMain'));
+const  TemplateBillSingle  = lazy(()=> import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/TemplateBillSingle'));
+const  BillNewMain  = lazy(()=> import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/BillNewMain'));
+const  BillNewSingle  = lazy(()=> import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/BillNewSingle'));
+
+const SubContractMain = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/SubContractMain'));
+const CreateSubContract = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/CreateSubContract'));
+const SingleSubContract = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/SingleSubContract'));
+const PublicSubContract = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/PublicSubContract'));
 const IssueDiscussionMain = lazy(() => import('./Pages/Stage Pages/Issue Discussion Pages/IssueDiscussionPage'));
 const VendorPaymentAccMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentAccMain'));
 const VendorPaymentSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentSingle'));
@@ -205,6 +209,47 @@ function App() {
       socket.emit("leave_organization", { organizationId: organizationId });
     };
   }, [organizationId]);
+
+
+  const currentUser = useCurrentSupervisor()
+
+  // useEffect(() => {
+  //   const userId = currentUser?.id;
+  //   if (!socket || !organizationId || !userId) return;
+
+  //   socket.emit('join_ticket_discussion', { organizationId, userId });
+
+  //   // No socket.on here! Only emit to join room
+  // }, [organizationId, currentUser?.id]);
+
+
+
+
+  useEffect(() => {
+    console.log("not geting this into the currentUser", currentUser?.id)
+    if (!organizationId || !currentUser?.id) return;
+
+    const userId = currentUser.id;
+
+    console.log("[Socket] Joining ticket discussion room for user:", userId);
+    socket.emit('join_ticket_discussion', { organizationId, userId });
+
+    // Rejoin on reconnect
+    const handleReconnect = () => {
+      console.log("[Socket] Rejoining ticket discussion room after reconnect");
+      socket.emit('join_ticket_discussion', { organizationId, userId });
+    };
+
+    socket.on('connect', handleReconnect);
+
+    return () => {
+      socket.off('connect', handleReconnect);
+      // Optionally: leave the room if user logs out
+      // socket.emit('leave_ticket_discussion', { organizationId });
+    };
+  }, [organizationId, currentUser?.id]);
+
+
 
   if (loading) <MaterialOverviewLoading />;
   return (
@@ -512,6 +557,43 @@ function App() {
 
             </Route>
 
+            
+
+
+             <Route path="billnew" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <BillNewMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <BillNewSingle mode="edit" />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <BillNewSingle mode="create" />
+              </ProtectedRoutes>} />
+
+
+              <Route path="billtemplate" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <TemplateBillMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <TemplateBillSingle mode="edit" />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <TemplateBillSingle mode="create" />
+              </ProtectedRoutes>} />
+            </Route>
+
+
+            </Route>
+
+
+
+
             <Route path="purchasemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <PurchaseAccountsMain />
             </ProtectedRoutes>} >
@@ -552,10 +634,10 @@ function App() {
                 <CreateSubContract />
               </ProtectedRoutes>} />
 
-               <Route path="single/:subContractId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="single/:subContractId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <SingleSubContract />
               </ProtectedRoutes>} />
-              
+
             </Route>
 
 

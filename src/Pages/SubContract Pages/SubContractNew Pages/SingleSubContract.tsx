@@ -64,6 +64,58 @@ const SingleSubContract = () => {
     const { mutateAsync: updateStatusMutation, } = useUpdateWorkerStatus()
 
 
+    // const statusConfig = {
+    //     pending: {
+    //         bg: "bg-yellow-100",
+    //         text: "text-yellow-700",
+    //         border: "border-yellow-300",
+    //         hover: "hover:bg-yellow-200",
+    //         label: "Pending"
+    //     },
+    //     accepted: {
+    //         bg: "bg-green-100",
+    //         text: "text-green-700",
+    //         border: "border-green-300",
+    //         hover: "hover:bg-green-200",
+    //         label: "Accepted"
+    //     },
+    //     rejected: {
+    //         bg: "bg-red-100",
+    //         text: "text-red-700",
+    //         border: "border-red-300",
+    //         hover: "hover:bg-red-200",
+    //         label: "Rejected"
+    //     }
+    // };
+
+
+
+    const statusConfig = {
+        pending: {
+            triggerClass: "bg-yellow-50 border-yellow-300 text-yellow-700",
+            valueClass: "text-yellow-700 font-medium",
+            itemClass: "text-yellow-700 hover:bg-yellow-50 hover:text-yellow-800 font-medium",
+            dotColor: "bg-yellow-500",
+            label: "Pending"
+        },
+        accepted: {
+            triggerClass: "!bg-green-50 border-green-300 text-green-700",
+            valueClass: "text-green-700 font-medium",
+            itemClass: "text-green-700 hover:bg-green-50 hover:text-green-800 font-medium",
+            dotColor: "bg-green-500",
+            label: "Accepted"
+        },
+        rejected: {
+            triggerClass: "!bg-red-50 border-red-300 text-red-700",
+            valueClass: "text-red-700 font-medium",
+            itemClass: "text-red-700 hover:bg-red-50 hover:text-red-800 font-medium",
+            dotColor: "bg-red-500",
+            label: "Rejected"
+        }
+    };
+
+
+
     const handleUpdateStatus = async (status: "pending" | "accepted" | "rejected") => {
         try {
             await updateStatusMutation({
@@ -115,19 +167,30 @@ const SingleSubContract = () => {
                         handleUpdateStatus(val as "pending" | "accepted" | "rejected")
                     }}
                 >
-                    <SelectTrigger className="w-full bg-white">
-                        <SelectValue placeholder="Select Status" selectedValue={status.toString()} />
+                    <SelectTrigger className={`w-full ${statusConfig[status].triggerClass}`}>
+                        <SelectValue
+                            placeholder="Select Status"
+                            selectedValue={status.toString()}
+                            className={statusConfig[status].valueClass}
+                        />
                     </SelectTrigger>
                     <SelectContent>
-                        {["pending", "accepted", "rejected"].map((status) => {
-                            return (
-                                <SelectItem key={status} value={status}>
-                                    {status}
-                                </SelectItem>
-                            );
-                        })}
+                        {(["pending", "accepted", "rejected"] as const).map((statusOption) => (
+                            <SelectItem
+                                key={statusOption}
+                                value={statusOption}
+                                className={statusConfig[statusOption].itemClass}
+                            >
+                                <span className="flex items-center gap-2">
+                                    <span className={`w-2 h-2 rounded-full ${statusConfig[statusOption].dotColor}`}></span>
+                                    {statusConfig[statusOption].label}
+                                </span>
+                            </SelectItem>
+                        ))}
                     </SelectContent>
                 </Select>
+
+
             </div>
 
             <div className="max-w-full mx-auto space-y-8">
