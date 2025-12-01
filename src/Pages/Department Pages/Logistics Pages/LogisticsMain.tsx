@@ -60,6 +60,7 @@ export interface ILogisticsShipment {
   actualDeliveryTime: string;
   // assignedTo?: string;
   notes: string;
+  trackingLink: string | null
 }
 
 

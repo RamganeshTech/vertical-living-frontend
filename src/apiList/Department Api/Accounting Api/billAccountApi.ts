@@ -94,6 +94,14 @@ const syncAcctoBill = async ({  billId, api }: {  billId: string; api: AxiosInst
 };
 
 
+const syncPaymentSectiontoBill = async ({  billId, api }: {  billId: string; api: AxiosInstance }) => {
+    // We send billData as JSON. 
+    // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
+    const { data } = await api.post(`/department/accounting/bill/synctopayments/${billId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
 
 // 3. UPLOAD FILES ONLY (Multipart)
 const uploadImagesOnlyApi = async ({ billId, files, api }: { billId: string; files: File[]; api: AxiosInstance }) => {
@@ -274,6 +282,26 @@ export const useSyncBillToAccounts = () => {
         },
     });
 };
+
+
+
+export const useSyncBillToPaymentsSection = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({  billId }: {  billId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await syncPaymentSectiontoBill({ billId, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bills"] });
+        },
+    });
+};
+
 
 
 export const useUploadBillImages = () => {

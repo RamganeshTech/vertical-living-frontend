@@ -7,11 +7,13 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
+const PaymentAccMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/PaymentAcc_Main_Pages/PaymentAccMain'));
+const PaymentAccSingle = lazy(() => import(  './Pages/Department Pages/Accounting Pages/PaymentAcc_Main_Pages/PaymentAccSingle'));
 
-const  TemplateBillMain  = lazy(()=> import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/TemplateBillMain'));
-const  TemplateBillSingle  = lazy(()=> import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/TemplateBillSingle'));
-const  BillNewMain  = lazy(()=> import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/BillNewMain'));
-const  BillNewSingle  = lazy(()=> import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/BillNewSingle'));
+const TemplateBillMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/TemplateBillMain'));
+const TemplateBillSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/TemplateBillSingle'));
+const BillNewMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/BillNewMain'));
+const BillNewSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/BillNewSingle'));
 
 const SubContractMain = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/SubContractMain'));
 const CreateSubContract = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/CreateSubContract'));
@@ -540,6 +542,20 @@ function App() {
               </ProtectedRoutes>} />
             </Route>
 
+            <Route path="paymentmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <PaymentAccMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <PaymentAccSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <BillNewSingle mode="create" />
+              </ProtectedRoutes>} />
+            </Route>
+
 
             <Route path="billmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <BillAccountsMain />
@@ -557,10 +573,7 @@ function App() {
 
             </Route>
 
-            
-
-
-             <Route path="billnew" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="billnew" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
               <BillNewMain />
             </ProtectedRoutes>} >
 
@@ -575,18 +588,18 @@ function App() {
 
 
               <Route path="billtemplate" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-              <TemplateBillMain />
-            </ProtectedRoutes>} >
+                <TemplateBillMain />
+              </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-                <TemplateBillSingle mode="edit" />
-              </ProtectedRoutes>} />
+                <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                  <TemplateBillSingle mode="edit" />
+                </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-                <TemplateBillSingle mode="create" />
-              </ProtectedRoutes>} />
-            </Route>
+                <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                  <TemplateBillSingle mode="create" />
+                </ProtectedRoutes>} />
+              </Route>
 
 
             </Route>

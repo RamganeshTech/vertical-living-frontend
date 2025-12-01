@@ -75,7 +75,7 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
 
 
     const formatDisplayDate = (date: Date | null) => {
-        if (!date) return "Not Available";
+        if (!date) return "In Progress";
         return date.toLocaleString("en-IN", {
             timeZone: "Asia/Kolkata",
             dateStyle: "medium",

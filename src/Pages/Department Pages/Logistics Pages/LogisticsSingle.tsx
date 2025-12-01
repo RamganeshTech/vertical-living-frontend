@@ -258,8 +258,8 @@ import { type IShipmentItem } from "./LogisticsMain";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { Button } from "../../../components/ui/Button";
 import { toast } from "../../../utils/toast";
-import { useLogisticsWebSocket } from "./useLogisticsWebSocket";
-import { LiveTrackingMap } from "./LiveTrackingMap";
+// import { useLogisticsWebSocket } from "./useLogisticsWebSocket";
+// import { LiveTrackingMap } from "./LiveTrackingMap";
 import InfoTooltip from "../../../components/ui/InfoToolTip";
 // import { LiveTrackingMap } from "./LiveTrackingMap"; // 🚀 NEW COMPONENT
 // import { useLogisticsWebSocket } from "../../../apiList/Department Api/Logistics Api/useLogisticsWebSocket"; // 🚀 WebSocket Hook
@@ -306,25 +306,25 @@ const LogisticsSingle: React.FC = () => {
     const [showForm, setShowForm] = useState(false);
 
     // 🚀 WebSocket for real-time location updates
-    const { isConnected } = useLogisticsWebSocket({
-        organizationId,
-        enabled: !!shipment && ["in_transit", "pickedup"].includes(shipment?.shipmentStatus || ""),
-        onLocationUpdate: (data) => {
-            if (data.shipmentId === id) {
-                console.log("📍 Location updated for current shipment:", data);
-                refetch(); // Refetch to update UI with latest location
-            }
-        },
-        onTrackingStopped: (data) => {
-            if (data.shipmentId === id) {
-                toast({
-                    title: "Tracking Stopped",
-                    description: `Shipment ${data.status === 'delivered' ? 'delivered' : 'cancelled'}`
-                });
-                refetch();
-            }
-        }
-    });
+    // const { isConnected } = useLogisticsWebSocket({
+    //     organizationId,
+    //     enabled: !!shipment && ["in_transit", "pickedup"].includes(shipment?.shipmentStatus || ""),
+    //     onLocationUpdate: (data) => {
+    //         if (data.shipmentId === id) {
+    //             console.log("📍 Location updated for current shipment:", data);
+    //             refetch(); // Refetch to update UI with latest location
+    //         }
+    //     },
+    //     onTrackingStopped: (data) => {
+    //         if (data.shipmentId === id) {
+    //             toast({
+    //                 title: "Tracking Stopped",
+    //                 description: `Shipment ${data.status === 'delivered' ? 'delivered' : 'cancelled'}`
+    //             });
+    //             refetch();
+    //         }
+    //     }
+    // });
 
     const handleGenerateAccounts = async () => {
         try {
@@ -359,13 +359,13 @@ const LogisticsSingle: React.FC = () => {
     }
 
     // ✅ Check if tracking is active and location data exists
-    const isTrackingActive = ["in_transit", "pickedup"].includes(shipment?.shipmentStatus || "");
-    const hasLocationData = shipment?.currentLocation?.latitude && shipment?.currentLocation?.longitude;
+    // const isTrackingActive = ["in_transit", "pickedup"].includes(shipment?.shipmentStatus || "");
+    // const hasLocationData = shipment?.currentLocation?.latitude && shipment?.currentLocation?.longitude;
 
     return (
         <div className="max-h-full overflow-y-auto max-w-full space-y-4">
             {/* Page Header */}
-            <header className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-200 pb-4">
+            <header className="sticky top-0 z-20 bg-white border-b border-gray-200 pb-4 pt-2 mb-6 flex justify-between items-center">
                 <div className="flex gap-2 items-center">
                     <div
                         onClick={() => navigate(-1)}
@@ -510,20 +510,30 @@ const LogisticsSingle: React.FC = () => {
                             </>
                         )}
 
+
+
+                        <>
+                            <Separator />
+                            <Section title="Tracking Link">
+                                <p className="text-sm text-gray-700">{shipment.trackingLink || "No Tracking link provided"}</p>
+                            </Section>
+                        </>
+
+
                         {/* Notes */}
-                        {shipment?.notes && (
+                        {
                             <>
                                 <Separator />
                                 <Section title="Notes">
-                                    <p className="text-sm text-gray-700">{shipment.notes}</p>
+                                    <p className="text-sm text-gray-700">{shipment.notes || "No Notes"}</p>
                                 </Section>
                             </>
-                        )}
+                        }
                     </CardContent>
                 </Card>
 
                 {/* 🚀 LIVE TRACKING SECTION - Show if tracking is active (regardless of location data) */}
-                {isTrackingActive && (
+                {/* {isTrackingActive && (
                     <Card className="w-1/2">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
@@ -539,7 +549,6 @@ const LogisticsSingle: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* ✅ SHOW MAP IF LOCATION EXISTS */}
                             {hasLocationData ? (
                                 <>
                                     <LiveTrackingMap
@@ -550,7 +559,6 @@ const LogisticsSingle: React.FC = () => {
                                         destination={shipment.destination}
                                     />
 
-                                    {/* Last Updated Info */}
                                     {shipment.lastLocationUpdate && (
                                         <p className="text-xs text-gray-500 mt-2">
                                             Last updated: {new Date(shipment.lastLocationUpdate).toLocaleString()}
@@ -558,7 +566,6 @@ const LogisticsSingle: React.FC = () => {
                                     )}
                                 </>
                             ) : (
-                                /* ✅ SHOW WAITING MESSAGE IF NO LOCATION YET */
                                 <div className="flex items-center justify-center py-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
                                     <div>
                                         <i className="fas fa-satellite-dish text-5xl text-gray-300 mb-4 animate-pulse" />
@@ -576,14 +583,31 @@ const LogisticsSingle: React.FC = () => {
                             )}
                         </CardContent>
                     </Card>
-                )}
+                )} */}
+
+                <div className="flex-1 w-1/2">
+                    {shipment.trackingLink ? <iframe src={shipment.trackingLink} width="100%" height="600px" /> :
+                        <>
+                            <div className="flex items-center justify-center py-12 text-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-300">
+                                <div>
+                                    <i className="fas fa-location text-5xl text-slate-300 mb-4 animate-pulse" />
+                                    <h4 className="text-lg font-semibold text-slate-700">Track the Vehicle by pasting the link</h4>
+                                    <p className="text-sm text-slate-500 mt-2">
+                                        paste the porter or rapido tracking link by clicking edit option
+                                    </p>
+                                    <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
+                                        <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                                        <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                        <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
 
 
-
-                {/* <iframe src="https://porter.in/rd/dd41177489" width="100%" height="600px" /> */}
-                <iframe src="https://shorturl.rapido.bike/RAPIDO/jzDvGb" width="100%" height="600px" />
-
-
+                    }
+                </div>
+                {/* <iframe src="https://shorturl.rapido.bike/RAPIDO/jzDvGb" width="100%" height="600px" /> */}
             </section>
 
 

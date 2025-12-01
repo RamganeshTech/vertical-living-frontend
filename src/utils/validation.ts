@@ -12,9 +12,9 @@ export const handleProjectValidate = (projectData: ProjectInput) => {
         newErrors.startDate = "start date is required"
     }
 
-    if (!projectData.dueDate) {
-        newErrors.dueDate = "Due date is Required"
-    }
+    // if (!projectData.dueDate) {
+    //     newErrors.dueDate = "Due date is Required"
+    // }
 
     if (projectData.startDate && projectData.endDate && projectData.endDate <= projectData.startDate) {
         newErrors.endDate = "End date must be after start date.";

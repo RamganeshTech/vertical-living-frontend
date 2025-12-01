@@ -3,6 +3,7 @@ import { getApiForRole } from "../../utils/roleCheck";
 import useGetRole from "../../Hooks/useGetRole";
 import type { AxiosInstance } from "axios";
 import { queryClient } from "../../QueryClient/queryClient";
+import axios from "axios";
 
 export interface UploadFilePayload {
     formId: string;
@@ -11,8 +12,8 @@ export interface UploadFilePayload {
 }
 
 // below api is used for submitting the form details form the form link submitted through whatsapp to the client 
-const createPublicFromSubmission = async ({ projectId, payload, token, api }: { projectId: string, payload: any, token: string, api: AxiosInstance }) => {
-    const { data } = await api.post(`/requirementform/createrequirement/${projectId}?token=${token}`, payload);
+const createPublicFromSubmission = async ({ projectId, payload, token }: { projectId: string, payload: any, token: string, }) => {
+    const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/requirementform/createrequirement/${projectId}?token=${token}`, payload);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 }
@@ -232,20 +233,20 @@ export const useDeleteRequirementUploadFile = () => {
 
 
 export const useCreateFormSubmission = () => {
-    const allowedRoles = ["owner", "staff", "CTO", "client"]
+    // const allowedRoles = ["owner", "staff", "CTO", "client"]
 
-    const { role } = useGetRole()
+    // const { role } = useGetRole()
 
-    const api = getApiForRole(role!)
+    // const api = getApiForRole(role!)
 
     return useMutation({
         mutationFn: async ({ projectId, payload, token }: { projectId: string, payload: any, token: string }) => {
 
-            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+            // if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
-            if (!api) throw new Error("API instance not found for role");
+            // if (!api) throw new Error("API instance not found for role");
 
-            return await createPublicFromSubmission({ projectId, payload, token, api })
+            return await createPublicFromSubmission({ projectId, payload, token })
         },
         onSuccess: (_, {projectId}) => {
             queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });

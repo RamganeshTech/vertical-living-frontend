@@ -17,14 +17,14 @@ import {
     useProcurementGeneratePdf,
     useDeleteProcurementPdf,
     useSyncLogistics,
-    useSyncAccountsProcurement
+    // useSyncAccountsProcurement
 } from "../../../apiList/Department Api/Procurement Api/procurementApi";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
 import { downloadImage } from "../../../utils/downloadFile";
 
 const ProcurementSub: React.FC = () => {
-    const { id, organizationId } = useParams() as { id: string, organizationId: string }
+    const { id } = useParams() as { id: string }
     const navigate = useNavigate()
     const { data, isLoading } = useGetSingleProcurementDetails(id);
     const { mutateAsync: updateShop } = useUpdateProcurementShopDetails();
@@ -33,7 +33,7 @@ const ProcurementSub: React.FC = () => {
     const { mutateAsync: generateLink, isPending: generatePending } = useProcurementGeneratePdf()
     const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteProcurementPdf()
     const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
-    const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsProcurement()
+    // const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsProcurement()
 
     const [editCost, setEditCost] = useState(false);
     const [totalCost, setTotalCost] = useState<number>(data?.totalCost || 0);
@@ -137,17 +137,17 @@ const ProcurementSub: React.FC = () => {
     }
 
 
-    const handleGenerateAccounts = async () => {
-        try {
-            await syncAccounts({ fromDept: "procurement", organizationId,
-                 projectId: data?.projectId, totalCost: data?.totalCost,
-                  upiId: data?.shopDetails?.upiId || null
-                });
-            toast({ title: "Success", description: "Details sent to Accounts Department" });
-        } catch (error: any) {
-            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
-        }
-    }
+    // const handleGenerateAccounts = async () => {
+    //     try {
+    //         await syncAccounts({ fromDept: "procurement", organizationId,
+    //              projectId: data?.projectId, totalCost: data?.totalCost,
+    //               upiId: data?.shopDetails?.upiId || null
+    //             });
+    //         toast({ title: "Success", description: "Details sent to Accounts Department" });
+    //     } catch (error: any) {
+    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+    //     }
+    // }
 
 
 
@@ -182,7 +182,7 @@ const ProcurementSub: React.FC = () => {
 
                     <div className="flex gap-2 items-center ">
 
-                        <div className="flex flex-col items-start space-y-1">
+                        {/* <div className="flex flex-col items-start space-y-1">
                             <Button
                                 variant="primary"
                                 isLoading={syncAccountsLoading}
@@ -193,7 +193,7 @@ const ProcurementSub: React.FC = () => {
                             <span className="text-xs text-blue-500 mx-auto">
                                 <strong>*</strong> Click the button to send the <br /> details to  accounts dept
                             </span>
-                        </div>
+                        </div> */}
 
                         <div className="flex flex-col items-start space-y-1">
                             <Button

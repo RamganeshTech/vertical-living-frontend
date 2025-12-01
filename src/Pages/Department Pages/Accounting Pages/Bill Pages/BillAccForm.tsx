@@ -879,7 +879,7 @@ import { Label } from '../../../../components/ui/Label';
 import ImageGalleryExample from '../../../../shared/ImageGallery/ImageGalleryMain';
 import type { CreateBillPayload, BillItem } from './CreateBillAcc';
 import { ORDERMATERIAL_UNIT_OPTIONS } from '../../../Stage Pages/Ordering Materials/OrderMaterialOverview';
-import { useDeleteBillImage, useSyncBillToAccounts } from '../../../../apiList/Department Api/Accounting Api/billAccountApi';
+import { useDeleteBillImage,  useSyncBillToPaymentsSection } from '../../../../apiList/Department Api/Accounting Api/billAccountApi';
 import { toast } from '../../../../utils/toast';
 import { Card, CardContent } from '../../../../components/ui/Card';
 import { downloadImage } from '../../../../utils/downloadFile';
@@ -1112,18 +1112,35 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
     const VendorOptions = (VendorData || [])?.map((v: any) => ({ value: v._id, label: v.vendorName }));
 
 
-    const { mutateAsync: syncAccountsMutation, isPending: syncAccountsLoading } = useSyncBillToAccounts()
+    // const { mutateAsync: syncAccountsMutation, isPending: syncAccountsLoading } = useSyncBillToAccounts()
+    const { mutateAsync: syncPaymentsMutation, isPending: syncPaymentsLoading } = useSyncBillToPaymentsSection()
 
-    const handleSyncToAccounts = async () => {
+    // const handleSyncToAccounts = async () => {
+    //     try {
+    //         await syncAccountsMutation({
+    //             billId: initialData._id!
+    //         });
+    //         toast({ title: "Success", description: "Bill sent to Accounts Department" });
+    //     } catch (error: any) {
+    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+    //     }
+    // }
+
+    const handleSyncToPayments = async () => {
         try {
-            await syncAccountsMutation({
+            if (initialData?.isSyncWithPaymentsSection) {
+                return toast({ variant: "destructive", title: "Error", description: "already sent to payments section" });
+            }
+            await syncPaymentsMutation({
                 billId: initialData._id!
             });
-            toast({ title: "Success", description: "Bill sent to Accounts Department" });
+            refetch?.()
+            toast({ title: "Success", description: "Bill sent to Payments Section" });
         } catch (error: any) {
             toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
         }
     }
+
 
     return (
         <div className="max-w-full mx-auto space-y-2">
@@ -1148,7 +1165,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 <div className='flex gap-2 items-center'>
 
 
-                    {isReadOnly && <div className="flex items-center space-y-1">
+                    {/* {isReadOnly && <div className="flex items-center space-y-1">
                         <Button
                             variant="primary"
                             isLoading={syncAccountsLoading}
@@ -1162,7 +1179,27 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                             type="info"
                             position="bottom"
                         />
+                    </div>} */}
+
+                    {isReadOnly && <div className="flex items-center space-y-1">
+                        <Button
+                            variant="primary"
+                            className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}
+                            title={initialData?.isSyncWithPaymentsSection ? "already sent to payment" : ""}
+                            isLoading={syncPaymentsLoading}
+                            disabled={initialData?.isSyncWithPaymentsSection}
+                            onClick={handleSyncToPayments}
+                        >
+                            Send To Payments Section
+                        </Button>
+
+                        <InfoTooltip
+                            content="Click the button to send the bill to Payments section"
+                            type="info"
+                            position="bottom"
+                        />
                     </div>}
+
 
                     {isReadOnly && (
                         <Button type="button" onClick={toggleEdit} className={isReadOnly ? "bg-blue-600 text-white" : "bg-gray-500 hover:bg-gray-500 text-white"}>
@@ -1172,14 +1209,14 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
 
 
                     {/* Actions */}
-                    {isCreateMode || isEditMode && (
+                    {(isCreateMode || isEditMode) && (
                         <div className="flex justify-end items-center gap-4">
 
                             <Button type="button" onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2" disabled={isSubmitting}>
                                 {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <>{isCreateMode ? 'Create Bill' : 'Update Bill'}</>}
                             </Button>
 
-                            <Button variant='outline'  type="button" onClick={() => {
+                            <Button variant='outline' type="button" onClick={() => {
                                 if (isCreateMode) {
                                     navigate(-1)
                                 }
@@ -1415,7 +1452,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 {/* --- NEW UPLOADS SECTION --- */}
                 {isReadOnly && <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <h3 className="text-lg font-semibold mb-4 pb-2 border-b flex justify-between items-center">
-                        <span><i className="fas fa-cloud-upload-alt mr-2 text-blue-500"></i> {isCreateMode ? 'Upload Documents' : 'Add New Documents'}</span>
+                        <span><i className="fas fa-cloud-upload-alt mr-2 text-blue-500"></i> {isCreateMode ? 'Upload Hot Copy of Bill' : 'Add Hot Copy of Bill'}</span>
                         {isReadOnly && <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">View Mode Upload</span>}
                     </h3>
 

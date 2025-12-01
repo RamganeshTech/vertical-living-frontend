@@ -41,7 +41,7 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
 }) => {
 
 
-  
+
 
   const { mutateAsync: createShipment, isPending: isCreatePending } = useCreateShipment();
   const { mutateAsync: updateShipment, isPending: isUpdatePending } = useUpdateShipment();
@@ -92,6 +92,7 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
     actualPickupTime: "",
     actualDeliveryTime: "",
     notes: "",
+    trackingLink: null
   });
 
   // useEffect(() => {
@@ -150,19 +151,19 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
 
 
   useEffect(() => {
-  const handleEscape = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      onClose(); // call your close function
-    }
-  };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose(); // call your close function
+      }
+    };
 
-  window.addEventListener("keydown", handleEscape);
+    window.addEventListener("keydown", handleEscape);
 
-  // Cleanup when component unmounts
-  return () => {
-    window.removeEventListener("keydown", handleEscape);
-  };
-}, [onClose]);
+    // Cleanup when component unmounts
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [onClose]);
 
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -399,7 +400,7 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
 
               <Input name="vehicleDetails.driverUpiId" type="text" placeholder="Driver Upi" value={formData.vehicleDetails.driverUpiId || ""}
                 onChange={(e) => {
-                    handleChange(e); 
+                  handleChange(e);
                 }}
 
 
@@ -516,7 +517,7 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
 
                           // ✅ Auto-add new empty row if typing in the last one
                           if (idx === newItems.length - 1 && value.trim() !== "") {
-                            newItems.push({ name: "", quantity: 0,});
+                            newItems.push({ name: "", quantity: 0, });
                           }
 
                           // ✅ Auto-remove empty row if cleared
@@ -587,6 +588,11 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
               </div>
             </div>
           </div>
+        </div>
+
+        <div>
+          <Label>Tracking Link</Label>
+          <Input name="trackingLink" placeholder="Paste the Tracking Link here" value={formData.trackingLink || ""} onChange={handleChange} />
         </div>
 
         {/* Footer Buttons */}
