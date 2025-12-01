@@ -954,7 +954,7 @@ const DailySchedulePage: React.FC = () => {
                 setShowTaskForm(false)
               }}
               refetch={refetch}
-              scheduleId={editingTask ? (selectedTask as any).scheduleId : null}
+              scheduleId={editingTask ? (selectedTask as any)?.scheduleId : null}
               editData={editingTask}
               onUpdate={() => {
 
