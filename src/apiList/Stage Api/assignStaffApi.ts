@@ -6,10 +6,11 @@ import { useMutation } from "@tanstack/react-query";
 // ✅ API function for assigning staff to a stage by name
 export const assignStaffToStageApi = async (
   projectId: string,
-  staffId: string,
+  staffId: string | null,
   stageName: string,
   api: AxiosInstance
 ) => {
+  console.log("staffid", staffId)
   const res = await api.put(`/assignstafftostage/${projectId}/${staffId}/${stageName}`);
   return res.data;
 };
@@ -27,7 +28,7 @@ export const useAssignStaffToStage = () => {
       stageName,
     }: {
       projectId: string;
-      staffId: string;
+      staffId: string | null;
       stageName: string;
     }) => {
       if(!role) throw new Error("Not Authorized")

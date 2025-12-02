@@ -18,6 +18,11 @@ const ExpenseAccountSingle: React.FC = () => {
         setIsEditing(p=> !p)
     }
 
+
+    
+    
+
+
     if (!id) {
         return <div>Expense ID not found</div>;
     }

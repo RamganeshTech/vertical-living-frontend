@@ -9,6 +9,7 @@ export interface CreateInvoicePayload {
     customerId: string;
     organizationId: string;
     customerName: string;
+    projectId: string | null,
     orderNumber?: string;
     accountsReceivable?: string;
     salesPerson?: string;

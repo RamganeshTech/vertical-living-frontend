@@ -82,7 +82,7 @@ export const useUpdateDeliveryLocation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ projectId, updates }: {projectId:string, updates:any}) => {
+    mutationFn: async ({ projectId, updates }: { projectId: string, updates: any }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to update delivery location");
       if (!api) throw new Error("API instance not available");
       return await updateDeliveryLocationApi(projectId, updates, api);
@@ -186,7 +186,7 @@ const updatePdfStatus = async ({
   status: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.patch(`/orderingmaterial/upddatepdfstatus/${projectId}/${pdfId}`, {status});
+  const { data } = await api.patch(`/orderingmaterial/upddatepdfstatus/${projectId}/${pdfId}`, { status });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -198,7 +198,7 @@ export const useOrderHistoryGenerateLink = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ projectId , organizationId}: { projectId: string, organizationId:string }) => {
+    mutationFn: async ({ projectId, organizationId }: { projectId: string, organizationId: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await generatedPublicLink({ projectId, api, organizationId });
@@ -216,10 +216,81 @@ export const useUpdatePdfStatus = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ projectId , pdfId, status }: { projectId: string, pdfId:string, status:string }) => {
+    mutationFn: async ({ projectId, pdfId, status }: { projectId: string, pdfId: string, status: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await updatePdfStatus({ projectId, pdfId, status, api });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+
+
+
+
+const uploadOrderingMateriaImages = async ({ projectId, files, api }: { projectId: string; files: File[]; api: AxiosInstance }) => {
+  const formData = new FormData();
+  files.forEach(file => formData.append('files', file));
+
+  const { data } = await api.post(`/orderingmaterial/${projectId}/upload`, formData);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+export const useUploadOrderingMaterialImages = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId, files }: { projectId: string, files: File[] }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+      if (!api) throw new Error("API instance not found for role");
+
+      return await uploadOrderingMateriaImages({ projectId, files, api });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+
+
+
+const deleteOrderingMaterialImage = async ({
+  projectId,
+  imageId,
+  api
+}: {
+  projectId: string;
+  imageId: string;
+  api: AxiosInstance
+}) => {
+  const { data } = await api.delete(`/orderingmaterial/${projectId}/deleteimage/${imageId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+
+export const useDeleteOrderMaterialImage = () => {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId, imageId }: { projectId: string, imageId: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+      if (!api) throw new Error("API instance not found for role");
+
+      return await deleteOrderingMaterialImage({ projectId, api, imageId });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
@@ -283,7 +354,7 @@ export const useAddOrderingMaterialSubItem = () => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
       queryClient.invalidateQueries({
         queryKey: ["inventory", vars.projectId],
-         refetchType: 'active' // Force active queries to refetch
+        refetchType: 'active' // Force active queries to refetch
       });
     },
   });
@@ -343,7 +414,7 @@ export const useDeleteOrderingMaterialSubItem = () => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
       queryClient.invalidateQueries({
         queryKey: ["inventory", vars.projectId],
-         refetchType: 'active' // Force active queries to refetch
+        refetchType: 'active' // Force active queries to refetch
       });
     },
   });
@@ -365,13 +436,13 @@ export const useDeleteAllSubItems = () => {
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await deleteAllSubUnits( projectId, api );
+      return await deleteAllSubUnits(projectId, api);
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
       queryClient.invalidateQueries({
         queryKey: ["inventory", vars.projectId],
-         refetchType: 'active' // Force active queries to refetch
+        refetchType: 'active' // Force active queries to refetch
       });
     },
   });
@@ -441,10 +512,10 @@ export const useUpdateOrderingMaterialSubItem = () => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
       queryClient.invalidateQueries({
         queryKey: ["inventory", vars.projectId],
-         refetchType: 'active' // Force active queries to refetch
+        refetchType: 'active' // Force active queries to refetch
       });
 
-      
+
     },
   });
 };
@@ -469,7 +540,7 @@ export const useUpdateShopDetails = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ projectId, updates }: {projectId:string, updates:any}) => {
+    mutationFn: async ({ projectId, updates }: { projectId: string, updates: any }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to update shop details");
       if (!api) throw new Error("API instance not available");
       return await updateShopDetailsApi(projectId, updates, api);
@@ -502,7 +573,7 @@ export const useDeleteOrderMaterialPdf = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ projectId, pdfId }: {projectId:string, pdfId: string,}) => {
+    mutationFn: async ({ projectId, pdfId }: { projectId: string, pdfId: string, }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Youre not allowed to delete pdf");
       if (!api) throw new Error("API instance not available");
       return await deleteOrderPdf(projectId, pdfId, api);

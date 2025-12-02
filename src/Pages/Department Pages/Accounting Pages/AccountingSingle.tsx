@@ -888,11 +888,11 @@ const AccountingSingle: React.FC = () => {
     const { data: apiResponse, isLoading, isError, refetch } = useGetSingleAccounting(id!);
 
 
-    
+
     // --- Render Loading / Error ---
     if (isLoading) return <div className="p-6"><MaterialOverviewLoading /></div>;
 
-    if (isError || !apiResponse ) {
+    if (isError || !apiResponse) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-xl p-6 border border-red-100 m-4">
                 <i className="fas fa-exclamation-triangle text-4xl text-red-300 mb-4" />
@@ -912,11 +912,11 @@ const AccountingSingle: React.FC = () => {
 
     return (
         <div className="p-4 h-full overflow-y-auto custom-scrollbar space-y-6 bg-gray-50/50">
-            
+
             {/* --- Header --- */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-4">
                 <div className="flex gap-3 items-center">
-                    <button 
+                    <button
                         onClick={() => navigate(-1)}
                         className="bg-white hover:bg-gray-100 shadow-sm flex items-center justify-center w-10 h-10 border border-gray-200 text-gray-600 rounded-lg transition-all"
                     >
@@ -932,15 +932,15 @@ const AccountingSingle: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={`px-4 py-2 rounded-lg text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border} capitalize flex items-center gap-2 shadow-sm`}>
+                {summary.type !== "Invoice" && <div className={`px-4 py-2 rounded-lg text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border} capitalize flex items-center gap-2 shadow-sm`}>
                     <i className={`fas ${statusConfig.icon}`}></i>
                     {summary.status}
-                </div>
+                </div>}
             </div>
 
             {/* --- Overview Cards --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                
+            <div className={`grid grid-cols-1 ${summary.type !== "Invoice" ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"} gap-4`}>
+
                 {/* 1. Payee Details */}
                 <Card className="shadow-sm border-gray-200">
                     <CardContent className="p-5">
@@ -974,7 +974,7 @@ const AccountingSingle: React.FC = () => {
                 </Card>
 
                 {/* 3. Payment Details (Nullable) */}
-                <Card className={`shadow-sm ${payment ? 'border-green-200 bg-green-50/30' : 'border-gray-200 bg-gray-50'}`}>
+                {summary.type !== "Invoice" && <Card className={`shadow-sm ${payment ? 'border-green-200 bg-green-50/30' : 'border-gray-200 bg-gray-50'}`}>
                     <CardContent className="p-5">
                         <div className="flex items-center justify-between mb-2">
                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Payment Record</h3>
@@ -995,7 +995,7 @@ const AccountingSingle: React.FC = () => {
                             </div>
                         )}
                     </CardContent>
-                </Card>
+                </Card>}
 
                 {/* 4. Financials */}
                 <Card className="shadow-sm border-blue-200 bg-blue-50/30">
@@ -1025,9 +1025,9 @@ const AccountingSingle: React.FC = () => {
                             <p className="text-xs text-gray-500 max-w-md truncate">{bill.pdfData.originalName}</p>
                         </div>
                     </div>
-                    <a 
-                        href={bill.pdfData.url} 
-                        target="_blank" 
+                    <a
+                        href={bill.pdfData.url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg transition-colors flex items-center gap-2"
                     >
@@ -1058,9 +1058,11 @@ const AccountingSingle: React.FC = () => {
                                 <th className="px-6 py-3 text-center">Qty</th>
                                 <th className="px-6 py-3 text-right">Rate</th>
                                 <th className="px-6 py-3 text-right">Total Cost</th>
-                                <th className="px-6 py-3">Order ID</th>
-                                <th className="px-6 py-3">Txn ID</th>
-                                <th className="px-6 py-3 text-center">Item Status</th>
+                                {summary.type !== "Invoice" && <><th className="px-6 py-3">Order ID</th>
+                                    <th className="px-6 py-3">Txn ID</th>
+                                    <th className="px-6 py-3 text-center">Item Status</th>
+                                </>
+                                }
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -1072,12 +1074,12 @@ const AccountingSingle: React.FC = () => {
                                 </tr>
                             ) : (
                                 bill.items.map((item: any, index: number) => {
-                                    
+
                                     // We try to find the corresponding item in the payment record if it exists
                                     // Assuming order is preserved or mapping is possible. 
                                     // Since both arrays usually come from the same source creation logic, index mapping is often safe here.
-                                    const paymentItem = payment?.items?.[index]; 
-                                    
+                                    const paymentItem = payment?.items?.[index];
+
                                     // If payment doesn't exist, status is pending. If it does, use item status.
                                     const itemStatus = paymentItem?.status || 'pending';
 
@@ -1113,8 +1115,7 @@ const AccountingSingle: React.FC = () => {
                                                 ₹{item.totalCost?.toLocaleString()}
                                             </td>
 
-                                            {/* Order ID (Display Only) */}
-                                            <td className="px-6 py-4">
+                                           {summary.type !=="Invoice" &&<> <td className="px-6 py-4">
                                                 {paymentItem?.orderId || item.orderId ? (
                                                     <span className="font-mono text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600 block truncate w-24" title={paymentItem?.orderId || item.orderId}>
                                                         {paymentItem?.orderId || item.orderId}
@@ -1124,7 +1125,6 @@ const AccountingSingle: React.FC = () => {
                                                 )}
                                             </td>
 
-                                            {/* Txn ID (Display Only) */}
                                             <td className="px-6 py-4">
                                                 {paymentItem?.transactionId ? (
                                                     <span className="font-mono text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100 block truncate w-24" title={paymentItem.transactionId}>
@@ -1135,7 +1135,6 @@ const AccountingSingle: React.FC = () => {
                                                 )}
                                             </td>
 
-                                            {/* Status (Read Only) */}
                                             <td className="px-6 py-4 text-center">
                                                 {itemStatus === 'paid' ? (
                                                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-wide">
@@ -1147,6 +1146,11 @@ const AccountingSingle: React.FC = () => {
                                                     </span>
                                                 )}
                                             </td>
+                                            
+                                            </>
+                                            }
+
+
                                         </tr>
                                     );
                                 })

@@ -19,6 +19,8 @@ const VendorPaymentAccMain = () => {
 
     const paths: BreadcrumbItem[] = [
         { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
+        { label: "Bills", path: `/organizations/${organizationId}/projects/billmain` },
+
         { label: "Vendor Payment", path: `/organizations/${organizationId}/projects/vendorpaymentmain` },
     ];
 

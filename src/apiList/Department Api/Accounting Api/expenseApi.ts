@@ -13,10 +13,14 @@ interface IExpense {
     organizationId: string;
     vendorId: string;
     vendorName: string;
-    invoiceNumber: string;
-    dateOfPayment: Date;
+    expenseNumber: string;
+    dueDate: Date,
+    projectId: string,
+    projectName: string,
+    expenseDate: Date;
     amount: number;
-    paidThrough: string;
+    payThrough: string;
+    isSyncWithPaymentsSection?: boolean,
     notes: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -26,9 +30,9 @@ interface CreateExpenseInput {
     organizationId: string;
     vendorId: string;
     vendorName: string;
-    dateOfPayment?: Date;
+    expenseDate?: Date;
     amount: number;
-    paidThrough: string;
+    payThrough: string;
     notes?: string;
 }
 
@@ -36,10 +40,10 @@ interface UpdateExpenseInput {
     id: string;
     vendorId?: string;
     vendorName?: string;
-    invoiceNumber?: string;
-    dateOfPayment?: Date;
+    expenseNumber?: string;
+    expenseDate?: Date;
     amount?: number;
-    paidThrough?: string;
+    payThrough?: string;
     notes?: string;
 }
 
@@ -47,38 +51,19 @@ interface GetAllExpensesParams {
     organizationId: string;
     vendorId?: string;
     search?: string;
-    dateOfPaymentToDate?: string
-    dateOfPaymentFromDate?: string
+    expenseDateToDate?: string
+    expenseDateFromDate?: string
     createdFromDate?: string
     createdToDate?: string,
     minAmount?: number;
     maxAmount?: number;
-    paidThrough?: string;
+    payThrough?: string;
     page?: number;
     limit?: number;
     sortBy?: string;
     sortOrder?: "asc" | "desc";
 }
 
-interface GetExpenseStatisticsParams {
-    organizationId: string;
-    startDate?: string;
-    endDate?: string;
-}
-
-interface ExpenseStatistics {
-    totalExpenses: number;
-    totalAmount: number;
-    averageAmount: number;
-    maxAmount: number;
-    minAmount: number;
-    topVendors: Array<{
-        _id: string;
-        vendorName: string;
-        totalAmount: number;
-        count: number;
-    }>;
-}
 
 // ========================================
 // 📌 API Functions
@@ -160,18 +145,12 @@ const getAllExpenses = async ({
         };
     };
 };
-
-// ✅ Get Expense Statistics
-const getExpenseStatistics = async ({
-    params,
-    api
-}: {
-    params: GetExpenseStatisticsParams;
-    api: AxiosInstance;
-}) => {
-    const { data } = await api.get("/department/accounting/expense/getstatistics", { params });
+const syncPaymentSectiontoBill = async ({ expenseId, api }: { expenseId: string; api: AxiosInstance }) => {
+    // We send billData as JSON. 
+    // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
+    const { data } = await api.post(`/department/accounting/expense/syntopayments/${expenseId}`);
     if (!data.ok) throw new Error(data.message);
-    return data.data as ExpenseStatistics;
+    return data.data;
 };
 
 // ========================================
@@ -332,24 +311,21 @@ export const useGetAllExpenses = (
     });
 };
 
-// ✅ 6. GET EXPENSE STATISTICS
-export const useGetExpenseStatistics = (
-    params: GetExpenseStatisticsParams,
-    enabled: boolean = true
-) => {
+
+
+export const useSyncExpenseToPaymentsSection = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
-    return useQuery({
-        queryKey: ["expenses", "statistics", params.organizationId, params],
-        queryFn: async () => {
-            if (!role || !allowedRoles.includes(role)) {
-                throw new Error("Not allowed to view statistics");
-            }
+    return useMutation({
+        mutationFn: async ({ expenseId }: { expenseId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
             if (!api) throw new Error("API instance not found for role");
-            return await getExpenseStatistics({ params, api });
+            return await syncPaymentSectiontoBill({ expenseId, api });
         },
-        enabled: enabled && !!params.organizationId && !!role && !!api,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bills"] });
+        },
     });
 };

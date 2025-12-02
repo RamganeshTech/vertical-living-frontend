@@ -6,11 +6,11 @@ import { dateFormate } from '../../../../utils/dateFormator';
 interface ExpenseAccListProps {
     expense: {
         _id: string;
-        invoiceNumber: string;
+        expenseNumber: string;
         vendorName: string;
         amount: number;
-        dateOfPayment: Date;
-        paidThrough: string;
+        expenseDate: Date;
+        payThrough: string;
         notes: string | null;
         createdAt: Date;
     };
@@ -36,10 +36,10 @@ const ExpenseList: React.FC<ExpenseAccListProps> = ({
                 {index + 1}
             </div>
 
-            {/* Invoice Number */}
+            {/* expense Number */}
             <div className="col-span-2 text-center">
                 <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-mono font-semibold">
-                    {expense.invoiceNumber}
+                    {expense.expenseNumber}
                 </span>
             </div>
 
@@ -64,16 +64,16 @@ const ExpenseList: React.FC<ExpenseAccListProps> = ({
                 })} */}
                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
 
-                {dateFormate(expense.dateOfPayment)}
+                {dateFormate(expense.expenseDate)}
             </div>
 
             {/* Paid Through */}
             <div className="col-span-2 text-center">
                 <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
-                    {expense.paidThrough ?
+                    {expense.payThrough ?
                         <>
                             <i className="fas fa-credit-card mr-1"></i>
-                            {expense.paidThrough}
+                            {expense.payThrough}
                         </> : "-"}
                 </span>
             </div>

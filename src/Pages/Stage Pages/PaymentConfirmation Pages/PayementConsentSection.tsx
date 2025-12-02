@@ -9,6 +9,7 @@ import {
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { dateFormate } from "../../../utils/dateFormator";
 
 
 const PaymentConsentSection: React.FC = () => {
@@ -138,7 +139,7 @@ const PaymentConsentSection: React.FC = () => {
 
                             <strong className="mr-2">{isAgreed ? <>Agreed <i className="fa-solid fa-circle-check text-green-600 mr-2" /></> : (isAgreed === null ? "Not Agreed Yet" : <>Not Agreed <i className="fa-solid fa-circle-xmark text-red-600 mr-2" /></>)}</strong>
                             <br />
-                            <span>Agreed on: <strong>{new Date(agreedAt).toLocaleDateString()}</strong></span>
+                            <span>Agreed on: <strong>{dateFormate(agreedAt)}</strong></span>
                         </div>
                     ) : !agreementToken ? (
                         <div className="bg-red-50 p-4 rounded text-red-700 border border-red-200 text-sm">

@@ -25,6 +25,7 @@ const ExpenseAccountsMain = () => {
         location.pathname.includes('/create')
     const paths: BreadcrumbItem[] = [
         { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
+        { label: "Bills", path: `/organizations/${organizationId}/projects/billmain` },
         { label: "Expenses", path: `/organizations/${organizationId}/projects/expensemain` },
     ];
 
@@ -32,13 +33,13 @@ const ExpenseAccountsMain = () => {
     const [filters, setFilters] = useState({
         search: '',
         vendorId: '',
-        dateOfPaymentToDate: "",
-        dateOfPaymentFromDate: "",
+        expenseDateToDate: "",
+        expenseDateFromDate: "",
         createdFromDate: "",
         createdToDate: "",
         minAmount: 0,
         maxAmount: 100000,
-        paidThrough: '',
+        payThrough: '',
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc'
     });
@@ -73,14 +74,14 @@ const ExpenseAccountsMain = () => {
         organizationId: organizationId || '',
         search: debouncedSearch,
         vendorId: filters.vendorId || undefined,
-        dateOfPaymentToDate: filters.dateOfPaymentToDate || undefined,
-        dateOfPaymentFromDate: filters.dateOfPaymentFromDate || undefined,
+        expenseDateToDate: filters.expenseDateToDate || undefined,
+        expenseDateFromDate: filters.expenseDateFromDate || undefined,
         createdFromDate: filters.createdFromDate || undefined,
         createdToDate: filters.createdToDate || undefined,
         minAmount: debouncedMinAmount ? Number(debouncedMinAmount) : undefined,
         maxAmount: debouncedMaxAmount ? Number(debouncedMaxAmount) : undefined,
         // maxAmount: filters.maxAmount ? filters.maxAmount : undefined,
-        paidThrough: filters.paidThrough || undefined,
+        payThrough: filters.payThrough || undefined,
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
         limit: 20
@@ -142,13 +143,13 @@ const ExpenseAccountsMain = () => {
             vendorId: '',
             // startDate: '',
             // endDate: '',
-            dateOfPaymentToDate: "",
-            dateOfPaymentFromDate: "",
+            expenseDateToDate: "",
+            expenseDateFromDate: "",
             createdFromDate: "",
             createdToDate: "",
             minAmount: 0,
             maxAmount: 100000,
-            paidThrough: '',
+            payThrough: '',
             sortBy: 'createdAt',
             sortOrder: 'desc'
         });
@@ -375,9 +376,9 @@ const ExpenseAccountsMain = () => {
                                     </label>
                                     <input
                                         type="date"
-                                        value={filters.dateOfPaymentFromDate}
+                                        value={filters.expenseDateFromDate}
                                         onChange={(e) => {
-                                            setFilters(f => ({ ...f, dateOfPaymentFromDate: e.target.value }));
+                                            setFilters(f => ({ ...f, expenseDateFromDate: e.target.value }));
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
@@ -390,9 +391,9 @@ const ExpenseAccountsMain = () => {
                                     </label>
                                     <input
                                         type="date"
-                                        value={filters.dateOfPaymentToDate}
+                                        value={filters.expenseDateToDate}
                                         onChange={(e) => {
-                                            setFilters(f => ({ ...f, dateOfPaymentToDate: e.target.value }));
+                                            setFilters(f => ({ ...f, expenseDateToDate: e.target.value }));
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
@@ -493,8 +494,8 @@ const ExpenseAccountsMain = () => {
                                         Payment Method
                                     </label>
                                     <select
-                                        value={filters.paidThrough}
-                                        onChange={(e) => setFilters(f => ({ ...f, paidThrough: e.target.value }))}
+                                        value={filters.payThrough}
+                                        onChange={(e) => setFilters(f => ({ ...f, payThrough: e.target.value }))}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option value="">All Methods</option>
@@ -520,7 +521,7 @@ const ExpenseAccountsMain = () => {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option value="createdAt">Created Date</option>
-                                        <option value="dateOfPayment">Payment Date</option>
+                                        <option value="expenseDate">Payment Date</option>
                                         <option value="amount">Amount</option>
                                         <option value="vendorName">Vendor Name</option>
                                         {/* <option value="invoiceNumber">Invoice Number</option> */}
@@ -567,10 +568,10 @@ const ExpenseAccountsMain = () => {
                             <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
                                 <div className="grid grid-cols-16 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
                                     <div className="col-span-1 text-center">S.No</div>
-                                    <div className="col-span-2 text-center">Invoice #</div>
+                                    <div className="col-span-2 text-center">Expense #</div>
                                     <div className="col-span-3 text-center">Vendor Name</div>
                                     <div className="col-span-2 text-center">Amount</div>
-                                    <div className="col-span-2 text-center">Payment Date</div>
+                                    <div className="col-span-2 text-center">Expense Date</div>
                                     <div className="col-span-2 text-center">Paid Through</div>
                                     <div className="col-span-2 text-center">Created At</div>
                                     <div className="col-span-2 text-center">Actions</div>

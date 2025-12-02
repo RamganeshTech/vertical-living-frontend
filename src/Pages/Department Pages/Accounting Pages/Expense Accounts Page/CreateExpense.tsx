@@ -23,6 +23,7 @@ const CreateExpense: React.FC = () => {
                         mode="create"
                         organizationId={organizationId!}
                         onCancel={handleCancel}
+                        
                     />
                 </div>
             </div>

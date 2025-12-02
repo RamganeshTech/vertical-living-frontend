@@ -171,7 +171,7 @@ const PaymentAccSingle: React.FC = () => {
                             <h3 className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">Important Dates</h3>
                             <div className="space-y-1">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Bill Date:</span>
+                                    <span className="text-gray-600">Payment Date:</span>
                                     <span className="font-medium">{dateFormate(data.paymentDate)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
@@ -222,10 +222,10 @@ const PaymentAccSingle: React.FC = () => {
                                     <div className="col-span-2">Item Name</div>
                                     <div className="col-span-1">Unit</div>
                                     <div className="col-span-1 text-center">Qty</div>
-                                    <div className="col-span-1 text-right">Rate</div>
-                                    <div className="col-span-1 text-right">Total</div>
+                                    <div className="col-span-1 text-center ">Rate</div>
+                                    <div className="col-span-1 text-center">Total</div>
                                     <div className="col-span-1">Order ID</div>
-                                    <div className="col-span-2">Txn ID</div>
+                                    <div className="col-span-2 ">Txn ID</div>
                                     <div className="col-span-1">Due Date</div>
                                     <div className="col-span-1 text-center">Pay</div>
                                 </div>
@@ -268,12 +268,12 @@ const PaymentAccSingle: React.FC = () => {
                                                 </div>
 
                                                 {/* Rate */}
-                                                <div className="col-span-1 text-right text-gray-600 font-mono text-xs">
+                                                <div className="col-span-1 text-center text-gray-600 font-mono text-xs">
                                                     {item.rate?.toLocaleString()}
                                                 </div>
 
                                                 {/* Total Cost */}
-                                                <div className="col-span-1 text-right font-bold text-blue-700 font-mono text-xs">
+                                                <div className="col-span-1 text-center font-bold text-blue-700 font-mono text-xs">
                                                     ₹{item.totalCost?.toLocaleString()}
                                                 </div>
 

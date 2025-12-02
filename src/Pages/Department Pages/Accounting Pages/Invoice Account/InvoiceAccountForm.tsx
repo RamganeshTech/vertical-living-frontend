@@ -818,6 +818,11 @@ import { Card, CardContent } from '../../../../components/ui/Card';
 // import { downloadImage } from '../../../../utils/downloadFile';
 import { ORDERMATERIAL_UNIT_OPTIONS } from '../../../Stage Pages/Ordering Materials/OrderMaterialOverview';
 import { downloadImage } from '../../../../utils/downloadFile';
+import { useGetProjects } from '../../../../apiList/projectApi';
+import type { AvailableProjetType } from '../../Logistics Pages/LogisticsShipmentForm';
+import { useSyncInvoiceToAccounts } from '../../../../apiList/Department Api/Accounting Api/invoiceApi';
+import { toast } from '../../../../utils/toast';
+import InfoTooltip from '../../../../components/ui/InfoToolTip';
 
 interface InvoiceItem {
     itemName: string;
@@ -841,6 +846,8 @@ interface InvoiceFormData {
     orderNumber: string;
     accountsReceivable: string;
     salesPerson: string;
+    projectId: string | null
+    projectName: string | null
     subject: string;
     invoiceDate: string;
     terms: string;
@@ -877,6 +884,8 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
     const defaultFormData: InvoiceFormData = {
         customerId: '',
         customerName: '',
+        projectId: null,
+        projectName: null,
         orderNumber: '',
         accountsReceivable: '',
         salesPerson: '',
@@ -907,12 +916,33 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
         grandTotal: 0
     });
 
+
+    const { mutateAsync: syncAccountsMutation, isPending: syncAccountsLoading } = useSyncInvoiceToAccounts()
+
+
+    const handleSyncToAccounts = async () => {
+        try {
+            await syncAccountsMutation({
+                id: initialData._id!
+            });
+            toast({ title: "Success", description: "Invoice sent to Accounts Department" });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+        }
+    }
+
+
+
+
+
     // Helper function to parse incoming data
     const parseInitialData = (data: any): InvoiceFormData => {
         return {
-            customerId: data.customerId?._id || data.customerId || '',
+            customerId: data.customerId?._id || data?.customerId || null,
             customerName: data.customerName || '',
             orderNumber: data.orderNumber || '',
+            projectId: data.projectId || null,
+            projectName: data.projectName || null,
             accountsReceivable: data.accountsReceivable || '',
             salesPerson: data.salesPerson || '',
             subject: data.subject || '',
@@ -960,6 +990,15 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
         label: customer.customerName,
         email: customer.email
     }));
+
+
+    const { data: projectData } = useGetProjects(organizationId!);
+    const projects = projectData?.map((project: AvailableProjetType) => ({
+        _id: project._id,
+        projectName: project.projectName
+    }));
+
+
 
     // --- Action Handlers ---
 
@@ -1129,7 +1168,27 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
                         </p>
                     </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+
+                    <div className="flex items-center space-y-1">
+                        <Button
+                            variant="primary"
+                            isLoading={syncAccountsLoading}
+                            onClick={handleSyncToAccounts}
+                        >
+                            Send To Accounts Dept
+                        </Button>
+
+                        <InfoTooltip
+                            content="Click the button to send the payment to accounts department"
+                            type="info"
+                            position="bottom"
+                        />
+                    </div>
+
+
+
+
                     {currentMode === 'view' && (
                         <Button
                             type="button"
@@ -1247,6 +1306,32 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
                                 disabled={isReadOnly}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                             />
+                        </div>
+
+                        <div>
+                            <Label>Project</Label>
+                            <select
+                                value={formData?.projectId || ''}
+                                disabled={isReadOnly}
+                                onChange={(e) => {
+                                    const selected = projects?.find((p: any) => p._id === e.target.value);
+                                    if (selected) {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            projectId: selected._id,
+                                            projectName: selected.projectName,
+                                        }));
+                                    } else {
+                                        setFormData(prev => ({ ...prev, projectId: null, projectName: null }));
+                                    }
+                                }}
+                                className=" disabled:bg-gray-100 disabled:cursor-not-allowed w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                            >
+                                <option value="">Select Projects</option>
+                                {projects?.map((project: any) => (
+                                    <option key={project._id} value={project._id}>{project.projectName}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                 </div>

@@ -102,6 +102,17 @@ const getSingleInvoice = async ({
 };
 
 
+
+const syncInvoicetoAcc = async ({  id, api }: {  id: string; api: AxiosInstance }) => {
+    // We send billData as JSON. 
+    // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
+    const { data } = await api.post(`/department/accounting/invoice/synctoaccounts/${id}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
+
 // ==================== REACT QUERY HOOKS ====================
 
 // Update the hook to use useInfiniteQuery
@@ -248,5 +259,25 @@ export const useGetSingleInvoice = (invoiceId: string) => {
             return await getSingleInvoice({ invoiceId, api });
         },
         enabled: !!invoiceId && !!role && allowedRoles.includes(role),
+    });
+};
+
+
+
+
+export const useSyncInvoiceToAccounts = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({  id }: {  id: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await syncInvoicetoAcc({ id, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["invoices"] });
+        },
     });
 };

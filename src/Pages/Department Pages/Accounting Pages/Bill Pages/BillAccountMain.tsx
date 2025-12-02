@@ -7,6 +7,7 @@ import { useDebounce } from '../../../../Hooks/useDebounce';
 import { useDeleteBill, useGetAllBill } from '../../../../apiList/Department Api/Accounting Api/billAccountApi';
 import BillAccList from './BillAccList';
 import type { CreateBillPayload } from './CreateBillAcc';
+import NavigationDDWithHeading, { type NavigationSection } from '../../../../shared/NavigationDDWithHeading';
 // import { Breadcrumb } from '../../Breadcrumb';
 
 const BillAccountsMain = () => {
@@ -21,21 +22,126 @@ const BillAccountsMain = () => {
         { label: "Bill", path: `/organizations/${organizationId}/projects/billmain` },
     ];
 
+
+    const navigationItemNew: NavigationSection[] = [
+
+        {
+            title: "Sales Transactions",
+            items: [
+                {
+                    label: 'Invoice',
+                    path: `/organizations/${organizationId}/projects/invoicemain`,
+                    icon: 'fas fa-file-invoice text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/invoicemain`)
+                },
+                {
+                    label: 'Retail Invoice',
+                    path: `/organizations/${organizationId}/projects/retailinvoicemain`,
+                    icon: 'fas fa-receipt text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/retailinvoicemain`)
+                },
+                {
+                    label: 'Sales Order',
+                    path: `/organizations/${organizationId}/projects/salesordermain`,
+                    icon: 'fas fa-shopping-cart text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/salesordermain`)
+                },
+                {
+                    label: 'Purchase Orders',
+                    path: `/organizations/${organizationId}/projects/purchasemain`,
+                    icon: 'fas fa-wallet text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/purchasemain`)
+                },
+
+            ]
+        },
+        {
+            title: "Expense Transactions",
+            items: [
+                {
+                    label: 'Expense',
+                    path: `/organizations/${organizationId}/projects/expensemain`,
+                    icon: 'fas fa-money-bill text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
+                },
+
+                // {
+                //     label: 'Bills',
+                //     path: `/organizations/${organizationId}/projects/billmain`,
+                //     icon: 'fas fa-receipt text-blue-600',
+                //     onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
+                // },
+
+                {
+                    label: 'Design Bills',
+                    path: `/organizations/${organizationId}/projects/billnew`,
+                    icon: 'fas fa-file-pdf text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/billnew`)
+                },
+
+
+                // {
+                //     label: 'Bill New',
+                //     path: `/organizations/${organizationId}/projects/billnew`,
+                //     icon: 'fas fa-receipt text-blue-600',
+                //     onClick: () => navigate(`/organizations/${organizationId}/projects/billnew`)
+                // },
+
+                // {
+                //     label: 'Payments Accounts',
+                //     path: `/organizations/${organizationId}/projects/paymentmain`,
+                //     icon: 'fas fa-receipt text-blue-600',
+                //     onClick: () => navigate(`/organizations/${organizationId}/projects/paymentmain`)
+                // },
+
+
+                {
+                    label: 'Vendor Payments',
+                    path: `/organizations/${organizationId}/projects/vendorpaymentmain`,
+                    icon: 'fas fa-credit-card text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/vendorpaymentmain`)
+                },
+            ]
+        },
+
+        {
+            title: "Office Records",
+            items: [
+                {
+                    label: 'Customer',
+                    path: `/organizations/${organizationId}/projects/customermain`,
+                    icon: 'fas fa-users text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/customermain`)
+                },
+                {
+                    label: 'Vendor',
+                    path: `/organizations/${organizationId}/projects/vendormain`,
+                    icon: 'fas fa-user text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
+                },
+            ]
+        }
+
+    ];
+
+    // --- Local State ---
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
     // Check if we're on a child route
     const isDetailView = location.pathname.includes('/billsingle') || location.pathname.includes('/create');
 
-        // Filter states
-        const [filters, setFilters] = useState({
-            search: '',
-            vendorId: '',
-            date: '',
-            billToDate: "",
-            billFromDate: "",
-            createdFromDate: "",
-            createdToDate: "",
-            sortBy: 'createdAt',
-            sortOrder: 'desc' as 'asc' | 'desc',
-        });
+    // Filter states
+    const [filters, setFilters] = useState({
+        search: '',
+        vendorId: '',
+        date: '',
+        billToDate: "",
+        billFromDate: "",
+        createdFromDate: "",
+        createdToDate: "",
+        sortBy: 'createdAt',
+        sortOrder: 'desc' as 'asc' | 'desc',
+    });
 
     // Debounced search
     const debouncedSearch = useDebounce(filters.search, 700)
@@ -137,6 +243,14 @@ const BillAccountsMain = () => {
 
     return (
         <div className="space-y-0 h-full">
+
+             <NavigationDDWithHeading
+                isOpen={isDropdownOpen}
+                onClose={() => setIsDropdownOpen(false)}
+                heading="Accounts"
+                sections={navigationItemNew}
+            /> 
+
             {/* Header */}
             <header className="flex justify-between items-center">
                 <div>
@@ -151,12 +265,26 @@ const BillAccountsMain = () => {
 
                 </div>
 
-                <Button
-                    onClick={() => navigate('create')}
-                >
-                    <i className="fas fa-plus mr-2" />
-                    Create Bill
-                </Button>
+
+                <div className='flex gap-2'>
+
+                  
+
+                    <button
+                        onClick={() => setIsDropdownOpen(true)}
+                        className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105"
+                        title="Quick Navigation"
+                    >
+                        <i className="fas fa-bars text-lg"></i>
+                    </button>
+
+                    <Button
+                        onClick={() => navigate('create')}
+                    >
+                        <i className="fas fa-plus mr-2" />
+                        Create Bill
+                    </Button>
+                </div>
             </header>
 
             {/* Loading State */}

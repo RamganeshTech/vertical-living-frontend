@@ -12,7 +12,7 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 // import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
 import { NO_IMAGE } from "../../../constants/constants";
-import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialPdf, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdatePdfStatus, useUpdateShopDetails } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
+import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialImage, useDeleteOrderMaterialPdf, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdatePdfStatus, useUpdateShopDetails, useUploadOrderingMaterialImages } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 // import GenerateWhatsappLink from "../../../shared/GenerateWhatsappLink";
 import { useEffect, useRef, useState } from "react";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
@@ -20,6 +20,7 @@ import { Input } from "../../../components/ui/Input";
 import { downloadImage } from "../../../utils/downloadFile";
 import { useGetShopLib } from "../../../apiList/Stage Api/shopLibDetailApi";
 import SearchSelectNew from "../../../components/ui/SearchSelectNew";
+import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 
 
 interface ProjectDetailsOutlet {
@@ -65,7 +66,6 @@ const OrderMaterialOverview = () => {
     const navigate = useNavigate()
     const location = useLocation();
 
-
     const { data, isLoading, isError, error: getAllError, refetch } = useGetAllOrderingMaterialHistory(projectId!);
     const { mutateAsync: generateLink, isPending: generatePending } = useOrderHistoryGenerateLink()
     const { mutateAsync: updatePdfStatus } = useUpdatePdfStatus()
@@ -73,6 +73,8 @@ const OrderMaterialOverview = () => {
     const { mutateAsync: addSubItem } = useAddOrderingMaterialSubItem();
     const { mutateAsync: deleteSubItem, isPending: deleteItemLoading } = useDeleteOrderingMaterialSubItem();
     const { mutateAsync: updateSubItem } = useUpdateOrderingMaterialSubItem();
+    const { mutateAsync: uploadImages, isPending: imagePending } = useUploadOrderingMaterialImages();
+    const deleteImgMutation = useDeleteOrderMaterialImage()
 
     const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetOrderingMaterialHistoryDeadline()
     const { mutateAsync: completionStatus, isPending: completePending } = useCompleteOrderingMaterialHistoryStage()
@@ -132,6 +134,33 @@ const OrderMaterialOverview = () => {
     }>({});
 
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            // Convert FileList → File[]
+            const validImages = Array.from(files).filter((file) =>
+                file.type.startsWith("image/")
+            );
+
+            if (validImages.length !== files.length) {
+                toast({
+                    title: "Invalid file type",
+                    description: "Only images are allowed (JPG, PNG, etc.)",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            await uploadImages({ files: validImages, projectId });
+
+            toast({ description: 'Successfully uploaded images', title: "Success" });
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to upload images", variant: "destructive" })
+        }
+    };
 
     const handleCompletionStatus = async () => {
         try {
@@ -199,6 +228,21 @@ const OrderMaterialOverview = () => {
 
 
 
+    const handleImageDelete = async (imageId: string) => {
+        try {
+            await deleteImgMutation.mutateAsync({
+                projectId,
+                imageId,
+            })
+
+            // console.log("upladsImages", uploadedImages)
+            refetch?.()
+            toast({ title: "Success", description: "deleted successfully" })
+
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || "failed to delete", variant: "destructive" })
+        }
+    }
 
     const handleDeletePdf = async (pdfId: string) => {
         try {
@@ -470,7 +514,7 @@ const OrderMaterialOverview = () => {
                                         </h2>
                                     </div>
 
-                                    {!editShop ?  <div className="gap-2 flex">
+                                    {!editShop ? <div className="gap-2 flex">
 
                                         <Button onClick={() => navigate("shoplib")}>
                                             <i className="fas fa-shop mr-2"></i>
@@ -486,9 +530,9 @@ const OrderMaterialOverview = () => {
                                             <i className="fa-solid fa-edit mr-1"></i>Edit
                                         </button>
                                     </div>
-                                    :
+                                        :
 
-                                    <div>
+                                        <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
                                             <SearchSelectNew
                                                 options={shopLibOptions}
@@ -498,7 +542,7 @@ const OrderMaterialOverview = () => {
                                                 onValueChange={(value) => {
                                                     const shopFound = shops?.find((s: any) => s._id === value)
                                                     // console.log("sop", shopFound)
-                                                    setSelectedShop(({selectedId: shopFound._id, shopName: shopFound.shopName}))
+                                                    setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
                                                 }}
                                                 searchBy="name"
                                                 displayFormat="detailed"
@@ -622,6 +666,85 @@ const OrderMaterialOverview = () => {
                                     </div>
                                 )}
                             </div>
+
+
+                            <section className="w-full">
+
+
+
+
+
+
+                                <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center">
+                                        <i className="fas fa-folder-open mr-2 text-blue-500"></i> Images
+                                    </h3>
+
+
+
+                                    <div className="flex items-center justify-between w-full relative">
+
+                                        <Input
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            placeholder="select files"
+                                            // className="h-10"
+                                            onChange={handleFileChange}
+                                            disabled={imagePending}
+                                            className={imagePending ? "pr-10 opacity-70 cursor-not-allowed w-full mb-4" : "mb-4"}
+                                        />
+
+                                        {imagePending && (
+                                            <div className="absolute inset-y-0 right-2 flex items-center">
+                                                <svg
+                                                    className="animate-spin h-5 w-5 text-gray-500"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 100 16v4l3.5-3.5L12 20v-4a8 8 0 01-8-8z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {/* <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            className="mb-1 sm:mb-0 w-full h-full py-2 border-1 px-2 rounded-lg"
+                                            onChange={handleFileChange}
+                                        /> */}
+
+
+                                    {/* Image Gallery */}
+                                    <div className="mb-6">
+                                        {data?.images?.length > 0 ? <ImageGalleryExample
+                                            handleDeleteFile={(imgId: string) => handleImageDelete(imgId)}
+                                            imageFiles={data?.images}
+                                            height={150}
+                                            minWidth={150}
+                                            maxWidth={200} />
+                                            :
+                                            <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
+                                                No Images uploaded yet.
+                                            </div>
+                                        }
+                                    </div>
+
+
+
+
+
+                                </section>
+
+
+                            </section>
 
                             {/* Modern header with subtle accent */}
                             <div className="p-6 border-b mt-4 border-gray-100 relative">

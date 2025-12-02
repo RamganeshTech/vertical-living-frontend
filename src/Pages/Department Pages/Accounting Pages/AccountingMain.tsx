@@ -402,7 +402,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams, useLocation, Outlet } from 'react-router-dom';
-import NavigationDDWithHeading, { type NavigationSection } from '../../../shared/NavigationDDWithHeading';
+// import { type NavigationSection } from '../../../shared/NavigationDDWithHeading';
 import { Button } from '../../../components/ui/Button';
 import MaterialOverviewLoading from '../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 import { useGetProjects } from '../../../apiList/projectApi';
@@ -432,109 +432,109 @@ const AccountingMain: React.FC = () => {
 
     // --- Navigation Items (Preserved) ---
 
-    const navigationItemNew: NavigationSection[] = [
+    // const navigationItemNew: NavigationSection[] = [
 
-        {
-            title: "Sales Transactions",
-            items: [
-                {
-                    label: 'Invoice',
-                    path: `/organizations/${organizationId}/projects/invoicemain`,
-                    icon: 'fas fa-file-invoice text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/invoicemain`)
-                },
-                {
-                    label: 'Retail Invoice',
-                    path: `/organizations/${organizationId}/projects/retailinvoicemain`,
-                    icon: 'fas fa-receipt text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/retailinvoicemain`)
-                },
-                {
-                    label: 'Sales Order',
-                    path: `/organizations/${organizationId}/projects/salesordermain`,
-                    icon: 'fas fa-shopping-cart text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/salesordermain`)
-                },
-                {
-                    label: 'Purchase Orders',
-                    path: `/organizations/${organizationId}/projects/purchasemain`,
-                    icon: 'fas fa-wallet text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/purchasemain`)
-                },
+    //     {
+    //         title: "Sales Transactions",
+    //         items: [
+    //             {
+    //                 label: 'Invoice',
+    //                 path: `/organizations/${organizationId}/projects/invoicemain`,
+    //                 icon: 'fas fa-file-invoice text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/invoicemain`)
+    //             },
+    //             {
+    //                 label: 'Retail Invoice',
+    //                 path: `/organizations/${organizationId}/projects/retailinvoicemain`,
+    //                 icon: 'fas fa-receipt text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/retailinvoicemain`)
+    //             },
+    //             {
+    //                 label: 'Sales Order',
+    //                 path: `/organizations/${organizationId}/projects/salesordermain`,
+    //                 icon: 'fas fa-shopping-cart text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/salesordermain`)
+    //             },
+    //             {
+    //                 label: 'Purchase Orders',
+    //                 path: `/organizations/${organizationId}/projects/purchasemain`,
+    //                 icon: 'fas fa-wallet text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/purchasemain`)
+    //             },
 
-            ]
-        },
-        {
-            title: "Expense Transactions",
-            items: [
-                {
-                    label: 'Expense',
-                    path: `/organizations/${organizationId}/projects/expensemain`,
-                    icon: 'fas fa-money-bill text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
-                },
+    //         ]
+    //     },
+    //     {
+    //         title: "Expense Transactions",
+    //         items: [
+    //             {
+    //                 label: 'Expense',
+    //                 path: `/organizations/${organizationId}/projects/expensemain`,
+    //                 icon: 'fas fa-money-bill text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/expensemain`)
+    //             },
 
-                {
-                    label: 'Bills',
-                    path: `/organizations/${organizationId}/projects/billmain`,
-                    icon: 'fas fa-receipt text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
-                },
+    //             {
+    //                 label: 'Bills',
+    //                 path: `/organizations/${organizationId}/projects/billmain`,
+    //                 icon: 'fas fa-receipt text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/billmain`)
+    //             },
 
-                {
-                    label: 'Design Bills',
-                    path: `/organizations/${organizationId}/projects/billnew`,
-                    icon: 'fas fa-file-pdf text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/billnew`)
-                },
-
-
-                // {
-                //     label: 'Bill New',
-                //     path: `/organizations/${organizationId}/projects/billnew`,
-                //     icon: 'fas fa-receipt text-blue-600',
-                //     onClick: () => navigate(`/organizations/${organizationId}/projects/billnew`)
-                // },
-
-                {
-                    label: 'Payments Accounts',
-                    path: `/organizations/${organizationId}/projects/paymentmain`,
-                    icon: 'fas fa-receipt text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/paymentmain`)
-                },
+    //             {
+    //                 label: 'Design Bills',
+    //                 path: `/organizations/${organizationId}/projects/billnew`,
+    //                 icon: 'fas fa-file-pdf text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/billnew`)
+    //             },
 
 
-                {
-                    label: 'Vendor Payments',
-                    path: `/organizations/${organizationId}/projects/vendorpaymentmain`,
-                    icon: 'fas fa-credit-card text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/vendorpaymentmain`)
-                },
-            ]
-        },
+    //             // {
+    //             //     label: 'Bill New',
+    //             //     path: `/organizations/${organizationId}/projects/billnew`,
+    //             //     icon: 'fas fa-receipt text-blue-600',
+    //             //     onClick: () => navigate(`/organizations/${organizationId}/projects/billnew`)
+    //             // },
 
-        {
-            title: "Office Records",
-            items: [
-                {
-                    label: 'Customer',
-                    path: `/organizations/${organizationId}/projects/customermain`,
-                    icon: 'fas fa-users text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/customermain`)
-                },
-                {
-                    label: 'Vendor',
-                    path: `/organizations/${organizationId}/projects/vendormain`,
-                    icon: 'fas fa-user text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
-                },
-            ]
-        }
+    //             {
+    //                 label: 'Payments Accounts',
+    //                 path: `/organizations/${organizationId}/projects/paymentmain`,
+    //                 icon: 'fas fa-receipt text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/paymentmain`)
+    //             },
 
-    ];
 
-    // --- Local State ---
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    //             {
+    //                 label: 'Vendor Payments',
+    //                 path: `/organizations/${organizationId}/projects/vendorpaymentmain`,
+    //                 icon: 'fas fa-credit-card text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/vendorpaymentmain`)
+    //             },
+    //         ]
+    //     },
+
+    //     {
+    //         title: "Office Records",
+    //         items: [
+    //             {
+    //                 label: 'Customer',
+    //                 path: `/organizations/${organizationId}/projects/customermain`,
+    //                 icon: 'fas fa-users text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/customermain`)
+    //             },
+    //             {
+    //                 label: 'Vendor',
+    //                 path: `/organizations/${organizationId}/projects/vendormain`,
+    //                 icon: 'fas fa-user text-blue-600',
+    //                 onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
+    //             },
+    //         ]
+    //     }
+
+    // ];
+
+    // // --- Local State ---
+    // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchInput, setSearchInput] = useState("");
     const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -602,12 +602,12 @@ const AccountingMain: React.FC = () => {
         <div className="p-2 space-y-4 h-full">
 
             {/* Navigation Dropdown */}
-            <NavigationDDWithHeading
+            {/* <NavigationDDWithHeading
                 isOpen={isDropdownOpen}
                 onClose={() => setIsDropdownOpen(false)}
                 heading="Accounts"
                 sections={navigationItemNew}
-            />
+            /> */}
 
             {/* --- Header --- */}
             <header className="flex justify-between items-center pb-2">
@@ -622,13 +622,26 @@ const AccountingMain: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2 w-[300px] md:w-[400px]">
-                    <button
+
+
+                    <Button onClick={() => navigate(`/organizations/${organizationId}/projects/paymentmain`)}>
+                        <i className="fas fa-money-check-alt mr-2 text-white"></i>
+                        Payments
+                    </Button>
+
+                    <Button variant='secondary' onClick={() => navigate(`/organizations/${organizationId}/projects/billmain`)}>
+                        <i className="fas fa-receipt mr-2 text-blue-600"></i>
+                        Billing
+                    </Button>
+
+
+                    {/* <button
                         onClick={() => setIsDropdownOpen(true)}
                         className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105"
                         title="Quick Navigation"
                     >
                         <i className="fas fa-plus text-lg"></i>
-                    </button>
+                    </button> */}
 
                     <input
                         type="text"
@@ -737,6 +750,9 @@ const AccountingMain: React.FC = () => {
                                         ))}
                                     </select>
                                 </div>
+
+
+                                <p className='text-center'>yet to add more filters</p>
                             </div>
                         </div>
                     </div>

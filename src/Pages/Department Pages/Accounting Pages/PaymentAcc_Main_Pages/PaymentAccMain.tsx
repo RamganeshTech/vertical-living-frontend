@@ -146,10 +146,10 @@ const PaymentAccMain = () => {
                     <Breadcrumb paths={paths} />
                 </div>
 
-                <Button onClick={() => navigate('create')}>
+                {/* <Button onClick={() => navigate('create')}>
                     <i className="fas fa-plus mr-2" />
                     Create Payment
-                </Button>
+                </Button> */}
             </header>
 
             {/* --- Loading / Error States --- */}

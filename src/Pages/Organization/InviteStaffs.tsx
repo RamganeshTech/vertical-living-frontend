@@ -506,12 +506,12 @@ const InviteStaffs: React.FC = () => {
 
               <div className="space-y-0.5 ">
                 <p className="font-semibold text-gray-900 text-base">{staff.staffName}</p>
-                <p className="text-sm text-gray-500 flex items-center gap-1">
+                {/* <p className="text-sm text-gray-500 flex items-center gap-1">
                   <i className="fas fa-envelope text-gray-400"></i> {staff.email}
                 </p>
                 <p className="text-sm text-gray-500 flex items-center gap-1">
                   <i className="fas fa-phone-alt text-gray-400"></i> {staff.phoneNo}
-                </p>
+                </p> */}
               </div>
 
               {/* <div className="flex flex-wrap gap-2 mt-2 md:mt-0">

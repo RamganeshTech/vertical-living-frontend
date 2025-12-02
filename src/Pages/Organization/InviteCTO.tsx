@@ -236,7 +236,7 @@ const InviteCTO: React.FC = () => {
                     </Avatar>
                     <div>
                       <h4 className="text-blue-900 font-semibold">{cto.CTOName}</h4>
-                      <p className="text-sm text-gray-600">
+                      {/* <p className="text-sm text-gray-600">
                         <i className="fas fa-envelope mr-1" />
                         {cto.email}
                       </p>
@@ -244,8 +244,8 @@ const InviteCTO: React.FC = () => {
                         <p className="text-sm text-gray-600">
                           <i className="fas fa-phone-alt mr-1" />
                           {cto.phoneNo}
-                        </p>
-                      )}
+                        </p> 
+                      )}*/}
                       <Badge className="mt-1 text-blue-800 border-blue-300">
                         {cto.role}
                       </Badge>
