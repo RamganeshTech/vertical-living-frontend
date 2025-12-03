@@ -199,7 +199,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
         let balancePayable = grandTotalBeforeAdvance;
 
         if (formData.paymentType === "pay advanced, balance later") {
-            console.log("222222222222")
+            // console.log("222222222222")
             const advance = formData?.advancedAmount || 0;
             balancePayable = Math.max(0, grandTotalBeforeAdvance - advance); // prevent negative
         }
@@ -302,6 +302,15 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
     // --- SUBMIT ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (formData.paymentType === "pay advanced, balance later") {
+            if (!formData.advancedAmount || formData.advancedAmount <= 0) {
+                toast({title:"Error", description:"Please enter a valid advance amount greater than 0", variant:"destructive"});
+                return;
+            }
+        }
+
+
         const cleanedItems = formData.items.filter(item => item.itemName.trim() !== '');
 
         const payload = {
@@ -317,7 +326,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
 
         // Pass payload (text) and newFiles (images) separately
         await onSubmit(payload, formData.images);
-        if(currentMode === "edit"){
+        if (currentMode === "edit") {
             setCurrentMode("view")
         }
 
@@ -457,7 +466,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 {/* </header> */}
             </header>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form className="space-y-6">
 
                 {/* Details Section */}
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
@@ -833,10 +842,10 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 )
                     :
                     <>
-                        <div className="shadow-md flex flex-col items-center justify-center min-h-[150px] w-full bg-white rounded-xl text-center p-6">
+                       {(!isCreateMode && !isEditMode) && <div className="shadow-md flex flex-col items-center justify-center min-h-[150px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">If No Pdf Found, just click on edit button and update the bill</h3>
-                        </div>
+                        </div>}
                     </>
                 }
 

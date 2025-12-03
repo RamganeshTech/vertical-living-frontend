@@ -8,6 +8,9 @@ import { useDeleteBill, useGetAllBill } from '../../../../apiList/Department Api
 import BillAccList from './BillAccList';
 import type { CreateBillPayload } from './CreateBillAcc';
 import NavigationDDWithHeading, { type NavigationSection } from '../../../../shared/NavigationDDWithHeading';
+import Slider from 'rc-slider';
+import "rc-slider/assets/index.css";
+
 // import { Breadcrumb } from '../../Breadcrumb';
 
 const BillAccountsMain = () => {
@@ -137,6 +140,8 @@ const BillAccountsMain = () => {
         date: '',
         billToDate: "",
         billFromDate: "",
+        minAmount: 0,
+        maxAmount: 1000000,
         createdFromDate: "",
         createdToDate: "",
         sortBy: 'createdAt',
@@ -145,6 +150,8 @@ const BillAccountsMain = () => {
 
     // Debounced search
     const debouncedSearch = useDebounce(filters.search, 700)
+    const debouncedMinAmount = useDebounce(filters.minAmount, 800);
+    const debouncedMaxAmount = useDebounce(filters.maxAmount, 800);
 
 
     // Infinite query
@@ -164,6 +171,8 @@ const BillAccountsMain = () => {
         date: filters.date || undefined,
         billToDate: filters.billToDate || undefined,
         billFromDate: filters.billFromDate || undefined,
+        minAmount: debouncedMinAmount,
+        maxAmount: debouncedMaxAmount,
         createdFromDate: filters.createdFromDate || undefined,
         createdToDate: filters.createdToDate || undefined,
         search: debouncedSearch || undefined,
@@ -223,6 +232,8 @@ const BillAccountsMain = () => {
             search: '',
             vendorId: '',
             date: '',
+            minAmount: 0,
+            maxAmount: 1000000,
             billToDate: "",
             billFromDate: "",
             createdFromDate: "",
@@ -244,12 +255,12 @@ const BillAccountsMain = () => {
     return (
         <div className="space-y-0 h-full">
 
-             <NavigationDDWithHeading
+            <NavigationDDWithHeading
                 isOpen={isDropdownOpen}
                 onClose={() => setIsDropdownOpen(false)}
                 heading="Accounts"
                 sections={navigationItemNew}
-            /> 
+            />
 
             {/* Header */}
             <header className="flex justify-between items-center">
@@ -268,15 +279,16 @@ const BillAccountsMain = () => {
 
                 <div className='flex gap-2'>
 
-                  
 
-                    <button
+
+                    <Button
                         onClick={() => setIsDropdownOpen(true)}
-                        className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105"
-                        title="Quick Navigation"
+                        // className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105"
+
+                        title="invoices, expense..."
                     >
-                        <i className="fas fa-bars text-lg"></i>
-                    </button>
+                        <i className="fas fa-bars text-lg mr-2"></i> Menu
+                    </Button>
 
                     <Button
                         onClick={() => navigate('create')}
@@ -404,6 +416,93 @@ const BillAccountsMain = () => {
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                                        <i className="fas fa-coins mr-2 text-gray-400"></i>
+                                        Amount Range
+                                    </label>
+
+                                    <div className="px-2 mb-3">
+                                        <Slider
+                                            range
+                                            min={0}
+                                            max={1000000}
+                                            step={500}
+                                            value={[Number(filters.minAmount), Number(filters.maxAmount)]}
+                                            onChange={(value) => {
+                                                const [min, max] = value as [number, number];
+                                                setFilters((f) => ({
+                                                    ...f,
+                                                    minAmount: min,
+                                                    maxAmount: max,
+                                                }));
+                                            }}
+                                            trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+                                            handleStyle={[
+                                                {
+                                                    borderColor: "#3b82f6",
+                                                    backgroundColor: "#fff",
+                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    width: 18,
+                                                    height: 18,
+                                                    marginTop: -6,
+                                                    opacity: 1
+                                                },
+                                                {
+                                                    borderColor: "#3b82f6",
+                                                    backgroundColor: "#fff",
+                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    width: 18,
+                                                    height: 18,
+                                                    marginTop: -6,
+                                                    opacity: 1
+                                                },
+                                            ]}
+                                            railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+                                        />
+                                    </div>
+
+                                    {/* Display Values */}
+                                    <div className="flex justify-between items-center gap-2 text-sm">
+                                        <div className="flex-1">
+                                            <span className="text-xs text-gray-500 block mb-1">Min</span>
+                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+                                                ₹{Number(filters.minAmount).toLocaleString("en-IN")}
+                                            </div>
+                                        </div>
+                                        <div className="text-gray-300">—</div>
+                                        <div className="flex-1">
+                                            <span className="text-xs text-gray-500 block mb-1">Max</span>
+                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+                                                ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2 items-center mt-3">
+                                        <input
+                                            type="number"
+                                            value={filters.minAmount}
+                                            onChange={(e) =>
+                                                setFilters((f) => ({ ...f, minAmount: +e.target.value }))
+                                            }
+                                            placeholder="Min"
+                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            min="0"
+                                        />
+                                        <input
+                                            type="number"
+                                            value={filters.maxAmount}
+                                            onChange={(e) =>
+                                                setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
+                                            }
+                                            placeholder="Max"
+                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            min="0"
+                                        />
+                                    </div>
                                 </div>
 
 

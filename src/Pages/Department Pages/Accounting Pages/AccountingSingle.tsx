@@ -853,6 +853,338 @@
 
 // export default AccountingSingle;
 
+
+
+
+// SECOND VERSION
+
+// import React from "react";
+// import { useNavigate, useParams } from "react-router-dom";
+
+// // --- Components ---
+// import { Button } from "../../../components/ui/Button";
+// import { Card, CardContent } from "../../../components/ui/Card";
+// import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+
+// // --- Hooks & Utils ---
+// import { dateFormate } from "../../../utils/dateFormator";
+// import { useGetSingleAccounting } from "../../../apiList/Department Api/Accounting Api/accountingApi";
+
+// // --- Helper for Badge Colors ---
+// const getStatusConfig = (status: string) => {
+//     switch (status?.toLowerCase()) {
+//         case 'paid':
+//             return { bg: 'bg-green-100', text: 'text-green-700', icon: 'fa-check-circle', border: 'border-green-200' };
+//         case 'processing':
+//             return { bg: 'bg-blue-100', text: 'text-blue-700', icon: 'fa-spinner fa-spin', border: 'border-blue-200' };
+//         case 'cancelled':
+//         case 'failed':
+//             return { bg: 'bg-red-100', text: 'text-red-700', icon: 'fa-times-circle', border: 'border-red-200' };
+//         default: // pending
+//             return { bg: 'bg-orange-100', text: 'text-orange-700', icon: 'fa-clock', border: 'border-orange-200' };
+//     }
+// };
+
+// const AccountingSingle: React.FC = () => {
+//     const { id } = useParams<{ id: string }>();
+//     const navigate = useNavigate();
+
+//     // --- Fetch Data ---
+//     const { data: apiResponse, isLoading, isError, refetch } = useGetSingleAccounting(id!);
+
+
+
+//     // --- Render Loading / Error ---
+//     if (isLoading) return <div className="p-6"><MaterialOverviewLoading /></div>;
+
+//     if (isError || !apiResponse) {
+//         return (
+//             <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-xl p-6 border border-red-100 m-4">
+//                 <i className="fas fa-exclamation-triangle text-4xl text-red-300 mb-4" />
+//                 <h3 className="text-lg font-semibold text-red-800 mb-2">Could not load details</h3>
+//                 <Button onClick={() => refetch()} variant="secondary">Retry</Button>
+//             </div>
+//         );
+//     }
+
+//     // --- Data Extraction based on your JSON structure ---
+//     const summary = apiResponse.data;    // The main ledger summary
+//     const raw = apiResponse.raw;         // The raw populated objects
+//     const bill = raw?.bill;              // Source Document
+//     const payment = raw?.payment;        // Payment Document (Can be null)
+
+//     const statusConfig = getStatusConfig(summary?.status);
+
+//     return (
+//         <div className="p-4 h-full overflow-y-auto custom-scrollbar space-y-6 bg-gray-50/50">
+
+//             {/* --- Header --- */}
+//             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-4">
+//                 <div className="flex gap-3 items-center">
+//                     <button
+//                         onClick={() => navigate(-1)}
+//                         className="bg-white hover:bg-gray-100 shadow-sm flex items-center justify-center w-10 h-10 border border-gray-200 text-gray-600 rounded-lg transition-all"
+//                     >
+//                         <i className="fas fa-arrow-left" />
+//                     </button>
+//                     <div>
+//                         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+//                             {summary.recordNumber || 'Transaction Details'}
+//                         </h1>
+//                         <p className="text-sm text-gray-500">
+//                             Created on {dateFormate(summary.createdAt)} via <span className="font-semibold text-blue-600 capitalize">{summary.type || 'Bill'}</span>
+//                         </p>
+//                     </div>
+//                 </div>
+
+//                 {summary.type !== "Invoice" && <div className={`px-4 py-2 rounded-lg text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border} capitalize flex items-center gap-2 shadow-sm`}>
+//                     <i className={`fas ${statusConfig.icon}`}></i>
+//                     {summary.status}
+//                 </div>}
+//             </div>
+
+//             {/* --- Overview Cards --- */}
+//             <div className={`grid grid-cols-1 ${summary.type !== "Invoice" ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"} gap-4`}>
+
+//                 {/* 1. Payee Details */}
+//                 <Card className="shadow-sm border-gray-200">
+//                     <CardContent className="p-5">
+//                         <div className="flex items-center justify-between mb-2">
+//                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Payee Details</h3>
+//                             <i className="fas fa-user-circle text-blue-200 text-xl"></i>
+//                         </div>
+//                         <div className="font-bold text-gray-800 text-lg truncate" title={summary.person?.name}>
+//                             {summary.person?.name || 'N/A'}
+//                         </div>
+//                         <div className="text-xs text-gray-500 mt-1 capitalize">
+//                             {summary.person?.model?.replace('AccountModel', '').replace('Model', '') || 'Vendor'}
+//                         </div>
+//                     </CardContent>
+//                 </Card>
+
+//                 {/* 2. Source Details (Bill) */}
+//                 <Card className="shadow-sm border-gray-200">
+//                     <CardContent className="p-5">
+//                         <div className="flex items-center justify-between mb-2">
+//                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Source Bill</h3>
+//                             <i className="fas fa-file-invoice text-purple-200 text-xl"></i>
+//                         </div>
+//                         <div className="font-bold text-gray-800">
+//                             {bill?.billNumber || 'N/A'}
+//                         </div>
+//                         <div className="text-xs text-gray-500 mt-1">
+//                             Date: {dateFormate(bill?.billDate)}
+//                         </div>
+//                     </CardContent>
+//                 </Card>
+
+//                 {/* 3. Payment Details (Nullable) */}
+//                 {summary.type !== "Invoice" && <Card className={`shadow-sm ${payment ? 'border-green-200 bg-green-50/30' : 'border-gray-200 bg-gray-50'}`}>
+//                     <CardContent className="p-5">
+//                         <div className="flex items-center justify-between mb-2">
+//                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Payment Record</h3>
+//                             <i className={`fas fa-money-check-alt text-xl ${payment ? 'text-green-500' : 'text-gray-300'}`}></i>
+//                         </div>
+//                         {payment ? (
+//                             <>
+//                                 <div className="font-bold text-gray-800">
+//                                     {payment.paymentNumber}
+//                                 </div>
+//                                 <div className="text-xs text-gray-500 mt-1">
+//                                     {payment.paymentDate ? `Paid: ${dateFormate(payment.paymentDate)}` : 'Processing...'}
+//                                 </div>
+//                             </>
+//                         ) : (
+//                             <div className="text-sm text-gray-400 italic mt-2">
+//                                 No payment record linked yet.
+//                             </div>
+//                         )}
+//                     </CardContent>
+//                 </Card>}
+
+//                 {/* 4. Financials */}
+//                 <Card className="shadow-sm border-blue-200 bg-blue-50/30">
+//                     <CardContent className="p-5 flex flex-col justify-center items-end h-full">
+//                         <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">Total Amount</h3>
+//                         <div className="text-2xl font-bold text-blue-700">
+//                             ₹{bill?.grandTotal?.toLocaleString('en-IN')}
+//                         </div>
+//                         {bill?.taxAmount > 0 && (
+//                             <div className="text-xs text-blue-400 mt-1">
+//                                 (Incl. ₹{bill.taxAmount} Tax)
+//                             </div>
+//                         )}
+//                     </CardContent>
+//                 </Card>
+//             </div>
+
+//             {/* --- Attachments / Proof --- */}
+//             {bill?.pdfData?.url && (
+//                 <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+//                     <div className="flex items-center gap-3">
+//                         <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-500">
+//                             <i className="fas fa-file-pdf text-xl"></i>
+//                         </div>
+//                         <div>
+//                             <h4 className="text-sm font-semibold text-gray-800">Original Bill Document</h4>
+//                             <p className="text-xs text-gray-500 max-w-md truncate">{bill.pdfData.originalName}</p>
+//                         </div>
+//                     </div>
+//                     <a
+//                         href={bill.pdfData.url}
+//                         target="_blank"
+//                         rel="noopener noreferrer"
+//                         className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg transition-colors flex items-center gap-2"
+//                     >
+//                         <i className="fas fa-external-link-alt"></i> View Proof
+//                     </a>
+//                 </div>
+//             )}
+
+//             {/* --- Items Table Section --- */}
+//             <Card className="shadow-sm border-gray-200 overflow-hidden">
+//                 <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+//                     <h2 className="font-bold text-gray-800 flex items-center gap-2">
+//                         <i className="fas fa-list text-blue-500"></i>
+//                         Transaction Items
+//                     </h2>
+//                     <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
+//                         {bill?.items?.length || 0} Items
+//                     </span>
+//                 </div>
+
+//                 <div className="overflow-x-auto">
+//                     <table className="w-full text-sm text-left">
+//                         <thead className="bg-gray-50 text-gray-600 font-semibold uppercase text-xs">
+//                             <tr>
+//                                 <th className="px-6 py-3 text-center w-16">S.No</th>
+//                                 <th className="px-6 py-3">Item Name</th>
+//                                 <th className="px-6 py-3">Unit</th>
+//                                 <th className="px-6 py-3 text-center">Qty</th>
+//                                 <th className="px-6 py-3 text-right">Rate</th>
+//                                 <th className="px-6 py-3 text-right">Total Cost</th>
+//                                 {summary.type !== "Invoice" && <><th className="px-6 py-3">Order ID</th>
+//                                     <th className="px-6 py-3">Txn ID</th>
+//                                     <th className="px-6 py-3 text-center">Item Status</th>
+//                                 </>
+//                                 }
+//                             </tr>
+//                         </thead>
+//                         <tbody className="divide-y divide-gray-100">
+//                             {(!bill?.items || bill.items.length === 0) ? (
+//                                 <tr>
+//                                     <td colSpan={9} className="px-6 py-8 text-center text-gray-400 italic">
+//                                         No items found in the source document.
+//                                     </td>
+//                                 </tr>
+//                             ) : (
+//                                 bill.items.map((item: any, index: number) => {
+
+//                                     // We try to find the corresponding item in the payment record if it exists
+//                                     // Assuming order is preserved or mapping is possible. 
+//                                     // Since both arrays usually come from the same source creation logic, index mapping is often safe here.
+//                                     const paymentItem = payment?.items?.[index];
+
+//                                     // If payment doesn't exist, status is pending. If it does, use item status.
+//                                     const itemStatus = paymentItem?.status || 'pending';
+
+//                                     return (
+//                                         <tr key={item._id || index} className="hover:bg-blue-50/30 transition-colors">
+//                                             {/* S.No */}
+//                                             <td className="px-6 py-4 text-center text-gray-500">
+//                                                 {index + 1}
+//                                             </td>
+
+//                                             {/* Item Name */}
+//                                             <td className="px-6 py-4 font-medium text-gray-800">
+//                                                 {item.itemName}
+//                                             </td>
+
+//                                             {/* Unit */}
+//                                             <td className="px-6 py-4 text-gray-500 text-xs uppercase">
+//                                                 {item.unit || '-'}
+//                                             </td>
+
+//                                             {/* Qty */}
+//                                             <td className="px-6 py-4 text-center text-gray-700 font-medium">
+//                                                 {item.quantity}
+//                                             </td>
+
+//                                             {/* Rate */}
+//                                             <td className="px-6 py-4 text-right text-gray-600 font-mono text-xs">
+//                                                 {item.rate?.toLocaleString()}
+//                                             </td>
+
+//                                             {/* Total Cost */}
+//                                             <td className="px-6 py-4 text-right font-bold text-blue-700 font-mono text-xs">
+//                                                 ₹{item.totalCost?.toLocaleString()}
+//                                             </td>
+
+//                                            {summary.type !=="Invoice" &&<> <td className="px-6 py-4">
+//                                                 {paymentItem?.orderId || item.orderId ? (
+//                                                     <span className="font-mono text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600 block truncate w-24" title={paymentItem?.orderId || item.orderId}>
+//                                                         {paymentItem?.orderId || item.orderId}
+//                                                     </span>
+//                                                 ) : (
+//                                                     <span className="text-gray-300">-</span>
+//                                                 )}
+//                                             </td>
+
+//                                             <td className="px-6 py-4">
+//                                                 {paymentItem?.transactionId ? (
+//                                                     <span className="font-mono text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100 block truncate w-24" title={paymentItem.transactionId}>
+//                                                         {paymentItem.transactionId}
+//                                                     </span>
+//                                                 ) : (
+//                                                     <span className="text-xs text-gray-400 italic">Pending</span>
+//                                                 )}
+//                                             </td>
+
+//                                             <td className="px-6 py-4 text-center">
+//                                                 {itemStatus === 'paid' ? (
+//                                                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-wide">
+//                                                         <i className="fas fa-check-double"></i> Paid
+//                                                     </span>
+//                                                 ) : (
+//                                                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-wide">
+//                                                         <i className="fas fa-clock"></i> Pending
+//                                                     </span>
+//                                                 )}
+//                                             </td>
+
+//                                             </>
+//                                             }
+
+
+//                                         </tr>
+//                                     );
+//                                 })
+//                             )}
+//                         </tbody>
+//                     </table>
+//                 </div>
+//             </Card>
+
+//             {/* --- Notes Section --- */}
+//             {(summary.notes || bill?.notes) && (
+//                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+//                     <h4 className="text-sm font-bold text-yellow-800 mb-1 flex items-center gap-2">
+//                         <i className="fas fa-sticky-note"></i> Notes
+//                     </h4>
+//                     <p className="text-sm text-yellow-800/90 leading-relaxed">
+//                         {summary.notes || bill?.notes}
+//                     </p>
+//                 </div>
+//             )}
+//         </div>
+//     );
+// };
+
+// export default AccountingSingle;
+
+
+
+// THIRD VERSION
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -864,6 +1196,7 @@ import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/Mat
 // --- Hooks & Utils ---
 import { dateFormate } from "../../../utils/dateFormator";
 import { useGetSingleAccounting } from "../../../apiList/Department Api/Accounting Api/accountingApi";
+// import { useGetSingleAccounting } from "./hooks/accounting.hooks"; // Adjust path if needed
 
 // --- Helper for Badge Colors ---
 const getStatusConfig = (status: string) => {
@@ -887,12 +1220,10 @@ const AccountingSingle: React.FC = () => {
     // --- Fetch Data ---
     const { data: apiResponse, isLoading, isError, refetch } = useGetSingleAccounting(id!);
 
-
-
     // --- Render Loading / Error ---
     if (isLoading) return <div className="p-6"><MaterialOverviewLoading /></div>;
 
-    if (isError || !apiResponse) {
+    if (isError || !apiResponse || !apiResponse.data) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-xl p-6 border border-red-100 m-4">
                 <i className="fas fa-exclamation-triangle text-4xl text-red-300 mb-4" />
@@ -902,13 +1233,24 @@ const AccountingSingle: React.FC = () => {
         );
     }
 
-    // --- Data Extraction based on your JSON structure ---
-    const summary = apiResponse.data;    // The main ledger summary
-    const raw = apiResponse.raw;         // The raw populated objects
-    const bill = raw?.bill;              // Source Document
-    const payment = raw?.payment;        // Payment Document (Can be null)
+    // --- Data Extraction ---
+    // We use the standardized data from the backend helper
+    const record = apiResponse.data;
+    const source = record.sourceDetails;
+    const payment = record.paymentDetails;
 
-    const statusConfig = getStatusConfig(summary?.status);
+    // --- Logic to determine View Mode ---
+    // Check if the type string contains "Invoice" (e.g., "Invoice", "Retail Invoice")
+    const isInvoiceType = record.type?.toLowerCase().includes('invoice');
+    const isExpenseType = record.type?.toLowerCase().includes('expense');
+
+    // We only show payment info for Bills, Expenses, SubContracts, etc.
+    const showPaymentSection = !isInvoiceType;
+
+    // 2. Item Table: Show for Bills and Invoices, BUT HIDE for Expenses
+    const showItemTable = !isExpenseType;
+
+    const statusConfig = getStatusConfig(record.status);
 
     return (
         <div className="p-4 h-full overflow-y-auto custom-scrollbar space-y-6 bg-gray-50/50">
@@ -924,119 +1266,128 @@ const AccountingSingle: React.FC = () => {
                     </button>
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                            {summary.recordNumber || 'Transaction Details'}
+                            {record.recordNumber || 'Transaction Details'}
                         </h1>
                         <p className="text-sm text-gray-500">
-                            Created on {dateFormate(summary.createdAt)} via <span className="font-semibold text-blue-600 capitalize">{summary.type || 'Bill'}</span>
+                            Created on {dateFormate(record.createdAt)} via <span className="font-semibold text-blue-600 capitalize">{record.type}</span>
                         </p>
                     </div>
                 </div>
 
-                {summary.type !== "Invoice" && <div className={`px-4 py-2 rounded-lg text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border} capitalize flex items-center gap-2 shadow-sm`}>
-                    <i className={`fas ${statusConfig.icon}`}></i>
-                    {summary.status}
-                </div>}
+                {/* Hide Status for Invoices if strictly required, otherwise show for all */}
+                {showPaymentSection && (
+                    <div className={`px-4 py-2 rounded-lg text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border} capitalize flex items-center gap-2 shadow-sm`}>
+                        <i className={`fas ${statusConfig.icon}`}></i>
+                        {record.status}
+                    </div>
+                )}
             </div>
 
             {/* --- Overview Cards --- */}
-            <div className={`grid grid-cols-1 ${summary.type !== "Invoice" ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"} gap-4`}>
+            {/* Adjust grid columns: 3 cols for Invoice, 4 cols for Bills/Expenses */}
+            <div className={`grid grid-cols-1 ${showPaymentSection ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"} gap-4`}>
 
                 {/* 1. Payee Details */}
                 <Card className="shadow-sm border-gray-200">
                     <CardContent className="p-5">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Payee Details</h3>
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                {isInvoiceType ? "Payer Details" : "Payee Details"}
+                            </h3>
                             <i className="fas fa-user-circle text-blue-200 text-xl"></i>
                         </div>
-                        <div className="font-bold text-gray-800 text-lg truncate" title={summary.person?.name}>
-                            {summary.person?.name || 'N/A'}
+                        <div className="font-bold text-gray-800 text-lg truncate" title={record.person?.name}>
+                            {record.person?.name || 'N/A'}
                         </div>
                         <div className="text-xs text-gray-500 mt-1 capitalize">
-                            {summary.person?.model?.replace('AccountModel', '').replace('Model', '') || 'Vendor'}
+                            {record.person?.model?.replace('AccountModel', '').replace('Model', '') || 'Unknown'}
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* 2. Source Details (Bill) */}
+                {/* 2. Source Details (Bill/Invoice No) */}
                 <Card className="shadow-sm border-gray-200">
                     <CardContent className="p-5">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Source Bill</h3>
-                            <i className="fas fa-file-invoice text-purple-200 text-xl"></i>
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                {isInvoiceType ? "Invoice Info" : "Source Document"}
+                            </h3>
+                            <i className={`fas ${isInvoiceType ? 'fa-file-contract' : 'fa-file-invoice'} text-purple-200 text-xl`}></i>
                         </div>
                         <div className="font-bold text-gray-800">
-                            {bill?.billNumber || 'N/A'}
+                            {source?.deptNumber || 'N/A'}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                            Date: {dateFormate(bill?.billDate)}
+                            Date: {dateFormate(source?.deptGeneratedDate)}
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* 3. Payment Details (Nullable) */}
-                {summary.type !== "Invoice" && <Card className={`shadow-sm ${payment ? 'border-green-200 bg-green-50/30' : 'border-gray-200 bg-gray-50'}`}>
-                    <CardContent className="p-5">
-                        <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Payment Record</h3>
-                            <i className={`fas fa-money-check-alt text-xl ${payment ? 'text-green-500' : 'text-gray-300'}`}></i>
-                        </div>
-                        {payment ? (
-                            <>
-                                <div className="font-bold text-gray-800">
-                                    {payment.paymentNumber}
-                                </div>
-                                <div className="text-xs text-gray-500 mt-1">
-                                    {payment.paymentDate ? `Paid: ${dateFormate(payment.paymentDate)}` : 'Processing...'}
-                                </div>
-                            </>
-                        ) : (
-                            <div className="text-sm text-gray-400 italic mt-2">
-                                No payment record linked yet.
+                {/* 3. Payment Details (Conditionally Rendered) */}
+                {showPaymentSection && (
+                    <Card className={`shadow-sm ${payment ? 'border-green-200 bg-green-50/30' : 'border-gray-200 bg-gray-50'}`}>
+                        <CardContent className="p-5">
+                            <div className="flex items-center justify-between mb-2">
+                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Payment Record</h3>
+                                <i className={`fas fa-money-check-alt text-xl ${payment ? 'text-green-500' : 'text-gray-300'}`}></i>
                             </div>
-                        )}
-                    </CardContent>
-                </Card>}
+                            {payment ? (
+                                <>
+                                    <div className="font-bold text-gray-800">
+                                        {payment.number}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {payment.date ? `Paid: ${dateFormate(payment.date)}` : 'Processing...'}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-sm text-gray-400 italic mt-2">
+                                    No payment record linked yet.
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* 4. Financials */}
                 <Card className="shadow-sm border-blue-200 bg-blue-50/30">
                     <CardContent className="p-5 flex flex-col justify-center items-end h-full">
                         <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">Total Amount</h3>
                         <div className="text-2xl font-bold text-blue-700">
-                            ₹{bill?.grandTotal?.toLocaleString('en-IN')}
+                            ₹{source?.grandTotal?.toLocaleString('en-IN') || record.amount?.toLocaleString('en-IN')}
                         </div>
-                        {bill?.taxAmount > 0 && (
+                        {/* {source?.taxAmount > 0 && (
                             <div className="text-xs text-blue-400 mt-1">
-                                (Incl. ₹{bill.taxAmount} Tax)
+                                (Incl. ₹{source.taxAmount} Tax)
                             </div>
-                        )}
+                        )} */}
                     </CardContent>
                 </Card>
             </div>
 
-            {/* --- Attachments / Proof --- */}
-            {bill?.pdfData?.url && (
-                <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-500">
-                            <i className="fas fa-file-pdf text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 className="text-sm font-semibold text-gray-800">Original Bill Document</h4>
-                            <p className="text-xs text-gray-500 max-w-md truncate">{bill.pdfData.originalName}</p>
-                        </div>
+
+            {isExpenseType && (
+                <Card className="shadow-sm border-gray-200">
+                    <div className="px-6 py-4 border-b border-gray-100 bg-pink-50/50 flex justify-between items-center">
+                        <h2 className="font-bold text-gray-800 flex items-center gap-2">
+                            <i className="fas fa-info-circle text-pink-500"></i>
+                            Expense Details
+                        </h2>
                     </div>
-                    <a
-                        href={bill.pdfData.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium rounded-lg transition-colors flex items-center gap-2"
-                    >
-                        <i className="fas fa-external-link-alt"></i> View Proof
-                    </a>
-                </div>
+                    <CardContent className="p-6">
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                            <h4 className="text-xs font-bold text-gray-400 uppercase mb-2">Description / Purpose</h4>
+                            <p className="text-gray-800 text-lg font-medium leading-relaxed">
+                                {source?.notes || "No description provided for this expense."}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
             )}
 
+
             {/* --- Items Table Section --- */}
+            {showItemTable && (
             <Card className="shadow-sm border-gray-200 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                     <h2 className="font-bold text-gray-800 flex items-center gap-2">
@@ -1044,7 +1395,7 @@ const AccountingSingle: React.FC = () => {
                         Transaction Items
                     </h2>
                     <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                        {bill?.items?.length || 0} Items
+                        {source?.items?.length || 0} Items
                     </span>
                 </div>
 
@@ -1058,99 +1409,74 @@ const AccountingSingle: React.FC = () => {
                                 <th className="px-6 py-3 text-center">Qty</th>
                                 <th className="px-6 py-3 text-right">Rate</th>
                                 <th className="px-6 py-3 text-right">Total Cost</th>
-                                {summary.type !== "Invoice" && <><th className="px-6 py-3">Order ID</th>
-                                    <th className="px-6 py-3">Txn ID</th>
-                                    <th className="px-6 py-3 text-center">Item Status</th>
-                                </>
-                                }
+
+                                {/* Conditional Columns for Payment Data */}
+                                {showPaymentSection && (
+                                    <>
+                                        <th className="px-6 py-3">Order ID</th>
+                                        <th className="px-6 py-3">Txn ID</th>
+                                        <th className="px-6 py-3 text-center">Status</th>
+                                    </>
+                                )}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {(!bill?.items || bill.items.length === 0) ? (
+                            {(!source?.items || source.items.length === 0) ? (
                                 <tr>
-                                    <td colSpan={9} className="px-6 py-8 text-center text-gray-400 italic">
+                                    <td colSpan={showPaymentSection ? 9 : 6} className="px-6 py-8 text-center text-gray-400 italic">
                                         No items found in the source document.
                                     </td>
                                 </tr>
                             ) : (
-                                bill.items.map((item: any, index: number) => {
+                                source.items.map((item: any, index: number) => {
 
-                                    // We try to find the corresponding item in the payment record if it exists
-                                    // Assuming order is preserved or mapping is possible. 
-                                    // Since both arrays usually come from the same source creation logic, index mapping is often safe here.
+                                    // If payment exists, try to map the item details (useful for partial payments/status)
                                     const paymentItem = payment?.items?.[index];
-
-                                    // If payment doesn't exist, status is pending. If it does, use item status.
                                     const itemStatus = paymentItem?.status || 'pending';
 
                                     return (
                                         <tr key={item._id || index} className="hover:bg-blue-50/30 transition-colors">
-                                            {/* S.No */}
-                                            <td className="px-6 py-4 text-center text-gray-500">
-                                                {index + 1}
-                                            </td>
-
-                                            {/* Item Name */}
-                                            <td className="px-6 py-4 font-medium text-gray-800">
-                                                {item.itemName}
-                                            </td>
-
-                                            {/* Unit */}
-                                            <td className="px-6 py-4 text-gray-500 text-xs uppercase">
-                                                {item.unit || '-'}
-                                            </td>
-
-                                            {/* Qty */}
-                                            <td className="px-6 py-4 text-center text-gray-700 font-medium">
-                                                {item.quantity}
-                                            </td>
-
-                                            {/* Rate */}
-                                            <td className="px-6 py-4 text-right text-gray-600 font-mono text-xs">
-                                                {item.rate?.toLocaleString()}
-                                            </td>
-
-                                            {/* Total Cost */}
+                                            <td className="px-6 py-4 text-center text-gray-500">{index + 1}</td>
+                                            <td className="px-6 py-4 font-medium text-gray-800">{item.itemName || item.name}</td>
+                                            <td className="px-6 py-4 text-gray-500 text-xs uppercase">{item.unit || '-'}</td>
+                                            <td className="px-6 py-4 text-center text-gray-700 font-medium">{item.quantity}</td>
+                                            <td className="px-6 py-4 text-right text-gray-600 font-mono text-xs">{item.rate?.toLocaleString()}</td>
                                             <td className="px-6 py-4 text-right font-bold text-blue-700 font-mono text-xs">
-                                                ₹{item.totalCost?.toLocaleString()}
+                                                ₹{(item.totalCost || (item.rate * item.quantity))?.toLocaleString()}
                                             </td>
 
-                                           {summary.type !=="Invoice" &&<> <td className="px-6 py-4">
-                                                {paymentItem?.orderId || item.orderId ? (
-                                                    <span className="font-mono text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600 block truncate w-24" title={paymentItem?.orderId || item.orderId}>
-                                                        {paymentItem?.orderId || item.orderId}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-gray-300">-</span>
-                                                )}
-                                            </td>
+                                            {/* Conditional Cells */}
+                                            {showPaymentSection && (
+                                                <>
+                                                    <td className="px-6 py-4">
+                                                        {paymentItem?.orderId || item.orderId ? (
+                                                            <span className="font-mono text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600 block truncate w-24" title={paymentItem?.orderId || item.orderId}>
+                                                                {paymentItem?.orderId || item.orderId}
+                                                            </span>
+                                                        ) : <span className="text-gray-300">-</span>}
+                                                    </td>
 
-                                            <td className="px-6 py-4">
-                                                {paymentItem?.transactionId ? (
-                                                    <span className="font-mono text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100 block truncate w-24" title={paymentItem.transactionId}>
-                                                        {paymentItem.transactionId}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-xs text-gray-400 italic">Pending</span>
-                                                )}
-                                            </td>
+                                                    <td className="px-6 py-4">
+                                                        {paymentItem?.transactionId ? (
+                                                            <span className="font-mono text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100 block truncate w-24" title={paymentItem.transactionId}>
+                                                                {paymentItem.transactionId}
+                                                            </span>
+                                                        ) : <span className="text-xs text-gray-400 italic">Pending</span>}
+                                                    </td>
 
-                                            <td className="px-6 py-4 text-center">
-                                                {itemStatus === 'paid' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-wide">
-                                                        <i className="fas fa-check-double"></i> Paid
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-wide">
-                                                        <i className="fas fa-clock"></i> Pending
-                                                    </span>
-                                                )}
-                                            </td>
-                                            
-                                            </>
-                                            }
-
-
+                                                    <td className="px-6 py-4 text-center">
+                                                        {itemStatus === 'paid' ? (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-bold uppercase tracking-wide">
+                                                                <i className="fas fa-check-double"></i> Paid
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-wide">
+                                                                <i className="fas fa-clock"></i> Pending
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </>
+                                            )}
                                         </tr>
                                     );
                                 })
@@ -1159,15 +1485,16 @@ const AccountingSingle: React.FC = () => {
                     </table>
                 </div>
             </Card>
+            )}
 
             {/* --- Notes Section --- */}
-            {(summary.notes || bill?.notes) && (
+            {(!isExpenseType && (source?.notes)) && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
                     <h4 className="text-sm font-bold text-yellow-800 mb-1 flex items-center gap-2">
                         <i className="fas fa-sticky-note"></i> Notes
                     </h4>
                     <p className="text-sm text-yellow-800/90 leading-relaxed">
-                        {summary.notes || bill?.notes}
+                        {source.notes}
                     </p>
                 </div>
             )}

@@ -7,12 +7,24 @@ import { useGetCustomerForDropDown } from '../../../../apiList/Department Api/Ac
 import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
 import { Label } from '../../../../components/ui/Label';
 import type { RetailCreateInvoicePayload } from './CreateRetailInvoiceAcc';
+import type { IInvoicePdf } from '../Invoice Account/InvoiceAccountForm';
+import { useGetProjects } from '../../../../apiList/projectApi';
+import type { AvailableProjetType } from '../../Logistics Pages/LogisticsShipmentForm';
+import { ORDERMATERIAL_UNIT_OPTIONS } from '../../../Stage Pages/Ordering Materials/OrderMaterialOverview';
+import { Card, CardContent } from '../../../../components/ui/Card';
+import { downloadImage } from '../../../../utils/downloadFile';
+// import { useSyncRetailInvoiceToAccounts } from '../../../../apiList/Department Api/Accounting Api/retailinvoiceApi';
+// import { toast } from '../../../../utils/toast';
+// import InfoTooltip from '../../../../components/ui/InfoToolTip';
 
 interface RetailInvoiceItem {
     itemName: string;
     quantity: number;
     rate: number;
+    unit: string;
     totalCost: number;
+    _id?: string; // Added _id for updates
+
 }
 
 interface RetailInvoiceFormData {
@@ -21,10 +33,13 @@ interface RetailInvoiceFormData {
     salesPerson: string;
     subject: string;
     invoiceDate: string;
-    
+    projectId: string | null
+    projectName: string | null
     items: RetailInvoiceItem[];
     discountPercentage: number;
     taxPercentage: number;
+    pdfData?: IInvoicePdf;
+    customerNotes: string
 }
 
 interface RetailInvoiceAccountFormProps {
@@ -43,25 +58,29 @@ const RetailInvoiceAccountForm: React.FC<RetailInvoiceAccountFormProps> = ({
     organizationId
 }) => {
     const navigate = useNavigate();
-    const [currentMode, _setCurrentMode] = useState<'create' | 'view' | 'edit'>(initialMode);
+    const [currentMode, setCurrentMode] = useState<'create' | 'view' | 'edit'>(initialMode);
 
     const { data: customerData } = useGetCustomerForDropDown(organizationId)
 
-const defaultFormData = {
+    const defaultFormData = {
         customerId: '',
         customerName: '',
         salesPerson: '',
+        projectId: null,
+        projectName: null,
         subject: '',
         invoiceDate: new Date().toISOString().split('T')[0],
         dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         items: [{
             itemName: "",
             rate: 0,
+            unit: "nos",
             quantity: 1,
             totalCost: 0
         }],
         discountPercentage: 0,
-        taxPercentage: 0
+        taxPercentage: 0,
+        customerNotes: "",
     }
 
     const [enableCustomerInput, setEnableCustomerInput] = useState<boolean>(false)
@@ -73,21 +92,44 @@ const defaultFormData = {
         taxAmount: 0,
         grandTotal: 0
     });
+    // const { mutateAsync: syncAccountsMutation, isPending: syncAccountsLoading } = useSyncRetailInvoiceToAccounts()
 
+    // const handleSyncToAccounts = async () => {
+    //     try {
+    //         await syncAccountsMutation({
+    //             id: initialData._id!
+    //         });
+    //         toast({ title: "Success", description: "Invoice sent to Accounts Department" });
+    //     } catch (error: any) {
+    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+    //     }
+    // }
+
+
+    const parseInitialData = (initialData: any): RetailInvoiceFormData => {
+        return {
+            customerId: initialData.customerId || null,
+            customerName: initialData.customerName || '',
+            projectId: initialData.projectId || null,
+            projectName: initialData.projectName || null,
+            salesPerson: initialData.salesPerson || '',
+            subject: initialData.subject || '',
+            invoiceDate: initialData.invoiceDate ? new Date(initialData.invoiceDate).toISOString().split('T')[0] : '',
+            items: initialData.items || [],
+            discountPercentage: initialData.discountPercentage || 0,
+            taxPercentage: initialData.taxPercentage || 0,
+            pdfData: initialData.pdfData,
+            customerNotes: initialData?.customerNotes || '',
+        };
+    };
     // Load initial data if provided (for view/edit mode)
     useEffect(() => {
         if (initialData) {
-            setFormData({
-                customerId: initialData.customerId || '',
-                customerName: initialData.customerName || '',
-               
-                salesPerson: initialData.salesPerson || '',
-                subject: initialData.subject || '',
-                invoiceDate: initialData.invoiceDate ? new Date(initialData.invoiceDate).toISOString().split('T')[0] : '',
-                items: initialData.items || [],
-                discountPercentage: initialData.discountPercentage || 0,
-                taxPercentage: initialData.taxPercentage || 0,
-            });
+            setFormData(parseInitialData(initialData));
+            // If coming from Single page, ensure mode is view initially if not specified otherwise
+            if (initialMode === 'view') {
+                setCurrentMode('view');
+            }
         }
     }, [initialData]);
 
@@ -121,6 +163,13 @@ const defaultFormData = {
         }));
     };
 
+    const { data: projectData } = useGetProjects(organizationId!);
+    const projects = projectData?.map((project: AvailableProjetType) => ({
+        _id: project._id,
+        projectName: project.projectName
+    }));
+
+
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         const numValue = parseFloat(value) || 0;
@@ -133,7 +182,7 @@ const defaultFormData = {
     const handleAddItem = () => {
         setFormData(prev => ({
             ...prev,
-            items: [...prev.items, { itemName: '', quantity: 1, rate: 0, totalCost: 0 }]
+            items: [...prev.items, { itemName: '', quantity: 1, unit: "nos", rate: 0, totalCost: 0 }]
         }));
     };
 
@@ -146,23 +195,20 @@ const defaultFormData = {
     };
 
 
-    // const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
-    //     setFormData(prev => {
-    //         const newItems = [...prev.items];
-    //         const item = { ...newItems[index] };
+    const handleEdit = () => {
+        setCurrentMode('edit');
+    };
 
-    //         if (field === 'itemName') {
-    //             item.itemName = value as string;
-    //         } else if (field === 'quantity' || field === 'rate') {
-    //             const numValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
-    //             item[field] = numValue < 0 ? 0 : numValue;
-    //             item.totalCost = item.quantity * item.rate;
-    //         }
+    const handleCancelEdit = () => {
+        // 1. Revert mode
+        setCurrentMode('view');
+        // 2. Reset data to original
+        if (initialData) {
+            setFormData(parseInitialData(initialData));
+        }
+    };
 
-    //         newItems[index] = item;
-    //         return { ...prev, items: newItems };
-    //     });
-    // };
+
 
     const handleItemChange = (index: number, field: keyof RetailInvoiceItem, value: string | number) => {
         setFormData(prev => {
@@ -183,12 +229,15 @@ const defaultFormData = {
 
                 if (isLastRow && wasEmpty && isNowFilled) {
                     // Add new row automatically (only once when transitioning from empty to filled)
-                    newItems.push({ itemName: '', quantity: 1, rate: 0, totalCost: 0 });
+                    newItems.push({ itemName: '', quantity: 1, unit: "nos", rate: 0, totalCost: 0 });
                 }
             } else if (field === 'quantity' || field === 'rate') {
                 const numValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
                 item[field] = numValue < 0 ? 0 : numValue;
                 item.totalCost = item.quantity * item.rate;
+            }
+            else if (field === 'unit') {
+                item.unit = value as string;
             }
 
             newItems[index] = item;
@@ -242,6 +291,11 @@ const defaultFormData = {
             item.itemName.trim() !== ''
         );
 
+        // if (cleanedItems.length === 0) {
+        //     alert("Please add at least one item");
+        //     return;
+        // }
+
         // Update formData with cleaned items
         const dataToValidate = {
             ...formData,
@@ -264,36 +318,26 @@ const defaultFormData = {
             grandTotal: calculatedTotals.grandTotal
         };
         // console.log("payload", payload)
-        await onSubmit(payload);
-        setFormData(defaultFormData)
+        // await onSubmit(payload);
+
+        try {
+            console.log("gettig caled ")
+            await onSubmit(payload);
+
+            // If this was an update (edit mode), switch back to view mode on success
+            if (currentMode === 'edit') {
+                setCurrentMode('view');
+            }
+
+            // If it was create mode, reset form
+            if (currentMode === 'create') {
+                setFormData(defaultFormData);
+            }
+        } catch (error) {
+            // Error handled in parent, but we keep the form in edit mode so user can fix it
+            console.error("Form submission failed", error);
+        }
     };
-
-    // const handleEdit = () => {
-    //     setCurrentMode('edit');
-    // };
-
-    // const handleCancelEdit = () => {
-    //     setCurrentMode('view');
-    //     // Reset form data to original
-    //     if (initialData) {
-    //         setFormData({
-    //             customerId: initialData.customerId || '',
-    //             customerName: initialData.customerName || '',
-    //             orderNumber: initialData.orderNumber || '',
-    //             accountsReceivable: initialData.accountsReceivable || '',
-    //             salesPerson: initialData.salesPerson || '',
-    //             subject: initialData.subject || '',
-    //             invoiceDate: initialData.invoiceDate ? new Date(initialData.invoiceDate).toISOString().split('T')[0] : '',
-    //             terms: initialData.terms || '',
-    //             dueDate: initialData.dueDate ? new Date(initialData.dueDate).toISOString().split('T')[0] : '',
-    //             items: initialData.items || [],
-    //             discountPercentage: initialData.discountPercentage || 0,
-    //             taxPercentage: initialData.taxPercentage || 0,
-    //             customerNotes: initialData.customerNotes || '',
-    //             termsAndConditions: initialData.termsAndConditions || ''
-    //         });
-    //     }
-    // };
 
     const isReadOnly = currentMode === 'view';
     const isCreateMode = currentMode === 'create';
@@ -302,26 +346,27 @@ const defaultFormData = {
     return (
         <div className="max-w-full mx-auto space-y-2">
             {/* Header */}
-            <header className="flex justify-between items-center">
+            <header className="sticky top-0 z-20 bg-white border-b border-gray-200 pb-4 pt-2 mb-6 flex justify-between items-center">
+            {/* <header className="flex justify-between items-center"> */}
                 <div className='flex justify-between items-center gap-2'>
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
                         className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
-                    
+
                         <i className="fas fa-arrow-left"></i>
-                        
+
                     </button>
                     <div>
 
                         <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                             <i className="fas fa-file-invoice mr-3 text-blue-600"></i>
-                            {isCreateMode ? 'Create Invoice' : isEditMode ? 'Update Invoice' : 'View Invoice'}
+                            {isCreateMode ? 'Create Retail Invoice' : isEditMode ? 'Update Retail Invoice' : 'View Retail Invoice'}
                         </h1>
                         <p className="text-gray-600 mt-1">
                             {isCreateMode ? 'Fill in the details to create a new invoice' :
-                                isEditMode ? 'Update the invoice details' :
-                                    'Invoice details'}
+                                isEditMode ? 'Update the Retail invoice details' :
+                                    'Retail Invoice details'}
                         </p>
                     </div>
                 </div>
@@ -335,22 +380,67 @@ const defaultFormData = {
                             <i className="fas fa-edit mr-2"></i>
                             Edit
                         </Button>
-                    )}
-                    {currentMode === 'edit' && (
+                        )}
+                        </div>  */}
+
+
+
+                <div className="flex items-center space-y-1">
+                    {/* <Button
+                            variant="primary"
+                            isLoading={syncAccountsLoading}
+                            onClick={handleSyncToAccounts}
+                        >
+                            Send To Accounts Dept
+                        </Button>
+
+                        <InfoTooltip
+                            content="Click the button to send the payment to accounts department"
+                            type="info"
+                            position="bottom"
+                        /> */}
+
+
+                    {currentMode === 'view' && (
                         <Button
                             type="button"
-                            onClick={handleCancelEdit}
-                            className="bg-gray-500 text-white"
+                            onClick={handleEdit}
+                            className="bg-blue-600 text-white"
                         >
-                            <i className="fas fa-times mr-2"></i>
-                            Cancel
+                            <i className="fas fa-edit mr-2"></i>
+                            Edit
                         </Button>
                     )}
 
-                </div> */}
+                    {!isReadOnly && (
+                        <div className="flex justify-end gap-4 pt-6">
+                            <Button
+                                type="button"
+                                variant='secondary'
+                                onClick={isEditMode ? handleCancelEdit : () => navigate(-1)}
+                                className="px-6 py-2"
+                                disabled={isSubmitting}
+                            >
+                                <i className="fas fa-times mr-2"></i>
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={handleSubmit}
+                                className="bg-blue-600 text-white px-6 py-2"
+                                isLoading={isSubmitting}
+
+                            >
+                               
+                                    <><i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i> {isCreateMode ? 'Create Invoice' : 'Update Invoice'}</>
+                            </Button>
+                        </div>
+                    )}
+
+                </div>
             </header>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form  className="space-y-6">
                 {/* Customer Information */}
                 {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
@@ -460,11 +550,7 @@ const defaultFormData = {
                             <input
                                 type="text"
                                 name="customerName"
-                                value={
-                                    enableCustomerInput
-                                        ? formData.customerName // user can edit manually
-                                        : "" // show from formData but not editable
-                                }
+                                value={formData.customerName}
                                 onChange={(e) => {
                                     if (enableCustomerInput) handleInputChange(e); // only update if manual input is enabled
                                 }}
@@ -544,109 +630,40 @@ const defaultFormData = {
                                 placeholder="Payment terms (e.g., Net 30)"
                             />
                         </div> */}
+
+
+                        <div>
+                            <Label>Project</Label>
+                            <select
+                                value={formData?.projectId || ''}
+                                disabled={isReadOnly}
+                                onChange={(e) => {
+                                    const selected = projects?.find((p: any) => p._id === e.target.value);
+                                    if (selected) {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            projectId: selected._id,
+                                            projectName: selected.projectName,
+                                        }));
+                                    } else {
+                                        setFormData(prev => ({ ...prev, projectId: null, projectName: null }));
+                                    }
+                                }}
+                                className=" disabled:bg-gray-100 disabled:cursor-not-allowed w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                            >
+                                <option value="">Select Projects</option>
+                                {projects?.map((project: any) => (
+                                    <option key={project._id} value={project._id}>{project.projectName}</option>
+                                ))}
+                            </select>
+                        </div>
+
+
                     </div>
                 </div>
 
                 {/* Items Section */}
-                {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                            <i className="fas fa-list mr-2 text-blue-600"></i>
-                            Invoice Items <span className="text-red-500 ml-1">*</span>
-                        </h2>
-                        {!isReadOnly && (
-                            <Button
-                                type="button"
-                                onClick={handleAddItem}
-                                className="bg-green-600 text-white text-sm"
-                            >
-                                <i className="fas fa-plus mr-2"></i>
-                                Add Item
-                            </Button>
-                        )}
-                    </div>
 
-                    {formData.items.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
-                            <i className="fas fa-inbox text-4xl mb-2"></i>
-                            <p>No items added yet. Click "Add Item" to get started.</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {formData.items.map((item, index) => (
-                                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <h3 className="font-medium text-gray-900">Item #{index + 1}</h3>
-                                        {!isReadOnly && (
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveItem(index)}
-                                                className="text-red-600 hover:text-red-800"
-                                            >
-                                                <i className="fas fa-trash"></i>
-                                            </button>
-                                        )}
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Item Name <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={item.itemName}
-                                                onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
-                                                disabled={isReadOnly}
-                                                required
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                placeholder="Enter item name"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Quantity
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={item.quantity}
-                                                onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                                                disabled={isReadOnly}
-                                                min="0"
-                                                step="1"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Rate <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={item.rate}
-                                                onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
-                                                disabled={isReadOnly}
-                                                min="0"
-                                                step="1"
-                                                required
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="mt-3 flex justify-end">
-                                        <div className="text-right">
-                                            <span className="text-sm text-gray-600">Total: </span>
-                                            <span className="text-lg font-semibold text-gray-900">
-                                                ₹{item.totalCost.toFixed(2)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div> */}
 
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <div className="flex justify-between items-center mb-4">
@@ -683,13 +700,14 @@ const defaultFormData = {
                     ) : (
                         <div className="overflow-x-auto">
                             {/* Table Header */}
-                            <div className="grid grid-cols-12 gap-3 mb-2 px-4 py-3 bg-gray-100 rounded-lg font-semibold text-gray-700 text-sm">
+                            <div className="grid grid-cols-14 gap-3 mb-2 px-4 py-3 bg-gray-100 rounded-lg font-semibold text-gray-700 text-sm">
                                 <div className="col-span-1 text-center">#</div>
                                 <div className="col-span-4 text-center">Item Name <span className="text-red-500">*</span></div>
+                                <div className="col-span-2 text-center">Unit</div>
                                 <div className="col-span-2 text-center">Quantity</div>
                                 <div className="col-span-2 text-center">Rate <span className="text-red-500">*</span></div>
                                 <div className="col-span-2 text-center">Total</div>
-                                <div className="col-span-1 text-center">Action</div>
+                                {!isReadOnly && <div className="col-span-1 text-center">Action</div>}
                             </div>
 
                             {/* Table Rows */}
@@ -697,7 +715,7 @@ const defaultFormData = {
                                 {formData.items.map((item, index) => (
                                     <div
                                         key={index}
-                                        className="grid grid-cols-12 gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors items-center"
+                                        className="grid grid-cols-14 gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors items-center"
                                     >
                                         {/* Row Number */}
                                         <div className="col-span-1 text-center text-gray-600 font-medium">
@@ -714,6 +732,19 @@ const defaultFormData = {
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
                                                 placeholder="Enter item name"
                                             />
+                                        </div>
+
+                                        <div className="col-span-2">
+                                            <select
+                                                value={item.unit}
+                                                onChange={(e) => handleItemChange(index, 'unit', e.target.value)}
+                                                disabled={isReadOnly}
+                                                className="w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 bg-white text-sm disabled:bg-gray-100"
+                                            >
+                                                {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
+                                                    <option key={unitOption} value={unitOption}>{unitOption}</option>
+                                                ))}
+                                            </select>
                                         </div>
 
                                         {/* Quantity */}
@@ -901,38 +932,72 @@ const defaultFormData = {
                             />
                         </div>
                     </div>
+
+                    
                 </div> */}
 
-                {/* Action Buttons */}
-                {!isReadOnly && (
-                    <div className="flex justify-end gap-4 pt-6">
-                        <Button
-                            type="button"
-                            onClick={() => navigate(-1)}
-                            className="bg-gray-500 text-white px-6 py-2"
-                            disabled={isSubmitting}
-                        >
-                            <i className="fas fa-times mr-2"></i>
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            className="bg-blue-600 text-white px-6 py-2"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <i className="fas fa-spinner fa-spin mr-2"></i>
-                                    {isCreateMode ? 'Creating...' : 'Updating...'}
-                                </>
-                            ) : (
-                                <>
-                                    <i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i>
-                                    {isCreateMode ? 'Create Invoice' : 'Update Invoice'}
-                                </>
-                            )}
-                        </Button>
-                    </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Customer Notes</label>
+                    <textarea
+                        name="customerNotes"
+                        value={formData?.customerNotes}
+                        onChange={handleInputChange}
+                        disabled={isReadOnly}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100"
+                    />
+                </div>
+
+
+
+                {initialData?.pdfData && (
+                    <>
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                            <div className="flex-1">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                    Invoice Pdf
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    Generate a PDF document for the invoice
+                                </p>
+                            </div>
+                        </div>
+
+                        <Card className="border-green-200 bg-green-50">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-3">
+                                        <i className="fas fa-check-circle text-green-600 text-2xl"></i>
+                                        <div>
+                                            <h4 className="font-semibold text-green-900">{initialData.pdfData.originalName}</h4>
+                                            <p className="text-sm text-green-700">Invoice PDF is ready</p>
+                                        </div>
+                                    </div>
+                                    <div className='gap-2 flex items-center'>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => window.open(initialData.pdfData.url, "_blank")}
+                                            className=""
+                                        >
+                                            View PDF
+                                        </Button>
+
+                                        <Button
+                                            type="button"
+                                            variant="primary"
+                                            onClick={() => downloadImage({ src: initialData.pdfData.url, alt: initialData.pdfData.originalName })}
+                                            className=""
+                                        >
+                                            download PDF
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </>
+
                 )}
             </form>
         </div>

@@ -10,10 +10,12 @@ const getAllInvoices = async ({
     organizationId,
     customerId,
     page,
-    limit, 
+    limit,
     fromInvoiceDate,
     toInvoiceDate,
     createdFromDate,
+    minAmount,
+    maxAmount,
     createdToDate,
     search,
     sortBy,
@@ -28,6 +30,8 @@ const getAllInvoices = async ({
     toInvoiceDate?: string
     createdFromDate?: string
     createdToDate?: string,
+    minAmount?: number;
+    maxAmount?: number;
     search?: string;
     api: AxiosInstance,
     sortBy?: string;
@@ -42,7 +46,8 @@ const getAllInvoices = async ({
     if (toInvoiceDate) params.append('toInvoiceDate', toInvoiceDate);
     if (createdFromDate) params.append('createdFromDate', createdFromDate);
     if (createdToDate) params.append('createdToDate', createdToDate);
-
+    if (minAmount) params.append('minAmount', minAmount.toString());
+    if (maxAmount) params.append('maxAmount', maxAmount.toString());
     if (sortBy) params.append('sortBy', sortBy);
     if (sortOrder) params.append('sortOrder', sortOrder);
     if (search) params.append('search', search);
@@ -103,7 +108,7 @@ const getSingleInvoice = async ({
 
 
 
-const syncInvoicetoAcc = async ({  id, api }: {  id: string; api: AxiosInstance }) => {
+const syncInvoicetoAcc = async ({ id, api }: { id: string; api: AxiosInstance }) => {
     // We send billData as JSON. 
     // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
     const { data } = await api.post(`/department/accounting/invoice/synctoaccounts/${id}`);
@@ -122,6 +127,8 @@ export const useGetAllInvoices = ({
     limit = 10,
     search,
     // date,
+    minAmount,
+    maxAmount,
     fromInvoiceDate,
     toInvoiceDate,
     createdFromDate,
@@ -134,6 +141,8 @@ export const useGetAllInvoices = ({
     limit?: number;
     search?: string;
     // date?: string
+    minAmount?: number;
+    maxAmount?: number;
     fromInvoiceDate?: string
     toInvoiceDate?: string
     createdFromDate?: string
@@ -149,7 +158,8 @@ export const useGetAllInvoices = ({
         queryKey: ["invoices", organizationId, customerId, limit, fromInvoiceDate,
             toInvoiceDate,
             createdFromDate,
-            createdToDate, search, sortBy, sortOrder],
+            createdToDate, search, sortBy, sortOrder, minAmount,
+            maxAmount],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -166,6 +176,8 @@ export const useGetAllInvoices = ({
                 toInvoiceDate,
                 createdFromDate,
                 createdToDate,
+                minAmount,
+                maxAmount,
                 search,
                 sortBy,
                 sortOrder,
@@ -214,10 +226,10 @@ export const useUpdateInvoice = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({ invoiceData, invoiceId }: { invoiceData: any, invoiceId:string }) => {
+        mutationFn: async ({ invoiceData, invoiceId }: { invoiceData: any, invoiceId: string }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
             if (!api) throw new Error("API instance not found for role");
-            return await updateInvoice({ invoiceData, invoiceId ,  api });
+            return await updateInvoice({ invoiceData, invoiceId, api });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["invoices"] });
@@ -264,14 +276,14 @@ export const useGetSingleInvoice = (invoiceId: string) => {
 
 
 
-
+// currently not in use , it will be sentot the accounts dept once it is created, and updated automatically
 export const useSyncInvoiceToAccounts = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({  id }: {  id: string }) => {
+        mutationFn: async ({ id }: { id: string }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
             if (!api) throw new Error("API instance not found for role");
             return await syncInvoicetoAcc({ id, api });

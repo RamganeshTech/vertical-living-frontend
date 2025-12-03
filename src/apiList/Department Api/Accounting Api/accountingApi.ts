@@ -368,13 +368,16 @@ const allowedRoles = ["owner", "CTO", "staff"];
 
 
 
-
-interface AccountingFilters {
+export interface AccountingFilters {
   projectId?: string;
-  fromDept?: string; // Maps to 'deptRecordFrom' in backend
+  fromDept?: string; // Maps to 'deptRecordFrom'
   status?: string;
+  search?: string,
   startDate?: string;
   endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  personName?: string; // For specific person filter, separate from global search
 }
 
 interface AccountingResponse {
@@ -396,12 +399,10 @@ export const getAccountingAllApi = async ({
   organizationId,
   api,
   filters,
-  search,
   pageParam = 1,
 }: {
   organizationId: string;
   api: AxiosInstance;
-  search?: string;
   filters?: AccountingFilters;
   pageParam: number;
 }) => {
@@ -413,17 +414,30 @@ export const getAccountingAllApi = async ({
     limit: 20, // Batch size
   };
 
+    // --- 1. Apply Filters ---
   if (filters?.projectId) params.projectId = filters.projectId;
   
-  // Backend expects 'deptRecordFrom', frontend might send 'fromDept'
-  if (filters?.fromDept) params.deptRecordFrom = filters.fromDept;
-  
   if (filters?.status) params.status = filters.status;
+
+  if (filters?.search) params.search = filters.search;
+  // Map Frontend 'fromDept' -> Backend 'deptRecordFrom'
+  if (filters?.fromDept) params.deptRecordFrom = filters.fromDept;
+
+  // Date Range (Backend uses 'deptGeneratedDate')
   if (filters?.startDate) params.startDate = filters.startDate;
   if (filters?.endDate) params.endDate = filters.endDate;
-  
-  // Map search to personName (or whichever field your backend searches)
-  if (search) params.personName = search;
+
+  // Amount Range (Backend uses 'amount')
+  if (filters?.minAmount !== undefined) params.minAmount = filters.minAmount;
+  if (filters?.maxAmount !== undefined) params.maxAmount = filters.maxAmount;
+
+  // Specific Person Filter
+  if (filters?.personName) params.personName = filters.personName;
+
+  // --- 2. Apply Global Search ---
+  // Maps to 'search' in backend (RegEx on Number, Name, Notes)
+  // if (search) params.search = search;
+
 
   const { data } = await api.get<AccountingResponse>(
     `/department/accounting/getaccountingall`,
@@ -431,7 +445,7 @@ export const getAccountingAllApi = async ({
   );
 
   // Handle both 'success' (new controller) and 'ok' (old standard)
-  if (!data.success && !data.ok) throw new Error(data.message || "Failed to fetch records");
+  if (!data.ok) throw new Error(data.message || "Failed to fetch records");
   
   return data;
 };
@@ -457,14 +471,14 @@ export const getSingleAccountingApi = async ({
 export const useGetAccountingAll = (
   organizationId: string,
   filters?: AccountingFilters,
-  search?: string
+  // search?: string
 ) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
   return useInfiniteQuery({
     // Unique key: Refetches when any filter/search changes
-    queryKey: ["accounting", "infinite", organizationId, filters, search],
+    queryKey: ["accounting", "infinite", organizationId, filters],
     
     queryFn: async ({ pageParam = 1 }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
@@ -474,7 +488,7 @@ export const useGetAccountingAll = (
         organizationId,
         api,
         filters,
-        search,
+        // search,
         pageParam: pageParam as number,
       });
     },

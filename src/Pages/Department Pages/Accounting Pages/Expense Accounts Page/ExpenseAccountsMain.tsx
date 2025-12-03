@@ -38,7 +38,7 @@ const ExpenseAccountsMain = () => {
         createdFromDate: "",
         createdToDate: "",
         minAmount: 0,
-        maxAmount: 100000,
+        maxAmount: 1000000,
         payThrough: '',
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc'
@@ -148,7 +148,7 @@ const ExpenseAccountsMain = () => {
             createdFromDate: "",
             createdToDate: "",
             minAmount: 0,
-            maxAmount: 100000,
+            maxAmount: 1000000,
             payThrough: '',
             sortBy: 'createdAt',
             sortOrder: 'desc'
@@ -409,7 +409,7 @@ const ExpenseAccountsMain = () => {
                                         <Slider
                                             range
                                             min={0}
-                                            max={100000}
+                                            max={1000000}
                                             step={500}
                                             value={[Number(filters.minAmount), Number(filters.maxAmount)]}
                                             onChange={(value) => {

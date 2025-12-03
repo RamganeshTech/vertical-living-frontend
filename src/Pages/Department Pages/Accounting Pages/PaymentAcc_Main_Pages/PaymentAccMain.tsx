@@ -37,7 +37,7 @@ const PaymentAccMain = () => {
     const [filters, setFilters] = useState({
         search: '', // Maps to personName
         minAmount: 0,
-        maxAmount: 10000000,
+        maxAmount: 1000000,
         startDate: '', // Payment Date From
         endDate: '',   // Payment Date To
         fromSection: '', // bill, expense, etc.
@@ -211,7 +211,7 @@ const PaymentAccMain = () => {
                                         <Slider
                                             range
                                             min={0}
-                                            max={100000}
+                                            max={1000000}
                                             step={500}
                                             value={[Number(filters.minAmount), Number(filters.maxAmount)]}
                                             onChange={(value) => {
@@ -263,6 +263,30 @@ const PaymentAccMain = () => {
                                             </div>
                                         </div>
                                     </div>
+
+                                                                        {/* Manual Input Fields */}
+                                    <div className="flex gap-2 items-center mt-3">
+                                        <input
+                                            type="number"
+                                            value={filters.minAmount}
+                                            onChange={(e) =>
+                                                setFilters((f) => ({ ...f, minAmount: +e.target.value }))
+                                            }
+                                            placeholder="Min"
+                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            min="0"
+                                        />
+                                        <input
+                                            type="number"
+                                            value={filters.maxAmount}
+                                            onChange={(e) =>
+                                                setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
+                                            }
+                                            placeholder="Max"
+                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            min="0"
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* 3. Date Filters */}
@@ -304,8 +328,8 @@ const PaymentAccMain = () => {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                                     >
                                         <option value="">All Sources</option>
-                                        <option value="bill">Bills</option>
-                                        <option value="expense">Expenses</option>
+                                        <option value="Bill">Bill</option>
+                                        <option value="Expense">Expense</option>
                                     </select>
                                 </div>
                             </div>

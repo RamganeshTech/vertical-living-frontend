@@ -36,12 +36,15 @@ const AccountingAccList: React.FC<Props> = ({ data, index, onView }) => {
     return (
         <div 
             onClick={onView}
-            className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-blue-50/30 transition-colors cursor-pointer items-center"
+            className="grid grid-cols-14 gap-4 px-6 py-4 hover:bg-blue-50/30 transition-colors cursor-pointer items-center"
         >
             {/* 1. Index */}
             <div className="col-span-1 text-center text-gray-400 font-medium text-sm">
                 {index + 1}
             </div>
+
+
+              
 
             {/* 2. Record Number */}
             <div className="col-span-2">
@@ -49,6 +52,13 @@ const AccountingAccList: React.FC<Props> = ({ data, index, onView }) => {
                     {data.recordNumber || 'N/A'}
                 </span>
             </div>
+
+            <div className="col-span-2">
+                <span className="font-mono text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded border border-gray-200">
+                    {data?.sourceDetails?.deptNumber || 'N/A'}
+                </span>
+            </div>
+
 
             {/* 3. Payee / Source Info */}
             <div className="col-span-3">
@@ -67,16 +77,16 @@ const AccountingAccList: React.FC<Props> = ({ data, index, onView }) => {
 
             {/* 4. Date */}
             <div className="col-span-2 text-sm text-gray-600">
-                {dateFormate(data.createdAt)}
+                {dateFormate(data?.sourceDetails.deptGeneratedDate)}
             </div>
 
             {/* 5. Amount */}
-            <div className="col-span-2 text-right font-bold text-gray-800 text-sm">
+            <div className="col-span-2 font-bold text-gray-800 text-sm">
                 ₹{data.amount?.toLocaleString('en-IN') || '0.00'}
             </div>
 
             {/* 6. Status */}
-            <div className="col-span-1 text-center">
+            <div className="col-span-1">
                 <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusStyle(data.status)}`}>
                     {data.status || 'Pending'}
                 </span>

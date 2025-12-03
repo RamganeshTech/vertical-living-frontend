@@ -5,6 +5,10 @@ import { toast } from '../../../../utils/toast';
 import { useDeleteRetailInvoice, useGetRetailAllInvoices } from '../../../../apiList/Department Api/Accounting Api/retailinvoiceApi';
 import RetailInvoiceAccList from './RetailInvoiceAccList';
 import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
+import { useDebounce } from '../../../../Hooks/useDebounce';
+
+import Slider from 'rc-slider';
+import "rc-slider/assets/index.css";
 
 const RetailInvoiceAccountsMain = () => {
     const navigate = useNavigate();
@@ -28,15 +32,20 @@ const RetailInvoiceAccountsMain = () => {
     const [filters, setFilters] = useState({
         search: '',
         customerId: '',
- fromInvoiceDate: "",
+        fromInvoiceDate: "",
+        minAmount: 0,
+        maxAmount: 1000000,
         toInvoiceDate: "",
         createdFromDate: "",
-        createdToDate: "",        sortBy: 'createdAt',
+        createdToDate: "", sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc',
     });
 
     // Debounced search
     const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
+    const debouncedMinAmount = useDebounce(filters.minAmount, 800);
+    const debouncedMaxAmount = useDebounce(filters.maxAmount, 800);
+
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -61,10 +70,12 @@ const RetailInvoiceAccountsMain = () => {
         organizationId: organizationId || '',
         customerId: filters.customerId || undefined,
         limit: 10,
-  fromInvoiceDate: filters.fromInvoiceDate || undefined,
+        minAmount: debouncedMinAmount,
+        maxAmount: debouncedMaxAmount,
+        fromInvoiceDate: filters.fromInvoiceDate || undefined,
         toInvoiceDate: filters.toInvoiceDate || undefined,
         createdFromDate: filters.createdFromDate || undefined,
-        createdToDate: filters.createdToDate || undefined,        search: debouncedSearch || undefined,
+        createdToDate: filters.createdToDate || undefined, search: debouncedSearch || undefined,
         sortBy: filters.sortBy || undefined,
         sortOrder: filters.sortOrder || undefined,
     });
@@ -141,11 +152,13 @@ const RetailInvoiceAccountsMain = () => {
         setFilters({
             search: '',
             customerId: '',
-fromInvoiceDate: "",
-        toInvoiceDate: "",
-        createdFromDate: "",
-        createdToDate: "",   
-                    sortBy: 'createdAt',
+            fromInvoiceDate: "",
+            minAmount: 0,
+            maxAmount: 1000000,
+            toInvoiceDate: "",
+            createdFromDate: "",
+            createdToDate: "",
+            sortBy: 'createdAt',
             sortOrder: 'desc'
         });
     };
@@ -258,7 +271,7 @@ fromInvoiceDate: "",
 
 
 
-                                 <div>
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         From CreatedAt Date
@@ -336,6 +349,94 @@ fromInvoiceDate: "",
                                     />
                                 </div> */}
 
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                                        <i className="fas fa-coins mr-2 text-gray-400"></i>
+                                        Amount Range
+                                    </label>
+
+                                    <div className="px-2 mb-3">
+                                        <Slider
+                                            range
+                                            min={0}
+                                            max={1000000}
+                                            step={500}
+                                            value={[Number(filters.minAmount), Number(filters.maxAmount)]}
+                                            onChange={(value) => {
+                                                const [min, max] = value as [number, number];
+                                                setFilters((f) => ({
+                                                    ...f,
+                                                    minAmount: min,
+                                                    maxAmount: max,
+                                                }));
+                                            }}
+                                            trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+                                            handleStyle={[
+                                                {
+                                                    borderColor: "#3b82f6",
+                                                    backgroundColor: "#fff",
+                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    width: 18,
+                                                    height: 18,
+                                                    marginTop: -6,
+                                                    opacity: 1
+                                                },
+                                                {
+                                                    borderColor: "#3b82f6",
+                                                    backgroundColor: "#fff",
+                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    width: 18,
+                                                    height: 18,
+                                                    marginTop: -6,
+                                                    opacity: 1
+                                                },
+                                            ]}
+                                            railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+                                        />
+                                    </div>
+
+                                    {/* Display Values */}
+                                    <div className="flex justify-between items-center gap-2 text-sm">
+                                        <div className="flex-1">
+                                            <span className="text-xs text-gray-500 block mb-1">Min</span>
+                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+                                                ₹{Number(filters.minAmount).toLocaleString("en-IN")}
+                                            </div>
+                                        </div>
+                                        <div className="text-gray-300">—</div>
+                                        <div className="flex-1">
+                                            <span className="text-xs text-gray-500 block mb-1">Max</span>
+                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+                                                ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2 items-center mt-3">
+                                        <input
+                                            type="number"
+                                            value={filters.minAmount}
+                                            onChange={(e) =>
+                                                setFilters((f) => ({ ...f, minAmount: +e.target.value }))
+                                            }
+                                            placeholder="Min"
+                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            min="0"
+                                        />
+                                        <input
+                                            type="number"
+                                            value={filters.maxAmount}
+                                            onChange={(e) =>
+                                                setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
+                                            }
+                                            placeholder="Max"
+                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+
                                 {/* Sort By */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -382,7 +483,7 @@ fromInvoiceDate: "",
                             <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Invoices Found</h3>
                             <p className="text-sm text-gray-500">
-                                {filters.search || filters.customerId 
+                                {filters.search || filters.customerId
                                     ? 'Try adjusting your filters to find invoices.'
                                     : 'Looks like there are no invoices yet.'}
                                 <br />

@@ -16,6 +16,8 @@ const getAllBills = async ({
     billFromDate,
     createdFromDate,
     createdToDate,
+    minAmount,
+    maxAmount,
     search,
     sortBy,
     sortOrder,
@@ -28,6 +30,8 @@ const getAllBills = async ({
     date?: string;
     billToDate?: string
     billFromDate?: string
+    minAmount?: number;
+    maxAmount?: number;
     createdFromDate?: string,
     createdToDate?: string,
     search?: string;
@@ -45,6 +49,8 @@ const getAllBills = async ({
     if (sortOrder) params.append('sortOrder', sortOrder);
     if (search) params.append('search', search);
     if (billToDate) params.append('billToDate', billToDate);
+    if (minAmount) params.append('minAmount', minAmount.toString());
+    if (maxAmount) params.append('maxAmount', maxAmount.toString());
     if (billFromDate) params.append('billFromDate', billFromDate);
     if (createdFromDate) params.append('createdFromDate', createdFromDate);
     if (createdToDate) params.append('createdToDate', createdToDate);
@@ -85,7 +91,7 @@ const updateBillApi = async ({ billData, billId, api }: { billData: any; billId:
 };
 
 
-const syncAcctoBill = async ({  billId, api }: {  billId: string; api: AxiosInstance }) => {
+const syncAcctoBill = async ({ billId, api }: { billId: string; api: AxiosInstance }) => {
     // We send billData as JSON. 
     // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
     const { data } = await api.post(`/department/accounting/bill/synctoaccounts/${billId}`);
@@ -94,7 +100,7 @@ const syncAcctoBill = async ({  billId, api }: {  billId: string; api: AxiosInst
 };
 
 
-const syncPaymentSectiontoBill = async ({  billId, api }: {  billId: string; api: AxiosInstance }) => {
+const syncPaymentSectiontoBill = async ({ billId, api }: { billId: string; api: AxiosInstance }) => {
     // We send billData as JSON. 
     // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
     const { data } = await api.post(`/department/accounting/bill/synctopayments/${billId}`);
@@ -165,6 +171,8 @@ export const useGetAllBill = ({
     date,
     billToDate,
     billFromDate,
+    minAmount,
+    maxAmount,
     createdFromDate,
     createdToDate,
     sortBy,
@@ -175,6 +183,8 @@ export const useGetAllBill = ({
     limit?: number;
     search?: string;
     date?: string
+    minAmount?: number;
+    maxAmount?: number;
     billToDate?: string
     billFromDate?: string
     createdFromDate?: string
@@ -187,7 +197,8 @@ export const useGetAllBill = ({
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["bills", organizationId, vendorId, limit, date, search, sortBy, sortOrder, billToDate, billFromDate, createdFromDate, createdToDate],
+        queryKey: ["bills", organizationId, vendorId, limit, date, search, sortBy, sortOrder, billToDate, billFromDate, createdFromDate, createdToDate, minAmount,
+            maxAmount],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -204,6 +215,8 @@ export const useGetAllBill = ({
                 billToDate,
                 billFromDate,
                 createdFromDate,
+                minAmount,
+                maxAmount,
                 createdToDate,
                 search,
                 sortBy,
@@ -272,7 +285,7 @@ export const useSyncBillToAccounts = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({  billId }: {  billId: string }) => {
+        mutationFn: async ({ billId }: { billId: string }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
             if (!api) throw new Error("API instance not found for role");
             return await syncAcctoBill({ billId, api });
@@ -291,7 +304,7 @@ export const useSyncBillToPaymentsSection = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({  billId }: {  billId: string }) => {
+        mutationFn: async ({ billId }: { billId: string }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
             if (!api) throw new Error("API instance not found for role");
             return await syncPaymentSectiontoBill({ billId, api });
@@ -350,7 +363,7 @@ export const useDeleteBillImage = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({ billId , imageId}: { billId: string , imageId:string}) => {
+        mutationFn: async ({ billId, imageId }: { billId: string, imageId: string }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
             if (!api) throw new Error("API instance not found for role");
 

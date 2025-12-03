@@ -11,11 +11,13 @@ const getAllRetailInvoices = async ({
     customerId,
     page,
     limit,
-fromInvoiceDate,
+    fromInvoiceDate,
     toInvoiceDate,
     createdFromDate,
     createdToDate,
-        search,
+    search,
+    minAmount,
+    maxAmount,
     api,
     sortBy,
     sortOrder
@@ -24,11 +26,14 @@ fromInvoiceDate,
     customerId?: string;
     page?: number;
     limit?: number;
- fromInvoiceDate?: string
+
+    fromInvoiceDate?: string
     toInvoiceDate?: string
     createdFromDate?: string
     createdToDate?: string,
-        search?: string;
+    search?: string;
+    minAmount?: number;
+    maxAmount?: number;
     api: AxiosInstance,
     sortBy?: string;
     sortOrder?: string;
@@ -38,10 +43,12 @@ fromInvoiceDate,
     if (customerId) params.append('customerId', customerId);
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
- if (fromInvoiceDate) params.append('fromInvoiceDate', fromInvoiceDate);
+    if (fromInvoiceDate) params.append('fromInvoiceDate', fromInvoiceDate);
     if (toInvoiceDate) params.append('toInvoiceDate', toInvoiceDate);
     if (createdFromDate) params.append('createdFromDate', createdFromDate);
     if (createdToDate) params.append('createdToDate', createdToDate);
+    if (minAmount) params.append('minAmount', minAmount.toString());
+    if (maxAmount) params.append('maxAmount', maxAmount.toString());
     if (sortBy) params.append('sortBy', sortBy);
     if (sortOrder) params.append('sortOrder', sortOrder);
     if (search) params.append('search', search);
@@ -62,6 +69,23 @@ const createRetailInvoice = async ({
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
+
+
+
+const updateInvoice = async ({
+    invoiceData,
+    invoiceId,
+    api
+}: {
+    invoiceData: any;
+    invoiceId: any;
+    api: AxiosInstance
+}) => {
+    const { data } = await api.put(`/department/accounting/retailinvoice/updateinvoice/${invoiceId}`, invoiceData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
 
 const deleteRetailInvoice = async ({
     invoiceId,
@@ -88,6 +112,16 @@ const getSingleRetailInvoice = async ({
 };
 
 
+
+
+const syncRetailInvoicetoAcc = async ({ id, api }: { id: string; api: AxiosInstance }) => {
+    // We send billData as JSON. 
+    // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
+    const { data } = await api.post(`/department/accounting/retailinvoice/synctoaccounts/${id}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
 // ==================== REACT QUERY HOOKS ====================
 
 // Update the hook to use useInfiniteQuery
@@ -96,22 +130,26 @@ export const useGetRetailAllInvoices = ({
     customerId,
     limit = 10,
     search,
-fromInvoiceDate,
+    fromInvoiceDate,
+    minAmount,
+                maxAmount,
     toInvoiceDate,
     createdFromDate,
     createdToDate,
-        sortBy,
+    sortBy,
     sortOrder
 }: {
     organizationId?: string;
     customerId?: string;
     limit?: number;
     search?: string;
- fromInvoiceDate?: string
+    fromInvoiceDate?: string
     toInvoiceDate?: string
+minAmount?: number;
+    maxAmount?: number;
     createdFromDate?: string
     createdToDate?: string,
-        sortBy?: string;
+    sortBy?: string;
     sortOrder?: string;
 }) => {
     const allowedRoles = ["owner", "staff", "CTO"];
@@ -119,9 +157,11 @@ fromInvoiceDate,
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["retailinvoices", organizationId, customerId, limit,  fromInvoiceDate,
+        queryKey: ["retailinvoices", organizationId, customerId, limit, fromInvoiceDate,
             toInvoiceDate,
             createdFromDate,
+            minAmount,
+                maxAmount,
             createdToDate, search, sortBy, sortOrder],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
@@ -135,11 +175,13 @@ fromInvoiceDate,
                 customerId,
                 page: pageParam,
                 limit,
- fromInvoiceDate,
+                fromInvoiceDate,
                 toInvoiceDate,
                 createdFromDate,
                 createdToDate,
-                                search,
+               minAmount,
+                maxAmount,
+                search,
                 api,
                 sortBy,
                 sortOrder
@@ -179,6 +221,28 @@ export const useCreateRetailInvoice = () => {
     });
 };
 
+
+
+
+export const useUpdateRetailInvoice = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ invoiceData, invoiceId }: { invoiceData: any, invoiceId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+            return await updateInvoice({ invoiceData, invoiceId, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["retailinvoices"] });
+        },
+    });
+};
+
+
+
 export const useDeleteRetailInvoice = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
@@ -211,5 +275,23 @@ export const useGetSingleRetailInvoice = (invoiceId: string) => {
             return await getSingleRetailInvoice({ invoiceId, api });
         },
         enabled: !!invoiceId && !!role && allowedRoles.includes(role),
+    });
+};
+
+// currently not in use , it will be sentot the accounts dept once it is created, and updated automatically
+export const useSyncRetailInvoiceToAccounts = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ id }: { id: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await syncRetailInvoicetoAcc({ id, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["invoices"] });
+        },
     });
 };

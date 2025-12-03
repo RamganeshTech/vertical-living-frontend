@@ -13,32 +13,17 @@ const PublicClientConsentForm: React.FC = () => {
     const [isAccepted, setIsAccepted] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const { mutateAsync: acceptConsent, isPending, isError, error:getAllError } = useAcceptClientConsent();
+    const { mutateAsync: acceptConsent, isPending, isError, error: getAllError } = useAcceptClientConsent();
 
 
-    if (isError) return  <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
-              <div className="text-red-600 font-semibold mb-2">
-                ⚠️ Error Occurred
-              </div>
-              <p className="text-red-500 text-sm mb-4">
-                {(getAllError as any)?.response?.data?.message || 
-                 (getAllError as any)?.message || 
-                 "Failed to load cost estimation data"}
-              </p>
-              <Button
-                onClick={() => window.location.reload()}
-                className="bg-red-600 text-white px-4 py-2"
-              >
-                Retry
-              </Button>
-            </div> 
+
 
     const fetchConsentContent = async () => {
         try {
             const { data } = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/paymentconfirmation/getpaymentconfirmation/${projectId}`
+                `${import.meta.env.VITE_API_URL}/api/paymentconfirmation/getconsentcontent/${projectId}/${token}`
             );
-            setContent(data?.data?.paymentClientConsent?.content || "");
+            setContent(data?.data || "");
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -71,8 +56,9 @@ const PublicClientConsentForm: React.FC = () => {
         fetchConsentContent();
     }, []);
 
+
     return (
-        <div className="min-h-screen flex flex-col items-center bg-gray-50 pb-10 ">
+        <div className=" w-full min-h-screen flex flex-col items-center bg-gray-50 pb-10 ">
             {/* Header */}
             <header className="w-full max-w-full mx-auto border-b border-gray-200 bg-white px-4 py-4 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex items-center gap-4 flex-wrap justify-start border-black md:justify-start text-center md:text-left">
@@ -94,8 +80,26 @@ const PublicClientConsentForm: React.FC = () => {
             </header>
 
 
+            {isError && <div className="min-w-md my-4 mx-auto p-4 bg-slate-50 border border-slate-200 rounded-lg shadow text-center mb-6">
+                <div className="text-slate-600 font-semibold mb-2">
+                    ⚠️ Error Occured
+                </div>
+                <p className="text-slate-500 text-sm mb-4">
+                    {(getAllError as any)?.response?.data?.message ||
+                        (getAllError as any)?.message ||
+                        "Failed to load cost estimation data"}
+                </p>
+                <Button
+                    onClick={() => window.location.reload()}
+                    className="bg-blue-600 text-white px-4 py-2"
+                >
+                    Retry
+                </Button>
+            </div>
+            }
+
             {/* Consent Content */}
-            <div className="w-full bg-white p-4 max-w-3xl rounded-lg overflow-hidden">
+            {!isError && <><div className="w-full bg-white p-4 max-w-3xl rounded-lg overflow-hidden">
                 <div className="p-5 bg-white max-h-[500px] rounded-md border-2 border-[#4e51543a] custom-scrollbar  overflow-y-auto ">
                     {loading ? (
                         <p className="text-gray-600">Loading form content...</p>
@@ -105,7 +109,7 @@ const PublicClientConsentForm: React.FC = () => {
                             dangerouslySetInnerHTML={{ __html: content }}
                         />
                     ) : (
-                        <p className="text-red-500 text-sm">Content not found.</p>
+                        <p className="text-slate-500 text-sm">Content not found.</p>
                     )}
                 </div>
 
@@ -140,6 +144,8 @@ const PublicClientConsentForm: React.FC = () => {
                 </div>
                 <div className="text-xs">All rights reserved. For queries, contact our team.</div>
             </footer>
+
+            </>}
         </div>
     );
 };

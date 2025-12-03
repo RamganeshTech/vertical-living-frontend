@@ -3,21 +3,26 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from '../../../../utils/toast';
 import RetailInvoiceAccountForm from './RetailInvoiceAccountForm';
 import type { RetailCreateInvoicePayload } from './CreateRetailInvoiceAcc';
-import { useGetSingleRetailInvoice } from '../../../../apiList/Department Api/Accounting Api/retailinvoiceApi';
+import { useGetSingleRetailInvoice, useUpdateRetailInvoice } from '../../../../apiList/Department Api/Accounting Api/retailinvoiceApi';
 
 const RetailInvoiceAccSingle = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { organizationId } = useParams() as { organizationId: string }
-    const { data: invoice, isLoading, isError, error } = useGetSingleRetailInvoice(id || '');
+    const { data: invoice, isLoading, isError, error, refetch } = useGetSingleRetailInvoice(id || '');
 
-    const handleUpdate = async (_data: RetailCreateInvoicePayload) => {
+    const updateInvoiceMutation = useUpdateRetailInvoice()
+
+
+
+    const handleUpdate = async (data: RetailCreateInvoicePayload) => {
         try {
             // TODO: Implement update mutation when backend is ready
-            // await updateInvoiceMutation.mutateAsync({ invoiceId: id!, invoiceData: data });
+            await updateInvoiceMutation.mutateAsync({ invoiceId: id!, invoiceData: {...data, organizationId} });
+            refetch()
 
             toast({ title: "Success", description: "Invoice updated successfully" });
-            navigate(-1);
+
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -65,7 +70,7 @@ const RetailInvoiceAccSingle = () => {
                 organizationId={organizationId}
                 initialData={invoice}
                 onSubmit={handleUpdate}
-                isSubmitting={false} // Update when mutation is implemented
+                isSubmitting={updateInvoiceMutation.isPending} // Update when mutation is implemented
             />
         </main>
     );
