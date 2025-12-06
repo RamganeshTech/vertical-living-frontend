@@ -12,6 +12,7 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   LOGISTICS: "Logistics",
   PROCUREMENT: "Procurement",
   ACCOUNTING: "Accounting",
+    DESIGNLAB: "Desgin Lab",
   // CUSTOMERACCOUNT: "Customer",
   // INVOICEACCOUNT: "Invoice",
   RATECONIG: "Rate Config (Material)",

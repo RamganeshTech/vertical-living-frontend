@@ -1,7 +1,7 @@
 // VendorPaymentSingle.tsx
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from '../../../../utils/toast';
-import { useGetSinglevendorpayments } from '../../../../apiList/Department Api/Accounting Api/vendorPaymentApi';
+import { useGetSinglevendorpayments, useUpdatevendorpayments } from '../../../../apiList/Department Api/Accounting Api/vendorPaymentApi';
 import type { PayloadVendorPayload } from './CreateVendorPaymentAcc';
 import VendorPaymentAccForm from './VendorPaymentAccForm';
 import MaterialOverviewLoading from '../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
@@ -10,15 +10,15 @@ const VendorPaymentSingle = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { organizationId } = useParams() as { organizationId: string }
-    const { data: payment, isLoading, isError, error } = useGetSinglevendorpayments(id || '');
+    const { data: payment, isLoading, isError, error, refetch } = useGetSinglevendorpayments(id || '');
+    const updatepaymentsMutation = useUpdatevendorpayments();
 
-    const handleUpdate = async (_data: PayloadVendorPayload) => {
+    const handleUpdate = async (data: PayloadVendorPayload) => {
         try {
             // TODO: Implement update mutation when backend is ready
-            // await updatepaymentsMutation.mutateAsync({ paymentId: id!, paymentData: data });
+            await updatepaymentsMutation.mutateAsync({ id: id!, vendorpaymentsData: {...data, organizationId} });
 
-            toast({ title: "Success", description: "payments updated successfully" });
-            navigate(-1);
+            toast({ title: "Success", description: "updated successfully" });
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -63,7 +63,8 @@ const VendorPaymentSingle = () => {
                 organizationId={organizationId}
                 initialData={payment}
                 onSubmit={handleUpdate}
-                isSubmitting={false} // Update when mutation is implemented
+                isSubmitting={updatepaymentsMutation.isPending} // Update when mutation is implemented
+                refetch={refetch}
             />
         </main>
     );

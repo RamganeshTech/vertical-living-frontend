@@ -12,7 +12,7 @@ const getAllVendorPayment = async ({
     page,
     limit,
     // date,
-    paymentFromDate, paymentToDate,createdFromDate,createdToDate,
+    vendorPaymentFromDate, vendorPaymentToDate,createdFromDate,createdToDate,
     search,
     sortBy,
     sortOrder,
@@ -23,8 +23,8 @@ const getAllVendorPayment = async ({
     page?: number;
     limit?: number;
     // date?: string;
-     paymentFromDate?: string
-    paymentToDate?: string
+     vendorPaymentFromDate?: string
+    vendorPaymentToDate?: string
     createdFromDate?: string
     createdToDate?: string,
     search?: string;
@@ -37,8 +37,8 @@ const getAllVendorPayment = async ({
     if (vendorId) params.append('vendorId', vendorId);
     if (page) params.append('page', page.toString());
     if (limit) params.append('limit', limit.toString());
-    if (paymentFromDate) params.append('paymentFromDate', paymentFromDate);
-    if (paymentToDate) params.append('paymentToDate', paymentToDate);
+    if (vendorPaymentFromDate) params.append('vendorPaymentFromDate', vendorPaymentFromDate);
+    if (vendorPaymentToDate) params.append('vendorPaymentToDate', vendorPaymentToDate);
     if (createdFromDate) params.append('createdFromDate', createdFromDate);
     if (createdToDate) params.append('createdToDate', createdToDate);
     if (sortBy) params.append('sortBy', sortBy);
@@ -61,6 +61,32 @@ const createVendorPayment = async ({
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
+
+const updateVendorPayment = async ({
+    vendorpaymentsData,
+    id,
+    api
+    
+}: {
+    vendorpaymentsData: any;
+    id:string,
+    api: AxiosInstance
+}) => {
+    const { data } = await api.put(`/department/accounting/vendorpayment/update/${id}`, vendorpaymentsData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
+const syncVendorPaymentToPayment = async ({ id, api }: { id: string; api: AxiosInstance }) => {
+    // We send billData as JSON. 
+    // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
+    const { data } = await api.post(`/department/accounting/vendorpayment/sendtopayment/${id}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
 
 const deleteVendorPayment = async ({
     vendorpaymentsId,
@@ -95,8 +121,8 @@ export const useGetAllVendorPayments = ({
     vendorId,
     limit = 10,
     search,
-    paymentFromDate,
-    paymentToDate,
+    vendorPaymentFromDate,
+    vendorPaymentToDate,
     createdFromDate,
     createdToDate,
     sortBy,
@@ -107,8 +133,8 @@ export const useGetAllVendorPayments = ({
     limit?: number;
     search?: string;
     // date?: string
-    paymentFromDate?: string
-    paymentToDate?: string
+    vendorPaymentFromDate?: string
+    vendorPaymentToDate?: string
     createdFromDate?: string
     createdToDate?: string,
     sortBy?: string;
@@ -119,7 +145,7 @@ export const useGetAllVendorPayments = ({
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["VendorPayment", organizationId, vendorId, limit, paymentFromDate, paymentToDate, createdFromDate, createdToDate, search, sortBy, sortOrder],
+        queryKey: ["VendorPayment", organizationId, vendorId, limit, vendorPaymentFromDate, vendorPaymentToDate, createdFromDate, createdToDate, search, sortBy, sortOrder],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedRoles.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -132,7 +158,7 @@ export const useGetAllVendorPayments = ({
                 vendorId,
                 page: pageParam,
                 limit,
-                paymentFromDate, paymentToDate, createdFromDate, createdToDate,
+                vendorPaymentFromDate, vendorPaymentToDate, createdFromDate, createdToDate,
                 search,
                 sortBy,
                 sortOrder,
@@ -173,6 +199,27 @@ export const useCreatevendorpayments = () => {
     });
 };
 
+
+
+export const useUpdatevendorpayments = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ vendorpaymentsData, id }: { vendorpaymentsData: any, id:string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+            return await updateVendorPayment({ vendorpaymentsData, id ,api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["VendorPayment"] });
+        },
+    });
+};
+
+
+
 export const useDeletevendorpayments = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
@@ -205,5 +252,25 @@ export const useGetSinglevendorpayments = (vendorpaymentsId: string) => {
             return await getSingleVendorPayment({ vendorpaymentsId, api });
         },
         enabled: !!vendorpaymentsId && !!role && allowedRoles.includes(role),
+    });
+};
+
+
+
+
+export const useSyncVendorPaymentToPaymentsSection = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ id }: { id: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await syncVendorPaymentToPayment({ id, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["VendorPayment"] });
+        },
     });
 };

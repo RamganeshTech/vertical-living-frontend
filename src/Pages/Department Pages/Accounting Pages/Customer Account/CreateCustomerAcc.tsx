@@ -15,7 +15,8 @@ const CreateCustomerAcc = () => {
             const payload: CreateCustomerPayload = {
                 ...data,
                 organizationId: organizationId!,
-                files: files || []
+                files: files || [],
+                // mainImage: mainImage // <--- Pass it here
             };
 
             await createCustomerMutation.mutateAsync(payload);

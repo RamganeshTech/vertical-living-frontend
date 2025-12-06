@@ -2,10 +2,10 @@
 
 import { type AxiosInstance } from 'axios';
 
-import { 
-    useInfiniteQuery, 
-    useMutation, 
-    useQuery, 
+import {
+    useInfiniteQuery,
+    useMutation,
+    useQuery,
 } from '@tanstack/react-query';
 import useGetRole from '../../../Hooks/useGetRole';
 import { getApiForRole } from '../../../utils/roleCheck';
@@ -13,50 +13,66 @@ import { queryClient } from '../../../QueryClient/queryClient';
 
 // Types
 export interface CreateCustomerPayload {
-    customerType: "business" | "individual";
+    // customerType: "business" | "individual";
     organizationId: string;
-    projectId: string;
+    // projectId: string;
     clientId: string;
+  // Basic
     firstName: string | null;
-    lastName: string | null;
     companyName: string | null;
     email: string | null;
     phone: {
         work: string | null;
         mobile: string | null;
     };
-    customerLanguage: string | null;
+
+    // Statutory
+    language: string | null;
     pan?: string | null;
+    tan?: string | null;
+    gstin?: string | null;
     currency?: string;
-    accountsReceivable?: string | null;
-    openingBalance?: number;
-    paymentTerms?: string;
-    enablePortal?: boolean;
-    files?: File[]; // Add files to payload
+
+    // Banking
+    bankAccNo?: string | null;
+    accHolderName?: string | null;
+    bankName?: string | null;
+    bankBranch?: string | null;
+    ifscCode?: string | null;
+
+    // Files (Raw Files for Upload)
+    mainImage?: File; 
+    files?: File[]; 
 }
 
 export interface UpdateCustomerPayload {
-    customerType?: "business" | "individual";
     firstName?: string | null;
-    lastName?: string | null;
     companyName?: string | null;
     email?: string | null;
     phone?: {
         work?: string | null;
         mobile?: string | null;
     };
-    customerLanguage?: string | null;
+
+    // Statutory
+    language?: string | null;
     pan?: string | null;
+    tan?: string | null;
+    gstin?: string | null;
     currency?: string;
-    accountsReceivable?: string | null;
-    openingBalance?: number;
-    paymentTerms?: string;
-    enablePortal?: boolean;
+
+    // Banking
+    bankAccNo?: string | null;
+    accHolderName?: string | null;
+    bankName?: string | null;
+    bankBranch?: string | null;
+    ifscCode?: string | null;
     documents?: Array<{
         type: "image" | "pdf";
         url: string;
         originalName?: string;
     }>;
+
 }
 
 export interface GetCustomersParams {
@@ -66,12 +82,19 @@ export interface GetCustomersParams {
     projectId?: string;
     firstName?: string;
     lastName?: string;
-    customerType?: "business" | "individual";
     search?: string;
     createdFromDate?: string
     createdToDate?: string,
     sortBy?: string;
     sortOrder?: "asc" | "desc";
+}
+
+export interface ICustomerFile {
+    _id?: string;
+    type: "image" | "pdf";
+    url: string;
+    originalName?: string;
+    uploadedAt?: string;
 }
 
 export interface Customer {
@@ -80,27 +103,32 @@ export interface Customer {
     organizationId: string;
     projectId: string;
     clientId: string;
-    firstName: string | null;
-    lastName: string | null;
+     firstName: string | null;
     companyName: string | null;
     email: string | null;
     phone: {
         work: string | null;
         mobile: string | null;
     };
-    customerLanguage?: string | null;
+
+    // Statutory Details
+    language?: string | null; // Renamed from customerLanguage to match Schema
     pan?: string | null;
+    tan?: string | null;
+    gstin?: string | null;
     currency?: string;
-    accountsReceivable?: string | null;
-    openingBalance?: number;
-    paymentTerms?: string;
-    enablePortal?: boolean;
-    documents?: Array<{
-        type: "image" | "pdf";
-        url: string;
-        originalName?: string;
-        uploadedAt?: Date;
-    }>;
+
+    // Banking Details
+    bankAccNo?: string | null;
+    accHolderName?: string | null;
+    bankName?: string | null;
+    bankBranch?: string | null;
+    ifscCode?: string | null;
+
+    // Media
+    mainImage?: ICustomerFile | null;
+    documents?: ICustomerFile[];
+
     createdAt: string;
     updatedAt: string;
 }
@@ -145,8 +173,8 @@ export const createCustomer = async ({
 }: {
     payload: CreateCustomerPayload;
     api: AxiosInstance;
-})=> {
-      // Always send as FormData
+}) => {
+    // Always send as FormData
     const formData = new FormData();
 
     // Extract files from payload
@@ -164,6 +192,10 @@ export const createCustomer = async ({
         formData.append('phone', JSON.stringify(phone));
     }
 
+    //  if (mainImage) {
+    //     formData.append('mainImage', mainImage);
+    // }
+
     // Append files if present
     if (files && files.length > 0) {
         files.forEach((file) => {
@@ -176,7 +208,7 @@ export const createCustomer = async ({
             'Content-Type': 'multipart/form-data'
         }
     });
-    
+
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
@@ -221,7 +253,7 @@ export const getAllCustomeforDD = async ({
 }) => {
     const { data } = await api.get(`/department/accounting/customer/getallcustomername/${organizationId}`);
     if (!data.ok) throw new Error(data.message);
-    
+
     return data.data;
 };
 
@@ -244,16 +276,44 @@ export const updateCustomer = async ({
 
 
 
-export const updateCustomerDocument = async ({api,formData, id}:{api:AxiosInstance, id: string, formData: FormData}) => {
-  const response = await api.put(`/department/accounting/customer/updatecustomer/${id}/document`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
-  return response.data;
+
+export const updateCustomerMainImage = async ({
+    customerId,
+    file,
+    api
+}: {
+    customerId: string;
+    file: File;
+    api: AxiosInstance;
+}) => {
+    const formData = new FormData();
+    formData.append('mainImage', file);
+
+    const { data } = await api.put(
+        `/department/accounting/customer/update-main-image/${customerId}`,
+        formData,
+        {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        }
+    );
+
+    if (!data.ok) throw new Error(data.message);
+    return data.data; // Should return { mainImage: "url..." }
+};
+
+
+
+
+export const updateCustomerDocument = async ({ api, formData, id }: { api: AxiosInstance, id: string, formData: FormData }) => {
+    const response = await api.put(`/department/accounting/customer/updatecustomer/${id}/document`,
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+    return response.data;
 };
 
 /**
@@ -298,12 +358,10 @@ export const useCreateCustomer = () => {
         },
         onSuccess: (_, variables) => {
             // Invalidate all customer queries for this organization
-            queryClient.invalidateQueries({ 
-                queryKey: ["customers", "list", variables.organizationId] 
+            queryClient.invalidateQueries({
+                queryKey: ["customers", "list", variables.organizationId]
             });
-            queryClient.invalidateQueries({ 
-                queryKey: ["customers", "list", variables.organizationId, variables.projectId] 
-            });
+          
         }
     });
 };
@@ -316,7 +374,7 @@ export const useGetAllCustomers = (params: Omit<GetCustomersParams, 'page'>) => 
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["customers", "list", params.organizationId, params.projectId, params.customerType, params.search, params.sortBy, params.sortOrder, params.createdFromDate, params.createdToDate],
+        queryKey: ["customers", "list", params.organizationId, params.projectId, params.search, params.sortBy, params.sortOrder, params.createdFromDate, params.createdToDate],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -324,9 +382,9 @@ export const useGetAllCustomers = (params: Omit<GetCustomersParams, 'page'>) => 
             if (!api) {
                 throw new Error("API instance not found for role");
             }
-            return await getAllCustomers({ 
-                params: { ...params, page: pageParam }, 
-                api 
+            return await getAllCustomers({
+                params: { ...params, page: pageParam },
+                api
             });
         },
         getNextPageParam: (lastPage) => {
@@ -399,11 +457,11 @@ export const useUpdateCustomer = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({ 
-            customerId, 
-            payload 
-        }: { 
-            customerId: string; 
+        mutationFn: async ({
+            customerId,
+            payload
+        }: {
+            customerId: string;
             payload: UpdateCustomerPayload;
         }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
@@ -416,12 +474,12 @@ export const useUpdateCustomer = () => {
         },
         onSuccess: (variables) => {
             // Invalidate single customer query
-            queryClient.invalidateQueries({ 
-                queryKey: ["customers", "single", variables.customerId] 
+            queryClient.invalidateQueries({
+                queryKey: ["customers", "single", variables.customerId]
             });
             // Invalidate all customer list queries
-            queryClient.invalidateQueries({ 
-                queryKey: ["customers", "list"] 
+            queryClient.invalidateQueries({
+                queryKey: ["customers", "list"]
             });
         }
     });
@@ -435,8 +493,8 @@ export const useUpdateCustomerDocument = () => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
-   return useMutation({
-        mutationFn: async ({ id, formData }: {id:string, formData:FormData}) => {
+    return useMutation({
+        mutationFn: async ({ id, formData }: { id: string, formData: FormData }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
                 throw new Error("Not allowed to make this API call");
             }
@@ -447,6 +505,34 @@ export const useUpdateCustomerDocument = () => {
         },
     });
 };
+
+
+export const useUpdateCustomerMainImage = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ customerId, file }: { customerId: string; file: File }) => {
+            if (!role || !ALLOWED_ROLES.includes(role)) {
+                throw new Error("Not allowed to make this API call");
+            }
+            if (!api) {
+                throw new Error("API instance not found for role");
+            }
+            return await updateCustomerMainImage({ customerId, file, api });
+        },
+        onSuccess: (_, variables) => {
+           queryClient.invalidateQueries({
+                queryKey: ["customers", "single", variables.customerId]
+            });
+            // Invalidate all customer list queries
+            queryClient.invalidateQueries({
+                queryKey: ["customers", "list"]
+            });
+        }
+    });
+};
+
 
 /**
  * Hook to delete customer
@@ -467,8 +553,8 @@ export const useDeleteCustomer = () => {
         },
         onSuccess: () => {
             // Invalidate all customer list queries
-            queryClient.invalidateQueries({ 
-                queryKey: ["customers", "list"] 
+            queryClient.invalidateQueries({
+                queryKey: ["customers", "list"]
             });
         }
     });

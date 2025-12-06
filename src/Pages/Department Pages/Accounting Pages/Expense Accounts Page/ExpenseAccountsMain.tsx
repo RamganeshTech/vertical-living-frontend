@@ -189,7 +189,7 @@ const ExpenseAccountsMain = () => {
                     </Button> */}
                     <Button onClick={() => navigate('create')}>
                         <i className="fas fa-plus mr-2" />
-                        Add Expense
+                        Create Expense
                     </Button>
                 </div>
             </div>

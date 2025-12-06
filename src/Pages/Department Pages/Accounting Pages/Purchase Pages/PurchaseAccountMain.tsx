@@ -155,7 +155,7 @@ const PurchaseAccountsMain = () => {
                     onClick={() => navigate('create')}
                 >
                     <i className="fas fa-plus mr-2" />
-                    Create Order
+                    Create Purchase Order
                 </Button>
             </div>
 

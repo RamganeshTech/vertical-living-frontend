@@ -1280,7 +1280,7 @@ const OrderMaterialOverview = () => {
                                                                 {/* PDF Generated Successfully */}
                                                                 {ele.pdfName}
                                                             </h4>
-                                                            <span className="text-sm">Pdf Reference Id: {ele.refUniquePdf || "N/A"}</span>
+                                                            <span className="text-sm">Order Number: {ele.refUniquePdf || "N/A"}</span>
                                                             <p className="text-sm text-green-700">
                                                                 Your order material PDF is ready to view or download
                                                             </p>

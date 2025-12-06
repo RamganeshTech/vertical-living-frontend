@@ -59,7 +59,7 @@ const PaymentAccList: React.FC<Props> = ({ payment, index, handleView, handleDel
             {/* 4. Payment Date */}
             <div className="col-span-2 text-gray-600 text-sm flex items-center">
                 <i className="far fa-calendar-alt text-gray-400 mr-2"></i>
-                {dateFormate(payment.paymentDate)}
+                {dateFormate(payment?.dueDate)}
             </div>
 
             {/* 5. Amount (Right Aligned) */}

@@ -20,13 +20,15 @@ const CustomerAccountsMain = () => {
 
     const paths: BreadcrumbItem[] = [
         { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
+        { label: "Bills", path: `/organizations/${organizationId}/projects/billmain` },
+
         { label: "Customer", path: `/organizations/${organizationId}/projects/customermain` },
     ];
 
     // Filter states
     const [filters, setFilters] = useState({
         search: '',
-        customerType: '' as '' | 'business' | 'individual',
+        // customerType: '' as '' | 'business' | 'individual',
         projectId: '',
         sortBy: 'createdAt',
         createdFromDate: "",
@@ -58,7 +60,7 @@ const CustomerAccountsMain = () => {
     } = useGetAllCustomers({
         organizationId: organizationId || '',
         search: debouncedSearch,
-        customerType: filters.customerType || undefined,
+        // customerType: filters.customerType || undefined,
         projectId: filters.projectId || undefined,
         createdFromDate: filters.createdFromDate || undefined,
         createdToDate: filters.createdToDate || undefined,
@@ -114,7 +116,7 @@ const CustomerAccountsMain = () => {
     const clearFilters = () => {
         setFilters({
             search: '',
-            customerType: '',
+            // customerType: '',
             projectId: '',
             createdFromDate: "",
         createdToDate: "",
@@ -204,7 +206,7 @@ const CustomerAccountsMain = () => {
                                     <input
                                         type="text"
                                         autoFocus
-                                        placeholder="Name, email, phone..."
+                                        placeholder="Name, email, phone, company..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -212,7 +214,7 @@ const CustomerAccountsMain = () => {
                                 </div>
 
                                 {/* Customer Type */}
-                                <div>
+                                {/* <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Customer Type
                                     </label>
@@ -225,7 +227,7 @@ const CustomerAccountsMain = () => {
                                         <option value="business">Business</option>
                                         <option value="individual">Individual</option>
                                     </select>
-                                </div>
+                                </div> */}
 
 
                                 <div>
@@ -299,7 +301,7 @@ const CustomerAccountsMain = () => {
                             <i className="fas fa-user-slash text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Customers Found</h3>
                             <p className="text-sm text-gray-500">
-                                {filters.search || filters.customerType
+                                {filters.search
                                     ? 'Try adjusting your filters to find customers.'
                                     : 'Looks like there are no customers yet.'}
                                 <br />
@@ -360,7 +362,7 @@ const CustomerAccountsMain = () => {
                                 <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
                                     <div className="col-span-1 text-center">S.No</div>
                                     <div className="col-span-3 text-center">Customer Name</div>
-                                    <div className="col-span-2 text-center">Type</div>
+                                    <div className="col-span-2 text-center">Company Name</div>
                                     <div className="col-span-2 text-center">Email</div>
                                     <div className="col-span-2 text-center">Phone</div>
                                     <div className="col-span-2 text-center">Created At</div>

@@ -17,12 +17,17 @@ const CustomerAccList: React.FC<Props> = ({
     onDelete,
     isDeleting,
 }) => {
-    const displayName = customer.firstName || customer.lastName ? `${customer.firstName || ""} ${customer.lastName || ""}`.trim() : null;
+    const displayName = customer.firstName;
 
-    const phone = customer.phone?.work || customer.phone?.mobile || null
+    // const phone = customer.phone?.work || customer.phone?.mobile || null
 
-    const customerTypeLabel =
-        customer.customerType === "business" ? "Business" : "Individual";
+    
+    const workPhone = customer?.phone?.work || null;
+    const mobilePhone = customer?.phone?.mobile || null;
+
+
+    // const customerTypeLabel =
+    //     customer.customerType === "business" ? "Business" : "Individual";
 
     return (
         <div
@@ -36,15 +41,15 @@ const CustomerAccList: React.FC<Props> = ({
             </div>
 
             {/* Customer Name */}
-            <div className="col-span-3 truncate font-medium text-gray-900 flex items-center gap-2">
+            <div className="col-span-3 text-center truncate font-medium text-gray-900 flex items-center gap-2">
                 {displayName ?
-                    <span>{displayName}</span>
+                    <span className=" block mx-auto">{displayName}</span>
                     : "-"
                 }
             </div>
 
             {/* Customer Type */}
-            <div className="col-span-2 text-center">
+            {/* <div className="col-span-2 text-center">
                 <span
                     className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${customer.customerType === "business"
                         ? "bg-blue-100 text-blue-800"
@@ -53,7 +58,13 @@ const CustomerAccList: React.FC<Props> = ({
                 >
                     {customerTypeLabel}
                 </span>
+            </div> */}
+
+            <div className="col-span-2 text-sm text-gray-700 truncate text-center">
+                {/* <i className="fas fa-envelope text-gray-400 mr-2"></i> */}
+                {customer.companyName ? customer.companyName : "-"}
             </div>
+
 
             {/* Email */}
             <div className="col-span-2 text-sm text-gray-700 truncate text-center">
@@ -62,9 +73,31 @@ const CustomerAccList: React.FC<Props> = ({
             </div>
 
             {/* Phone */}
-            <div className="col-span-2 text-sm text-gray-700 truncate text-center">
-                {/* <i className="fas fa-phone text-gray-400 mr-2"></i> */}
+            {/* <div className="col-span-2 text-sm text-gray-700 truncate text-center">
+                <i className="fas fa-phone text-gray-400 mr-2"></i>
                 {phone ? phone : "-"}
+            </div> */}
+
+             <div className="col-span-2 text-sm text-gray-700 flex flex-col items-center gap-1">
+
+                {/* Work Phone */}
+                {workPhone && (
+                    <div className="flex items-center gap-2">
+                        <i className="fas fa-phone text-gray-400"></i>
+                        <span>{workPhone}</span>
+                    </div>
+                )}
+
+                {/* Mobile Phone */}
+                {mobilePhone && (
+                    <div className="flex items-center gap-2">
+                        <i className="fas fa-mobile-alt text-gray-400"></i>
+                        <span>{mobilePhone}</span>
+                    </div>
+                )}
+
+                {/* If nothing exists */}
+                {!workPhone && !mobilePhone && <span>-</span>}
             </div>
 
             {/* Created At */}

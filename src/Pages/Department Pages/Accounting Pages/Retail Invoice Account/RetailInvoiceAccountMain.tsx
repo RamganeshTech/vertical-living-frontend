@@ -192,7 +192,7 @@ const RetailInvoiceAccountsMain = () => {
                     onClick={() => navigate('create')}
                 >
                     <i className="fas fa-plus mr-2" />
-                    Create Invoice
+                    Create Retail Invoice
                 </Button>
             </div>
 

@@ -6,6 +6,11 @@ import { useGetVendorForDropDown } from '../../../../apiList/Department Api/Acco
 import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
 import { Label } from '../../../../components/ui/Label';
 import type { CreateVendorPaymentPayload, PayloadVendorPayload, VendorPaymentItem } from './CreateVendorPaymentAcc';
+import { useGetProjects } from '../../../../apiList/projectApi';
+import type { AvailableProjetType } from '../../Logistics Pages/LogisticsShipmentForm';
+import { useSyncVendorPaymentToPaymentsSection } from '../../../../apiList/Department Api/Accounting Api/vendorPaymentApi';
+import { toast } from '../../../../utils/toast';
+import InfoTooltip from '../../../../components/ui/InfoToolTip';
 
 
 // CAN USE THE OMIT ALSO INSTEAD OF PICK
@@ -25,12 +30,12 @@ export type VendorPaymentFormData = Pick<
     CreateVendorPaymentPayload,
     | 'vendorId'
     | 'vendorName'
-    | 'paymentDate'
+    | 'vendorPaymentDate'
     | 'paymentMode'
     | 'paidThrough'
     | 'items'
+    | "paymentTerms"
     | 'totalAmount'
-    | 'totalDueAmount'
     | 'notes'
 >;
 
@@ -45,8 +50,17 @@ const paymentModeOptions = [
     { label: "Others", value: "others" },
 ];
 
+
+
+const paymentTermsOptions = [
+    "Cash EOD",
+    "weekly salary",
+    "pay advance and balance after completion",
+    "credit pay as you go",
+];
+
 // const paidThroughOptions = [
-//     { label: "Cash Account", value: "cashcAccount" },
+//     { label: "Cash Account",
 //     { label: "Petty Cash", value: "pettyCash" },
 //     { label: "Bank", value: "bank" },
 //     { label: "Others", value: "others" },
@@ -58,6 +72,7 @@ interface Props {
     onSubmit: (data: PayloadVendorPayload) => Promise<void>;
     isSubmitting: boolean;
     organizationId: string;
+    refetch?: any;
 }
 
 const VendorPaymentAccForm: React.FC<Props> = ({
@@ -65,34 +80,42 @@ const VendorPaymentAccForm: React.FC<Props> = ({
     initialData,
     onSubmit,
     isSubmitting,
-    organizationId
+    organizationId,
+    refetch
 }) => {
     const navigate = useNavigate();
-    const [currentMode, _setCurrentMode] = useState<'create' | 'view' | 'edit'>(initialMode);
+    const [currentMode, setCurrentMode] = useState<'create' | 'view' | 'edit'>(initialMode);
 
     const { data: VendorData } = useGetVendorForDropDown(organizationId)
+    const { mutateAsync: syncPaymentsMutation, isPending: syncPaymentsLoading } = useSyncVendorPaymentToPaymentsSection()
 
 
     const defaultFormData: PayloadVendorPayload = {
         organizationId: organizationId,
         vendorId: '',
+        projectId: null,
+        paymentTerms: "",
         vendorName: '',
-        paymentDate: new Date().toISOString().split('T')[0],
+        vendorPaymentDate: new Date().toISOString().split('T')[0],
         paymentMode: "Cash",
         paidThrough: "",
         items: [
             {
-                date: new Date().toISOString().split('T')[0],
+                itemName: "",
                 billAmount: 0,
-                amountDue: 0,
-                paymentMadeOn: null
             }
         ],
         totalAmount: 0,
-        totalDueAmount: 0,
         notes: '',
     };
 
+
+
+    const { data: projectData } = useGetProjects(organizationId!);
+    const projects = projectData?.map((project: AvailableProjetType) => ({
+        _id: project._id,
+        projectName: project.projectName
+    }));
 
 
     const [enableVendorInput, setEnableVendorInput] = useState<boolean>(false)
@@ -100,7 +123,6 @@ const VendorPaymentAccForm: React.FC<Props> = ({
 
     const [calculatedTotals, setCalculatedTotals] = useState({
         totalAmount: 0,
-        totalDueAmount: 0
         // discountAmount: 0,
         // taxAmount: 0,
         // grandTotal: 0
@@ -112,24 +134,20 @@ const VendorPaymentAccForm: React.FC<Props> = ({
             ...defaultFormData,
             ...(initialData && {
                 vendorId: initialData.vendorId || defaultFormData.vendorId,
+                projectId: initialData.projectId || defaultFormData.projectId,
                 vendorName: initialData.vendorName || defaultFormData.vendorName,
-                paymentDate: initialData.paymentDate
-                    ? new Date(initialData.paymentDate).toISOString().split('T')[0]
-                    : defaultFormData.paymentDate,
+                vendorPaymentDate: initialData.vendorPaymentDate
+                    ? new Date(initialData.vendorPaymentDate).toISOString().split('T')[0]
+                    : defaultFormData.vendorPaymentDate,
                 paymentMode: initialData.paymentMode || defaultFormData.paymentMode,
                 paidThrough: initialData.paidThrough || defaultFormData.paidThrough,
                 items: initialData.items?.length
                     ? initialData.items.map(item => ({
-                        date: item.date ? new Date(item.date).toISOString().split('T')[0] : defaultFormData.items[0].date,
+                        itemName: item?.itemName ? item.itemName : defaultFormData.items[0].itemName,
                         billAmount: item.billAmount ?? defaultFormData.items[0].billAmount,
-                        amountDue: item.amountDue ?? defaultFormData.items[0].amountDue,
-                        paymentMadeOn: item.paymentMadeOn
-                            ? new Date(item.paymentMadeOn).toISOString().split('T')[0]
-                            : defaultFormData.items[0].paymentMadeOn
                     }))
                     : defaultFormData.items,
                 totalAmount: initialData.totalAmount ?? defaultFormData.totalAmount,
-                totalDueAmount: initialData.totalDueAmount ?? defaultFormData.totalDueAmount,
                 notes: initialData.notes || defaultFormData.notes,
             }),
         });
@@ -144,7 +162,6 @@ const VendorPaymentAccForm: React.FC<Props> = ({
     // Calculate totals whenever items, discount, or tax changes
     useEffect(() => {
         const totalAmount = formData.items.reduce((sum, item) => sum + (item.billAmount || 0), 0);
-        const totalDueAmount = formData.items.reduce((sum, item) => sum + (item.amountDue || 0), 0);
         // const discountAmount = (totalAmount * formData.discountPercentage) / 100;
         // const amountAfterDiscount = totalAmount - discountAmount;
         // const taxAmount = (amountAfterDiscount * formData.taxPercentage) / 100;
@@ -152,11 +169,14 @@ const VendorPaymentAccForm: React.FC<Props> = ({
 
         setCalculatedTotals({
             totalAmount,
-            totalDueAmount
         });
     }, [formData.items,
         // formData.discountPercentage, formData.taxPercentage
     ]);
+
+
+
+
 
     const VendorOptions = (VendorData || [])?.map((Vendor: { _id: string; email: string; vendorName: string }) => ({
         value: Vendor._id,
@@ -185,10 +205,9 @@ const VendorPaymentAccForm: React.FC<Props> = ({
         setFormData(prev => ({
             ...prev,
             items: [...prev.items, {
-                date: new Date().toISOString().split('T')[0],
+                itemName: "",
                 billAmount: 0,
-                amountDue: 0,
-                paymentMadeOn: null
+
             }]
         }));
     };
@@ -211,7 +230,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
             const item = { ...newItems[index] };
 
             // Update the field value
-            if (field === 'billAmount' || field === 'amountDue') {
+            if (field === 'billAmount') {
                 let numValue: number = 0;
                 if (value === null || value === '') {
                     numValue = 0;
@@ -221,12 +240,9 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                     numValue = value;
                 }
                 item[field] = numValue < 0 ? 0 : numValue;
-            } else if (field === 'date') {
+            } else if (field === 'itemName') {
                 // date cannot be null
-                item.date = value ? (value as string) : new Date().toISOString().split('T')[0];
-            } else if (field === 'paymentMadeOn') {
-                // can be null
-                item.paymentMadeOn = value ? (value as string) : null;
+                item.itemName = value as string
             }
 
 
@@ -243,10 +259,9 @@ const VendorPaymentAccForm: React.FC<Props> = ({
 
                 if (hasValue) {
                     newItems.push({
-                        date: new Date().toISOString().split('T')[0],
+                        itemName: "",
                         billAmount: 0,
-                        amountDue: 0,
-                        paymentMadeOn: null
+
                     });
                 }
             }
@@ -272,12 +287,15 @@ const VendorPaymentAccForm: React.FC<Props> = ({
         //     errors.push('At least one item is required');
         // }
 
+        if (formData?.items && formData?.items?.length === 0) {
+            errors.push(`Atleast one item should be provided`);
+
+        }
+
         formData.items.forEach((item, index) => {
             // Validate date
-            if (!item.date || item.date.trim() === '') {
-                errors.push(`Item ${index + 1}: Date is required`);
-            } else if (isNaN(new Date(item.date).getTime())) {
-                errors.push(`Item ${index + 1}: Date is invalid`);
+            if (!item.itemName || item.itemName.trim() === '') {
+                errors.push(`Item ${index + 1}: itemName is required`);
             }
 
             // Validate billAmount
@@ -285,17 +303,6 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                 errors.push(`Item ${index + 1}: Bill amount cannot be negative`);
             }
 
-            // Validate amountDue
-            if (item.amountDue < 0) {
-                errors.push(`Item ${index + 1}: Amount due cannot be negative`);
-            }
-
-            // Validate paymentMadeOn if provided
-            if (item.paymentMadeOn) {
-                if (isNaN(new Date(item.paymentMadeOn).getTime())) {
-                    errors.push(`Item ${index + 1}: Payment made on must be a valid date`);
-                }
-            }
         });
         return errors;
     };
@@ -323,9 +330,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
             // Keep the row if ANY field has a value
             const hasValue =
                 // (item.date && item.date.trim() !== '') ||
-                item.billAmount > 0 ||
-                item.amountDue > 0 ||
-                (item.paymentMadeOn && item.paymentMadeOn.trim() !== '');
+                item.billAmount > 0 || item.itemName?.trim();
             return hasValue;
         });
 
@@ -352,18 +357,47 @@ const VendorPaymentAccForm: React.FC<Props> = ({
         };
         // console.log("payload", payload)
         await onSubmit(payload);
-        setFormData(defaultFormData)
+
+        if (currentMode === "edit") {
+            setCurrentMode("view")
+        }
+
+        if (currentMode === "create") {
+            setFormData(defaultFormData)
+        }
+
     };
+
+
+    const handleSyncToPayments = async () => {
+        try {
+            if (initialData?.isSyncWithPaymentsSection) {
+                return toast({ variant: "destructive", title: "Error", description: "already sent to payments section" });
+            }
+            await syncPaymentsMutation({
+                id: initialData?._id!
+            });
+            refetch?.()
+            toast({ title: "Success", description: "Bill sent to Payments Section" });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+        }
+    }
 
 
     const isReadOnly = currentMode === 'view';
     const isCreateMode = currentMode === 'create';
     const isEditMode = currentMode === 'edit';
 
+
+    const toggleEdit = () => setCurrentMode(p => p === 'view' ? 'edit' : 'view');
+
+
     return (
         <div className="max-w-full mx-auto space-y-2">
             {/* Header */}
-            <header className="flex justify-between items-center">
+            <header className="sticky top-0 z-20 bg-white border-b border-gray-200 pb-4 pt-2 mb-6 flex justify-between items-center">
+                {/* <header className="flex justify-between items-center"> */}
                 <div className='flex justify-between items-center gap-2'>
                     <button
                         type="button"
@@ -386,29 +420,94 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                         </p>
                     </div>
                 </div>
-                {/* <div className="flex gap-2">
-                    {currentMode === 'view' && (
+
+
+
+                <div className='flex gap-2 items-center'>
+                    {isReadOnly && <div className="flex items-center">
                         <Button
-                            type="button"
-                            onClick={handleEdit}
-                            className="bg-blue-600 text-white"
+                            variant="primary"
+                            className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}
+                            title={initialData?.isSyncWithPaymentsSection ? "already sent to payment" : ""}
+                            isLoading={syncPaymentsLoading}
+                            disabled={initialData?.isSyncWithPaymentsSection}
+                            onClick={handleSyncToPayments}
                         >
-                            <i className="fas fa-edit mr-2"></i>
-                            Edit
+                            Send To Payments Section
                         </Button>
+
+                        <InfoTooltip
+                            content="Click the button to send the vendor payment order to Payments section"
+                            type="info"
+                            position="bottom"
+                        />
+                    </div>}
+
+
+                    {currentMode === "view" && (
+                        <div className="flex justify-end">
+                            <Button onClick={toggleEdit} className="bg-blue-600 text-white px-6 py-2">
+                                Edit
+                            </Button>
+                        </div>
                     )}
-                    {currentMode === 'edit' && (
+
+
+                </div>
+
+                {(isCreateMode || isEditMode) && (
+                    <div className="flex justify-end items-center gap-4">
+
+                        <Button type="button" onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2" disabled={isSubmitting}>
+                            {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <>{isCreateMode ? 'Create' : 'Update'}</>}
+                        </Button>
+
+                        <Button variant='outline' type="button" onClick={() => {
+                            if (isCreateMode) {
+                                navigate(-1)
+                            }
+                            else {
+                                toggleEdit()
+                            }
+                        }} className="bg-gray-500 hover:bg-gray-500 text-white px-6 py-2">
+                            Cancel</Button>
+
+
+                    </div>
+                )}
+
+
+                {/* old version */}
+                {/* {!isReadOnly && (
+                    <div className="flex justify-end gap-4 pt-6">
                         <Button
                             type="button"
-                            onClick={handleCancelEdit}
-                            className="bg-gray-500 text-white"
+                            onClick={() => navigate(-1)}
+                            className="bg-gray-500 text-white px-6 py-2"
+                            disabled={isSubmitting}
                         >
                             <i className="fas fa-times mr-2"></i>
                             Cancel
                         </Button>
-                    )}
-
-                </div> */}
+                        <Button
+                            type="submit"
+                            className="bg-blue-600 text-white px-6 py-2"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                                    {isCreateMode ? 'Creating...' : 'Updating...'}
+                                </>
+                            ) : (
+                                <>
+                                    <i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i>
+                                    {isCreateMode ? 'Create' : 'Update'}
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                )} */}
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -442,10 +541,8 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                             <input
                                 type="text"
                                 name="vendorName"
-                                value={
-                                    enableVendorInput
-                                        ? formData.vendorName // user can edit manually
-                                        : "" // show from formData but not editable
+                                value={formData.vendorName // user can edit manually
+                                    // show from formData but not editable
                                 }
                                 onChange={(e) => {
                                     if (enableVendorInput) handleInputChange(e); // only update if manual input is enabled
@@ -473,14 +570,42 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 placeholder="Enter Remarks"
                             />
                         </div> */}
+
+                        <div>
+                            <Label>Project</Label>
+                            <select
+                                value={formData?.projectId || ''}
+                                disabled={isReadOnly}
+                                onChange={(e) => {
+                                    const selected = projects?.find((p: any) => p._id === e.target.value);
+                                    if (selected) {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            projectId: selected._id,
+                                            projectName: selected.projectName,
+                                        }));
+                                    } else {
+                                        setFormData(prev => ({ ...prev, projectId: null, projectName: null }));
+                                    }
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                <option value="">Select Projects</option>
+                                {projects?.map((project: any) => (
+                                    <option key={project._id} value={project._id}>{project.projectName}</option>
+                                ))}
+                            </select>
+                        </div>
+
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Payment Date
+                                Date
                             </label>
                             <input
                                 type="date"
-                                name="paymentDate"
-                                value={formData.paymentDate}
+                                name="vendorPaymentDate"
+                                value={formData.vendorPaymentDate}
                                 onChange={handleInputChange}
                                 disabled={isReadOnly}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
@@ -501,6 +626,26 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 {paymentModeOptions.map((option) => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Payment Terms
+                            </label>
+                            <select
+                                name="paymentTerms"
+                                value={formData.paymentTerms}
+                                onChange={handleInputChange}
+                                disabled={isReadOnly}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                <option value="">Select Payment Term</option>
+                                {paymentTermsOptions.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
                                     </option>
                                 ))}
                             </select>
@@ -569,11 +714,11 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                             {/* Table Header */}
                             <div className="grid grid-cols-10 gap-3 mb-2 px-4 py-3 bg-gray-100 rounded-lg font-semibold text-gray-700 text-sm">
                                 <div className="col-span-1 text-center">#</div>
-                                <div className="col-span-2 text-center">Date<span className="text-red-500">*</span></div>
-                                <div className="col-span-2 text-center">Bill Amount</div>
-                                <div className="col-span-2 text-center">Amount Due <span className="text-red-500">*</span></div>
-                                <div className="col-span-2 text-center">Payment Made On</div>
-                                <div className="col-span-1 text-center">Action</div>
+                                <div className="col-span-3 text-center">Item Name<span className="text-red-500">*</span></div>
+                                <div className="col-span-3 text-center">Bill Amount</div>
+                                {/* <div className="col-span-2 text-center">Amount Due <span className="text-red-500">*</span></div>
+                                <div className="col-span-2 text-center">Payment Date</div> */}
+                                <div className="col-span-3 text-center">Action</div>
                             </div>
 
                             {/* Table Rows */}
@@ -589,11 +734,11 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                         </div>
 
                                         {/* Item Name */}
-                                        <div className="col-span-2">
+                                        <div className="col-span-3">
                                             <input
-                                                type="date"
-                                                value={item.date}
-                                                onChange={(e) => handleItemChange(index, 'date', e.target.value)}
+                                                type="itemName"
+                                                value={item.itemName}
+                                                onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
                                                 disabled={isReadOnly}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
                                                 placeholder="Enter item name"
@@ -601,7 +746,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                         </div>
 
                                         {/* Quantity */}
-                                        <div className="col-span-2">
+                                        <div className="col-span-3">
                                             <input
                                                 type="number"
                                                 value={item.billAmount}
@@ -614,32 +759,6 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                             />
                                         </div>
 
-                                        {/* Rate */}
-                                        <div className="col-span-2">
-                                            <input
-                                                type="number"
-                                                value={item.amountDue}
-                                                onChange={(e) => handleItemChange(index, 'amountDue', e.target.value)}
-                                                disabled={isReadOnly}
-                                                min="0"
-                                                step="1"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
-                                                placeholder="0.00"
-                                            />
-                                        </div>
-
-                                        <div className="col-span-2">
-                                            <input
-                                                type="date"
-                                                value={item.paymentMadeOn || ""}
-                                                onChange={(e) => handleItemChange(index, 'paymentMadeOn', e.target.value)}
-                                                disabled={isReadOnly}
-                                                min="0"
-                                                step="0.01"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
-                                                placeholder="0.00"
-                                            />
-                                        </div>
 
                                         {/* Total */}
                                         {/* <div className="col-span-2 text-center font-semibold text-gray-900">
@@ -647,7 +766,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                         </div> */}
 
                                         {/* Delete Button */}
-                                        <div className="col-span-1 text-center">
+                                        <div className="col-span-3 text-center">
                                             {!isReadOnly && (
                                                 <button
                                                     type="button"
@@ -670,13 +789,6 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                     Total:
                                     <span className="ml-3 text-right text-blue-600 text-lg">
                                         ₹{calculatedTotals.totalAmount.toFixed(2)}
-                                    </span>
-                                </div>
-
-                                <div className="text-right">
-                                    Total Due Amount:
-                                    <span className="ml-3 text-right text-blue-600 text-lg">
-                                        ₹{calculatedTotals.totalDueAmount.toFixed(2)}
                                     </span>
                                 </div>
 
@@ -798,37 +910,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                     </div>
                 </div>
 
-                {/* Action Buttons */}
-                {!isReadOnly && (
-                    <div className="flex justify-end gap-4 pt-6">
-                        <Button
-                            type="button"
-                            onClick={() => navigate(-1)}
-                            className="bg-gray-500 text-white px-6 py-2"
-                            disabled={isSubmitting}
-                        >
-                            <i className="fas fa-times mr-2"></i>
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            className="bg-blue-600 text-white px-6 py-2"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <i className="fas fa-spinner fa-spin mr-2"></i>
-                                    {isCreateMode ? 'Creating...' : 'Updating...'}
-                                </>
-                            ) : (
-                                <>
-                                    <i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i>
-                                    {isCreateMode ? 'Create Order' : 'Update Order'}
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                )}
+
             </form>
         </div>
     );

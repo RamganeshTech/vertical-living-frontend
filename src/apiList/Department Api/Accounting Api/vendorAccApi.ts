@@ -13,52 +13,100 @@ import { queryClient } from '../../../QueryClient/queryClient';
 
 // Types
 export interface CreateVendorPayload {
-    // VendorType: "business" | "individual";
-    organizationId: string;
-    projectId: string | null;
+        organizationId: string;
     clientId: string | null;
+
+    // Basic
     firstName: string | null;
-    // lastName: string | null;
     companyName: string | null;
+    shopDisplayName: string | null;
+    vendorCategory: string | null;
+    language: string | null;
+
+    // Contact
     email: string | null;
     phone: {
         work: string | null;
         mobile: string | null;
     };
-    vendorLanguage: string | null;
+    shopFullAddress?: string | null;
+
+    // Location
+    mapUrl?: string | null;
+    location?: {
+        latitude?: number | null; // Optional, backend calculates from mapUrl
+        longitude?: number | null;
+    };
+
+    // Statutory
     pan?: string | null;
-    currency?: string;
-    accountsPayable?: string | null;
+    tan?: string | null;
+    gstin?: string | null;
+    msmeNo?: string | null;
+    cin?: string | null;
+    businessStructure?: string | null;
+
+    // Banking
+    bankAccNo?: string | null;
+    accHolderName?: string | null;
+    bankName?: string | null;
+    upiId?: string | null;
+    bankBranch?: string | null;
+    ifscCode?: string | null;
+
+    // Financials
+    // currency?: string;
     openingBalance?: number;
     paymentTerms?: string;
-    // enablePortal?: boolean;
-    files?: File[]; // Add files to payload
-    mainImage?: File; // <--- ADD THIS
 
+    // File Uploads (Raw Files)
+    mainImage?: File;       // Single file
+    shopImages?: File[];    // Array of files
+    files?: File[]; 
 }
 
 export interface UpdateVendorPayload {
-    // VendorType?: "business" | "individual";
-    firstName?: string | null;
-    lastName?: string | null;
+   firstName?: string | null;
     companyName?: string | null;
+    shopDisplayName?: string | null;
+    vendorCategory?: string | null;
+    language?: string | null;
+
     email?: string | null;
     phone?: {
         work?: string | null;
         mobile?: string | null;
     };
-    VendorLanguage?: string | null;
+
+    shopFullAddress?: string | null;
+    
+    // Updating mapUrl triggers lat/lng update on backend
+    mapUrl?: string | null; 
+    location?: {
+        latitude?: number | null;
+        longitude?: number | null;
+    };
+
+    // Statutory
     pan?: string | null;
-    currency?: string;
-    accountsPayable?: string | null;
+    tan?: string | null;
+    gstin?: string | null;
+    msmeNo?: string | null;
+    cin?: string | null;
+    businessStructure?: string | null;
+
+    // Banking
+    bankAccNo?: string | null;
+    accHolderName?: string | null;
+    bankName?: string | null;
+    upiId?: string | null;
+    bankBranch?: string | null;
+    ifscCode?: string | null;
+
+    // Financials
+    // currency?: string;
     openingBalance?: number;
     paymentTerms?: string;
-    // enablePortal?: boolean;
-    documents?: Array<{
-        type: "image" | "pdf";
-        url: string;
-        originalName?: string;
-    }>;
 }
 
 export interface GetVendorsParams {
@@ -78,43 +126,72 @@ export interface GetVendorsParams {
 
 export interface Vendor {
     _id: string;
-    // VendorType: "business" | "individual";
     organizationId: string;
-    projectId: string;
-    clientId: string;
+    clientId: string | null;
+
+    // Basic Details
     firstName: string | null;
-    lastName: string | null;
     companyName: string | null;
+    shopDisplayName: string | null;
+    vendorCategory: string | null;
+    language: string | null; // Renamed from language to match backend
+
+    // Contact
     email: string | null;
     phone: {
         work: string | null;
         mobile: string | null;
     };
-    vendorLanguage?: string | null;
-    pan?: string | null;
-    currency?: string;
-    accountsPayable?: string | null;
-    openingBalance?: number;
-    paymentTerms?: string;
-    // enablePortal?: boolean;
-    documents?: Array<{
+    shopFullAddress?: string | null;
+
+    // Location (mapUrl is at root now)
+    mapUrl?: string | null; 
+    location?: {
+        latitude: number | null;
+        longitude: number | null;
+    };
+
+    // Media (using IVendorFile helper)
+    mainImage?: {
         type: "image" | "pdf";
         url: string;
         originalName?: string;
-        uploadedAt?: Date;
-    }>;
-    location?: {
-        address: string | null,
-        mapUrl: string | null,
-        latitude: number | null
-        longitude: number | null,
-    }
-    mainImage?: {
+        uploadedAt?: string, 
+    } | null;
+    shopImages?: {
         type: "image";
         url: string;
         originalName?: string;
-        uploadedAt?: Date;
-    }
+        uploadedAt?: string, 
+    }[];
+    documents?: {
+        type: "image" | "pdf";
+        url: string;
+        originalName?: string;
+        uploadedAt?: string, 
+    }[];
+
+    // Statutory Details
+    pan?: string | null;
+    tan?: string | null;
+    gstin?: string | null;
+    msmeNo?: string | null;
+    cin?: string | null;
+    businessStructure?: string | null;
+
+    // Banking Details
+    bankAccNo?: string | null;
+    accHolderName?: string | null;
+    bankName?: string | null;
+    upiId?: string | null;
+    bankBranch?: string | null;
+    ifscCode?: string | null;
+
+    // Financials
+    // currency?: string;
+    openingBalance?: number;
+    paymentTerms?: string;
+
     createdAt: string;
     updatedAt: string;
 }
@@ -164,7 +241,7 @@ export const createVendor = async ({
     const formData = new FormData();
 
     // Extract files from payload
-    const { files, phone, mainImage, ...restPayload } = payload;
+    const { files, phone, shopImages, location, ...restPayload } = payload;
 
     // Append all string/number fields
     Object.entries(restPayload).forEach(([key, value]) => {
@@ -180,13 +257,27 @@ export const createVendor = async ({
         formData.append('phone', JSON.stringify(phone));
     }
 
-    if (mainImage) {
-        formData.append('mainImage', mainImage);
+    // 4. Append location (Stringified) <--- ADD THIS
+    if (location) {
+        formData.append('location', JSON.stringify(location));
     }
+    
+
+    // if (mainImage) {
+    //     formData.append('mainImage', mainImage);
+    // }
+
+
     // Append files if present
     if (files && files.length > 0) {
         files.forEach((file) => {
             formData.append('files', file);
+        });
+    }
+
+     if (shopImages && shopImages.length > 0) {
+        shopImages.forEach((file) => {
+            formData.append('shopImages', file);
         });
     }
 
@@ -301,6 +392,21 @@ export const updateVendorDocument = async ({ api, formData, id }: { api: AxiosIn
     return response.data;
 };
 
+
+
+
+export const updateVendorShopImages = async ({ api, formData, id }: { api: AxiosInstance, id: string, formData: FormData }) => {
+    const response = await api.put(`/department/accounting/vendor/updatevendor/${id}/shopimages`,
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+    return response.data;
+};
+
 /**
  * Delete Vendor
  */
@@ -345,9 +451,6 @@ export const useCreateVendor = () => {
             // Invalidate all Vendor queries for this organization
             queryClient.invalidateQueries({
                 queryKey: ["vendors", "list", variables.organizationId]
-            });
-            queryClient.invalidateQueries({
-                queryKey: ["vendors", "list", variables.organizationId, variables.projectId]
             });
         }
     });
@@ -521,6 +624,25 @@ export const useUpdateVendorDocument = () => {
                 throw new Error("API instance not found for role");
             }
             return await updateVendorDocument({ id, formData, api });
+        },
+    });
+};
+
+
+
+export const useUpdateVendorShopImages = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ id, formData }: { id: string, formData: FormData }) => {
+            if (!role || !ALLOWED_ROLES.includes(role)) {
+                throw new Error("Not allowed to make this API call");
+            }
+            if (!api) {
+                throw new Error("API instance not found for role");
+            }
+            return await updateVendorShopImages({ id, formData, api });
         },
     });
 };

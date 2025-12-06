@@ -12,7 +12,7 @@ interface CustomerCardProps {
 }
 
 export const CustomerAccCard: React.FC<CustomerCardProps> = ({ customer, onView, onDelete, isDeleting }) => {
-    const displayName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'N/A';
+    const displayName = `${customer.firstName || 'N/A'}`
 
     return (
         <Card className="hover:shadow-lg transition-shadow border-l-4 border-blue-600">

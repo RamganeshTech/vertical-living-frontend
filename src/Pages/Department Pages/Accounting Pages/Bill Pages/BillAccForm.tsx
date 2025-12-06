@@ -177,60 +177,20 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
     }, [currentMode])
 
     // --- CALCULATIONS ---
-    // useEffect(() => {
-    //     const totalAmount = formData.items.reduce((sum, item) => sum + (item.totalCost || 0), 0);
-    //     const discountAmount = (totalAmount * formData.discountPercentage) / 100;
-    //     const amountAfterDiscount = totalAmount - discountAmount;
-    //     const taxAmount = (amountAfterDiscount * formData.taxPercentage) / 100;
-    //     const grandTotal = amountAfterDiscount + taxAmount;
-
-    //     setCalculatedTotals({ totalAmount, discountAmount, taxAmount, grandTotal });
-    // }, [formData.items, formData.discountPercentage, formData.taxPercentage]);
-
-
     useEffect(() => {
         const totalAmount = formData.items.reduce((sum, item) => sum + (item.totalCost || 0), 0);
         const discountAmount = (totalAmount * formData.discountPercentage) / 100;
         const amountAfterDiscount = totalAmount - discountAmount;
         const taxAmount = (amountAfterDiscount * formData.taxPercentage) / 100;
-        const grandTotalBeforeAdvance = amountAfterDiscount + taxAmount;
+        const grandTotal = amountAfterDiscount + taxAmount;
 
-        // let grandTotal = grandTotalBeforeAdvance;
-        let balancePayable = grandTotalBeforeAdvance;
-
-        if (formData.paymentType === "pay advanced, balance later") {
-            // console.log("222222222222")
-            const advance = formData?.advancedAmount || 0;
-            balancePayable = Math.max(0, grandTotalBeforeAdvance - advance); // prevent negative
-        }
-        else {
-            console.log("33333333333")
-            // setFormData(p => ({ ...p, advancedAmount: 0 }))
-            balancePayable = grandTotalBeforeAdvance; // prevent negative
-        }
-
-        setCalculatedTotals({
-            totalAmount,
-            discountAmount,
-            taxAmount,
-            grandTotal: balancePayable,
-            // balancePayable
-        });
-    }, [
-        formData.items,
-        formData.discountPercentage,
-        formData.taxPercentage,
-        formData.paymentType,
-        formData.advancedAmount
-    ]);
+        setCalculatedTotals({ totalAmount, discountAmount, taxAmount, grandTotal });
+    }, [formData.items, formData.discountPercentage, formData.taxPercentage]);
 
 
-    // --- HANDLERS ---
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
-
-
 
         const { name, value } = e.target;
 
@@ -717,9 +677,9 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         {formData.paymentType === "pay advanced, balance later" && (
                             <>
                                 <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                                    <span className="text-gray-700 font-medium">Advance Paid:</span>
+                                    <span className="text-gray-700 font-medium">Advance Amount (Need To Pay):</span>
                                     <span className="text-xl font-semibold text-green-600">
-                                        -₹{(formData.advancedAmount || 0)}
+                                        ₹{(formData.advancedAmount || 0)}
                                     </span>
                                 </div>
                             </>

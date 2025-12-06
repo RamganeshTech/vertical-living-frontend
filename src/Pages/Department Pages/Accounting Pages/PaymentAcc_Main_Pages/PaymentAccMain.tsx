@@ -293,7 +293,7 @@ const PaymentAccMain = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar-alt mr-2 text-gray-400"></i>
-                                        Payment Date From
+                                        Due Date From
                                     </label>
                                     <input
                                         type="date"
@@ -306,7 +306,7 @@ const PaymentAccMain = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar-alt mr-2 text-gray-400"></i>
-                                        Payment Date To
+                                        Due Date To
                                     </label>
                                     <input
                                         type="date"
@@ -360,7 +360,7 @@ const PaymentAccMain = () => {
                                     <div className="col-span-1 text-center">#</div>
                                     <div className="col-span-3">Payee Name</div>
                                     <div className="col-span-2">Payment No</div>
-                                    <div className="col-span-2">Date</div>
+                                    <div className="col-span-2">Due Date</div>
                                     <div className="col-span-2 text-right">Amount</div>
                                     <div className="col-span-1 text-center">Status</div>
                                     <div className="col-span-1 text-center">Action</div>

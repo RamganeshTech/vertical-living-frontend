@@ -39,13 +39,13 @@ const VendorPaymentList: React.FC<Props> = ({ vendor, index, handleView, handleD
 
              <div className="col-span-2 text-gray-600 text-sm">
                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
-                {dateFormate(vendor.paymentDate!)}
+                {dateFormate(vendor?.vendorPaymentDate!)}
             </div>
 
             {/* Created At */}
             <div className="col-span-2 text-gray-600 text-sm">
                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
-                {dateFormate(vendor.createdAt!)}
+                {dateFormate(vendor?.createdAt!)}
             </div>
 
             {/* Grand Total or total amount */}

@@ -7,6 +7,10 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
+
+const CreateDesignLab  = lazy(() => import( './Pages/DesignLab_Pages/CreateDesignLab'));
+const  DesignLabSingle  = lazy(() => import( './Pages/DesignLab_Pages/DesignLabSingle'));
+const DesignLabMain = lazy(() => import('./Pages/DesignLab_Pages/DesignLabMain'));
 const PaymentAccMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/PaymentAcc_Main_Pages/PaymentAccMain'));
 const PaymentAccSingle = lazy(() => import(  './Pages/Department Pages/Accounting Pages/PaymentAcc_Main_Pages/PaymentAccSingle'));
 
@@ -649,6 +653,21 @@ function App() {
 
               <Route path="single/:subContractId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
                 <SingleSubContract />
+              </ProtectedRoutes>} />
+
+            </Route>
+
+            <Route path="designlabmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <DesignLabMain />
+            </ProtectedRoutes>} >
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <CreateDesignLab />
+              </ProtectedRoutes>} />
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <DesignLabSingle />
               </ProtectedRoutes>} />
 
             </Route>

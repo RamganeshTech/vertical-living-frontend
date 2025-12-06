@@ -32,8 +32,8 @@ const VendorPaymentAccMain = () => {
         search: '',
         vendorId: '',
         // date: '',
-        paymentFromDate: "",
-        paymentToDate: "",
+        vendorPaymentFromDate: "",
+        vendorPaymentToDate: "",
         createdFromDate: "",
         createdToDate: "",
         sortBy: 'createdAt',
@@ -59,8 +59,8 @@ const VendorPaymentAccMain = () => {
         vendorId: filters.vendorId || undefined,
         limit: 9,
         // date: filters.date || undefined,
-        paymentFromDate: filters.paymentFromDate || undefined,
-        paymentToDate: filters.paymentToDate || undefined,
+        vendorPaymentFromDate: filters.vendorPaymentFromDate || undefined,
+        vendorPaymentToDate: filters.vendorPaymentToDate || undefined,
         createdFromDate: filters.createdFromDate || undefined,
         createdToDate: filters.createdToDate || undefined,
         search: debouncedSearch || undefined,
@@ -119,8 +119,8 @@ const VendorPaymentAccMain = () => {
         setFilters({
             search: '',
             vendorId: '',
-            paymentFromDate: "",
-            paymentToDate: "",
+            vendorPaymentFromDate: "",
+            vendorPaymentToDate: "",
             createdFromDate: "",
             createdToDate: "",
             sortBy: 'createdAt',
@@ -156,7 +156,7 @@ const VendorPaymentAccMain = () => {
                     onClick={() => navigate('create')}
                 >
                     <i className="fas fa-plus mr-2" />
-                    Create Order
+                    Create Vendor Payment
                 </Button>
             </div>
 
@@ -273,9 +273,9 @@ const VendorPaymentAccMain = () => {
                                     </label>
                                     <input
                                         type="date"
-                                        value={filters.paymentFromDate}
+                                        value={filters.vendorPaymentFromDate}
                                         onChange={(e) => {
-                                            setFilters(f => ({ ...f, paymentFromDate: e.target.value }));
+                                            setFilters(f => ({ ...f, vendorPaymentFromDate: e.target.value }));
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
@@ -288,9 +288,9 @@ const VendorPaymentAccMain = () => {
                                     </label>
                                     <input
                                         type="date"
-                                        value={filters.paymentToDate}
+                                        value={filters.vendorPaymentToDate}
                                         onChange={(e) => {
-                                            setFilters(f => ({ ...f, paymentToDate: e.target.value }));
+                                            setFilters(f => ({ ...f, vendorPaymentToDate: e.target.value }));
                                         }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />

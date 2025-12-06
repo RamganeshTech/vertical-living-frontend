@@ -159,7 +159,7 @@ createdToDate: "",
                     onClick={() => navigate('create')}
                 >
                     <i className="fas fa-plus mr-2" />
-                    Create Order
+                    Create Sales Order
                 </Button>
             </div>
 

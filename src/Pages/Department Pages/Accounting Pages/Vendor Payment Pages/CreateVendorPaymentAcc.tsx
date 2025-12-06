@@ -7,24 +7,24 @@ import { useCreatevendorpayments } from '../../../../apiList/Department Api/Acco
 import VendorPaymentAccForm from './VendorPaymentAccForm';
 
 export interface VendorPaymentItem {
-    date: string;
-    billAmount: number;
-    amountDue: number;
-    paymentMadeOn: string | null;
+ itemName: string;
+    billAmount: number; 
 }
 
 export interface CreateVendorPaymentPayload {
     _id?: string,
     organizationId: string;
-    vendorId: string
+    vendorId: string | null
+    projectId: null | string;
     vendorName: string;
     paymentNumber: string,
-    paymentDate: string,
+    vendorPaymentDate: string,
+    isSyncWithPaymentsSection?:boolean,
+    paymentTerms: string,
     paymentMode: string,
     paidThrough: string,
     items: VendorPaymentItem[]
     totalAmount: number
-    totalDueAmount: number
     notes: string
     createdAt?: string
 }

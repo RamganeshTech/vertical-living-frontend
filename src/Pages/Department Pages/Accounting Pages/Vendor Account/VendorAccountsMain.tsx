@@ -21,7 +21,6 @@ const VendorAccountsMain = () => {
     const paths: BreadcrumbItem[] = [
         { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
         { label: "Bills", path: `/organizations/${organizationId}/projects/billmain` },
-
         { label: "Vendor", path: `/organizations/${organizationId}/projects/vendormain` },
     ];
 
@@ -203,7 +202,7 @@ const VendorAccountsMain = () => {
                                         <input
                                             type="text"
                                             autoFocus
-                                            placeholder="Name, email, phone..."
+                                            placeholder="Name, phone, company..."
                                             value={filters.search}
                                             onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -315,7 +314,7 @@ const VendorAccountsMain = () => {
                                     <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
                                         <div className="col-span-1 text-center">S.No</div>
                                         <div className="col-span-3 text-center">Vendor Name</div>
-                                        <div className="col-span-2 text-center">Email</div>
+                                        <div className="col-span-2 text-center">Company Name</div>
                                         <div className="col-span-2 text-center">Phone</div>
                                         <div className="col-span-2 text-center">Created At</div>
                                         <div className="col-span-2 text-center">Actions</div>
