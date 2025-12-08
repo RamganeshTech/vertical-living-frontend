@@ -76,6 +76,29 @@ const getDesignLabByIdApi = async ({
     return data.data;
 };
 
+
+
+// 4. Update Design Lab (Supports Text + Files via FormData)
+const updateDesignLabApiNew = async ({
+    id,
+    formData,
+    api
+}: {
+    id: string;
+    formData: FormData;
+    api: AxiosInstance;
+}) => {
+    // We use PUT and send FormData. 
+    // The browser/Axios will automatically handle the boundary in Content-Type 
+    // when passing FormData, but explicit header is also fine.
+    const { data } = await api.put(`${BASE_URL}/updatedesignnew/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
+    
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
 // 4. Update Design Lab (Text Data)
 const updateDesignLabApi = async ({
     id,
@@ -279,6 +302,56 @@ export const useUpdateDesignLab = () => {
         onSuccess: (_, { id }) => {
             queryClient.invalidateQueries({ queryKey: ["designLab", id] });
             queryClient.invalidateQueries({ queryKey: ["designLabs"] }); // Refresh list as well
+        }
+    });
+};
+
+
+
+ export const useUpdateDesignLabNew = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const queryClient = useQueryClient();
+    
+    // Define allowed roles (same as your create logic)
+    const allowedRoles = ["owner", "staff", "CTO"]; 
+
+    return useMutation({
+        mutationFn: async ({
+            id,
+            formData
+        }: {
+            id: string;
+            formData: FormData;
+        }) => {
+            if (!role || !allowedRoles.includes(role)) {
+                throw new Error("Not allowed to make this API call");
+            }
+            if (!api) {
+                throw new Error("API instance not found for role");
+            }
+            return await updateDesignLabApiNew({ id, formData, api });
+        },
+        onSuccess: (data, variables) => {
+            // 1. Invalidate the specific design detail query so the View/Edit page updates immediately
+            queryClient.invalidateQueries({ 
+                queryKey: ["designLab", variables.id] 
+            });
+
+            // 2. Invalidate the list query so the Grid/Card view updates
+            // (Using the organizationId returned from the backend response)
+            if (data?.organizationId) {
+                queryClient.invalidateQueries({ 
+                    queryKey: ["designLabs", data.organizationId] 
+                });
+            }
+            
+            // Fallback: If you have a general list query
+            queryClient.invalidateQueries({ queryKey: ["designLabs"] });
+        },
+        onError: (error) => {
+            console.error("Failed to update design lab:", error);
+            // Handle error (toast notification, etc. usually handled in the UI component)
         }
     });
 };

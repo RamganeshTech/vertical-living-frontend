@@ -7,6 +7,7 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
+const PublicProcurementRatePage = lazy(() => import( './Pages/Department Pages/ProcurementNew Pages/PublicProcurementNew'));
 
 const CreateDesignLab  = lazy(() => import( './Pages/DesignLab_Pages/CreateDesignLab'));
 const  DesignLabSingle  = lazy(() => import( './Pages/DesignLab_Pages/DesignLabSingle'));
@@ -1239,6 +1240,7 @@ function App() {
           <Route path='/clientconsent/public/:projectId/:token' element={<PublicClientConsentForm />} />
           <Route path='/ordermaterial/setup' element={<PublicOrgOrderMaterialSetup />} />
           <Route path='/:organizationId/ordermaterial' element={<PublicOrderMaterialMain />} />
+          <Route path='/:organizationId/procurement/public' element={<PublicProcurementRatePage />} />
 
           <Route path='/subcontract/share/:subContractId' element={<PublicSubContract />} />
 

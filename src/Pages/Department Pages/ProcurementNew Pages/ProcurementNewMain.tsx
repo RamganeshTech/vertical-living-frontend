@@ -19,6 +19,7 @@ export interface OrderMaterialSiteDetail {
 export interface OrderMaterialShopDetails {
     shopName: String,
     address: String,
+    upiId: string
     contactPerson: String,
     phoneNumber: String,
 }
@@ -29,15 +30,31 @@ export interface OrderSubItems {
     refId: string,
     quantity: number,
     unit: string,
+    rate: number,
+    totalCost: number
 }
 
 export interface IProcurementNew {
     _id?: string
     organizationId: string,
-    projectId: string,
+    projectId: {
+        _id: string,
+        projectName: string
+    } | null,
     shopDetails: OrderMaterialShopDetails,
     deliveryLocationDetails: OrderMaterialSiteDetail,
     selectedUnits: OrderSubItems[],
+
+    shopQuoteNumber: string,
+    fromDeptNumber: string;
+    isConfirmedRate: boolean,
+    procurementNumber: string;
+    fromDeptName: string
+    fromDeptModel: string;
+
+    generatedLink?: string
+    isSyncWithPaymentsSection: boolean,
+
     totalCost: number
     refPdfId: string
 }
@@ -58,11 +75,11 @@ const ProcurementNewMain: React.FC = () => {
 
 
     const { data: procurements, isLoading, isError, error, refetch } = useGetProcurementNewDetails(organizationId!, filters);
-    const { mutateAsync: deleteProcurement, isPending:deletePending, variables } = useDeleteProcurement();
+    const { mutateAsync: deleteProcurement, isPending: deletePending, variables } = useDeleteProcurement();
 
     const handleDeleteProcurement = async ({ id }: { id: string }) => {
         try {
-           await deleteProcurement({ id })
+            await deleteProcurement({ id })
             toast({ title: "Success", description: "Deleted Successfully" });
         }
         catch (error: any) {
@@ -228,21 +245,43 @@ const ProcurementNewMain: React.FC = () => {
                         <div className="flex-1 max-h-[100%]  overflow-y-auto">
 
                             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 ">
-                                {procurements.map((po: IProcurementNew) => (
+                                {procurements.map((item: IProcurementNew) => (
                                     <>
                                         <ProcurementCard
-                                            key={po._id}
-                                            shopDetails={po.shopDetails}
-                                            siteDetails={po.deliveryLocationDetails}
-                                            totalCost={po.totalCost}
-                                            refPdfId={po.refPdfId}
-                                            onView={() => navigate(`sub/${po._id}`)}
-                                            onDelete={(e:any) => {
-                                                e.stopPropagation();
-                                               handleDeleteProcurement({id:po._id!})
-                                            }
-                                            }
-                                            deletePending={deletePending && variables.id === po._id! }
+
+                                            // key={po._id}
+                                            // shopDetails={po.shopDetails}
+                                            // siteDetails={po.deliveryLocationDetails}
+                                            // totalCost={po.totalCost}
+                                            // refPdfId={po.refPdfId}
+                                            // onView={() => navigate(`sub/${po._id}`)}
+                                            // onDelete={(e:any) => {
+                                            //     e.stopPropagation();
+                                            //    handleDeleteProcurement({id:po._id!})
+                                            // }
+                                            // }
+                                            // deletePending={deletePending && variables.id === po._id! }
+
+                                            procurementNumber={item?.procurementNumber || item?.refPdfId}
+                                            fromDeptName={item?.fromDeptName}
+                                            fromDeptNumber={item?.fromDeptNumber}
+
+                                            // Status Logic
+                                            isConfirmedRate={item?.isConfirmedRate}
+                                            isSyncWithPaymentsSection={item?.isSyncWithPaymentsSection}
+
+                                            // Details
+                                            projectName={item?.projectId?.projectName}
+                                            shopDetails={item?.shopDetails}
+
+                                            // Stats
+                                            itemCount={item?.selectedUnits?.length || 0}
+                                            totalCost={item?.totalCost || 0}
+
+                                            // Actions
+                                            onView={() => navigate(`sub/${item._id!}`)}
+                                            onDelete={() => handleDeleteProcurement({id:item._id!})}
+                                            deletePending={deletePending && variables.id === item._id}
                                         />
                                     </>
                                 ))}

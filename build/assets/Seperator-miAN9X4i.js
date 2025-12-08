@@ -1,0 +1,1 @@
+import{j as a}from"./index-CqEiDvr_.js";const n=({orientation:t="horizontal",className:s=""})=>{const o=`bg-gray-200 ${t==="horizontal"?"w-full h-px":"h-full w-px"} ${s}`.trim();return a.jsx("div",{className:o})};export{n as S};

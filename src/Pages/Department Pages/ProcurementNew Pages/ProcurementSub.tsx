@@ -13,31 +13,47 @@ import {
     useGetSingleProcurementDetails,
     useUpdateProcurementShopDetails,
     useUpdateProcurementDeliveryLocation,
-    useUpdateProcurementTotalCost,
+    // useUpdateProcurementTotalCost,
     useProcurementGeneratePdf,
     useDeleteProcurementPdf,
-    useSyncLogistics,
+    // useSyncLogistics,
+    useProcurementGenerateLink,
+    useSyncProcurementToPaymentsSection,
     // useSyncAccountsProcurement
 } from "../../../apiList/Department Api/Procurement Api/procurementApi";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
 import { downloadImage } from "../../../utils/downloadFile";
+import InfoTooltip from "../../../components/ui/InfoToolTip";
+import { dateFormate } from "../../../utils/dateFormator";
+import { Badge } from "../../../components/ui/Badge";
+import { Textarea } from "../../../components/ui/TextArea";
 
 const ProcurementSub: React.FC = () => {
-    const { id } = useParams() as { id: string }
+    const { id, organizationId } = useParams() as { id: string, organizationId: string }
     const navigate = useNavigate()
-    const { data, isLoading } = useGetSingleProcurementDetails(id);
+    const { data, isLoading, refetch } = useGetSingleProcurementDetails(id);
     const { mutateAsync: updateShop } = useUpdateProcurementShopDetails();
     const { mutateAsync: updateDelivery } = useUpdateProcurementDeliveryLocation();
-    const { mutateAsync: updateCost, isPending: totalCostPending } = useUpdateProcurementTotalCost();
-    const { mutateAsync: generateLink, isPending: generatePending } = useProcurementGeneratePdf()
+    // const { mutateAsync: updateCost, isPending: totalCostPending } = useUpdateProcurementTotalCost();
+    const { mutateAsync: generatePdf, isPending: generatePending } = useProcurementGeneratePdf()
+    const { mutateAsync: generateLink, isPending: linkPending } = useProcurementGenerateLink()
     const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteProcurementPdf()
-    const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
+    const { mutateAsync: syncPaymentsMutation, isPending: syncPaymentsLoading } = useSyncProcurementToPaymentsSection()
+
+    // const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
     // const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsProcurement()
 
-    const [editCost, setEditCost] = useState(false);
-    const [totalCost, setTotalCost] = useState<number>(data?.totalCost || 0);
+    // const [editCost, setEditCost] = useState(false);
+    // const [totalCost, _setTotalCost] = useState<number>(data?.totalCost || 0);
 
+    // const [link, setLink] = useState<string>("");
+    // const link = data?.generatedLink ? `${import.meta.env.VITE_FRONTEND_URL}/${organizationId}/procurement/public/${encodeURIComponent(data?.generatedLink)}` : null;
+    const tokenEncoded = encodeURIComponent(data?.generatedLink); // encode only once
+
+    const link = `${import.meta.env.VITE_FRONTEND_URL}/${organizationId}/procurement/public?token=${tokenEncoded}&orderId=${id}`;
+
+    const [copied, setCopied] = useState(false);
 
     const [editDelivery, setEditDelivery] = useState(false);
     const [deliveryForm, setDeliveryForm] = useState<any>({});
@@ -86,31 +102,93 @@ const ProcurementSub: React.FC = () => {
 
 
 
-    const handletotalCost = async () => {
+    // const handletotalCost = async () => {
+    //     try {
+    //         await updateCost({
+    //             id,
+    //             payload: { totalCost }
+    //         });
+    //         setEditCost(false);
+    //         toast({ title: "Success", description: "Cost Updated Successfully" });
+    //     }
+    //     catch (error: any) {
+    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "Update failed" });
+
+    //     }
+    // }
+
+
+
+    const handleGeneratePdf = async () => {
         try {
-            await updateCost({
-                id,
-                payload: { totalCost }
-            });
-            setEditCost(false);
-            toast({ title: "Success", description: "Cost Updated Successfully" });
-        }
-        catch (error: any) {
-            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "Update failed" });
-
-        }
-    }
-
-
-
-    const handleGenerate = async () => {
-        try {
-            await generateLink({ id });
+            await generatePdf({ id });
 
             toast({ title: "Success", description: "Pdf Generated successfully" });
         } catch (err: any) {
             toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
         }
+    };
+
+
+
+    const handleGenerateLink = async () => {
+        try {
+            await generateLink({ orderId: id });
+            refetch()
+            toast({ title: "Success", description: "Link Generated successfully" });
+        } catch (err: any) {
+            toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
+        }
+    };
+
+    // Copy to clipboard handler
+    const handleCopy = async () => {
+
+        if (!link) return
+
+        try {
+            await navigator.clipboard.writeText(link);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        } catch (err) {
+            toast({ title: "Error", description: "Failed to copy link", variant: "destructive" });
+        }
+    };
+
+
+
+
+
+    const handleWhatsappShare = () => {
+        if (!link) return;
+
+        // Pre-filled message
+        // const text = `Hey, please check this items link: ${link}`
+        const text = `Hey, please check this items link:\n\n${link}`;
+
+
+        // Check if phone number exists
+        const phoneNumber = data?.shopDetails?.phoneNumber;
+
+        let waUrl = "";
+
+        if (phoneNumber) {
+            // Send directly to the phone number (must include country code, no + or spaces)
+            // Example: 919876543210
+            // const formattedNumber = phoneNumber.replace(/\D/g, ""); // remove non-digit characters
+            // waUrl = `https://wa.me/${formattedNumber}?text=${text}`;
+
+            // Remove non-digit characters
+            const formattedNumber = phoneNumber.replace(/\D/g, "");
+            waUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(text)}`;
+
+        } else {
+            // Fallback: let user choose whom to send
+            waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        }
+
+        // Open WhatsApp
+        window.open(waUrl, "_blank");
     };
 
 
@@ -126,16 +204,31 @@ const ProcurementSub: React.FC = () => {
     };
 
 
-    const handleGenerateLogistics = async () => {
-        try {
+    // const handleGenerateLogistics = async () => {
+    //     try {
 
-            await syncLogistics({ id });
-            toast({ title: "Success", description: "Details sent to Logistics Department" });
-        } catch (error: any) {
-            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
-        }
-    }
+    //         await syncLogistics({ id });
+    //         toast({ title: "Success", description: "Details sent to Logistics Department" });
+    //     } catch (error: any) {
+    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+    //     }
+    // }
 
+
+     const handleSyncToPayments = async () => {
+            try {
+                if (data?.isSyncWithPaymentsSection) {
+                    return toast({ variant: "destructive", title: "Error", description: "already sent to payments section" });
+                }
+                await syncPaymentsMutation({
+                    id: data._id!
+                });
+                refetch?.()
+                toast({ title: "Success", description: "Procurement order sent to Payments Section" });
+            } catch (error: any) {
+                toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+            }
+        }    
 
     // const handleGenerateAccounts = async () => {
     //     try {
@@ -176,7 +269,7 @@ const ProcurementSub: React.FC = () => {
                             <i className='fas fa-arrow-left'></i>
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-blue-700">
-                            <span className="text-black text-2xl">Ref Id:</span> {data?.refPdfId ? data?.refPdfId.replace(/-pdf$/, "") : "N/A"}
+                            <span className="text-black text-2xl">Ref Id:</span> {data?.procurementNumber || data?.refPdfId ? data?.refPdfId.replace(/-pdf$/, "") : "N/A"}
                         </h1>
                     </div>
 
@@ -195,24 +288,32 @@ const ProcurementSub: React.FC = () => {
                             </span>
                         </div> */}
 
-                        <div className="flex flex-col items-start space-y-1">
+                        <div className="flex gap-1 items-center">
+                            <InfoTooltip
+                                content="Click the button to send the details to  payments dept"
+                                position="bottom"
+                                className=""
+                            />
                             <Button
                                 variant="primary"
-                                isLoading={syncLogisticsLoading}
-                                onClick={handleGenerateLogistics}
+                                disabled={data.isSyncWithPaymentsSection}
+                                isLoading={syncPaymentsLoading}
+                                className="disabled:cursor-not-allowed"
+                                onClick={handleSyncToPayments}
                             >
-                                Send To Logistics Dept
+                                Send To Payments
                             </Button>
-                            <span className="text-xs text-blue-500 mx-auto">
+
+                            {/* <span className="text-xs text-blue-500 mx-auto">
                                 <strong>*</strong> Click the button to send the <br /> details to  logistics dept
-                            </span>
+                            </span> */}
                         </div>
 
                     </div>
                 </section>
             </header>
 
-            <div className="border-l-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
+            {/* <div className="border-l-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
                 <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
                     <i className="fa-solid fa-store"></i>
                     Shop Details
@@ -357,6 +458,276 @@ const ProcurementSub: React.FC = () => {
                         </button>
                     </div>
                 )}
+            </div> */}
+
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 min-h-[140px] divide-y md:divide-y-0 md:divide-x divide-gray-100">
+
+                    {/* --- COLUMN 1: SHOP DETAILS (Editable) --- */}
+                    <div className="p-4 flex flex-col relative group transition-all hover:bg-slate-50/50">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <i className="fa-solid fa-store text-sm"></i>
+                            </div>
+                            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Shop Details</h4>
+
+                            {/* Edit Button (Only visible in view mode) */}
+                            {!editShop && (
+                                <button
+                                    onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
+                                    className="ml-auto cursor-pointer text-gray-400 hover:text-blue-600 transition-colors"
+                                    title="Edit Shop Details"
+                                >
+                                    <i className="fa-solid fa-pen-to-square text-sm"></i>
+                                </button>
+                            )}
+                        </div>
+
+                        {editShop ? (
+                            <div className="space-y-2 animate-in fade-in zoom-in-95 duration-200">
+                                <Input
+                                    placeholder="Shop Name"
+                                    value={shopForm?.shopName || ""}
+                                    onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
+                                    className="h-8 text-xs"
+                                />
+                                <Input
+                                    placeholder="Contact Person"
+                                    value={shopForm?.contactPerson || ""}
+                                    onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
+                                    className="h-8 text-xs"
+                                />
+                                <Input
+                                    placeholder="Phone"
+                                    value={shopForm?.phoneNumber || ""}
+                                    onChange={(e) => {
+                                        if (/^\d*$/.test(e.target.value)) setShopForm({ ...shopForm, phoneNumber: e.target.value });
+                                    }}
+                                    className="h-8 text-xs"
+                                    maxLength={10}
+                                />
+
+                                <Textarea
+                                    placeholder="Address"
+                                    value={shopForm?.address || ""}
+                                    onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
+                                    className=" text-xs"
+                                />
+
+                                {/* <Input
+                                    placeholder="upi Id"
+                                    value={shopForm?.upiId || ""}
+                                    onChange={(e) => setShopForm({ ...shopForm, upiId: e.target.value })}
+                                    className="h-8"
+                                /> */}
+
+                                <div className="flex gap-2 pt-1">
+                                    <Button size="sm" onClick={() => { handleUpdateShop(); setEditShop(false); }} className="h-7 text-xs px-3 bg-blue-600">
+                                        Save
+                                    </Button>
+                                    <Button size="sm" variant="outline" onClick={() => setEditShop(false)} className="h-7 text-xs px-3">
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-1.5 mt-1">
+                                <p className="font-bold text-gray-900 text-base leading-tight truncate">
+                                    {data?.shopDetails?.shopName || <span className="text-gray-400 italic">No Shop Name</span>}
+                                </p>
+
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                    <i className="fa-solid fa-user text-gray-400 w-3"></i>
+                                    <span className="truncate">{data?.shopDetails?.contactPerson || "-"}</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                    <i className="fa-solid fa-phone text-gray-400 w-3"></i>
+                                    <span className="font-mono">{data?.shopDetails?.phoneNumber || "-"}</span>
+                                </div>
+
+                                <div className="flex items-start gap-2 text-xs text-gray-500 mt-1">
+                                    <i className="fa-solid fa-location-dot text-gray-400 w-3 mt-0.5"></i>
+                                    <p className="line-clamp-2 leading-snug">{data?.shopDetails?.address || "-"}</p>
+                                </div>
+
+                                {/* <div className="flex items-start gap-2 text-xs text-gray-500 mt-1">
+                                    <i className="fa-solid fa-wallet text-gray-400 w-3 mt-0.5"></i>
+                                    <p className="line-clamp-2 leading-snug">{data?.shopDetails?.upiId || "-"}</p>
+                                </div> */}
+
+                                {/* <p><strong>Upi Id:</strong> {data?.shopDetails?.upiId || "-"}</p> */}
+
+                            </div>
+                        )}
+                    </div>
+
+                    {/* --- COLUMN 2: DELIVERY LOCATION (Editable) --- */}
+                    <div className="p-4 flex flex-col relative group transition-all hover:bg-slate-50/50">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+                                <i className="fa-solid fa-truck-fast text-sm"></i>
+                            </div>
+                            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Delivery Details</h4>
+
+                            {/* Edit Button */}
+                            {!editDelivery && (
+                                <button
+                                    onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
+                                    className="ml-auto cursor-pointer text-gray-400 hover:text-orange-600 transition-colors"
+                                    title="Edit Delivery Details"
+                                >
+                                    <i className="fa-solid fa-pen-to-square text-sm"></i>
+                                </button>
+                            )}
+                        </div>
+
+                        {editDelivery ? (
+                            <div className="space-y-2 animate-in fade-in zoom-in-95 duration-200">
+                                <Input
+                                    placeholder="Site Name"
+                                    value={deliveryForm?.siteName || ""}
+                                    onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })}
+                                    className="h-8 text-xs"
+                                />
+                                <Input
+                                    placeholder="Supervisor"
+                                    value={deliveryForm?.siteSupervisor || ""}
+                                    onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })}
+                                    className="h-8 text-xs"
+                                />
+                                <Input
+                                    placeholder="Phone"
+                                    value={deliveryForm?.phoneNumber || ""}
+                                    onChange={(e) => {
+                                        if (/^\d*$/.test(e.target.value)) setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value });
+                                    }}
+                                    className="h-8 text-xs"
+                                    maxLength={10}
+                                />
+                                <Input
+                                    placeholder="Address"
+                                    value={deliveryForm?.address || ""}
+                                    onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
+                                    className="w-full"
+                                />
+                                <div className="flex gap-2 pt-1">
+                                    <Button size="sm" onClick={() => { handleUpdateDelivery(); setEditDelivery(false); }} className="h-7 text-xs px-3 bg-blue-600">
+                                        Save
+                                    </Button>
+                                    <Button size="sm" variant="outline" onClick={() => setEditDelivery(false)} className="h-7 text-xs px-3">
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-1.5 mt-1">
+                                <p className="font-bold text-gray-900 text-base leading-tight truncate">
+                                    {data?.deliveryLocationDetails?.siteName || <span className="text-gray-400 italic">No Site Name</span>}
+                                </p>
+
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                    <i className="fa-solid fa-helmet-safety text-gray-400 w-3"></i>
+                                    <span>{data?.deliveryLocationDetails?.siteSupervisor || "No Supervisor"}</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                    <i className="fa-solid fa-mobile-screen text-gray-400 w-3"></i>
+                                    <span className="font-mono">{data?.deliveryLocationDetails?.phoneNumber || "-"}</span>
+                                </div>
+
+                                <div className="flex items-start gap-2 text-xs text-gray-500 mt-1">
+                                    <i className="fa-solid fa-map-pin text-gray-400 w-3 mt-0.5"></i>
+                                    <p className="line-clamp-2 leading-snug">{data?.deliveryLocationDetails?.address || "No Address"}</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* --- COLUMN 3: ORDER MATERIAL / SOURCE INFO --- */}
+                    <div className="px-4  flex flex-col justify-center border-dashed border-l border-gray-200 bg-gray-50/30">
+                        {/* Badge for Department Name */}
+                        <div className="mb-2 flex gap-[3px]">
+                            <span className="text-[10px] text-gray-400 uppercase font-semibold">From:</span>
+                            {/* <span className="inline-flex items-center px-1 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">
+                                {data?.fromDeptName || "Order Material tracking-wider"}
+                            </span> */}
+                            <Badge className="mbg-blue-100 uppercase text-[10px] !px-1 !font-bold">
+                                {data?.fromDeptName || "Order Material"}
+
+                            </Badge>
+                        </div>
+
+                        {/* Prominent Number (Procurement No OR Order Material No) */}
+                        <div className="flex flex-col">
+                            <span className="text-[10px] text-gray-400 uppercase font-semibold">Order Number</span>
+                            <h2 className="text-2xl font-mono font-bold text-gray-800 tracking-tight leading-none">
+                                #{data?.fromDeptNumber || "N/A"}
+                            </h2>
+                        </div>
+
+                        {/* Rate Confirmation Status */}
+                        <div className="mt-4 pt-3 border-t border-gray-100 border-dashed">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-500">Rate Status</span>
+                                {data?.isConfirmedRate ? (
+                                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-200">
+                                        <i className="fa-solid fa-check-circle"></i> Confirmed
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">
+                                        <i className="fa-solid fa-clock"></i> Pending
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* --- COLUMN 4: TIMELINE & META --- */}
+                    <div className="p-4 flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <i className="fa-regular fa-calendar-check text-gray-400"></i>
+                                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Timeline</h4>
+                            </div>
+
+                            <div className="space-y-3">
+                                {/* Created Date */}
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="text-gray-500">Created</span>
+                                    <span className="font-medium text-gray-900 font-mono bg-gray-100 px-1.5 py-0.5 rounded">
+                                        {dateFormate(data?.createdAt)}
+                                    </span>
+                                </div>
+
+                                {/* Quote Number (if exists) */}
+                                {data?.shopQuoteNumber && (
+                                    <div className="flex justify-between items-center text-xs">
+                                        <span className="text-gray-500">Shop Quote #</span>
+                                        <span className="font-medium text-gray-700">{data.shopQuoteNumber}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Payment Status Badge */}
+                        <div className="mt-auto">
+                            <div className={`p-2 rounded-lg border flex items-center gap-3 ${data?.isSendToPayment ? 'bg-purple-50 border-purple-100' : 'bg-gray-50 border-gray-100'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${data?.isSendToPayment ? 'bg-purple-100 text-purple-600' : 'bg-gray-200 text-gray-400'}`}>
+                                    <i className={`fa-solid ${data?.isSendToPayment ? 'fa-file-invoice-dollar' : 'fa-hourglass'}`}></i>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] uppercase font-bold text-gray-400">Payment Process</span>
+                                    <span className={`text-xs font-bold ${data?.isSendToPayment ? 'text-purple-700' : 'text-gray-500'}`}>
+                                        {data?.isSendToPayment ? "Sent to Payment" : "Not Sent Yet"}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
             <Card>
@@ -366,15 +737,57 @@ const ProcurementSub: React.FC = () => {
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                             <h3 className="text-lg font-bold text-indigo-700 mb-2 sm:mb-0">
                                 Items List 📋
+                                {/* <span>{data?.isConfirmedRate ? "Vendor has confirmed the rates" : "Generate the Link and share the link to the vendor"}</span> */}
                             </h3>
 
-                            {/* Total Cost Right Aligned */}
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                                <h3 className="text-lg font-bold text-blue-700">
-                                    {/* <i className="fas fa-money-bill-1-wave"></i>  */}
-                                    Total Cost </h3>
-                                <div className="flex items-center gap-3 text-sm">
-                                    {editCost ? (
+                            {/* Right Side: Dynamic Status Badge */}
+                            <div>
+                                {!data?.generatedLink && 
+                                    // --- RED STATE: ACTION REQUIRED ---
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-full shadow-sm">
+                                        <i className="fas fa-exclamation-circle text-red-500 text-lg"></i>
+                                        <span className="text-sm font-bold text-red-600 tracking-wide">
+                                            Action: Generate & Share Link
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        {/* Items Table */}
+                        <div className="overflow-x-auto rounded border border-gray-200">
+                            <table className="min-w-full divide-y divide-gray-100">
+                                <thead className="bg-gray-50 text-sm text-gray-700 font-medium">
+                                    <tr>
+                                        <th className="px-5 py-2 text-center">S.No</th>
+                                        <th className="px-5 py-2 text-center">Item Name</th>
+                                        <th className="px-5 py-2 text-center">Quantity</th>
+                                        <th className="px-5 py-2 text-center">Unit</th>
+                                        <th className="px-5 py-2 text-center">Rate</th>
+                                        <th className="px-5 py-2 text-center">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-100 text-sm">
+                                    {data.selectedUnits.map((item: any, index: number) => (
+                                        <tr key={index}>
+                                            <td className="px-5 py-2 text-center">{index + 1}</td>
+                                            <td className="px-5 py-2 text-center">{item.subItemName}</td>
+                                            <td className="px-5 py-2 text-center">{item.quantity}</td>
+                                            <td className="px-5 py-2 text-center">{item.unit}</td>
+                                            <td className="px-5 py-2 text-center">{item.rate}</td>
+                                            <td className="px-5 py-2 text-center">{item.totalCost}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Total Cost Right Aligned */}
+                        <div className="flex !ml-auto w-fit mr-[20px] sm:flex-row items-start sm:items-center gap-2">
+                            <h3 className="text-lg font-bold text-blue-700">
+                                Total Cost </h3>
+                            <div className="flex  items-center gap-3 text-sm">
+                                {/* {editCost ? (
                                         <>
                                             <Input
                                                 type="number"
@@ -390,43 +803,56 @@ const ProcurementSub: React.FC = () => {
                                             </Button>
                                         </>
                                     ) : (
-                                        <>
-                                            <p className="text-base font-semibold text-gray-800">₹ {data.totalCost}</p>
-                                            <Button size="sm" variant="secondary" onClick={() => setEditCost(true)}>
+                                        <> */}
+                                <p className="text-base font-semibold text-gray-800">₹ {data?.totalCost || 0}</p>
+                                {/* <Button size="sm" variant="secondary" onClick={() => setEditCost(true)}>
                                                 <i className="fas fa-pen mr-1" />
                                                 Edit
-                                            </Button>
-                                        </>
-                                    )}
-                                </div>
+                                            </Button> */}
+                                {/* </>
+                                    )} */}
                             </div>
-                        </div>
-
-                        {/* Items Table */}
-                        <div className="overflow-x-auto rounded border border-gray-200">
-                            <table className="min-w-full divide-y divide-gray-100">
-                                <thead className="bg-gray-50 text-sm text-gray-700 font-medium">
-                                    <tr>
-                                        <th className="px-5 py-2 text-left">Item Name</th>
-                                        <th className="px-5 py-2 text-left">Quantity</th>
-                                        <th className="px-5 py-2 text-left">Unit</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-100 text-sm">
-                                    {data.selectedUnits.map((item: any, index: number) => (
-                                        <tr key={index}>
-                                            <td className="px-5 py-2">{item.subItemName}</td>
-                                            <td className="px-5 py-2">{item.quantity}</td>
-                                            <td className="px-5 py-2">{item.unit}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
+
+
+
+            {/* sharable link */}
+            <section className="w-full">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-sm w-full ">
+                    <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-semibold text-blue-800 flex items-center gap-2">
+                            <i className="fas fa-link"></i> Generate Shareable Link
+                        </h3>
+                    </div>
+
+                    {/* Show link after generation */}
+                    {data?.generatedLink ? (
+                        <div className="flex flex-col sm:flex-row gap-2 items-center">
+                            <Input readOnly value={link} className="flex-1 text-sm cursor-default" />
+                            <Button onClick={handleCopy} variant="outline" className="flex gap-2">
+                                <i className={`fas ${copied ? "fa-check-circle" : "fa-copy"}`}></i>
+                                {copied ? "Copied" : "Copy"}
+                            </Button>
+                            <Button onClick={handleWhatsappShare} className="bg-green-500 hover:bg-green-600 text-white flex gap-2">
+                                <i className="fab fa-whatsapp"></i>
+                                Share
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button
+                            onClick={handleGenerateLink}
+                            disabled={linkPending}
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                            {linkPending ? "Generating..." : "Generate Link"}
+                        </Button>
+                    )}
+                </div>
+            </section>
 
 
             {/* PDF GENERATION */}
@@ -448,7 +874,7 @@ const ProcurementSub: React.FC = () => {
                         </div>
 
                         <Button
-                            onClick={handleGenerate}
+                            onClick={handleGeneratePdf}
                             disabled={generatePending}
                             className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
                             size="lg"

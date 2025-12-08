@@ -1,13 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
+import  { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { dateFormate } from '../../utils/dateFormator';
+// import { dateFormate } from '../../utils/dateFormator';
 import { useDebounce } from '../../Hooks/useDebounce';
 import { useDeleteDesignLab, useGetAllDesignLabs } from '../../apiList/DesignLab_Api/designLabApi';
 import { Button } from '../../components/ui/Button';
 import { toast } from '../../utils/toast';
+import { DesignLabCard } from './DesignLabCard';
 // Assuming these are your custom UI components based on description
 // import { Button } from '../../components/ui/button'; 
 // import { toast } from '../../components/ui/use-toast'; 
+
+export interface IUpload {
+    type: "image" | "pdf";
+    url: string;
+    originalName?: string;
+    uploadedAt?: Date;
+}
+
 
 // --- TYPES ---
 export interface IDesignLab {
@@ -16,11 +25,14 @@ export interface IDesignLab {
     productName: string;
     designerName: string;
     spaceType: string;
+    referenceImages: IUpload[]
     difficultyLevel: string;
     status: string;
     designDate: string;
     createdAt: string;
 }
+
+
 
 interface FilterState {
     search: string;
@@ -39,79 +51,83 @@ const STATUSES = ["draft", "published", "archived"];
 // ==========================================
 // SUB-COMPONENT: Design Lab List Row
 // ==========================================
-interface ListProps {
-    design: IDesignLab;
-    index: number;
-    handleView: (id: string) => void;
-    handleDelete: (id: string) => void;
-    deletePending: boolean;
-}
+// interface ListProps {
+//     design: IDesignLab;
+//     index: number;
+//     handleView: (id: string) => void;
+//     handleDelete: (id: string) => void;
+//     deletePending: boolean;
+// }
 
-const DesignLabListRow: React.FC<ListProps> = ({ design, index, handleView, handleDelete, deletePending }) => {
-    return (
-        <div
-            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
-            onClick={() => handleView(design._id)}
-        >
-            {/* S.No */}
-            <div className="col-span-1 text-center text-gray-600 font-medium">
-                {index + 1}
-            </div>
+// const DesignLabListRow: React.FC<ListProps> = ({ design, index, handleView, handleDelete, deletePending }) => {
+//     return (
+//         <div
+//             className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
+//             onClick={() => handleView(design._id)}
+//         >
+//             {/* S.No */}
+//             <div className="col-span-1 text-center text-gray-600 font-medium">
+//                 {index + 1}
+//             </div>
 
-            {/* Product Name & Designer */}
-            <div className="col-span-4">
-                <div className="flex flex-col">
-                    <span className="font-medium text-gray-900 truncate text-base">
-                        {design.productName}
-                    </span>
-                    <span className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                        <i className="fas fa-user text-[10px] text-blue-500"></i> {design.designerName}
-                    </span>
-                </div>
-            </div>
+//             {/* Product Name & Designer */}
+//             <div className="col-span-4">
+//                 <div className="flex flex-col">
+//                     <span className="font-medium text-gray-900 truncate text-base">
+//                         {design.productName}
+//                     </span>
+//                     <span className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+//                         <i className="fas fa-user text-[10px] text-blue-500"></i> {design.designerName}
+//                     </span>
+//                 </div>
+//             </div>
 
-            {/* Design Code */}
-            <div className="col-span-2">
-                <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-md text-xs font-mono font-bold border border-indigo-100">
-                    {design.designCode}
-                </span>
-            </div>
+//             {/* Design Code */}
+//             <div className="col-span-2">
+//                 <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-md text-xs font-mono font-bold border border-indigo-100">
+//                     {design.designCode}
+//                 </span>
+//             </div>
 
-            {/* Space Type & Level */}
-            <div className="col-span-2 text-sm">
-                <div className="text-gray-800 font-medium">{design.spaceType}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{design.difficultyLevel}</div>
-            </div>
+//             {/* Space Type & Level */}
+//             <div className="col-span-2 text-sm">
+//                 <div className="text-gray-800 font-medium">{design.spaceType}</div>
+//                 <div className="text-xs text-gray-500 mt-0.5">{design.difficultyLevel}</div>
+//             </div>
 
-            {/* Date */}
-            <div className="col-span-2 text-gray-600 text-sm flex items-center">
-                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
-                {dateFormate(design.designDate)}
-            </div>
+//             {/* Date */}
+//             <div className="col-span-2 text-gray-600 text-sm flex items-center">
+//                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+//                 {dateFormate(design.designDate)}
+//             </div>
 
-            {/* Actions */}
-            <div className="col-span-1 flex justify-center gap-2">
-                <Button
-                    variant="ghost" 
-                    size="sm"
-                    onClick={(e: any) => {
-                        e.stopPropagation();
-                        handleDelete(design._id);
-                    }}
-                    disabled={deletePending}
-                    className="text-red-500 hover:bg-red-50 h-8 w-8 p-0"
-                    title="Delete Design"
-                >
-                    {deletePending ? (
-                        <i className="fas fa-spinner fa-spin"></i>
-                    ) : (
-                        <i className="fas fa-trash"></i>
-                    )}
-                </Button>
-            </div>
-        </div>
-    );
-};
+//             {/* Actions */}
+//             <div className="col-span-1 flex justify-center gap-2">
+//                 <Button
+//                     variant="ghost" 
+//                     size="sm"
+//                     onClick={(e: any) => {
+//                         e.stopPropagation();
+//                         handleDelete(design._id);
+//                     }}
+//                     disabled={deletePending}
+//                     className="text-red-500 hover:bg-red-50 h-8 w-8 p-0"
+//                     title="Delete Design"
+//                 >
+//                     {deletePending ? (
+//                         <i className="fas fa-spinner fa-spin"></i>
+//                     ) : (
+//                         <i className="fas fa-trash"></i>
+//                     )}
+//                 </Button>
+//             </div>
+//         </div>
+//     );
+// };
+
+
+
+
 
 // ==========================================
 // MAIN COMPONENT
@@ -172,7 +188,7 @@ const DesignLabMain = () => {
 
     // --- HANDLERS ---
     const handleDelete = async (id: string) => {
-        if (!window.confirm("Are you sure you want to delete this design? This cannot be undone.")) return;
+        // if (!window.confirm("Are you sure you want to delete this design? This cannot be undone.")) return;
         
         try {
             await deleteMutation.mutateAsync(id);
@@ -415,50 +431,92 @@ const DesignLabMain = () => {
                         </div>
                     ) : (
                         // --- DATA TABLE ---
+                        // <div
+                        //     ref={scrollContainerRef}
+                        //     className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto custom-scrollbar flex flex-col"
+                        // >
+                        //     <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
+                        //         <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50/80 backdrop-blur-sm font-semibold text-gray-700 text-xs uppercase tracking-wider">
+                        //             <div className="col-span-1 text-center">S.No</div>
+                        //             <div className="col-span-4">Product / Designer</div>
+                        //             <div className="col-span-2">Design Code</div>
+                        //             <div className="col-span-2">Type / Level</div>
+                        //             <div className="col-span-2">Date</div>
+                        //             <div className="col-span-1 text-center">Actions</div>
+                        //         </div>
+                        //     </div>
+
+                        //     <div className="flex-1">
+                        //         {designLabs.map((design, index) => (
+                        //             <DesignLabListRow 
+                        //                 key={design._id}
+                        //                 design={design} 
+                        //                 index={index} 
+                        //                 handleView={handleView}
+                        //                 handleDelete={handleDelete}
+                        //                 deletePending={deleteMutation.isPending && deleteMutation.variables === design._id}
+                        //             />
+                        //         ))}
+                        //     </div>
+
+                        //     {/* Footer Loaders/Messages */}
+                        //     <div className="py-6 text-center border-t border-gray-100 bg-gray-50/50 mt-auto shrink-0">
+                        //         {isFetchingNextPage ? (
+                        //             <div className="flex items-center justify-center gap-2 text-blue-600">
+                        //                 <i className="fas fa-spinner fa-spin"></i>
+                        //                 <span className="text-sm font-medium">Loading more designs...</span>
+                        //             </div>
+                        //         ) : !hasNextPage ? (
+                        //             <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+                        //                 — End of List —
+                        //             </p>
+                        //         ) : null}
+                        //     </div>
+                        // </div>
+
+
+
                         <div
-                            ref={scrollContainerRef}
-                            className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto custom-scrollbar flex flex-col"
-                        >
-                            {/* Table Header */}
-                            <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
-                                <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50/80 backdrop-blur-sm font-semibold text-gray-700 text-xs uppercase tracking-wider">
-                                    <div className="col-span-1 text-center">S.No</div>
-                                    <div className="col-span-4">Product / Designer</div>
-                                    <div className="col-span-2">Design Code</div>
-                                    <div className="col-span-2">Type / Level</div>
-                                    <div className="col-span-2">Date</div>
-                                    <div className="col-span-1 text-center">Actions</div>
-                                </div>
-                            </div>
+    ref={scrollContainerRef}
+    className="flex-1 bg-gray-50/50 rounded-xl overflow-y-auto custom-scrollbar flex flex-col p-6" // Added padding and bg color
+>
+    {/* Grid Container */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
+        {designLabs.map((design) => (
+            <DesignLabCard 
+                key={design._id}
+                // index={idx}
+                design={design} 
+                handleView={handleView}
+                handleDelete={handleDelete}
+                deletePending={deleteMutation.isPending && deleteMutation.variables === design._id}
+            />
+        ))}
+    </div>
 
-                            {/* Table Body */}
-                            <div className="flex-1">
-                                {designLabs.map((design, index) => (
-                                    <DesignLabListRow 
-                                        key={design._id}
-                                        design={design} 
-                                        index={index} 
-                                        handleView={handleView}
-                                        handleDelete={handleDelete}
-                                        deletePending={deleteMutation.isPending && deleteMutation.variables === design._id}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Footer Loaders/Messages */}
-                            <div className="py-6 text-center border-t border-gray-100 bg-gray-50/50 mt-auto shrink-0">
-                                {isFetchingNextPage ? (
-                                    <div className="flex items-center justify-center gap-2 text-blue-600">
-                                        <i className="fas fa-spinner fa-spin"></i>
-                                        <span className="text-sm font-medium">Loading more designs...</span>
-                                    </div>
-                                ) : !hasNextPage ? (
-                                    <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
-                                        — End of List —
-                                    </p>
-                                ) : null}
-                            </div>
-                        </div>
+    {/* Footer Loaders/Messages */}
+    <div className="py-8 text-center mt-auto shrink-0">
+        {isFetchingNextPage ? (
+            <div className="flex flex-col items-center gap-2 text-blue-600">
+                <i className="fas fa-circle-notch fa-spin text-xl"></i>
+                <span className="text-sm font-medium">Loading more designs...</span>
+            </div>
+        ) : !hasNextPage && designLabs.length > 0 ? (
+            <div className="flex items-center justify-center gap-2 opacity-50">
+                <span className="h-px w-12 bg-gray-300"></span>
+                <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">End of Collection</p>
+                <span className="h-px w-12 bg-gray-300"></span>
+            </div>
+        ) : designLabs.length === 0 && !isFetchingNextPage ? (
+             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <i className="fas fa-layer-group text-2xl"></i>
+                </div>
+                <p>No designs found</p>
+            </div>
+        ) : null}
+    </div>
+</div>
                     )}
                 </div>
             </main>

@@ -5,12 +5,15 @@ type InfoTooltipProps = {
     content: string;
     type?: 'info' | 'warning';
     position?: 'top' | 'bottom' | 'left' | 'right';
+    className?: string
+
 };
 
 const InfoTooltip: React.FC<InfoTooltipProps> = ({
     content,
     type = 'info',
-    position = 'top'
+    position = 'top',
+    className ="",
 }) => {
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const [isSticky, setIsSticky] = useState<boolean>(false);
@@ -94,7 +97,7 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({
     };
 
     return (
-        <div className="inline-block relative mx-1" ref={tooltipRef}>
+        <div className={`inline-block relative mx-1`} ref={tooltipRef}>
             <button
                 className={getTriggerClasses()}
                 onMouseEnter={handleMouseEnter}
@@ -114,6 +117,7 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({
             
 !min-w-[100px] sm:!min-w-[150px] md:!min-w-[200px]
 !max-w-[400px] sm:!max-w-[500px] md:!max-w-[600px]
+ ${className}
             ${isSticky ? 'border-blue-300 ring-1 ring-blue-200' : ''}
           `}>
                         <div className="flex items-start gap-1">

@@ -123,12 +123,12 @@ const PublicOrderMaterialMain = () => {
                                 {generatePending ? (
                                     <>
                                         <i className="fas fa-spinner fa-spin"></i>
-                                        Generating...
+                                        Sending...
                                     </>
                                 ) : (
                                     <>
                                         <i className="fas fa-file-pdf"></i>
-                                        Generate PDF
+                                        Send To Procurement
                                     </>
                                 )}
                             </Button>
