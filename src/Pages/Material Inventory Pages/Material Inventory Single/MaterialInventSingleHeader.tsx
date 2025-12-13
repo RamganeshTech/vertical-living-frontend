@@ -2,6 +2,7 @@ import React from 'react'
 import { Button } from '../../../components/ui/Button'
 import SearchSelectNew from '../../../components/ui/SearchSelectNew'
 import { memo } from 'react';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 type Props = {
     navigate: (num: number) => any,
@@ -18,6 +19,15 @@ type Props = {
 }
 const MaterialInventSingleHeader: React.FC<Props> = ({ navigate, data, editMode,projectOptions,selectedProjectId,
     handleSelectProjectId, handleCancel,handleSave, updateMutation, handleEdit }) => {
+
+        
+            const { role, permission } = useAuthCheck();
+            // const canDelete = role === "owner" || permission?.productinventory?.delete;
+            // const canCreate = role === "owner" || permission?.productinventory?.create;
+            const canEdit = role === "owner" || permission?.productinventory?.edit;
+        
+        
+
     return (
         <div>
             <header className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -50,13 +60,13 @@ const MaterialInventSingleHeader: React.FC<Props> = ({ navigate, data, editMode,
                                 />
                             </div>
 
-                            <Button
+                          {canEdit &&  <Button
                                 onClick={handleEdit}
                                 className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 text-white shadow-lg"
                             >
                                 <i className="fas fa-edit mr-2"></i>
                                 Edit Details
-                            </Button>
+                            </Button>}
 
                         </div>
                     ) : (

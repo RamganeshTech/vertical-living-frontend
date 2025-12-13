@@ -7,7 +7,7 @@ import staffApi from "../apiService/staffApiservice";
 const loginStaff = async ({ email, password }: { email: string; password: string }) => {
   const { data } = await staffApi.post("/auth/staff/login", { email, password });
   if (!data.ok) throw new Error(data.message);
-  return data;
+  return data.data;
 };
 export const useLoginStaff = () => {
   return useMutation({

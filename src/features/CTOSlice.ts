@@ -6,7 +6,11 @@ const initialState = {
     email: "",
     role: "",
     phoneNo: "",
-    isauthenticated: false
+    isauthenticated: false,
+    permission: {} as Record<string, Record<string, boolean>>,
+    isGuideRequired: undefined,
+    // <-- add this
+
 }
 
 const CTOSlice = createSlice({
@@ -14,7 +18,7 @@ const CTOSlice = createSlice({
     initialState,
     reducers: {
         setCTOProfileData: (state, action) => {
-            const { CTOId, CTOName, email, phoneNo, isauthenticated, role } = action.payload
+            const { CTOId, CTOName, email, phoneNo, isauthenticated, role, permission, isGuideRequired } = action.payload
 
             return {
                 ...state,
@@ -23,16 +27,20 @@ const CTOSlice = createSlice({
                 email,
                 phoneNo,
                 role,
-                isauthenticated
+                isauthenticated,
+                permission, isGuideRequired
             };
+        },
+        updateCTOGuideStatus: (state, action) => {
+            state.isGuideRequired = action.payload;
         },
         setAuth: (state, action) => {
             return { ...state, isauthenticated: action.payload }
-        }, 
-         resetCTOProfile: () => initialState
+        },
+        resetCTOProfile: () => initialState
     }
 })
 
-export const { setCTOProfileData, setAuth, resetCTOProfile } = CTOSlice.actions
+export const { setCTOProfileData, setAuth, resetCTOProfile, updateCTOGuideStatus } = CTOSlice.actions
 
 export default CTOSlice.reducer

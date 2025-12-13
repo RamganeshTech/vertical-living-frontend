@@ -6,6 +6,7 @@ import type { AvailableProjetType } from '../../Department Pages/Logistics Pages
 import { useGetProjects } from '../../../apiList/projectApi';
 import QuoteGenerateCard from './QuoteGenerate Main/QuoteGenerateCard';
 import type { FurnitureBlock } from './QuoteGenerate Main/FurnitureForm';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 type Props = {
     setFurnitures: React.Dispatch<React.SetStateAction<FurnitureBlock[]>>
@@ -27,6 +28,16 @@ const QuoteGenerateList: React.FC<Props> = ({ setFurnitures, setEditQuoteNo, set
         projectName: "",
         createdAt: "",
     });
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.materialquote?.list;
+    // const canCreate = role === "owner" || permission?.materialquote?.create;
+    // const canDelete = role === "owner" || permission?.materialquote?.delete;
+    // const canEdit = role === "owner" || permission?.materialquote?.edit;
+
+
 
     const { data } = useGetProjects(organizationId!)
 
@@ -115,7 +126,7 @@ const QuoteGenerateList: React.FC<Props> = ({ setFurnitures, setEditQuoteNo, set
                     </div>
                 </div>
 
-                <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
+              {canList &&  <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
 
                     {isLoading ? (
                         <p><MaterialOverviewLoading /></p>
@@ -134,14 +145,14 @@ const QuoteGenerateList: React.FC<Props> = ({ setFurnitures, setEditQuoteNo, set
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {quotes.map((quote: any) => (
+                            {quotes?.map((quote: any) => (
                                 <>
                                     <QuoteGenerateCard setEditQuoteNo={setEditQuoteNo} setFurnitures={setFurnitures} setIsEditingId={setIsEditingId} setQuoteType={setQuoteType} setFiltersMain={setFiltersMain} key={quote._id} quote={quote} organizationId={organizationId!} />
                                 </>
                             ))}
                         </div>
                     )}
-                </section>
+                </section>}
 
             </main>
         </div>

@@ -7,7 +7,7 @@ import CTOApi from "../apiService/CTOService";
 const loginCTO = async ({ email, password }: { email: string; password: string }) => {
     const { data } = await CTOApi.post("/auth/CTO/login", { email, password });
     if (!data.ok) throw new Error(data.message);
-    return data;
+    return data.data;
 };
 export const useLoginCTO = () => {
     return useMutation({

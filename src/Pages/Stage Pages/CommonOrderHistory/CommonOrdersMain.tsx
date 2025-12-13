@@ -20,6 +20,7 @@ import {
 } from "../../../components/ui/Card"
 import { toast } from "../../../utils/toast"
 import { Label } from "../../../components/ui/Label"
+import { useAuthCheck } from "../../../Hooks/useAuthCheck"
 
 const CommonOrdersMain = () => {
     const { organizationId } = useParams<{ organizationId: string }>()
@@ -30,6 +31,18 @@ const CommonOrdersMain = () => {
     const [showInput, setShowInput] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editingText, setEditingText] = useState("")
+
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.commonorder?.delete;
+    const canList = role === "owner" || permission?.commonorder?.list;
+    const canCreate = role === "owner" || permission?.commonorder?.create;
+    const canEdit = role === "owner" || permission?.commonorder?.edit;
+
+
 
     const {
         data: commonOrders,
@@ -98,7 +111,7 @@ const CommonOrdersMain = () => {
                     <i className="fas fa-layer-group mr-2" />
                     Common Projects
                 </h1>
-                {!showInput && (
+                {(!showInput && canCreate ) && (
                     <Button variant="primary" onClick={() => setShowInput(true)}>
                         <i className="fas fa-plus mr-2" />
                         Create New Project
@@ -156,7 +169,7 @@ const CommonOrdersMain = () => {
             )}
 
             {/* Project Cards */}
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+            {canList && <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                 {commonOrders?.map((project: any) => (
                     <div
                         key={project._id}
@@ -198,7 +211,7 @@ const CommonOrdersMain = () => {
                                 <div className="flex gap-3 flex-wrap">
                                     {editingId === project._id ? (
                                         <>
-                                            <Button
+                                            {canEdit && <Button
                                                 size="sm"
                                                 variant="primary"
                                                 onClick={(e) => {
@@ -209,8 +222,8 @@ const CommonOrdersMain = () => {
                                             >
                                                 <i className="fas fa-check mr-1" />
                                                 Save
-                                            </Button>
-                                            <Button
+                                            </Button>}
+                                           {canEdit && <Button
                                                 size="sm"
                                                 variant="ghost"
                                                 onClick={(e) => {
@@ -220,11 +233,11 @@ const CommonOrdersMain = () => {
                                                 }}
                                             >
                                                 Cancel
-                                            </Button>
+                                            </Button>}
                                         </>
                                     ) : (
                                         <>
-                                            <Button
+                                          {canEdit &&  <Button
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={(e) => {
@@ -235,8 +248,8 @@ const CommonOrdersMain = () => {
                                             >
                                                 <i className="fas fa-edit mr-1 text-blue-500" />
                                                 Edit
-                                            </Button>
-                                            <Button
+                                            </Button>}
+                                           {canDelete && <Button
                                                 size="sm"
                                                 variant="danger"
                                                 onClick={(e) => {
@@ -248,7 +261,7 @@ const CommonOrdersMain = () => {
                                             >
                                                 <i className="fas fa-trash-alt mr-1" />
                                                 Delete
-                                            </Button>
+                                            </Button>}
                                             <Button
                                                 size="sm"
                                                 variant="secondary"
@@ -267,7 +280,7 @@ const CommonOrdersMain = () => {
                         </Card>
                     </div>
                 ))}
-            </div>
+            </div>}
         </div>
     )
 }

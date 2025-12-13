@@ -4,6 +4,7 @@ import { Input } from "../../../components/ui/Input";
 import { useCreateItems, useDeleteItem, useGetCategories, useGetItemsByCategory } from "../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 import { Button } from "../../../components/ui/Button";
 import { toast } from "../../../utils/toast";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 export default function RateConfigSub() {
     const { organizationId, id: categoryId } = useParams<{
@@ -11,6 +12,15 @@ export default function RateConfigSub() {
         id: string;
     }>();
     const navigate = useNavigate()
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.materialquote?.list;
+    const canCreate = role === "owner" || permission?.materialquote?.create;
+    const canDelete = role === "owner" || permission?.materialquote?.delete;
+    const canEdit = role === "owner" || permission?.materialquote?.edit;
+
+
+
 
     const { data: categories } = useGetCategories(organizationId!);
     const { data: existingItems, isLoading, refetch } = useGetItemsByCategory(categoryId!);
@@ -176,12 +186,12 @@ export default function RateConfigSub() {
                     <h2 className="text-2xl font-bold text-gray-800">{currentCategory.name}</h2>
                 </div>
                 <div className="flex gap-2 mt-3 sm:mt-0">
-                    <Button onClick={handleAddRow} variant="primary" className="">
+                    {(canEdit || canCreate) && <Button onClick={handleAddRow} variant="primary" className="">
                         + Add Row
-                    </Button>
-                    <Button onClick={handleSave} isLoading={createPending} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    </Button>}
+                    {(canEdit || canCreate) && <Button onClick={handleSave} isLoading={createPending} className="bg-blue-600 hover:bg-blue-700 text-white">
                         <i className="fas fa-file mr-2"></i> Save Items
-                    </Button>
+                    </Button>}
                 </div>
             </div>
 
@@ -194,7 +204,7 @@ export default function RateConfigSub() {
                     >
                         <tr>
                             <th
-                                    className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider"
                             >
                                 S.NO
                             </th>
@@ -211,7 +221,7 @@ export default function RateConfigSub() {
 
                     <tbody>
                         {/* Existing Items */}
-                        {existingItems?.map((item: any, i:number) => (
+                        {existingItems?.map((item: any, i: number) => (
                             <tr
                                 key={`existing-${item?._id}`}
                                 // className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}
@@ -219,11 +229,11 @@ export default function RateConfigSub() {
      hover:bg-gray-50 hover:border-gray-300
   `}
                             >
-                                 <td 
-                                        className="border border-gray-100 font-medium text-center  text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
-                                    >
-                                        {i+1 || "—"}
-                                    </td>
+                                <td
+                                    className="border border-gray-100 p-4 font-medium text-center  text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
+                                >
+                                    {i + 1 || "—"}
+                                </td>
                                 {currentCategory?.fields?.map((field: any) => (
                                     <td key={field?.key}
                                         //    className="p-4 border-t text-gray-700"
@@ -232,7 +242,7 @@ export default function RateConfigSub() {
                                         {item?.data[field?.key] ?? "—"}
                                     </td>
                                 ))}
-                                <td className="text-center p-4 border border-gray-100">
+                               {canDelete && <td className="text-center p-4 border border-gray-100">
                                     <Button
                                         size="sm"
                                         variant="danger"
@@ -245,7 +255,7 @@ export default function RateConfigSub() {
                                         <i className="fas fa-trash mr-2"></i>
                                         <span className="">Delete</span>
                                     </Button>
-                                </td>
+                                </td>}
                             </tr>
                         ))}
 

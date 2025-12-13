@@ -10,6 +10,7 @@ import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { dateFormate } from "../../../utils/dateFormator";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 
 const PaymentConsentSection: React.FC = () => {
@@ -19,6 +20,16 @@ const PaymentConsentSection: React.FC = () => {
     const { data, isLoading, isError, refetch , error:getAllError} = useGetPaymentConfirmation(projectId!);
     const toggleConsent = useToggleConsentRequired();
     const generateConsent = useGenerateConsentLink();
+
+    
+    
+      const { role, permission } = useAuthCheck();
+      // const canDelete = role === "owner" || permission?.paymentconfirmation?.delete;
+      // const canList = role === "owner" || permission?.paymentconfirmation?.list;
+      const canCreate = role === "owner" || permission?.paymentconfirmation?.create;
+      const canEdit = role === "owner" || permission?.paymentconfirmation?.edit;
+    
+
 
     // const [link, setLink] = useState<string | null>(null);
 
@@ -97,7 +108,7 @@ const PaymentConsentSection: React.FC = () => {
                 </h2>
 
               <div className="space-x-1">
-                  <Button
+                 {(canCreate || canEdit )&& <Button
                   isLoading={toggleConsent.isPending}
                     size="sm"
                     onClick={handleToggleConsent}
@@ -114,7 +125,7 @@ const PaymentConsentSection: React.FC = () => {
                             <span className="inline sm:hidden">Make Mandatory</span>
                         </>
                     }
-                </Button>
+                </Button>}
 
                 <Button variant="primary" onClick={()=> navigate(`/${organizationId}/projectdetails/${projectId}/paymentconfirmation`)}>
                     Back
@@ -168,14 +179,15 @@ const PaymentConsentSection: React.FC = () => {
 
                     <div className="p-4 space-y-3">
                         {!agreementToken && !consentURL ? (
-                            <Button
+                            <>
+                            {(canCreate || canEdit )&&<Button
                                 isLoading={generateConsent.isPending}
                                 onClick={handleGenerate}
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
                             >
                                 <i className="fa-solid fa-wand-magic-sparkles mr-2" />
                                 Generate Consent Link
-                            </Button>
+                            </Button>}</>
                         ) : (
                             <>
                                 <div className="flex items-center justify-between p-3 border rounded-lg bg-gray-100">

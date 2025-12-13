@@ -15,6 +15,8 @@ import AssignStageStaff from "../../../shared/AssignStaff";
 import type { ProjectDetailsOutlet } from "../../../types/types";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 const SampleDesignModule: React.FC = () => {
   const { projectId, organizationId } = useParams();
@@ -22,6 +24,14 @@ const SampleDesignModule: React.FC = () => {
   const navigate = useNavigate()
 
   if (!projectId) return null;
+
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.sampledesign?.delete;
+  // const canList = role === "owner" || permission?.sampledesign?.list;
+  const canCreate = role === "owner" || permission?.sampledesign?.create;
+  const canEdit = role === "owner" || permission?.sampledesign?.edit;
+
 
   const [showAddRoomModal, setShowAddRoomModal] = useState(false);
   const addRoom = useAddRoom();
@@ -109,7 +119,7 @@ const SampleDesignModule: React.FC = () => {
   if (isLoading) return <MaterialOverviewLoading />
 
   const isChildRoute = location.pathname.includes("shortlist")
-  if(isChildRoute){
+  if (isChildRoute) {
     return <Outlet />
   }
 
@@ -133,7 +143,7 @@ const SampleDesignModule: React.FC = () => {
 
         <div className="!w-[100%] sm:!w-[100%] lg:!w-[50%] xl:!w-[65%] flex flex-col sm:flex-row gap-3 justify-end">
           <div className="flex  flex-wrap md:flex-nowrap gap-2 justify-end">
-            <Button
+            {(canCreate || canEdit) && <Button
               onClick={() => setShowAddRoomModal(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-initial min-w-max"
               disabled={!!getAllError}
@@ -141,9 +151,9 @@ const SampleDesignModule: React.FC = () => {
               <i className="fas fa-plus mr-2" />
               <span className="">Add room</span>
               {/* <span className="flex sm:hidden">Add room</span> */}
-            </Button>
+            </Button>}
 
-            <Button
+            {(canCreate || canEdit) && <Button
               isLoading={completePending}
               onClick={handleCompletionStatus}
               className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
@@ -151,19 +161,21 @@ const SampleDesignModule: React.FC = () => {
             >
               <i className="fa-solid fa-circle-check mr-2"></i>
               Mark Complete
-            </Button>
+            </Button>}
           </div>
 
           <div className="flex flex-wrap md:flex-nowrap gap-2 justify-end">
-            <ResetStageButton
+
+            {(canCreate || canEdit) && <ResetStageButton
               projectId={projectId}
               stageNumber={3}
               stagePath="sampledesign"
               className="flex-1 sm:flex-initial min-w-max"
               disabled={!!getAllError}
             />
+            }
 
-            {!getAllError && <ShareDocumentWhatsapp
+            {(!getAllError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
               projectId={projectId}
               stageNumber="3"
               className="w-full sm:w-fit"
@@ -177,6 +189,13 @@ const SampleDesignModule: React.FC = () => {
               currentAssignedStaff={sampleDesign?.assignedTo || null}
               className="flex-1 sm:flex-initial min-w-max"
             />
+
+            <div className="w-full sm:w-auto flex justify-end sm:block">
+              <StageGuide
+                organizationId={organizationId!}
+                stageName="sampledesign"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -223,16 +242,16 @@ const SampleDesignModule: React.FC = () => {
 
 
           <Card className="mb-6  text-blue-600 border-l-4 border-1 border-blue-600">
-           <Link to={`shortlist`}>
-            <div className="py-4 ml-2 flex justify-between items-center">
-              <p className="text-md sm:text-xl">Sample Reference Designs</p>
-              <i className="mr-4 fas fa-arrow-right text-blue-600"></i>
-            </div>
-           </Link>
+            <Link to={`shortlist`}>
+              <div className="py-4 ml-2 flex justify-between items-center">
+                <p className="text-md sm:text-xl">Sample Reference Designs</p>
+                <i className="mr-4 fas fa-arrow-right text-blue-600"></i>
+              </div>
+            </Link>
           </Card>
 
 
-           {/* <Card className="mb-6  text-blue-600 border-l-4 border-1 border-blue-600">
+          {/* <Card className="mb-6  text-blue-600 border-l-4 border-1 border-blue-600">
            <Link to={`shortlistmica`}>
             <div className="py-4 ml-2 flex justify-between items-center">
               <p className="text-md sm:text-xl">Sample Mica Designs</p>
@@ -247,13 +266,13 @@ const SampleDesignModule: React.FC = () => {
               <i className="fas fa-home text-blue-200 text-5xl sm:text-6xl mb-4" />
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-2">No Rooms Added Yet</h2>
               <p className="text-gray-500 mb-6 max-w-md mx-auto">Start by adding a room to upload design files</p>
-              <button
+              {(canCreate || canEdit) && <button
                 onClick={() => setShowAddRoomModal(true)}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 min-w-[200px]"
               >
                 <i className="fas fa-plus mr-2" />
                 Add Your First Room
-              </button>
+              </button>}
             </div>
           ) : (
             <div className="grid grid-cols-1  gap-6">
@@ -265,7 +284,7 @@ const SampleDesignModule: React.FC = () => {
                       {room.roomName}
                     </h2>
 
-                    <Button
+                    {canDelete && <Button
                       isLoading={deleteRoomIsPending}
                       onClick={() => handleDeleteRoom(room._id)}
                       variant="danger"
@@ -273,7 +292,7 @@ const SampleDesignModule: React.FC = () => {
                     >
                       <i className="fa-solid fa-trash mr-2"></i>
                       Delete
-                    </Button>
+                    </Button>}
                   </div>
 
                   <div className="flex-grow">

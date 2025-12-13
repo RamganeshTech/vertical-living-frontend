@@ -6,7 +6,7 @@ import clientApi from "../apiService/clientService";
 const loginClient = async ({ email, password }: { email: string; password: string }) => {
     const { data } = await clientApi.post("/auth/client/login", { email, password });
     if (!data.ok) throw new Error(data.message);
-    return data;
+    return data.data;
 };
 export const useLoginClient = () => {
     return useMutation({

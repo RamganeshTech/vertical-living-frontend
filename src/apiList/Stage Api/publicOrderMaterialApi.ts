@@ -207,29 +207,60 @@ export const useUpdateOrderingMaterialSubItem = () => {
 
 
 
-const generatedPublicLink = async ({
+const generatedPublicOrderPdf = async ({
     projectId,
     organizationId,
+  orderItemId,
+
 }: {
     projectId: string;
+  orderItemId: string;
+
     organizationId: string;
 }) => {
-    const { data } = await axios.patch(`${backendUrl}/publicordermaterial/generatelink/${projectId}/${organizationId}`);
+    const { data } = await axios.patch(`${backendUrl}/publicordermaterial/generatelink/${projectId}/${organizationId}/${orderItemId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
 
-
+//  just now create the pdf doesnt sends to the proucrement
 export const useGeneratePublicOrderMaterial = () => {
     return useMutation({
-        mutationFn: async ({ projectId, organizationId }: { projectId: string, organizationId: string }) => {
-            return await generatedPublicLink({ projectId, organizationId });
+        mutationFn: async ({ projectId, organizationId, orderItemId }: { projectId: string, organizationId: string , orderItemId: string}) => {
+            return await generatedPublicOrderPdf({ projectId, organizationId , orderItemId});
         },
         onSuccess: (_, { projectId }) => {
             queryClient.invalidateQueries({ queryKey: ["public-ordering-material", projectId] });
         },
     });
 };
+
+
+
+const submitPublicOrderMaterial = async ({
+  projectId,
+}: {
+  projectId: string;
+}) => {
+  const { data } = await axios.put(`${backendUrl}/publicordermaterial/${projectId}/submitpublicorder`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+//  used to store the public order in that particular project
+export const usePublicOrderHistorySubmit = () => {
+  return useMutation({
+    mutationFn: async ({ projectId, }: { projectId: string }) => {
+      return await submitPublicOrderMaterial({ projectId,  });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["public-ordering-material", projectId] });
+    },
+  });
+};
+
 
 
 

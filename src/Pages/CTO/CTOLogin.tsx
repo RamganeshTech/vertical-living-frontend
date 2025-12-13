@@ -71,14 +71,16 @@ export default function CTOLogin() {
       const data = await loginCTO.mutateAsync(formData)
 
 
-      const CTOData = data.data;
+      const CTOData = data;
 
       // ✅ 1) Set authSlice
       dispatch(setRole({
         role: CTOData.role,
         isauthenticated: true,
         _id: CTOData.CTOId, // map _id
-        userName: CTOData?.CTOName
+        userName: CTOData?.CTOName,
+        permission: CTOData?.permission || {},
+        isGuideRequired: CTOData.isGuideRequired
 
       }));
 
@@ -89,7 +91,11 @@ export default function CTOLogin() {
         email: CTOData.email,
         phoneNo: CTOData.phoneNo,
         role: CTOData.role,
-        isauthenticated: true
+        isauthenticated: true,
+        permission: CTOData?.permission || {},
+        isGuideRequired: CTOData.isGuideRequired
+
+
       }));
 
 

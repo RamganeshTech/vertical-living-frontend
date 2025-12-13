@@ -7,12 +7,23 @@ import { useDeleteRoomItems, useGetSingleRoomRequirement, useUpdateRequirementRo
 import { toast } from "../../utils/toast";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
+import { useAuthCheck } from "../../Hooks/useAuthCheck";
 
 
-type NewItem= { itemName: string; quantity: number; unit: string }
+type NewItem = { itemName: string; quantity: number; unit: string }
 const RoomPage: React.FC = () => {
 
     const { projectId, roomId } = useParams() as { roomId: string, projectId: string }
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.clientrequirement?.delete;
+    // const canList = role === "owner" || permission?.clientrequirement?.list;
+    const canCreate = role === "owner" || permission?.clientrequirement?.create;
+    const canEdit = role === "owner" || permission?.clientrequirement?.edit;
+
+
 
     const navigate = useNavigate()
     const { data, isLoading, refetch } = useGetSingleRoomRequirement({ roomId, projectId });
@@ -55,13 +66,14 @@ const RoomPage: React.FC = () => {
 
     // Handle change in any field
     const handleNewItemChange = (index: number, field: "itemName" | "quantity" | "unit", value: string | number) => {
-        setNewItems((prev:NewItem[]) => {
+        setNewItems((prev: NewItem[]) => {
             const updated = prev.map((item, i) =>
-                i === index ? { ...item, 
-                    [field]: field === "quantity" ? Number(value) : value, 
+                i === index ? {
+                    ...item,
+                    [field]: field === "quantity" ? Number(value) : value,
                     unit: field === "unit" ? String(value) : (item?.unit || "unit"),
-                 } 
-                 : item
+                }
+                    : item
             );
 
             // If user typed something in the last row, add a new empty one automatically
@@ -292,13 +304,13 @@ const RoomPage: React.FC = () => {
                                 <p className="text-slate-500 mb-6 max-w-md mx-auto">
                                     Start by adding your first item to this room. You can specify quantities and manage specifications.
                                 </p>
-                                <Button
+                                {(canCreate || canEdit) && <Button
                                     onClick={() => setIsAdding(true)}
                                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center space-x-2 mx-auto"
                                 >
                                     <i className="fas fa-plus text-sm" />
                                     <span>Add First Item</span>
-                                </Button>
+                                </Button>}
                             </div>
                         ) : (
                             <div className="space-y-3">
@@ -363,7 +375,7 @@ const RoomPage: React.FC = () => {
                                                 </select>
 
                                                 {/* Action */}
-                                                <div className="flex justify-center">
+                                                {canDelete && <div className="flex justify-center">
                                                     <Button
                                                         onClick={() => handleDeleteItem(item._id)}
                                                         disabled={deletePending}
@@ -371,7 +383,7 @@ const RoomPage: React.FC = () => {
                                                     >
                                                         {deletePending ? "Deleting..." : "Delete"}
                                                     </Button>
-                                                </div>
+                                                </div>}
                                             </div>
                                         ))}
                                     </div>
@@ -427,7 +439,7 @@ const RoomPage: React.FC = () => {
                                             ))}
 
                                             <div className="flex justify-end mt-3">
-                                                <Button
+                                              {  (canCreate || canEdit) && <Button
                                                     onClick={handleSaveAll}
                                                     disabled={newItems.every((item) =>
                                                         Object.entries(item).every(([k, v]) => k === "itemName" && !v ? false : true)
@@ -436,12 +448,12 @@ const RoomPage: React.FC = () => {
                                                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
                                                 >
                                                     Save All Items
-                                                </Button>
+                                                </Button>}
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="w-full  flex justify-end">
-                                            <Button
+                                          {(canCreate || canEdit) &&   <Button
                                                 onClick={() => {
                                                     setIsAdding(true);
                                                     setNewItems([{ itemName: "", quantity: 1, unit: "unit" }]);
@@ -449,7 +461,7 @@ const RoomPage: React.FC = () => {
                                                 className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg  "
                                             >
                                                 + Add Item
-                                            </Button>
+                                            </Button>}
                                         </div>
 
                                     )}

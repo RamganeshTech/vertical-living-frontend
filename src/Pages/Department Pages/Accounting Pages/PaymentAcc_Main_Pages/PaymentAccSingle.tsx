@@ -6,6 +6,7 @@ import { Button } from "../../../../components/ui/Button";
 import { dateFormate } from "../../../../utils/dateFormator";
 import { Card, CardContent } from "../../../../components/ui/Card";
 import InfoTooltip from "../../../../components/ui/InfoToolTip";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 
 // ... existing getStatusConfig function ...
 const getStatusConfig = (status: string) => {
@@ -26,6 +27,15 @@ const PaymentAccSingle: React.FC = () => {
     const navigate = useNavigate();
 
     const { data, isLoading, isError, refetch } = useGetSinglePayment(id!);
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.payments?.delete;
+    const canEdit = role === "owner" || permission?.payments?.edit;
+    const canCreate = role === "owner" || permission?.payments?.create;
+
+
+
     const { mutateAsync: syncAccountsMutation, isPending: syncAccountsLoading } = useSyncPaymentToAccounts();
 
     const [processingItems, setProcessingItems] = useState<Set<string>>(new Set());
@@ -97,12 +107,12 @@ const PaymentAccSingle: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center space-y-1">
+                    {(canEdit || canCreate) && <div className="flex items-center space-y-1">
                         <Button variant="primary" isLoading={syncAccountsLoading} onClick={handleSyncToAccounts}>
                             Send To Accounts Dept
                         </Button>
                         <InfoTooltip content="Click to send the payment to accounts department" type="info" position="bottom" />
-                    </div>
+                    </div>}
                     <div className={`px-4 py-1.5 rounded-full text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} border-current/20 capitalize flex items-center gap-2`}>
                         <i className={`fas ${statusConfig.icon}`}></i>
                         {data.generalStatus}
@@ -204,7 +214,7 @@ const PaymentAccSingle: React.FC = () => {
                                 <div className="text-[10px] text-gray-900 font-medium capitalize flex items-center gap-1 pt-0.5">
                                     <i className="fas fa-folder-open text-[9px]"></i>
 
-                                   <span className="text-gray-500">project:</span>  {" "}
+                                    <span className="text-gray-500">project:</span>  {" "}
                                     {data?.projectId?.projectName}
                                 </div>
                             )}
@@ -269,11 +279,11 @@ const PaymentAccSingle: React.FC = () => {
                                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                                         <i className="fas fa-align-left"></i> Description / Notes
                                     </label>
-                                    
+
                                     <div className="flex-1 bg-gray-50 rounded-xl p-5 border border-gray-100 relative group hover:border-blue-200 transition-colors">
                                         {/* Decorative quote icon */}
                                         {/* <i className="fas fa-quote-left absolute top-4 left-4 text-gray-200 text-2xl -z-0"></i> */}
-                                        
+
                                         <div className="relative z-10">
                                             {data.notes ? (
                                                 <p className="text-gray-800 text-base md:text-lg leading-relaxed font-medium whitespace-pre-wrap">
@@ -300,17 +310,19 @@ const PaymentAccSingle: React.FC = () => {
                                 </div>
 
                                 {data?.generalStatus?.toLowerCase() !== 'paid' ? (
-                                    <div className="w-full space-y-3">
-                                        <Button
-                                            onClick={() => handleItemPay(data._id, data.grandTotal)}
-                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 transition-all py-6 text-lg rounded-xl font-semibold group"
-                                        >
-                                            Pay Now <i className="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                                        </Button>
-                                        <p className="text-[10px] text-gray-400">
-                                            Clicking pay will process the full amount.
-                                        </p>
-                                    </div>
+                                    <>
+                                        {(canCreate || canEdit) && <div className="w-full space-y-3">
+                                            <Button
+                                                onClick={() => handleItemPay(data._id, data.grandTotal)}
+                                                className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 transition-all py-6 text-lg rounded-xl font-semibold group"
+                                            >
+                                                Pay Now <i className="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                                            </Button>
+                                            <p className="text-[10px] text-gray-400">
+                                                Clicking pay will process the full amount.
+                                            </p>
+                                        </div>}
+                                    </>
                                 ) : (
                                     <div className="w-full flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-300">
                                         <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-1">
@@ -402,7 +414,7 @@ const PaymentAccSingle: React.FC = () => {
 
                                                         {/* <div className="col-span-1 text-xs text-gray-600">{dateFormate(data.dueDate)}</div> */}
 
-                                                        <div className="col-span-1 text-center">
+                                                        {(canEdit || canCreate) && <div className="col-span-1 text-center">
                                                             {itemStatus === 'paid' ? (
                                                                 <span className="text-green-600 text-xs font-bold flex justify-center items-center gap-1">
                                                                     <i className="fas fa-check-double"></i> Paid
@@ -418,7 +430,7 @@ const PaymentAccSingle: React.FC = () => {
                                                                     {isProcessing ? <i className="fas fa-spinner fa-spin"></i> : <><i className="fas fa-rupee-sign"></i> Pay</>}
                                                                 </button>
                                                             )}
-                                                        </div>
+                                                        </div>}
                                                     </div>
                                                 );
                                             })
@@ -507,13 +519,13 @@ const PaymentAccSingle: React.FC = () => {
                                                         ₹{data.advancedAmount.totalAmount.toLocaleString('en-IN')}
                                                     </span>
 
-                                                    <Button
+                                                    {(canEdit || canCreate) && <Button
                                                         onClick={() => handleItemPay(data._id, data.advancedAmount.totalAmount)}
                                                         className="bg-purple-600 hover:bg-purple-700 text-white shadow-md hover:shadow-lg transition-all w-32"
                                                         size="sm"
                                                     >
                                                         Pay Advance <i className="fas fa-arrow-right ml-2 text-xs"></i>
-                                                    </Button>
+                                                    </Button>}
                                                 </div>
                                             </div>
                                         )}
@@ -533,19 +545,19 @@ const PaymentAccSingle: React.FC = () => {
 
                                                 {/* Render Pay Button Only if Not Paid */}
                                                 {data?.generalStatus?.toLowerCase() !== 'paid' ? (
-                                                    <Button
-                                                        onClick={() => handleItemPay(data._id, data?.amountRemaining?.totalAmount)}
-                                                        // disabled={isProcessing}
-                                                        // variant=""
-                                                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all w-32"
-                                                        size="sm"
-                                                    >
-                                                        {/* {isGlobalProcessing ? (
-                                                    <i className="fas fa-spinner fa-spin"></i>
-                                                ) : ( */}
-                                                        <>Pay Now <i className="fas fa-arrow-right ml-2 text-xs"></i></>
-                                                        {/* )} */}
-                                                    </Button>
+                                                    <>
+                                                        {(canCreate || canEdit) &&
+                                                            <Button
+                                                                onClick={() => handleItemPay(data._id, data?.amountRemaining?.totalAmount)}
+                                                                // disabled={isProcessing}
+                                                                // variant=""
+                                                                className="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all w-32"
+                                                                size="sm"
+                                                            >
+
+                                                                <>Pay Now <i className="fas fa-arrow-right ml-2 text-xs"></i></>
+                                                            </Button>}
+                                                    </>
                                                 ) : (
                                                     <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 rounded-lg text-sm font-bold">
                                                         <i className="fas fa-check-circle"></i> Fully Paid

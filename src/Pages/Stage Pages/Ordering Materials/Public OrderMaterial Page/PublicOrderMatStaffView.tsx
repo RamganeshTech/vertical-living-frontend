@@ -2,9 +2,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../../../components/ui/Button';
 import { toast } from '../../../../utils/toast';
 import {
-    useGeneratePublicOrderMaterial,
+    // useGeneratePublicOrderMaterial,
+    usePublicOrderHistorySubmit,
 } from '../../../../apiList/Stage Api/publicOrderMaterialApi';
-import { downloadImage } from '../../../../utils/downloadFile';
+// import { downloadImage } from '../../../../utils/downloadFile';
 import PublicOrderMaterialCompo from './PublicOrderMaterialCompo';
 
 // interface AvailableProjetType {
@@ -19,7 +20,7 @@ const PublicOrderMatStaffView = () => {
     const navigate = useNavigate();
 
     // const [selectedProjectId, setSelectedProjectId] = useState<string>("");
-   
+
     // Fetch projects
     // const { data } = useGetProjects(organizationId!);
     // const projects = data?.map((project: AvailableProjetType) => ({
@@ -34,14 +35,28 @@ const PublicOrderMatStaffView = () => {
     //     }
     // }, [projects, selectedProjectId]);
 
-    const { mutateAsync: generateLink, isPending: generatePending } = useGeneratePublicOrderMaterial()
+    // const { mutateAsync: generateLink, isPending: generatePending } = useGeneratePublicOrderMaterial()
 
 
-    const handleGenerate = async () => {
+    // const handleGenerate = async () => {
+    //     try {
+    //         const res = await generateLink({ projectId: projectId!, organizationId: organizationId! });
+    //         await downloadImage({ src: res?.pdfData?.url, alt: res?.pdfData?.pdfName })
+    //         toast({ title: "Success", description: "Pdf Generated successfully" });
+    //     } catch (err: any) {
+    //         toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
+    //     }
+    // };
+
+
+
+    const { mutateAsync: submitOrder, isPending: generatePending } = usePublicOrderHistorySubmit()
+
+    const handlesubmit = async () => {
         try {
-            const res = await generateLink({ projectId: projectId!, organizationId: organizationId! });
-            await downloadImage({ src: res?.pdfData?.url, alt: res?.pdfData?.pdfName })
-            toast({ title: "Success", description: "Pdf Generated successfully" });
+            await submitOrder({ projectId: projectId! });
+            // await downloadImage({ src: res?.pdfData?.url, alt: res?.pdfData?.pdfName })
+            toast({ title: "Success", description: "Order Sent to Ordering Material Stage" });
         } catch (err: any) {
             toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
         }
@@ -75,22 +90,13 @@ const PublicOrderMatStaffView = () => {
 
 
                         <Button
-                            onClick={handleGenerate}
-                            disabled={generatePending}
+                            onClick={handlesubmit}
+                            isLoading={generatePending}
                             className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
                             size="lg"
                         >
-                            {generatePending ? (
-                                <>
-                                    <i className="fas fa-spinner fa-spin"></i>
-                                    Generating...
-                                </>
-                            ) : (
-                                <>
-                                    <i className="fas fa-file-pdf"></i>
-                                    Generate PDF
-                                </>
-                            )}
+                            <i className="fas fa-save"></i>
+                            Save
                         </Button>
 
 

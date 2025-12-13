@@ -12,6 +12,7 @@ import { useGetSubContractById, useUpdateWorkerStatus } from "../../../apiList/S
 import SubContractForm from "./SubContractForm";
 import { Label } from "../../../components/ui/Label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 const SingleSubContract = () => {
     const navigate = useNavigate();
@@ -26,6 +27,9 @@ const SingleSubContract = () => {
     const [shareableLink, setShareableLink] = useState<string>("")
     const [status, setStatus] = useState<"pending" | "accepted" | "rejected">(subContractData?.status || "pending")
 
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.subcontract?.list;
 
 
 
@@ -63,30 +67,6 @@ const SingleSubContract = () => {
 
     const { mutateAsync: updateStatusMutation, } = useUpdateWorkerStatus()
 
-
-    // const statusConfig = {
-    //     pending: {
-    //         bg: "bg-yellow-100",
-    //         text: "text-yellow-700",
-    //         border: "border-yellow-300",
-    //         hover: "hover:bg-yellow-200",
-    //         label: "Pending"
-    //     },
-    //     accepted: {
-    //         bg: "bg-green-100",
-    //         text: "text-green-700",
-    //         border: "border-green-300",
-    //         hover: "hover:bg-green-200",
-    //         label: "Accepted"
-    //     },
-    //     rejected: {
-    //         bg: "bg-red-100",
-    //         text: "text-red-700",
-    //         border: "border-red-300",
-    //         hover: "hover:bg-red-200",
-    //         label: "Rejected"
-    //     }
-    // };
 
 
 
@@ -149,6 +129,12 @@ const SingleSubContract = () => {
         return <div>Error loading data. Please try again.</div>;
     }
 
+
+
+
+    if (!canList) {
+        return
+    }
     return (
         <div className="space-y-6 max-h-full overflow-y-auto">
             <div className="flex justify-between gap-2 items-center">
@@ -201,62 +187,6 @@ const SingleSubContract = () => {
                     initialData={subContractData}
                     refetch={refetch}
                 />
-
-                {/* --- Separate Component for After Work Upload --- */}
-                {/* <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center text-lg">
-                            <i className="fas fa-camera-retro mr-3 text-purple-600"></i>
-                            Upload After-Work Pictures
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <p className="text-sm text-gray-600">
-                            Once the work is completed, upload pictures here for verification.
-                        </p>
-                        <div className="space-y-2">
-                            <Label htmlFor="afterWorkUpload">Select Files</Label>
-                            <Input
-                                id="afterWorkUpload"
-                                type="file"
-                                multiple
-                                onChange={(e) => setAfterWorkFiles(Array.from(e.target.files || []))}
-                            />
-                        </div>
-
-                       
-
-
-                        {subContractData?.filesAfterWork.some((file:SubContractFile) => file.type === "image") && (
-                            <div className="mb-6">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <i className="fas fa-images text-purple-600"></i>
-                                    <h4 className="font-semibold text-gray-800 text-sm">Images</h4>
-                                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                                        {subContractData?.filesAfterWork.filter((f:any) => f.type === "image").length}
-                                    </span>
-                                </div>
-                                <ImageGalleryExample
-                                    imageFiles={subContractData?.filesAfterWork?.filter((file: SubContractFile) => file.type === "image")}
-                                    height={150}
-                                    minWidth={150}
-                                    maxWidth={200}
-                                />
-                            </div>
-                        )}
-
-                        <div className="flex justify-end">
-                            <Button onClick={handleAfterUploads} disabled={uploadAfterMutation.isPending || afterWorkFiles.length === 0}>
-                                {uploadAfterMutation.isPending ? (
-                                    <><i className="fas fa-spinner fa-spin mr-2"></i>Uploading...</>
-                                ) : (
-                                    <><i className="fas fa-cloud-upload-alt mr-2"></i>Upload Files</>
-                                )}
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card> */}
-
 
 
                 {shareableLink && <div className="space-y-4">

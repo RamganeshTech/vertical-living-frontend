@@ -1,5 +1,5 @@
 // procurementNew.queries.ts
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import axios, { type AxiosInstance } from "axios";
 import useGetRole from "../../../Hooks/useGetRole";
 import { getApiForRole } from "../../../utils/roleCheck";
@@ -22,6 +22,37 @@ export const updateProcurementShopDetailsApi = async ({
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
+
+
+
+export const createProcurement = async ({
+
+  payload,
+  api,
+}: {
+  payload: any;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.post(`/department/procurement/create`, payload);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+
+export const getOrderMaterialfromDeptNumber = async ({
+  projectId,
+  api,
+}: {
+  projectId: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.get(`/department/procurement/getordermaterial/fromdeptnumbers/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
 
 export const updateProcurementDeliveryLocationApi = async ({
   id,
@@ -49,20 +80,79 @@ export const deleteProcurementApi = async ({
   return data.data;
 };
 
+// export const getProcurementNewDetailsApi = async ({
+//   organizationId,
+//   projectId,
+//   api,
+// }: {
+//   organizationId: string;
+//   api: AxiosInstance;
+//   projectId?: string;
+// }) => {
+//      const params = new URLSearchParams();
+//   if (organizationId) params.append("organizationId", organizationId);
+//   if (projectId) params.append("projectId", projectId);
+//   const { data } = await api.get(`/department/procurement/getprocurementall?${params.toString()}`);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
+
+
+
+export interface ProcurementFilters {
+  projectId?: string;
+  search?: string;
+  isSyncWithPaymentsSection?: boolean | null; // null/undefined means "All"
+  isConfirmedRate?: boolean | null;
+  minAmount?: number;
+  maxAmount?: number;
+  fromDate?: string; // YYYY-MM-DD
+  toDate?: string;   // YYYY-MM-DD
+}
+
 export const getProcurementNewDetailsApi = async ({
   organizationId,
-  projectId,
   api,
+  pageParam = 1,
+  filters
 }: {
   organizationId: string;
   api: AxiosInstance;
-  projectId?: string;
+  pageParam?: number;
+  filters?: ProcurementFilters;
 }) => {
-     const params = new URLSearchParams();
-  if (organizationId) params.append("organizationId", organizationId);
-  if (projectId) params.append("projectId", projectId);
+  const params = new URLSearchParams();
+
+  // Required Params
+  params.append("organizationId", organizationId);
+  params.append("page", pageParam.toString());
+  params.append("limit", "10"); // You can make this dynamic if needed
+
+  // Optional Filters
+  if (filters) {
+    if (filters.projectId) params.append("projectId", filters.projectId);
+    if (filters.search) params.append("search", filters.search);
+
+    // Handle Booleans carefully (exclude if null/undefined)
+    if (typeof filters.isSyncWithPaymentsSection === 'boolean') {
+      params.append("isSyncWithPaymentsSection", String(filters.isSyncWithPaymentsSection));
+    }
+    if (typeof filters.isConfirmedRate === 'boolean') {
+      params.append("isConfirmedRate", String(filters.isConfirmedRate));
+    }
+
+    if (filters.minAmount !== undefined) params.append("minAmount", String(filters.minAmount));
+    if (filters.maxAmount !== undefined) params.append("maxAmount", String(filters.maxAmount));
+    
+    if (filters.fromDate) params.append("fromDate", filters.fromDate);
+    if (filters.toDate) params.append("toDate", filters.toDate);
+  }
+
   const { data } = await api.get(`/department/procurement/getprocurementall?${params.toString()}`);
+
   if (!data.ok) throw new Error(data.message);
+
+  // Return the specific data structure expected by useInfiniteQuery
   return data.data;
 };
 
@@ -96,7 +186,7 @@ export const updateProcurementTotalCostApi = async ({
 
 
 const generatedProcurementPdfLink = async ({
- id,
+  id,
   api,
 }: {
   id: string;
@@ -146,9 +236,9 @@ const deleteProcurementPdf = async (
 
 
 const syncPaymentSectiontoProcurement = async ({ id, api }: { id: string; api: AxiosInstance }) => {
-    const { data } = await api.post(`/department/procurement/synctopayments/${id}`);
-    if (!data.ok) throw new Error(data.message);
-    return data.data;
+  const { data } = await api.post(`/department/procurement/synctopayments/${id}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
 };
 
 
@@ -156,7 +246,7 @@ const syncPaymentSectiontoProcurement = async ({ id, api }: { id: string; api: A
 // PUBLIC APIS
 
 const generateShareLink = async ({
- orderId,
+  orderId,
   api,
 }: {
   orderId: string;
@@ -229,7 +319,7 @@ export const useUpdateProcurementShopDetails = () => {
       if (!api) throw new Error("API instance not found for role");
       return await updateProcurementShopDetailsApi({ id, payload, api });
     },
-     onSuccess: (_, {id}) => {
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
       queryClient.invalidateQueries({ queryKey: ["procurement", "single", id] });
     },
@@ -246,12 +336,49 @@ export const useUpdateProcurementDeliveryLocation = () => {
       if (!api) throw new Error("API instance not found for role");
       return await updateProcurementDeliveryLocationApi({ id, payload, api });
     },
-    onSuccess: (_, {id}) => {
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
       queryClient.invalidateQueries({ queryKey: ["procurement", "single", id] });
     },
   });
 };
+
+
+
+
+export const useCreateProcurement = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ payload }: { payload: any }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("API instance not found for role");
+      return await createProcurement({ payload, api });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
+    },
+  });
+};
+
+
+
+export const useGetOrderMateiralRefPdfId = (projectId: string) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ["ordermaterial", "refId", projectId],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("API instance not found for role");
+      return await getOrderMaterialfromDeptNumber({ api, projectId: projectId });
+    },
+    enabled: !!projectId && !!role && !!api,
+  });
+};
+
 
 export const useDeleteProcurement = () => {
   const { role } = useGetRole();
@@ -269,31 +396,72 @@ export const useDeleteProcurement = () => {
   });
 };
 
-export const useGetProcurementNewDetails = (organizationId: string, filters?: any) => {
+// export const useGetProcurementNewDetails = (organizationId: string, filters?: any) => {
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+
+//   return useQuery({
+//     queryKey: ["procurement", "details", organizationId, filters],
+//     queryFn: async () => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+//       if (!api) throw new Error("API instance not found for role");
+//       return await getProcurementNewDetailsApi({ organizationId, api, projectId: filters.projectId });
+//     },
+//     enabled: !!organizationId && !!role && !!api,
+//   });
+// };
+
+
+
+export const useGetProcurementNewDetails = (
+  organizationId: string,
+  filters: ProcurementFilters
+) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
-  return useQuery({
-    queryKey: ["procurement", "details", organizationId, filters],
-    queryFn: async () => {
+  return useInfiniteQuery({
+    // Include all filters in the Query Key so refetch happens automatically when filters change
+    queryKey: ["procurement", "infinite", organizationId, filters],
+
+    queryFn: async ({ pageParam = 1 }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
       if (!api) throw new Error("API instance not found for role");
-      return await getProcurementNewDetailsApi({ organizationId, api, projectId: filters.projectId });
+
+      return await getProcurementNewDetailsApi({
+        organizationId,
+        api,
+        pageParam, // React Query passes this automatically
+        filters
+      });
     },
+
+    // Determine the next page number based on backend response
+    getNextPageParam: (lastPage) => {
+      // lastPage structure matches the backend: { items: [], hasNextPage: boolean, currentPage: number }
+      if (lastPage.hasNextPage) {
+        return lastPage.currentPage + 1;
+      }
+      return undefined; // No more pages
+    },
+
+    // Initial Page Param
+    initialPageParam: 1,
+
     enabled: !!organizationId && !!role && !!api,
   });
 };
 
 
 export const useGetSingleProcurementDetails = (id: string) => {
- 
+
   return useQuery({
     queryKey: ["procurement", "single", id],
     queryFn: async () => {
-    
+
       return await getSingleProcurementDetailsApi({ id });
     },
-    enabled: !!id ,
+    enabled: !!id,
     refetchOnMount: true,
     // refetchOnWindowFocus: true,
   });
@@ -310,7 +478,7 @@ export const useUpdateProcurementTotalCost = () => {
       if (!api) throw new Error("API instance not found for role");
       return await updateProcurementTotalCostApi({ id, payload, api });
     },
-     onSuccess: (_, {id}) => {
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
       queryClient.invalidateQueries({ queryKey: ["procurement", "single", id] });
     },
@@ -327,12 +495,12 @@ export const useProcurementGeneratePdf = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ id}: { id: string}) => {
+    mutationFn: async ({ id }: { id: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await generatedProcurementPdfLink({ id, api });
     },
-    onSuccess: (_, {id}) => {
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
       queryClient.invalidateQueries({ queryKey: ["procurement", "single", id] });
     },
@@ -347,12 +515,12 @@ export const useDeleteProcurementPdf = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ id, pdfId }: {id:string, pdfId: string,}) => {
+    mutationFn: async ({ id, pdfId }: { id: string, pdfId: string, }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Youre not allowed to delete pdf");
       if (!api) throw new Error("API instance not available");
       return await deleteProcurementPdf(id, pdfId, api);
     },
-     onSuccess: (_, {id}) => {
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
       queryClient.invalidateQueries({ queryKey: ["procurement", "single", id] });
     },
@@ -402,20 +570,20 @@ export const useDeleteProcurementPdf = () => {
 
 
 export const useSyncProcurementToPaymentsSection = () => {
-    const allowedRoles = ["owner", "staff", "CTO"];
-    const { role } = useGetRole();
-    const api = getApiForRole(role!);
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
 
-    return useMutation({
-        mutationFn: async ({ id }: { id: string }) => {
-            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
-            if (!api) throw new Error("API instance not found for role");
-            return await syncPaymentSectiontoProcurement({ id, api });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["bills"] });
-        },
-    });
+  return useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+      if (!api) throw new Error("API instance not found for role");
+      return await syncPaymentSectiontoProcurement({ id, api });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bills"] });
+    },
+  });
 };
 
 
@@ -433,12 +601,12 @@ export const useProcurementGenerateLink = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ orderId}: { orderId: string}) => {
+    mutationFn: async ({ orderId }: { orderId: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await generateShareLink({ orderId, api });
     },
-    onSuccess: (_, {orderId}) => {
+    onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
       queryClient.invalidateQueries({ queryKey: ["procurement", "single", orderId] });
     },
@@ -448,14 +616,14 @@ export const useProcurementGenerateLink = () => {
 
 
 
-export const useGetProcurementItemsPublic = (token: string, orderId:string) => {
+export const useGetProcurementItemsPublic = (token: string, orderId: string) => {
   return useQuery({
     queryKey: ["procurement", "public", token],
     queryFn: async () => {
       return await getProcurementItemsPublicApi({ token, orderId });
     },
     enabled: !!token,
-    retry:false,
+    retry: false,
   });
 };
 
@@ -474,7 +642,7 @@ export const usePublicUpdateProcurementRateSubmit = () => {
       token: string;
       payload: Array<any>;
     }) => {
-      return await submitProcurementItemRateByShop({token,payload, orderId });
+      return await submitProcurementItemRateByShop({ token, payload, orderId });
     },
   });
 };
@@ -499,7 +667,7 @@ export const usePublicUpdateProcurementItemRate = () => {
       token: string;
       payload: Array<any>;
     }) => {
-      return await updatePublicProcurementItemRateByShop({token,payload, orderId, itemId });
+      return await updatePublicProcurementItemRateByShop({ token, payload, orderId, itemId });
     },
   });
 };

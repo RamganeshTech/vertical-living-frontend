@@ -13,6 +13,7 @@ import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import { dateFormate } from "../../../utils/dateFormator";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 const statusOptions = ["pending", "approved", "rejected"] as const;
 
@@ -30,6 +31,18 @@ const PaymentScheduleSection: React.FC = () => {
     const [dueDate, setDueDate] = useState(data?.dueDate);
     const [isEditingDueDate, setIsEditingDueDate] = useState(false);
     const dueDateMutation = useUpdatePaymentScheduleDueDate();
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.paymentconfirmation?.delete;
+    // const canList = role === "owner" || permission?.paymentconfirmation?.list;
+    const canCreate = role === "owner" || permission?.paymentconfirmation?.create;
+    const canEdit = role === "owner" || permission?.paymentconfirmation?.edit;
+
+
+
+
 
     const handleDueDateSave = async () => {
         try {
@@ -142,8 +155,8 @@ const PaymentScheduleSection: React.FC = () => {
 
                 <h2 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
                     <i className="fa-regular fa-calendar-check text-blue-600" />
-                  <span className="hidden sm:inline">  Step 2: Payment Schedule Approval</span>
-                  <span className="inline sm:hidden">  Payment Schedule</span>
+                    <span className="hidden sm:inline">  Step 2: Payment Schedule Approval</span>
+                    <span className="inline sm:hidden">  Payment Schedule</span>
                 </h2>
 
 
@@ -165,14 +178,14 @@ const PaymentScheduleSection: React.FC = () => {
                                 {data?.dueDate ? dateFormate(data?.dueDate) : "Not set"}
                             </span>
 
-                            <Button
+                            {(canCreate || canEdit) && <Button
                                 size="sm"
                                 onClick={() => setIsEditingDueDate(true)}
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1"
                             >
                                 <i className="fa-regular fa-pen-to-square mr-2" />
                                 Edit
-                            </Button>
+                            </Button>}
                         </div>
                     ) : (
                         <div className="flex items-center gap-3 flex-wrap">
@@ -218,7 +231,7 @@ const PaymentScheduleSection: React.FC = () => {
                     </h3>
 
                     <div className="flex items-center gap-2">
-                        {statusOptions.map((status) => (
+                        {(canCreate || canEdit) && statusOptions.map((status) => (
                             <Button
                                 isLoading={
                                     clientStatusMutation.isPending &&
@@ -262,14 +275,14 @@ const PaymentScheduleSection: React.FC = () => {
                         onChange={(e) => setClientNotes(e.target.value)}
                         rows={3}
                     />
-                    <Button
+                    {(canCreate || canEdit) && <Button
                         onClick={handleClientNotesSubmit}
                         isLoading={clientNotesMutation.isPending}
                         className="bg-blue-600 hover:bg-blue-700 text-white mt-2"
                     >
                         <i className="fa-regular fa-floppy-disk mr-2" />
                         Save Client Notes
-                    </Button>
+                    </Button>}
                 </div>
             </Card>
 
@@ -281,7 +294,7 @@ const PaymentScheduleSection: React.FC = () => {
                     </h3>
 
                     <div className="flex items-center gap-2">
-                        {statusOptions.map((status) => (
+                        {(canCreate || canEdit) && statusOptions.map((status) => (
                             <Button
                                 isLoading={
                                     mdStatusMutation.isPending &&
@@ -326,14 +339,14 @@ const PaymentScheduleSection: React.FC = () => {
                         onChange={(e) => setMdNotes(e.target.value)}
                         rows={3}
                     />
-                    <Button
+                    {(canCreate || canEdit) && <Button
                         onClick={handleMdNotesSubmit}
                         isLoading={mdNotesMutation.isPending}
                         className="bg-blue-600 hover:bg-blue-700 text-white mt-2"
                     >
                         <i className="fa-regular fa-floppy-disk mr-2" />
                         Save MD Notes
-                    </Button>
+                    </Button>}
                 </div>
             </Card>
         </div>

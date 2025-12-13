@@ -1,5 +1,6 @@
 import React from 'react';
 import { dateFormate } from '../../../../utils/dateFormator'; // Adjust path if needed
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 // You can import the interface from your model file or use 'any' if strict typing isn't ready
 // import { IPaymentMainAcc } from '../../path/to/model'; 
 
@@ -12,7 +13,9 @@ type Props = {
 };
 
 const PaymentAccList: React.FC<Props> = ({ payment, index, handleView, handleDelete, deletePending }) => {
-    
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.payments?.delete;
     // Helper for status colors
     const getStatusColor = (status: string) => {
         switch (status?.toLowerCase()) {
@@ -76,7 +79,7 @@ const PaymentAccList: React.FC<Props> = ({ payment, index, handleView, handleDel
 
             {/* 7. Actions */}
             <div className="col-span-1 flex justify-center items-center gap-2">
-                <button
+                {canDelete && <button
                     onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(payment._id);
@@ -90,7 +93,7 @@ const PaymentAccList: React.FC<Props> = ({ payment, index, handleView, handleDel
                     ) : (
                         <i className="far fa-trash-alt text-gray-400 group-hover:text-red-500 transition-colors text-sm"></i>
                     )}
-                </button>
+                </button>}
             </div>
         </div>
     );

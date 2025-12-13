@@ -8,13 +8,15 @@ import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Skeleton } from "../../components/ui/Skeleton"
 
-import { toast } from "../../utils/toast" 
+import { toast } from "../../utils/toast"
 import type { ProjectDetailsOutlet } from "../../types/types"
 import { useGetWorkersAsStaff, useInviteWorkerByStaff, useRemoveWorkerAsStaff } from "../../apiList/orgApi"
+import { useAuthCheck } from "../../Hooks/useAuthCheck"
+import StageGuide from "../../shared/StageGuide"
 
 export default function Workers() {
-  const { projectId , organizationId} = useParams<{ projectId: string , organizationId: string}>()
-  const {openMobileSidebar , isMobile} = useOutletContext<ProjectDetailsOutlet>()
+  const { projectId, organizationId } = useParams<{ projectId: string, organizationId: string }>()
+  const { openMobileSidebar, isMobile } = useOutletContext<ProjectDetailsOutlet>()
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
   // const [workerRole, setWorkerRole] = useState("")
@@ -25,6 +27,16 @@ export default function Workers() {
   // Mutations using the provided hooks
   const inviteWorker = useInviteWorkerByStaff()
   const removeWorker = useRemoveWorkerAsStaff()
+
+
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.inviteworker?.delete;
+  const canList = role === "owner" || permission?.inviteworker?.list;
+  const canCreate = role === "owner" || permission?.inviteworker?.create;
+  const canEdit = role === "owner" || permission?.inviteworker?.edit;
+
+
 
   const handleGenerateInviteLink = async () => {
     // if (!workerRole.trim()) {
@@ -40,7 +52,7 @@ export default function Workers() {
       const response = await inviteWorker.mutateAsync({
         projectId: projectId || "",
         // specificRole: workerRole,
-        role:"worker",
+        role: "worker",
         organizationId: organizationId!
       })
       setInviteLink(response?.inviteLink || response)
@@ -87,7 +99,7 @@ export default function Workers() {
       try {
         await removeWorker.mutateAsync({
           workerId,
-          orgId:organizationId!,
+          orgId: organizationId!,
           projectId: projectId || "",
         })
         toast({
@@ -135,25 +147,34 @@ export default function Workers() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Left Section */}
             <div className="flex items-center space-x-4 min-w-0 flex-1">
-               {isMobile && (
-                  <button
-                    onClick={openMobileSidebar}
-                    className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
-                    title="Open Menu"
-                  >
-                    <i className="fa-solid fa-bars "></i>
-                  </button>
-                )} 
+              {isMobile && (
+                <button
+                  onClick={openMobileSidebar}
+                  className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                  title="Open Menu"
+                >
+                  <i className="fa-solid fa-bars "></i>
+                </button>
+              )}
 
               <div className="hidden sm:block w-px bg-gray-300 flex-shrink-0" />
 
               <div className="flex items-center space-x-3 min-w-0 flex-1">
                 <div className="min-w-0 flex-1">
                   <h1 className="text-xl sm:text-2xl font-bold text-blue-600 truncate">
-                      <i className="fas fa-user-plus mr-1"></i>
+                    <i className="fas fa-user-plus mr-1"></i>
                     Invite Workers</h1>
                 </div>
               </div>
+            </div>
+
+
+
+            <div className="w-full sm:w-auto flex justify-end sm:block">
+              <StageGuide
+                organizationId={organizationId!}
+                stageName="inviteworker"
+              />
             </div>
           </div>
         </div>
@@ -185,14 +206,17 @@ export default function Workers() {
                 </div> */}
 
                 {!inviteLink ? (
-                  <Button
-                    onClick={handleGenerateInviteLink}
-                    isLoading={inviteWorker.isPending}
-                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl"
-                  >
-                    <i className="fas fa-link mr-2"></i>
-                    {inviteWorker.isPending ? "Generating..." : "Generate Invitation Link"}
-                  </Button>
+                  <>
+                    {(canCreate || canEdit) && <Button
+                      onClick={handleGenerateInviteLink}
+                      isLoading={inviteWorker.isPending}
+                      className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl"
+                    >
+                      <i className="fas fa-link mr-2"></i>
+                      {inviteWorker.isPending ? "Generating..." : "Generate Invitation Link"}
+                    </Button>
+                    }
+                  </>
                 ) : (
                   <div className="space-y-3">
                     <div className="space-y-2">
@@ -229,7 +253,7 @@ export default function Workers() {
                         <i className="fab fa-whatsapp mr-2"></i>
                         Share on WhatsApp
                       </Button>
-                      <Button
+                      {(canCreate || canEdit) && <Button
                         onClick={() => {
                           setInviteLink("")
                           // setWorkerRole("")
@@ -239,7 +263,7 @@ export default function Workers() {
                       >
                         <i className="fas fa-plus mr-2"></i>
                         Generate Another
-                      </Button>
+                      </Button>}
                     </div>
                   </div>
                 )}
@@ -273,7 +297,7 @@ export default function Workers() {
           </div>
 
           {/* Workers List */}
-          <div className={`lg:col-span-2 sm:max-h-[43%] lg:!max-h-[90%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto custom-scrollbar`}>
+          {canList && <div className={`lg:col-span-2 sm:max-h-[43%] lg:!max-h-[90%] rounded-2xl border-l-4 border-orange-600  overflow-y-auto custom-scrollbar`}>
             <Card className="bg-white/70 backdrop-blur-sm border-0  !shadow-none">
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center justify-between">
@@ -339,7 +363,7 @@ export default function Workers() {
                             </div>
                           </div>
                         </div>
-                        <Button
+                        {canDelete && <Button
                           onClick={() => handleRemoveWorker(worker._id, worker?.workerName || worker?.name)}
                           variant="danger"
                           size="sm"
@@ -348,7 +372,7 @@ export default function Workers() {
                         >
                           <i className="fas fa-user-minus mr-1"></i>
                           Remove
-                        </Button>
+                        </Button>}
                       </div>
                     ))}
                   </div>
@@ -372,7 +396,7 @@ export default function Workers() {
                          </button>
                       ))} */}
                     </div>
-                    <Button
+                    {(canCreate || canEdit) && <Button
                       onClick={() => {
                         // if (!workerRole) setWorkerRole("Worker")
                         handleGenerateInviteLink()
@@ -381,13 +405,13 @@ export default function Workers() {
                     >
                       <i className="fas fa-user-plus mr-2"></i>
                       Invite First Worker
-                    </Button>
+                    </Button>}
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
-      
+          }
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import type { CreateBillPayload } from './CreateBillAcc';
 import NavigationDDWithHeading, { type NavigationSection } from '../../../../shared/NavigationDDWithHeading';
 import Slider from 'rc-slider';
 import "rc-slider/assets/index.css";
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 // import { Breadcrumb } from '../../Breadcrumb';
 
@@ -19,6 +20,15 @@ const BillAccountsMain = () => {
     const { organizationId } = useParams();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+
+
+    
+        const { role, permission } = useAuthCheck();
+        // const canDelete = role === "owner" || permission?.billing?.delete;
+        const canList = role === "owner" || permission?.billing?.list;
+        const canCreate = role === "owner" || permission?.billing?.create;
+        // const canEdit = role === "owner" || permission?.billing?.create;
+    
 
     const paths: BreadcrumbItem[] = [
         { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
@@ -290,12 +300,12 @@ const BillAccountsMain = () => {
                         <i className="fas fa-bars text-lg mr-2"></i> Menu
                     </Button>
 
-                    <Button
+                   {canCreate && <Button
                         onClick={() => navigate('create')}
                     >
                         <i className="fas fa-plus mr-2" />
                         Create Bill
-                    </Button>
+                    </Button>}
                 </div>
             </header>
 
@@ -565,7 +575,7 @@ const BillAccountsMain = () => {
                     </div>
 
                     {/* No Bills Fallback */}
-                    {bills.length === 0 ? (
+                {canList && <> {bills.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-file-bill text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Bills Found</h3>
@@ -638,6 +648,7 @@ const BillAccountsMain = () => {
                             )} */}
                         </div>
                     )}
+                    </>}
                 </main>
             )}
         </div>

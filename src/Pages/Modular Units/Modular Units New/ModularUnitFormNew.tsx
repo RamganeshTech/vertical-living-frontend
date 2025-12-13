@@ -7,6 +7,7 @@ import { Label } from "../../../components/ui/Label";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { Textarea } from "../../../components/ui/TextArea";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface ModularUnitFormProps {
     mode: "create" | "edit";
@@ -40,6 +41,16 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
     const { data: existingUnit, isLoading: isLoadingUnit } = useGetModularUnitByIdNew(
         mode === "edit" && unitId ? unitId : ""
     );
+
+
+    
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.modularunit?.delete;
+    // const canList = role === "owner" || permission?.modularunit?.list;
+    const canCreate = role === "owner" || permission?.modularunit?.create;
+    const canEdit = role === "owner" || permission?.modularunit?.edit;
+
+
 
     const defaultValues = {
  productName: "",
@@ -582,7 +593,7 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                     </Card>
 
                     {/* Submit Buttons */}
-                    <div className="flex items-center justify-end gap-4 sticky bottom-0 bg-white p-4  rounded-lg shadow-lg">
+                  {(canCreate || canEdit) &&  <div className="flex items-center justify-end gap-4 sticky bottom-0 bg-white p-4  rounded-lg shadow-lg">
                         <Button
                             type="button"
                             variant="outline"
@@ -605,7 +616,7 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                                 </>
                             )}
                         </Button>
-                    </div>
+                    </div>}
                 </form>
             </div>
         </div>

@@ -6,6 +6,7 @@ import type { ILogisticsShipment } from "./LogisticsMain";
 import { useGetProjects } from "../../../apiList/projectApi";
 import { useCreateShipment, useUpdateShipment } from "../../../apiList/Department Api/Logistics Api/logisticsApi";
 import { toast } from "../../../utils/toast";
+// import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface LogisticsShipmentFormProps {
   shipment?: any;
@@ -39,6 +40,13 @@ export const LogisticsShipmentForm: React.FC<LogisticsShipmentFormProps> = ({
   organizationId,
 
 }) => {
+
+
+  // const { role, permission } = useAuthCheck();
+
+
+  // const canEdit = role === "owner" || permission?.logistics?.edit;
+  // const canList = role === "owner" || permission?.logistics?.list;
 
 
 

@@ -17,6 +17,7 @@ import SearchSelectNew from "../../components/ui/SearchSelectNew"
 import { Button } from "../../components/ui/Button"
 import StaffTaskCard from "./StaffTaskCard"
 import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading"
+import { useAuthCheck } from "../../Hooks/useAuthCheck"
 
 // Types
 export type FilterType = {
@@ -41,6 +42,13 @@ export const StaffTasksListMain: React.FC = () => {
     const [filters, setFilters] = useState<FilterType>({})
     const navigate = useNavigate()
     const location = useLocation()
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.stafftask?.delete;
+    const canCreate = role === "owner" || permission?.stafftask?.create;
+    const canList = role === "owner" || permission?.stafftask?.list;
+
 
 
     const { data: tasks, isLoading, isError, error, refetch } = useGetAllStaffTasks(organizationId, filters)
@@ -87,14 +95,14 @@ export const StaffTasksListMain: React.FC = () => {
                         Manage & Assign Tasks to your team members
                     </p>
                 </div>
-                <Button
+                {canCreate && <Button
                     onClick={() => {
                         navigate(`addtask`)
                     }}
                     className="bg-blue-600  cursor-pointer "
                 >
                     Add Task
-                </Button>
+                </Button>}
             </header>
 
             <section className="py-2 flex w-full gap-6 flex-col lg:flex-row items-start lg:h-[90%]">
@@ -281,8 +289,8 @@ export const StaffTasksListMain: React.FC = () => {
                 </div>
 
                 {/* Cards / Results - RIGHT (70%) */}
-                <div className="flex-1 w-full overflow-y-auto  h-[100%]">
-                   
+                {canList && <div className="flex-1 w-full overflow-y-auto  h-[100%]">
+
                     {isLoading && <MaterialOverviewLoading />}
 
 
@@ -319,7 +327,7 @@ export const StaffTasksListMain: React.FC = () => {
                             <StaffTaskCard key={task._id} task={task} />
                         ))}
                     </div>}
-                </div>
+                </div>}
             </section>
 
         </div>

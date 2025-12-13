@@ -11,8 +11,8 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 // import { useCompleteOrderingMaterialStage, useGetAllOrderingMaterial, useSetOrderingMaterialDeadline } from "../../../apiList/Stage Api/orderingMaterialApi";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 // import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
-import { NO_IMAGE } from "../../../constants/constants";
-import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialImage, useDeleteOrderMaterialPdf, useGetAllOrderingMaterialHistory, useOrderHistoryGenerateLink, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdatePdfStatus, useUpdateShopDetails, useUploadOrderingMaterialImages } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
+// import { NO_IMAGE } from "../../../constants/constants";
+import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialImage, useGetAllOrderingMaterialHistory, useOrderHistoryGneratePdf, useOrderHistorySendToProcurement, useOrderHistorySubmitOrder, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdateShopDetails, useUploadOrderingMaterialImages } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 // import GenerateWhatsappLink from "../../../shared/GenerateWhatsappLink";
 import { useEffect, useRef, useState } from "react";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
@@ -21,6 +21,9 @@ import { downloadImage } from "../../../utils/downloadFile";
 import { useGetShopLib } from "../../../apiList/Stage Api/shopLibDetailApi";
 import SearchSelectNew from "../../../components/ui/SearchSelectNew";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
+// import { dateFormate, formatTime } from "../../../utils/dateFormator";
 
 
 interface ProjectDetailsOutlet {
@@ -66,9 +69,21 @@ const OrderMaterialOverview = () => {
     const navigate = useNavigate()
     const location = useLocation();
 
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.ordermaterial?.delete;
+    // const canList = role === "owner" || permission?.ordermaterial?.list;
+    const canCreate = role === "owner" || permission?.ordermaterial?.create;
+    const canEdit = role === "owner" || permission?.ordermaterial?.edit;
+
+
+
+
     const { data, isLoading, isError, error: getAllError, refetch } = useGetAllOrderingMaterialHistory(projectId!);
-    const { mutateAsync: generateLink, isPending: generatePending } = useOrderHistoryGenerateLink()
-    const { mutateAsync: updatePdfStatus } = useUpdatePdfStatus()
+    const { mutateAsync: generateLink, isPending: generatePending } = useOrderHistoryGneratePdf()
+    // const { mutateAsync: updatePdfStatus } = useUpdatePdfStatus()
+    const { mutateAsync: submitOrder, isPending: isSubmitting } = useOrderHistorySubmitOrder()
 
     const { mutateAsync: addSubItem } = useAddOrderingMaterialSubItem();
     const { mutateAsync: deleteSubItem, isPending: deleteItemLoading } = useDeleteOrderingMaterialSubItem();
@@ -85,8 +100,9 @@ const OrderMaterialOverview = () => {
     const { data: shops } = useGetShopLib(organizationId);
 
     const { mutateAsync: deleteAllSubItems, isPending: deleteAllPending } = useDeleteAllSubItems();
-    const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
+    // const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
 
+    const { mutateAsync: sendToProcurement, isPending: isSending } = useOrderHistorySendToProcurement();
 
 
     const [editDelivery, setEditDelivery] = useState(false);
@@ -119,19 +135,31 @@ const OrderMaterialOverview = () => {
     }))
 
 
-    const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
+    // const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
     const [editingCell, setEditingCell] = useState<{
         subItemId: string;
         field: 'name' | 'quantity' | 'unit';
     } | null>(null);
     // const [tempValues, setTempValues] = useState<{ [key: string]: any }>({});
+    // const [newRowData, setNewRowData] = useState<{
+    //     [unitId: string]: {
+    //         name: string;
+    //         quantity: number;
+    //         unit: string;
+    //     }
+    // }>({});
+
     const [newRowData, setNewRowData] = useState<{
-        [unitId: string]: {
-            name: string;
-            quantity: number;
-            unit: string;
-        }
-    }>({});
+        name: string;
+        quantity: number;
+        unit: string;
+    }>({
+        name: "",
+        quantity: 1,
+        unit: "",
+    });
+
+
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -174,6 +202,10 @@ const OrderMaterialOverview = () => {
     };
 
 
+
+
+
+
     const handleDeleteAllSubItems = async () => {
         try {
             if (!window.confirm("Are you sure need to perform this operation?")) {
@@ -184,6 +216,31 @@ const OrderMaterialOverview = () => {
 
         } catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to delete sub items", variant: "destructive" })
+        }
+    };
+
+
+
+
+    const handleSubmitOrder = async () => {
+        try {
+
+            await submitOrder({ projectId: projectId! });
+            toast({ description: 'All Sub Items successfully', title: "Success" });
+
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to delete sub items", variant: "destructive" })
+        }
+    };
+
+
+
+    const handleSendToProcurement = async (orderItemId: string) => {
+        try {
+            await sendToProcurement({ projectId: projectId!, orderItemId: orderItemId!, organizationId: organizationId! });
+            toast({ description: 'Sent to Procurement', title: "Success" });
+        } catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
         }
     };
 
@@ -244,23 +301,23 @@ const OrderMaterialOverview = () => {
         }
     }
 
-    const handleDeletePdf = async (pdfId: string) => {
-        try {
+    // const handleDeletePdf = async (pdfId: string) => {
+    //     try {
 
-            await deletePdf({ projectId: projectId!, pdfId });
-            toast({ title: "Success", description: "PDF deleted" });
-            setEditShop(false);
-            refetch()
-        } catch (error: any) {
-            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete" });
-        }
-    };
+    //         await deletePdf({ projectId: projectId!, pdfId });
+    //         toast({ title: "Success", description: "PDF deleted" });
+    //         setEditShop(false);
+    //         refetch()
+    //     } catch (error: any) {
+    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete" });
+    //     }
+    // };
 
 
     // const selectRef = useRef<HTMLButtonElement>(null);
-    const selectedUnits = data?.selectedUnits || [];
-    const totalCost = data?.totalCost || 0;
-    const hasUnits = selectedUnits.length > 0;
+    // const selectedUnits = data?.selectedUnits || [];
+    // const totalCost = data?.totalCost || 0;
+    // const hasUnits = selectedUnits.length > 0;
 
     // Focus input when editing starts
     useEffect(() => {
@@ -271,17 +328,131 @@ const OrderMaterialOverview = () => {
     }, [editingCell]);
 
     // Handle auto-save when editing ends
-    const handleSaveEdit = async (unitId: string, subItemId: string, field: string, value: any) => {
+
+    // START OF OLDER VERSION
+    // const handleSaveEdit = async (unitId: string, subItemId: string, field: string, value: any) => {
+    //     try {
+    //         const unit = selectedUnits.find((u: any) => u._id === unitId);
+    //         const subItem = unit?.subItems?.find((s: any) => s._id === subItemId);
+    //         // console.log("subitem", subItem)
+    //         if (!subItem) return;
+
+
+    //         const updatedData = {
+    //             projectId,
+    //             unitId,
+    //             subItemId,
+    //             subItemName: field === 'name' ? value : subItem.subItemName,
+    //             quantity: field === 'quantity' ? (Number(value) ? Number(value) : 1) : subItem.quantity,
+    //             unit: field === 'unit' ? value : subItem.unit,
+    //         };
+
+    //         await updateSubItem(updatedData);
+    //         toast({ title: "Success", description: "Item updated successfully" });
+    //     } catch (error: any) {
+    //         console.log("filed", error)
+    //         toast({
+    //             title: "Error",
+    //             description: error?.response?.data?.message || "Failed to update item",
+    //             variant: "destructive"
+    //         });
+    //     }
+    // };
+
+    // // Handle new row creation
+    // const handleNewRowSave = async (unitId: string, newData: any) => {
+    //     const rowData: any = newData;
+    //     // console.log("row data", rowData)
+
+    //     if (!rowData && !rowData?.name.trim()) {
+    //         return toast({
+    //             title: "Error",
+    //             description: "Material Name is mandatory",
+    //             variant: "destructive"
+    //         });
+    //     }
+    //     try {
+    //         await addSubItem({
+    //             projectId,
+    //             unitId,
+    //             subItemName: rowData.name,
+    //             quantity: rowData.quantity ?? 1,
+    //             unit: rowData.unit,
+    //         });
+
+    //         // Clear the new row data
+    //         setNewRowData(prev => ({
+    //             ...prev,
+    //             [unitId]: { name: '', quantity: 1, unit: '' }
+    //         }));
+
+    //         toast({ title: "Success", description: "Item created successfully" });
+    //     } catch (error: any) {
+    //         toast({
+    //             title: "Error",
+    //             description: error?.response?.data?.message || "Failed to create item",
+    //             variant: "destructive"
+    //         });
+    //     }
+    // };
+
+    // // Handle delete
+    // const handleDelete = async (unitId: string, subItemId: string) => {
+    //     try {
+    //         await deleteSubItem({ projectId, unitId, subItemId });
+    //         toast({ title: "Success", description: "Item deleted successfully" });
+    //     } catch (error: any) {
+    //         toast({
+    //             title: "Error",
+    //             description: error?.response?.data?.message || "Failed to delete item",
+    //             variant: "destructive"
+    //         });
+    //     }
+    // };
+
+    // END OF OLD VERSION
+
+
+
+
+    const projectCode = projectId
+        ?.replace(/[^a-zA-Z0-9]/g, "")
+        .slice(-3)
+        .toLowerCase();
+
+    const year = new Date().getFullYear();
+
+    // Collect all order numbers
+    const orderNumbers = data?.orderedItems
+        ?.map((item: any) => item?.orderMaterialNumber)
+        ?.filter(Boolean) || [];
+
+    // Extract numeric sequences
+    const sequences = orderNumbers.map((num: string) => {
+        const seq: any = num.split("-").pop();      // "005"
+        return parseInt(seq, 10) || 0;
+    });
+
+    // Find maximum
+    const maxSequence = sequences.length ? Math.max(...sequences) : 0;
+
+    // Next number
+    const nextSequence = (maxSequence + 1).toString().padStart(3, "0");
+
+    // Final ID
+    const nextOrderMaterialNumber = data?.currentOrder?.orderMaterialNumber || `ORD-${projectCode}-${year}-${nextSequence}` || null;
+
+
+    const handleSaveEdit = async (subItemId: string, field: string, value: any) => {
         try {
-            const unit = selectedUnits.find((u: any) => u._id === unitId);
-            const subItem = unit?.subItems?.find((s: any) => s._id === subItemId);
+            // const unit = data.currentOrder.subItems.find((u: any) => u._id === unitId);
+            const subItem = data.currentOrder.subItems?.find((s: any) => s._id === subItemId);
             // console.log("subitem", subItem)
             if (!subItem) return;
 
 
             const updatedData = {
                 projectId,
-                unitId,
                 subItemId,
                 subItemName: field === 'name' ? value : subItem.subItemName,
                 quantity: field === 'quantity' ? (Number(value) ? Number(value) : 1) : subItem.quantity,
@@ -301,7 +472,9 @@ const OrderMaterialOverview = () => {
     };
 
     // Handle new row creation
-    const handleNewRowSave = async (unitId: string, newData: any) => {
+    const handleNewRowSave = async (newData: any) => {
+
+        if (!canEdit && !canCreate) return
         const rowData: any = newData;
         // console.log("row data", rowData)
 
@@ -312,25 +485,18 @@ const OrderMaterialOverview = () => {
                 variant: "destructive"
             });
         }
-
-        // if (!rowData || !rowData.name.trim() || !rowData.unit) return;
-
-        // console.log("row data", rowData)
-
         try {
             await addSubItem({
                 projectId,
-                unitId,
                 subItemName: rowData.name,
                 quantity: rowData.quantity ?? 1,
                 unit: rowData.unit,
             });
 
             // Clear the new row data
-            setNewRowData(prev => ({
-                ...prev,
-                [unitId]: { name: '', quantity: 1, unit: '' }
-            }));
+            setNewRowData(
+                { name: '', quantity: 1, unit: '' }
+            );
 
             toast({ title: "Success", description: "Item created successfully" });
         } catch (error: any) {
@@ -343,9 +509,9 @@ const OrderMaterialOverview = () => {
     };
 
     // Handle delete
-    const handleDelete = async (unitId: string, subItemId: string) => {
+    const handleDelete = async (subItemId: string) => {
         try {
-            await deleteSubItem({ projectId, unitId, subItemId });
+            await deleteSubItem({ projectId, subItemId });
             toast({ title: "Success", description: "Item deleted successfully" });
         } catch (error: any) {
             toast({
@@ -355,6 +521,8 @@ const OrderMaterialOverview = () => {
             });
         }
     };
+
+
 
     // Initialize new row data for a unit
     // const initializeNewRow = (unitId: string) => {
@@ -368,32 +536,53 @@ const OrderMaterialOverview = () => {
 
 
 
-    const handleGenerate = async () => {
+    const handleGenerate = async (orderItemId: string) => {
         try {
-            await generateLink({ projectId, organizationId });
+            const res = await generateLink({ projectId, organizationId, orderItemId });
 
+            await downloadImage({ src: res?.pdfUrl, alt: "Order Material" })
             toast({ title: "Success", description: "Pdf Generated successfully" });
             refetch()
-
         } catch (err: any) {
             toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
         }
     };
 
 
-    const handleUpdatePdfStatus = async (pdfId: string, status: string) => {
+    // const handleUpdatePdfStatus = async (pdfId: string, status: string) => {
+    //     try {
+    //         await updatePdfStatus({ projectId, pdfId, status });
+
+    //         toast({ title: "Success", description: "Pdf status updated successfully" });
+    //         refetch()
+
+    //     } catch (err: any) {
+    //         toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to update status", variant: "destructive" });
+    //     }
+    // };
+
+
+
+    const handleDownloadPdf = async (orderData: any) => {
         try {
-            await updatePdfStatus({ projectId, pdfId, status });
 
-            toast({ title: "Success", description: "Pdf status updated successfully" });
-            refetch()
-
-        } catch (err: any) {
-            toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to update status", variant: "destructive" });
+            await downloadImage({ src: orderData?.pdfLink?.url, alt: orderData?.pdfLink?.pdfName })
+            toast({ title: "Success", description: "PDF Downloaded successfully" });
+        }
+        catch (err: any) {
+            toast({
+                title: "Error",
+                description: err?.response?.data?.message || err?.message || "Failed to generate PDF",
+                variant: "destructive"
+            });
         }
     };
 
-    const isChild = location.pathname.includes("siteorders") || location.pathname.includes("shoplib");
+
+
+
+
+    const isChild = location.pathname.includes("siteorders") || location.pathname.includes("shoplib") || location.pathname.includes("singleorder");
 
     if (isChild) {
         return <Outlet />
@@ -408,7 +597,7 @@ const OrderMaterialOverview = () => {
         <div className="w-full h-full flex flex-col">
 
             {/* Header Section - Always visible */}
-            <div className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+            <header className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
                 <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
                     {isMobile && (
                         <button
@@ -424,38 +613,51 @@ const OrderMaterialOverview = () => {
                     <span className="sm:hidden">Order Material</span>
                 </h2>
 
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <Button
-                        isLoading={completePending}
-                        onClick={handleCompletionStatus}
-                        className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
-                    >
-                        <i className="fa-solid fa-circle-check mr-2"></i>
-                        Mark as Complete
-                    </Button>
+                {(canCreate || canEdit) &&
+                    <> <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <Button
+                            isLoading={completePending}
+                            onClick={handleCompletionStatus}
+                            className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
+                        >
+                            <i className="fa-solid fa-circle-check mr-2"></i>
+                            Mark as Complete
+                        </Button>
 
-                    <ResetStageButton
-                        projectId={projectId!}
-                        stageNumber={8}
-                        stagePath="orderingmaterial"
-                    />
+                        <ResetStageButton
+                            projectId={projectId!}
+                            stageNumber={8}
+                            stagePath="orderingmaterial"
+                        />
 
 
-                    {!getAllError && <ShareDocumentWhatsapp
-                        projectId={projectId!}
-                        stageNumber="8"
-                        className="w-full sm:w-fit"
-                        isStageCompleted={data?.status}
-                    />}
+                        {!getAllError && <ShareDocumentWhatsapp
+                            projectId={projectId!}
+                            stageNumber="8"
+                            className="w-full sm:w-fit"
+                            isStageCompleted={data?.status}
+                        />}
 
-                    <AssignStageStaff
-                        stageName="OrderMaterialHistoryModel"
-                        projectId={projectId!}
-                        organizationId={organizationId!}
-                        currentAssignedStaff={data?.assignedTo || null}
-                    />
-                </div>
-            </div>
+                        <AssignStageStaff
+                            stageName="OrderMaterialHistoryModel"
+                            projectId={projectId!}
+                            organizationId={organizationId!}
+                            currentAssignedStaff={data?.assignedTo || null}
+                        />
+                    </div>
+                       
+                    </>
+                }
+
+                 <div className="w-full sm:w-auto flex justify-end sm:block">
+                            <StageGuide
+                                organizationId={organizationId!}
+                                stageName="ordermaterial"
+                            />
+                        </div>
+
+
+            </header>
 
             {/* Error Display */}
             {(isError) && (
@@ -521,14 +723,14 @@ const OrderMaterialOverview = () => {
                                             Shop Library
                                         </Button>
 
-                                        <button
+                                        {(canEdit || canCreate) && <button
                                             onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
                                             // className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
                                             className=" text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
 
                                         >
                                             <i className="fa-solid fa-edit mr-1"></i>Edit
-                                        </button>
+                                        </button>}
                                     </div>
                                         :
 
@@ -657,12 +859,12 @@ const OrderMaterialOverview = () => {
                                         <p><strong>Supervisor:</strong> {data?.deliveryLocationDetails?.siteSupervisor || "-"}</p>
                                         <p><strong>Phone:</strong> {data?.deliveryLocationDetails?.phoneNumber || "-"}</p>
                                         <p><strong>Address:</strong> {data?.deliveryLocationDetails?.address || "-"}</p>
-                                        <button
+                                        {(canEdit || canCreate) && <button
                                             onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
                                             className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
                                         >
                                             <i className="fa-solid fa-edit mr-1"></i>Edit
-                                        </button>
+                                        </button>}
                                     </div>
                                 )}
                             </div>
@@ -684,7 +886,7 @@ const OrderMaterialOverview = () => {
 
                                     <div className="flex items-center justify-between w-full relative">
 
-                                        <Input
+                                        {(canEdit || canCreate) && <Input
                                             type="file"
                                             multiple
                                             accept="image/*"
@@ -693,7 +895,7 @@ const OrderMaterialOverview = () => {
                                             onChange={handleFileChange}
                                             disabled={imagePending}
                                             className={imagePending ? "pr-10 opacity-70 cursor-not-allowed w-full mb-4" : "mb-4"}
-                                        />
+                                        />}
 
                                         {imagePending && (
                                             <div className="absolute inset-y-0 right-2 flex items-center">
@@ -725,7 +927,8 @@ const OrderMaterialOverview = () => {
                                     {/* Image Gallery */}
                                     <div className="mb-6">
                                         {data?.images?.length > 0 ? <ImageGalleryExample
-                                            handleDeleteFile={(imgId: string) => handleImageDelete(imgId)}
+                                            {...(canDelete ? { handleDeleteFile: (imgId: string) => handleImageDelete(imgId) } : {})}
+
                                             imageFiles={data?.images}
                                             height={150}
                                             minWidth={150}
@@ -762,38 +965,331 @@ const OrderMaterialOverview = () => {
                                         <Button variant="primary" className=""
                                             onClick={() => navigate('siteorders')}>
                                             <i className="fas fa-box-archive !mr-2"></i>
-                                            View Orders from Site
+                                            View Public Orders
                                         </Button>
 
-                                        <Button variant="danger" className="bg-red-600 text-white"
+                                        {canDelete && <Button variant="danger" className="bg-red-600 text-white"
                                             isLoading={deleteAllPending} onClick={handleDeleteAllSubItems}>
                                             <i className="fas fa-trash !mr-2"></i>
                                             Delete All SubItems
-                                        </Button>
+                                        </Button>}
 
-                                        {hasUnits && (
+                                        {/* {hasUnits && (
                                             <div className="flex items-center gap-2">
                                                 <span className="text-gray-500 text-sm">Total:</span>
                                                 <span className="text-xl font-bold text-blue-600">₹{totalCost.toFixed(2)}</span>
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="py-2 overflow-y-auto custom-scrollbar ">
+
+
+
+
+                            {/* Newer version */}
+
+                            <div
+                                className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
+
+                            >
+                                <div className="mb-3 ">
+
+                                    <div className="flex items-center gap-2">
+                                        <i className="fa-solid fa-list text-blue-600"></i>
+                                        <h4 className="font-semibold text-blue-800 text-xl">Create Material Order</h4>
+                                        <span className="text-sm text-gray-500">(Click to edit, changes save by clicking Enter)</span>
+                                    </div>
+
+                                    <p className="ml-6 text-sm text-gray-500">Order Id: {" "}
+                                        {/* <span>{data?.orderedItems[data?.orderedItems.length - 1]?.orderMaterialNumber}</span> */}
+                                        <span className="text-lg text-black font-medium">
+                                            {nextOrderMaterialNumber}
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
+                                    <div
+                                        className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
+                                    >
+                                        <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                            Ref ID
+                                        </div>
+                                        <div className="col-span-8 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                            Material Name
+                                        </div>
+                                        <div className="col-span-2 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                            Quantity
+                                        </div>
+                                        <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                            Unit
+                                        </div>
+                                        <div className="col-span-1 px-4 py-3 text-sm font-medium text-gray-700">
+                                            Action
+                                        </div>
+                                    </div>
+
+
+                                    {data.currentOrder.subItems && data.currentOrder?.subItems.length > 0 && data.currentOrder.subItems.map((sub: SubItem) => (
+                                        <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-gray-100 hover:bg-gray-50">
+
+                                            <div className="col-span-3 border-r border-blue-200">
+
+                                                <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
+                                                    {sub?.refId || "N/A"}
+                                                </div>
+                                            </div>
+
+                                            <div className="col-span-8 border-r border-blue-200">
+                                                {editingCell?.subItemId === sub._id && editingCell?.field === 'name' ? (
+                                                    <input
+                                                        ref={inputRef}
+                                                        type="text"
+                                                        defaultValue={sub.subItemName}
+                                                        className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                                        onBlur={(e) => {
+                                                            handleSaveEdit(sub._id, 'name', e.target.value);
+                                                            setEditingCell(null);
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                const value = (e.target as HTMLInputElement).value;
+                                                                handleSaveEdit(sub._id, 'name', value);
+                                                                setEditingCell(null);
+                                                            }
+                                                            if (e.key === 'Escape') {
+                                                                setEditingCell(null);
+                                                            }
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                        onClick={() => {
+                                                            if (canCreate || canEdit) {
+                                                                setEditingCell({ subItemId: sub._id, field: 'name' })
+                                                            }
+                                                        }
+                                                        }
+
+                                                    >
+                                                        {sub.subItemName}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="col-span-2 border-r border-blue-200">
+                                                {editingCell?.subItemId === sub._id && editingCell?.field === 'quantity' ? (
+                                                    <input
+                                                        ref={inputRef}
+                                                        type="number"
+                                                        defaultValue={sub.quantity}
+                                                        min="0"
+                                                        className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                                        onBlur={(e) => {
+                                                            handleSaveEdit(sub._id, 'quantity', e.target.value);
+                                                            setEditingCell(null);
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                handleSaveEdit(sub._id, 'quantity', e.currentTarget.value);
+                                                                setEditingCell(null);
+                                                            }
+                                                            if (e.key === 'Escape') {
+                                                                setEditingCell(null);
+                                                            }
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                        onClick={() => {
+                                                            if (canCreate || canEdit) {
+                                                                setEditingCell({ subItemId: sub._id, field: 'quantity' })
+                                                            }
+
+                                                        }
+                                                        }
+                                                    >
+                                                        {sub.quantity}
+                                                    </div>
+                                                )}
+                                            </div>
+
+
+                                            <div className="col-span-3 border-r border-blue-200">
+                                                {editingCell?.subItemId === sub._id && editingCell?.field === 'unit' ? (
+                                                    <div className="p-2 relative z-50">
+                                                        <select
+                                                            defaultValue={sub.unit}
+                                                            onChange={(e) => {
+                                                                handleSaveEdit(sub._id, 'unit', e.target.value);
+                                                                setEditingCell(null);
+                                                            }}
+                                                            className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                                        >
+                                                            <option value="" disabled>Selected unit</option>
+                                                            {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
+                                                                <option key={unitOption} value={unitOption}>
+                                                                    {unitOption}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                        onClick={() => {
+
+                                                            if (canCreate || canEdit) {
+                                                                setEditingCell({ subItemId: sub._id, field: 'unit' })
+                                                            }
+
+                                                        }
+                                                        }
+                                                    >
+                                                        {sub.unit}
+                                                    </div>
+                                                )}
+                                            </div>
+
+
+                                            {canDelete && <div className="col-span-1 flex items-center justify-center">
+                                                <Button
+                                                    variant="danger"
+                                                    onClick={() => handleDelete(sub._id)}
+                                                    disabled={deleteItemLoading}
+                                                    isLoading={deleteItemLoading}
+                                                    className="p-2 bg-red-600 text-white  hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                                                    title="Delete item"
+                                                >
+                                                    <i className="fa fa-trash text-sm"></i>
+                                                </Button>
+                                            </div>}
+                                        </div>
+                                    ))}
+
+                                    <div className="grid grid-cols-17 gap-0 bg-green-50 border-b border-gray-100">
+
+
+                                        <div className="col-span-3 border-r border-gray-200">
+
+                                            <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
+                                                Ref Id
+                                            </div>
+                                        </div>
+
+
+                                        <div className="col-span-8 border-r border-gray-200">
+                                            <input
+                                                type="text"
+                                                placeholder="Enter matterial name..."
+                                                value={newRowData?.name || ''}
+                                                onChange={(e) => {
+                                                    setNewRowData(prev => ({
+                                                        ...prev,
+
+                                                        name: e.target.value
+
+                                                    }));
+                                                }}
+                                                onBlur={() => {
+                                                    if (newRowData?.name?.trim() && newRowData.quantity && newRowData.unit) {
+                                                        handleNewRowSave(newRowData);
+                                                    }
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        handleNewRowSave(newRowData);
+                                                    }
+                                                }}
+                                                className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
+                                            />
+                                        </div>
+
+                                        <div className="col-span-2 border-r border-gray-200">
+                                            <input
+                                                type="number"
+                                                placeholder="Qty"
+                                                min="0"
+                                                value={newRowData?.quantity || 1}
+                                                onChange={(e) => {
+                                                    setNewRowData(prev => ({
+                                                        ...prev,
+
+                                                        quantity: Number(e.target.value) || 1
+
+                                                    }));
+                                                }}
+                                                className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
+                                            />
+                                        </div>
+
+                                        <div className="col-span-3 border-r border-gray-200">
+                                            <div className="p-2">
+
+
+                                                <select
+                                                    value={newRowData?.unit || ''}
+                                                    onChange={async (e) => {
+
+                                                        const updatedRow = {
+                                                            ...newRowData,
+                                                            unit: e.target.value
+                                                        };
+
+                                                        // update state
+                                                        setNewRowData(prev => ({
+                                                            ...prev,
+                                                            unit: e.target.value
+                                                        }));
+
+                                                        // setNewRowData(prev => ({
+                                                        //     ...prev,
+                                                        //     [unit._id]: {
+                                                        //         ...prev[unit._id],
+                                                        //         unit: e.target.value
+                                                        //     }
+                                                        // }));
+
+
+                                                        await handleNewRowSave(updatedRow);
+
+                                                    }}
+                                                    className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                                >
+                                                    <option value="">Selected unit</option>
+                                                    {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
+                                                        <option key={unitOption} value={unitOption}>
+                                                            {unitOption}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    {(!data.currentOrder.subItems || data.currentOrder?.subItems?.length === 0) && (
+                                        <div className="text-center py-8 text-gray-500">
+                                            <i className="fa-solid fa-inbox text-2xl mb-2"></i>
+                                            <p className="text-sm">No sub-items yet. Start typing in the row above to add items.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/*end of newer  version */}
+
+                            {/* <div className="py-2 overflow-y-auto custom-scrollbar ">
                                 {hasUnits ? (
                                     <div className="grid gap-5">
                                         {selectedUnits.map((unit: any, idx: number) => (
                                             <div
                                                 key={unit._id || idx}
-                                                // className={`group relative p-5
-
-                                                //     ${expandedUnitId === unit._id ?
-                                                //         'border-blue-600 border-2 shadow-md bg-blue-50' :
-                                                //         'border border-blue-500 hover:border-blue-100'
-                                                //     }
-                                                //     bg-white rounded-xl transition-all shadow-[0_3px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.04)]`}
                                                 className={`group relative p-5 transition-all duration-200
                     ${expandedUnitId === unit._id
                                                         ? "border-2 border-blue-500 shadow-lg bg-gradient-to-r from-blue-50 to-blue-50 ring-2 ring-blue-200"
@@ -802,13 +1298,8 @@ const OrderMaterialOverview = () => {
                     rounded-xl shadow-[0_3px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)]`}
                                             >
 
-                                                {/* {expandedUnitId === unit._id && (
-                                                    <div className="absolute -top-2 z-[999] -left-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                                                        <i className="fa fa-check text-white text-xs"></i>
-                                                    </div>
-                                                )} */}
+                                                
                                                 <div className="flex flex-col md:flex-row gap-5">
-                                                    {/* Product Image */}
                                                     <div className="relative w-full md:w-32 h-32 bg-gray-50 rounded-lg overflow-hidden">
                                                         <img
                                                             src={unit?.image || NO_IMAGE}
@@ -817,19 +1308,16 @@ const OrderMaterialOverview = () => {
                                                         />
                                                         <div
                                                             className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"
-                                                        // className={`absolute top-2 right-2 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm"
-                                                        // }`}
+                                                     
                                                         >
                                                             ×{unit.quantity}
                                                         </div>
                                                     </div>
 
-                                                    {/* Product Details */}
                                                     <div className="flex-1 flex flex-col">
                                                         <div className="flex-1">
                                                             <div className="flex items-center justify-between">
                                                                 <h3
-                                                                    // className="text-lg font-semibold text-gray-800 mb-1.5"
                                                                     className={`text-lg font-semibold mb-1.5 ${expandedUnitId === unit._id ? "text-blue-800" : "text-gray-800"
                                                                         }`}
                                                                 >
@@ -837,7 +1325,6 @@ const OrderMaterialOverview = () => {
                                                                 </h3>
                                                                 <div className="flex gap-2 items-center">
                                                                     <span
-                                                                        // className="flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                                                                         className={`flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${expandedUnitId === unit._id
                                                                             ? "text-blue-700 bg-blue-100 hover:bg-blue-200"
                                                                             : "text-blue-600 bg-blue-50 hover:bg-blue-100"
@@ -851,14 +1338,12 @@ const OrderMaterialOverview = () => {
                                                                                 expandedUnitId === unit._id ? null : unit._id
                                                                             )
                                                                         }
-                                                                        // className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                                                                         className={`flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 ${expandedUnitId === unit._id
                                                                             ? "text-white bg-blue-600 hover:bg-blue-700 shadow-md"
                                                                             : "text-blue-600 bg-blue-50 hover:bg-blue-100"
                                                                             }`}
                                                                     >
                                                                         <span className="hidden sm:inline">
-                                                                            {/* {expandedUnitId === unit._id ? 'Hide' : 'Show'} Sub Items */}
                                                                             Create Material Items
                                                                         </span>
                                                                         <i
@@ -873,7 +1358,6 @@ const OrderMaterialOverview = () => {
 
                                                             <div className="flex items-center gap-2 mb-3">
                                                                 <span
-                                                                    // className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
                                                                     className={`px-2.5 py-1 text-xs font-medium rounded-full ${expandedUnitId === unit._id ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
                                                                         }`}
                                                                 >
@@ -915,7 +1399,6 @@ const OrderMaterialOverview = () => {
 
                                                 {expandedUnitId === unit._id && (
                                                     <div
-                                                        // className="mt-6 pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-4"
                                                         className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
 
                                                     >
@@ -925,7 +1408,6 @@ const OrderMaterialOverview = () => {
                                                             <span className="text-sm text-gray-500">(Click to edit, changes save by clicking Enter)</span>
                                                         </div>
 
-                                                        {/* Spreadsheet Header */}
                                                         <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
                                                             <div
                                                                 className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
@@ -947,10 +1429,10 @@ const OrderMaterialOverview = () => {
                                                                 </div>
                                                             </div>
 
-                                                            {/* Existing Sub Items */}
+                                                           
                                                             {unit.subItems && unit.subItems.length > 0 && unit.subItems.map((sub: SubItem) => (
                                                                 <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-gray-100 hover:bg-gray-50">
-                                                                    {/* Item Name Cell */}
+                                                                   
                                                                     <div className="col-span-3 border-r border-blue-200">
 
                                                                         <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
@@ -989,7 +1471,7 @@ const OrderMaterialOverview = () => {
                                                                             </div>
                                                                         )}
                                                                     </div>
-                                                                    {/* Quantity Cell */}
+                                                                   
                                                                     <div className="col-span-2 border-r border-blue-200">
                                                                         {editingCell?.subItemId === sub._id && editingCell?.field === 'quantity' ? (
                                                                             <input
@@ -1022,7 +1504,7 @@ const OrderMaterialOverview = () => {
                                                                         )}
                                                                     </div>
 
-                                                                    {/* Unit Cell */}
+                                                                   
                                                                     <div className="col-span-3 border-r border-blue-200">
                                                                         {editingCell?.subItemId === sub._id && editingCell?.field === 'unit' ? (
                                                                             <div className="p-2 relative z-50">
@@ -1052,7 +1534,7 @@ const OrderMaterialOverview = () => {
                                                                         )}
                                                                     </div>
 
-                                                                    {/* Delete Action */}
+                                                                   
                                                                     <div className="col-span-1 flex items-center justify-center">
                                                                         <Button
                                                                             variant="danger"
@@ -1068,9 +1550,7 @@ const OrderMaterialOverview = () => {
                                                                 </div>
                                                             ))}
 
-                                                            {/* New Row for Adding Items */}
                                                             <div className="grid grid-cols-17 gap-0 bg-green-50 border-b border-gray-100">
-                                                                {/* New Item Name */}
 
 
                                                                 <div className="col-span-3 border-r border-gray-200">
@@ -1110,7 +1590,6 @@ const OrderMaterialOverview = () => {
                                                                     />
                                                                 </div>
 
-                                                                {/* New Quantity */}
                                                                 <div className="col-span-2 border-r border-gray-200">
                                                                     <input
                                                                         type="number"
@@ -1130,7 +1609,6 @@ const OrderMaterialOverview = () => {
                                                                     />
                                                                 </div>
 
-                                                                {/* New Unit */}
                                                                 <div className="col-span-3 border-r border-gray-200">
                                                                     <div className="p-2">
 
@@ -1174,17 +1652,9 @@ const OrderMaterialOverview = () => {
                                                                     </div>
                                                                 </div>
 
-                                                                {/* Add Icon */}
-                                                                {/* <div onClick={() => {
-                                                                   
-                                                                    handleNewRowSave(unit._id, newRowData)
-                                                                }} className="col-span-1 cursor-pointer flex items-center justify-center">
-                                                                    {addItemLoading && <i className="fas fa-spinner animate-spin mr-2"></i>}
-                                                                    <i className="fa fa-plus text-green-600 text-sm"></i>
-                                                                </div> */}
+
                                                             </div>
 
-                                                            {/* Empty State */}
                                                             {(!unit.subItems || unit.subItems.length === 0) && (
                                                                 <div className="text-center py-8 text-gray-500">
                                                                     <i className="fa-solid fa-inbox text-2xl mb-2"></i>
@@ -1217,12 +1687,128 @@ const OrderMaterialOverview = () => {
                                         </p>
                                     </div>
                                 )}
-                            </div>
+                            </div> */}
                         </section>
                     )}
 
-                    <section className="mt-4">
-                        {/* <GenerateWhatsappLink
+
+
+                    <section>
+
+
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                            <div className="flex-1">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                    Orders
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    view your orders
+                                </p>
+                            </div>
+
+                            {canCreate && <Button
+                                onClick={handleSubmitOrder}
+                                isLoading={isSubmitting}
+                                className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                                size="lg"
+                            >
+                                Submit Order
+                            </Button>}
+                        </div>
+
+
+
+
+                        {data?.orderedItems && data?.orderedItems?.length > 0 ?
+
+                            <div className="flex flex-col gap-2">
+
+                                {data?.orderedItems?.map((ele: any) => (
+                                    <Card key={ele._id} className="border-green-200 bg-green-50 shadow ">
+                                        <CardContent className="p-6">
+                                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                                <div className="flex items-center gap-3 flex-1">
+                                                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                                        <i className="fas fa-check-circle text-7reen-600"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-semibold text-blue-700 ">
+                                                            <span className="!text-sm text-gray-600">Order Id: </span> {ele.orderMaterialNumber}
+                                                        </h4>
+                                                        {/* <span className="text-sm text-gray-500">Created At:</span> <span>{dateFormate(ele.createdAt)} - {formatTime(ele.createdAt)}</span> */}
+                                                        <span className="text-sm text-gray-900">Order Material</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto ">
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={() => navigate(`singleorder/${ele._id}`)}
+                                                        className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                    >
+                                                        <i className="fas mr-2 fa-external-link-alt"></i>
+                                                        View
+                                                    </Button>
+
+
+
+
+                                                    {(canCreate || canEdit) && <Button
+                                                        variant="outline"
+                                                        onClick={() => handleGenerate(ele._id)}
+                                                        isLoading={generatePending}
+                                                        className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                    >
+                                                        Generate Pdf
+                                                    </Button>}
+
+                                                    <Button
+                                                        variant="secondary"
+                                                        onClick={() => handleDownloadPdf(ele)}
+                                                        className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                    >
+                                                        Download PDF
+                                                    </Button>
+
+
+                                                    {(canCreate || canEdit) && <Button
+                                                        variant="outline"
+                                                        onClick={() => handleSendToProcurement(ele._id)}
+                                                        disabled={ele?.isSyncWithProcurement}
+                                                        title={ele?.isSyncWithProcurement ? "already sent to procurement" : ""}
+
+                                                        isLoading={isSending}
+                                                        className="border-green-300 text-blue-700 disabled:cursor-not-allowed hover:bg-blue-100 hover:border-blue-400"
+                                                    >
+                                                        Send To Procurement
+                                                    </Button>}
+
+
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+
+                            :
+                            <>
+                                <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+                                    <i className="fa-solid fa-box text-5xl text-blue-300 mb-4" />
+                                    <h3 className="text-lg font-semibold text-blue-800 mb-1">No Orders Found</h3>
+                                    {/* <p className="text-sm text-gray-500">
+                                        No PDF Generated</p> */}
+                                </div>
+                            </>
+                        }
+
+
+
+
+                    </section>
+
+                    {/* <section className="mt-4"> */}
+                    {/* <GenerateWhatsappLink
                             projectId={projectId!} context="order material"
                             stage="ordermaterial"
                             data={data?.generatedLink}
@@ -1230,7 +1816,7 @@ const OrderMaterialOverview = () => {
                             generateLink={generateLink} /> */}
 
 
-                        <div className="space-y-4">
+                    {/* <div className="space-y-4">
 
 
 
@@ -1246,22 +1832,12 @@ const OrderMaterialOverview = () => {
                                     </div>
 
                                     <Button
-                                        onClick={handleGenerate}
-                                        disabled={generatePending}
+                                        onClick={handleSubmitOrder}
+                                        isLoading={isSubmitting}
                                         className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
                                         size="lg"
                                     >
-                                        {generatePending ? (
-                                            <>
-                                                <i className="fas fa-spinner fa-spin"></i>
-                                                Generating...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <i className="fas fa-file-pdf"></i>
-                                                Generate PDF
-                                            </>
-                                        )}
+                                        Submit Order
                                     </Button>
                                 </div>
 
@@ -1277,10 +1853,9 @@ const OrderMaterialOverview = () => {
                                                         </div>
                                                         <div>
                                                             <h4 className="font-semibold text-green-900 mb-1">
-                                                                {/* PDF Generated Successfully */}
                                                                 {ele.pdfName}
                                                             </h4>
-                                                            <span className="text-sm">Order Number: {ele.refUniquePdf || "N/A"}</span>
+                                                            <span className="text-sm">Order Id: {ele.refUniquePdf || "N/A"}</span>
                                                             <p className="text-sm text-green-700">
                                                                 Your order material PDF is ready to view or download
                                                             </p>
@@ -1327,7 +1902,6 @@ const OrderMaterialOverview = () => {
                                                                                     border-blue-300 text-blue-800  hover:border-blue-400
                                                                                     "
                                                             >
-                                                                {/* <option disabled value="">Select Status</option> */}
                                                                 {["pending", "delivered", "shipped", "ordered", "cancelled"].map((status) => (
                                                                     <option key={status} value={status}>
                                                                         {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -1335,7 +1909,6 @@ const OrderMaterialOverview = () => {
                                                                 ))}
                                                             </select>
 
-                                                            {/* Custom dropdown chevron icon */}
                                                             <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
                                                                 <i className="fas fa-chevron-down text-xs"></i>
                                                             </div>
@@ -1366,7 +1939,7 @@ const OrderMaterialOverview = () => {
                                 }
                             </div>
                         </div>
-                    </section>
+                    </section> */}
                 </div>
             )
             }

@@ -5,6 +5,7 @@ import { PROJECTS_ICONS, PROJECTS_LABELS, } from "../../constants/constants";
 import Sidebar from '../../shared/Sidebar';
 import { Outlet, useLocation } from 'react-router-dom';
 import MobileSidebar from '../../shared/MobileSidebar';
+import { useAuthCheck } from '../../Hooks/useAuthCheck';
 
 
 type ProjectType = {
@@ -14,9 +15,31 @@ type ProjectType = {
   setOrganizationId: React.Dispatch<React.SetStateAction<string | null>>
 }
 
+// These values MUST match the 'PROJECT_STAGES' array in StaffPermissionsSingle.tsx
+const PERMISSION_MAPPING: Record<string, string> = {
+  INVENTORY: "inventory",
+  WORKERS: "inviteworker",         // Changed from 'projectworkers' to match Admin
+  INVITECLIENT: "inviteclient",
+  PREREQUISTIES: "prerequisites",
+  REQUIREMENTFORM: "clientrequirement", // Changed from 'requirementform' to match Admin
+  SITEMEASUREMENT: "sitemeasurement",
+  SAMPLEDESIGN: "sampledesign",
+  WORKSCHEDULE: "workschedule",
+  TECHNICALCONSULTANT: "technicalconsultant",
+  PAYMENTCONFIRMATION: "paymentconfirmation",
+  MODULARUNIT: "modularunit",
+  ORDERMATERIALS: "ordermaterial",
+  MATERIALARRIVED: "materialarrival",
+  INSTALLATION: "installation",
+  QUALITYCHECK: "qualitycheck",
+  CLEANINGSANITATION: "cleaning",
+  PROJECTDELIVERY: "projectdelivery"
+};
 const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organizationId, setOrganizationId }) => {
 
   const location = useLocation()
+  const { role, permission } = useAuthCheck();
+  const lowerRole = role?.toLowerCase() || "";
 
   // ProjectDetails.tsx (your layout)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
@@ -49,7 +72,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const path = {
+  const path: Record<string, string> = {
     // LABOURS: projectId ? `/${organizationId}/projectdetails/${projectId}/labourlist` : "",
     // MATERIALS: projectId ? `/${organizationId}/projectdetails/${projectId}/materiallist` : "",
     // TRANSPORTATION: projectId ? `/${organizationId}/projectdetails/${projectId}/transportationlist` : "",
@@ -63,14 +86,12 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     SAMPLEDESIGN: projectId ? `/${organizationId}/projectdetails/${projectId}/sampledesign` : "",
     WORKSCHEDULE: projectId ? `/${organizationId}/projectdetails/${projectId}/workmainschedule` : "",
     TECHNICALCONSULTANT: projectId ? `/${organizationId}/projectdetails/${projectId}/technicalconsultant` : "",
-    // TICKETOPERATIONS: projectId ? `/${organizationId}/projectdetails/${projectId}/issuediscussion` : "",
     // SELECTSTAGE: projectId ? `/${organizationId}/projectdetails/${projectId}/selectstage` : "",
     // EXTERNAL: projectId ? `/${organizationId}/projectdetails/${projectId}/externalunits` : "",
     // MODULARUNIT: projectId ? `/${organizationId}/projectdetails/${projectId}/modularunits` : "",
     // MATERIALSELECTION: projectId ? `/${organizationId}/projectdetails/${projectId}/materialselection` : "",
     // COSTESTIMATION: projectId ? `/${organizationId}/projectdetails/${projectId}/costestimation` : "",
     PAYMENTCONFIRMATION: projectId ? `/${organizationId}/projectdetails/${projectId}/paymentconfirmation` : "",
-    // QUOTEPDF: projectId ? `/${organizationId}/projectdetails/${projectId}/quotepdf` : "",
     MODULARUNIT: projectId ? `/${organizationId}/projectdetails/${projectId}/modularunitsnew` : "",
     ORDERMATERIALS: projectId ? `/${organizationId}/projectdetails/${projectId}/ordermaterial` : "",
     MATERIALARRIVED: projectId ? `/${organizationId}/projectdetails/${projectId}/materialarrival` : "",
@@ -80,6 +101,134 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     PROJECTDELIVERY: projectId ? `/${organizationId}/projectdetails/${projectId}/projectdelivery` : "",
   };
 
+  //   // =========================================================
+  //   // 4. CONSTRUCT INITIAL OBJECTS
+  //   // =========================================================
+
+
+  const allKeys = Object.keys(PROJECTS_LABELS);
+  let allowedKeys: string[] = [];
+
+  // if (lowerRole === "client") {
+  //   // Client Whitelist
+  //   allowedKeys = [
+  //     "REQUIREMENTFORM",
+  //     "SITEMEASUREMENT",
+  //     "PAYMENTCONFIRMATION",
+  //     "PROJECTDELIVERY"
+  //   ];
+  // }
+  // else if (lowerRole === "worker") {
+  //   // Worker Whitelist
+  //   allowedKeys = [
+  //     "WORKSCHEDULE",
+  //     "TECHNICALCONSULTANT",
+  //     "ORDERMATERIALS",
+  //     "MATERIALARRIVED",
+  //     "INSTALLATION",
+  //     "QUALITYCHECK",
+  //     "CLEANINGSANITATION",
+  //   ];
+  // }
+  // else {
+  //   // Owner, CTO, Staff start with everything
+  //   // (We will filter Staff by permissions in the next step)
+  //   allowedKeys = allKeys;
+  // }
+
+  allowedKeys = allKeys
+  
+  let sidebarLabels: any = {};
+  let sidebarIcons: any = {};
+  let sidebarPath: any = {};
+
+  allowedKeys.forEach(key => {
+    // Safety check if key exists in constants
+    if (PROJECTS_LABELS[key] && path[key]) {
+      sidebarLabels[key] = PROJECTS_LABELS[key];
+      sidebarIcons[key] = PROJECTS_ICONS[key];
+      sidebarPath[key] = path[key];
+    }
+  });
+
+  // =========================================================
+  // 5. ⭐ PERMISSION-BASED HIDING (The Database Check) ⭐
+  // =========================================================
+
+  // If NOT owner, remove items if they lack DB permissions
+  if (lowerRole !== "owner") {
+
+    Object.keys(sidebarLabels).forEach((sidebarKey) => {
+
+      const backendKey = PERMISSION_MAPPING[sidebarKey];
+
+      if (backendKey) {
+        const deptPermissions = permission?.[backendKey];
+
+        // Check if user has AT LEAST ONE permission set to true
+        const hasAccess = deptPermissions && Object.values(deptPermissions).some(val => val === true);
+
+        // If no access, hard delete from the sidebar
+        if (!hasAccess) {
+          delete sidebarLabels[sidebarKey];
+          delete sidebarIcons[sidebarKey];
+          delete sidebarPath[sidebarKey];
+        }
+      }
+    });
+  }
+
+  //  START OF OLD VERION
+  // let sidebarLabels = { ...PROJECTS_LABELS };
+  // let sidebarIcons = { ...PROJECTS_ICONS };
+  // let sidebarPath = { ...path };
+
+
+  // if (role?.toLowerCase() === "client") {
+  //   const allowedKeys = [
+  //     "REQUIREMENTFORM",
+  //     "SITEMEASUREMENT",
+  //     "PAYMENTCONFIRMATION",
+  //     "PROJECTDELIVERY"
+  //   ];
+
+  //   Object.keys(sidebarLabels).forEach((key) => {
+  //     if (!allowedKeys.includes(key)) {
+  //       delete sidebarLabels[key];
+  //       delete sidebarIcons[key];
+  //       delete sidebarPath[key];
+  //     }
+  //   });
+  // }
+
+
+  // if (role?.toLowerCase() === "worker") {
+  //   const allowedKeys = [
+  //     "WORKSCHEDULE",
+  //     "TECHNICALCONSULTANT",
+  //     "ORDERMATERIALS",
+  //     "MATERIALARRIVED",
+  //     "INSTALLATION",
+  //     "QUALITYCHECK",
+  //     "CLEANINGSANITATION",
+  //   ];
+
+  //   Object.keys(sidebarLabels).forEach((key) => {
+  //     if (!allowedKeys.includes(key)) {
+  //       delete sidebarLabels[key];
+  //       delete sidebarIcons[key];
+  //       delete sidebarPath[key];
+  //     }
+  //   });
+  // }
+
+  // =========================================================
+  // 4. CONSTRUCT INITIAL OBJECTS
+  // =========================================================
+
+
+
+
   return (
     <>
       <div className="flex w-screen h-screen">
@@ -87,16 +236,16 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
 
         {isMobile ? (
           <MobileSidebar
-            labels={PROJECTS_LABELS}
-            path={path}
+            labels={sidebarLabels}
+            path={sidebarPath}
             isOpen={isMobileSidebarOpen}
             onClose={() => setIsMobileSidebarOpen(false)}
           />
         ) : (
           <Sidebar
-            path={path}
-            labels={PROJECTS_LABELS}
-            icons={PROJECTS_ICONS}
+            path={sidebarPath}
+            labels={sidebarLabels}
+            icons={sidebarIcons}
             setProjectName={setProjectName}
             projectName={projectName}
           />

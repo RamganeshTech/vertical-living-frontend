@@ -10,8 +10,9 @@ import { downloadImage } from "../../../utils/downloadFile";
 import SearchSelect from "../../../components/ui/SearchSelect";
 import { Card } from "../../../components/ui/Card";
 import { useGetSingleLabourCost } from "../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
-export const DEFAULT_LAMINATE_RATE_PER_SQFT = 10;
+export const DEFAULT_LAMINATE_RATE_PER_SQFT = 0;
 
 const QuoteGenerateVariantSub = () => {
     const { organizationId, quoteId } = useParams<{ organizationId: string; quoteId: string }>();
@@ -26,6 +27,13 @@ const QuoteGenerateVariantSub = () => {
     const furnitureRefs = useRef<Array<React.RefObject<FurnitureQuoteRef | null>>>([]);
     const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
     const [selectedLaminateBrand, setSelectedLaminateBrand] = useState<string | null>(null);
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.materialquote?.list;
+    const canCreate = role === "owner" || permission?.materialquote?.create;
+    // const canDelete = role === "owner" || permission?.materialquote?.delete;
+    const canEdit = role === "owner" || permission?.materialquote?.edit;
+
 
 
 
@@ -252,7 +260,7 @@ const QuoteGenerateVariantSub = () => {
             })
             // console.log("reso", res)
             downloadImage({ src: res.url, alt: res.fileName })
-            toast({ title: "success", description: "Successfully created, check it in the Quote for clients section"})
+            toast({ title: "success", description: "Successfully created, check it in the Quote for clients section" })
         }
         catch (error: any) {
             toast({
@@ -352,9 +360,9 @@ const QuoteGenerateVariantSub = () => {
                     </div>
 
                     {/* Right - Generate Button */}
-                    <Button onClick={handleGenerateQuote} disabled={quotePending} className="flex-shrink-0">
+                    {(canCreate || canEdit) && <Button onClick={handleGenerateQuote} disabled={quotePending} className="flex-shrink-0">
                         {quotePending ? "Generating..." : "Generate Quote for Client"}
-                    </Button>
+                    </Button>}
                 </div>
 
                 {/* Bottom Row - Brand Selection */}

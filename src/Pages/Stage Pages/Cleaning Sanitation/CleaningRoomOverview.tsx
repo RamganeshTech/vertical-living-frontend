@@ -17,6 +17,7 @@ import { Input } from "../../../components/ui/Input";
 import { Label } from "../../../components/ui/Label";
 import { downloadImage } from "../../../utils/downloadFile";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 export default function CleaningRoomOverview() {
     const { projectId, roomId, organizationId } = useParams() as { projectId: string, roomId: string, organizationId: string };
@@ -26,6 +27,18 @@ export default function CleaningRoomOverview() {
         projectId as string,
         roomId as string
     );
+
+    
+    
+      const { role, permission } = useAuthCheck();
+    
+    
+      const canDelete = role === "owner" || permission?.cleaning?.delete;
+      // const canList = role === "owner" || permission?.cleaning?.list;
+      const canCreate = role === "owner" || permission?.cleaning?.create;
+      const canEdit = role === "owner" || permission?.cleaning?.edit;
+    
+
     const [popupImage, setPopupImage] = useState<string | null>(null);
 
     const { mutateAsync: uploadFiles, isPending: uploading } = useUploadCleaningRoomFiles();
@@ -154,14 +167,14 @@ const imageFiles = (data?.uploads || [])?.filter((file:any)=> file.type === "ima
                 </h2>
 
                 <div className="flex gap-1 items-center">
-                    <Button
+                   {(canCreate || canEdit ) && <Button
                         isLoading={updatingStatus}
                         onClick={handleUpdateStatus}
                         className="bg-blue-600 hover:bg-blue-700 text-white text-sm !p-2 lg:p-4 "
                     >
                         {completelyCleaned ? "Mark as Not Cleaned" : "Mark as Cleaned"}
                     </Button>
-
+}
 
                     <Button variant="primary" className="" onClick={() => navigate(`/${organizationId}/projectdetails/${projectId}/cleaning`)}>
                         Go Back
@@ -173,7 +186,7 @@ const imageFiles = (data?.uploads || [])?.filter((file:any)=> file.type === "ima
                 <Card className="p-2 border-gray-100 border-2">
                     <div className="w-full justify-between flex items-center">
                         <h3 className="text-md font-semibold  text-blue-700">Notes</h3>
-                        {!editing && <Button
+                        {(!editing && (canCreate || canEdit )) && <Button
                             onClick={() => { setNoteText(data?.notes); setEditing(true) }}
                             className="bg-blue-600 text-white hover:bg-blue-700"
                         >
@@ -225,7 +238,7 @@ const imageFiles = (data?.uploads || [])?.filter((file:any)=> file.type === "ima
                     )}
                 </Card>
 
-                <Card className="p-2 h-full border-gray-100 border-2">
+               {(canCreate || canEdit)  && <Card className="p-2 h-full border-gray-100 border-2">
                     <Label className="block mb-2 font-semibold !text-blue-700">Upload Images or PDFs:</Label>
                     <Input
                         type="file"
@@ -243,7 +256,7 @@ const imageFiles = (data?.uploads || [])?.filter((file:any)=> file.type === "ima
                     >
                         {uploading ? "Uploading..." : `Upload ${selectedFiles ? selectedFiles.length : ""} file(s)`}
                     </Button>
-                </Card>
+                </Card>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[95%] sm:h-[65%]">
@@ -310,7 +323,7 @@ const imageFiles = (data?.uploads || [])?.filter((file:any)=> file.type === "ima
                        
                          <ImageGalleryExample
                         imageFiles={imageFiles}
-                        handleDeleteFile={handleDelete}
+                        {...(canDelete ? {handleDeleteFile:handleDelete} : {} ) }
                         // className="grid grid-cols-3"
                         height={80}
                         minWidth={98}
@@ -364,7 +377,7 @@ const imageFiles = (data?.uploads || [])?.filter((file:any)=> file.type === "ima
                                                 <i className="fa-solid fa-download"></i>
                                             </Button>
 
-                                            <Button
+                                           {canDelete && <Button
                                                 size="sm"
                                                 isLoading={deleting}
                                                 onClick={() => handleDelete(f._id)}
@@ -373,7 +386,7 @@ const imageFiles = (data?.uploads || [])?.filter((file:any)=> file.type === "ima
                                                 className="bg-red-600 text-white rounded px-2 py-1 text-xs"
                                             >
                                                 <i className="fas fa-trash-can"></i>
-                                            </Button>
+                                            </Button>}
                                         </div>
                                     </li>
                                 ))}

@@ -16,6 +16,7 @@ import { useState } from "react";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { downloadImage } from "../../../utils/downloadFile";
 import { dateFormate, formatTime } from './../../../utils/dateFormator';
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface IModularUnitUpload {
     type: "image" | "pdf";
@@ -76,6 +77,13 @@ export default function SelectedModularUnitsNew() {
     const { mutateAsync: deleteUnit, isPending: isDeleting, variables } = useDeleteSelectedUnitNew()
     const { mutateAsync: generatePdf, isPending: isCompleting } = useGeneratePdfModularUnits()
     const { mutateAsync: updateUnit, isPending: isUpdating } = useAddSelectedUnitNew()
+
+      const { role, permission } = useAuthCheck();
+        const canDelete = role === "owner" || permission?.modularunit?.delete;
+        // const canList = role === "owner" || permission?.modularunit?.list;
+        // const canCreate = role === "owner" || permission?.modularunit?.create;
+        const canEdit = role === "owner" || permission?.modularunit?.edit;
+    
 
     const handleDeleteUnit = async (unitId: string) => {
         try {
@@ -352,7 +360,7 @@ export default function SelectedModularUnitsNew() {
                                                 />
 
                                                 {/* Delete Button Overlay */}
-                                                <Button
+                                               {(canDelete || canEdit)  && <Button
                                                     onClick={() => handleDeleteUnit(unit._id!)}
                                                     isLoading={isDeleting && variables.unitId === unit._id}
                                                     variant="ghost"
@@ -360,7 +368,7 @@ export default function SelectedModularUnitsNew() {
                                                     className="absolute top-2 right-2 bg-white/90 hover:bg-white text-red-500 hover:text-red-700 shadow-sm"
                                                 >
                                                     <i className="fas fa-trash text-sm" />
-                                                </Button>
+                                                </Button>}
 
                                                 {/* Category Badge */}
                                                 {unit.category && (
@@ -436,7 +444,7 @@ export default function SelectedModularUnitsNew() {
                                                         <span className="text-sm text-slate-600">Quantity:</span>
                                                         <div className="flex items-center space-x-2">
 
-                                                            <Button
+                                                           {canEdit && <Button
                                                                 onClick={() => handleQuantityChange(unit, unit.quantity - 1)}
                                                                 disabled={unit.quantity <= 0 || isUpdating || updatingUnitId === unit.productId}
                                                                 isLoading={isUpdating}
@@ -445,7 +453,7 @@ export default function SelectedModularUnitsNew() {
                                                                 className="h-7 w-7 p-0"
                                                             >
                                                                 <i className="fas fa-minus text-xs"></i>
-                                                            </Button>
+                                                            </Button>}
                                                             <span className="font-semibold text-slate-900 min-w-[30px] text-center">
                                                                 {updatingUnitId === unit.productId ? (
                                                                     <i className="fas fa-spinner fa-spin text-sm"></i>
@@ -453,7 +461,7 @@ export default function SelectedModularUnitsNew() {
                                                                     unit.quantity
                                                                 )}
                                                             </span>
-                                                            <Button
+                                                          {canEdit &&  <Button
                                                                 onClick={() => handleQuantityChange(unit, unit.quantity + 1)}
                                                                 disabled={isUpdating || updatingUnitId === unit.productId}
                                                                 variant="outline"
@@ -461,7 +469,7 @@ export default function SelectedModularUnitsNew() {
                                                                 className="h-7 w-7 p-0"
                                                             >
                                                                 <i className="fas fa-plus text-xs"></i>
-                                                            </Button>
+                                                            </Button>}
 
                                                         </div>
                                                     </div>

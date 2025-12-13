@@ -1,4 +1,4 @@
-import  { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useNavigate, useLocation, Outlet } from 'react-router-dom';
 // import { dateFormate } from '../../utils/dateFormator';
 import { useDebounce } from '../../Hooks/useDebounce';
@@ -6,6 +6,7 @@ import { useDeleteDesignLab, useGetAllDesignLabs } from '../../apiList/DesignLab
 import { Button } from '../../components/ui/Button';
 import { toast } from '../../utils/toast';
 import { DesignLabCard } from './DesignLabCard';
+import { useAuthCheck } from '../../Hooks/useAuthCheck';
 // Assuming these are your custom UI components based on description
 // import { Button } from '../../components/ui/button'; 
 // import { toast } from '../../components/ui/use-toast'; 
@@ -137,6 +138,11 @@ const DesignLabMain = () => {
     const location = useLocation();
     const { organizationId } = useOutletContext<{ organizationId: string }>();
 
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.design?.list;
+    const canCreate = role === "owner" || permission?.design?.create;
+
+
     const isDetailView = location.pathname.includes('/single') || location.pathname.includes('/create');
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -163,9 +169,9 @@ const DesignLabMain = () => {
         hasNextPage,
         isFetchingNextPage,
         refetch
-    } = useGetAllDesignLabs({ 
-        organizationId, 
-        filters: { ...filters, search: debouncedSearch } 
+    } = useGetAllDesignLabs({
+        organizationId,
+        filters: { ...filters, search: debouncedSearch }
     });
 
     const deleteMutation = useDeleteDesignLab();
@@ -189,7 +195,7 @@ const DesignLabMain = () => {
     // --- HANDLERS ---
     const handleDelete = async (id: string) => {
         // if (!window.confirm("Are you sure you want to delete this design? This cannot be undone.")) return;
-        
+
         try {
             await deleteMutation.mutateAsync(id);
             toast({ title: "Success", description: "Design deleted successfully" });
@@ -232,7 +238,7 @@ const DesignLabMain = () => {
 
     return (
         <div className="space-y-0 h-full flex flex-col">
-            
+
             {/* --- HEADER --- */}
             <header className="flex justify-between items-center shrink-0 mb-4 px-1">
                 <div>
@@ -252,19 +258,19 @@ const DesignLabMain = () => {
                         <i className="fas fa-bars"></i> Menu
                     </Button> */}
 
-                    <Button
+                   {canCreate && <Button
                         onClick={() => navigate(`create`)}
                         className="flex items-center gap-2"
                     >
                         <i className="fas fa-plus"></i>
                         Create Design
-                    </Button>
+                    </Button>}
                 </div>
             </header>
 
             {/* --- MAIN CONTENT AREA (Split View) --- */}
             <main className="flex gap-4 flex-1 overflow-hidden">
-                
+
                 {/* --- FILTERS SIDEBAR (Always Visible) --- */}
                 <div className="w-72 flex-shrink-0 h-full overflow-y-auto custom-scrollbar pb-4">
                     <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200 h-full flex flex-col">
@@ -382,7 +388,7 @@ const DesignLabMain = () => {
                 </div>
 
                 {/* --- LIST AREA (Conditional Rendering) --- */}
-                <div className="flex-1 h-full overflow-hidden flex flex-col">
+                {canList && <div className="flex-1 h-full overflow-hidden flex flex-col">
                     {isLoading ? (
                         <div className="flex-1 flex justify-center items-center bg-white rounded-xl border border-gray-200">
                             <div className="flex flex-col items-center gap-3 text-blue-600">
@@ -419,14 +425,14 @@ const DesignLabMain = () => {
                                     : 'Your design library is empty. Start by creating your first design specification.'}
                             </p>
                             {(filters.search || activeFiltersCount > 0) ? (
-                                <button 
+                                <button
                                     onClick={clearFilters}
                                     className="text-blue-600 font-medium hover:underline"
                                 >
                                     Clear all filters
                                 </button>
                             ) : (
-                               null
+                                null
                             )}
                         </div>
                     ) : (
@@ -477,48 +483,48 @@ const DesignLabMain = () => {
 
 
                         <div
-    ref={scrollContainerRef}
-    className="flex-1 bg-gray-50/50 rounded-xl overflow-y-auto custom-scrollbar flex flex-col p-6" // Added padding and bg color
->
-    {/* Grid Container */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
-        {designLabs.map((design) => (
-            <DesignLabCard 
-                key={design._id}
-                // index={idx}
-                design={design} 
-                handleView={handleView}
-                handleDelete={handleDelete}
-                deletePending={deleteMutation.isPending && deleteMutation.variables === design._id}
-            />
-        ))}
-    </div>
+                            ref={scrollContainerRef}
+                            className="flex-1 bg-gray-50/50 rounded-xl overflow-y-auto custom-scrollbar flex flex-col p-6" // Added padding and bg color
+                        >
+                            {/* Grid Container */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
+                                {designLabs.map((design) => (
+                                    <DesignLabCard
+                                        key={design._id}
+                                        // index={idx}
+                                        design={design}
+                                        handleView={handleView}
+                                        handleDelete={handleDelete}
+                                        deletePending={deleteMutation.isPending && deleteMutation.variables === design._id}
+                                    />
+                                ))}
+                            </div>
 
-    {/* Footer Loaders/Messages */}
-    <div className="py-8 text-center mt-auto shrink-0">
-        {isFetchingNextPage ? (
-            <div className="flex flex-col items-center gap-2 text-blue-600">
-                <i className="fas fa-circle-notch fa-spin text-xl"></i>
-                <span className="text-sm font-medium">Loading more designs...</span>
-            </div>
-        ) : !hasNextPage && designLabs.length > 0 ? (
-            <div className="flex items-center justify-center gap-2 opacity-50">
-                <span className="h-px w-12 bg-gray-300"></span>
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">End of Collection</p>
-                <span className="h-px w-12 bg-gray-300"></span>
-            </div>
-        ) : designLabs.length === 0 && !isFetchingNextPage ? (
-             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <i className="fas fa-layer-group text-2xl"></i>
-                </div>
-                <p>No designs found</p>
-            </div>
-        ) : null}
-    </div>
-</div>
+                            {/* Footer Loaders/Messages */}
+                            <div className="py-8 text-center mt-auto shrink-0">
+                                {isFetchingNextPage ? (
+                                    <div className="flex flex-col items-center gap-2 text-blue-600">
+                                        <i className="fas fa-circle-notch fa-spin text-xl"></i>
+                                        <span className="text-sm font-medium">Loading more designs...</span>
+                                    </div>
+                                ) : !hasNextPage && designLabs.length > 0 ? (
+                                    <div className="flex items-center justify-center gap-2 opacity-50">
+                                        <span className="h-px w-12 bg-gray-300"></span>
+                                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">End of Collection</p>
+                                        <span className="h-px w-12 bg-gray-300"></span>
+                                    </div>
+                                ) : designLabs.length === 0 && !isFetchingNextPage ? (
+                                    <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                            <i className="fas fa-layer-group text-2xl"></i>
+                                        </div>
+                                        <p>No designs found</p>
+                                    </div>
+                                ) : null}
+                            </div>
+                        </div>
                     )}
-                </div>
+                </div>}
             </main>
         </div>
     );

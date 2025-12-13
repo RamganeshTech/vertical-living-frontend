@@ -19,6 +19,8 @@ import { downloadImage } from "../../../utils/downloadFile";
 import type { IConsultationMessage, ITechnicalConsultation } from "../../../types/types";
 import { Badge } from "../../../components/ui/Badge";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 // import { useGetStageSelection } from "../../../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi";
 
 // Define context type
@@ -30,10 +32,21 @@ type ProjectDetailsOutlet = {
 const TechnicalConsultant: React.FC = () => {
     const { projectId, organizationId } = useParams<{ projectId: string, organizationId: string }>();
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
-    const { role, _id: userId } = useGetRole();
+    const { _id: userId } = useGetRole();
     const navigate = useNavigate()
 
     // const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId!)
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.technicalconsultant?.delete;
+    // const canList = role === "owner" || permission?.technicalconsultant?.list;
+    const canCreate = role === "owner" || permission?.technicalconsultant?.create;
+    const canEdit = role === "owner" || permission?.technicalconsultant?.edit;
+
+
+
+
+
 
     const [text, setText] = useState("");
     const [attachments, setAttachments] = useState<File[]>([]);
@@ -135,7 +148,7 @@ const TechnicalConsultant: React.FC = () => {
 
     const getName = (role: string, sender: any) => {
         if (role === "owner") {
-           return sender.username
+            return sender.username
         }
         if (role === "staff") {
             return sender.staffName
@@ -170,38 +183,45 @@ const TechnicalConsultant: React.FC = () => {
 
                 <div className="w-full lg:w-[60%]  flex flex-col sm:flex-row gap-3 justify-end">
                     {/* <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-end"> */}
-                    <Button
+                    {(canCreate || canEdit) && <Button
                         isLoading={updateCompletionStatus.isPending}
                         onClick={handleCompletionStatus}
                         className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
                     >
                         <i className="fa-solid fa-circle-check mr-2"></i>
                         Mark Complete
-                    </Button>
+                    </Button>}
                     {/* </div> */}
 
                     <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-end">
-                        <ResetStageButton
+                        {(canCreate || canEdit) && <ResetStageButton
                             projectId={projectId!}
                             stageNumber={4}
                             stagePath="technicalconsultation"
                             className="flex-1 sm:flex-initial min-w-max"
-                        />
+                        />}
 
-                        {!getMessageError && <ShareDocumentWhatsapp
+                        {(!getMessageError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
                             projectId={projectId!}
                             stageNumber="4"
                             className="w-full sm:w-fit"
                             isStageCompleted={techDoc?.status}
                         />}
 
-                        <AssignStageStaff
+                        {(canCreate || canEdit) && <AssignStageStaff
                             stageName="TechnicalConsultationModel"
                             projectId={projectId!}
                             organizationId={organizationId!}
                             currentAssignedStaff={techDoc?.assignedTo || null}
                             className="flex-1 sm:flex-initial min-w-max"
-                        />
+                        />}
+
+                        <div className="w-full sm:w-auto flex justify-end sm:block">
+                            <StageGuide
+                                organizationId={organizationId!}
+                                stageName="technicalconsultant"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -278,9 +298,9 @@ const TechnicalConsultant: React.FC = () => {
                                                 <div className="opacity-0 scale-95 group-hover:opacity-100 transition-all duration-300">
                                                     {(msg.sender._id === userId || role === "owner" || role === "CTO") && (
                                                         <div className="flex gap-2">
-                                                            <Button variant="secondary" onClick={() => handleEdit(msg._id, msg.message)} className="text-blue-600 text-sm">
+                                                            {canEdit && <Button variant="secondary" onClick={() => handleEdit(msg._id, msg.message)} className="text-blue-600 text-sm">
                                                                 <i className="fas fa-edit"></i>
-                                                            </Button>
+                                                            </Button>}
                                                             {/* <Button variant="danger" isLoading={deletePending} onClick={() => handleDelete(msg._id)} className="text-white bg-red-600 text-sm">
                                                             <i className="fas fa-trash"></i>
                                                         </Button> */}
@@ -346,7 +366,7 @@ const TechnicalConsultant: React.FC = () => {
             </div>
 
             {/* Message Input Area */}
-            <div className="bg-white px-4 py-2 rounded-xl shadow-md">
+            {(canCreate || canEdit) && <div className="bg-white px-4 py-2 rounded-xl shadow-md">
                 <Label htmlFor="message">Your Message</Label>
                 <div className="flex flex-col sm:flex-row gap-2 mb-3">
                     <Input
@@ -370,15 +390,17 @@ const TechnicalConsultant: React.FC = () => {
                     </Button>
                 </div>
 
-                <Label>Attach Files (PDF or Image)</Label>
-                <Input
-                    type="file"
-                    multiple
-                    accept=".pdf,image/*"
-                    onChange={(e) => setAttachments(Array.from(e.target.files || []))}
-                    className=""
-                />
-            </div>
+                {(canCreate || canEdit) && <>  <Label>Attach Files (PDF or Image)</Label>
+                    <Input
+                        type="file"
+                        multiple
+                        accept=".pdf,image/*"
+                        onChange={(e) => setAttachments(Array.from(e.target.files || []))}
+                        className=""
+                    />
+                </>
+                }
+            </div>}
 
             {/* Image Preview Modal */}
             {previewImage && (

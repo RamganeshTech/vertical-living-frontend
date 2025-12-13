@@ -90,6 +90,8 @@ export const useUploadCleaningRoomFiles = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
+const allowedRoles = ["owner", "CTO", "staff", "worker"];
+
 
   return useMutation({
     mutationFn: async ({
@@ -116,6 +118,8 @@ export const useDeleteCleaningRoomFile = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient();
+const allowedRoles = ["owner", "CTO", "staff", "worker"];
+
 
   return useMutation({
     mutationFn: async ({

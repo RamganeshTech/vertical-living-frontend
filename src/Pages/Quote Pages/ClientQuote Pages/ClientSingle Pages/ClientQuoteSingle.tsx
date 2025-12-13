@@ -14,12 +14,17 @@ import { useGetSingleClientQuote, useSendQuoteToPaymentStage } from "../../../..
 // import { Input } from "../../../../components/ui/Input";
 import { Label } from './../../../../components/ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/Select";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 
-export const DEFAULT_LAMINATE_RATE_PER_SQFT = 10;
+export const DEFAULT_LAMINATE_RATE_PER_SQFT = 0;
 
 const ClientQuoteSingle = () => {
     const { organizationId, quoteId } = useParams<{ organizationId: string; quoteId: string }>() as { organizationId: string; quoteId: string }
     const navigate = useNavigate()
+
+    const { role, permission } = useAuthCheck();
+    const canCreate = role === "owner" || permission?.materialquote?.create;
+    const canEdit = role === "owner" || permission?.materialquote?.edit;
 
     const { data: quote, isLoading: quoteLoading } = useGetSingleClientQuote(organizationId!, quoteId!);
     // const { mutateAsync: blurMutate, isPending: blurPending } = useToggleBlurring();
@@ -406,9 +411,9 @@ const ClientQuoteSingle = () => {
                             <p className="text-md text-gray-600">Total Cost</p>
                             <p className="text-md font-bold text-green-600">₹{grandTotal?.toLocaleString("en-in")}</p>
                         </div>
-                        <Button onClick={handleSendToPayment} disabled={paymentPending} className="flex-shrink-0 px-4 ">
+                        {(canCreate || canEdit) && <Button onClick={handleSendToPayment} disabled={paymentPending} className="flex-shrink-0 px-4 ">
                             {paymentPending ? "Sending..." : "Select Quote"}
-                        </Button>
+                        </Button>}
 
                         <div className="flex gap-2 w-fit px-4 justify-center">
                             {/* <input checked={!isBlured}  type="checkbox" id="blurinput" onClick={handletoggleBlur}

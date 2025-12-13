@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Button } from "../../../components/ui/Button";
 import type { SiteRooms } from "../../../types/types";
-import {  useUploadRoomSiteFiles } from "../../../apiList/Stage Api/siteMeasurementApi";
+import { useUploadRoomSiteFiles } from "../../../apiList/Stage Api/siteMeasurementApi";
 import { toast } from "../../../utils/toast";
 import { useParams } from "react-router-dom";
 import { Input } from "../../../components/ui/Input";
 
 import RoomImage from "./RoomImage";
 import { NO_IMAGE } from "../../../constants/constants";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface RoomCardProps {
   room: SiteRooms;
@@ -20,14 +21,22 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomL
 
   const { projectId } = useParams()
   const [previewImage, setPreviewImage] = useState<string | null>(null)
- 
+
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.sitemeasurement?.delete;
+  // const canList = role === "owner" || permission?.sitemeasurement?.list;
+  const canCreate = role === "owner" || permission?.sitemeasurement?.create;
+  const canEdit = role === "owner" || permission?.sitemeasurement?.edit;
+
+
   const uploads = room?.uploads || []
   const area = room.length && room.breadth ? (room.length * room.breadth).toFixed(2) : null;
-  
-   
+
+
   // console.log("uploads", room.uploads)
   const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRoomSiteFiles()
- 
+
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -79,7 +88,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomL
     }
   }
 
-  
+
 
 
 
@@ -88,15 +97,15 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomL
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-xl font-semibold text-blue-700">{room.name}</h3>
         <div className="flex gap-2">
-          <button
+          {canEdit && <button
             onClick={() => onEdit(room)}
             className="text-blue-600 hover:text-blue-800"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-          </button>
-          <Button
+          </button>}
+          {canDelete && <Button
             isLoading={deleteRoomLoading}
             onClick={onDelete}
             variant="ghost"
@@ -106,7 +115,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomL
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg> */}
             <i className="fas fa-trash-can"></i>
-          </Button>
+          </Button>}
         </div>
       </div>
 
@@ -118,7 +127,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomL
       {/* File Upload Section */}
       <div className="space-y-4 w-full">
         {/* Upload Button */}
-        <div className="flex items-center justify-between w-full relative">
+        {(canCreate || canEdit) && <div className="flex items-center justify-between w-full relative">
           <Input
             type="file"
             multiple
@@ -145,7 +154,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomL
               </svg>
             </div>
           )}
-        </div>
+        </div>}
 
         {/* Images Display */}
         <div className="my-6">
@@ -157,7 +166,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onEdit, onDelete, deleteRoomL
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl">
               {uploads.map((file) => (
-                <RoomImage room={room} setPreviewImage={setPreviewImage}  file={file} />
+                <RoomImage room={room} setPreviewImage={setPreviewImage} file={file} />
               ))}
             </div>
           )}

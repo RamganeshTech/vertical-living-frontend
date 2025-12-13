@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { useCurrentSupervisor } from '../../Hooks/useCurrentSupervisor';
 import { useNavigate } from 'react-router-dom';
+import { useAuthCheck } from '../../Hooks/useAuthCheck';
 // import { useDeleteMaterialImage, useDeleteReferenceImage, useUploadMaterialImage, useUploadReferenceImages } from '../../apiList/DesignLab_Api/designLabApi';
 //   makgint eh chges
 
@@ -58,6 +59,7 @@ export interface IComponent {
 export interface IDesignLabFormData {
     _id?: string;
     designerName: string;
+    designerId: string | null,
     designDate: string;
     designCode: string;
     productName: string;
@@ -101,9 +103,22 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
     const navigate = useNavigate();
     const isCreateMode = mode === "create"
 
+
+
+    const { role, permission } = useAuthCheck();
+
+
+    const canCreate = role === "owner" || permission?.design?.create;
+    const canEdit = role === "owner" || permission?.design?.edit;
+    const canList = role === "owner" || permission?.design?.list;
+
+
+
+
     // --- STATE ---
     const [formData, setFormData] = useState<IDesignLabFormData>({
         designerName: currentUser?.name || 'Loading...',
+        designerId: currentUser?.id || null,
         designDate: new Date().toISOString(),
         designCode: '',
         productName: '',
@@ -206,13 +221,13 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
         // }
 
 
-          if (!e.target.files?.length) return;
+        if (!e.target.files?.length) return;
         const files = Array.from(e.target.files);
 
         // Just update Local State for BOTH Create and Edit modes.
         // The Parent component (UpdateDesignLab) will handle the actual upload on Save.
         const tempUrls = files.map(f => ({ url: URL.createObjectURL(f) }));
-        
+
         setFormData(prev => ({
             ...prev,
             newRefFiles: [...(prev.newRefFiles || []), ...files], // Store file for upload
@@ -266,29 +281,29 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
         // (Simplified logic: if we just assume user removes newly added ones from the end or track them)
         // For strict correctness in "Edit", we rely on the parent filtering existing vs new.
         // But we must maintain the newRefFiles array cleanly.
-        
+
         // Strategy: 
         // 1. If it's a 'blob:' url (New), remove from newRefFiles.
         // 2. If it's a real url (Old), just removing from referenceImages is enough (Backend won't get it in the JSON list).
-        
+
         const imageToRemove = formData.referenceImages[index];
         if (imageToRemove.url.startsWith('blob:')) {
-             // It is a new file. We need to find and remove it from newRefFiles.
-             // This can be tricky with just arrays. 
-             // Ideally, map specific IDs, but for now, we can filter newRefFiles.
-             // A simple way is to rebuild newRefFiles based on remaining blob images in referenceImages
-             // But we can't easily map back to the File object from the Blob URL in all browsers.
-             
-             // Simple fix for now:
-             // If user deletes a "New" image, we might just clear that specific File from state.
-             // Since we pushed them, the order in newRefFiles corresponds to the order of blob urls in referenceImages.
-             
-             // However, for this implementation, let's keep it simple:
-             // If they delete an *existing* image, it's gone from the UI list -> gone from DB on save.
+            // It is a new file. We need to find and remove it from newRefFiles.
+            // This can be tricky with just arrays. 
+            // Ideally, map specific IDs, but for now, we can filter newRefFiles.
+            // A simple way is to rebuild newRefFiles based on remaining blob images in referenceImages
+            // But we can't easily map back to the File object from the Blob URL in all browsers.
+
+            // Simple fix for now:
+            // If user deletes a "New" image, we might just clear that specific File from state.
+            // Since we pushed them, the order in newRefFiles corresponds to the order of blob urls in referenceImages.
+
+            // However, for this implementation, let's keep it simple:
+            // If they delete an *existing* image, it's gone from the UI list -> gone from DB on save.
         }
 
-        setFormData(prev => ({ 
-            ...prev, 
+        setFormData(prev => ({
+            ...prev,
             referenceImages: newImages,
             // Optimization: If you want to be perfect, you'd filter newRefFiles here too, 
             // but the Parent filters newRefFiles based on what is actually uploaded vs what is mapped.
@@ -299,10 +314,10 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                 // Recommendation: Just let it be. If an extra file uploads but isn't mapped, it's just a wasted S3 call, not a broken logic.
                 // Or better: Don't rely on 'newRefFiles' array index.
                 // In handleRefImageUpload, assign a temp ID to the file object and the preview object.
-                return true; 
+                return true;
             })
         }));
-        
+
         if (currentRefIndex >= newImages.length) setCurrentRefIndex(Math.max(0, newImages.length - 1));
     };
 
@@ -471,17 +486,17 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
         // }
 
 
-         // Pure State Update. No API.
+        // Pure State Update. No API.
         const newComps = [...formData.components];
-        
+
         // Store the File object directly on the material
-        newComps[compIdx].materials[matIdx].tempFile = file; 
+        newComps[compIdx].materials[matIdx].tempFile = file;
         // Show Preview
         newComps[compIdx].materials[matIdx].image = { url: URL.createObjectURL(file) };
-        
+
         // Trigger smart row logic if needed
         updateMaterial(compIdx, matIdx, 'tempFile', file);
-        
+
         // Force update state
         setFormData(prev => ({ ...prev, components: newComps }));
     };
@@ -535,17 +550,22 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
         // }
 
 
-         // Pure State Update.
+        // Pure State Update.
         const newComps = [...formData.components];
-        
+
         newComps[compIdx].materials[matIdx].image = null;
         newComps[compIdx].materials[matIdx].tempFile = undefined;
-        
+
         updateMaterial(compIdx, matIdx, 'image', null); // Triggers smart row logic
-        
+
         setFormData(prev => ({ ...prev, components: newComps }));
     };
 
+
+
+    if (!canList) {
+        return
+    }
 
     return (
         <div className="max-h-full overflow-y-auto bg-gray-100 text-gray-800 font-sans">
@@ -572,13 +592,14 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                             <i className="fas fa-undo mr-2"></i> Reset
                         </Button>
                     )}
-                    <Button
-                        onClick={() => onSubmit(formData)}
-                        isLoading={isLoading}
-                        className="h-9 text-sm bg-blue-700 hover:bg-blue-800 text-white shadow-md"
-                    >
-                        <i className="fas fa-save mr-2"></i> {mode === 'create' ? 'Create Design' : 'Save Changes'}
-                    </Button>
+                    {((mode === "create" && canCreate) || (mode === "edit" && canEdit)) && (
+                        <Button
+                            onClick={() => onSubmit(formData)}
+                            isLoading={isLoading}
+                            className="h-9 text-sm bg-blue-700 hover:bg-blue-800 text-white shadow-md"
+                        >
+                            <i className="fas fa-save mr-2"></i> {mode === 'create' ? 'Create Design' : 'Save Changes'}
+                        </Button>)}
                 </div>
             </header>
 
@@ -666,10 +687,10 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                         <label className="cursor-pointer bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded font-bold text-xs uppercase transition-colors flex items-center gap-2">
                             {/* {!uploadingReferenceImg ?  */}
                             <i className="fas fa-upload"></i>
-                             {/* : 
+                            {/* : 
                              <i className="fas fa-spinner animate-spin text-[10px]"></i> */}
-                             {/* }  */}
-                             Upload Images
+                            {/* }  */}
+                            Upload Images
                             <input type="file" multiple accept="image/*" className="hidden" onChange={handleRefImageUpload} />
                         </label>
                     </CardHeader>
@@ -699,7 +720,7 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                     <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-gray-400 ">
                                         <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
                                             {/* {!uploadingReferenceImg ? ( */}
-                                                <i className="fas fa-cloud-upload-alt text-3xl"></i>
+                                            <i className="fas fa-cloud-upload-alt text-3xl"></i>
                                             {/* ) : (
                                                 <i className="fas fa-spinner animate-spin text-3xl text-blue-500"></i>
                                             )} */}
@@ -739,7 +760,7 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                                     title="Delete Image"
                                                 >
                                                     {/* {!deletingReferenceImg ?  */}
-                                                    <i className="fas fa-trash text-[10px]"></i> 
+                                                    <i className="fas fa-trash text-[10px]"></i>
                                                     {/* :
                                                      <i className="fas fa-spinner animate-spin text-[10px]"></i>
                                                      } */}
@@ -860,7 +881,7 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                                                         title="Remove Image"
                                                                     >
                                                                         {/* {!deletingMatImg ? ( */}
-                                                                            <i className="fas fa-trash text-xs"></i>
+                                                                        <i className="fas fa-trash text-xs"></i>
                                                                         {/* ) : (
                                                                             <i className="fas fa-spinner animate-spin text-xs"></i>
                                                                         )} */}
@@ -872,7 +893,7 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                                             <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 text-gray-400 hover:text-blue-500 transition-all group/upload">
                                                                 <div className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm mb-1 group-hover/upload:scale-110 transition-transform">
                                                                     {/* {!uploadingMatImg ? ( */}
-                                                                        <i className="fas fa-plus text-xs"></i>
+                                                                    <i className="fas fa-plus text-xs"></i>
                                                                     {/* ) : (
                                                                         <i className="fas fa-spinner animate-spin text-xs text-blue-500"></i>
                                                                     )} */}

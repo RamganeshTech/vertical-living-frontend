@@ -1,18 +1,28 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Button } from '../../components/ui/Button';
+import { useAuthCheck } from '../../Hooks/useAuthCheck';
 
 type Props = {
     work: any
     role: string | null
-    onDelete: (id:string)=> any,
-    deletePending:boolean
-    navigate: (path:string)=>any
+    onDelete: (id: string) => any,
+    deletePending: boolean
+    navigate: (path: string) => any
 }
 
 const WorkLibraryCard: React.FC<Props> = (
-    { work , role, onDelete, deletePending, navigate}
+    { work, role, onDelete, deletePending, navigate }
+
+
 ) => {
+
+
+
+    const { permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.stafftask?.delete;
+
+
     return (
         <Card key={work._id} className="p-0 border-l-4 border-blue-600">
             <CardHeader>
@@ -21,7 +31,7 @@ const WorkLibraryCard: React.FC<Props> = (
             <CardContent className="space-y-2">
                 <p className="text-sm">
                     <i className="fa-solid fa-file-lines mr-2 text-blue-600" />
-                    Description: {work?.description ? (work?.description?.length > 100 ? `${work?.description?.slice(0, 100)}...` : work?.description  )  : "N/A"}
+                    Description: {work?.description ? (work?.description?.length > 100 ? `${work?.description?.slice(0, 100)}...` : work?.description) : "N/A"}
                 </p>
                 {/* <p className="text-sm">
                                     <i className="fa-solid fa-tags mr-2 text-green-600" />
@@ -40,7 +50,7 @@ const WorkLibraryCard: React.FC<Props> = (
                         <i className="fa-solid fa-eye mr-1" />
                         View
                     </Button>
-                    {role !== "staff" && (
+                    {(role !== "staff" && canDelete )&& (
                         <Button
                             size="sm"
                             onClick={() => onDelete(work._id)}

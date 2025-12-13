@@ -69,7 +69,7 @@ export const useGetMyOrganizations = () => {
   return useQuery({
     queryKey: ["myOrgs"],
     queryFn: async () => {
-      if(!role) throw new Error("Not Authorized");
+      if (!role) throw new Error("Not Authorized");
       if (!allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance not found for role");
 
@@ -87,7 +87,7 @@ export const useGetSingleOrganization = (organizationId: string) => {
   const api = getApiForRole(role!);
 
   return useQuery({
-    queryKey: ["myOrgs"],
+    queryKey: ["myOrgs-single"],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance not found for role");
@@ -126,6 +126,7 @@ export const useCreateOrganization = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myOrgs"] });
+      queryClient.invalidateQueries({ queryKey: ["myOrgs-single"] });
     },
   });
 };
@@ -155,6 +156,8 @@ export const useUpdateOrganizationName = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myOrgs"] });
+      queryClient.invalidateQueries({ queryKey: ["myOrgs-single"] });
+
     },
   });
 };
@@ -180,6 +183,8 @@ export const useDeleteOrganization = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myOrgs"] });
+      queryClient.invalidateQueries({ queryKey: ["myOrgs-single"] });
+
     },
   });
 };
@@ -196,7 +201,7 @@ const fetchStaffsByOrganization = async (orgId: string, api: AxiosInstance) => {
 const inviteStaffToOrganization = async (payload: {
   organizationId: string;
   role: string;
-  specificRole: string
+  // specificRole: string[]
 }, api: AxiosInstance) => {
   const { data } = await api.post("/orgs/invitestafftoorganization", payload);
   if (!data.ok) throw new Error(data.message);
@@ -252,7 +257,7 @@ export const useInviteStaffToOrganization = () => {
     mutationFn: async (payload: {
       organizationId: string;
       role: string;
-      specificRole: string
+      // specificRole: string[]
     }) => {
 
       if (!role) throw new Error("Not authrized")
@@ -263,8 +268,8 @@ export const useInviteStaffToOrganization = () => {
 
       return await inviteStaffToOrganization(payload, api)
     },
-    onSuccess:(_, payload)=>{
-      queryClient.invalidateQueries({queryKey:["staffs", payload.organizationId]})
+    onSuccess: (_, payload) => {
+      queryClient.invalidateQueries({ queryKey: ["staffs", payload.organizationId] })
     }
 
 
@@ -403,7 +408,7 @@ export const useRemoveCTOFromOrganization = () => {
 
 
 // client routes
-const inviteClient = async ({ projectId, api , organizationId}: { projectId: string, organizationId:string,api: AxiosInstance }) => {
+const inviteClient = async ({ projectId, api, organizationId }: { projectId: string, organizationId: string, api: AxiosInstance }) => {
   const { data } = await api.post('orgs/inviteclienttoproject', { projectId, organizationId })
   if (!data.ok) throw new Error(data.message);
   return data.data;
@@ -417,7 +422,7 @@ export const useInviteClientToProject = () => {
   const api = getApiForRole(role!)
 
   return useMutation({
-    mutationFn: async ({ projectId , organizationId}: { projectId: string, organizationId:string }) => {
+    mutationFn: async ({ projectId, organizationId }: { projectId: string, organizationId: string }) => {
       if (!role) throw new Error("not authrized")
 
       if (!allowedRoles.includes(role)) throw new Error("youre not allowed to access this api")
@@ -479,7 +484,7 @@ const getWorkersByProjectAsStaff = async (projectId: string, api: AxiosInstance)
   return data.data;
 };
 
-const removeWorkerAsStaff = async ({ workerId, orgId, projectId, api }: { orgId:string,workerId: string; projectId: string, api: AxiosInstance }) => {
+const removeWorkerAsStaff = async ({ workerId, orgId, projectId, api }: { orgId: string, workerId: string; projectId: string, api: AxiosInstance }) => {
   const { data } = await api.put(`orgs/removeworker/${orgId}/${workerId}/${projectId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
@@ -532,7 +537,7 @@ export const useRemoveWorkerAsStaff = () => {
   const api = getApiForRole(role!)
 
   return useMutation({
-    mutationFn: async ({ workerId, orgId, projectId }: { workerId: string; orgId:string, projectId: string }) => {
+    mutationFn: async ({ workerId, orgId, projectId }: { workerId: string; orgId: string, projectId: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
 
       if (!api) throw new Error("API instance not found for role");
@@ -542,3 +547,240 @@ export const useRemoveWorkerAsStaff = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workers"] }),
   })
 }
+
+
+
+
+
+// ROLES AND PERMISSIONS
+
+
+
+// Types for the Payloads
+interface RegisterUserPayload {
+  email: string;
+  password?: string;
+  staffName?: string;
+  clientName?: string;
+  workerName?: string;
+  CTOName?: string;
+  phoneNo?: string;
+  permissions?: any; // The permissions object/map
+}
+
+
+// 1. Register User API
+export const registerUserApi = async ({
+  api,
+  organizationId,
+  roleToCreate,
+  payload
+}: {
+  api: AxiosInstance;
+  organizationId: string;
+  roleToCreate: string; // e.g. 'staff', 'worker', 'client'
+  payload: RegisterUserPayload;
+}) => {
+  // POST /api/orgs/registeruser/:organizationId/:role
+  const { data } = await api.post(`orgs/registeruser/${organizationId}/${roleToCreate}`, payload);
+  if (!data.ok) throw new Error(data.message || "Failed to register");
+  return data;
+};
+
+// 2. Update Permissions API
+export const updatePermissionsApi = async ({
+  api,
+  userId,
+  permission
+}: {
+  api: AxiosInstance;
+  userId: string;
+  permission: any
+}) => {
+  // PUT /api/orgs/updatepermission/:userId
+  const { data } = await api.put(`orgs/updatepermission/${userId}`, { permission });
+  if (!data.ok) throw new Error(data.message || "Failed to update permissions");
+  return data;
+};
+
+// 3. Get All Users API
+export const getAllUsersApi = async ({
+  api,
+  organizationId
+}: {
+  api: AxiosInstance;
+  organizationId: string
+}) => {
+  // GET /api/orgs/getalluser/:organizationId
+  const { data } = await api.get(`orgs/getalluser/${organizationId}`);
+  if (!data.ok) throw new Error(data.message || "Failed to fetch users");
+  return data.data; // Assumes your backend returns { data: [...] }
+};
+
+
+const getSingleUsersApi = async ({
+  userId,
+  api
+}: {
+  api: AxiosInstance;
+  userId: string
+}) => {
+  const { data } = await api.get(`orgs/getsingleuser/${userId}`);
+  if (!data.ok) throw new Error(data.message || "Failed to fetch users");
+  return data.data; // Assumes your backend returns { data: [...] }
+
+}
+
+// 4. Delete User API
+export const deleteUserApi = async ({
+  api,
+  userId
+}: {
+  api: AxiosInstance;
+  userId: string
+}) => {
+  // DELETE /api/orgs/deleteuser/:userId
+  const { data } = await api.delete(`orgs/deleteuser/${userId}`);
+  if (!data.ok) throw new Error(data.message || "Failed to delete user");
+  return data;
+};
+
+
+
+
+
+
+// Allowed roles for these admin actions
+// Based on your routes: multiRoleAuthMiddleware("owner")
+const ADMIN_ROLES = ["owner"];
+
+// ==========================================
+// 1. Hook: Register User
+// ==========================================
+export const useRegisterUser = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({
+      organizationId,
+      roleToCreate,
+      payload
+    }: {
+      organizationId: string;
+      roleToCreate: string;
+      payload: any
+    }) => {
+      if (!role || !ADMIN_ROLES.includes(role)) {
+        throw new Error("You are not authorized to perform this action");
+      }
+      if (!api) throw new Error("API instance not found for role");
+
+      return await registerUserApi({ api, organizationId, roleToCreate, payload });
+    },
+    onSuccess: (_, variables) => {
+      // Refresh the user list for this organization
+      queryClient.invalidateQueries({ queryKey: ['orgUsers', variables.organizationId] });
+    }
+  });
+};
+
+// ==========================================
+// 2. Hook: Update Permissions
+// ==========================================
+export const useUpdateUserPermissions = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      permission,
+    }: {
+      userId: string;
+      permission: any;
+    }) => {
+      if (!role || !ADMIN_ROLES.includes(role)) {
+        throw new Error("You are not authorized to update permissions");
+      }
+      if (!api) throw new Error("API instance not found");
+
+      return await updatePermissionsApi({ api, userId, permission });
+    },
+    onSuccess: (_, variables) => {
+      // Refresh list to show updated permissions
+      queryClient.invalidateQueries({ queryKey: ['orgUsers', "single", variables.userId] });
+    }
+  });
+};
+
+// ==========================================
+// 3. Hook: Get All Users (Query)
+// ==========================================
+export const useGetAllUsers = (organizationId: string) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ['orgUsers', organizationId],
+    queryFn: async () => {
+      if (!role || !ADMIN_ROLES.includes(role)) {
+        throw new Error("You are not authorized to view users");
+      }
+      if (!api) throw new Error("API instance not found");
+
+      return await getAllUsersApi({ api, organizationId });
+    },
+    enabled: !!organizationId && !!role && ADMIN_ROLES.includes(role), // Only run if auth checks pass
+  });
+};
+
+
+export const useGetSingleUserForRoles = (userId: string) => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ['orgUsers', "single", userId],
+    queryFn: async () => {
+      if (!role || !ADMIN_ROLES.includes(role)) {
+        throw new Error("You are not authorized to view users");
+      }
+      if (!api) throw new Error("API instance not found");
+
+      return await getSingleUsersApi({ api, userId });
+    },
+    enabled: !!userId && !!role && ADMIN_ROLES.includes(role), // Only run if auth checks pass
+  });
+};
+
+
+// ==========================================
+// 4. Hook: Delete User
+// ==========================================
+export const useDeleteUser = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      organizationId // Needed for invalidation
+    }: {
+      userId: string;
+      organizationId: string;
+    }) => {
+      console.log(organizationId)
+      if (!role || !ADMIN_ROLES.includes(role)) {
+        throw new Error("You are not authorized to delete users");
+      }
+      if (!api) throw new Error("API instance not found");
+
+      return await deleteUserApi({ api, userId });
+    },
+    onSuccess: (_, variables) => {
+      // Refresh list to remove the deleted user
+      queryClient.invalidateQueries({ queryKey: ['orgUsers', variables.organizationId] });
+    }
+  });
+};

@@ -7,19 +7,21 @@ import { downloadImage } from "../utils/downloadFile";
 import { createPortal } from "react-dom";
 import ImageGalleryExample from "./ImageGallery/ImageGalleryMain";
 import VideoGalleryMain from "./VideoGallery/VideoGalleryMain";
+import { useAuthCheck } from "../Hooks/useAuthCheck";
 
 
 interface ExistingUploads {
-type: "image" | "pdf" | "video";
-        url: string;
-        originalName: string;
-        uploadedAt: string;
+    type: "image" | "pdf" | "video";
+    url: string;
+    originalName: string;
+    uploadedAt: string;
 }
 
 
 interface UploadSectionProps {
     formId: string;
     existingUploads: ExistingUploads[];
+    enableUpload?:boolean,
     onUploadComplete?: () => void;
     uploadFilesMutate: ({ formId, files, projectId }: { formId: string, projectId: string, files: any }) => Promise<any>,
     uploadPending: boolean
@@ -30,9 +32,19 @@ interface UploadSectionProps {
     refetch: () => Promise<any>
 }
 
-const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpload, projectId, refetch, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending, onDeleteUpload, deleteFilePending }) => {
+const RequirementFileUploader: React.FC<UploadSectionProps> = ({enableUpload, formId, autoUpload, projectId, refetch, existingUploads = [], onUploadComplete, uploadFilesMutate, uploadPending, onDeleteUpload, deleteFilePending }) => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [popupImage, setPopupImage] = useState<string | null>(null);
+
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.clientrequirement?.delete;
+    // const canList = role === "owner" || permission?.clientrequirement?.list;
+    // const canCreate = role === "owner" || permission?.clientrequirement?.create;
+    // const canEdit = role === "owner" || permission?.clientrequirement?.edit;
 
 
 
@@ -87,41 +99,44 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
 
     const pdfFiles = existingUploads.filter((file) => file.type === "pdf");
     const imageFiles = existingUploads.filter((file) => file.type === "image");
-    const videoFiles  = existingUploads.filter((file) => file.type === "video");
+    const videoFiles = existingUploads.filter((file) => file.type === "video");
     return (
         <div className="space-y-6">
             <h3 className="text-xl font-semibold text-blue-700">Common Uploads</h3>
 
             <div className="flex gap-4 items-center relative">
-                <Input type="file" multiple onChange={handleFileChange} accept="image/jpeg,image/png,application/pdf,video/*" />
-                {!autoUpload && <Button onClick={handleUpload} isLoading={uploadPending} className="bg-blue-600 text-white">
-                    Upload
-                </Button>}
-                {autoUpload && uploadPending && (
-                    <div className="absolute inset-y-0 right-2 flex items-center">
-                        <svg
-                            className="animate-spin h-5 w-5 text-gray-500"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                            />
-                            <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 100 16v4l3.5-3.5L12 20v-4a8 8 0 01-8-8z"
-                            />
-                        </svg>
-                    </div>
-                )}
+                {enableUpload &&
+                    <>
+                        <Input type="file" multiple onChange={handleFileChange} accept="image/jpeg,image/png,application/pdf,video/*" />
+                        {!autoUpload && <Button onClick={handleUpload} isLoading={uploadPending} className="bg-blue-600 text-white">
+                            Upload
+                        </Button>}
 
+                        {autoUpload && uploadPending && (
+                            <div className="absolute inset-y-0 right-2 flex items-center">
+                                <svg
+                                    className="animate-spin h-5 w-5 text-gray-500"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    />
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 100 16v4l3.5-3.5L12 20v-4a8 8 0 01-8-8z"
+                                    />
+                                </svg>
+                            </div>
+                        )}
+                    </>}
             </div>
 
             {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4"> */}
@@ -144,9 +159,9 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
                                         <i className="fa-solid fa-download"></i>
                                     </Button>
 
-                                    <Button size="sm" isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-green-600 text-sm">
+                                    {canDelete && <Button size="sm" isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-green-600 text-sm">
                                         <i className="fa-solid fa-trash-can"></i>
-                                    </Button>
+                                    </Button>}
                                 </div>
                             </li>
                         ))}
@@ -162,11 +177,14 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
                         {imageFiles.length === 0 && <div className="min-h-[145px]  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
 
                         {imageFiles.length > 0 && <ImageGalleryExample
-                            imageFiles={imageFiles} refetch={refetch} handleDeleteFile={handleDeleteFile}
+                            imageFiles={imageFiles} refetch={refetch}
+                            
+                            // handleDeleteFile={handleDeleteFile}
                             // className="grid grid-cols-3"
                             height={80}
                             minWidth={98}
                             maxWidth={100}
+                            {...(canDelete ? { handleDeleteFile } : {})}
                         />}
 
                         {/* {imageFiles.map((file, i) => (
@@ -223,11 +241,11 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({ formId, autoUpl
                             <VideoGalleryMain
                                 videoFiles={videoFiles}
                                 refetch={refetch}
-                                handleDeleteFile={handleDeleteFile}
                                 isDeleting={deleteFilePending}
                                 height={80}
-                            minWidth={98}
-                            maxWidth={100}
+                                minWidth={98}
+                                maxWidth={100}
+                                {...(canDelete ? { handleDeleteFile } : {})}
                             />
                         )}
                     </ul>

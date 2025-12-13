@@ -16,6 +16,7 @@ import { socket } from "../../../lib/socket"
 import { useCurrentSupervisor } from "../../../Hooks/useCurrentSupervisor"
 import CreateWorkReport from "./CreateWorkReport"
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading"
+import { useAuthCheck } from "../../../Hooks/useAuthCheck"
 
 interface CalendarDay {
   date: Date
@@ -71,6 +72,15 @@ const DailySchedulePage: React.FC = () => {
   const { mutateAsync: deleteWork } = useDeleteWork()
   const uploadImagesMutation = useUploadDailyScheduleImages()
   const deleteImageMutation = useDeleteDailyScheduleImage()
+
+
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.workschedule?.delete;
+  // const canList = role === "owner" || permission?.workschedule?.list;
+  const canCreate = role === "owner" || permission?.workschedule?.create;
+  const canEdit = role === "owner" || permission?.workschedule?.create;
+
 
 
   useEffect(() => {
@@ -521,7 +531,7 @@ const DailySchedulePage: React.FC = () => {
         // console.log("upladsImages", uploadedImages)
         refetch()
 
-        
+
         const currentDate = selectedDate?.toISOString().split("T")[0] || "";
         // ✅ Update selected task without full refetch
         setSelectedTask((prev) => {
@@ -593,13 +603,13 @@ const DailySchedulePage: React.FC = () => {
             </button>
             <h1 className="text-3xl font-bold text-gray-800">Work Schedule Calendar</h1>
             <div className="flex gap-2">
-              <button
+             {canCreate && <button
                 onClick={() => setShowTaskForm(true)}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2"
               >
                 <i className="fas fa-plus"></i>
                 Add Events
-              </button>
+              </button>}
 
 
               <button className="bg-gray-100 rounded-lg px-2 py-1 cursor-pointer" onClick={() => {
@@ -780,7 +790,7 @@ const DailySchedulePage: React.FC = () => {
                       <div className="border-t pt-6">
                         <div className="flex justify-between items-center mb-4">
                           <h5 className="text-lg font-semibold">Task Images</h5>
-                          <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded cursor-pointer transition-colors">
+                          {(canCreate || canEdit) && <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded cursor-pointer transition-colors">
                             {uploadImagesMutation.isPending && <span className="animate-spin fas fa-spinner mr-1"></span>}
                             <i className="fas fa-upload mr-2"></i>
                             Upload Images
@@ -795,7 +805,7 @@ const DailySchedulePage: React.FC = () => {
                                 }
                               }}
                             />
-                          </label>
+                          </label>}
                         </div>
 
                         {selectedTask?.uploadedImages && selectedTask?.uploadedImages.length > 0 ? (
@@ -843,7 +853,9 @@ const DailySchedulePage: React.FC = () => {
                                   {/* <h3 className="text-sm font-semibold text-gray-600 mb-2">{dateKey}</h3> */}
                                   <ImageGalleryExample
                                     imageFiles={groups[dateKey]}
-                                    handleDeleteFile={(imgId: string) => handleImageDelete(imgId!, selectedTask)}
+                                    {...(canDelete ? { handleDeleteFile: (imgId: string) => handleImageDelete(imgId!, selectedTask) } : {})}
+
+                                    // handleDeleteFile={(imgId: string) => handleImageDelete(imgId!, selectedTask)}
                                     refetch={refetch}
                                     height={120}
                                     minWidth={120}
@@ -868,17 +880,17 @@ const DailySchedulePage: React.FC = () => {
                         >
                           <i className="fas fa-edit mr-2"></i>Edit Task
                         </button> */}
-                        <button
+                        {canDelete && <button
                           onClick={() => handleDeleteTask(selectedTask)}
                           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors"
                         >
                           <i className="fas fa-trash mr-2"></i>Delete Task
-                        </button>
+                        </button>}
 
 
 
-                        <Button onClick={() => handleEnableEditTask((selectedTask as any).scheduleId)}>Edit Task</Button>
-                        <Button onClick={() => handleCreateReport((selectedTask as any).scheduleId)}>Create Report</Button>
+                       {(canEdit || canCreate) && <> <Button onClick={() => handleEnableEditTask((selectedTask as any).scheduleId)}>Edit Task</Button>
+                        <Button onClick={() => handleCreateReport((selectedTask as any).scheduleId)}>Create Report</Button></>}
                       </div>
                     </div>
                   </div>

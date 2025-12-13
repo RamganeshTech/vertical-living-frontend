@@ -6,7 +6,11 @@ const initialState = {
     email: "",
     role: "",
     phoneNo: "",
-    isauthenticated: false
+    isauthenticated: false,
+    permission: {} as Record<string, Record<string, boolean>>,
+    isGuideRequired: undefined,
+
+
 }
 
 const staffSlice = createSlice({
@@ -14,7 +18,9 @@ const staffSlice = createSlice({
     initialState,
     reducers: {
         setStaffProfileData: (state, action) => {
-            const { staffId, staffName, email, phoneNo, isauthenticated, role } = action.payload
+            const { staffId, staffName, email, phoneNo, isauthenticated, role, permission,
+                isGuideRequired
+             } = action.payload
 
             return {
                 ...state,
@@ -23,16 +29,21 @@ const staffSlice = createSlice({
                 email,
                 phoneNo,
                 role,
-                isauthenticated
+                isauthenticated,
+                permission,
+                isGuideRequired
             };
+        },
+            updateStaffGuideStatus: (state, action) => {
+            state.isGuideRequired = action.payload;
         },
         setAuth: (state, action) => {
             return { ...state, isauthenticated: action.payload }
-        }, 
-         resetStaffProfile: () => initialState
+        },
+        resetStaffProfile: () => initialState
     }
 })
 
-export const { setStaffProfileData, setAuth, resetStaffProfile } = staffSlice.actions
+export const { setStaffProfileData, setAuth, resetStaffProfile, updateStaffGuideStatus } = staffSlice.actions
 
 export default staffSlice.reducer

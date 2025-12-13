@@ -3,6 +3,7 @@ import type { IFileItem } from "../../../types/types";
 import { Button } from "../../../components/ui/Button";
 import { downloadImage } from "../../../utils/downloadFile";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface FileUploadSectionProps {
 
@@ -21,6 +22,15 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
     uploadPending,
     deletePending,
 }) => {
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.sampledesign?.delete;
+    // const canList = role === "owner" || permission?.sampledesign?.list;
+    const canCreate = role === "owner" || permission?.sampledesign?.create;
+    const canEdit = role === "owner" || permission?.sampledesign?.edit;
+
+
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -66,6 +76,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                     >
                         Choose Files No file chosen
                     </label> */}
+                   {(canCreate || canEdit) && <>
                     <input
                         id="fileInput"
                         ref={fileInputRef}
@@ -93,6 +104,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                     >
                         upload
                     </Button>
+                    </>}
                 </div>
 
 
@@ -142,7 +154,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                                                 <i className="fa-solid fa-download"></i>
                                             </Button>
 
-                                            <Button
+                                           {canDelete && <Button
                                                 size="sm"
                                                 isLoading={deletePending}
                                                 onClick={() => onDelete((file as any)._id)}
@@ -150,7 +162,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                                                 title="Delete"
                                             >
                                                 <i className="fas fa-trash" />
-                                            </Button>
+                                            </Button>}
                                         </div>
                                     </div>
                                 ))}
@@ -190,7 +202,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                             //                  <Button  onClick={() => downloadImage({src:file?.url, alt:file?.originalName || "file.pdf"})} size="sm" className="text-sm">
                             //                                                        <i className="fa-solid fa-download"></i>
                             //                                                    </Button>
-                                           
+
                             //                 <Button
                             //                     size="sm"
                             //                     isLoading={deletePending}
@@ -206,16 +218,18 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
                             // </div>
 
                             <ImageGalleryExample
-                            imageFiles={imageFiles}  handleDeleteFile={onDelete}
-                            // className="grid grid-cols-3"
-                            height={80}
-                            minWidth={98}
-                            maxWidth={100}
-                        />
+                                imageFiles={imageFiles} 
+                                
+                                {...(canDelete ? {handleDeleteFile:onDelete} : {})}
+                                // className="grid grid-cols-3"
+                                height={80}
+                                minWidth={98}
+                                maxWidth={100}
+                            />
                         )}
 
 
-                        
+
                     </div>
                 </div>
             </div>

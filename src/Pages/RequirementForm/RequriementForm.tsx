@@ -13,7 +13,7 @@ import { Label } from "../../components/ui/Label";
 import { Input } from "../../components/ui/Input";
 import StageTimerInfo from "../../shared/StagetimerInfo";
 import RequirementFileUploader from "../../shared/StageFileUploader";
-import useGetRole from "../../Hooks/useGetRole";
+// import useGetRole from "../../Hooks/useGetRole";
 import { ResetStageButton } from "../../shared/ResetStageButton";
 import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import ClientInfoCard from "./components/ClientInfoCard";
@@ -21,6 +21,8 @@ import SectionCards from "./components/SectionCards";
 import AssignStageStaff from "../../shared/AssignStaff";
 import type { ProjectDetailsOutlet } from "../../types/types";
 import ShareDocumentWhatsapp from "../../shared/ShareDocumentWhatsapp";
+import { useAuthCheck } from "../../Hooks/useAuthCheck";
+import StageGuide from "../../shared/StageGuide";
 
 export type PrivateRequriementFromProp = {
   data: any,
@@ -66,8 +68,8 @@ export function CreateRoomModal({
           placeholder="Enter Room Name"
           className="w-full p-2 border border-gray-300 rounded mb-4"
           value={roomName}
-          onKeyDown={(e)=>{
-            if(e.key === "Enter"){
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
               onSubmit(roomName)
             }
           }}
@@ -125,7 +127,7 @@ export function CreateRoomModal({
 
 export default function RequirementForm() {
   const { projectId, organizationId } = useParams() as { projectId: string; organizationId: string };
-  const { role } = useGetRole()
+  // const { role } = useGetRole()
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>()
 
   const navigate = useNavigate()
@@ -146,6 +148,14 @@ export default function RequirementForm() {
   const [isCreateRoomOpen, setIsCreateRoomOpen] = useState(false);
 
   const { mutateAsync: createRoom, isPending: roomPending } = useCreateRoom();
+
+
+  const { role, permission } = useAuthCheck();
+  // const canDelete = role === "owner" || permission?.clientrequirement?.delete;
+  const canList = role === "owner" || permission?.clientrequirement?.list;
+  const canCreate = role === "owner" || permission?.clientrequirement?.create;
+  const canEdit = role === "owner" || permission?.clientrequirement?.edit;
+
 
   // Handler to submit new room creation
   const handleCreateRoomSubmit = async (roomName: string) => {
@@ -281,14 +291,14 @@ export default function RequirementForm() {
             {/* <Button onClick={handleLockForm} className="bg-yellow-100 hover:bg-yellow-100 border-yellow-400 text-yellow-800 w-full sm:w-auto">
                 <i className="fa-solid fa-lock"></i>
               </Button> */}
-            <Button
+            {(canCreate || canEdit) && <Button
               isLoading={completePending}
               onClick={handleFormCompletion}
               className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
             >
               <i className="fa-solid fa-circle-check mr-2"></i>
               Mark as Complete
-            </Button>
+            </Button>}
 
             {/* <Button
                 onClick={handleFormDeletion}
@@ -297,28 +307,35 @@ export default function RequirementForm() {
                 <i className="fa-solid fa-trash-can"></i>
               </Button> */}
 
-            <ResetStageButton
+            {(canCreate || canEdit) &&<ResetStageButton
               projectId={projectId!}
               stageNumber={1}
               stagePath="requirementform"
               className="sm:!max-w-[20%] w-full"
-            />
+            />}
 
-            {!error && <ShareDocumentWhatsapp
+            {(!error && (canCreate || canEdit)) && <ShareDocumentWhatsapp
               projectId={projectId}
               stageNumber="1"
               className="w-full sm:w-fit"
               isStageCompleted={formData?.status}
             />}
 
-            <AssignStageStaff
+           {(canCreate || canEdit) && <AssignStageStaff
               stageName="RequirementFormModel"
               projectId={projectId}
               organizationId={organizationId}
               currentAssignedStaff={formData?.assignedTo || null}
               // className="!w-[100%]"
               className="w-full sm:w-auto"
-            />
+            />}
+
+             <div className="w-full sm:w-auto flex justify-end sm:block">
+                <StageGuide 
+                    organizationId={organizationId} 
+                    stageName="clientrequirement" 
+                />
+            </div>
           </div>
         </div>
 
@@ -364,8 +381,10 @@ export default function RequirementForm() {
           <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
             <ClientInfoCard className="w-[100%] md:w-[50%]" client={formData?.clientData} />
 
-            <Card className="p-4 w-[100%] md:w-[50%] shadow border-l-4 border-blue-500 bg-white">
+           {canList && <Card className="p-4 w-[100%] md:w-[50%] shadow border-l-4 border-blue-500 bg-white">
               <RequirementFileUploader
+          enableUpload={canEdit || canCreate}
+
                 formId={formData?._id}
                 existingUploads={formData?.uploads}
                 onUploadComplete={refetch}
@@ -376,7 +395,7 @@ export default function RequirementForm() {
                 onDeleteUpload={deleteUploadFile}
                 deleteFilePending={deleteUploadPending}
               />
-            </Card>
+            </Card>}
           </div>
 
           {/* Create Room Modal */}
@@ -404,7 +423,7 @@ export default function RequirementForm() {
                 <p className="text-sm text-gray-600">
                   Request to fill the form by generating a link.
                 </p>
-                {!inviteLink ? (
+                {(!inviteLink && (canCreate || canEdit) ) ? (
                   <Button
                     onClick={handleGenerateInviteLink}
                     isLoading={linkPending}

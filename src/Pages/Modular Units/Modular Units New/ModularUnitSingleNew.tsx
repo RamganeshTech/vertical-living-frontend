@@ -19,6 +19,7 @@ import { Button } from "../../../components/ui/Button";
 import { Textarea } from "../../../components/ui/TextArea";
 import type { ModularFormValues } from "./ModularUnitFormNew";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 const ModularUnitSingleNew = () => {
     const navigate = useNavigate();
@@ -150,6 +151,13 @@ const ModularUnitSingleNew = () => {
             attributes: prev.attributes.filter((_, i) => i !== index),
         }));
     };
+
+      const { role, permission } = useAuthCheck();
+        // const canDelete = role === "owner" || permission?.modularunit?.delete;
+        // const canList = role === "owner" || permission?.modularunit?.list;
+        // const canCreate = role === "owner" || permission?.modularunit?.create;
+        const canEdit = role === "owner" || permission?.modularunit?.edit;
+    
 
     // Toggle Edit Mode
     const handleToggleEditMode = () => {
@@ -307,7 +315,7 @@ const ModularUnitSingleNew = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        {!isEditMode && (
+                        {(!isEditMode && canEdit) && (
                             <Button
                                 onClick={handleToggleEditMode}
                                 className="flex items-center gap-2"

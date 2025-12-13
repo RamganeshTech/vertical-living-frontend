@@ -3,6 +3,7 @@ import { useGetAllUsers } from "../apiList/getAll Users Api/getAllUsersApi";
 import { useAssignStaffToStage } from "../apiList/Stage Api/assignStaffApi";
 import { toast } from "../utils/toast";
 import { Button } from "../components/ui/Button";
+// import { useAuthCheck } from "../Hooks/useAuthCheck";
 
 export type currentAssignedStaffType = {
   _id: string;
@@ -34,6 +35,8 @@ export default function AssignStageStaff({
   const { data: realStaffList, isLoading } = useGetAllUsers(organizationId, "staff");
 
   const { mutateAsync: assignStaff } = useAssignStaffToStage();
+
+
 
   // const dummyStaffList = [
   //   { _id: "1", staffName: "John Doe", email: "john@example.com" },
@@ -111,7 +114,7 @@ export default function AssignStageStaff({
               <li onClick={() => handleAssign(null)}
                 className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
               >
-                  <span className="font-medium text-blue-700 block truncate text-center py-1">Select Staff</span>
+                <span className="font-medium text-blue-700 block truncate text-center py-1">Select Staff</span>
 
               </li>
               {staffList?.map((staff: any) => (

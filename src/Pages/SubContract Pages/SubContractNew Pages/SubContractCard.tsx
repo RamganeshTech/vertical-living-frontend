@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "../../../components/ui/Card";
 import { Badge } from "../../../components/ui/Badge";
 import { Button } from "../../../components/ui/Button";
 import type { SubContractSingleData } from "./SubContractMain";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface SubContractCardProps {
     data: SubContractSingleData;
@@ -13,6 +14,12 @@ interface SubContractCardProps {
 }
 
 const SubContractCard = ({ data, index, isDeleting, onDelete, onView }: SubContractCardProps) => {
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.subcontract?.delete;
+
+
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -31,7 +38,7 @@ const SubContractCard = ({ data, index, isDeleting, onDelete, onView }: SubContr
     };
 
 
-      const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation(); // Prevents the click from "bubbling up" to the parent Card.
         onDelete();
     };
@@ -129,18 +136,18 @@ const SubContractCard = ({ data, index, isDeleting, onDelete, onView }: SubContr
                         <i className="fas fa-eye mr-1"></i>
                         View
                     </Button> */}
-                
 
-                    <Button variant="danger"
-                    
-                     className="absolute top-2 right-2 h-8 w-8 rounded-full
+
+                    {canDelete && <Button variant="danger"
+
+                        className="absolute top-2 right-2 h-8 w-8 rounded-full
                            flex items-center justify-center
                            opacity-0 group-hover:opacity-100 transition-opacity
                            hover:!opacity-100 bg-red-600 text-white hover:text-white"
-isLoading={isDeleting}
-                    size="sm" onClick={handleDeleteClick}>
+                        isLoading={isDeleting}
+                        size="sm" onClick={handleDeleteClick}>
                         <i className="fas fa-trash"></i>
-                    </Button>
+                    </Button>}
                 </div>
             </div>
         </Card>

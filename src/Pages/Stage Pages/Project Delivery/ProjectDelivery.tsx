@@ -19,6 +19,8 @@ import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionL
 import { downloadImage } from "../../../utils/downloadFile";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 type ProjectDetailsOutlet = {
   isMobile: boolean;
@@ -44,12 +46,20 @@ export default function ProjectDeliveryPanel() {
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetprojectDeliveryDeadline();
   const { mutateAsync: completionStatus, isPending: completePending } = useCompleteprojectDelivery();
 
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.projectdelivery?.delete;
+  // const canList = role === "owner" || permission?.projectdelivery?.list;
+  const canCreate = role === "owner" || permission?.projectdelivery?.create;
+  const canEdit = role === "owner" || permission?.projectdelivery?.edit;
+
+
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCompletionStatus = async () => {
     try {
-      await completionStatus({ projectId , organizationId});
+      await completionStatus({ projectId, organizationId });
       toast({ description: "Project Delivery marked as complete.", title: "Success" });
       refetch();
     } catch (error: any) {
@@ -149,7 +159,7 @@ export default function ProjectDeliveryPanel() {
           Project Delivery
         </h2>
 
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <> {(canCreate || canEdit) && <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button
             isLoading={completePending}
             onClick={handleCompletionStatus}
@@ -174,7 +184,15 @@ export default function ProjectDeliveryPanel() {
             currentAssignedStaff={data?.assignedTo || null}
             className="w-full sm:w-auto"
           />
-        </div>
+        </div>}
+
+          <div className="w-full sm:w-auto flex justify-end sm:block">
+            <StageGuide
+              organizationId={organizationId!}
+              stageName="projectdelivery"
+            />
+          </div>
+        </>
       </div>
 
       {/* If error, show only above header and handle block */}
@@ -224,7 +242,7 @@ export default function ProjectDeliveryPanel() {
                 Upload Files
               </h2>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+              {(canCreate || canEdit) && <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <input
                   multiple
                   ref={fileInputRef}
@@ -241,7 +259,7 @@ export default function ProjectDeliveryPanel() {
                 >
                   Upload Files
                 </Button>
-              </div>
+              </div>}
             </div>
 
             {/* Uploaded Files (PDF & Images) */}
@@ -274,14 +292,14 @@ export default function ProjectDeliveryPanel() {
                             <i className="fa-solid fa-download"></i>
                           </Button>
 
-                          <Button
+                          {canDelete && <Button
                             size="sm"
                             isLoading={variables?.fileId === file._id && deletePending}
                             onClick={() => handleDelete(file._id)}
                             className="text-red-600"
                           >
                             <i className="fas fa-trash" />
-                          </Button>
+                          </Button>}
                         </div>
                       </li>
                     ))}
@@ -302,50 +320,15 @@ export default function ProjectDeliveryPanel() {
                     </p>
                   </div>
                 ) : (
-                  // <ul className="space-y-2">
-                  //   {imageFiles.map((file: any) => (
-                  //     <li
-                  //       key={file._id}
-                  //       className="flex justify-between items-center bg-blue-50 px-3 py-2 rounded"
-                  //     >
-                  //       <span className="truncate text-sm">{file.originalName}</span>
-                  //       <div className="flex gap-3 items-center text-blue-600">
-                  //         <Button
-                  //           size="sm"
-                  //           variant="primary"
-                  //           onClick={() => setPopupImage(file?.url)}
-                  //         >
-                  //           <i className="fas fa-eye"></i>
-                  //         </Button>
-                  //         <Button size="sm"
-                  //           variant="primary"
-                  //           onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })}
-                  //         >
-                  //           <i className="fa-solid fa-download"></i>
-                  //         </Button>
-
-                  //         <Button
-                  //           size="sm"
-                  //           isLoading={variables?.fileId === file._id && deletePending}
-                  //           onClick={() => handleDelete(file._id)}
-                  //           className="text-red-600"
-                  //         >
-                  //           <i className="fas fa-trash" />
-                  //         </Button>
-                  //       </div>
-                  //     </li>
-                  //   ))}
-                  // </ul>
-
-
-                    <ImageGalleryExample
-                                          imageFiles={imageFiles}
-                                          handleDeleteFile={handleDelete}
-                                          // className="grid grid-cols-3"
-                                          height={80}
-                                          minWidth={98}
-                                          maxWidth={100}
-                                      />
+                  <ImageGalleryExample
+                    imageFiles={imageFiles}
+                    {...(canDelete ? { handleDeleteFile: handleDelete } : {})}
+                    //  handleDeleteFile={handleDelete}
+                    // className="grid grid-cols-3"
+                    height={80}
+                    minWidth={98}
+                    maxWidth={100}
+                  />
                 )}
               </div>
             </div>
@@ -353,19 +336,19 @@ export default function ProjectDeliveryPanel() {
 
           {/* ✅ Confirm Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4">
-            <Button
+            {(canCreate || canEdit) && <Button
               onClick={() => handleConfirm("client")}
               className={`w-full ${data?.clientConfirmation ? "bg-blue-600" : "bg-red-600"} text-white`}
             >
               <i className={`fas ${data?.clientConfirmation ? "fa-check" : "fa-xmark"} mr-2`} /> {data?.clientConfirmation ? "Client Confirmed" : "Client not confirmed"}
-            </Button>
+            </Button>}
 
-            <Button
+            {(canCreate || canEdit) && <Button
               onClick={() => handleConfirm("owner")}
               className={`w-full ${data?.ownerConfirmation ? "bg-blue-600" : "bg-red-600"} text-white`}
             >
               <i className={`fas ${data?.ownerConfirmation ? "fa-check" : "fa-xmark"} mr-2`} /> {data?.ownerConfirmation ? "Owner Confirmed" : "Owner not confirmed"}
-            </Button>
+            </Button>}
 
             <div className="bg-blue-50 border border-blue-200 rounded px-4 py-3 flex items-center gap-3 text-sm text-blue-800">
               <i className="fas fa-user-check text-blue-600 text-base" />

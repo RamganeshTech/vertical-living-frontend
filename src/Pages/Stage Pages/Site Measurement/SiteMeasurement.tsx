@@ -28,6 +28,8 @@ import { ResetStageButton } from '../../../shared/ResetStageButton';
 import MaterialOverviewLoading from '../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 import AssignStageStaff from '../../../shared/AssignStaff';
 import ShareDocumentWhatsapp from '../../../shared/ShareDocumentWhatsapp';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
+import StageGuide from '../../../shared/StageGuide';
 
 const initialSiteDetails: SiteDetails = {
   totalPlotAreaSqFt: null,
@@ -73,10 +75,20 @@ function HomeInteriorProject() {
   const { mutateAsync: uploadFilesMutate, isPending: uploadPending } = useUploadRequirementFiles()
   const { mutateAsync: deleteUploadFile, isPending: deleteUploadPending } = useDeleteSiteRequriementFile()
 
+
+  const { role, permission } = useAuthCheck();
+  // const canDelete = role === "owner" || permission?.sitemeasurement?.delete;
+  // const canList = role === "owner" || permission?.sitemeasurement?.list;
+  const canCreate = role === "owner" || permission?.sitemeasurement?.create;
+  const canEdit = role === "owner" || permission?.sitemeasurement?.edit;
+
+
+
+
   // Handlers
   const handleSiteSubmit = async () => {
     try {
-      const isCreated = Object.values(measurementData.siteDetails).some(value=> typeof value === "number")
+      const isCreated = Object.values(measurementData.siteDetails).some(value => typeof value === "number")
       if (isCreated) {
         await updateSiteDetails.mutateAsync({ projectId, payload: siteDetails });
       } else {
@@ -140,7 +152,7 @@ function HomeInteriorProject() {
     try {
       await updateCompletionStatus.mutateAsync({ projectId });
       toast({ description: 'Completion updated', title: "Success" });
-        navigate(`../sampledesign`)
+      navigate(`../sampledesign`)
     } catch (error: any) {
       toast({ title: "Error", description: error?.response?.data?.message || "Update failed", variant: "destructive" });
     }
@@ -174,20 +186,20 @@ function HomeInteriorProject() {
         </div>
 
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2  !w-[100%] sm:!w-[50%] lg:!w-[60%] justify-start lg:justify-end">
-          <Button
+          {(canCreate || canEdit) && <Button
             isLoading={updateCompletionStatus.isPending}
             onClick={handleCompletionStatus}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2  w-full sm:w-auto"
           >
             <i className="fa-solid fa-circle-check mr-2"></i> Mark Complete
-          </Button>
+          </Button>}
 
-          <ResetStageButton
+          {(canCreate || canEdit) && <ResetStageButton
             projectId={projectId!}
             stageNumber={2}
             stagePath="sitemeasurement"
             className="sm:!max-w-[20%] w-full"
-          />
+          />}
 
           {!getAllError && <ShareDocumentWhatsapp
             projectId={projectId}
@@ -204,6 +216,13 @@ function HomeInteriorProject() {
             className="w-full sm:w-auto"
 
           />
+
+          <div className="w-full sm:w-auto flex justify-end sm:block">
+                <StageGuide 
+                    organizationId={organizationId!} 
+                    stageName="sitemeasurement" 
+                />
+            </div>
         </div>
       </div>
 
@@ -245,6 +264,7 @@ function HomeInteriorProject() {
       {!getAllError && <div className="mb-6">
         <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
           <RequirementFileUploader
+            enableUpload={canEdit || canCreate}
             autoUpload={true}
             formId={measurementData?._id}
             refetch={refetch}
@@ -269,12 +289,12 @@ function HomeInteriorProject() {
                 </svg>
               </div>
               <p className="text-gray-600 mb-4">No Site Details Added</p>
-              <button
+              {(canEdit || canCreate) && <button
                 onClick={() => setShowSiteForm(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               >
                 Add Site Details
-              </button>
+              </button>}
             </div>
           ) : (
             <CommonSiteInfo   // this has teh room cards also 

@@ -14,6 +14,8 @@ import {
 import AssignStageStaff from "../../../shared/AssignStaff";
 import type { ProjectDetailsOutlet } from "../../../types/types";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 export const roomKeys = [
   "Living Room",
@@ -65,6 +67,18 @@ export default function CleaningOverview() {
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetCleaningDeadline();
   const { mutateAsync: completionStatus, isPending: completePending } = useCompleteCleaningStage();
 
+
+
+  const { role, permission } = useAuthCheck();
+
+
+  // const canDelete = role === "owner" || permission?.cleaning?.delete;
+  // const canList = role === "owner" || permission?.cleaning?.list;
+  const canCreate = role === "owner" || permission?.cleaning?.create;
+  const canEdit = role === "owner" || permission?.cleaning?.edit;
+
+
+
   const handleCompletionStatus = async () => {
     try {
       await completionStatus({ projectId: projectId! });
@@ -114,7 +128,7 @@ export default function CleaningOverview() {
             </h2>
 
             {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            {(canCreate || canEdit) &&  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <Button
                 isLoading={completePending}
                 onClick={handleCompletionStatus}
@@ -148,8 +162,17 @@ export default function CleaningOverview() {
                   currentAssignedStaff={data?.assignedTo || null}
                   className="!w-[48%] sm:!w-auto"
                 />
+
+              
               </div>
-            </div>
+            </div>}
+              <div className="w-full sm:w-auto flex justify-end sm:block">
+                <StageGuide
+                  organizationId={organizationId!}
+                  stageName="cleaning"
+                />
+              </div>
+            
           </div>
 
           {/* ✅ Show only child route */}

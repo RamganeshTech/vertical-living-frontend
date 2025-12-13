@@ -1,17 +1,51 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useGetRole from "../../Hooks/useGetRole";
 import { getApiForRole } from "../../utils/roleCheck";
-import axios from "axios";
+import axios, { type AxiosInstance } from "axios";
+
+
 
 // PUT /materialarrivalcheck/updateImage/:projectId/:fieldId
 export const updateMaterialArrivalItemApi = async (
     projectId: string,
-    fieldId: string,
+    orderNumber: string,
+    subItemId: string,
     formData: FormData,
 ) => {
-    const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/materialarrivalcheck/updateImage/${projectId}/${fieldId}`, formData);
+    const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/materialarrivalcheck/updateImage/${projectId}/${orderNumber}/${subItemId}`, formData);
     return res.data;
 };
+
+
+
+// PUT /materialarrivalcheck/updateImage/:projectId/:fieldId
+export const updateStaffMaterialArrivalItemApi = async (
+    projectId: string,
+    orderNumber: string,
+    subItemId: string,
+    arrivedQuantity: number,
+    api: AxiosInstance) => {
+    const res = await api.put(`/materialarrivalcheck/updatequantity/${projectId}/${orderNumber}/${subItemId}`, { arrivedQuantity });
+    return res.data;
+};
+
+
+
+// PUT /materialarrivalcheck/updateImage/:projectId/:fieldId
+export const uploadMatArrImageByStaff = async (
+    projectId: string,
+    orderNumber: string,
+    subItemId: string,
+    formData: FormData,
+    api: AxiosInstance
+) => {
+    const res = await api.put(`/materialarrivalcheck/uploadimage/staff/${projectId}/${orderNumber}/${subItemId}`, formData);
+    return res.data;
+};
+
+
+
+
 
 export const useUpdateMaterialArrivalItemNew = () => {
     const queryClient = useQueryClient();
@@ -19,14 +53,79 @@ export const useUpdateMaterialArrivalItemNew = () => {
     return useMutation({
         mutationFn: async ({
             projectId,
-            fieldId,
+            orderNumber, subItemId,
             formData,
         }: {
             projectId: string;
-            fieldId: string;
+            orderNumber: string,
+            subItemId: string,
             formData: FormData;
         }) => {
-            return await updateMaterialArrivalItemApi(projectId, fieldId, formData);
+            return await updateMaterialArrivalItemApi(projectId, orderNumber, subItemId, formData);
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
+        },
+    });
+};
+
+
+
+export const useUpdateStaffMatArrivalItemImage = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const queryClient = useQueryClient();
+    const allowedRoles = ["owner", "staff", "CTO"]
+
+
+    return useMutation({
+        mutationFn: async ({
+            projectId,
+            orderNumber, subItemId,
+            formData,
+        }: {
+            projectId: string;
+            orderNumber: string,
+            subItemId: string,
+            formData: FormData;
+        }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+            if (!api) throw new Error("API instance not available");
+
+
+            return await uploadMatArrImageByStaff(projectId, orderNumber, subItemId, formData, api);
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
+        },
+    });
+};
+
+
+
+export const useUpdateStaffMaterialArrivalItemQuantity = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const queryClient = useQueryClient();
+    const allowedRoles = ["owner", "staff", "CTO"]
+
+    return useMutation({
+        mutationFn: async ({
+            projectId,
+            orderNumber, subItemId,
+            arrivedQuantity,
+
+        }: {
+            projectId: string;
+            orderNumber: string,
+            subItemId: string,
+            arrivedQuantity: number;
+        }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+            if (!api) throw new Error("API instance not available");
+
+
+            return await updateStaffMaterialArrivalItemApi(projectId, orderNumber, subItemId, arrivedQuantity, api);
         },
         onSuccess: (_, { projectId }) => {
             queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
@@ -39,11 +138,12 @@ export const useUpdateMaterialArrivalItemNew = () => {
 // PUT /materialarrivalcheck/updateverification/:projectId/:fieldId
 export const toggleMaterialVerificationApi = async (
     projectId: string,
-    unitName: string,
-    toggle:boolean,
+    orderNumber: string,
+    subItemId: string,
+    toggle: boolean,
     api: any
 ) => {
-    const res = await api.put(`/materialarrivalcheck/updateverification/${projectId}/${unitName}`, {isVerified:toggle});
+    const res = await api.put(`/materialarrivalcheck/updateverification/${projectId}/${orderNumber}/${subItemId}`, { isVerified: toggle });
     return res.data;
 };
 
@@ -56,15 +156,18 @@ export const useToggleMaterialVerification = () => {
     return useMutation({
         mutationFn: async ({
             projectId,
-            unitName,
+            orderNumber, subItemId,
             toggle
         }: {
             projectId: string;
-            unitName: string;
+            orderNumber: string,
+            subItemId: string,
             toggle: boolean;
         }) => {
-            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
-            return await toggleMaterialVerificationApi(projectId, unitName, toggle, api);
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+            if (!api) throw new Error("API instance not available");
+
+            return await toggleMaterialVerificationApi(projectId, orderNumber, subItemId, toggle, api);
         },
         onSuccess: (_, { projectId }) => {
             queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
@@ -83,6 +186,7 @@ export const bulkToggleAllVerificationApi = async (
     return res.data;
 };
 
+//  not used
 export const useBulkToggleAllVerification = () => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
@@ -93,7 +197,9 @@ export const useBulkToggleAllVerification = () => {
 
     return useMutation({
         mutationFn: async ({ projectId }: { projectId: string }) => {
-            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+            if (!api) throw new Error("API instance not available");
+
             return await bulkToggleAllVerificationApi(projectId, api);
         },
         onSuccess: (_, { projectId }) => {
@@ -116,12 +222,12 @@ export const getAllMaterialArrivalDetailsApi = async (
 export const useGetAllMaterialArrivalDetailsNew = (projectId: string) => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
-    const allowedRoles = ["owner", "staff", "CTO"]
+    const allowedRoles = ["owner", "staff", "CTO", "worker"]
 
     return useQuery({
         queryKey: ["material-arrival", projectId],
         queryFn: async () => {
-            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
             return await getAllMaterialArrivalDetailsApi(projectId, api);
         },
         enabled: !!projectId && !!role,
@@ -156,7 +262,7 @@ export const useGenerateMaterialArrivalLinkNew = () => {
 
     return useMutation({
         mutationFn: async ({ projectId }: { projectId: string }) => {
-            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
             return await generateMaterialArrivalLinkApi(projectId, api);
         },
     });
@@ -171,3 +277,87 @@ export const useGetPublicMaterialArrivalNew = (projectId: string, token: string)
         enabled: !!projectId && !!token,
     });
 };
+
+
+
+
+
+
+
+
+
+
+
+
+// COMMON API 
+const setMaterialArrivalDeadlineApi = async ({
+    formId,
+    projectId, deadLine, api }:
+    {
+        projectId: string,
+        formId: string;
+        deadLine: string;
+        api: AxiosInstance;
+    }) => {
+    const { data } = await api.put(`/materialarrivalcheck/deadline/${projectId}/${formId}`, { deadLine });
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+// ✅ 11. Complete Stage
+const completeMaterialArrivalStageApi = async ({
+    projectId,
+    api,
+}: {
+    projectId: string;
+    api: AxiosInstance;
+}) => {
+    const { data } = await api.put(`/materialarrivalcheck/completionstatus/${projectId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+export const useSetMaterialArrivalDeadline = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            formId,
+            projectId, deadLine, }:
+            {
+                projectId: string,
+                formId: string;
+                deadLine: string;
+            }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+            if (!api) throw new Error("API instance missing");
+            return await setMaterialArrivalDeadlineApi({ formId, projectId, deadLine, api });
+        },
+        onSuccess: (_, vars) => {
+            queryClient.invalidateQueries({ queryKey: ["ordering-material", vars.formId] });
+        },
+    });
+};
+
+export const useCompleteMaterialArrivalStage = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ projectId }: { projectId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+            if (!api) throw new Error("API instance missing");
+            return await completeMaterialArrivalStageApi({ projectId, api });
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
+        },
+    });
+};
+
+

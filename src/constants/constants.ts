@@ -1,4 +1,4 @@
-  import noimg from '../assets/no image.jpeg'
+import noimg from '../assets/no image.jpeg'
 
 export const SIDEBAR_LABELS: Record<string, string> = {
   //   DASHBOARD: "Dashboard",
@@ -12,7 +12,7 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   LOGISTICS: "Logistics",
   PROCUREMENT: "Procurement",
   ACCOUNTING: "Accounting",
-    DESIGNLAB: "Desgin Lab",
+  DESIGNLAB: "Design Lab",
   // CUSTOMERACCOUNT: "Customer",
   // INVOICEACCOUNT: "Invoice",
   RATECONIG: "Rate Config (Material)",
@@ -43,6 +43,8 @@ export const SIDEBAR_ICONS: Record<string, string> = {
   LOGISTICS: "fa-solid fa-dolly text-2xl",
   PROCUREMENT: "fa-solid fa-box-open text-2xl",
   ACCOUNTING: "fas fa-money-bill-wave text-2xl",
+  DESIGNLAB: "fas fa-layer-group text-2xl",
+
   // CUSTOMERACCOUNT: "fas fa-user text-2xl",
   // INVOICEACCOUNT: "fas fa-note text-2xl",
   RATECONIG: "fas fa-box-archive text-2xl",
@@ -83,9 +85,10 @@ export const LOGIN_LABELS = {
   PUBLICORDERS: `Public Orders`,
 }
 
-export const ORGANIZATION_ICONS = {
+export const ORGANIZATION_ICONS:Record<string, string> = {
   INVITECTO: "fa-solid fa-user-tie text-2xl",
   INVITESTAFFS: "fa-solid fa-user text-2xl",
+  ROLESPERMISSIONS: "fa-solid fa-dashboard text-2xl",
   DETAILS: "fa-solid fa-building text-2xl",
   PROJECTS: "fa-solid fa-diagram-project  text-2xl",
   PLAN: "fa-solid fa-wallet  text-2xl",
@@ -94,9 +97,10 @@ export const ORGANIZATION_ICONS = {
   // EXTERNAL: "fa-solid fa-boxes-stacked text-2xl",
 }
 
-export const ORGANIZATION_LABELS = {
+export const ORGANIZATION_LABELS: Record<string, string> = {
   INVITECTO: "Invite CTO",
   INVITESTAFFS: "Invite Staffs",
+  ROLESPERMISSIONS: "Roles And Permission",
   DETAILS: "Org Details",
   PROJECTS: "Projects",
   PLAN: "Upgrade Plan",
@@ -106,7 +110,7 @@ export const ORGANIZATION_LABELS = {
 
 }
 
-export const PROJECTS_LABELS = {
+export const PROJECTS_LABELS:Record<string, string> = {
   // MATERIALS: "Materials",
   // LABOURS: "Labours",
   // TRANSPORTATION: "Transportation",
@@ -137,7 +141,7 @@ export const PROJECTS_LABELS = {
 }
 
 
-export const PROJECTS_ICONS = {
+export const PROJECTS_ICONS:Record<string, string> = {
   // MATERIALS: "fa-solid fa-cubes-stacked text-2xl",
   // LABOURS: "fa-solid fa-users text-2xl",
   // TRANSPORTATION: "fa-solid fa-road text-2xl",
@@ -432,12 +436,15 @@ export const PREDEFINED_ROOMS = [
 
 
 export const roles = [
-  "Accounting",
-  "Logistics",
-  "Factory Production",
-  "HR & Adminstration",
-  "Legal",
-  "Procurement",
+  "payment",
+  "billing",
+  "hr",
+  "accounts",
+  "designlab",
+  "ordermaterial",
+  "carpentor",
+  "procurement",
+  "logistics"
 ];
 
 

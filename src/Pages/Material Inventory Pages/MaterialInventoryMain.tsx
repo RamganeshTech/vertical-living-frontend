@@ -22,6 +22,7 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import SearchSelectNew from "../../components/ui/SearchSelectNew";
 import { Label } from "../../components/ui/Label";
+import { useAuthCheck } from "../../Hooks/useAuthCheck";
 
 
 const MaterialInventoryMain: React.FC = () => {
@@ -46,6 +47,13 @@ const MaterialInventoryMain: React.FC = () => {
 
     const [selectedProjectId, setSelectedProjectId] = useState("");
 
+
+
+    
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.productinventory?.delete;
+    const canEdit = role === "owner" || permission?.productinventory?.edit;
+    const canList = role === "owner" || permission?.productinventory?.list;
 
 
 
@@ -594,14 +602,14 @@ const MaterialInventoryMain: React.FC = () => {
                     <section className="flex justify-between items-center mt-4">
 
                         <div className="flex justify-end gap-2">
-                            <Button
+                           {canList && <Button
                                 size="sm"
                                 variant="primary"
                                 onClick={() => navigate(`single/${(item as any)._id}`)}
                             >
                                 <i className="fas fa-eye mr-1" />
                                 View
-                            </Button>
+                            </Button>}
                             {/* <Button
                                 size="sm"
                                 variant="secondary"
@@ -610,7 +618,7 @@ const MaterialInventoryMain: React.FC = () => {
                                 <i className="fas fa-edit mr-1" />
                                 Edit
                             </Button> */}
-                            <Button
+                           {canDelete && <Button
                                 size="sm"
                                 isLoading={deleteMutation.isPending}
                                 variant="danger"
@@ -619,14 +627,15 @@ const MaterialInventoryMain: React.FC = () => {
                             >
                                 <i className="fas fa-trash mr-1" />
                                 Delete
-                            </Button>
+                            </Button>}
                         </div>
 
 
                         {/* Add to Cart / Quantity Controls */}
                         <div className="flex gap-2 items-center">
                             {!isInCart ? (
-                                <Button
+                                <>
+                                {canEdit && <Button
                                     size="sm"
                                     variant="primary"
                                     onClick={() => handleAddToCart(item)}
@@ -637,7 +646,11 @@ const MaterialInventoryMain: React.FC = () => {
                                     <i className="fas fa-cart-plus mr-1" />
                                     Add to Cart
                                 </Button>
+                            }
+                            </>
                             ) : (
+                                 <>
+                                {canEdit &&
                                 <div className="flex items-center gap-2 bg-green-50 rounded-lg p-1 border border-green-200">
                                     <Button
                                         size="sm"
@@ -665,6 +678,8 @@ const MaterialInventoryMain: React.FC = () => {
                                         <i className="fas fa-plus text-sm"></i>
                                     </Button>
                                 </div>
+                                }
+                                </>
                             )}
                         </div>
                     </section>
@@ -723,7 +738,7 @@ const MaterialInventoryMain: React.FC = () => {
                             </div>
 
 
-                            <Button
+                           {canList && <Button
                                 onClick={() => navigate("cart")}
                                 variant="primary"
                                 className="relative w-full sm:w-auto"
@@ -734,7 +749,7 @@ const MaterialInventoryMain: React.FC = () => {
                                         {cartData.items.length}
                                     </span>
                                 )}
-                            </Button>
+                            </Button>}
 
 
                         </div>
@@ -1018,16 +1033,10 @@ const MaterialInventoryMain: React.FC = () => {
                         </div>
                     </div>
                     {/* Main Content */}
-                    <div className="flex-1 !max-h-[95vh] overflow-y-auto custom-scrollbar">
+                   {canList && <div className="flex-1 !max-h-[95vh] overflow-y-auto custom-scrollbar">
                         <div
                             ref={listRef}
-                            className="h-full overflow-y-auto custom-scrollbar pr-2"
-                        // style={{
-                        //     maxHeight: 'calc(100vh - 200px)',
-                        //     overscrollBehavior: 'contain'
-                        // }}
-                        // className="flex-1 overflow-y-auto custom-scrollbar rounded-lg"
-                        >
+                       >
 
                             {!selectedProjectId && (
                                 <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 mb-4 flex items-center">
@@ -1071,7 +1080,7 @@ const MaterialInventoryMain: React.FC = () => {
                                 </div>}
                             </div>
                         </div>
-                    </div>
+                    </div>}
                 </div>
             </div>
 

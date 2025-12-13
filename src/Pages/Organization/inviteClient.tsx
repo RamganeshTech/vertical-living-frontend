@@ -7,6 +7,8 @@ import { toast } from '../../utils/toast';
 import {  useOutletContext, useParams } from 'react-router-dom';
 import { useGetClientByOrgsAndProject, useInviteClientToProject } from '../../apiList/orgApi';
 import type { ProjectDetailsOutlet } from '../../types/types';
+import { useAuthCheck } from '../../Hooks/useAuthCheck';
+import StageGuide from '../../shared/StageGuide';
 
 //   const dummyClients = [
 //   {
@@ -69,6 +71,14 @@ const InviteClient: React.FC = () => {
   const inviteClient = useInviteClientToProject();
   const { data: clients, isLoading, isError } = useGetClientByOrgsAndProject(organizationId!, projectId!);
 
+
+  
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.inviteclient?.delete;
+  const canList = role === "owner" || permission?.inviteclient?.list;
+  const canCreate = role === "owner" || permission?.inviteclient?.create;
+  const canEdit = role === "owner" || permission?.inviteclient?.edit;
+
   const handleGenerateInviteLink = async () => {
     try {
       const response = await inviteClient.mutateAsync({ projectId: projectId! , organizationId:organizationId!});
@@ -128,6 +138,14 @@ const InviteClient: React.FC = () => {
                 </div>
               </div>
             </div>
+
+
+              <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="inviteclient"
+                        />
+                    </div>
           </div>
         </div>
       </div>
@@ -142,13 +160,14 @@ const InviteClient: React.FC = () => {
             <p className="text-sm text-gray-600 mb-4">Invite a client by generating a link.</p>
 
             {!inviteLink ? (
-              <Button
+              <>
+             {(canCreate || canEdit) && <Button
                 onClick={handleGenerateInviteLink}
                 isLoading={inviteClient.isPending}
                 className="w-full bg-blue-600 text-white py-3"
               >
                 <i className="fas fa-link mr-2" /> Generate Invitation Link
-              </Button>
+              </Button>}</>
             ) : (
               <div className="space-y-4">
                 <Label>Invitation Link</Label>
@@ -166,16 +185,16 @@ const InviteClient: React.FC = () => {
                     <i className="fas fa-copy mr-2" /> Copy
                   </Button>
                 </div>
-                <Button onClick={handleGenerateInviteLink} className="w-full bg-purple-600 text-white">
+              { (canCreate || canEdit) &&  <Button onClick={handleGenerateInviteLink} className="w-full bg-purple-600 text-white">
                   <i className="fas fa-sync-alt mr-2" /> Generate New Link
-                </Button>
+                </Button>}
               </div>
             )}
           </div>
         </div>
 
         {/* Clients list */}
-        <div className="flex-1 bg-white border-2 border-blue-200 p-6 rounded-2xl shadow-lg py-4 max-h-[70vh] sm:!max-h-[63vh] md:!max-h-[100vh]  lg:!max-h-[85vh] xl:!max-h-[90vh] overflow-y-auto custom-scrollbar">
+     {canList &&   <div className="flex-1 bg-white border-2 border-blue-200 p-6 rounded-2xl shadow-lg py-4 max-h-[70vh] sm:!max-h-[63vh] md:!max-h-[100vh]  lg:!max-h-[85vh] xl:!max-h-[90vh] overflow-y-auto custom-scrollbar">
           <h2 className="text-2xl font-bold text-blue-600 mb-4 flex items-center">
             <i className="fas fa-users mr-2" /> Clients ({clients?.length || 0})
           </h2>
@@ -218,7 +237,7 @@ const InviteClient: React.FC = () => {
               ))}
             </div>
           )}
-        </div>
+        </div>}
       </div>
     </div>
   );

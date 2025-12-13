@@ -91,8 +91,6 @@ const BillNewMain = () => {
     };
 
 
-
-
     const paths: BreadcrumbItem[] = [
         { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
         { label: "Design Bill", path: `/organizations/${organizationId}/projects/billnew` },

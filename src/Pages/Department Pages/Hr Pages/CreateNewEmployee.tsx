@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAddEmployeeByHR } from '../../../apiList/Department Api/HrApi/HrApi';
 import { toast } from '../../../utils/toast';
 import { roles } from '../../../constants/constants';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 interface CreateNewEmployeeProps {
   organizationId: string;
@@ -82,6 +83,14 @@ const CreateNewEmployee: React.FC<CreateNewEmployeeProps> = ({
   onSuccess
 }) => {
   const newEmployeeByHR = useAddEmployeeByHR();
+
+
+  const { role, permission } = useAuthCheck();
+
+
+  const canCreate = role === "owner" || permission?.hr?.create;
+
+
 
   const [activeTab, setActiveTab] = useState<'personal' | 'employment' | 'documents'>('personal');
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
@@ -352,6 +361,11 @@ const CreateNewEmployee: React.FC<CreateNewEmployeeProps> = ({
     }).format(salary.total);
   };
 
+
+  if(!canCreate){
+    return 
+  }
+
   return (
     <div className='max-h-full overflow-y-auto bg-gray-50'>
       <div className="bg-white rounded-xl shadow-xl w-full">
@@ -579,7 +593,7 @@ const CreateNewEmployee: React.FC<CreateNewEmployeeProps> = ({
                             if (/^\d*$/.test(val)) {
                               handleInputChange('personalInfo', 'pincode', e.target.value, 'address')
                             }
-                            }
+                          }
                           }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />

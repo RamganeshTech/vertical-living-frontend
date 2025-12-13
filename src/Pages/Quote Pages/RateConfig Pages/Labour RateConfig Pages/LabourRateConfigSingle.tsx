@@ -1,11 +1,12 @@
 import { useState } from "react";
-import {  useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Input } from "../../../../components/ui/Input";
 // import { useCreateItems, useDeleteItem, useGetCategories, useGetItemsByCategory } from "../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 import { Button } from "../../../../components/ui/Button";
 import { toast } from "../../../../utils/toast";
 import { useCreateLabourRateConfigItems, useDeleteLabourRateConfigItem, useGetItemsByLabourRateConfigCategory, useGetLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 
 export default function LabourRateConfigSingle() {
     const { organizationId, } = useParams<{
@@ -18,6 +19,16 @@ export default function LabourRateConfigSingle() {
     const { data: existingItems, isLoading, refetch } = useGetItemsByLabourRateConfigCategory(organizationId!);
     const { mutateAsync: createItems, isPending: createPending } = useCreateLabourRateConfigItems();
     const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteLabourRateConfigItem();
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.materialquote?.list;
+    const canCreate = role === "owner" || permission?.materialquote?.create;
+    const canDelete = role === "owner" || permission?.materialquote?.delete;
+    const canEdit = role === "owner" || permission?.materialquote?.edit;
+
+
+
 
     const [rows, setRows] = useState([{ data: {} }]);
 
@@ -147,12 +158,12 @@ export default function LabourRateConfigSingle() {
 
                 </div>
                 <div className="flex gap-2 mt-3 sm:mt-0 absolute -top-[83px] right-[5px] ">
-                    <Button onClick={handleAddRow} variant="primary" className="">
+                    {(canEdit || canCreate) && <Button onClick={handleAddRow} variant="primary" className="">
                         + Add Row
-                    </Button>
-                    <Button onClick={handleSave} isLoading={createPending} className="bg-blue-600 hover:bg-blue-700 text-white">
-                        <i className="fas fa-file mr-2"></i> Save Items
-                    </Button>
+                    </Button>}  
+                        {(canEdit || canCreate) && <Button onClick={handleSave} isLoading={createPending} className="bg-blue-600 hover:bg-blue-700 text-white">
+                            <i className="fas fa-file mr-2"></i> Save Items
+                        </Button> }
                 </div>
             </div>
 
@@ -191,7 +202,7 @@ export default function LabourRateConfigSingle() {
   `}
                             >
                                 <td
-                                    className="border border-gray-100 font-medium text-center  text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
+                                    className="border border-gray-100 font-medium text-center p-4  text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
                                 >
                                     {i + 1 || "—"}
                                 </td>
@@ -203,7 +214,7 @@ export default function LabourRateConfigSingle() {
                                         {item?.data[field?.key] ?? "—"}
                                     </td>
                                 ))}
-                                <td className="text-center p-4 border border-gray-100">
+                                {canDelete && <td className="text-center p-4 border border-gray-100">
                                     <Button
                                         size="sm"
                                         variant="danger"
@@ -216,7 +227,7 @@ export default function LabourRateConfigSingle() {
                                         <i className="fas fa-trash mr-2"></i>
                                         <span className="">Delete</span>
                                     </Button>
-                                </td>
+                                </td>}
                             </tr>
                         ))}
 

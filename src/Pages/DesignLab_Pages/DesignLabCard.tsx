@@ -1,5 +1,6 @@
 import React from 'react';
 import type { IDesignLab } from './DesignLabMain';
+import { useAuthCheck } from '../../Hooks/useAuthCheck';
 
 interface CardProps {
     design: IDesignLab;
@@ -48,6 +49,10 @@ const ImageCollage = ({ images }: { images: any[] }) => {
 };
 
 export const DesignLabCard: React.FC<CardProps> = ({ design, handleView, handleDelete, deletePending }) => {
+        const { role, permission } = useAuthCheck();
+    
+            const canDelete = role === "owner" || permission?.design?.delete;
+
     return (
         <div
             onClick={() => handleView(design._id)}
@@ -69,7 +74,7 @@ export const DesignLabCard: React.FC<CardProps> = ({ design, handleView, handleD
                 </div>
 
                 {/* Delete Button (Floating) */}
-                <button
+              {canDelete &&  <button
                     onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(design._id);
@@ -83,7 +88,7 @@ export const DesignLabCard: React.FC<CardProps> = ({ design, handleView, handleD
                     ) : (
                         <i className="fas fa-trash text-xs"></i>
                     )}
-                </button>
+                </button>}
             </div>
 
             {/* --- Bottom Section: Content --- */}

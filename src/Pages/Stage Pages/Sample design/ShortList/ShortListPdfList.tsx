@@ -4,17 +4,28 @@ import { Button } from '../../../../components/ui/Button'
 import { downloadImage } from '../../../../utils/downloadFile'
 import { toast } from '../../../../utils/toast'
 import MaterialOverviewLoading from '../../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
 
 const ShortListPdfList = ({ projectId }: { projectId: string }) => {
     const { data, isLoading, isError, error } = useGetShortlistedDesigns(projectId)
 
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.sampledesign?.delete;
+    // const canList = role === "owner" || permission?.sampledesign?.list;
+    // const canCreate = role === "owner" || permission?.sampledesign?.create;
+    // const canEdit = role === "owner" || permission?.sampledesign?.create;
+
+
+
     const { mutateAsync: deletePdf, isPending: deletepdfPending } = useDeleteShortListedPdf()
 
-// console.log("data form pdf", data)
+    // console.log("data form pdf", data)
 
     const handleDeletePdf = async (id: string) => {
         try {
-            await deletePdf({ id: id!, projectId});
+            await deletePdf({ id: id!, projectId });
             toast({ title: "Success", description: "PDF deleted" });
             // refetch()
         } catch (error: any) {
@@ -93,31 +104,31 @@ const ShortListPdfList = ({ projectId }: { projectId: string }) => {
                                             Download PDF
                                         </Button>
 
-                                        <Button
+                                        {canDelete &&  < Button
                                             variant="danger"
-                                            isLoading={deletepdfPending}
-                                            onClick={() => handleDeletePdf(pdf._id)}
-                                            className="border-red-300 bg-red-600 text-white hover:bg-red-600 hover:border-red-400"
+                                        isLoading={deletepdfPending}
+                                        onClick={() => handleDeletePdf(pdf._id)}
+                                        className="border-red-300 bg-red-600 text-white hover:bg-red-600 hover:border-red-400"
                                         >
-                                            Delete PDF
-                                        </Button>
-                                    </div>
+                                        Delete PDF
+                                    </Button>}
                                 </div>
-                            </CardContent>
+                            </div>
+                        </CardContent>
                         </Card>
-                    )
+            )
                 })
-                    :
-                    <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-                        <i className="fa-solid fa-file-lines text-5xl text-blue-300 mb-4" />
-                        <h3 className="text-lg font-semibold text-blue-800 mb-1">No Pdf Found</h3>
-                        <p className="text-sm text-gray-500">
-                            No PDF Generated</p>
-                    </div>
+            :
+            <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+                <i className="fa-solid fa-file-lines text-5xl text-blue-300 mb-4" />
+                <h3 className="text-lg font-semibold text-blue-800 mb-1">No Pdf Found</h3>
+                <p className="text-sm text-gray-500">
+                    No PDF Generated</p>
+            </div>
 
                 }
-            </section>
-        </div>
+        </section>
+        </div >
     )
 }
 

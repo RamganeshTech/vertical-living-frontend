@@ -7,6 +7,7 @@ import { downloadImage } from "../../../utils/downloadFile";
 // import { NO_IMAGE } from "../../../constants/constants";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 import VideoGalleryMain from "../../../shared/VideoGallery/VideoGalleryMain";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface UploadEntry {
   _id: string;
@@ -33,6 +34,15 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
 
   const { mutateAsync: uploadFiles, isPending: isUploading } = useUploadRequirementSectionFiles();
   const { mutateAsync: deleteFile, isPending: isDeleting } = useDeleteRequirementSectionFile();
+
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.clientrequirement?.delete;
+  // const canList = role === "owner" || permission?.clientrequirement?.list;
+  const canCreate = role === "owner" || permission?.clientrequirement?.create;
+  const canEdit = role === "owner" || permission?.clientrequirement?.edit;
+
+
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -74,13 +84,14 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
   const pdfFiles = existingUploads?.filter(file => file.type === "pdf")
   const videoFiles = existingUploads?.filter(file => file.type === "video")
 
+const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
 
 
   return (
     <div className="space-y-4 w-full">
       {/* Upload Button */}
       <div className="flex relative items-center justify-between w-full">
-        <Input
+        {(canCreate || canEdit) && <Input
           type="file"
           multiple
           placeholder="select files"
@@ -88,7 +99,7 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
           onChange={handleUpload}
           disabled={isUploading}
           className={isUploading ? "pr-10 opacity-70 cursor-not-allowed w-full" : ""}
-        />
+        />}
 
         {isUploading && (
           <div className="absolute inset-y-0 right-2 flex items-center">
@@ -128,7 +139,7 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
                 <span className="text-sm font-medium !truncate max-w-[100%] whitespace-wrap">{type.originalName}</span>
               </div>
               <div className="flex ">
-                {["eye", "trash", "download"].map((action) => (
+                {pdfActions.map((action) => (
                   <Button
                     key={action}
                     variant="ghost"
@@ -170,11 +181,15 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
         ) : <>
           <div className="">
             <ImageGalleryExample
-              imageFiles={imageFiles} refetch={refetch} handleDeleteFile={handleDelete}
+              imageFiles={imageFiles}
+              
+              refetch={refetch}
+              //  handleDeleteFile={handleDelete}
               height={190}
               minWidth={156}
               maxWidth={100}
-            // className="flex-1 flex  flex-wrap w-[100px] border"
+              // className="flex-1 flex  flex-wrap w-[100px] border"
+              {...(canDelete ? { handleDeleteFile: handleDelete } : {})}
             />
           </div>
 
@@ -202,11 +217,15 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
             <VideoGalleryMain
               videoFiles={videoFiles}
               refetch={refetch}
-              handleDeleteFile={handleDelete}
+              // handleDeleteFile={handleDelete}
+              // /                            {...(canDelete ? { handleDeleteFile:  } : {})}
+              
+              
               isDeleting={isDeleting}
               height={190}
               minWidth={156}
               maxWidth={100}
+              {...(canDelete ? { handleDeleteFile: handleDelete } : {})}
             />
           </div>
 

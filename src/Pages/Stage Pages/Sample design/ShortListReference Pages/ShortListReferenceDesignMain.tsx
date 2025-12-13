@@ -9,6 +9,7 @@ import { Button } from "../../../../components/ui/Button";
 // import TagInput from "../../../../shared/TagInput";
 import SmartTagInput from "../../../../shared/SmartTagInput";
 import { fetchSuggestions } from "../ShortList/ShortListMain";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 
 
 const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -21,7 +22,17 @@ export default function ShortListReferenceDesignMain() {
         organizationId,
     });
 
-    const { mutateAsync: uploadImages, isPending:uploadPending } = useUploadReferenceDesigns();
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.referencedesign?.delete;
+    const canList = role === "owner" || permission?.referencedesign?.list;
+    const canCreate = role === "owner" || permission?.referencedesign?.create;
+    const canEdit = role === "owner" || permission?.referencedesign?.create;
+
+
+    const { mutateAsync: uploadImages, isPending: uploadPending } = useUploadReferenceDesigns();
     const { mutateAsync: deleteImage, } = useDeleteReferenceDesign();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -117,22 +128,22 @@ export default function ShortListReferenceDesignMain() {
                 /> */}
 
                 <SmartTagInput
-                            tags={tags}
-                            setState={setTags}
-                            suggestionFetcher={fetchSuggestions}
-                          />
-                
+                    tags={tags}
+                    setState={setTags}
+                    suggestionFetcher={fetchSuggestions}
+                />
+
             </div>
 
 
-            <Card className="">
+            {(canCreate || canEdit) && <Card className="">
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                         {isDragging
                             ? "Drop files here..."
                             : "Drag and drop image files here or "}
-                        <Button variant="outline"  size="sm" className="text-blue-600 bg-transparent">
-                           { uploadPending ? <>Loading <i className="fas fa-spinner ml-2 animate-spin"></i></> : "Upload reference images, and can be used to compare in the projects"}
+                        <Button variant="outline" size="sm" className="text-blue-600 bg-transparent">
+                            {uploadPending ? <>Loading <i className="fas fa-spinner ml-2 animate-spin"></i></> : "Upload reference images, and can be used to compare in the projects"}
                         </Button>
                     </CardTitle>
                 </CardHeader>
@@ -161,10 +172,10 @@ export default function ShortListReferenceDesignMain() {
                         onChange={handleImageChange}
                     />
                 </CardContent>
-            </Card>
+            </Card>}
 
             {/* Image Gallery */}
-            <div className="mt-5">
+            {canList && <div className="mt-5">
 
                 <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images</h1>
 
@@ -177,10 +188,12 @@ export default function ShortListReferenceDesignMain() {
                         <ImageGalleryExample
                             imageFiles={imageData?.referenceImages || []}
                             refetch={refetch}
-                            handleDeleteFile={handleDelete}
                             height={190}
                             minWidth={156}
                             maxWidth={200}
+                            {...(canDelete ? { handleDeleteFile: handleDelete } : {})}
+
+                        // handleDeleteFile={handleDelete}
                         />
                         : <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
                             <i className="fas fa-image text-5xl text-blue-300 mb-4" />
@@ -191,7 +204,7 @@ export default function ShortListReferenceDesignMain() {
                         </div>
 
                 )}
-            </div>
+            </div>}
 
         </div>
     );

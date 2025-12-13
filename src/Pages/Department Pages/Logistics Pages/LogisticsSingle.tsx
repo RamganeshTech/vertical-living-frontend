@@ -261,6 +261,7 @@ import { toast } from "../../../utils/toast";
 // import { useLogisticsWebSocket } from "./useLogisticsWebSocket";
 // import { LiveTrackingMap } from "./LiveTrackingMap";
 import InfoTooltip from "../../../components/ui/InfoToolTip";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 // import { LiveTrackingMap } from "./LiveTrackingMap"; // 🚀 NEW COMPONENT
 // import { useLogisticsWebSocket } from "../../../apiList/Department Api/Logistics Api/useLogisticsWebSocket"; // 🚀 WebSocket Hook
 
@@ -304,6 +305,16 @@ const LogisticsSingle: React.FC = () => {
 
     const [editingShipment, setEditingShipment] = useState<any | null>(null);
     const [showForm, setShowForm] = useState(false);
+
+
+    const { role, permission } = useAuthCheck();
+
+
+    const canEdit = role === "owner" || permission?.logistics?.edit;
+    // const canList = role === "owner" || permission?.logistics?.list;
+
+
+
 
     // 🚀 WebSocket for real-time location updates
     // const { isConnected } = useLogisticsWebSocket({
@@ -397,7 +408,7 @@ const LogisticsSingle: React.FC = () => {
                         </span> */}
                     </div>
 
-                    <Button
+                    {canEdit && <Button
                         size="md"
                         variant="primary"
                         onClick={() => {
@@ -407,7 +418,7 @@ const LogisticsSingle: React.FC = () => {
                     >
                         <i className="fas fa-edit mr-1" />
                         Edit
-                    </Button>
+                    </Button>}
                 </div>
             </header>
 

@@ -1,4 +1,4 @@
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "../../../../utils/toast";
 import ShortListImageGallery from "../../../../shared/ImageGallery/ShortListImageGallery";
@@ -13,6 +13,7 @@ import ShortListPdfList from "./ShortListPdfList";
 // import TagInput from "../../../../shared/TagInput";
 import axios from "axios";
 import SmartTagInput from "../../../../shared/SmartTagInput";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 
 interface ImageFile {
   _id: string;
@@ -30,19 +31,19 @@ interface RoomShortlist {
 
 
 export const fetchSuggestions = (query: string) =>
-    axios
-      .get(
-        `${import.meta.env.VITE_API_URL}/api/shortlisteddesign/getsuggestedtags?q=${encodeURIComponent(
-          query
-        )}`
-      )
-      .then((res) => {
-        if (Array.isArray(res?.data?.tags)) {
-          return res.data.tags;
-        }
-        return [];
-      })
- 
+  axios
+    .get(
+      `${import.meta.env.VITE_API_URL}/api/shortlisteddesign/getsuggestedtags?q=${encodeURIComponent(
+        query
+      )}`
+    )
+    .then((res) => {
+      if (Array.isArray(res?.data?.tags)) {
+        return res.data.tags;
+      }
+      return [];
+    })
+
 
 
 
@@ -166,6 +167,14 @@ export default function ShortlistMain() {
       toast({ title: "Error", description: error?.message, variant: "destructive" });
     }
   };
+
+
+
+  const { role, permission } = useAuthCheck();
+  // const canDelete = role === "owner" || permission?.sampledesign?.delete;
+  // const canList = role === "owner" || permission?.sampledesign?.list;
+  const canCreate = role === "owner" || permission?.sampledesign?.create;
+  const canEdit = role === "owner" || permission?.sampledesign?.create;
 
 
 
@@ -355,13 +364,13 @@ export default function ShortlistMain() {
               <h3 className="font-bold text-xl mb-4">Selected Designs</h3>
 
               <div className="flex gap-2">
-                <Button
+                {(canCreate || canEdit) && <Button
                   isLoading={isGenerating}
                   onClick={handleGenerate}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow disabled:opacity-50"
                 >
                   {isGenerating ? "Generating..." : "Generate Pdf"}
-                </Button>
+                </Button>}
 
                 <Button
                   onClick={() => {

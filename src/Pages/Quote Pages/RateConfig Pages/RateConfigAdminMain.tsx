@@ -10,6 +10,7 @@ import { Button } from "../../../components/ui/Button";
 import { useCreateCategory, useDeleteCategory, useGetCategories } from "../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/Dialog";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 // import {
 //   Dialog,
 //   DialogContent,
@@ -26,6 +27,17 @@ export default function RateConfigAdminMain() {
     const { organizationId } = useParams<{ organizationId: string }>();
     const navigate = useNavigate();
     const location = useLocation();
+
+    
+    
+      const { role, permission } = useAuthCheck();
+      const canList = role === "owner" || permission?.materialquote?.list;
+      const canCreate = role === "owner" || permission?.materialquote?.create;
+      const canDelete = role === "owner" || permission?.materialquote?.delete;
+    //   const canEdit = role === "owner" || permission?.materialquote?.edit;
+    
+    
+    
 
     const isChildRoute = location.pathname.includes("single");
 
@@ -120,9 +132,9 @@ export default function RateConfigAdminMain() {
                     </p>
                 </div>
 
-                <div>
+                {canCreate && <div>
                     <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button>
-                </div>
+                </div>}
             </header>
 
             {/* Create Modal */}
@@ -185,7 +197,7 @@ export default function RateConfigAdminMain() {
             </Dialog>
 
             {/* Category Cards Section */}
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {canList &&  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
                 {isLoading && <p>Loading categories...</p>}
                 {!isLoading && categories?.length === 0 && (
@@ -216,7 +228,7 @@ export default function RateConfigAdminMain() {
                                     <i className="fas fa-eye mr-1" />
                                     View
                                 </Button>
-                                <Button
+                                {canDelete && <Button
                                     size="sm"
                                     isLoading={isPending}
                                     variant="danger"
@@ -227,12 +239,12 @@ export default function RateConfigAdminMain() {
                                 >
                                     <i className="fas fa-trash mr-1" />
                                     Delete
-                                </Button>
+                                </Button>}
                             </div>
                         </CardContent>
                     </Card>
                 ))}
-            </div>
+            </div>}
         </div>
     );
 }

@@ -100,19 +100,19 @@ const updateDesignLabApiNew = async ({
 };
 
 // 4. Update Design Lab (Text Data)
-const updateDesignLabApi = async ({
-    id,
-    updateData,
-    api
-}: {
-    id: string;
-    updateData: any; // Partial<IDesignLab>
-    api: AxiosInstance;
-}) => {
-    const { data } = await api.put(`${BASE_URL}/updatedesign/${id}`, updateData);
-    if (!data.ok) throw new Error(data.message);
-    return data.data;
-};
+// const updateDesignLabApi = async ({
+//     id,
+//     updateData,
+//     api
+// }: {
+//     id: string;
+//     updateData: any; // Partial<IDesignLab>
+//     api: AxiosInstance;
+// }) => {
+//     const { data } = await api.put(`${BASE_URL}/updatedesign/${id}`, updateData);
+//     if (!data.ok) throw new Error(data.message);
+//     return data.data;
+// };
 
 // 5. Delete Design Lab
 const deleteDesignLabApi = async ({
@@ -281,30 +281,30 @@ export const useGetDesignLabById = (id: string) => {
     });
 };
 
-// 4. Hook: Update Design Lab
-export const useUpdateDesignLab = () => {
-    const { role } = useGetRole();
-    const api = getApiForRole(role!);
-    const queryClient = useQueryClient();
+// // 4. Hook: Update Design Lab
+// export const useUpdateDesignLab = () => {
+//     const { role } = useGetRole();
+//     const api = getApiForRole(role!);
+//     const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: async ({
-            id,
-            updateData
-        }: {
-            id: string;
-            updateData: any;
-        }) => {
-            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
-            if (!api) throw new Error("API instance not found for role");
-            return await updateDesignLabApi({ id, updateData, api });
-        },
-        onSuccess: (_, { id }) => {
-            queryClient.invalidateQueries({ queryKey: ["designLab", id] });
-            queryClient.invalidateQueries({ queryKey: ["designLabs"] }); // Refresh list as well
-        }
-    });
-};
+//     return useMutation({
+//         mutationFn: async ({
+//             id,
+//             updateData
+//         }: {
+//             id: string;
+//             updateData: any;
+//         }) => {
+//             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+//             if (!api) throw new Error("API instance not found for role");
+//             return await updateDesignLabApi({ id, updateData, api });
+//         },
+//         onSuccess: (_, { id }) => {
+//             queryClient.invalidateQueries({ queryKey: ["designLab", id] });
+//             queryClient.invalidateQueries({ queryKey: ["designLabs"] }); // Refresh list as well
+//         }
+//     });
+// };
 
 
 

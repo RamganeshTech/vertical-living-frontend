@@ -7,6 +7,7 @@ import type { AvailableProjetType } from "../../Department Pages/Logistics Pages
 import { useGetProjects } from "../../../apiList/projectApi";
 import { useState } from "react";
 import QuoteVarientCard from "./QuoteVarientCard";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 const QuoteGenerateVariantMain = () => {
     const { organizationId } = useParams();
@@ -17,6 +18,15 @@ const QuoteGenerateVariantMain = () => {
         projectName: "",
         createdAt: "",
     });
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.materialquote?.list;
+    // const canCreate = role === "owner" || permission?.materialquote?.create;
+    // const canDelete = role === "owner" || permission?.materialquote?.delete;
+    // const canEdit = role === "owner" || permission?.materialquote?.edit;
+
 
     const [searchInput, setSearchInput] = useState("");     // user typing
     const [searchTerm, setSearchTerm] = useState<string>(""); // value used for sending to the api
@@ -64,7 +74,7 @@ const QuoteGenerateVariantMain = () => {
             <header className="flex justify-between items-center">
                 <div className="flex gap-2">
                     <i className="fas fa-file-invoice text-4xl text-blue-600" />
-                    <h1 className="text-2xl font-bold mb-4">Quote Varient generator</h1>
+                    <h1 className="text-2xl font-bold mb-4">Quote Variant generator</h1>
                 </div>
 
 
@@ -207,7 +217,7 @@ const QuoteGenerateVariantMain = () => {
                     </div>
                 </div>
 
-                <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
+               {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
 
                     {isLoading ? (
                         <p><MaterialOverviewLoading /></p>
@@ -234,7 +244,7 @@ const QuoteGenerateVariantMain = () => {
                             ))}
                         </div>
                     )}
-                </section>
+                </section>}
 
             </main>
         </div>

@@ -12,11 +12,22 @@ import { Input } from '../../components/ui/Input'
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar'
 import { COMPANY_DETAILS } from '../../constants/constants'
 import type { OrganizationOutletTypeProps } from './OrganizationChildren'
+import { useAuthCheck } from '../../Hooks/useAuthCheck'
 
 const InviteCTO: React.FC = () => {
   const { organizationId } = useParams()
   const navigate = useNavigate()
   const { openMobileSidebar, isMobile } = useOutletContext<OrganizationOutletTypeProps>()
+
+
+  const { role, permission } = useAuthCheck();
+
+
+  const canDelete = role === "owner" || permission?.invitecto?.delete;
+  const canList = role === "owner" || permission?.invitecto?.list;
+  const canCreate = role === "owner" || permission?.invitecto?.create;
+  const canEdit = role === "owner" || permission?.invitecto?.edit;
+
 
 
   const [inviteLink, setInviteLink] = useState("")
@@ -64,7 +75,7 @@ const InviteCTO: React.FC = () => {
     window.open(whatsappUrl, "_blank")
   }
 
-  const getInitials = (name: string) => name.split(" ").map(n => n[0]).join("").toUpperCase()
+  // const getInitials = (name: string) => name?.split(" ").map(n => n[0]).join("").toUpperCase()
 
   if (CTOLoading) {
     return (
@@ -161,13 +172,14 @@ const InviteCTO: React.FC = () => {
             </p>
 
             {!inviteLink ? (
-              <Button
-                onClick={handleGenerateInviteLink}
-                isLoading={inviteCTO.isPending}
-                className="w-full bg-blue-600 text-white py-3"
-              >
-                <i className="fas fa-link mr-2" /> Generate Invitation Link
-              </Button>
+              <>
+                {(canCreate || canEdit) && <Button
+                  onClick={handleGenerateInviteLink}
+                  isLoading={inviteCTO.isPending}
+                  className="w-full bg-blue-600 text-white py-3"
+                >
+                  <i className="fas fa-link mr-2" /> Generate Invitation Link
+                </Button>}</>
             ) : (
               <div className="space-y-4">
                 <Label>Invitation Link</Label>
@@ -195,12 +207,12 @@ const InviteCTO: React.FC = () => {
                     <i className="fas fa-copy mr-2" /> Copy
                   </Button>
                 </div>
-                <Button
+                {(canCreate || canEdit) && <Button
                   onClick={handleGenerateInviteLink}
                   className="w-full bg-purple-600 text-white"
                 >
                   <i className="fas fa-sync-alt mr-2" /> Generate New Link
-                </Button>
+                </Button>}
               </div>
             )}
           </div>
@@ -208,7 +220,7 @@ const InviteCTO: React.FC = () => {
 
         {/*invited memebers */}
 
-        <div className="bg-white p-6 py-2 w-full !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] md:w-1/2  rounded-2xl shadow-lg overflow-y-auto  max-h-[90%] custom-scrollbar">
+        {canList && <div className="bg-white p-6 py-2 w-full !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] md:w-1/2  rounded-2xl shadow-lg overflow-y-auto  max-h-[90%] custom-scrollbar">
           <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
             <i className="fas fa-users mr-2" /> CTO Members ({CTOs.length})
           </h2>
@@ -231,7 +243,8 @@ const InviteCTO: React.FC = () => {
                         src={cto.avatarUrl || COMPANY_DETAILS.COMPANY_LOGO}
                       />
                       <AvatarFallback className="bg-blue-600 text-white">
-                        {getInitials(cto.CTOName)}
+                        {/* {getInitials(cto.CTOName)} */}
+                        {cto?.CTOName}
                       </AvatarFallback>
                     </Avatar>
                     <div>
@@ -251,7 +264,7 @@ const InviteCTO: React.FC = () => {
                       </Badge>
                     </div>
                   </div>
-                  <Button
+                  {canDelete && <Button
                     onClick={() => handleRemoveCTO(cto._id, cto.CTOName)}
                     isLoading={removeCTO.isPending}
                     variant='danger'
@@ -259,12 +272,12 @@ const InviteCTO: React.FC = () => {
                   >
                     {/* <i className="fas fa-user-minus mr-1" /> Remove */}
                     <i className="fas fa-trash-can mr-1 text-white" />
-                  </Button>
+                  </Button>}
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </div>}
       </div>
     </div>
   )

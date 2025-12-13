@@ -5,6 +5,7 @@ import { Button } from '../../../components/ui/Button'
 // import { toast } from '../../../utils/toast'
 import { useNavigate } from 'react-router-dom'
 import { dateFormate, formatTime } from './../../../utils/dateFormator';
+// import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 type Props = {
     quote: any
@@ -12,6 +13,10 @@ type Props = {
 }
 const QuoteClientCard: React.FC<Props> = ({ quote }) => {
     const navigate = useNavigate();
+
+
+  
+
 
     // const { mutateAsync: deleteQuote, isPending } = useDeleteQuote();
 

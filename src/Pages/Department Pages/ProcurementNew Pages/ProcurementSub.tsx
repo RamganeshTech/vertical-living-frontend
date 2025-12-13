@@ -28,6 +28,7 @@ import InfoTooltip from "../../../components/ui/InfoToolTip";
 import { dateFormate } from "../../../utils/dateFormator";
 import { Badge } from "../../../components/ui/Badge";
 import { Textarea } from "../../../components/ui/TextArea";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 const ProcurementSub: React.FC = () => {
     const { id, organizationId } = useParams() as { id: string, organizationId: string }
@@ -49,6 +50,16 @@ const ProcurementSub: React.FC = () => {
 
     // const [link, setLink] = useState<string>("");
     // const link = data?.generatedLink ? `${import.meta.env.VITE_FRONTEND_URL}/${organizationId}/procurement/public/${encodeURIComponent(data?.generatedLink)}` : null;
+
+
+
+
+    const { role, permission } = useAuthCheck();
+
+
+    const canList = role === "owner" || permission?.procurement?.list;
+    const canEdit = role === "owner" || permission?.procurement?.edit;
+
     const tokenEncoded = encodeURIComponent(data?.generatedLink); // encode only once
 
     const link = `${import.meta.env.VITE_FRONTEND_URL}/${organizationId}/procurement/public?token=${tokenEncoded}&orderId=${id}`;
@@ -215,20 +226,20 @@ const ProcurementSub: React.FC = () => {
     // }
 
 
-     const handleSyncToPayments = async () => {
-            try {
-                if (data?.isSyncWithPaymentsSection) {
-                    return toast({ variant: "destructive", title: "Error", description: "already sent to payments section" });
-                }
-                await syncPaymentsMutation({
-                    id: data._id!
-                });
-                refetch?.()
-                toast({ title: "Success", description: "Procurement order sent to Payments Section" });
-            } catch (error: any) {
-                toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+    const handleSyncToPayments = async () => {
+        try {
+            if (data?.isSyncWithPaymentsSection) {
+                return toast({ variant: "destructive", title: "Error", description: "already sent to payments section" });
             }
-        }    
+            await syncPaymentsMutation({
+                id: data._id!
+            });
+            refetch?.()
+            toast({ title: "Success", description: "Procurement order sent to Payments Section" });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+        }
+    }
 
     // const handleGenerateAccounts = async () => {
     //     try {
@@ -257,6 +268,17 @@ const ProcurementSub: React.FC = () => {
         </div>
     }
 
+
+
+    if (!canList) {
+        return ;
+    }
+
+
+
+    console.log("data", data)
+    console.log("data procuremnet", data.procurementNumber)
+
     return (
         <div className="p-1 max-w-full max-h-full overflow-y-auto space-y-8">
 
@@ -269,7 +291,15 @@ const ProcurementSub: React.FC = () => {
                             <i className='fas fa-arrow-left'></i>
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-blue-700">
-                            <span className="text-black text-2xl">Ref Id:</span> {data?.procurementNumber || data?.refPdfId ? data?.refPdfId.replace(/-pdf$/, "") : "N/A"}
+                            <span className="!text-gray-600 text-2xl">Procurement No:</span> {" "}
+                            {/* {data?.procurementNumber || data?.refPdfId ? data?.refPdfId?.replace(/-pdf$/, "") : "N/A"} */}
+
+                            {data?.procurementNumber
+                                ? data.procurementNumber
+                                : data?.refPdfId
+                                    ? data.refPdfId?.replace(/-pdf$/, "")
+                                    : "N/A"}
+
                         </h1>
                     </div>
 
@@ -473,7 +503,7 @@ const ProcurementSub: React.FC = () => {
                             <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Shop Details</h4>
 
                             {/* Edit Button (Only visible in view mode) */}
-                            {!editShop && (
+                            {(!editShop && canEdit) && (
                                 <button
                                     onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
                                     className="ml-auto cursor-pointer text-gray-400 hover:text-blue-600 transition-colors"
@@ -572,7 +602,7 @@ const ProcurementSub: React.FC = () => {
                             <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Delivery Details</h4>
 
                             {/* Edit Button */}
-                            {!editDelivery && (
+                            {(!editDelivery && canEdit) && (
                                 <button
                                     onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
                                     className="ml-auto cursor-pointer text-gray-400 hover:text-orange-600 transition-colors"
@@ -667,6 +697,10 @@ const ProcurementSub: React.FC = () => {
                             </h2>
                         </div>
 
+                        {(data?.quoteNumber && data?.quoteNumber > 1) && <div className="">
+                            <span className="text-[10px] text-gray-400 uppercase font-semibold">Quote Number: {data?.quoteNumber} </span>
+                        </div>}
+
                         {/* Rate Confirmation Status */}
                         <div className="mt-4 pt-3 border-t border-gray-100 border-dashed">
                             <div className="flex items-center justify-between">
@@ -742,7 +776,7 @@ const ProcurementSub: React.FC = () => {
 
                             {/* Right Side: Dynamic Status Badge */}
                             <div>
-                                {!data?.generatedLink && 
+                                {!data?.generatedLink &&
                                     // --- RED STATE: ACTION REQUIRED ---
                                     <div className="flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-full shadow-sm">
                                         <i className="fas fa-exclamation-circle text-red-500 text-lg"></i>

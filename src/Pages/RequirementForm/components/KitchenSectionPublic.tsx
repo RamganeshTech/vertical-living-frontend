@@ -1,215 +1,215 @@
-import React, { memo } from "react";
-import { Input } from "../../../components/ui/Input";
-import { Label } from "../../../components/ui/Label";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "../../../components/ui/Select";
-import { Textarea } from "../../../components/ui/TextArea";
-import { Button } from "../../../components/ui/Button";
+// import React, { memo } from "react";
+// import { Input } from "../../../components/ui/Input";
+// import { Label } from "../../../components/ui/Label";
+// import {
+//   Select,
+//   SelectTrigger,
+//   SelectValue,
+//   SelectContent,
+//   SelectItem,
+// } from "../../../components/ui/Select";
+// import { Textarea } from "../../../components/ui/TextArea";
+// import { Button } from "../../../components/ui/Button";
 
-const KitchenSectionPublic = ({ formData, setFormData }: any) => {
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const target = e.target;
-    const { name, type, value } = target;
+// const KitchenSectionPublic = ({ formData, setFormData }: any) => {
+//   const handleChange = (
+//     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+//   ) => {
+//     const target = e.target;
+//     const { name, type, value } = target;
 
-    let finalValue: string | number | boolean = value;
+//     let finalValue: string | number | boolean = value;
 
-    if (type === "checkbox") {
-      finalValue = (target as HTMLInputElement).checked;
-    } else if (type === "number") {
-      const parsedValue = parseFloat(value);
-      finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
-    }
+//     if (type === "checkbox") {
+//       finalValue = (target as HTMLInputElement).checked;
+//     } else if (type === "number") {
+//       const parsedValue = parseFloat(value);
+//       finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue); // ✅ ensure value >= 0
+//     }
 
-    if (["top", "left", "right"].includes(name)) {
-      setFormData((prev: any) => ({
-        ...prev,
-        kitchen: {
-          ...prev.kitchen,
-          measurements: {
-            ...prev.kitchen?.measurements,
-            [name]: finalValue,
-          },
-        },
-      }));
-    } else {
-      setFormData((prev: any) => ({
-        ...prev,
-        kitchen: {
-          ...prev.kitchen,
-          [name]: finalValue,
-        },
-      }));
-    }
-  };
-
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      kitchen: {
-        ...prev.kitchen,
-        [name]: value,
-      },
-    }));
-  };
+//     if (["top", "left", "right"].includes(name)) {
+//       setFormData((prev: any) => ({
+//         ...prev,
+//         kitchen: {
+//           ...prev.kitchen,
+//           measurements: {
+//             ...prev.kitchen?.measurements,
+//             [name]: finalValue,
+//           },
+//         },
+//       }));
+//     } else {
+//       setFormData((prev: any) => ({
+//         ...prev,
+//         kitchen: {
+//           ...prev.kitchen,
+//           [name]: finalValue,
+//         },
+//       }));
+//     }
+//   };
 
 
-
-  const handleResetBedroom = () => {
-    setFormData((prev: any) => ({
-      ...prev,
-      kitchen: {
-        layoutType: null,
-        kitchenPackage: null,
-        measurements: { top: null, left: null, right: null },
-        graniteCountertop: null,
-        numberOfShelves: null,
-        notes: null,
-      },// or {} if you prefer to use empty object instead of null
-    }));
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow p-6">
-      <h2 className="text-2xl font-semibold text-blue-800 mb-4">Kitchen Requirements</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Layout Type */}
-        <div>
-          <Label>Layout Type</Label>
-          <Select
-            // value={formData?.kitchen?.layoutType || ""}
-            onValueChange={(val) => handleSelectChange("layoutType", val)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select layout" selectedValue={formData?.kitchen?.layoutType || ""} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">Select Layout</SelectItem>
-              <SelectItem value="L-shaped">L-shaped</SelectItem>
-              <SelectItem value="Straight">Straight</SelectItem>
-              <SelectItem value="U-shaped">U-shaped</SelectItem>
-              <SelectItem value="Parallel">Parallel</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Kitchen Package */}
-        <div>
-          <Label>Kitchen Package</Label>
-          <Select
-            // value={formData?.kitchen?.kitchenPackage || ""}
-            onValueChange={(val) => handleSelectChange("kitchenPackage", val)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select package" selectedValue={formData?.kitchen?.kitchenPackage || ""} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">Select package</SelectItem>
-              <SelectItem value="Essentials">Essentials</SelectItem>
-              <SelectItem value="Premium">Premium</SelectItem>
-              <SelectItem value="Luxury">Luxury</SelectItem>
-              <SelectItem value="Build Your Own Package">
-                Build Your Own Package
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+//   const handleSelectChange = (name: string, value: string) => {
+//     setFormData((prev: any) => ({
+//       ...prev,
+//       kitchen: {
+//         ...prev.kitchen,
+//         [name]: value,
+//       },
+//     }));
+//   };
 
 
 
-        {/* Number of Shelves */}
-        <div>
-          <Label>Number of Shelves</Label>
-          <Input
-            type="number"
-            name="numberOfShelves"
-            value={formData?.kitchen?.numberOfShelves}
-            onChange={handleChange}
-            placeholder="e.g., 3"
-          />
-        </div>
+//   const handleResetBedroom = () => {
+//     setFormData((prev: any) => ({
+//       ...prev,
+//       kitchen: {
+//         layoutType: null,
+//         kitchenPackage: null,
+//         measurements: { top: null, left: null, right: null },
+//         graniteCountertop: null,
+//         numberOfShelves: null,
+//         notes: null,
+//       },// or {} if you prefer to use empty object instead of null
+//     }));
+//   };
 
-        {/* Measurements */}
-        <div>
-          <Label>Measurement Top (ft)</Label>
-          <Input
-            type="number"
-            name="top"
-            value={formData?.kitchen?.measurements?.top ?? 0}
-            onChange={handleChange}
-            placeholder="Length Top"
-          />
-        </div>
-        <div>
-          <Label>Measurement Left (ft)</Label>
-          <Input
-            type="number"
-            name="left"
-            value={formData?.kitchen?.measurements?.left}
-            onChange={handleChange}
-            placeholder="Length Left"
-          />
-        </div>
-        <div>
-          <Label>Measurement Right (ft)</Label>
-          <Input
-            type="number"
-            name="right"
-            value={formData?.kitchen?.measurements?.right}
-            onChange={handleChange}
-            placeholder="Length right"
-          />
-        </div>
+//   return (
+//     <div className="bg-white rounded-2xl shadow p-6">
+//       <h2 className="text-2xl font-semibold text-blue-800 mb-4">Kitchen Requirements</h2>
 
-        {/* Granite Countertop */}
-        <div className="flex  items-center">
-          <input
-            id="graniteCountertop"
-            type="checkbox"
-            name="graniteCountertop"
-            checked={formData?.kitchen?.graniteCountertop || false}
-            onChange={handleChange}
-            className="!w-[10%]"
-          />
-          <Label htmlFor="graniteCountertop">Granite Countertop?</Label>
-        </div>
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//         {/* Layout Type */}
+//         <div>
+//           <Label>Layout Type</Label>
+//           <Select
+//             // value={formData?.kitchen?.layoutType || ""}
+//             onValueChange={(val) => handleSelectChange("layoutType", val)}
+//           >
+//             <SelectTrigger>
+//               <SelectValue placeholder="Select layout" selectedValue={formData?.kitchen?.layoutType || ""} />
+//             </SelectTrigger>
+//             <SelectContent>
+//               <SelectItem value="">Select Layout</SelectItem>
+//               <SelectItem value="L-shaped">L-shaped</SelectItem>
+//               <SelectItem value="Straight">Straight</SelectItem>
+//               <SelectItem value="U-shaped">U-shaped</SelectItem>
+//               <SelectItem value="Parallel">Parallel</SelectItem>
+//             </SelectContent>
+//           </Select>
+//         </div>
 
-        {/* Notes */}
-        <div className="md:col-span-2">
-          <Label>Additional Notes</Label>
-          <Textarea
-            name="notes"
-            value={formData?.kitchen?.notes || ""}
-            onChange={handleChange}
-            placeholder="Mention any additional kitchen preferences"
-            rows={3}
-            className="w-full"
-          />
-        </div>
-      </div>
-
-      <div className="flex justify-end mt-4">
-        <Button
-          variant="outline"
-          className="border-red-500 text-red-500 hover:bg-red-50"
-          onClick={handleResetBedroom}
-        >
-          <i className="fa-solid fa-rotate-left mr-2"></i> Reset Kitchen Section
-        </Button>
-      </div>
+//         {/* Kitchen Package */}
+//         <div>
+//           <Label>Kitchen Package</Label>
+//           <Select
+//             // value={formData?.kitchen?.kitchenPackage || ""}
+//             onValueChange={(val) => handleSelectChange("kitchenPackage", val)}
+//           >
+//             <SelectTrigger>
+//               <SelectValue placeholder="Select package" selectedValue={formData?.kitchen?.kitchenPackage || ""} />
+//             </SelectTrigger>
+//             <SelectContent>
+//               <SelectItem value="">Select package</SelectItem>
+//               <SelectItem value="Essentials">Essentials</SelectItem>
+//               <SelectItem value="Premium">Premium</SelectItem>
+//               <SelectItem value="Luxury">Luxury</SelectItem>
+//               <SelectItem value="Build Your Own Package">
+//                 Build Your Own Package
+//               </SelectItem>
+//             </SelectContent>
+//           </Select>
+//         </div>
 
 
-      {/* <Separator className="my-6" /> */}
-    </div>
-  );
-};
 
-export default memo(KitchenSectionPublic);
+//         {/* Number of Shelves */}
+//         <div>
+//           <Label>Number of Shelves</Label>
+//           <Input
+//             type="number"
+//             name="numberOfShelves"
+//             value={formData?.kitchen?.numberOfShelves}
+//             onChange={handleChange}
+//             placeholder="e.g., 3"
+//           />
+//         </div>
+
+//         {/* Measurements */}
+//         <div>
+//           <Label>Measurement Top (ft)</Label>
+//           <Input
+//             type="number"
+//             name="top"
+//             value={formData?.kitchen?.measurements?.top ?? 0}
+//             onChange={handleChange}
+//             placeholder="Length Top"
+//           />
+//         </div>
+//         <div>
+//           <Label>Measurement Left (ft)</Label>
+//           <Input
+//             type="number"
+//             name="left"
+//             value={formData?.kitchen?.measurements?.left}
+//             onChange={handleChange}
+//             placeholder="Length Left"
+//           />
+//         </div>
+//         <div>
+//           <Label>Measurement Right (ft)</Label>
+//           <Input
+//             type="number"
+//             name="right"
+//             value={formData?.kitchen?.measurements?.right}
+//             onChange={handleChange}
+//             placeholder="Length right"
+//           />
+//         </div>
+
+//         {/* Granite Countertop */}
+//         <div className="flex  items-center">
+//           <input
+//             id="graniteCountertop"
+//             type="checkbox"
+//             name="graniteCountertop"
+//             checked={formData?.kitchen?.graniteCountertop || false}
+//             onChange={handleChange}
+//             className="!w-[10%]"
+//           />
+//           <Label htmlFor="graniteCountertop">Granite Countertop?</Label>
+//         </div>
+
+//         {/* Notes */}
+//         <div className="md:col-span-2">
+//           <Label>Additional Notes</Label>
+//           <Textarea
+//             name="notes"
+//             value={formData?.kitchen?.notes || ""}
+//             onChange={handleChange}
+//             placeholder="Mention any additional kitchen preferences"
+//             rows={3}
+//             className="w-full"
+//           />
+//         </div>
+//       </div>
+
+//       <div className="flex justify-end mt-4">
+//         <Button
+//           variant="outline"
+//           className="border-red-500 text-red-500 hover:bg-red-50"
+//           onClick={handleResetBedroom}
+//         >
+//           <i className="fa-solid fa-rotate-left mr-2"></i> Reset Kitchen Section
+//         </Button>
+//       </div>
+
+
+//       {/* <Separator className="my-6" /> */}
+//     </div>
+//   );
+// };
+
+// export default memo(KitchenSectionPublic);

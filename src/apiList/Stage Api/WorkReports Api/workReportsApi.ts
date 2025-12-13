@@ -74,7 +74,7 @@ const deleteWorkReportByIdApi = async ({
 
 // Create Work Report Hook
 export const useCreateWorkReport = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -101,7 +101,7 @@ export const useCreateWorkReport = () => {
 
 // Get Work Reports Hook
 export const useGetWorkReportsByProjectId = (projectId: string) => {
-  const allowedRoles = ["owner", "staff", "CTO", "client"];
+  const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -119,7 +119,7 @@ export const useGetWorkReportsByProjectId = (projectId: string) => {
 
 // Delete Work Report Hook
 export const useDeleteWorkReportById = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO", ];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -142,7 +142,7 @@ export const useDeleteWorkReportById = () => {
 export const useGetWorkReportImages = (projectId: string, id:string,
   //  date:string,
     dailyTaskId:string) => {
-  const allowedRoles = ["owner", "staff", "CTO", "client"];
+  const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 

@@ -304,7 +304,7 @@ const getSubContWorkDetails = async ({
 
 // ==================== HOOKS ====================
 
-const ALLOWED_ROLES = ["owner", "staff", "CTO"];
+const ALLOWED_ROLES = ["owner", "staff", "CTO", "worker"];
 
 // Create SubContract Hook
 export const useCreateSubContract = () => {
@@ -531,7 +531,7 @@ export const useDeleteSubContract = () => {
                 throw new Error("Not allowed to make this API call");
             }
             if (!api) throw new Error("API instance not found for role");
-            return await deleteSubContract({ subContractId, api });
+            return await deleteSubContract({  subContractId, api });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({

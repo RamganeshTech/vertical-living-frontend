@@ -5,6 +5,7 @@ import { useDeleteQuote } from '../../../apiList/Quote Api/QuoteVariant Api/quot
 import { toast } from '../../../utils/toast'
 import { useNavigate } from 'react-router-dom'
 import { dateFormate, formatTime } from '../../../utils/dateFormator'
+import { useAuthCheck } from '../../../Hooks/useAuthCheck'
 
 
 type Props = {
@@ -13,6 +14,13 @@ type Props = {
 }
 const QuoteVarientCard: React.FC<Props> = ({ quote, organizationId }) => {
     const navigate = useNavigate();
+
+     const { role, permission } = useAuthCheck();
+        const canList = role === "owner" || permission?.materialquote?.list;
+        // const canCreate = role === "owner" || permission?.materialquote?.create;
+        const canDelete = role === "owner" || permission?.materialquote?.delete;
+        const canEdit = role === "owner" || permission?.materialquote?.edit;
+    
 
     const { mutateAsync: deleteQuote, isPending } = useDeleteQuote();
 
@@ -76,14 +84,14 @@ const QuoteVarientCard: React.FC<Props> = ({ quote, organizationId }) => {
                 </p>
 
                 <div className="flex justify-end gap-2 pt-2">
-                    <Button
+                  {(canList || canEdit ) &&   <Button
                         size="sm"
                         variant="secondary"
                         onClick={() => navigate(`single/${quote._id}`)}
                     >
                         <i className="fas fa-eye mr-1" /> View
-                    </Button>
-                    <Button
+                    </Button>}
+                   {canDelete && <Button
                         size="sm"
                         isLoading={isPending}
                         variant="danger"
@@ -91,7 +99,7 @@ const QuoteVarientCard: React.FC<Props> = ({ quote, organizationId }) => {
                         onClick={() => handleDelete(quote._id)}
                     >
                         <i className="fas fa-trash mr-1" /> Delete
-                    </Button>
+                    </Button>}
 
                 </div>
             </CardContent>

@@ -5,6 +5,7 @@ import { useDeleteRoomSiteFiles, useUpdateImageCategoryName } from '../../../api
 import { useParams } from 'react-router-dom'
 import { toast } from '../../../utils/toast'
 import { downloadImage } from '../../../utils/downloadFile'
+import { useAuthCheck } from '../../../Hooks/useAuthCheck'
 
 
 
@@ -21,6 +22,15 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
 
     const { mutateAsync: deleteFile, isPending: isDeleting } = useDeleteRoomSiteFiles()
     const { mutateAsync: updateCategory, isPending: isUpdatingName } = useUpdateImageCategoryName()
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.sitemeasurement?.delete;
+    // const canList = role === "owner" || permission?.sitemeasurement?.list;
+    const canCreate = role === "owner" || permission?.sitemeasurement?.create;
+    const canEdit = role === "owner" || permission?.sitemeasurement?.edit;
+
 
     const handleDeleteFile = async (uploadId: string) => {
         try {
@@ -54,8 +64,8 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
             await updateCategory({
                 uploadId: file._id,
                 categoryName: tempCategory,
-                roomId:room._id,
-                projectId:projectId!,
+                roomId: room._id,
+                projectId: projectId!,
             });
 
             toast({
@@ -72,6 +82,10 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
             setIsEditing(false);
         }
     };
+
+
+    const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
+
 
     return (
         <div
@@ -94,7 +108,7 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
                 {/* Desktop Hover Overlay */}
                 <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 items-center justify-center hidden md:flex">
                     <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-4 group-hover:translate-y-0">
-                        {["eye", "trash", "download"].map((action) => (
+                        {pdfActions.map((action) => (
                             <Button
                                 key={action}
                                 variant="secondary"
@@ -126,7 +140,7 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
 
                 {/* Mobile Action Buttons - Inside Image at Top Right */}
                 <div className="absolute top-2 right-[2px] flex flex-col space-y-1 sm:hidden">
-                    {["eye", "trash", "download"].map((action) => (
+                    {pdfActions.map((action) => (
                         <Button
                             key={action}
                             variant="secondary"
@@ -162,30 +176,31 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
 
 
 
-                 {/* Category Label / Editor */}
-           
+                {/* Category Label / Editor */}
+
             </div>
-             <div onClick={e=> e.stopPropagation()} className="my-1 flex items-center justify-between px-1">
+            <div onClick={e => e.stopPropagation()} className="my-1 flex items-center justify-between px-1">
                 {!isEditing ? (
                     <>
                         <span className="text-sm text-gray-800 truncate max-w-[80%]">
                             {file?.categoryName || 'No category'}
                         </span>
-                        <button
+                        {(canEdit || canCreate) && <button
                             className="text-gray-500 cursor-pointer hover:text-blue-600 text-xs"
                             onClick={() => setIsEditing(true)}
                         >
                             <i className="fas fa-pen" />
-                        </button>
+                        </button>}
                     </>
                 ) : (
+
                     <div className="flex w-full items-center space-x-1">
                         <input
                             value={tempCategory}
                             onChange={(e) => setTempCategory(e.target.value)}
                             className="text-sm border px-1 py-0.5 rounded w-full"
-                            onKeyDown={e=>{
-                                if(e.key === "Enter"){
+                            onKeyDown={e => {
+                                if (e.key === "Enter") {
                                     handleCategoryUpdate()
                                 }
                             }}
@@ -195,7 +210,7 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
                             disabled={isUpdatingName}
                             className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs"
                         >
-                           {!isUpdatingName ? <i className="fas fa-check" /> :  <i className='fa fa-spinner animate-spin'></i> }    
+                            {!isUpdatingName ? <i className="fas fa-check" /> : <i className='fa fa-spinner animate-spin'></i>}
                         </button>
                         <button
                             onClick={() => {

@@ -15,6 +15,7 @@ import { Textarea } from '../../../../components/ui/TextArea';
 import InfoTooltip from '../../../../components/ui/InfoToolTip';
 import { useGetProjects } from '../../../../apiList/projectApi';
 import type { AvailableProjetType } from '../../Logistics Pages/LogisticsShipmentForm';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 // Internal Form State (Images are strictly NEW FILES)
 export interface BillFormData {
@@ -62,6 +63,13 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
     const { data: VendorData } = useGetVendorForDropDown(organizationId);
     const deleteImgMutation = useDeleteBillImage()
 
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.billing?.delete;
+    // const canList = role === "owner" || permission?.billing?.list;
+    const canCreate = role === "owner" || permission?.billing?.create;
+    const canEdit = role === "owner" || permission?.billing?.edit;
 
 
     const PAYMENTTYPES = [
@@ -265,7 +273,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
 
         if (formData.paymentType === "pay advanced, balance later") {
             if (!formData.advancedAmount || formData.advancedAmount <= 0) {
-                toast({title:"Error", description:"Please enter a valid advance amount greater than 0", variant:"destructive"});
+                toast({ title: "Error", description: "Please enter a valid advance amount greater than 0", variant: "destructive" });
                 return;
             }
         }
@@ -390,7 +398,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                     </div>}
 
 
-                    {isReadOnly && (
+                    {(isReadOnly && canEdit) && (
                         <Button type="button" onClick={toggleEdit} className={isReadOnly ? "bg-blue-600 text-white" : "bg-gray-500 hover:bg-gray-500 text-white"}>
                             <i className="fas fa-edit mr-2"></i>Edit
                         </Button>
@@ -398,26 +406,27 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
 
 
                     {/* Actions */}
-                    {(isCreateMode || isEditMode) && (
-                        <div className="flex justify-end items-center gap-4">
+                    {((isCreateMode && canCreate) ||
+                        (isEditMode && canEdit)) && (
+                            <div className="flex justify-end items-center gap-4">
 
-                            <Button type="button" onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2" disabled={isSubmitting}>
-                                {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <>{isCreateMode ? 'Create Bill' : 'Update Bill'}</>}
-                            </Button>
+                                <Button type="button" onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2" disabled={isSubmitting}>
+                                    {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <>{isCreateMode ? 'Create Bill' : 'Update Bill'}</>}
+                                </Button>
 
-                            <Button variant='outline' type="button" onClick={() => {
-                                if (isCreateMode) {
-                                    navigate(-1)
-                                }
-                                else {
-                                    toggleEdit()
-                                }
-                            }} className="bg-gray-500 hover:bg-gray-500 text-white px-6 py-2">
-                                Cancel</Button>
+                                <Button variant='outline' type="button" onClick={() => {
+                                    if (isCreateMode) {
+                                        navigate(-1)
+                                    }
+                                    else {
+                                        toggleEdit()
+                                    }
+                                }} className="bg-gray-500 hover:bg-gray-500 text-white px-6 py-2">
+                                    Cancel</Button>
 
 
-                        </div>
-                    )}
+                            </div>
+                        )}
 
 
 
@@ -802,7 +811,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 )
                     :
                     <>
-                       {(!isCreateMode && !isEditMode) && <div className="shadow-md flex flex-col items-center justify-center min-h-[150px] w-full bg-white rounded-xl text-center p-6">
+                        {(!isCreateMode && !isEditMode) && <div className="shadow-md flex flex-col items-center justify-center min-h-[150px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">If No Pdf Found, just click on edit button and update the bill</h3>
                         </div>}

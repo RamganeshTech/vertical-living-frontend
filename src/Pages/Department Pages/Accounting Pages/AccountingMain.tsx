@@ -412,6 +412,7 @@ import AccountingAccList from './AccountingCard';
 import { useDebounce } from '../../../Hooks/useDebounce';
 import Slider from 'rc-slider';
 import "rc-slider/assets/index.css";
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 // // --- Components ---
 // import { Button } from '../../../../components/ui/Button'; // Adjust path
@@ -565,6 +566,16 @@ const AccountingMain: React.FC = () => {
     }));
 
 
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.stafftask?.delete;
+    const canList = role === "owner" || permission?.accounts?.list;
+    const showBilling = role === "owner" || permission?.billing?.create || permission?.billing?.list || permission?.billing?.delete || permission?.billing?.edit;
+    const showPayments = role === "owner" || permission?.payments?.create || permission?.payments?.list || permission?.payments?.delete || permission?.payments?.edit
+
+
     const AVAILABLE_SECTIONS = ["Retail Invoice", "Invoice", "Bill", "Expense"]
 
 
@@ -582,7 +593,7 @@ const AccountingMain: React.FC = () => {
         status: filters.status,
         projectId: filters.projectId,
         fromDept: filters.fromDept,
-       startDate: debouncedStartDate, // <--- Used here
+        startDate: debouncedStartDate, // <--- Used here
         endDate: debouncedEndDate,     // <--- Used here
         minAmount: debouncedMinAmount,
         maxAmount: debouncedMaxAmount,
@@ -682,15 +693,16 @@ const AccountingMain: React.FC = () => {
                 <div className="flex gap-2">
 
 
-                    <Button onClick={() => navigate(`/organizations/${organizationId}/projects/paymentmain`)}>
+                    {showPayments && <Button onClick={() => navigate(`/organizations/${organizationId}/projects/paymentmain`)}>
                         <i className="fas fa-money-check-alt mr-2 text-white"></i>
                         Payments
-                    </Button>
+                    </Button>}
 
-                    <Button variant='secondary' onClick={() => navigate(`/organizations/${organizationId}/projects/billmain`)}>
+                    {showBilling && <Button variant='secondary' onClick={() => navigate(`/organizations/${organizationId}/projects/billmain`)}>
                         <i className="fas fa-receipt mr-2 text-blue-600"></i>
                         Billing
                     </Button>
+                    }
 
 
                     {/* <button
@@ -808,7 +820,7 @@ const AccountingMain: React.FC = () => {
                                     </select>
                                 </div>
 
-                               
+
 
                                 {/* 5. Date Range Filter */}
                                 <div>
@@ -929,7 +941,7 @@ const AccountingMain: React.FC = () => {
                     </div>
 
                     {/* --- List View --- */}
-                    {records.length === 0 ? (
+                    {canList && <> {records.length === 0 ? (
                         <div className="flex-1 flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200 text-center p-6">
                             <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
                                 <i className="fas fa-file-invoice-dollar text-3xl text-blue-400" />
@@ -992,7 +1004,7 @@ const AccountingMain: React.FC = () => {
                                 </div>
                             )}
                         </div>
-                    )}
+                    )}</>}
                 </main>
             )}
         </div>

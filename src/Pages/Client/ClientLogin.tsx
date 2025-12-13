@@ -70,13 +70,17 @@ export default function ClientLogin() {
     try {
       const data = await loginClient.mutateAsync(formData)
 
-      const clientData = data.data;
+      const clientData = data;
 
       dispatch(setRole({
         role: clientData.role,
         isauthenticated: true,
         _id: clientData.clientId, // or _id
-        userName: clientData?.clientName
+        userName: clientData?.clientName,
+        permission: clientData?.permission || {},
+                isGuideRequired: clientData.isGuideRequired
+
+
       }));
 
       dispatch(setClientProfileData({
@@ -85,7 +89,11 @@ export default function ClientLogin() {
         email: clientData.email,
         phoneNo: clientData.phoneNo,
         role: clientData.role,
-        isauthenticated: true
+        isauthenticated: true,
+        permission: clientData?.permission || {},
+                isGuideRequired: clientData.isGuideRequired
+
+
       }));
 
 
@@ -194,7 +202,7 @@ export default function ClientLogin() {
 
 
 
-            
+
 
               <div className="text-right">
                 <Link to="/forgotpassword/client" className="text-blue-600 text-sm font-medium ">forgot Password</Link>

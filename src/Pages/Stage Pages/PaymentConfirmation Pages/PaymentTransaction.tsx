@@ -10,6 +10,7 @@ import {
 } from "../../../apiList/Stage Api/Payment Api/paymentTransactionApi";
 import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 
 const PaymentTransaction = () => {
@@ -21,6 +22,17 @@ const PaymentTransaction = () => {
 
   const { mutateAsync: createPaymentOrder, isPending: isCreating } = useCreatePaymentOrder();
   const { mutateAsync: verifyPayment, isPending: isVerifying } = useVerifyPayment();
+
+
+
+  const { role, permission } = useAuthCheck();
+  // const canDelete = role === "owner" || permission?.paymentconfirmation?.delete;
+  // const canList = role === "owner" || permission?.paymentconfirmation?.list;
+  const canCreate = role === "owner" || permission?.paymentconfirmation?.create;
+  const canEdit = role === "owner" || permission?.paymentconfirmation?.edit;
+
+
+
 
   const client = useSelector((state: RootState) => state.clientProfileStore);
 
@@ -152,16 +164,16 @@ const PaymentTransaction = () => {
                 <div className="flex items-center gap-2">
                   <i
                     className={`fa-solid ${paymentTransaction.status === "successful"
-                        ? "fa-circle-check text-green-600"
-                        : "fa-circle-xmark text-red-600"
+                      ? "fa-circle-check text-green-600"
+                      : "fa-circle-xmark text-red-600"
                       }`}
                   />
                   <span className="font-medium">Status:</span>
                 </div>
                 <span
                   className={`font-semibold ${paymentTransaction.status === "successful"
-                      ? "text-green-700"
-                      : "text-red-700"
+                    ? "text-green-700"
+                    : "text-red-700"
                     }`}
                 >
                   {paymentTransaction.status.toUpperCase()}
@@ -191,15 +203,15 @@ const PaymentTransaction = () => {
           )}
 
           {/* Pay Button */}
-          <div className="pt-2">
+          { (canCreate || canEdit )&& <div className="pt-2">
             <button
               onClick={handlePayment}
               disabled={isCreating || isVerifying || paymentTransaction?.status === "successful"}
               className={`w-full py-3 sm:py-4 rounded-md text-white text-base sm:text-lg font-medium transition ${isCreating || isVerifying
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : paymentTransaction?.status === "successful"
-                    ? "bg-green-600 cursor-default"
-                    : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
+                ? "bg-blue-400 cursor-not-allowed"
+                : paymentTransaction?.status === "successful"
+                  ? "bg-green-600 cursor-default"
+                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
                 }`}
             >
               {paymentTransaction?.status === "successful" ? (
@@ -220,7 +232,7 @@ const PaymentTransaction = () => {
                 </span>
               )}
             </button>
-          </div>
+          </div>}
 
           {/* Security Notice */}
           <div className="text-center pt-2">

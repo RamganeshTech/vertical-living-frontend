@@ -11,6 +11,7 @@ import type { SubContractFile } from "./SubContractMain";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 import { toast } from "../../../utils/toast";
 import { useUpdateSubContract, useUploadAfterWorkFiles, useUploadBeforeWorkFiles } from "../../../apiList/SubContract Api/subContractNewApi";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 // --- PROPS & INTERFACES ---
 
@@ -60,6 +61,12 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
     //     dateOfCompletion: "", labourCost: 0, materialCost: 0, totalCost: 0
     // });
 
+
+    
+        const { role, permission } = useAuthCheck();
+        const canEdit = role === "owner" || permission?.subcontract?.edit;
+    
+    
 
 
     const [errors, setErrors] = useState<any>({});
@@ -277,7 +284,7 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                         : handleUpdateSubmit
                 }>
                     <div>
-                        {mode === 'view' && !isEditing && (
+                        {(mode === 'view' && !isEditing && canEdit) && (
                             <div className="flex justify-between items-center mb-6 pb-4 border-b">
                                 <h2 className="text-xl font-semibold text-gray-800">Contract Details</h2>
                                 <Button type="button" variant="outline" onClick={() => setIsEditing(true)}>

@@ -3,10 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../../../components/ui/Button';
 import { toast } from '../../../../utils/toast';
 import {
-    useGeneratePublicOrderMaterial,
+    // useGeneratePublicOrderMaterial,
     useGetPublicProjects,
+    usePublicOrderHistorySubmit,
 } from '../../../../apiList/Stage Api/publicOrderMaterialApi';
-import { downloadImage } from '../../../../utils/downloadFile';
+// import { downloadImage } from '../../../../utils/downloadFile';
 import PublicOrderMaterialCompo from './PublicOrderMaterialCompo';
 
 interface AvailableProjetType {
@@ -37,16 +38,32 @@ const PublicOrderMaterialMain = () => {
     }, [projects, selectedProjectId]);
 
 
-    const { mutateAsync: generateLink, isPending: generatePending } = useGeneratePublicOrderMaterial()
-   
+    // const { mutateAsync: generateLink, isPending: generatePending } = useGeneratePublicOrderMaterial()
 
 
 
-    const handleGenerate = async () => {
+
+
+    // const handleGenerate = async () => {
+    //     try {
+    //         const res = await generateLink({ projectId: selectedProjectId, organizationId: organizationId! });
+    //         await downloadImage({ src: res?.pdfData?.url, alt: res?.pdfData?.pdfName })
+    //         toast({ title: "Success", description: "Pdf Generated successfully" });
+    //     } catch (err: any) {
+    //         toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
+    //     }
+    // };
+
+
+
+
+    const { mutateAsync: submitOrder, isPending: generatePending } = usePublicOrderHistorySubmit()
+
+    const handlesubmit = async () => {
         try {
-            const res = await generateLink({ projectId: selectedProjectId, organizationId: organizationId! });
-            await downloadImage({ src: res?.pdfData?.url, alt: res?.pdfData?.pdfName })
-            toast({ title: "Success", description: "Pdf Generated successfully" });
+            await submitOrder({ projectId: selectedProjectId! });
+            // await downloadImage({ src: res?.pdfData?.url, alt: res?.pdfData?.pdfName })
+            toast({ title: "Success", description: "Order Sent to Ordering Material Stage" });
         } catch (err: any) {
             toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
         }
@@ -115,22 +132,12 @@ const PublicOrderMaterialMain = () => {
                             </div>
 
                             <Button
-                                onClick={handleGenerate}
+                                onClick={handlesubmit}
                                 disabled={generatePending}
                                 className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
                                 size="lg"
                             >
-                                {generatePending ? (
-                                    <>
-                                        <i className="fas fa-spinner fa-spin"></i>
-                                        Sending...
-                                    </>
-                                ) : (
-                                    <>
-                                        <i className="fas fa-file-pdf"></i>
-                                        Send To Procurement
-                                    </>
-                                )}
+                                Send To Order Material
                             </Button>
 
 
@@ -149,7 +156,7 @@ const PublicOrderMaterialMain = () => {
                 ) : (
                     <div>
 
-                       
+
                         <PublicOrderMaterialCompo selectedProjectId={selectedProjectId} organizationId={organizationId} />
                     </div>
                 )}

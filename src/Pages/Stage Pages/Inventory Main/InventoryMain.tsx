@@ -7,32 +7,41 @@ import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import type { ProjectDetailsOutlet } from "../../../types/types";
 import RecycleMaterialProject from "../Recycle Materials/RecycleMaterialProject";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import { ORDERMATERIAL_UNIT_OPTIONS } from "../Ordering Materials/OrderMaterialOverview";
+import StageGuide from "../../../shared/StageGuide";
 
-const units = [
-    "nos",
-    "pieces",
-    "litre",
-    "kg",
-    "mm",
-    "cm",
-    "meter",
-    "feet",
-    "inch",
-    "sqft",
-    "sqmm",
-    "packet",
-    "roll",
-    "sheet"
-];
+// const units = [
+//     "nos",
+//     "pieces",
+//     "litre",
+//     "kg",
+//     "mm",
+//     "cm",
+//     "meter",
+//     "feet",
+//     "inch",
+//     "sqft",
+//     "sqmm",
+//     "packet",
+//     "roll",
+//     "sheet"
+// ];
 
 const InventoryMain: React.FC = () => {
-    const { projectId } = useParams<{ projectId: string }>() as { projectId: string }
+    const { projectId, organizationId } = useParams<{ projectId: string }>() as { projectId: string, organizationId:string }
     const { data, isLoading, isError, error } = useGetInventoryDetails(projectId!);
     const createSubItem = useCreateInventorySubItem();
     const updateSubItem = useUpdateInventorySubItem();
     const deleteSubItem = useDeleteInventorySubItem();
     const { isMobile, openMobileSidebar, projectName } = useOutletContext<ProjectDetailsOutlet>();
 
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.inventory?.delete;
+    // const canList = role === "owner" || permission?.inventory?.list;
+    const canCreate = role === "owner" || permission?.inventory?.create;
+    const canEdit = role === "owner" || permission?.inventory?.edit;
 
     // console.log("projectName", projectName)
     // const [items, setItems] = useState<any[]>([]);
@@ -47,12 +56,6 @@ const InventoryMain: React.FC = () => {
     }>({ name: '', totalQuantity: 1, unit: '' });
 
     const inputRef = useRef<HTMLInputElement>(null);
-
-    // useEffect(() => {
-    //     if (data) {
-    //         setItems(data.subItems || []);
-    //     }
-    // }, [data]);
 
 
     const items: any[] = data?.subItems || []
@@ -88,6 +91,11 @@ const InventoryMain: React.FC = () => {
     };
 
     const handleNewRowSave = async (newData: any) => {
+        if (!canCreate || !canEdit) {
+            toast({ description: "you dont have the permission to edit or create", variant: "destructive", title: "Error" })
+            return
+        }
+
         if (!newData.name.trim() || !newData.unit) {
             return toast({
                 title: "Error",
@@ -131,20 +139,30 @@ const InventoryMain: React.FC = () => {
     return (
         <>
             <div className="w-full max-h-full overflow-y-auto flex flex-col p-2 min-h-full">
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-semibold mb-1 text-blue-600 flex items-center">
-                        {isMobile && (
-                            <button
-                                onClick={openMobileSidebar}
-                                className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100"
-                                title="Open Menu"
-                            >
-                                <i className="fa-solid fa-bars"></i>
-                            </button>
-                        )}
-                        <i className="fa-solid fa-boxes-stacked mr-2"></i>
-                        Inventory Items {projectName ? `for ${projectName}` : ""}</h1>
-                    <p className="text-gray-400">Manage and track project materials in one place</p>
+                <div className="flex justify-between items-center">
+                    <div >
+                        <h1 className="text-2xl sm:text-3xl font-semibold mb-1 text-blue-600 flex items-center">
+                            {isMobile && (
+                                <button
+                                    onClick={openMobileSidebar}
+                                    className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100"
+                                    title="Open Menu"
+                                >
+                                    <i className="fa-solid fa-bars"></i>
+                                </button>
+                            )}
+                            <i className="fa-solid fa-boxes-stacked mr-2"></i>
+                            Inventory Items {projectName ? `for ${projectName}` : ""}</h1>
+                        <p className="text-gray-400">Manage and track project materials in one place</p>
+
+                    </div>
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="inventory"
+                        />
+                    </div>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-gray-200 bg-gray-50 rounded-lg p-4">
@@ -188,6 +206,7 @@ const InventoryMain: React.FC = () => {
                                                 if (newRowData?.name?.trim() && newRowData?.unit) {
                                                     handleSaveEdit(item._id, 'name', e.target.value);
                                                 }
+
                                                 setEditingCell(null);
                                             }}
                                             onKeyDown={(e: any) => {
@@ -203,7 +222,12 @@ const InventoryMain: React.FC = () => {
                                     ) : (
                                         <div
                                             className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
-                                            onClick={() => setEditingCell({ subItemId: item._id, field: 'name' })}
+                                            onClick={() => {
+                                                if (canEdit || canCreate) {
+                                                    setEditingCell({ subItemId: item._id, field: 'name' })
+                                                }
+                                            }
+                                            }
                                         >
                                             {item.itemName}
                                         </div>
@@ -234,7 +258,13 @@ const InventoryMain: React.FC = () => {
                                     ) : (
                                         <div
                                             className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
-                                            onClick={() => setEditingCell({ subItemId: item._id, field: 'totalQuantity' })}
+                                            onClick={() => {
+                                                if (canEdit || canCreate) {
+
+                                                    setEditingCell({ subItemId: item._id, field: 'totalQuantity' })
+                                                }
+                                            }
+                                            }
                                         >
                                             {item.totalQuantity}
                                         </div>
@@ -261,7 +291,7 @@ const InventoryMain: React.FC = () => {
                                             className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
                                         >
                                             <option value="" disabled>Selected unit</option>
-                                            {units.map((unitOption) => (
+                                            {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
                                                 <option key={unitOption} value={unitOption}>
                                                     {unitOption}
                                                 </option>
@@ -270,14 +300,20 @@ const InventoryMain: React.FC = () => {
                                     ) : (
                                         <div
                                             className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
-                                            onClick={() => setEditingCell({ subItemId: item._id, field: 'unit' })}
+                                            onClick={() => {
+                                                if (canEdit || canCreate) {
+
+                                                    setEditingCell({ subItemId: item._id, field: 'unit' })
+                                                }
+                                            }
+                                            }
                                         >
                                             {item.unit}
                                         </div>
                                     )}
                                 </div>
                                 <div className="col-span-1 flex items-center justify-center">
-                                    <Button
+                                    {canDelete && <Button
                                         variant="danger"
                                         isLoading={deleteSubItem.isPending}
                                         onClick={() => handleDelete(item._id)}
@@ -285,7 +321,7 @@ const InventoryMain: React.FC = () => {
                                         title="Delete item"
                                     >
                                         <i className="fa fa-trash text-sm"></i>
-                                    </Button>
+                                    </Button>}
                                 </div>
                             </div>
                         ))}
@@ -350,7 +386,7 @@ const InventoryMain: React.FC = () => {
                                     className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
                                 >
                                     <option value="" disabled>Selected unit</option>
-                                    {units.map((unitOption) => (
+                                    {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
                                         <option key={unitOption} value={unitOption}>
                                             {unitOption}
                                         </option>

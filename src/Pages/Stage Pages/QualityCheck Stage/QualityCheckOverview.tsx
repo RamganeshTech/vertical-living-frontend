@@ -12,6 +12,8 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 // Context type for Outlet
 type ProjectDetailsOutlet = {
@@ -54,6 +56,15 @@ export default function QualityCheckOverview() {
   const navigate = useNavigate()
   if (!projectId) return null;
 
+
+
+
+  const { role, permission } = useAuthCheck();
+  // const canDelete = role === "owner" || permission?.qualitycheck?.delete;
+  // const canList = role === "owner" || permission?.qualitycheck?.list;
+  const canCreate = role === "owner" || permission?.qualitycheck?.create;
+  const canEdit = role === "owner" || permission?.qualitycheck?.edit;
+
   const {
     data,
     isLoading,
@@ -87,7 +98,7 @@ export default function QualityCheckOverview() {
 
   if (isLoading) return <MaterialOverviewLoading />;
 
-  console.log("data", data)
+  // console.log("data", data)
 
   return (
     <main className="w-full h-full  overflow-y-auto custom-scrollbar">
@@ -112,7 +123,7 @@ export default function QualityCheckOverview() {
               Quality Check Overview
             </h2>
 
-            <div className="!w-[100%] sm:!w-[100%] lg:!w-[50%] xl:!w-[65%] flex flex-col sm:flex-row gap-2 justify-end">
+            {(canCreate || canEdit) && <><div className="!w-[100%] sm:!w-[100%] lg:!w-[50%] xl:!w-[65%] flex flex-col sm:flex-row gap-2 justify-end">
               <Button
                 isLoading={completePending}
                 onClick={handleCompletionStatus}
@@ -144,7 +155,20 @@ export default function QualityCheckOverview() {
                 currentAssignedStaff={data?.assignedTo || null}
                 className="w-full sm:w-auto"
               />
+
             </div>
+              
+
+
+
+            </>
+            }
+            <div className="w-full sm:w-auto flex justify-end sm:block">
+                <StageGuide
+                  organizationId={organizationId!}
+                  stageName="qualitycheck"
+                />
+              </div>
           </div>
 
           {isError ? (
@@ -216,7 +240,7 @@ export default function QualityCheckOverview() {
               </div>
 
 
-              <section>
+              {/* <section>
                 <h3 className="text-xl text-blue-600 font-semibold mb-2">Walls SOP Section</h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
@@ -233,11 +257,11 @@ export default function QualityCheckOverview() {
                     </Link>
                   ))}
                 </div>
-              </section>
+              </section> */}
             </>
           )}
         </>
       }
-    </main>
+    </main >
   );
 }

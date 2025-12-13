@@ -8,6 +8,7 @@ import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { useState } from "react";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 const RecycleMaterialProject = () => {
     const { projectId, organizationId } = useParams() as { projectId: string, organizationId: string };
@@ -15,24 +16,36 @@ const RecycleMaterialProject = () => {
     const { mutateAsync: updateSyncMaterial, isPending } = useUpdateRecycleMaterialManually();
     const { mutateAsync: updateMaterialQuantity } = useUpdateRecycleMaterialQuantity();
 
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.inventory?.delete;
+    // const canList = role === "owner" || permission?.inventory?.list;
+    const canCreate = role === "owner" || permission?.inventory?.create;
+    const canEdit = role === "owner" || permission?.inventory?.edit;
+
+
     const [editingId, setEditingId] = useState<string | null>(null);
     // const [editQuantity, setEditQuantity] = useState<number>(0);
 
     const handleEdit = (id: string) => {
-        setEditingId(id);
+        if (canCreate || canEdit) {
+            setEditingId(id);
+        }
         // setEditQuantity(currentQty);
     };
 
     const handleSyncMaterial = async () => {
         try {
-            await updateSyncMaterial({
-                organizationId,
-                projectId,
-            });
-            toast({
-                title: "Success",
-                description: `Sync successfull.`,
-            });
+
+                await updateSyncMaterial({
+                    organizationId,
+                    projectId,
+                });
+                toast({
+                    title: "Success",
+                    description: `Sync successfull.`,
+                });
+            
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -46,7 +59,7 @@ const RecycleMaterialProject = () => {
     };
 
 
-    const handleEditQuantity = async (itemId:string, qty:number) => {
+    const handleEditQuantity = async (itemId: string, qty: number) => {
         try {
             await updateMaterialQuantity({
                 organizationId,
@@ -103,9 +116,9 @@ const RecycleMaterialProject = () => {
                 </h2>
 
 
-                <Button isLoading={isPending} onClick={handleSyncMaterial}>
+              {(canCreate || canEdit )&&  <Button isLoading={isPending} onClick={handleSyncMaterial}>
                     Sync Recycle Materiasl
-                </Button>
+                </Button>}
             </div>
             {isLoading ? (
                 <p className="text-gray-500"><MaterialOverviewLoading /></p>
@@ -136,36 +149,36 @@ const RecycleMaterialProject = () => {
                             </div> */}
 
                             <div className=" border-r border-gray-200">
-                                    {editingId === item._id ? (
-                                        <input
-                                            type="number"
-                                            defaultValue={item.remainingQuantity}
-                                            min="0"
-                                            autoFocus
-                                            className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
-                                            onBlur={(e) => {
+                                {editingId === item._id ? (
+                                    <input
+                                        type="number"
+                                        defaultValue={item.remainingQuantity}
+                                        min="0"
+                                        autoFocus
+                                        className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                        onBlur={(e) => {
+                                            handleEditQuantity(item._id, +e.target.value);
+                                            setEditingId(null);
+                                        }}
+                                        onKeyDown={(e: any) => {
+                                            if (e.key === 'Enter') {
                                                 handleEditQuantity(item._id, +e.target.value);
                                                 setEditingId(null);
-                                            }}
-                                            onKeyDown={(e: any) => {
-                                                if (e.key === 'Enter') {
-                                                handleEditQuantity(item._id, +e.target.value);
-                                                    setEditingId(null);
-                                                }
-                                                if (e.key === 'Escape') {
-                                                    setEditingId(null);
-                                                }
-                                            }}
-                                        />
-                                    ) : (
-                                        <div
-                                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
-                                            onClick={() => handleEdit(item._id)}
-                                        >
-                                            {item.remainingQuantity}
-                                        </div>
-                                    )}
-                                </div>
+                                            }
+                                            if (e.key === 'Escape') {
+                                                setEditingId(null);
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <div
+                                        className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                        onClick={() => handleEdit(item._id)}
+                                    >
+                                        {item.remainingQuantity}
+                                    </div>
+                                )}
+                            </div>
 
                             {/* <div className="border-r border-gray-200 px-4 py-3 hover:bg-blue-50 transition-colors">{item.unit || "N/A"}</div> */}
 

@@ -80,7 +80,8 @@ const LoginPage = () => {
                         email: userData?.email,
                         phoneNo: userData?.phoneNo,
                         role: userData?.role,
-                        isauthenticated: true
+                        isauthenticated: true,
+                        isGuideRequired: userData.isGuideRequired
                     }));
 
                     toast({ title: "Success", description: "Login successfull" })

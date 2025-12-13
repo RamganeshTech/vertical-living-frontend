@@ -6,6 +6,8 @@ import { toast } from "../../utils/toast";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import type { ProjectDetailsOutlet } from "../../types/types";
 import { Button } from "../../components/ui/Button";
+import { useAuthCheck } from "../../Hooks/useAuthCheck";
+import StageGuide from "../../shared/StageGuide";
 
 interface PrerequisitesSectionProps {
     title: string
@@ -24,6 +26,16 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
     formId,
     onUpdate,
 }) => {
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.prerequisites?.delete;
+    // const canList = role === "owner" || permission?.prerequisites?.list;
+    const canCreate = role === "owner" || permission?.prerequisites?.create;
+    const canEdit = role === "owner" || permission?.prerequisites?.edit;
+
+
+
     const [isOpen, setIsOpen] = useState(false)
     const [localNotes, setLocalNotes] = useState(notes)
     const [isUpdatingNotes, setIsUpdatingNotes] = useState(false)
@@ -122,8 +134,7 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                        {/* Custom Toggle Switch */}
+                    {(canCreate || canEdit) && <div className="flex items-center space-x-2">
                         <label className="relative inline-flex items-center cursor-pointer">
                             <input
                                 type="checkbox"
@@ -146,7 +157,7 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
                             </div>
                         </label>
                         {updateBooleanMutation.isPending && <i className="fas fa-spinner fa-spin text-gray-400"></i>}
-                    </div>
+                    </div>}
                 </div>
             </div>
 
@@ -154,7 +165,7 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
             {isOpen && (
                 <div className="p-4">
                     <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
+                        {(canCreate || canEdit) && <div className="flex items-center space-x-2">
                             <label className="relative inline-flex items-center cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -174,9 +185,9 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
                                 </div>
                             </label>
                             <label className="text-sm font-medium text-gray-700">This work is required for the project</label>
-                        </div>
+                        </div>}
 
-                        <div className="space-y-2">
+                        {(canCreate || canEdit) && <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700">Notes & Additional Details</label>
                             <div className="relative">
                                 <textarea
@@ -195,7 +206,7 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
                                 )}
                             </div>
                             <p className="text-xs text-gray-500">Press Ctrl+Enter to save or click outside the text area</p>
-                        </div>
+                        </div>}
                     </div>
                 </div>
             )}
@@ -205,12 +216,20 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
 
 const PrerequisitesPage: React.FC = () => {
 
-    const { projectId } = useParams() as { projectId: string }
+    const { projectId, organizationId } = useParams() as { projectId: string, organizationId: string }
     const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>()
 
     //   const { toast } = useToast()
     const { data, isLoading, error, refetch } = useGetAllPreRequireties(projectId)
     const navigate = useNavigate()
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.prerequisites?.delete;
+    // const canList = role === "owner" || permission?.prerequisites?.list;
+    const canCreate = role === "owner" || permission?.prerequisites?.create;
+    const canEdit = role === "owner" || permission?.prerequisites?.edit;
+
 
     const workTypes = [
         { key: "modularWork", title: "Modular Work", description: "Prefabricated components and modular construction", _id: data?.data?._id },
@@ -289,16 +308,26 @@ const PrerequisitesPage: React.FC = () => {
 
     return (
         <>
-            <div className="max-h-full overflow-y-auto mx-auto px-4 py-4 custom-scrollbar">
+            <div className="max-h-full overflow-y-auto mx-auto px-4  custom-scrollbar">
                 <div className="space-y-6">
                     {/* Header */}
-                    <div className="text-center hidden sm:block space-y-2">
+                    {/* <header className="flex justify-between items-center">
+
+                     <div className="text-left hidden sm:block space-y-2">
                         <h1 className="text-3xl font-bold text-blue-700">Project Prerequisites</h1>
-                        <p className="text-gray-600 max-w-2xl mx-auto">
-                            Configure the required work types for your project. These prerequisites must be completed before
+                        <p className="text-gray-600 max-w-full mx-auto">
+                            Configure the required work types for your project. <br />  These prerequisites must be completed before
                             proceeding to the 14-step process.
                         </p>
                     </div>
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="prerequisites"
+                        />
+                    </div>
+                   </header>
 
                     <header className="block sm:hidden space-y-2">
                         <h1 className="text-2xl font-bold text-gray-900">
@@ -312,6 +341,50 @@ const PrerequisitesPage: React.FC = () => {
                                 </button>
                             )}
                             Project Prerequisites</h1>
+                    </header> */}
+
+
+                    <header className="flex justify-between items-center mb-2 pb-2  border-b border-gray-100 gap-4">
+
+                        {/* --- Left Side: Content --- */}
+                        <div className="flex-1">
+
+                            {/* Mobile View: Hamburger + Title */}
+                            <div className="flex items-center sm:hidden">
+                                {isMobile && (
+                                    <button
+                                        onClick={openMobileSidebar}
+                                        className="mr-3 p-2 h-10 w-10 flex items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                                        title="Open Menu"
+                                    >
+                                        <i className="fa-solid fa-bars text-lg"></i>
+                                    </button>
+                                )}
+                                <h1 className="text-xl font-bold text-gray-800 leading-tight">
+                                    Project Prerequisites
+                                </h1>
+                            </div>
+
+                            {/* Desktop View: Title + Description */}
+                            <div className="hidden sm:block space-y-2">
+                                <h1 className="text-3xl font-bold text-blue-700 tracking-tight">
+                                    Project Prerequisites
+                                </h1>
+                                <p className="text-gray-500 text-sm md:text-base max-w-2xl leading-relaxed">
+                                    Configure the required work types for your project. These prerequisites must be completed before proceeding to the 14-step process.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* --- Right Side: Stage Guide --- */}
+                        {/* shrink-0 ensures it never collapses or hides on mobile */}
+                        <div className="shrink-0 pt-1">
+                            <StageGuide
+                                organizationId={organizationId!}
+                                stageName="prerequisites"
+                            />
+                        </div>
+
                     </header>
 
                     {/* Prerequisites Sections */}
@@ -360,13 +433,13 @@ const PrerequisitesPage: React.FC = () => {
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Button
-                        variant="ghost"
+                            variant="ghost"
                             onClick={() => refetch()}
                             className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
                         >
                             Refresh Data
                         </Button>
-                        <Button
+                        {(canCreate || canEdit) && <Button
                             onClick={() => {
                                 navigate(`../requirementform`)
                                 toast({
@@ -377,7 +450,7 @@ const PrerequisitesPage: React.FC = () => {
                             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                         >
                             Continue to Next Steps
-                        </Button>
+                        </Button>}
                     </div>
                 </div>
             </div>

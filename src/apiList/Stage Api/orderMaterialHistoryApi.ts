@@ -15,6 +15,15 @@ const getAllOrderHistory = async ({ projectId, api }: { projectId: string, api: 
 
 
 
+
+const getSingleOrderItem = async ({ projectId,orderItemId, api }: { projectId: string, orderItemId: string, api: AxiosInstance }) => {
+  const { data } = await api.get(`/orderingmaterial/${projectId}/${orderItemId}/getsingleorderedItem`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+}
+
+
+
 export const useGetAllOrderingMaterialHistory = (projectId: string) => {
   const allowedRoles = ["owner", "staff", "CTO", "worker", "client"]
   const { role } = useGetRole();
@@ -95,7 +104,7 @@ export const useUpdateDeliveryLocation = () => {
 
 
 export const useSetOrderingMaterialHistoryDeadline = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker", ];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -119,7 +128,7 @@ export const useSetOrderingMaterialHistoryDeadline = () => {
 };
 
 export const useCompleteOrderingMaterialHistoryStage = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker",];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -159,19 +168,52 @@ export const useGetOrderPublicDetails = (projectId: string) => {
 
 
 
-const generatedPublicLink = async ({
+const generatedPdfOrderMaterial = async ({
   projectId,
   organizationId,
+  orderItemId,
   api,
 }: {
   projectId: string;
   organizationId: string;
+  orderItemId: string;
   api: AxiosInstance;
 }) => {
-  const { data } = await api.patch(`/orderingmaterial/generatelink/${projectId}/${organizationId}`);
+  const { data } = await api.patch(`/orderingmaterial/generatelink/${projectId}/${organizationId}/${orderItemId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
+
+
+const submitOrderMaterial = async ({
+  projectId,
+  api,
+}: {
+  projectId: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.put(`/orderingmaterial/${projectId}/submitorder`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+const sendToProcruement = async ({
+  projectId,
+  orderItemId, organizationId,
+  api,
+}: {
+  projectId: string;
+  orderItemId: string,
+  organizationId: string
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.put(`/orderingmaterial/${projectId}/${orderItemId}/${organizationId}/senttoprocurement`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
 
 
 
@@ -192,20 +234,80 @@ const updatePdfStatus = async ({
 };
 
 
-export const useOrderHistoryGenerateLink = () => {
+export const useOrderHistoryGneratePdf = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ projectId, organizationId }: { projectId: string, organizationId: string }) => {
+    mutationFn: async ({ projectId, organizationId, orderItemId }: { projectId: string, organizationId: string, orderItemId: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await generatedPublicLink({ projectId, api, organizationId });
+      return await generatedPdfOrderMaterial({ projectId, api, organizationId, orderItemId });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
     },
+  });
+};
+
+
+
+export const useOrderHistorySubmitOrder = () => {
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId, }: { projectId: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await submitOrderMaterial({ projectId, api, });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+
+
+
+export const useOrderHistorySendToProcurement = () => {
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId, orderItemId, organizationId }: { projectId: string, orderItemId: string, organizationId: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await sendToProcruement({ projectId, orderItemId, organizationId, api, });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+
+
+
+export const useGetSingleOrderItem = (projectId: string, orderItemId:string) => {
+  const allowedRoles = ["owner", "staff", "CTO", "worker", "client"]
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ["ordering-material-history", "order-item", projectId],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch ordering material");
+      if (!api) throw new Error("API not available");
+      return await getSingleOrderItem({ projectId, api, orderItemId });
+    },
+    enabled: !!role && !!projectId && !!api,
+    retry: false,
+    // refetchOnMount: false,
   });
 };
 
@@ -243,7 +345,7 @@ const uploadOrderingMateriaImages = async ({ projectId, files, api }: { projectI
 
 
 export const useUploadOrderingMaterialImages = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -281,7 +383,7 @@ const deleteOrderingMaterialImage = async ({
 
 
 export const useDeleteOrderMaterialImage = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -300,26 +402,240 @@ export const useDeleteOrderMaterialImage = () => {
 
 
 
-// SUB ITEMS HOOKS
+// // SUB ITEMS HOOKS (START OF OLD VERSISON)
 
-// ✅ Add SubItem
+// // ✅ Add SubItem
+// const addOrderingMaterialSubItemApi = async ({
+//   projectId,
+//   unitId,
+//   subItemName,
+//   quantity,
+//   unit,
+//   api,
+// }: {
+//   projectId: string;
+//   unitId: string;
+//   subItemName: string;
+//   quantity: number;
+//   unit: string;
+//   api: AxiosInstance;
+// }) => {
+//   const { data } = await api.post(
+//     `/orderingmaterial/${projectId}/unit/${unitId}/addsubitem`,
+//     { subItemName, quantity, unit }
+//   );
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
+
+// export const useAddOrderingMaterialSubItem = () => {
+//   const allowedRoles = ["owner", "staff", "CTO"];
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   const queryClient = useQueryClient()
+
+//   return useMutation({
+//     mutationFn: async ({
+//       projectId,
+//       unitId,
+//       subItemName,
+//       quantity,
+//       unit,
+//     }: {
+//       projectId: string;
+//       unitId: string;
+//       subItemName: string;
+//       quantity: number;
+//       unit: string;
+//     }) => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+//       if (!api) throw new Error("API instance missing");
+//       return await addOrderingMaterialSubItemApi({ projectId, unitId, subItemName, quantity, unit, api });
+//     },
+//     onSuccess: (_, vars) => {
+//       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+//       queryClient.invalidateQueries({
+//         queryKey: ["inventory", vars.projectId],
+//         refetchType: 'active' // Force active queries to refetch
+//       });
+//     },
+//   });
+// };
+
+// const deleteOrderingMaterialSubItemApi = async ({
+//   projectId,
+//   unitId,
+//   subItemId,
+//   api,
+// }: {
+//   projectId: string;
+//   unitId: string;
+//   subItemId: string;
+//   api: AxiosInstance;
+// }) => {
+//   const { data } = await api.delete(
+//     `/orderingmaterial/${projectId}/unit/${unitId}/deletesubitem/${subItemId}`
+//   );
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
+
+
+// export const useDeleteOrderingMaterialSubItem = () => {
+//   const allowedRoles = ["owner", "staff", "CTO"];
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   const queryClient = useQueryClient()
+//   return useMutation({
+//     mutationFn: async ({
+//       projectId,
+//       unitId,
+//       subItemId,
+//     }: {
+//       projectId: string;
+//       unitId: string;
+//       subItemId: string;
+//     }) => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+//       if (!api) throw new Error("API instance missing");
+//       return await deleteOrderingMaterialSubItemApi({ projectId, unitId, subItemId, api });
+//     },
+//     onSuccess: (_, vars) => {
+//       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+//       queryClient.invalidateQueries({
+//         queryKey: ["inventory", vars.projectId],
+//         refetchType: 'active' // Force active queries to refetch
+//       });
+//     },
+//   });
+// };
+
+
+// const deleteAllSubUnits = async (
+//   projectId: string,
+//   api: AxiosInstance
+// ) => {
+//   const { data } = await api.delete(`/orderingmaterial/deleteallsubunits/${projectId}`);
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
+
+// export const useDeleteAllSubItems = () => {
+//   const allowedRoles = ["owner", "staff", "CTO"];
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   const queryClient = useQueryClient()
+//   return useMutation({
+//     mutationFn: async ({
+//       projectId,
+//     }: {
+//       projectId: string;
+//     }) => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+//       if (!api) throw new Error("API instance missing");
+//       return await deleteAllSubUnits(projectId, api);
+//     },
+//     onSuccess: (_, vars) => {
+//       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+//       queryClient.invalidateQueries({
+//         queryKey: ["inventory", vars.projectId],
+//         refetchType: 'active' // Force active queries to refetch
+//       });
+//     },
+//   });
+// };
+
+// const updateOrderingMaterialSubItemApi = async ({
+//   projectId,
+//   unitId,
+//   subItemId,
+//   subItemName,
+//   quantity,
+//   unit,
+//   api,
+// }: {
+//   projectId: string;
+//   unitId: string;
+//   subItemId: string;
+//   subItemName?: string;
+//   quantity?: number;
+//   unit?: string;
+//   api: AxiosInstance;
+// }) => {
+//   const { data } = await api.put(
+//     `/orderingmaterial/${projectId}/unit/${unitId}/updatesubitem/${subItemId}`,
+//     { subItemName, quantity, unit }
+//   );
+//   if (!data.ok) throw new Error(data.message);
+//   return data.data;
+// };
+
+// export const useUpdateOrderingMaterialSubItem = () => {
+//   const allowedRoles = ["owner", "staff", "CTO"];
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+//   const queryClient = useQueryClient()
+
+//   return useMutation({
+//     mutationFn: async ({
+//       projectId,
+//       unitId,
+//       subItemId,
+//       subItemName,
+//       quantity,
+//       unit,
+//     }: {
+//       projectId: string;
+//       unitId: string;
+//       subItemId: string;
+//       subItemName?: string;
+//       quantity?: number;
+//       unit?: string;
+//     }) => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+//       if (!api) throw new Error("API instance missing");
+//       return await updateOrderingMaterialSubItemApi({
+//         projectId,
+//         unitId,
+//         subItemId,
+//         subItemName,
+//         quantity,
+//         unit,
+//         api,
+//       });
+//     },
+//     onSuccess: (_, vars) => {
+//       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+//       queryClient.invalidateQueries({
+//         queryKey: ["inventory", vars.projectId],
+//         refetchType: 'active' // Force active queries to refetch
+//       });
+
+
+//     },
+//   });
+// };
+
+//  END OF OLD VERSION
+
+
+
+
 const addOrderingMaterialSubItemApi = async ({
   projectId,
-  unitId,
   subItemName,
   quantity,
   unit,
   api,
 }: {
   projectId: string;
-  unitId: string;
   subItemName: string;
   quantity: number;
   unit: string;
   api: AxiosInstance;
 }) => {
   const { data } = await api.post(
-    `/orderingmaterial/${projectId}/unit/${unitId}/addsubitem`,
+    `/orderingmaterial/${projectId}/unit/addsubitem`,
     { subItemName, quantity, unit }
   );
   if (!data.ok) throw new Error(data.message);
@@ -327,7 +643,7 @@ const addOrderingMaterialSubItemApi = async ({
 };
 
 export const useAddOrderingMaterialSubItem = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient()
@@ -335,20 +651,18 @@ export const useAddOrderingMaterialSubItem = () => {
   return useMutation({
     mutationFn: async ({
       projectId,
-      unitId,
       subItemName,
       quantity,
       unit,
     }: {
       projectId: string;
-      unitId: string;
       subItemName: string;
       quantity: number;
       unit: string;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await addOrderingMaterialSubItemApi({ projectId, unitId, subItemName, quantity, unit, api });
+      return await addOrderingMaterialSubItemApi({ projectId, subItemName, quantity, unit, api });
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
@@ -363,52 +677,37 @@ export const useAddOrderingMaterialSubItem = () => {
 // ✅ Delete SubItem
 const deleteOrderingMaterialSubItemApi = async ({
   projectId,
-  unitId,
   subItemId,
   api,
 }: {
   projectId: string;
-  unitId: string;
   subItemId: string;
   api: AxiosInstance;
 }) => {
   const { data } = await api.delete(
-    `/orderingmaterial/${projectId}/unit/${unitId}/deletesubitem/${subItemId}`
+    `/orderingmaterial/${projectId}/unit/deletesubitem/${subItemId}`
   );
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
 
-
-const deleteAllSubUnits = async (
-  projectId: string,
-  api: AxiosInstance
-) => {
-  const { data } = await api.delete(`/orderingmaterial/deleteallsubunits/${projectId}`);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
-};
-
-
 export const useDeleteOrderingMaterialSubItem = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({
       projectId,
-      unitId,
       subItemId,
     }: {
       projectId: string;
-      unitId: string;
       subItemId: string;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await deleteOrderingMaterialSubItemApi({ projectId, unitId, subItemId, api });
+      return await deleteOrderingMaterialSubItemApi({ projectId, subItemId, api });
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
@@ -421,10 +720,17 @@ export const useDeleteOrderingMaterialSubItem = () => {
 };
 
 
-
+const deleteAllSubUnits = async (
+  projectId: string,
+  api: AxiosInstance
+) => {
+  const { data } = await api.delete(`/orderingmaterial/deleteallsubunits/${projectId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
 
 export const useDeleteAllSubItems = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient()
@@ -451,7 +757,6 @@ export const useDeleteAllSubItems = () => {
 // ✅ Update SubItem
 const updateOrderingMaterialSubItemApi = async ({
   projectId,
-  unitId,
   subItemId,
   subItemName,
   quantity,
@@ -459,7 +764,6 @@ const updateOrderingMaterialSubItemApi = async ({
   api,
 }: {
   projectId: string;
-  unitId: string;
   subItemId: string;
   subItemName?: string;
   quantity?: number;
@@ -467,7 +771,7 @@ const updateOrderingMaterialSubItemApi = async ({
   api: AxiosInstance;
 }) => {
   const { data } = await api.put(
-    `/orderingmaterial/${projectId}/unit/${unitId}/updatesubitem/${subItemId}`,
+    `/orderingmaterial/${projectId}/unit/updatesubitem/${subItemId}`,
     { subItemName, quantity, unit }
   );
   if (!data.ok) throw new Error(data.message);
@@ -475,7 +779,7 @@ const updateOrderingMaterialSubItemApi = async ({
 };
 
 export const useUpdateOrderingMaterialSubItem = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient()
@@ -483,14 +787,12 @@ export const useUpdateOrderingMaterialSubItem = () => {
   return useMutation({
     mutationFn: async ({
       projectId,
-      unitId,
       subItemId,
       subItemName,
       quantity,
       unit,
     }: {
       projectId: string;
-      unitId: string;
       subItemId: string;
       subItemName?: string;
       quantity?: number;
@@ -500,7 +802,6 @@ export const useUpdateOrderingMaterialSubItem = () => {
       if (!api) throw new Error("API instance missing");
       return await updateOrderingMaterialSubItemApi({
         projectId,
-        unitId,
         subItemId,
         subItemName,
         quantity,
@@ -520,7 +821,6 @@ export const useUpdateOrderingMaterialSubItem = () => {
   });
 };
 
-
 // ==========  UPDATE SHOP DETAILS ==========
 const updateShopDetailsApi = async (
   projectId: string,
@@ -533,7 +833,7 @@ const updateShopDetailsApi = async (
 };
 
 export const useUpdateShopDetails = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
 
   const { role } = useGetRole();
   const api = getApiForRole(role!);
@@ -566,7 +866,7 @@ const deleteOrderPdf = async (
 
 
 export const useDeleteOrderMaterialPdf = () => {
-  const allowedRoles = ["owner", "staff", "CTO"];
+  const allowedRoles = ["owner", "staff", "CTO","worker"];
 
   const { role } = useGetRole();
   const api = getApiForRole(role!);

@@ -11,6 +11,7 @@ import { useDebounce } from "../../../Hooks/useDebounce";
 import type { OrganizationOutletTypeProps } from "../../Organization/OrganizationChildren";
 import { useAddSelectedUnitNew, useGetSelectedUnitsByProjectNew } from "../../../apiList/Modular Unit Api/Selected Modular Api copy New/selectedModularUnitNewApi";
 import type { ISelectedModularUnit, ISelectedUnit } from "../Selected Units New/SelectedModularUnitNew";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 const ModularUnitMainNew = () => {
     const navigate = useNavigate();
@@ -18,6 +19,16 @@ const ModularUnitMainNew = () => {
     const { organizationId, projectId } = useParams() as { organizationId: string, projectId: string }
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const { isMobile, openMobileSidebar } = useOutletContext<OrganizationOutletTypeProps>()
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.modularunit?.delete;
+    const canList = role === "owner" || permission?.modularunit?.list;
+    const canCreate = role === "owner" || permission?.modularunit?.create;
+    // const canEdit = role === "owner" || permission?.modularunit?.edit;
+
+
 
     const { data: selectedModularUnits } = useGetSelectedUnitsByProjectNew(projectId!) as {
         data: ISelectedModularUnit,
@@ -117,10 +128,10 @@ const ModularUnitMainNew = () => {
     };
 
 
-    const { mutateAsync: addToCart, isPending: isAddingToCart , variables} = useAddSelectedUnitNew();
+    const { mutateAsync: addToCart, isPending: isAddingToCart, variables } = useAddSelectedUnitNew();
     const { data: selectedUnits } = useGetSelectedUnitsByProjectNew(projectId!);
 
-    const handleAddToCart = async (e:React.FormEvent, unit: any, quantity: number) => {
+    const handleAddToCart = async (e: React.FormEvent, unit: any, quantity: number) => {
         e.stopPropagation()
         try {
             await addToCart({
@@ -201,10 +212,13 @@ const ModularUnitMainNew = () => {
                 </div>
 
                 {!isProjectDetails ?
-                    <Button onClick={() => navigate("create")}>
-                        <i className="fas fa-plus mr-2" />
-                        Add Product
-                    </Button> :
+                    <>
+                        {canCreate && <Button onClick={() => navigate("create")}>
+                            <i className="fas fa-plus mr-2" />
+                            Add Product
+                        </Button>}
+                    </>
+                    :
                     <Link to={`/${organizationId}/projectdetails/${projectId}/modularunitsnew/selectedunitsnew`}>
                         <div className="p-2 relative border-2 border-gray-300 rounded-lg">
                             <div className="w-6 justify-center items-center flex absolute top-[-12px] right-[-10px] h-6 rounded-full bg-gray-200 text-black">
@@ -406,7 +420,7 @@ const ModularUnitMainNew = () => {
                     </section>
 
                     {/* No Products Fallback */}
-                    {allUnits.length === 0 ? (
+                   {canList && <>{allUnits.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">
@@ -417,16 +431,16 @@ const ModularUnitMainNew = () => {
                                     ? "Try adjusting your filters to find products."
                                     : "Looks like there are no products yet."}
                                 <br />
-                                {isProjectDetails ? 
-                                <>
-                                    click on <Button onClick={()=> navigate(`/organizations/${organizationId}/modularunits`)}>Add Product</Button> to add products
-                                </> : <>click on <strong>"Add Product"</strong> to get started 🚀 </>}
+                                {isProjectDetails ?
+                                    <>
+                                        click on <Button onClick={() => navigate(`/organizations/${organizationId}/modularunits`)}>Add Product</Button> to add products
+                                    </> : <>click on <strong>"Add Product"</strong> to get started 🚀 </>}
                             </p>
                         </div>
                     ) : (
                         <div ref={scrollContainerRef} className="flex-1 max-h-[100%] overflow-y-auto">
                             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-                                {allUnits.map((unit:ISelectedUnit) => (
+                                {allUnits.map((unit: ISelectedUnit) => (
                                     <ModularUnitCardNew
                                         key={unit._id}
                                         unit={unit}
@@ -464,7 +478,7 @@ const ModularUnitMainNew = () => {
                                 </div>
                             )}
                         </div>
-                    )}
+                    )}</>} 
                 </main>
             )}
         </div>

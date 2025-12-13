@@ -11,6 +11,9 @@ export interface UploadFilePayload {
     projectId: string;
 }
 
+    const allowedRoles = ["owner", "staff", "CTO", "client", "worker"];
+
+
 // below api is used for submitting the form details form the form link submitted through whatsapp to the client 
 const createPublicFromSubmission = async ({ projectId, payload, token }: { projectId: string, payload: any, token: string, }) => {
     const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/requirementform/createrequirement/${projectId}?token=${token}`, payload);
@@ -132,12 +135,6 @@ const generateRequirementFormLink = async ({ projectId, api }: { projectId: stri
     return data.data; //it has the link
 };
 
-const lockUpdationOfForm = async ({ formId, projectId, api }: { formId: string, projectId: string, api: AxiosInstance }) => {
-
-    const { data } = await api.patch(`/requirementform/lockupdation/${projectId}/${formId}`);
-    if (!data.ok) throw new Error(data.message);
-    return data.data;
-}
 
 const formCompletion = async ({ formId, projectId, api }: { formId: string, projectId: string, api: AxiosInstance }) => {
     const { data } = await api.patch(`/requirementform/formcompleted/${projectId}/${formId}`);
@@ -151,12 +148,6 @@ const setDeadlineFormRequirement = async ({ formId, projectId, deadLine, api }: 
     return data.data;
 }
 
-
-const deleteFormRequirements = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
-    const { data } = await api.delete(`/requirementform/deleteform/${projectId}`);
-    if (!data.ok) throw new Error(data.message);
-    return data.data;
-}
 
 const uploadRequirementFiles = async ({ formId, projectId, files, api }: UploadFilePayload & { api: any }) => {
     const formData = new FormData();
@@ -190,7 +181,6 @@ export const useDeleteRequirementUploadFile = () => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
-    const allowedRoles = ["owner", "staff", "CTO"]
 
     return useMutation({
         mutationFn: async ({ projectId, fileId }: { projectId: string, fileId: string }) => {
@@ -205,35 +195,7 @@ export const useDeleteRequirementUploadFile = () => {
     });
 };
 
-//updation part of the requriement form
-
-// const kitchenRequriementFormUpdation = async ({ projectId, api, updateData }: { projectId: string, api: AxiosInstance, updateData: any }) => {
-//     const { data } = await api.put(`/requirementform/${projectId}/updatekitchen`, { kitchen: updateData });
-//     if (!data.ok) throw new Error(data.message);
-//     return data.data;
-// }
-
-// const bedroomRequriementFormUpdation = async ({ projectId, api, updateData }: { projectId: string, api: AxiosInstance, updateData: any }) => {
-//     const { data } = await api.put(`/requirementform/${projectId}/updatebedroom`, { bedroom: updateData });
-//     if (!data.ok) throw new Error(data.message);
-//     return data.data;
-// }
-
-// const wardrobeRequriementFormUpdation = async ({ projectId, api, updateData }: { projectId: string, api: AxiosInstance, updateData: any }) => {
-//     const { data } = await api.put(`/requirementform/${projectId}/updatewardrobe`, { wardrobe: updateData });
-//     if (!data.ok) throw new Error(data.message);
-//     return data.data;
-// }
-
-// const livingHallRequriementFormUpdation = async ({ projectId, api, updateData }: { projectId: string, api: AxiosInstance, updateData: any }) => {
-//     const { data } = await api.put(`/requirementform/${projectId}/updatelivinghall`, { livingHall: updateData });
-//     if (!data.ok) throw new Error(data.message);
-//     return data.data;
-// }
-
-
 export const useCreateFormSubmission = () => {
-    // const allowedRoles = ["owner", "staff", "CTO", "client"]
 
     // const { role } = useGetRole()
 
@@ -255,51 +217,8 @@ export const useCreateFormSubmission = () => {
 
 }
 
-// export const useGetFormRequriemetn = ({ projectId }: { projectId: string }) => {
-//     const allowedRoles = ["owner", "staff", "CTO", "client"]
-
-//     const { role } = useGetRole()
-
-//     const api = getApiForRole(role!)
-//     return useQuery({
-//         queryKey: ["requirementForm"],
-//         queryFn: async () => {
-
-//             if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
-
-//             if (!api) throw new Error("API instance not found for role");
-
-//             return await getRequrimentformDetails({ projectId, api });
-//         },
-//         retry: false,
-//         refetchOnWindowFocus: false,
-//     })
-// }
-
-
-export const useDeleteRequriementForm = () => {
-    const allowedRoles = ["owner", "staff", "CTO"]
-    const { role } = useGetRole()
-
-    const api = getApiForRole(role!)
-
-    return useMutation({
-        mutationFn: async ({ projectId }: { projectId: string }) => {
-
-            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
-
-            if (!api) throw new Error("API instance not found for role");
-
-            return await deleteFormRequirements({ projectId, api });
-        },
-         onSuccess: (_, {projectId}) => {
-            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
-        },
-    });
-};
 
 export const useGenerateShareableLink = () => {
-    const allowedRoles = ["owner", "staff", "CTO"]
     const { role } = useGetRole()
 
     const api = getApiForRole(role!)
@@ -320,31 +239,8 @@ export const useGenerateShareableLink = () => {
 };
 
 
-export const useLockUpdationOfForm = () => {
-    const allowedRoles = ["owner", "staff", "CTO", "client"]
-
-    const { role } = useGetRole()
-
-    const api = getApiForRole(role!)
-
-    return useMutation({
-        mutationFn: async ({ formId, projectId }: { formId: string, projectId: string }) => {
-            if (!role) throw new Error("not authorized")
-            if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
-            if (!api) throw new Error("api is null")
-
-            return await lockUpdationOfForm({ formId, projectId, api })
-        },
-         onSuccess: (_, {projectId}) => {
-            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
-        },
-    })
-
-}
-
 
 export const useFormCompletion = () => {
-    const allowedRoles = ["owner", "staff", "CTO", "client"]
     const { role } = useGetRole()
     const api = getApiForRole(role!)
     return useMutation({
@@ -366,7 +262,6 @@ export const useFormCompletion = () => {
 }
 
 export const useSetDeadLineFormRequirement = () => {
-    const allowedRoles = ["owner", "staff", "CTO"]
     const { role } = useGetRole()
     const api = getApiForRole(role!)
     return useMutation({
@@ -389,7 +284,6 @@ export const useSetDeadLineFormRequirement = () => {
 
 
 export const useUploadRequirementFiles = () => {
-    const allowedRoles = ["owner", "staff", "CTO", "client"]
 
     const { role } = useGetRole()
     const api = getApiForRole(role!)
@@ -415,97 +309,7 @@ export const useUploadRequirementFiles = () => {
 
 
 
-//updation part of the requriement form of custom hooks
-
-// export const useKitchenFormUpdation = () => {
-//     const allowedRoles = ["client", "owner", "staff"]
-
-//     const { role } = useGetRole()
-
-//     const api = getApiForRole(role!)
-//     return useMutation({
-//         mutationFn: async ({ projectId, updateData }: { projectId: string, updateData: any }) => {
-
-//             if (!role) throw new Error("not authorized")
-
-//             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
-
-//             if (!api) throw new Error("api is null")
-
-//             return await kitchenRequriementFormUpdation({ projectId, api, updateData })
-
-//         }
-//     })
-// }
-
-// export const useBedroomFormUpdation = () => {
-//     const allowedRoles = ["client", "owner", "staff"]
-
-//     const { role } = useGetRole()
-
-//     const api = getApiForRole(role!)
-//     return useMutation({
-//         mutationFn: async ({ projectId, updateData }: { projectId: string, updateData: any }) => {
-
-//             if (!role) throw new Error("not authorized")
-
-//             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
-
-//             if (!api) throw new Error("api is null")
-
-//             return await bedroomRequriementFormUpdation({ projectId, api, updateData })
-
-//         }
-//     })
-// }
-
-// export const useWardrobeFormUpdation = () => {
-//     const allowedRoles = ["client", "owner", "staff"]
-
-//     const { role } = useGetRole()
-
-//     const api = getApiForRole(role!)
-//     return useMutation({
-//         mutationFn: async ({ projectId, updateData }: { projectId: string, updateData: any }) => {
-
-//             if (!role) throw new Error("not authorized")
-
-//             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
-
-//             if (!api) throw new Error("api is null")
-
-//             return await wardrobeRequriementFormUpdation({ projectId, api, updateData })
-
-//         }
-//     })
-// }
-
-// export const useLivingHallFormUpdation = () => {
-//     const allowedRoles = ["client", "owner", "staff"]
-
-//     const { role } = useGetRole()
-
-//     const api = getApiForRole(role!)
-//     return useMutation({
-//         mutationFn: async ({ projectId, updateData }: { projectId: string, updateData: any }) => {
-
-//             if (!role) throw new Error("not authorized")
-
-//             if (!allowedRoles.includes(role)) throw new Error('you  dont have the access to make this api')
-
-//             if (!api) throw new Error("api is null")
-
-//             return await livingHallRequriementFormUpdation({ projectId, api, updateData })
-
-//         }
-//     })
-// }
-
-
-
-
 export const useCreateRoom = () => {
-    const allowedRoles = ["owner", "staff", "CTO",];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
     const queryClient = useQueryClient();
@@ -525,7 +329,6 @@ export const useCreateRoom = () => {
 
 
 export const useDeleteRoomRequirement = () => {
-    const allowedRoles = ["owner", "staff", "CTO",];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
     const queryClient = useQueryClient();
@@ -543,7 +346,6 @@ export const useDeleteRoomRequirement = () => {
 };
 
 export const useUpdateRequirementRoomItem = () => {
-    const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
     const queryClient = useQueryClient();
@@ -572,7 +374,6 @@ export const useUpdateRequirementRoomItem = () => {
 
 
 export const useDeleteRoomItems = () => {
-    const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
     const queryClient = useQueryClient();
@@ -602,7 +403,6 @@ export const useDeleteRoomItems = () => {
 
 
 export const useGetAllRequirementInfo = ({ projectId }: { projectId: string }) => {
-    const allowedRoles = ["owner", "staff", "CTO", "client",];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
@@ -625,7 +425,6 @@ export const useGetSingleRoomRequirement = ({
     projectId: string;
     roomId: string;
 }) => {
-    const allowedRoles = ["owner", "staff", "CTO", "client"];
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
@@ -670,7 +469,6 @@ export const useUploadRequirementSectionFiles = () => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
-    const allowedRoles = ["owner", "staff", "CTO", "client"];
 
     return useMutation({
         mutationFn: async ({
@@ -723,7 +521,6 @@ export const useDeleteRequirementSectionFile = () => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
-    const allowedRoles = ["owner", "staff", "CTO"];
 
     return useMutation({
         mutationFn: async ({

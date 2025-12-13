@@ -17,6 +17,8 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 // import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -45,8 +47,15 @@ export default function InstallationOverview() {
   const location = useLocation();
   const navigate = useNavigate()
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
- 
+
   const isChildRoute = location.pathname.includes("/installationroom");
+
+  const { role, permission } = useAuthCheck();
+  // const canDelete = role === "owner" || permission?.installation?.delete;
+  // const canList = role === "owner" || permission?.installation?.list;
+  const canCreate = role === "owner" || permission?.installation?.create;
+  const canEdit = role === "owner" || permission?.installation?.edit;
+
 
   const {
     data,
@@ -121,7 +130,7 @@ export default function InstallationOverview() {
               <i className="fas fa-tools mr-2"></i> Installation Overview
             </h2>
 
-            <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
+            {(canEdit || canCreate) && <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
               <Button
                 isLoading={completePending}
                 onClick={handleCompletionStatus}
@@ -152,6 +161,14 @@ export default function InstallationOverview() {
                 organizationId={organizationId!}
                 currentAssignedStaff={data?.assignedTo || null}
                 className="w-full sm:w-auto"
+              />
+            </div>
+            }
+
+            <div className="w-full sm:w-auto flex justify-end sm:block">
+              <StageGuide
+                organizationId={organizationId!}
+                stageName="installation"
               />
             </div>
           </div>
@@ -198,7 +215,7 @@ export default function InstallationOverview() {
                   />
                 </Card>
 
-              
+
                 {/* Installation Images Gallery */}
                 {data?.tasks && data?.tasks.length > 0 ? (
                   <Card className="p-2 mb-6 w-full shadow  bg-white">
@@ -243,7 +260,7 @@ export default function InstallationOverview() {
                               </div>
 
 
-                              <div className="flex items-center gap-3">
+                              {(canCreate || canEdit) && <div className="flex items-center gap-3">
                                 <div className="flex flex-col gap-1">
                                   <label className="text-xs font-medium text-gray-600">Update Status</label>
                                   <Select
@@ -283,7 +300,7 @@ export default function InstallationOverview() {
                                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                                   </div>
                                 )}
-                              </div>
+                              </div>}
                             </div>
 
                             {/* Image Number Badge */}

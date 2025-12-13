@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useGetShopLib, useCreateShopLib, useDeleteShopLib } from "../../../../apiList/Stage Api/shopLibDetailApi";
 import { toast } from "../../../../utils/toast";
 import { Button } from "../../../../components/ui/Button";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 // import { useGetShopLib, useCreateShopLib, useDeleteShopLib } from "../../api/shopLibApi";
 
 interface ShopFormData {
@@ -24,6 +25,14 @@ const ShopLibDetailsMain: React.FC = () => {
         contactPerson: "",
         phoneNumber: "",
     });
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.ordermaterial?.delete;
+    // const canList = role === "owner" || permission?.ordermaterial?.list;
+    const canCreate = role === "owner" || permission?.ordermaterial?.create;
+    // const canEdit = role === "owner" || permission?.ordermaterial?.edit;
+
+
 
     const { data: shops, isLoading, error } = useGetShopLib(organizationId);
     const createShopMutation = useCreateShopLib();
@@ -174,13 +183,13 @@ const ShopLibDetailsMain: React.FC = () => {
                             </div>
 
                         </div>
-                        <Button
+                       {(canCreate)  && <Button
                             onClick={() => setIsCreateModalOpen(true)}
                             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
                         >
                             <i className="fas fa-plus"></i>
                             <span>Add New Shop</span>
-                        </Button>
+                        </Button>}
                     </div>
 
                     {/* Search and View Toggle */}
@@ -230,7 +239,7 @@ const ShopLibDetailsMain: React.FC = () => {
                                 ? "Try adjusting your search terms"
                                 : "Get started by adding your first shop"}
                         </p>
-                        {!searchTerm && (
+                        {(!searchTerm || canCreate) && (
                             <button
                                 onClick={() => setIsCreateModalOpen(true)}
                                 className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
@@ -351,7 +360,7 @@ const ShopLibDetailsMain: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                                <Button
+                                               {canDelete && <Button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleDeleteShop(shop._id);
@@ -361,7 +370,7 @@ const ShopLibDetailsMain: React.FC = () => {
                                                     isLoading={deleteShopMutation.isPending && deleteShopMutation.variables?.id === shop._id}
                                                 >
                                                     <i className="fas fa-trash"></i>
-                                                </Button>
+                                                </Button>}
                                             </td>
                                         </tr>
                                     ))}

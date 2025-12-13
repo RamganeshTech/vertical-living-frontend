@@ -7,6 +7,7 @@ import { useGetProjects } from "../../../apiList/projectApi";
 import { useState } from "react";
 import QuoteClientCard from "./QuoteClientCard";
 import { useGetAllClientQuotes } from "../../../apiList/Quote Api/ClientQuote/clientQuoteApi";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 const ClientQuoteMain = () => {
     const { organizationId } = useParams();
@@ -17,6 +18,18 @@ const ClientQuoteMain = () => {
         projectName: "",
         createdAt: "",
     });
+
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.materialquote?.list;
+    // const canCreate = role === "owner" || permission?.materialquote?.create;
+    // const canDelete = role === "owner" || permission?.materialquote?.delete;
+    // const canEdit = role === "owner" || permission?.materialquote?.edit;
+
+
 
     const [searchInput, setSearchInput] = useState("");     // user typing
     const [searchTerm, setSearchTerm] = useState<string>(""); // value used for sending to the api
@@ -207,7 +220,7 @@ const ClientQuoteMain = () => {
                     </div>
                 </div>
 
-                <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
+               {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
 
                     {isLoading ? (
                         <p><MaterialOverviewLoading /></p>
@@ -234,7 +247,7 @@ const ClientQuoteMain = () => {
                             ))}
                         </div>
                     )}
-                </section>
+                </section>}
 
             </main>
         </div>

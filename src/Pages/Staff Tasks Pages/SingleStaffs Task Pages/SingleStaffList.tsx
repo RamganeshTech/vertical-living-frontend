@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import MaterialOverviewLoading from '../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../store/store'
+// import { useAuthCheck } from '../../../Hooks/useAuthCheck'
 
 
 
@@ -23,6 +24,14 @@ const SingleStaffList = () => {
     const [filters, setFilters] = useState<FilterType>({})
     const [showPendingTask, setShowPendingTask] = useState<boolean>(false)
     const location = useLocation()
+
+
+
+    // const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.stafftask?.delete;
+    // const canCreate = role === "owner" || permission?.stafftask?.create;
+    // const canList = role === "owner" || permission?.stafftask?.list;
+
 
 
     const { staffName } = useSelector((state: RootState) => state.staffProfileStore)

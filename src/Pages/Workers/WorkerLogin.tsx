@@ -45,7 +45,7 @@ export default function WorkerLogin() {
       newErrors.password = "Password must be at least 6 characters"
     }
 
-     
+
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -76,14 +76,17 @@ export default function WorkerLogin() {
     try {
       const data = await loginWorker.mutateAsync(formData)
 
-      const workerData = data?.data;
+      const workerData = data;
 
       // ✅ 1) Update authSlice
       dispatch(setRole({
         role: workerData.role,
         isauthenticated: true,
         _id: workerData._id,
-        userName: workerData?.workerName
+        userName: workerData?.workerName,
+        permission: workerData?.permission || {},
+        isGuideRequired: workerData.isGuideRequired
+
       }));
 
       // ✅ 2) Update workerSlice
@@ -93,7 +96,11 @@ export default function WorkerLogin() {
         email: workerData.email,
         phoneNo: workerData.phoneNo,
         role: workerData.role,
-        isauthenticated: true
+        isauthenticated: true,
+        permission: workerData?.permission || {},
+        isGuideRequired: workerData.isGuideRequired
+
+
       }));
 
       navigate("/organizations")
@@ -197,7 +204,7 @@ export default function WorkerLogin() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="text-right">
                 <Link to="/forgotpassword/worker" className="text-blue-600 text-sm font-medium ">forgot Password</Link>
               </div>

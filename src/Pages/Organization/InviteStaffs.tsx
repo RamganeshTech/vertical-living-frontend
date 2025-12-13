@@ -10,9 +10,10 @@ import { Input } from '../../components/ui/Input';
 // import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar';
 // import { COMPANY_DETAILS } from '../../constants/constants';
 import type { OrganizationOutletTypeProps } from './OrganizationChildren';
+import { useAuthCheck } from '../../Hooks/useAuthCheck';
 // import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
-import { roles } from '../../constants/constants';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
+// import { roles } from '../../constants/constants';
 
 
 
@@ -24,9 +25,21 @@ const InviteStaffs: React.FC = () => {
 
   const navigate = useNavigate()
 
+
+
+  const { role, permission } = useAuthCheck();
+
+
+  const canDelete = role === "owner" || permission?.invitestaff?.delete;
+  const canList = role === "owner" || permission?.invitestaff?.list;
+  const canCreate = role === "owner" || permission?.invitestaff?.create;
+  const canEdit = role === "owner" || permission?.invitestaff?.edit;
+
+
+
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
-  const [specificRole, setSpecificRole] = useState("")
+  // const [specificRoles, setSpecificRoles] = useState<string[]>([])
 
   // 🔎 search filters
   const [searchName, setSearchName] = useState("")
@@ -47,6 +60,19 @@ const InviteStaffs: React.FC = () => {
       (searchPhone === "" || staff.phoneNo?.toString().includes(searchPhone))
     )
   })
+
+
+  // 3. Logic to toggle roles in the array
+  // const handleRoleToggle = (role: string) => {
+  //   setSpecificRoles((prev) => {
+  //     if (prev.includes(role)) {
+  //       return prev.filter((r) => r !== role) // Remove if exists
+  //     } else {
+  //       return [...prev, role] // Add if doesn't exist
+  //     }
+  //   })
+  // }
+
 
 
   const handleRemoveStaff = async (staffId: string, staffName: string) => {
@@ -75,7 +101,7 @@ const InviteStaffs: React.FC = () => {
       const response = await inviteStaff.mutateAsync({
         organizationId: organizationId!,
         role: "staff",
-        specificRole,
+        // specificRole:specificRoles,
       })
       setInviteLink(response?.inviteLink || response)
       toast({
@@ -317,10 +343,10 @@ const InviteStaffs: React.FC = () => {
           </div>
 
           {/* Grid container for form and actions */}
-          <div className={`grid grid-cols-1  md:grid-cols-3 md:gap-6 ${inviteLink ? "items-start" :"items-end"}`}>
+          <div className={`grid grid-cols-1  md:grid-cols-3 md:gap-6 ${inviteLink ? "items-start" : "items-end"}`}>
 
             {/* Role Selection */}
-            <div className="md:col-span-1  space-y-2">
+            {/* <div className="md:col-span-1  space-y-2">
               <Label className="block text-sm text-gray-700 font-medium">Staff Role</Label>
               <Select
                 value={specificRole}
@@ -338,20 +364,60 @@ const InviteStaffs: React.FC = () => {
                 </SelectContent>
               </Select>
              
-            </div>
+            </div> */}
+
+
+            {/* Role Selection - UPDATED UI
+            <div className="md:col-span-1 space-y-3">
+              <Label className="block text-sm text-gray-700 font-medium">Specific Roles</Label>
+              
+              <div className="flex flex-wrap gap-2">
+                {roles.map((role) => {
+                  const isSelected = specificRoles.includes(role);
+                  return (
+                    <div
+                      key={role}
+                      onClick={() => handleRoleToggle(role)}
+                      className={`
+                        cursor-pointer px-3 py-1.5 rounded-md border text-xs sm:text-sm font-medium transition-all duration-200 select-none flex items-center gap-2 w-fit
+                        ${isSelected 
+                          ? "bg-blue-600 text-white border-blue-600 shadow-sm" 
+                          : "bg-white text-gray-600 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                        }
+                      `}
+                    >
+                      <div className={`
+                        w-3.5 h-3.5 rounded flex items-center justify-center border transition-colors
+                        ${isSelected ? "border-white bg-transparent" : "border-gray-400 bg-white"}
+                      `}>
+                         {isSelected && <i className="fas fa-check text-[8px] text-white"></i>}
+                      </div>
+                      
+                      <span className="capitalize">{role}</span>
+                    </div>
+                  )
+                })}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Selected: {specificRoles.length > 0 ? specificRoles.join(", ") : "None"}
+              </p>
+            </div> */}
+
 
             {/* Invite Link and Buttons */}
             <div className="md:col-span-2  mt-6 md:mt-0 space-y-3">
               {/* Generate Button or Link UI */}
               {!inviteLink ? (
-                <Button
-                  onClick={handleGenerateInviteLink}
-                  isLoading={inviteStaff.isPending}
-                  className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md text-sm font-medium flex items-center gap-2"
-                >
-                  <i className="fas fa-link" />
-                  Generate Invitation Link
-                </Button>
+                <>
+                  {(canCreate || canEdit) && <Button
+                    onClick={handleGenerateInviteLink}
+                    isLoading={inviteStaff.isPending}
+                    className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md text-sm font-medium flex items-center gap-2"
+                  >
+                    <i className="fas fa-link" />
+                    Generate Invitation Link
+                  </Button>}
+                </>
               ) : (
                 <div className="space-y-4">
                   {/* Link Display with Copy */}
@@ -393,13 +459,13 @@ const InviteStaffs: React.FC = () => {
                   </div>
 
                   {/* Regenerate Link Button */}
-                  <Button
+                  {(canCreate || canEdit) && <Button
                     onClick={handleGenerateInviteLink}
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md text-sm font-medium flex items-center justify-center gap-2"
                   >
                     <i className="fas fa-sync-alt" />
                     Generate New Link
-                  </Button>
+                  </Button>}
                 </div>
               )}
             </div>
@@ -466,7 +532,7 @@ const InviteStaffs: React.FC = () => {
         </div> */}
 
 
-        <div className="bg-white p-6 py-2 w-full !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
+        {canList && <div className="bg-white p-6 py-2 w-full !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
           <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
             <i className="fas fa-users mr-2" /> Staff Members ({filteredStaffs?.length})
           </h2>
@@ -530,7 +596,7 @@ const InviteStaffs: React.FC = () => {
       ))}
     </div> */}
 
-              <div className="mt-2 md:mt-0 md:text-center">
+              {canDelete && <div className="mt-2 md:mt-0 md:text-center">
                 <Button
                   variant="danger"
                   size="sm"
@@ -540,10 +606,10 @@ const InviteStaffs: React.FC = () => {
                   <i className="fas fa-trash-alt"></i>
                   Delete
                 </Button>
-              </div>
+              </div>}
             </div>
           ))}
-        </div>
+        </div>}
       </div>
     </div>
   )

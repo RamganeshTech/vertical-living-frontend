@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useGetShopLib, useUpdateShopLib } from "../../../../apiList/Stage Api/shopLibDetailApi";
 import { toast } from "../../../../utils/toast";
 import { Button } from "../../../../components/ui/Button";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 // import { useGetShopLib, useUpdateShopLib } from "../../api/shopLibApi";
 // import toast from "react-hot-toast";
 
@@ -28,6 +29,19 @@ const ShopDetailSingle: React.FC = () => {
 
     const { data: shops, isLoading, error } = useGetShopLib(organizationId);
     const updateShopMutation = useUpdateShopLib();
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.ordermaterial?.delete;
+    // const canList = role === "owner" || permission?.ordermaterial?.list;
+    // const canCreate = role === "owner" || permission?.ordermaterial?.create;
+    const canEdit = role === "owner" || permission?.ordermaterial?.edit;
+
+
+
+
 
     // Find the current shop
     const currentShop = shops?.find((shop: any) => shop._id === shopId);
@@ -398,14 +412,14 @@ const ShopDetailSingle: React.FC = () => {
                             Quick Actions
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <button
+                            {canEdit && <button
                                 onClick={() => setIsEditMode(true)}
                                 className="p-4 cursor-pointer border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
                             >
                                 <i className="fas fa-edit text-blue-500 text-xl mb-2"></i>
                                 <p className="font-medium text-gray-800">Edit Details</p>
                                 <p className="text-sm text-gray-500">Update shop information</p>
-                            </button>
+                            </button>}
 
                             <button
                                 onClick={handleCopyDetails}

@@ -9,6 +9,7 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { Input } from "../../../components/ui/Input";
 import { useDebounce } from "../../../Hooks/useDebounce";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface FilterState {
   search: string;
@@ -63,6 +64,12 @@ const SubContractMain = () => {
   const location = useLocation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { organizationId } = useParams() as { organizationId: string }
+
+
+  const { role, permission } = useAuthCheck();
+  const canList = role === "owner" || permission?.subcontract?.list;
+  const canCreate = role === "owner" || permission?.subcontract?.create;
+
 
 
   const [filters, setFilters] = useState<FilterState>({
@@ -281,10 +288,10 @@ const SubContractMain = () => {
           {/* <Breadcrumb paths={paths} /> */}
         </div>
 
-        <Button onClick={() => navigate('create')}>
+        {canCreate && <Button onClick={() => navigate('create')}>
           <i className="fas fa-plus mr-2" />
           Create Sub Contract
-        </Button>
+        </Button>}
       </div>
 
       {/* Loading State */}
@@ -402,7 +409,7 @@ const SubContractMain = () => {
                 </div>
 
                 {/* Labour Cost Range */}
-                
+
 
                 {/* <div className="">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -602,13 +609,12 @@ const SubContractMain = () => {
                   </select>
                 </div> */}
 
-                
+
               </div>
             </div>
           </div>
 
-          {/* Main Content */}
-          {allSubContracts.length === 0 ? (
+          {canList && <>{allSubContracts.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
               <i className="fas fa-hard-hat text-5xl text-blue-300 mb-4" />
               <h3 className="text-lg font-semibold text-blue-800 mb-1">No Sub Contracts Found</h3>
@@ -635,7 +641,6 @@ const SubContractMain = () => {
                 ))}
               </div>
 
-              {/* Loading indicator */}
               {isFetchingNextPage && (
                 <div className="flex justify-center py-8">
                   <div className="flex items-center gap-2 text-blue-600">
@@ -645,7 +650,6 @@ const SubContractMain = () => {
                 </div>
               )}
 
-              {/* End of list */}
               {!hasNextPage && allSubContracts.length > 0 && (
                 <div className="flex justify-center py-6">
                   <p className="text-gray-400 text-sm font-medium">
@@ -656,6 +660,8 @@ const SubContractMain = () => {
               )}
             </div>
           )}
+
+          </>}
         </main>
       )}
     </div>

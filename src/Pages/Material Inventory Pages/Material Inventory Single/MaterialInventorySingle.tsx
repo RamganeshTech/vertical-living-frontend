@@ -15,6 +15,7 @@ import { useAddToCart, useGetCart, useRemoveCartItem, useUpdateCartItemQuantity 
 import MaterialInventSingleHeader from "./MaterialInventSingleHeader";
 // import { NO_IMAGE } from "../../../constants/constants";
 import MaterialInventSingleMainCompo from "./MaterialInventSingleMainCompo";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 export type Variant = {
     color: string;
@@ -71,6 +72,14 @@ const MaterialInventorySingle: React.FC = () => {
     const addToCartMutation = useAddToCart();
     const updateCartQuantityMutation = useUpdateCartItemQuantity();
     const removeFromCartMutation = useRemoveCartItem();
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.productinventory?.delete;
+    // const canCreate = role === "owner" || permission?.productinventory?.create;
+    const canList = role === "owner" || permission?.productinventory?.list;
+
+
+
 
 
     // Initialize form with data when data loads
@@ -560,6 +569,11 @@ const MaterialInventorySingle: React.FC = () => {
     };
 
     const editableFields = getEditableFields();
+
+
+    if(!canList){
+        return
+    }
 
     return (
         <div className="max-h-full min-h-full overflow-y-auto bg-gradient-to-br from-violet-50 via-blue-50 to-white p-4">

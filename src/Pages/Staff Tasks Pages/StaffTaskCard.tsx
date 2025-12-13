@@ -9,13 +9,18 @@ import { toast } from '../../utils/toast'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../store/store'
 import type { MainStaffTaskForm } from './Create Task Pages/StaffAssignTaskMain'
+import { useAuthCheck } from '../../Hooks/useAuthCheck'
 
 type Props = {
     task: MainStaffTaskForm
 }
 const StaffTaskCard: React.FC<Props> = ({ task }) => {
     const navigate = useNavigate()
-    const { _id: staffId, role } = useSelector((state: RootState) => state.authStore)
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.stafftask?.delete;
+
+    const { _id: staffId, } = useSelector((state: RootState) => state.authStore)
     // const { role } = useGetRole()
     const isStaff = role === "staff"
 
@@ -103,7 +108,7 @@ const StaffTaskCard: React.FC<Props> = ({ task }) => {
                                                 View
                                             </Button> */}
 
-                    {!isStaff && <Button
+                    {(!isStaff && canDelete) && <Button
                         size='sm'
                         onClick={(e) => {
                             e.stopPropagation()

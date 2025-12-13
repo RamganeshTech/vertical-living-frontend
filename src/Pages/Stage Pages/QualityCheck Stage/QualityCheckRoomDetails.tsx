@@ -1,11 +1,12 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {  useCreateQualityCheckItem, useEditQualityCheckItem, useDeleteQualityCheckItem, useGetQualityCheckRoomItems, } from "../../../apiList/Stage Api/qualityCheckApi";
+import { useCreateQualityCheckItem, useEditQualityCheckItem, useDeleteQualityCheckItem, useGetQualityCheckRoomItems, } from "../../../apiList/Stage Api/qualityCheckApi";
 import { Input } from "../../../components/ui/Input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "../../../components/ui/Select";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 import RoomDetailsLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/RoomDetailLoading";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 // const dummyQualityCheckRooms: QualityCheckRoom[] = [
 //   {
@@ -130,6 +131,15 @@ export default function QualityCheckRoomDetails() {
 
   const [popupImage, setPopupImage] = useState<string | null>(null);
 
+
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.qualitycheck?.delete;
+  // const canList = role === "owner" || permission?.qualitycheck?.list;
+  const canCreate = role === "owner" || permission?.qualitycheck?.create;
+  const canEdit = role === "owner" || permission?.qualitycheck?.edit;
+
+
   const { data, isLoading, error, isError, refetch } = useGetQualityCheckRoomItems(projectId, decodedRoomName);
   const { mutateAsync: createItem, isPending: createPending } = useCreateQualityCheckItem();
   const { mutateAsync: editItem, isPending: editPending } = useEditQualityCheckItem();
@@ -152,7 +162,7 @@ export default function QualityCheckRoomDetails() {
   const handleAdd = async () => {
     try {
 
-      if(!form.workName.trim()){
+      if (!form.workName.trim()) {
         throw new Error("Work name is mandatory")
       }
 
@@ -180,7 +190,7 @@ export default function QualityCheckRoomDetails() {
     try {
       if (!editingId) return;
 
-        if(!form.workName.trim()){
+      if (!form.workName.trim()) {
         throw new Error("Work name is mandatory")
       }
 
@@ -314,28 +324,28 @@ export default function QualityCheckRoomDetails() {
                           setForm({ ...form, workName: e.target.value })
                         }
                       />
-                    <div className="relative z-50">
+                      <div className="relative z-50">
                         <Select
-                        value={form.status}
-                        onValueChange={(val) =>
-                          setForm({ ...form, status: val })
-                        }
-                      >
-                        <SelectTrigger selectedValue={form.status}>
-                          <SelectValue
-                            selectedValue={form.status}
-                            placeholder="Select status"
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {["pass", "fail", "pending"].map((opt) => (
-                            <SelectItem key={opt} value={opt}>
-                              {opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                          value={form.status}
+                          onValueChange={(val) =>
+                            setForm({ ...form, status: val })
+                          }
+                        >
+                          <SelectTrigger selectedValue={form.status}>
+                            <SelectValue
+                              selectedValue={form.status}
+                              placeholder="Select status"
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {["pass", "fail", "pending"].map((opt) => (
+                              <SelectItem key={opt} value={opt}>
+                                {opt}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                       <Input
                         value={form.remarks}
                         placeholder="Remarks"
@@ -402,7 +412,7 @@ export default function QualityCheckRoomDetails() {
                         )}
                       </div>
                       <div className="flex gap-2 justify-center">
-                        <button
+                       {canEdit &&  <button
                           onClick={() => {
                             setEditingId((item as any)._id);
                             setAdding(false);
@@ -416,15 +426,15 @@ export default function QualityCheckRoomDetails() {
                           className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
                         >
                           <i className="fas fa-edit mr-1"></i> Edit
-                        </button>
-                        <Button
+                        </button>}
+                       {canDelete && <Button
                           variant="danger"
                           isLoading={deletePending}
                           onClick={() => handleDelete((item as any)._id)}
                           className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
                         >
                           <i className="fas fa-trash mr-1"></i> Delete
-                        </Button>
+                        </Button>}
                       </div>
                     </div>
                   )
@@ -479,7 +489,7 @@ export default function QualityCheckRoomDetails() {
                     />
                   </div>
                   <div className="flex gap-2 justify-center">
-                    <button
+                   {canCreate && <><button
                       onClick={handleAdd}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
                     >
@@ -491,6 +501,8 @@ export default function QualityCheckRoomDetails() {
                     >
                       <i className="fas fa-times mr-1"></i> Cancel
                     </button>
+                    </>
+}
                   </div>
                 </div>
               )}
@@ -500,7 +512,7 @@ export default function QualityCheckRoomDetails() {
           {/* Add New Button */}
           {!adding && items.length > 0 && (
             <div className="mt-4">
-              <Button
+              {canCreate && <Button
                 isLoading={createPending}
                 variant="primary"
                 onClick={() => {
@@ -510,7 +522,7 @@ export default function QualityCheckRoomDetails() {
                 }}
               >
                 <i className="fas fa-plus mr-2"></i> Add Item
-              </Button>
+              </Button>}
             </div>
           )}
         </>

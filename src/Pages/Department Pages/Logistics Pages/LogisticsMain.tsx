@@ -9,6 +9,7 @@ import { Button } from "../../../components/ui/Button";
 import { useGetProjects } from "../../../apiList/projectApi";
 import ShipmentCard from "./ShipmentCard";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 
 export interface ILogisticsVehicle {
@@ -69,6 +70,15 @@ const LogisticsMain: React.FC = () => {
   const location = useLocation();
 
 
+
+
+  const { role, permission } = useAuthCheck();
+
+
+  const canCreate = role === "owner" || permission?.logistics?.create;
+  const canList = role === "owner" || permission?.logistics?.list;
+
+
   const [filters, setFilters] = useState({
     status: "",
     projectId: "",
@@ -122,7 +132,7 @@ const LogisticsMain: React.FC = () => {
 
 
         {/* <h2 className="text-3xl font-bold text-blue-600">Logistics Department</h2> */}
-        <Button
+        {canCreate && <Button
           onClick={() => {
             setEditingShipment(null);
             setShowForm(true);
@@ -130,11 +140,11 @@ const LogisticsMain: React.FC = () => {
         >
           <i className="fas fa-plus mr-2" />
           Add Shipment
-        </Button>
+        </Button>}
       </div>
 
       {isLoading ? (
-       <MaterialOverviewLoading />
+        <MaterialOverviewLoading />
       ) : isError ? (
         <div className="max-w-xl sm:min-w-[80%]  mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
           <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
@@ -234,14 +244,13 @@ const LogisticsMain: React.FC = () => {
             </div>
           </div>
 
-          {/* No Shipments Fallback */}
-          {shipments.length === 0 ? (
+          {canList && <>{shipments.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
               <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
               <h3 className="text-lg font-semibold text-blue-800 mb-1">No Shipments Found</h3>
               <p className="text-sm text-gray-500">
                 Looks like there are no logistics shipments yet for this project.<br />
-                Click on <strong>"Add Shipment"</strong> to get started 🚀
+                Click on <strong>Add Shipment</strong> to get started 🚀
               </p>
             </div>
           ) : (
@@ -255,7 +264,7 @@ const LogisticsMain: React.FC = () => {
                 ))}
               </div>
             </div>
-          )}
+          )}</>}
         </main>
       )}
 

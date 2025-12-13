@@ -1,6 +1,7 @@
 import React from 'react'
 import { dateFormate } from '../../../../utils/dateFormator'
 import type { CreateBillPayload } from './CreateBillAcc'
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
 type Props = {
     bill: CreateBillPayload,
     index: number,
@@ -9,6 +10,17 @@ type Props = {
     deletePending:boolean
 }
 const BillAccList: React.FC<Props> = ({ bill, index, handleView, handleDelete, deletePending }) => {
+
+
+
+    
+        
+            const { role, permission } = useAuthCheck();
+            const canDelete = role === "owner" || permission?.billing?.delete;
+            // const canList = role === "owner" || permission?.billing?.list;
+            // const canCreate = role === "owner" || permission?.billing?.create;
+            // const canEdit = role === "owner" || permission?.billing?.create;
+        
     return (
         <div
             className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
@@ -71,7 +83,7 @@ const BillAccList: React.FC<Props> = ({ bill, index, handleView, handleDelete, d
                 >
                     <i className="fas fa-eye"></i>
                 </button> */}
-                <button
+                {canDelete && <button
                     onClick={(e) => {
                         e.stopPropagation()
                         handleDelete(bill._id!)
@@ -85,7 +97,7 @@ const BillAccList: React.FC<Props> = ({ bill, index, handleView, handleDelete, d
                     ) : (
                         <i className="fas fa-trash"></i>
                     )}
-                </button>
+                </button>}
             </div>
         </div>
     )

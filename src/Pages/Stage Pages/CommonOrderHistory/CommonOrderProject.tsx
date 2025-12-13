@@ -30,6 +30,7 @@ import { NO_IMAGE } from "../../../constants/constants"
 import CreateUnitModel, { type UnitPayload } from "./CreateUnitModel"
 import { downloadImage } from "../../../utils/downloadFile"
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading"
+import { useAuthCheck } from "../../../Hooks/useAuthCheck"
 
 
 
@@ -107,6 +108,16 @@ const CommonOrderProject = () => {
     const { mutateAsync: deletePdf, isPending: deletepdfPending } = useDeleteCommonOrderMaterialPdf()
     const { mutateAsync: updateCommonOrderPdfStatus } = useUpdateCommonOrderPdfStatus()
 
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canDelete = role === "owner" || permission?.commonorder?.delete;
+    // const canList = role === "owner" || permission?.commonorder?.list;
+    const canCreate = role === "owner" || permission?.commonorder?.create;
+    const canEdit = role === "owner" || permission?.commonorder?.edit;
+
     // const { mutateAsync: completionStatus, isPending: completePending } = useCompleteCommonOrderMaterialHistoryStage()
 
 
@@ -131,6 +142,7 @@ const CommonOrderProject = () => {
 
 
     const handleSaveEdit = async (unitId: string, subItemId: string, field: string, value: any) => {
+        if(!canEdit) return 
         try {
             const unit = selectedUnits.find((u: any) => u._id === unitId);
             const subItem = unit?.subItems?.find((s: any) => s._id === subItemId);
@@ -163,6 +175,7 @@ const CommonOrderProject = () => {
 
     // Handle new row creation
     const handleNewRowSave = async (unitId: string, newData: any) => {
+        if(!canCreate) return;
         const rowData: any = newData;
 
         if (!rowData && !rowData?.name.trim()) {
@@ -489,12 +502,12 @@ const CommonOrderProject = () => {
                                 <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
                                 <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
 
-                                <button
+                               {canEdit && <button
                                     onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
                                     className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
                                 >
                                     <i className="fa-solid fa-edit mr-1"></i>Edit
-                                </button>
+                                </button>}
 
                             </div>
                         )}
@@ -552,12 +565,12 @@ const CommonOrderProject = () => {
                                 <p><strong>Supervisor:</strong> {data?.deliveryLocationDetails?.siteSupervisor || "-"}</p>
                                 <p><strong>Phone:</strong> {data?.deliveryLocationDetails?.phoneNumber || "-"}</p>
                                 <p><strong>Address:</strong> {data?.deliveryLocationDetails?.address || "-"}</p>
-                                <button
+                                {canEdit && <button
                                     onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
                                     className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
                                 >
                                     <i className="fa-solid fa-edit mr-1"></i>Edit
-                                </button>
+                                </button>}
                             </div>
                         )}
                     </div>
@@ -575,7 +588,7 @@ const CommonOrderProject = () => {
 
                             <div className="flex gap-3">
 
-                                {!showCreateUnitForm && (
+                                {(!showCreateUnitForm && canCreate) && (
                                     <Button onClick={() => setShowCreateUnitForm(true)} variant="primary">
                                         + Create New Unit
                                     </Button>
@@ -620,7 +633,7 @@ const CommonOrderProject = () => {
                                                             {unit.unitName}
                                                         </h3>
                                                         <div className="flex gap-2 items-center">
-                                                            <Button size="sm" variant="ghost" onClick={() => {
+                                                            {canEdit && <Button size="sm" variant="ghost" onClick={() => {
                                                                 setEditingUnitId(unit._id)
                                                                 setEditingUnit(unit)
                                                                 setIsUnitEditing(true)
@@ -628,16 +641,16 @@ const CommonOrderProject = () => {
                                                             }
                                                             >
                                                                 Edit
-                                                            </Button>
+                                                            </Button>}
 
-                                                            <Button size="sm" variant="danger"
+                                                            {canDelete && <Button size="sm" variant="danger"
                                                                 isLoading={deletePending}
                                                                 onClick={() => handleUnitDelete(unit._id)
                                                                 }
                                                                 className="text-white bg-red-600"
                                                             >
                                                                 delete
-                                                            </Button>
+                                                            </Button>}
 
 
                                                             <span className="flex cursor-pointer gap-1 items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"> Total Sub Items : <span className="">{unit?.subItems?.length || 0}</span></span>

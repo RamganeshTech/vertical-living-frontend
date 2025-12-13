@@ -72,13 +72,17 @@ export default function StaffLogin() {
     try {
       const data = await loginStaff.mutateAsync(formData)
 
-      const staffData = data.data;
+      const staffData = data;
 
       dispatch(setRole({
         _id: staffData.staffId,
         role: staffData.role,
         isauthenticated: true,
-        userName: staffData?.staffName
+        userName: staffData?.staffName,
+        permission: staffData?.permission || {},
+        isGuideRequired: staffData.isGuideRequired
+
+
       }));
       dispatch(setStaffProfileData({
         staffId: staffData.staffId,
@@ -86,7 +90,11 @@ export default function StaffLogin() {
         email: staffData.email,
         phoneNo: staffData.phoneNo,
         role: staffData.role,
-        isauthenticated: true
+        isauthenticated: true,
+        permission: staffData?.permission || {},
+        isGuideRequired: staffData.isGuideRequired
+
+
       }));
 
       toast({

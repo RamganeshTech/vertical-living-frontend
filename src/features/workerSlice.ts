@@ -1,20 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    workerId:"",
-    workerName:"",
-    email:"",
-    role:"",
-    phoneNo:"",
-    isauthenticated:false
+    workerId: "",
+    workerName: "",
+    email: "",
+    role: "",
+    phoneNo: "",
+    isauthenticated: false,
+    permission: {} as Record<string, Record<string, boolean>>,
+    isGuideRequired: undefined,
+
+
 }
 
 const workerSlice = createSlice({
-    name:"workerprofile",
+    name: "workerprofile",
     initialState,
-    reducers:{
-        setWorkerProfileData:(state, action)=>{
-            const { workerId, workerName, email, phoneNo, isauthenticated, role } = action.payload
+    reducers: {
+        setWorkerProfileData: (state, action) => {
+            const { workerId, workerName, email, phoneNo, isauthenticated, role, permission, isGuideRequired } = action.payload
 
             return {
                 ...state,
@@ -23,16 +27,22 @@ const workerSlice = createSlice({
                 email,
                 phoneNo,
                 role,
-                isauthenticated
-            };        
+                isauthenticated,
+                permission,
+                isGuideRequired,
+
+            };
         },
-        setAuth:(state, action)=>{
-            return {...state, isauthenticated:action.payload}
-        }, 
-        resetWorkerProfile: ()=> initialState
+        updateWorkerGuideStatus: (state, action) => {
+            state.isGuideRequired = action.payload;
+        },
+        setAuth: (state, action) => {
+            return { ...state, isauthenticated: action.payload }
+        },
+        resetWorkerProfile: () => initialState
     }
 })
 
-export const {setWorkerProfileData, setAuth, resetWorkerProfile} = workerSlice.actions
+export const { setWorkerProfileData, setAuth, resetWorkerProfile, updateWorkerGuideStatus } = workerSlice.actions
 
 export default workerSlice.reducer

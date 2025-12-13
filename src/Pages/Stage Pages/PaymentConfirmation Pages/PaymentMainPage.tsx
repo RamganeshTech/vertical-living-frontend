@@ -9,6 +9,8 @@ import { Card } from "../../../components/ui/Card";
 import { useCompletePaymentConfirmation, useGetPaymentConfirmation, useSetPaymentConfirmationDeadline } from "../../../apiList/Stage Api/Payment Api/paymentConfirmationApi";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -36,7 +38,7 @@ const sectionCards = [
     path: "transaction",
   },
 
-   {
+  {
     title: "Client Quotes",
     description: "Get the Quotation that is approved by client",
     icon: "📄",
@@ -53,6 +55,17 @@ const PaymentConfirmationStage: React.FC = () => {
   const { data, isLoading, isError: getAllError, refetch, error } = useGetPaymentConfirmation(projectId!);
   const { mutateAsync: completeStage, isPending: completePending } = useCompletePaymentConfirmation();
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetPaymentConfirmationDeadline();
+
+
+
+
+
+  const { role, permission } = useAuthCheck();
+  // const canDelete = role === "owner" || permission?.paymentconfirmation?.delete;
+  // const canList = role === "owner" || permission?.paymentconfirmation?.list;
+  const canCreate = role === "owner" || permission?.paymentconfirmation?.create;
+  const canEdit = role === "owner" || permission?.paymentconfirmation?.edit;
+
 
   // Hide main page if a sub-stage is open
   if (
@@ -104,39 +117,46 @@ const PaymentConfirmationStage: React.FC = () => {
 
         <div className="!w-[100%] sm:!w-[80%] lg:w-[50%] flex flex-col sm:flex-row gap-3 justify-end">
           <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-end">
-            <Button
+            {(canCreate || canEdit) && <Button
               isLoading={completePending}
               onClick={handleCompletionStatus}
               className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
             >
               <i className="fa-solid fa-circle-check mr-2" />
               Mark Complete
-            </Button>
+            </Button>}
           </div>
 
           <div className="flex flex-wrap sm:flex-nowrap gap-2 justify-end">
-            <ResetStageButton
+            {(canCreate || canEdit) && <ResetStageButton
               stageNumber={7}
               stagePath="paymentconfirmation"
               projectId={projectId!}
               className="flex-1 sm:flex-initial min-w-max"
-            />
+            />}
 
 
-            {!getAllError && <ShareDocumentWhatsapp
+            {(!getAllError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
               projectId={projectId!}
               stageNumber="7"
               className="w-full sm:w-fit"
               isStageCompleted={data?.status}
             />}
 
-            <AssignStageStaff
+            {(canCreate || canEdit) && <AssignStageStaff
               stageName="PaymentConfirmationModel"
               projectId={projectId!}
               organizationId={organizationId!}
               currentAssignedStaff={assignedTo || null}
               className="flex-1 sm:flex-initial min-w-max"
-            />
+            />}
+
+            <div className="w-full sm:w-auto flex justify-end sm:block">
+              <StageGuide
+                organizationId={organizationId!}
+                stageName="paymentconfirmation"
+              />
+            </div>
           </div>
         </div>
       </div>

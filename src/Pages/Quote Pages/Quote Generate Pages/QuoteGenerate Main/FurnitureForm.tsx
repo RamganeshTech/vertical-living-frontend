@@ -54,7 +54,7 @@ type Props = {
 
 // Constants ----------------------------------------
 export const RATES = {
-  labour: 1300,
+  // labour: 1300,
   plywood: 1,
   laminate: 1,
 };
@@ -183,21 +183,11 @@ const FurnitureForm: React.FC<Props> = ({
     const updatedFurniture: FurnitureBlock = {
       ...data,
       coreMaterials: updatedRows,
-      // fittingsAndAccessories: mapSimpleWithProfit(data.fittingsAndAccessories),
-      // glues: mapSimpleWithProfit(data.glues),
-      // nonBrandMaterials: mapSimpleWithProfit(data.nonBrandMaterials),
-
       fittingsAndAccessories: applyProfitAndRecalculate(data.fittingsAndAccessories),      // false = not glue
       glues: applyProfitAndRecalculate(data.glues, true),                                  // glue = needs special calc
       nonBrandMaterials: applyProfitAndRecalculate(data.nonBrandMaterials),                // false = not glue
     };
 
-
-
-    // const updatedFurniture: FurnitureBlock = {
-    //   ...data,
-    //   coreMaterials: updatedRows,
-    // };
 
     updatedFurniture.totals = computeTotals(updatedFurniture);
     updateFurniture?.(updatedFurniture);

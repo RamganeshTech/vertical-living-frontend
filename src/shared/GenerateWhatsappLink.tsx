@@ -4,6 +4,7 @@ import { Input } from "../components/ui/Input";
 import { toast } from "../utils/toast";
 
 interface GenerateWhatsappLinkProps {
+  enableCreate?: boolean;
   projectId: string;
   context: string;
   label?: string;
@@ -14,6 +15,7 @@ interface GenerateWhatsappLinkProps {
 }
 
 const GenerateWhatsappLink: React.FC<GenerateWhatsappLinkProps> = ({
+  enableCreate,
   projectId,
   context,
   label,
@@ -83,13 +85,14 @@ const GenerateWhatsappLink: React.FC<GenerateWhatsappLinkProps> = ({
           </Button>
         </div>
       ) : (
-        <Button
+        <>
+        {enableCreate && <Button
           onClick={handleGenerate}
           disabled={isPending}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           {isPending ? "Generating..." : "Generate Link"}
-        </Button>
+        </Button>}</>
       )}
     </div>
   );

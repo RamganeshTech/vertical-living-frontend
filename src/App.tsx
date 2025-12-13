@@ -7,13 +7,17 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
-const PublicProcurementRatePage = lazy(() => import( './Pages/Department Pages/ProcurementNew Pages/PublicProcurementNew'));
+const  StaffPermissionDashboard  = lazy(() => import( './Pages/Organization/Staffs_And_Roles_Pages/StaffPermissionDashboardMain'));
+const StaffPermissionsSingle  = lazy(() => import( './Pages/Organization/Staffs_And_Roles_Pages/StaffPermissionsSingle'));
+const CreateProcurementPage = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/CreateProcurementPage'));
+const SingleOrderViewPage = lazy(() => import('./Pages/Stage Pages/Ordering Materials/SingleOrderViewPage'));
+const PublicProcurementRatePage = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/PublicProcurementNew'));
 
-const CreateDesignLab  = lazy(() => import( './Pages/DesignLab_Pages/CreateDesignLab'));
-const  DesignLabSingle  = lazy(() => import( './Pages/DesignLab_Pages/DesignLabSingle'));
+const CreateDesignLab = lazy(() => import('./Pages/DesignLab_Pages/CreateDesignLab'));
+const DesignLabSingle = lazy(() => import('./Pages/DesignLab_Pages/DesignLabSingle'));
 const DesignLabMain = lazy(() => import('./Pages/DesignLab_Pages/DesignLabMain'));
-const PaymentAccMain = lazy(() => import( './Pages/Department Pages/Accounting Pages/PaymentAcc_Main_Pages/PaymentAccMain'));
-const PaymentAccSingle = lazy(() => import(  './Pages/Department Pages/Accounting Pages/PaymentAcc_Main_Pages/PaymentAccSingle'));
+const PaymentAccMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/PaymentAcc_Main_Pages/PaymentAccMain'));
+const PaymentAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/PaymentAcc_Main_Pages/PaymentAccSingle'));
 
 const TemplateBillMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/TemplateBillMain'));
 const TemplateBillSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/BillNewAccountant_Pages/TemplateBillSingle'));
@@ -67,8 +71,8 @@ const MaterialInventorySingle = lazy(() => import('./Pages/Material Inventory Pa
 const MaterialInventoryCartMain = lazy(() => import('./Pages/Material Inventory Pages/Material Inventory Cart/MaterialInventoryCartMain'));
 const WorkLibraryMain = lazy(() => import('./Pages/Work Library Pages/WorkLibraryMain'));
 const WorkLibrarySingle = lazy(() => import('./Pages/Work Library Pages/WorkLibrarySingle'));
-const ShortlistMicaMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortList/ShortListMicaMain'));
-const ShortListMicaReferenceDesignMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortListReference Pages/ShortlListMicaDesignMain'));
+// const ShortlistMicaMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortList/ShortListMicaMain'));
+// const ShortListMicaReferenceDesignMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortListReference Pages/ShortlListMicaDesignMain'));
 const StaffAssignTaskMain = lazy(() => import('./Pages/Staff Tasks Pages/Create Task Pages/StaffAssignTaskMain'));
 const SingleStaffList = lazy(() => import('./Pages/Staff Tasks Pages/SingleStaffs Task Pages/SingleStaffList'));
 const LabourRateConfigMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigMain'));
@@ -85,7 +89,7 @@ const TaskViewMain = lazy(() => import('./Pages/Staff Tasks Pages/TaskViewMain')
 const QuoteGenerateVariantSub = lazy(() => import('./Pages/Quote Pages/Quote VariantGenerate Pages/QuoteGenerateVariantSub '));
 const RateConfigAdminMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain'));
 const RateConfigSub = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigSub'));
-const QuoteGenerateMain = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/QuoteGeenrateMain'));
+const InternalQuoteEntryMain = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuoteEntry'));
 const QuoteVariantGenerateMain = lazy(() => import('./Pages/Quote Pages/Quote VariantGenerate Pages/QuoteVariantGenerateMain'));
 const LogisticsMain = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsMain'));
 const LogisticsSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsSingle'));
@@ -192,6 +196,9 @@ const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 
+
+
+
 function App() {
 
   const [projectId, setProjectId] = useState<string | null>(null)
@@ -199,7 +206,7 @@ function App() {
   const { isauthenticated } = useSelector((state: RootState) => state.authStore)
 
   //it is used to check whether which user is now currently using the application
-  const { loading } = useAuthCheck()
+  const { loading } = useAuthCheck();
 
 
   useEffect(() => {
@@ -258,7 +265,7 @@ function App() {
 
 
 
-  if (loading) <MaterialOverviewLoading />;
+  if (loading) return <MaterialOverviewLoading />;
   return (
     <>
       <LazyWrapper>
@@ -310,17 +317,38 @@ function App() {
               </ProtectedRoutes>} />
 
             <Route path='invitestaff'
-              element={<ProtectedRoutes allowedRoles={["CTO", "owner", "staff"]}>
+              element={<ProtectedRoutes allowedRoles={["CTO", "owner", "staff", "worker", "client"]}
+                requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="invitestaff"
+              
+              >
                 <InviteStaffs />
               </ProtectedRoutes>} />
 
             <Route path='invitecto'
-              element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="invitecto"
+              >
                 <InviteCTO />
               </ProtectedRoutes>} />
 
+
+            <Route path='dashboard'
+              element={<ProtectedRoutes allowedRoles={["owner"]}>
+                <StaffPermissionDashboard />
+              </ProtectedRoutes>} >
+
+              <Route path='roles/:userId'
+                element={<ProtectedRoutes allowedRoles={["owner"]}>
+                  <StaffPermissionsSingle />
+                </ProtectedRoutes>} />
+
+
+            </Route>
+
+
+
             <Route path='subscriptionplan'
-              element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              element={<ProtectedRoutes allowedRoles={["owner"]}>
                 <SubscriptionParent />
               </ProtectedRoutes>} />
 
@@ -365,18 +393,26 @@ function App() {
 
 
             <Route path="modularunits" element={
-              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client", "worker"]}
+                requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="modularunit"
+              >
                 <ModularUnitMainNew />
               </ProtectedRoutes>
             } >
 
               <Route path="create" element={
-                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker"]}
+                  requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="modularunit"
+
+                >
                   <CreateModularUnitNew />
                 </ProtectedRoutes>} />
 
               <Route path="single/:unitId" element={
-                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client", "worker"]}
+                  requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="modularunit"
+
+                >
                   <ModularUnitSingleNew />
                 </ProtectedRoutes>} />
             </Route>
@@ -394,16 +430,45 @@ function App() {
 
 
           <Route path='/organizations/:organizationId/projects' element={<Projects projectId={projectId} setProjectId={setProjectId} />} >
-            <Route index element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route index element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+            requiredDepartment={["inventory",
+"inviteworker",
+"inviteclient",
+"prerequisites",
+"clientrequirement",
+"sitemeasurement",
+"sampledesign",
+"workschedule",
+"technicalconsultant",
+"paymentconfirmation",
+"modularunit",
+"ordermaterial",
+"materialarrival",
+"installation",
+"qualitycheck",
+"cleaning",
+"projectdelivery"
+]}
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+            >
               <ProjectLists />
             </ProtectedRoutes>} />
 
-            <Route path="hr" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="hr" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="hr"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+            >
               <HRMainPage />
             </ProtectedRoutes>} >
 
 
-              <Route path=":id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path=":id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="hr"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit',]}
+              >
                 <HrSingleEmployeeDetail />
               </ProtectedRoutes>} />
 
@@ -411,7 +476,10 @@ function App() {
             </Route>
 
 
-            <Route path="logistics" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="logistics" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="logistics"
+
+            >
               <LogisticsMain />
             </ProtectedRoutes>} >
 
@@ -421,38 +489,70 @@ function App() {
               </ProtectedRoutes>} /> */}
 
 
-              <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="logistics"
+
+              >
                 <LogisticsSingle />
               </ProtectedRoutes>} />
 
 
             </Route>
 
-            <Route path="procurement" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="procurement" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="procurement"
+            >
               <ProcurementNewMain />
             </ProtectedRoutes>} >
 
-              <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="sub/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredAction={["edit", "list"]} requiredDepartment="procurement"
+
+              >
                 <ProcurementSub />
               </ProtectedRoutes>} />
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredAction={["create"]} requiredDepartment="procurement"
+              >
+                <CreateProcurementPage />
+              </ProtectedRoutes>} />
+
             </Route>
 
-            <Route path="shortlistdesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="shortlistdesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="referencedesign"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
               <ShortListReferenceDesignMain />
             </ProtectedRoutes>} >
             </Route>
 
-            <Route path="shortlistmicadesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            {/* <Route path="shortlistmicadesign" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="design"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit']}
+            >
               <ShortListMicaReferenceDesignMain />
             </ProtectedRoutes>} >
-            </Route>
+            </Route> */}
 
 
-            <Route path="accounting" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="accounting" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              // requiredDepartment={"accounts" || "billing"}
+              requiredDepartment={["accounts", "billing", "payments"]}
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <AccountingMain />
             </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="accounts"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["list"]}
+              >
                 <AccountingSingle />
               </ProtectedRoutes>} />
 
@@ -547,31 +647,55 @@ function App() {
               </ProtectedRoutes>} />
             </Route>
 
-            <Route path="paymentmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="paymentmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="payments"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <PaymentAccMain />
             </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="payments"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["list", "edit", "create"]}
+              >
                 <PaymentAccSingle />
               </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              {/* <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="payments"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create']}
+              >
                 <BillNewSingle mode="create" />
-              </ProtectedRoutes>} />
+              </ProtectedRoutes>} /> */}
             </Route>
 
 
-            <Route path="billmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="billmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="billing"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={["list", "edit", "create", "delete"]}
+            >
               <BillAccountsMain />
             </ProtectedRoutes>} >
 
-              <Route path="billsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="billsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment={"billing"}
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["list", "edit"]}
+              >
                 <BillAccSingle />
               </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="billing"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["create"]}
+              >
                 <CreateBillAcc />
               </ProtectedRoutes>} />
 
@@ -643,31 +767,57 @@ function App() {
             </Route>
 
 
-            <Route path="subcontractmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-              <SubContractMain />
+            <Route path="subcontractmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}
+              requiredDepartment="subcontract"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+            >
+              <SubContractMain
+
+              />
             </ProtectedRoutes>} >
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}
+                requiredDepartment="subcontract"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create']}
+              >
                 <CreateSubContract />
               </ProtectedRoutes>} />
 
-              <Route path="single/:subContractId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="single/:subContractId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}
+                requiredDepartment="subcontract"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit',]}
+              >
                 <SingleSubContract />
               </ProtectedRoutes>} />
 
             </Route>
 
-            <Route path="designlabmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="designlabmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="design"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+            >
               <DesignLabMain />
             </ProtectedRoutes>} >
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="design"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create']}
+              >
                 <CreateDesignLab />
               </ProtectedRoutes>} />
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="design"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit']}
+              >
                 <DesignLabSingle />
               </ProtectedRoutes>} />
 
@@ -675,28 +825,48 @@ function App() {
 
 
 
-            <Route path="commonorder" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="commonorder" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}
+              requiredDepartment="commonorder"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
               <CommonOrdersMain />
             </ProtectedRoutes>} >
 
 
-              <Route path=":id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path=":id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="commonorder"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
                 <CommonOrderProject />
               </ProtectedRoutes>} />
 
             </Route>
 
 
-            <Route path="rateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="rateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="materialquote"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
               <RateConfigAdminMain />
             </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="materialquote"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
                 <RateConfigSub />
               </ProtectedRoutes>} />
             </Route>
 
-            <Route path="labourrateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="labourrateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="materialquote"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
               <LabourRateConfigMain />
             </ProtectedRoutes>} >
 
@@ -705,101 +875,210 @@ function App() {
               </ProtectedRoutes>} /> */}
             </Route>
 
-            <Route path="internalquote" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-              <QuoteGenerateMain />
+            <Route path="internalquote" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="materialquote"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <InternalQuoteEntryMain />
             </ProtectedRoutes>} >
             </Route>
 
 
-            <Route path="quotevariant" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="quotevariant" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="materialquote"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
               <QuoteVariantGenerateMain />
             </ProtectedRoutes>} >
 
 
               <Route
                 path="single/:quoteId"
-                element={<QuoteGenerateVariantSub />}
+                element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="materialquote"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'edit', "create",]}
+                  >
+                    <QuoteGenerateVariantSub />
+                  </ProtectedRoutes>
+
+                }
               />
 
             </Route>
 
 
-            <Route path="clientquotes" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="clientquotes" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="materialquote"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
               <ClientQuoteMain />
             </ProtectedRoutes>} >
 
 
               <Route
                 path="single/:quoteId"
-                element={<ClientQuoteSingle />}
+                element={
+
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="materialquote"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'edit', "create",]}
+                  >
+                    <ClientQuoteSingle />
+                  </ProtectedRoutes>
+                }
               />
 
             </Route>
 
 
 
-            <Route path="worklibrary" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="worklibrary" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="stafftask"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+            >
               <WorkLibraryMain />
             </ProtectedRoutes>} >
 
 
               <Route
                 path="single/:id"
-                element={<WorkLibrarySingle />}
+                element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="stafftask"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'edit']}
+
+                  >
+                    <WorkLibrarySingle />
+                  </ProtectedRoutes>
+
+
+
+                }
               />
-
-
-              {/* <Route
-                path="addtask"
-                element={<StaffAssignTaskMain />}
-              /> */}
 
             </Route>
 
 
-            <Route path="stafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}>
+            <Route path="stafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO"]}
+              requiredDepartment="stafftask"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+
+            >
               <StaffTasksListMain />
             </ProtectedRoutes>} >
 
 
               <Route
                 path="single/:id"
-                element={<TaskViewMain />}
+                element={
+
+                  <ProtectedRoutes allowedRoles={["owner", "CTO"]}
+                    requiredDepartment="stafftask"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'edit', 'delete']}
+
+                  >
+                    <TaskViewMain />
+                  </ProtectedRoutes>
+
+                }
               />
 
 
               <Route
                 path="addtask"
-                element={<StaffAssignTaskMain />}
+                element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO"]}
+                    requiredDepartment="stafftask"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['create', 'edit',]}
+
+                  >
+                    <StaffAssignTaskMain />
+                  </ProtectedRoutes>
+
+                }
               />
 
             </Route>
 
-            <Route path="associatedstafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="associatedstafftask" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="stafftask"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit',]}
+
+            >
               <SingleStaffList />
             </ProtectedRoutes>} >
 
               <Route
                 path="single/:id"
-                element={<TaskViewMain />}
+                element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="stafftask"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'edit', 'delete']}
+
+                  >
+                    {/* <SingleStaffList /> */}
+                    <TaskViewMain />
+                  </ProtectedRoutes>
+
+
+
+                }
               />
 
             </Route>
 
 
-            <Route path="materialinventory" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="materialinventory" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="productinventory"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+
+            >
               <MaterialInventoryMain />
             </ProtectedRoutes>} >
 
               <Route
                 path="single/:id"
-                element={<MaterialInventorySingle />}
+                element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="productinventory"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+
+                  >
+
+                    <MaterialInventorySingle />
+                  </ProtectedRoutes>
+                }
               />
 
 
               <Route
                 path="cart"
-                element={<MaterialInventoryCartMain />}
+                element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="productinventory"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'edit', 'delete']}
+
+                  >
+
+                    <MaterialInventoryCartMain />
+                  </ProtectedRoutes>
+                }
               />
 
             </Route>
@@ -822,7 +1101,14 @@ function App() {
           <Route path="transportationlist" element={<Transportationlist />} /> */}
 
             <Route path="prerequisites" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff",
+                "client", "worker"
+              ]}
+                requiredDepartment="prerequisites"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <PrerequisitesPage />
               </ProtectedRoutes>
             } />
@@ -830,7 +1116,12 @@ function App() {
 
 
             <Route path="inventory" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="inventory"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <InventoryMain />
               </ProtectedRoutes>
             } />
@@ -852,32 +1143,57 @@ function App() {
             </Route>
 
             <Route path="workers" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                requiredDepartment="inviteworker"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <Workers />
               </ProtectedRoutes>
             } />
             <Route path="inviteclient" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                requiredDepartment="inviteclient"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
 
                 <InviteClient />
               </ProtectedRoutes>
             } />
 
             <Route path="requirementform" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                requiredDepartment="clientrequirement"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <RequriementForm />
               </ProtectedRoutes>
             } >
 
               <Route path="roompage/:roomId" element={
-                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}
+                  requiredDepartment="clientrequirement"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <RoomPage />
                 </ProtectedRoutes>} />
 
             </Route>
 
             <Route path="sitemeasurement" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                requiredDepartment="sitemeasurement"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
 
                 <SiteMeasurement />
               </ProtectedRoutes>
@@ -886,7 +1202,12 @@ function App() {
 
 
             <Route path="sampledesign" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="sampledesign"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
 
                 <SampleDesign />
               </ProtectedRoutes>
@@ -894,19 +1215,30 @@ function App() {
 
 
               <Route path="shortlist" element={
-                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}
+                  requiredDepartment="sampledesign"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <ShortlistMain />
                 </ProtectedRoutes>} />
 
-              <Route path="shortlistmica" element={
+              {/* <Route path="shortlistmica" element={
                 <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
                   <ShortlistMicaMain />
-                </ProtectedRoutes>} />
+                </ProtectedRoutes>} /> */}
 
             </Route>
 
             <Route path="technicalconsultant" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="technicalconsultant"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+
+              >
 
                 <TechnicalConsultant />
               </ProtectedRoutes>
@@ -988,14 +1320,25 @@ function App() {
 
 
             <Route path="modularunitsnew" element={
-              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client", "worker"]}
+
+                requiredDepartment="modularunit"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <ModularUnitMainNew />
               </ProtectedRoutes>
             } >
 
 
               <Route path="selectedunitsnew" element={
-                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                <ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "client", "worker"]}
+                  requiredDepartment="modularunit"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <SelectedModularUnitsNew />
                 </ProtectedRoutes>} />
 
@@ -1008,39 +1351,69 @@ function App() {
 
 
             <Route path="paymentconfirmation" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                requiredDepartment="paymentconfirmation"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <PaymentConfirmationStage />
               </ProtectedRoutes>
 
             } >
               <Route path="consent" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                  requiredDepartment="paymentconfirmation"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <PaymentConsentSection />
                 </ProtectedRoutes>
 
               } />
               <Route path="schedule" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                  requiredDepartment="paymentconfirmation"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <PaymentScheduleSection />
                 </ProtectedRoutes>
 
               } />
               <Route path="transaction" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client",]}
+                  requiredDepartment="paymentconfirmation"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <PaymentTransaction />
                 </ProtectedRoutes>
 
               } />
 
               <Route path="quotes" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                  requiredDepartment="paymentconfirmation"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <QuotePaymentMain />
                 </ProtectedRoutes>
 
               } >
 
                 <Route path="single/:id" element={
-                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                    requiredDepartment="paymentconfirmation"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+
+                  >
                     <QuotePaymentChild />
                   </ProtectedRoutes>
 
@@ -1051,7 +1424,12 @@ function App() {
 
 
             <Route path="quotepdf" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client", "worker"]}
+                requiredDepartment="paymentconfirmation"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
 
                 <QuotePdfMain />
               </ProtectedRoutes>
@@ -1060,7 +1438,12 @@ function App() {
 
 
             <Route path="ordermaterial" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="ordermaterial"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
 
                 <OrderMaterialOverview />
               </ProtectedRoutes>
@@ -1075,7 +1458,12 @@ function App() {
               } /> */}
 
               <Route path="siteorders" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                  requiredDepartment="ordermaterial"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
 
                   <PublicOrderMatStaffView />
                 </ProtectedRoutes>
@@ -1083,8 +1471,27 @@ function App() {
               } />
 
 
+              <Route path="singleorder/:orderItemId" element={
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                  requiredDepartment="ordermaterial"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
+
+                  <SingleOrderViewPage />
+                </ProtectedRoutes>
+
+              } />
+
+
               <Route path="shoplib" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="ordermaterial"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
 
                   <ShopLibDetailsMain />
                 </ProtectedRoutes>
@@ -1092,7 +1499,12 @@ function App() {
               }>
 
                 <Route path="single/:shopId" element={
-                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="ordermaterial"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+
+                  >
 
                     <ShopDetailSingle />
                   </ProtectedRoutes>
@@ -1106,7 +1518,12 @@ function App() {
 
 
             <Route path="materialarrival" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="materialarrival"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
 
                 <MaterialArrivalOverviewNew />
               </ProtectedRoutes>
@@ -1122,7 +1539,12 @@ function App() {
             </Route>
 
             <Route path="workmainschedule" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="workschedule"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <WorkMainOverview />
               </ProtectedRoutes>
             } >
@@ -1133,13 +1555,23 @@ function App() {
               } /> */}
 
               <Route path="dailyschedule/:sectionId" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                  requiredDepartment="workschedule"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <DailySchedulePage />
                 </ProtectedRoutes>
               } >
 
                 <Route path="workreport" element={
-                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker",]}>
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                    requiredDepartment="workschedule"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+
+                  >
                     <WorkReportMain />
                   </ProtectedRoutes>
                 } />
@@ -1150,7 +1582,12 @@ function App() {
             </Route>
 
             <Route path="installation" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="installation"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <InstallationOverview />
               </ProtectedRoutes>
             } >
@@ -1162,36 +1599,106 @@ function App() {
             </Route>
 
             <Route path="qualitycheck" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff",]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="qualitycheck"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <QualityCheckOverview />
               </ProtectedRoutes>
             } >
               <Route path="qualitycheckroom/:roomName" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                  requiredDepartment="qualitycheck"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <QualityCheckRoomDetails />
                 </ProtectedRoutes>
               } />
 
-              <Route path={`qualitycheckroom/adminwall`} element={<AdminWallMainContainer />} >
-                <Route path={`step/:stepId/:stepNumber`} element={<AdminWallStepPage />} />
+              <Route path={`qualitycheckroom/adminwall`} element={
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="qualitycheck"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
+                  <AdminWallMainContainer />
+                </ProtectedRoutes>
+              } >
+                <Route path={`step/:stepId/:stepNumber`} element={
+
+
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="qualitycheck"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+
+                  >
+                    {/* <AdminWallMainContainer /> */}
+                    <AdminWallStepPage />
+                  </ProtectedRoutes>
+
+                } />
               </Route>
 
-              <Route path="qualitycheckroom/workerwall" element={<WorkerWallMainContainer />} >
-                <Route path='step/:stepId/:stepNumber' element={<WorkerWallStepPage />} />
+              <Route path="qualitycheckroom/workerwall" element={
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}
+                  requiredDepartment="qualitycheck"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
+                  <WorkerWallMainContainer />
+                </ProtectedRoutes>
+              } >
+                <Route path='step/:stepId/:stepNumber' element={
+                  <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}
+                    requiredDepartment="qualitycheck"
+                    // ⭐ Allow entry if they can do ANY of these things
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+
+                  >
+                    <WorkerWallStepPage />
+                  </ProtectedRoutes>
+
+                } />
               </Route>
 
             </Route>
 
-            <Route path="cleaning" element={<CleaningOverview />} >
+            <Route path="cleaning" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="cleaning"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
+                <CleaningOverview />
+              </ProtectedRoutes>
+            } >
               <Route path="cleaningroom/:roomId" element={
-                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}>
+                <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                  requiredDepartment="cleaning"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+
+                >
                   <CleaningRoomOverview />
                 </ProtectedRoutes>
               } />
             </Route>
 
             <Route path="projectdelivery" element={
-              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client"]}>
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                requiredDepartment="projectdelivery"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
                 <ProjectDelivery />
               </ProtectedRoutes>
             } />

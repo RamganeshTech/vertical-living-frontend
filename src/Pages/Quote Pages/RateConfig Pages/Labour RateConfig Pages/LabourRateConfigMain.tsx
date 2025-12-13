@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../../co
 import { useCreateLabourRateConfigCategory,  useGetLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 import LabourRateConfigSingle from "./LabourRateConfigSingle";
 import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 // import {
 //   Dialog,
 //   DialogContent,
@@ -30,6 +31,13 @@ export default function LabourRateConfigMain() {
     // const location = useLocation();
 
     // const isChildRoute = location.pathname.includes("laboursingle");
+
+     const { role, permission } = useAuthCheck();
+        const canList = role === "owner" || permission?.materialquote?.list;
+        const canCreate = role === "owner" || permission?.materialquote?.create;
+        // const canDelete = role === "owner" || permission?.materialquote?.delete;
+        // const canEdit = role === "owner" || permission?.materialquote?.edit;
+    
 
     const [categoryName, setCategoryName] = useState("Labour and Miscellaneous");
     const [fields, setFields] = useState([{ key: "Category", type: "string", required: false }, { key: "Rs", type: "number", required: false }, { key: "notes", type: "string", required: false },]);
@@ -129,7 +137,7 @@ export default function LabourRateConfigMain() {
                     </p>
                 </div>
 
-                {categories?.length === 0 && <div>
+                {(categories?.length === 0 && canCreate) && <div>
                     {/* <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button> */}
                     <Button onClick={handleCreate} isLoading={createPending}>Create New Category</Button>
                 </div>}
@@ -242,7 +250,7 @@ export default function LabourRateConfigMain() {
                     </Card>
                 ))} */}
 
-                {categories?.length > 0 && (
+                {(canList && categories?.length > 0) && (
                     <LabourRateConfigSingle />
                 )}
             {/* </div> */}

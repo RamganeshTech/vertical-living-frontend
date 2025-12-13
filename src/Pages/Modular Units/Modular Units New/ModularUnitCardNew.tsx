@@ -165,11 +165,12 @@ import { Card, CardContent } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import type { ISelectedUnit } from "../Selected Units New/SelectedModularUnitNew";
 import { NO_IMAGE } from "../../../constants/constants";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 interface ModularUnitCardNewProps {
   unit: ISelectedUnit;
   onView: () => void;
   onDelete?: () => void;
-  onAddToCart?: (e:React.FormEvent, unit: ISelectedUnit, quantity: number) => void;
+  onAddToCart?: (e: React.FormEvent, unit: ISelectedUnit, quantity: number) => void;
   isDeleting?: boolean;
   isCartUpdating?: boolean;
   isProjectDetails?: boolean;
@@ -177,10 +178,10 @@ interface ModularUnitCardNewProps {
   isAddingToCart?: boolean;
 }
 
-const ModularUnitCardNew = ({ 
-  unit, 
-  onView, 
-  onDelete, 
+const ModularUnitCardNew = ({
+  unit,
+  onView,
+  onDelete,
   onAddToCart,
   isDeleting = false,
   isCartUpdating = false,
@@ -201,7 +202,18 @@ const ModularUnitCardNew = ({
   //   }
   // };
 
-  const handleAddToCart = (e:React.FormEvent, quantity: number) => {
+
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.modularunit?.delete;
+  // const canList = role === "owner" || permission?.modularunit?.list;
+  const canCreate = role === "owner" || permission?.modularunit?.create;
+  const canEdit = role === "owner" || permission?.modularunit?.edit;
+
+
+
+
+  const handleAddToCart = (e: React.FormEvent, quantity: number) => {
     if (onAddToCart) {
       onAddToCart(e, unit, quantity);
     }
@@ -224,7 +236,7 @@ const ModularUnitCardNew = ({
             <i className="fas fa-image text-3xl" />
           </div>
         )}
-        
+
         {/* Category Badge */}
         {unit.category && (
           <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium text-gray-700 shadow">
@@ -245,7 +257,7 @@ const ModularUnitCardNew = ({
       <CardContent className="p-3 space-y-2">
         {/* Product Name & Fabrication Cost */}
         <div className="flex items-start justify-between gap-2">
-          <h3 
+          <h3
             className="font-semibold text-base text-gray-800 line-clamp-1 cursor-pointer hover:text-blue-600 flex-1"
             onClick={onView}
             title={unit.productName}
@@ -344,29 +356,29 @@ const ModularUnitCardNew = ({
             <div className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
               <span className="text-xs font-medium text-gray-700">Quantity:</span>
               <div className="flex items-center gap-2">
-                <Button
+                {(canCreate || canEdit ) &&<Button
                   variant="outline"
                   size="sm"
                   // onClick={handleDecrement}
-                   onClick={(e)=> handleAddToCart(e, cartQuantity - 1)}
+                  onClick={(e) => handleAddToCart(e, cartQuantity - 1)}
                   disabled={cartQuantity <= 0 || isAddingToCart}
                   className="h-7 w-7 p-0"
                 >
                   <i className="fas fa-minus text-xs"></i>
-                </Button>
+                </Button>}
                 <span className="font-bold text-gray-900 min-w-[30px] text-center">
                   {isCartUpdating ? <i className="fas fa-spinner animate-spin"></i> : cartQuantity}
                 </span>
-                <Button
+                {(canCreate || canEdit ) && <Button
                   variant="outline"
                   size="sm"
                   // onClick={handleIncrement}
-                   onClick={(e)=> handleAddToCart(e, cartQuantity + 1)}
+                  onClick={(e) => handleAddToCart(e, cartQuantity + 1)}
                   disabled={isAddingToCart}
                   className="h-7 w-7 p-0"
                 >
                   <i className="fas fa-plus text-xs"></i>
-                </Button>
+                </Button>}
               </div>
             </div>
 
@@ -434,7 +446,7 @@ const ModularUnitCardNew = ({
               <i className="fas fa-eye mr-1" />
               View
             </Button> */}
-            {onDelete && (
+            {(onDelete && canDelete) && (
               <Button
                 variant="danger"
                 size="sm"

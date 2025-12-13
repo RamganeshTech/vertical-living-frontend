@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../../components/ui/Button";
 import { useDeleteRoomRequirement } from "../../../apiList/Stage Api/requirementFormApi";
 import { toast } from "../../../utils/toast";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 type SectionConfigType = {
   roomName: string;
@@ -20,10 +21,19 @@ const SectionCards = ({ sections, setIsCreateRoomOpen }: Props) => {
   const { projectId } = useParams()
 
 
+
+  const { role, permission } = useAuthCheck();
+  const canDelete = role === "owner" || permission?.clientrequirement?.delete;
+  // const canList = role === "owner" || permission?.clientrequirement?.list;
+  const canCreate = role === "owner" || permission?.clientrequirement?.create;
+  const canEdit = role === "owner" || permission?.clientrequirement?.edit;
+
+
+
   const navigate = useNavigate()
 
 
-  const { mutateAsync: deleteRoom, isPending:deletepending } = useDeleteRoomRequirement()
+  const { mutateAsync: deleteRoom, isPending: deletepending } = useDeleteRoomRequirement()
 
 
 
@@ -39,14 +49,14 @@ const SectionCards = ({ sections, setIsCreateRoomOpen }: Props) => {
           <p className="hidden sm:inline-block text-slate-600">Manage requirements and items for each room</p>
 
         </div>
-        <div className="mt-4">
+        {(canCreate || canEdit) && <div className="mt-4">
           <Button
             onClick={() => setIsCreateRoomOpen(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             + Create New Room
           </Button>
-        </div>
+        </div>}
       </div>
 
       {!Array.isArray(sections) || !sections?.length ?
@@ -97,14 +107,15 @@ const SectionCards = ({ sections, setIsCreateRoomOpen }: Props) => {
                       <i className="fas fa-arrow-right text-slate-400 group-hover:text-blue-500 transition-colors duration-300" />
                     </div> */}
 
-                      <div>
-                        <Button variant="danger" isLoading={deletepending} className="hover:text-white" onClick={(e)=> {
+                     {canDelete && <div>
+                        <Button variant="danger" isLoading={deletepending} className="hover:text-white" onClick={(e) => {
                           e.stopPropagation()
-                          handleDeleteRoom()}
-                          }>
+                          handleDeleteRoom()
+                        }
+                        }>
                           <i className="fas fa-trash"></i>
                         </Button>
-                      </div>
+                      </div>}
                     </div>
 
                     {/* Room Name */}

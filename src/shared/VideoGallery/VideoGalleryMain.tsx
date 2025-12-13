@@ -11,7 +11,7 @@ interface VideoFile {
 
 interface VideoGalleryProps {
     videoFiles: VideoFile[];
-    handleDeleteFile: (fileId: string) => void;
+    handleDeleteFile?: (fileId: string) => any;
     refetch: () => Promise<any>;
     isDeleting?: boolean;
 
@@ -162,7 +162,7 @@ const VideoGalleryMain: React.FC<VideoGalleryProps> = ({
                             >
                                 <i className="fa-solid fa-download"></i>
                             </button>
-                            <button
+                          {handleDeleteFile &&  <button
                                 className="bg-black/50 hover:bg-black/70 text-white rounded-full p-3 transition-all duration-200"
                                 disabled={isDeleting}
                                 onClick={(e) => {
@@ -174,7 +174,7 @@ const VideoGalleryMain: React.FC<VideoGalleryProps> = ({
                                 }
                             >
                                 <i className="fa-solid fa-trash-can"></i>
-                            </button>
+                            </button>}
 
                             {/* Close Button */}
                             <button

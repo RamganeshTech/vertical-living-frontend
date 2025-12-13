@@ -5,6 +5,7 @@ import { useDeleteQuote } from '../../../../apiList/Quote Api/QuoteVariant Api/q
 import { toast } from '../../../../utils/toast'
 import type { FurnitureBlock } from './FurnitureForm'
 import { dateFormate, formatTime } from './../../../../utils/dateFormator';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
 
 
 type Props = {
@@ -25,6 +26,13 @@ type Props = {
 const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, setFurnitures, setIsEditingId, setQuoteType,  setEditQuoteNo, setFiltersMain }) => {
 
     const { mutateAsync: deleteQuote, isPending } = useDeleteQuote();
+
+     const { role, permission } = useAuthCheck();
+        // const canList = role === "owner" || permission?.materialquote?.list;
+        // const canCreate = role === "owner" || permission?.materialquote?.create;
+        const canDelete = role === "owner" || permission?.materialquote?.delete;
+        // const canEdit = role === "owner" || permission?.materialquote?.edit;
+    
 
     const handleDelete = async (id: string) => {
         try {
@@ -146,7 +154,7 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, setFurnitur
                     >
                         <i className="fas fa-eye mr-1" /> Edit
                     </Button>
-                    <Button
+                   {canDelete && <Button
                         size="sm"
                         isLoading={isPending}
                         variant="danger"
@@ -154,7 +162,7 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, setFurnitur
                         onClick={() => handleDelete(quote._id)}
                     >
                         <i className="fas fa-trash mr-1" /> Delete
-                    </Button>
+                    </Button>}
 
                 </div>
             </CardContent>

@@ -10,6 +10,7 @@ import {
 } from "../../apiList/workLibrary Api/workLibraryApi";
 import { toast } from "../../utils/toast";
 import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+import { useAuthCheck } from "../../Hooks/useAuthCheck";
 
 const WorkLibrarySingle: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,6 +21,16 @@ const WorkLibrarySingle: React.FC = () => {
     const [work, setWork] = useState<any>(null);
     const [deletedSubtaskIds, setDeletedSubtaskIds] = useState<{ taskId: string, subtaskId: string }[]>([]);
     const [deletedTaskIds, setDeletedTaskIds] = useState<string[]>([]);
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.stafftask?.delete;
+    // const canList = role === "owner" || permission?.stafftask?.list;
+    // const canCreate = role === "owner" || permission?.stafftask?.create;
+    const canEdit = role === "owner" || permission?.stafftask?.edit;
+
+
 
 
     useEffect(() => {
@@ -459,9 +470,9 @@ const WorkLibrarySingle: React.FC = () => {
             </div>
 
             <div className="flex justify-end mt-6">
-                <Button onClick={handleSave}>
+                {canEdit && <Button onClick={handleSave}>
                     <i className="fa-solid fa-floppy-disk mr-2" /> Save All Changes
-                </Button>
+                </Button>}
             </div>
         </div>
     );

@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useDeleteWorkLibrary, useGetAllWorkLibraries } from "../../apiList/workLibrary Api/workLibraryApi";
-import useGetRole from "../../Hooks/useGetRole";
+// import useGetRole from "../../Hooks/useGetRole";
 import { Button } from "../../components/ui/Button";
 
 import { toast } from "../../utils/toast";
 import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import WorkLibraryCard from "./WorkLibraryCard";
 import CreateWorkLib from "./CreateWorkLib";
+import { useAuthCheck } from "../../Hooks/useAuthCheck";
 
 
 // Subtask Interface
@@ -39,10 +40,16 @@ export interface IWorkLibrary {
 
 const WorkLibraryMain = () => {
     const { organizationId } = useParams() as { organizationId: string };
-    const { role } = useGetRole();
+    // const { role } = useGetRole();
     const navigate = useNavigate()
     const [dialogOpen, setDialogOpen] = useState(false)
 
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.stafftask?.delete;
+    const canList = role === "owner" || permission?.stafftask?.list;
+    const canCreate = role === "owner" || permission?.stafftask?.create;
 
     const { data: works = [], isLoading, error } = useGetAllWorkLibraries(organizationId!);
     const deleteMutation = useDeleteWorkLibrary();
@@ -82,13 +89,13 @@ const WorkLibraryMain = () => {
                         Manage your work flows
                     </p>
                 </div>
-                <Button
+               {canCreate && <Button
                     onClick={() => setDialogOpen(true)}
                     className="bg-blue-600 flex items-center "
                 >
                     <i className="fas fa-plus mr-1 text-white"></i>
                     Add Work
-                </Button>
+                </Button>}
             </header>
 
 
@@ -109,7 +116,7 @@ const WorkLibraryMain = () => {
                 <CreateWorkLib organizationId={organizationId} dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
             )}
 
-            {isLoading ? (
+       {canList &&  <>   {isLoading ? (
                 <p><MaterialOverviewLoading /></p>
             ) : !error && works?.length === 0 ? (
                 <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
@@ -126,7 +133,7 @@ const WorkLibraryMain = () => {
                         <WorkLibraryCard key={work._id} navigate={navigate} role={role} work={work} onDelete={handleDelete} deletePending={deleteMutation.isPending} />
                     ))}
                 </div>
-            )}
+            )}</>}
         </div>
     );
 };
