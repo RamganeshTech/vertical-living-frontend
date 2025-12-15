@@ -18,6 +18,7 @@ import { Button } from "../../components/ui/Button"
 import StaffTaskCard from "./StaffTaskCard"
 import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading"
 import { useAuthCheck } from "../../Hooks/useAuthCheck"
+import StageGuide from "../../shared/StageGuide"
 
 // Types
 export type FilterType = {
@@ -95,14 +96,26 @@ export const StaffTasksListMain: React.FC = () => {
                         Manage & Assign Tasks to your team members
                     </p>
                 </div>
-                {canCreate && <Button
-                    onClick={() => {
-                        navigate(`addtask`)
-                    }}
-                    className="bg-blue-600  cursor-pointer "
-                >
-                    Add Task
-                </Button>}
+
+                <section className="flex gap-2 items-center">
+
+                    {canCreate && <Button
+                        onClick={() => {
+                            navigate(`addtask`)
+                        }}
+                        className="bg-blue-600  cursor-pointer "
+                    >
+                        Add Task
+                    </Button>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="stafftask"
+                        />
+                    </div>
+                </section>
+
             </header>
 
             <section className="py-2 flex w-full gap-6 flex-col lg:flex-row items-start lg:h-[90%]">

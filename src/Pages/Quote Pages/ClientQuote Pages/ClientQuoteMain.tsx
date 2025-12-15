@@ -8,6 +8,7 @@ import { useState } from "react";
 import QuoteClientCard from "./QuoteClientCard";
 import { useGetAllClientQuotes } from "../../../apiList/Quote Api/ClientQuote/clientQuoteApi";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 const ClientQuoteMain = () => {
     const { organizationId } = useParams();
@@ -104,6 +105,13 @@ const ClientQuoteMain = () => {
                         <i className="fas fa-search"> </i>
                     </Button>
                 </div> */}
+
+                <div className="w-full sm:w-auto flex justify-end sm:block">
+                    <StageGuide
+                        organizationId={organizationId!}
+                        stageName="materialquote"
+                    />
+                </div>
             </header>
 
 
@@ -220,7 +228,7 @@ const ClientQuoteMain = () => {
                     </div>
                 </div>
 
-               {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
+                {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
 
                     {isLoading ? (
                         <p><MaterialOverviewLoading /></p>

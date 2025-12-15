@@ -9,6 +9,7 @@ import MaterialOverviewLoading from "../Stage Pages/MaterialSelectionRoom/Matera
 import WorkLibraryCard from "./WorkLibraryCard";
 import CreateWorkLib from "./CreateWorkLib";
 import { useAuthCheck } from "../../Hooks/useAuthCheck";
+import StageGuide from "../../shared/StageGuide";
 
 
 // Subtask Interface
@@ -89,13 +90,25 @@ const WorkLibraryMain = () => {
                         Manage your work flows
                     </p>
                 </div>
-               {canCreate && <Button
-                    onClick={() => setDialogOpen(true)}
-                    className="bg-blue-600 flex items-center "
-                >
-                    <i className="fas fa-plus mr-1 text-white"></i>
-                    Add Work
-                </Button>}
+
+                <section className="flex gap-2 items-center">
+
+                    {canCreate && <Button
+                        onClick={() => setDialogOpen(true)}
+                        className="bg-blue-600 flex items-center "
+                    >
+                        <i className="fas fa-plus mr-1 text-white"></i>
+                        Add Work
+                    </Button>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="stafftask"
+                        />
+                    </div>
+                </section>
+
             </header>
 
 
@@ -116,7 +129,7 @@ const WorkLibraryMain = () => {
                 <CreateWorkLib organizationId={organizationId} dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
             )}
 
-       {canList &&  <>   {isLoading ? (
+            {canList && <>   {isLoading ? (
                 <p><MaterialOverviewLoading /></p>
             ) : !error && works?.length === 0 ? (
                 <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">

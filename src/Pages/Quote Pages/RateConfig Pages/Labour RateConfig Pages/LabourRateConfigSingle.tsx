@@ -157,7 +157,7 @@ export default function LabourRateConfigSingle() {
 
 
                 </div>
-                <div className="flex gap-2 mt-3 sm:mt-0 absolute -top-[83px] right-[5px] ">
+                <div className="flex gap-2 mt-3 sm:mt-0 absolute -top-[83px] right-[45px] ">
                     {(canEdit || canCreate) && <Button onClick={handleAddRow} variant="primary" className="">
                         + Add Row
                     </Button>}  

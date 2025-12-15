@@ -14,6 +14,7 @@ import CreateNewEmployee from './CreateNewEmployee';
 // import GridCardEmployeeView from './GridCardEmployeeView';
 import EmployeeListView from './EmployeeListView';
 import { useAuthCheck } from '../../../Hooks/useAuthCheck';
+import StageGuide from '../../../shared/StageGuide';
 
 const HRMainPage: React.FC = () => {
   const { openMobileSidebar, isMobile } = useOutletContext<OrganizationOutletTypeProps>()
@@ -193,6 +194,15 @@ const HRMainPage: React.FC = () => {
                     <Button onClick={() => setShowCreateForm(true)}>Create New Employee</Button>
                   </div>
                   }
+
+                  <div className="w-full sm:w-auto flex justify-end sm:block">
+                    <StageGuide
+                      organizationId={organizationId!}
+                      stageName="hr"
+                    />
+                  </div>
+
+
                   {/* <div className="flex gap-2">
                 <button
                   onClick={() => setViewMode('grid')}

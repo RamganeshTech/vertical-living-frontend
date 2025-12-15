@@ -10,6 +10,7 @@ import { Button } from "../../../../components/ui/Button";
 import SmartTagInput from "../../../../shared/SmartTagInput";
 import { fetchSuggestions } from "../ShortList/ShortListMain";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
+import StageGuide from "../../../../shared/StageGuide";
 
 
 const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -117,6 +118,15 @@ export default function ShortListReferenceDesignMain() {
                     <i className="fa-solid fa-object-group text-2xl text-blue-600 mr-2"></i>
                     Reference Designs
                 </h1>
+
+
+
+                <div className="w-full sm:w-auto flex justify-end sm:block">
+                    <StageGuide
+                        organizationId={organizationId!}
+                        stageName="referencedesign"
+                    />
+                </div>
             </div>
 
 

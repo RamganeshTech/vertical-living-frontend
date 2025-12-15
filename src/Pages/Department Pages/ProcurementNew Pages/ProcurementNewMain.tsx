@@ -12,6 +12,7 @@ import Slider from 'rc-slider';
 import "rc-slider/assets/index.css";
 import { useDebounce } from "../../../Hooks/useDebounce";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 
 export interface OrderMaterialSiteDetail {
@@ -236,13 +237,22 @@ const ProcurementNewMain: React.FC = () => {
                 </div>
 
 
-               {canCreate && <Button
+              <div className="flex gap-2 items-center">
+                  {canCreate && <Button
                     onClick={() => navigate('create')}
                 >
                     <i className="fas fa-plus mr-2" />
                     Create
                 </Button>}
 
+                <div className="w-full sm:w-auto flex justify-end sm:block">
+                    <StageGuide
+                        organizationId={organizationId!}
+                        stageName="procurement"
+                    />
+                </div>
+
+              </div>
                 {/* <h2 className="text-3xl font-bold text-blue-600">Logistics Department</h2> */}
 
             </div>
@@ -492,78 +502,78 @@ const ProcurementNewMain: React.FC = () => {
                         </div>
                     </div>
 
-                   {canList && <>
-                    {allProcurements.length === 0 ? (
-                        <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-                            <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Procurements Found</h3>
-                            <p className="text-sm text-gray-500">
-                                Looks like there are no Procurements yet for this project.<br />
-                                {/* Click on <strong>"Add Shipment"</strong> to get started 🚀 */}
-                                Once you have <strong> generated the Pdf </strong>  items will be listed here  to get started 🚀
-                            </p>
-                        </div>
-                    ) : (
-                        <div
-                            ref={scrollContainerRef}
-                            className="flex-1 max-h-[100%]  overflow-y-auto">
-
-                            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 ">
-                                {allProcurements.map((item: IProcurementNew) => (
-
-                                    <ProcurementCard
-                                        key={item._id}
-                                        procurementNumber={item?.procurementNumber || item?.refPdfId}
-                                        fromDeptName={item?.fromDeptName}
-                                        fromDeptNumber={item?.fromDeptNumber}
-
-                                        // Status Logic
-                                        isConfirmedRate={item?.isConfirmedRate}
-                                        isSyncWithPaymentsSection={item?.isSyncWithPaymentsSection}
-
-                                        // Details
-                                        projectName={item?.projectId?.projectName}
-                                        shopDetails={item?.shopDetails}
-
-                                        // Stats
-                                        itemCount={item?.selectedUnits?.length || 0}
-                                        totalCost={item?.totalCost || 0}
-                                        createdAt={(item as any)?.createdAt}
-
-                                        // Actions
-                                        onView={() => navigate(`sub/${item._id!}`)}
-                                        onDelete={() => handleDeleteProcurement({ id: item._id! })}
-                                        deletePending={deletePending && variables.id === item._id}
-                                    />
-                                ))}
+                    {canList && <>
+                        {allProcurements.length === 0 ? (
+                            <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+                                <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
+                                <h3 className="text-lg font-semibold text-blue-800 mb-1">No Procurements Found</h3>
+                                <p className="text-sm text-gray-500">
+                                    Looks like there are no Procurements yet for this project.<br />
+                                    {/* Click on <strong>"Add Shipment"</strong> to get started 🚀 */}
+                                    Once you have <strong> generated the Pdf </strong>  items will be listed here  to get started 🚀
+                                </p>
                             </div>
+                        ) : (
+                            <div
+                                ref={scrollContainerRef}
+                                className="flex-1 max-h-[100%]  overflow-y-auto">
 
+                                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 ">
+                                    {allProcurements.map((item: IProcurementNew) => (
 
+                                        <ProcurementCard
+                                            key={item._id}
+                                            procurementNumber={item?.procurementNumber || item?.refPdfId}
+                                            fromDeptName={item?.fromDeptName}
+                                            fromDeptNumber={item?.fromDeptNumber}
 
-                            {isFetchingNextPage ? (
-                                <div className="flex flex-col items-center gap-2 text-blue-600">
-                                    <i className="fas fa-spinner fa-spin text-2xl"></i>
-                                    <span className="text-sm font-medium">Loading more items...</span>
+                                            // Status Logic
+                                            isConfirmedRate={item?.isConfirmedRate}
+                                            isSyncWithPaymentsSection={item?.isSyncWithPaymentsSection}
+
+                                            // Details
+                                            projectName={item?.projectId?.projectName}
+                                            shopDetails={item?.shopDetails}
+
+                                            // Stats
+                                            itemCount={item?.selectedUnits?.length || 0}
+                                            totalCost={item?.totalCost || 0}
+                                            createdAt={(item as any)?.createdAt}
+
+                                            // Actions
+                                            onView={() => navigate(`sub/${item._id!}`)}
+                                            onDelete={() => handleDeleteProcurement({ id: item._id! })}
+                                            deletePending={deletePending && variables.id === item._id}
+                                        />
+                                    ))}
                                 </div>
-                            ) : hasNextPage ? (
-                                // Invisible spacer to ensure scroll target exists
-                                <div className="h-4 w-full"></div>
-                            ) : (
-                                // Optional: "End of List" message
-                                allProcurements.length > 0 && (
-                                    // <p className="text-xs text-center text-gray-400 mt-4">No more items to load</p>
-                                    <div className="flex mt-4 justify-center py-6 bg-gray-50 border-t border-gray-100">
-                                        <p className="text-gray-400 text-sm font-medium flex items-center">
-                                            <i className="fas fa-check-circle mr-2"></i>
-                                            All records loaded
-                                        </p>
+
+
+
+                                {isFetchingNextPage ? (
+                                    <div className="flex flex-col items-center gap-2 text-blue-600">
+                                        <i className="fas fa-spinner fa-spin text-2xl"></i>
+                                        <span className="text-sm font-medium">Loading more items...</span>
                                     </div>
-                                )
-                            )}
+                                ) : hasNextPage ? (
+                                    // Invisible spacer to ensure scroll target exists
+                                    <div className="h-4 w-full"></div>
+                                ) : (
+                                    // Optional: "End of List" message
+                                    allProcurements.length > 0 && (
+                                        // <p className="text-xs text-center text-gray-400 mt-4">No more items to load</p>
+                                        <div className="flex mt-4 justify-center py-6 bg-gray-50 border-t border-gray-100">
+                                            <p className="text-gray-400 text-sm font-medium flex items-center">
+                                                <i className="fas fa-check-circle mr-2"></i>
+                                                All records loaded
+                                            </p>
+                                        </div>
+                                    )
+                                )}
 
 
-                        </div>
-                    )}
+                            </div>
+                        )}
                     </>}
                 </main>
             )

@@ -8,6 +8,7 @@ import { useGetProjects } from "../../../apiList/projectApi";
 import { useState } from "react";
 import QuoteVarientCard from "./QuoteVarientCard";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 const QuoteGenerateVariantMain = () => {
     const { organizationId } = useParams();
@@ -101,6 +102,15 @@ const QuoteGenerateVariantMain = () => {
                         <i className="fas fa-search"> </i>
                     </Button>
                 </div> */}
+
+
+
+                <div className="w-full sm:w-auto flex justify-end sm:block">
+                    <StageGuide
+                        organizationId={organizationId!}
+                        stageName="materialquote"
+                    />
+                </div>
             </header>
 
 
@@ -217,7 +227,7 @@ const QuoteGenerateVariantMain = () => {
                     </div>
                 </div>
 
-               {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
+                {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
 
                     {isLoading ? (
                         <p><MaterialOverviewLoading /></p>

@@ -10,6 +10,7 @@ import { useGetProjects } from "../../../apiList/projectApi";
 import ShipmentCard from "./ShipmentCard";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 
 export interface ILogisticsVehicle {
@@ -132,15 +133,27 @@ const LogisticsMain: React.FC = () => {
 
 
         {/* <h2 className="text-3xl font-bold text-blue-600">Logistics Department</h2> */}
-        {canCreate && <Button
-          onClick={() => {
-            setEditingShipment(null);
-            setShowForm(true);
-          }}
-        >
-          <i className="fas fa-plus mr-2" />
-          Add Shipment
-        </Button>}
+        <div className="flex gap-2 items-center">
+
+          {canCreate && <Button
+            onClick={() => {
+              setEditingShipment(null);
+              setShowForm(true);
+            }}
+          >
+            <i className="fas fa-plus mr-2" />
+            Add Shipment
+          </Button>}
+
+          <div className="w-full sm:w-auto flex justify-end sm:block">
+            <StageGuide
+              organizationId={organizationId!}
+              stageName="logistics"
+            />
+          </div>
+        </div>
+
+
       </div>
 
       {isLoading ? (

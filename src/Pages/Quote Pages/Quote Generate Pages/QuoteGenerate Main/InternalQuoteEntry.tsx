@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import QuoteGenerateList from "../QuoteGenerateList";
 import { useGetSingleLabourCost } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
+import StageGuide from "../../../../shared/StageGuide";
 
 
 type CoreMaterialRow = {
@@ -348,7 +349,9 @@ const InternalQuoteEntryMain = () => {
                                 </option>
                             ))}
                         </select>
-                    </div>}
+                    </div>
+                    
+                    }
 
                     {furnitures.length > 0 && <div className="text-right flex gap-2 items-center">
                         <div className="text-xs text-gray-600 uppercase tracking-widest">Grand Total</div>
@@ -360,6 +363,14 @@ const InternalQuoteEntryMain = () => {
                         setModalOpen(true)
                         // setQuoteType("single")
                     }}><i className="fas fa-add mr-1"> </i> Product</Button>}
+
+
+                     <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="materialquote"
+                        />
+                    </div>
                 </div>
 
 

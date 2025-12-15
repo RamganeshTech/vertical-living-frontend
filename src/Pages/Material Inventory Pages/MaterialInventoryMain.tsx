@@ -21,8 +21,10 @@ import { useAddToCart, useGetCart, useRemoveCartItem, useUpdateCartItemQuantity 
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import SearchSelectNew from "../../components/ui/SearchSelectNew";
-import { Label } from "../../components/ui/Label";
+// import { Label } from "../../components/ui/Label";
 import { useAuthCheck } from "../../Hooks/useAuthCheck";
+import StageGuide from "../../shared/StageGuide";
+import InfoTooltip from "../../components/ui/InfoToolTip";
 
 
 const MaterialInventoryMain: React.FC = () => {
@@ -49,7 +51,7 @@ const MaterialInventoryMain: React.FC = () => {
 
 
 
-    
+
     const { role, permission } = useAuthCheck();
     const canDelete = role === "owner" || permission?.productinventory?.delete;
     const canEdit = role === "owner" || permission?.productinventory?.edit;
@@ -602,7 +604,7 @@ const MaterialInventoryMain: React.FC = () => {
                     <section className="flex justify-between items-center mt-4">
 
                         <div className="flex justify-end gap-2">
-                           {canList && <Button
+                            {canList && <Button
                                 size="sm"
                                 variant="primary"
                                 onClick={() => navigate(`single/${(item as any)._id}`)}
@@ -618,7 +620,7 @@ const MaterialInventoryMain: React.FC = () => {
                                 <i className="fas fa-edit mr-1" />
                                 Edit
                             </Button> */}
-                           {canDelete && <Button
+                            {canDelete && <Button
                                 size="sm"
                                 isLoading={deleteMutation.isPending}
                                 variant="danger"
@@ -635,50 +637,50 @@ const MaterialInventoryMain: React.FC = () => {
                         <div className="flex gap-2 items-center">
                             {!isInCart ? (
                                 <>
-                                {canEdit && <Button
-                                    size="sm"
-                                    variant="primary"
-                                    onClick={() => handleAddToCart(item)}
-                                    isLoading={isUpdatingCart}
-                                    disabled={!selectedProjectId || isUpdatingCart}
-                                    className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-                                >
-                                    <i className="fas fa-cart-plus mr-1" />
-                                    Add to Cart
-                                </Button>
-                            }
-                            </>
-                            ) : (
-                                 <>
-                                {canEdit &&
-                                <div className="flex items-center gap-2 bg-green-50 rounded-lg p-1 border border-green-200">
-                                    <Button
-                                        size="sm"
-                                        onClick={() => handleUpdateCartQuantity(itemCode, cartQuantity - 1)}
-                                        disabled={isUpdatingCart}
-                                        variant="danger"
-
-                                        className="w-8 h-8 p-0 bg-red-600 text-white rounded-md shadow-sm"
-                                    >
-                                        <i className="fas fa-minus text-sm"></i>
-                                    </Button>
-
-                                    <span className="w-10 text-center font-bold text-green-700">
-                                        {cartQuantity}
-                                    </span>
-
-                                    <Button
+                                    {canEdit && <Button
                                         size="sm"
                                         variant="primary"
-
-                                        onClick={() => handleUpdateCartQuantity(itemCode, cartQuantity + 1)}
-                                        disabled={isUpdatingCart}
-                                        className="w-8 h-8 p-0  rounded-md shadow-sm"
+                                        onClick={() => handleAddToCart(item)}
+                                        isLoading={isUpdatingCart}
+                                        disabled={!selectedProjectId || isUpdatingCart}
+                                        className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
                                     >
-                                        <i className="fas fa-plus text-sm"></i>
+                                        <i className="fas fa-cart-plus mr-1" />
+                                        Add to Cart
                                     </Button>
-                                </div>
-                                }
+                                    }
+                                </>
+                            ) : (
+                                <>
+                                    {canEdit &&
+                                        <div className="flex items-center gap-2 bg-green-50 rounded-lg p-1 border border-green-200">
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleUpdateCartQuantity(itemCode, cartQuantity - 1)}
+                                                disabled={isUpdatingCart}
+                                                variant="danger"
+
+                                                className="w-8 h-8 p-0 bg-red-600 text-white rounded-md shadow-sm"
+                                            >
+                                                <i className="fas fa-minus text-sm"></i>
+                                            </Button>
+
+                                            <span className="w-10 text-center font-bold text-green-700">
+                                                {cartQuantity}
+                                            </span>
+
+                                            <Button
+                                                size="sm"
+                                                variant="primary"
+
+                                                onClick={() => handleUpdateCartQuantity(itemCode, cartQuantity + 1)}
+                                                disabled={isUpdatingCart}
+                                                className="w-8 h-8 p-0  rounded-md shadow-sm"
+                                            >
+                                                <i className="fas fa-plus text-sm"></i>
+                                            </Button>
+                                        </div>
+                                    }
                                 </>
                             )}
                         </div>
@@ -707,7 +709,7 @@ const MaterialInventoryMain: React.FC = () => {
                             </p>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
                             {/* Debouncing indicator */}
                             {isDebouncing && (
                                 <div className="flex items-center gap-2 text-sm text-amber-600">
@@ -719,11 +721,11 @@ const MaterialInventoryMain: React.FC = () => {
 
 
                             {/* Project Selection */}
-                            <div className="w-full sm:w-64">
+                            <div className="w-full flex gap-1 items-center sm:w-64">
 
 
                                 {/* <div className="relative min-w-[250px]"> */}
-                                <Label>Select project for the displaying the cart items</Label>
+                                {/* <Label></Label> */}
                                 <SearchSelectNew
                                     options={projectOptions}
                                     placeholder="Select project"
@@ -734,11 +736,12 @@ const MaterialInventoryMain: React.FC = () => {
                                     displayFormat="simple"
                                     className="w-full"
                                 />
+                                <InfoTooltip  position="bottom" content="Select project for the displaying the cart items" />
                                 {/* </div> */}
                             </div>
 
 
-                           {canList && <Button
+                            {canList && <Button
                                 onClick={() => navigate("cart")}
                                 variant="primary"
                                 className="relative w-full sm:w-auto"
@@ -750,6 +753,15 @@ const MaterialInventoryMain: React.FC = () => {
                                     </span>
                                 )}
                             </Button>}
+
+
+
+                            <div className="w-full sm:w-auto flex justify-end sm:block">
+                                <StageGuide
+                                    organizationId={organizationId!}
+                                    stageName="productinventory"
+                                />
+                            </div>
 
 
                         </div>
@@ -1033,10 +1045,10 @@ const MaterialInventoryMain: React.FC = () => {
                         </div>
                     </div>
                     {/* Main Content */}
-                   {canList && <div className="flex-1 !max-h-[95vh] overflow-y-auto custom-scrollbar">
+                    {canList && <div className="flex-1 !max-h-[95vh] overflow-y-auto custom-scrollbar">
                         <div
                             ref={listRef}
-                       >
+                        >
 
                             {!selectedProjectId && (
                                 <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 mb-4 flex items-center">

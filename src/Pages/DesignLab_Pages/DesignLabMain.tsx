@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/Button';
 import { toast } from '../../utils/toast';
 import { DesignLabCard } from './DesignLabCard';
 import { useAuthCheck } from '../../Hooks/useAuthCheck';
+import StageGuide from '../../shared/StageGuide';
 // Assuming these are your custom UI components based on description
 // import { Button } from '../../components/ui/button'; 
 // import { toast } from '../../components/ui/use-toast'; 
@@ -249,7 +250,7 @@ const DesignLabMain = () => {
                     <p className="text-gray-500 text-sm mt-1">Manage your design specifications</p>
                 </div>
 
-                <div className='flex gap-3'>
+                <div className='flex gap-3 items-center'>
                     {/* <Button
                         variant="outline"
                         className="flex items-center gap-2"
@@ -258,13 +259,25 @@ const DesignLabMain = () => {
                         <i className="fas fa-bars"></i> Menu
                     </Button> */}
 
-                   {canCreate && <Button
+
+                    {canCreate && <Button
                         onClick={() => navigate(`create`)}
                         className="flex items-center gap-2"
                     >
                         <i className="fas fa-plus"></i>
                         Create Design
                     </Button>}
+
+
+
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="design"
+                        />
+                    </div>
+
                 </div>
             </header>
 

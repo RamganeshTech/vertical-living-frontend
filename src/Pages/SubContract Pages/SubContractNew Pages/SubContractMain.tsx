@@ -10,6 +10,7 @@ import 'rc-slider/assets/index.css';
 import { Input } from "../../../components/ui/Input";
 import { useDebounce } from "../../../Hooks/useDebounce";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 
 interface FilterState {
   search: string;
@@ -288,10 +289,21 @@ const SubContractMain = () => {
           {/* <Breadcrumb paths={paths} /> */}
         </div>
 
-        {canCreate && <Button onClick={() => navigate('create')}>
-          <i className="fas fa-plus mr-2" />
-          Create Sub Contract
-        </Button>}
+        <div className='flex gap-3 items-center'>
+
+          {canCreate && <Button onClick={() => navigate('create')}>
+            <i className="fas fa-plus mr-2" />
+            Create Sub Contract
+          </Button>}
+
+
+          <div className="w-full sm:w-auto flex justify-end sm:block">
+            <StageGuide
+              organizationId={organizationId!}
+              stageName="subcontract"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Loading State */}

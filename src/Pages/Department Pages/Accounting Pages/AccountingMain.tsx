@@ -413,6 +413,7 @@ import { useDebounce } from '../../../Hooks/useDebounce';
 import Slider from 'rc-slider';
 import "rc-slider/assets/index.css";
 import { useAuthCheck } from '../../../Hooks/useAuthCheck';
+import StageGuide from '../../../shared/StageGuide';
 
 // // --- Components ---
 // import { Button } from '../../../../components/ui/Button'; // Adjust path
@@ -690,7 +691,7 @@ const AccountingMain: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
 
 
                     {showPayments && <Button onClick={() => navigate(`/organizations/${organizationId}/projects/paymentmain`)}>
@@ -703,6 +704,16 @@ const AccountingMain: React.FC = () => {
                         Billing
                     </Button>
                     }
+
+
+
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="accounts"
+                        />
+                    </div>
 
 
                     {/* <button

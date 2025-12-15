@@ -11,6 +11,7 @@ import { useCreateCategory, useDeleteCategory, useGetCategories } from "../../..
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/Dialog";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import StageGuide from "../../../shared/StageGuide";
 // import {
 //   Dialog,
 //   DialogContent,
@@ -28,16 +29,16 @@ export default function RateConfigAdminMain() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    
-    
-      const { role, permission } = useAuthCheck();
-      const canList = role === "owner" || permission?.materialquote?.list;
-      const canCreate = role === "owner" || permission?.materialquote?.create;
-      const canDelete = role === "owner" || permission?.materialquote?.delete;
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.materialquote?.list;
+    const canCreate = role === "owner" || permission?.materialquote?.create;
+    const canDelete = role === "owner" || permission?.materialquote?.delete;
     //   const canEdit = role === "owner" || permission?.materialquote?.edit;
-    
-    
-    
+
+
+
 
     const isChildRoute = location.pathname.includes("single");
 
@@ -46,7 +47,7 @@ export default function RateConfigAdminMain() {
     const [showCreateForm, setShowCreateForm] = useState(false);
 
     const { data: categories, isLoading, refetch } = useGetCategories(organizationId!);
-    const { mutateAsync: createCategory , isPending:createPending} = useCreateCategory();
+    const { mutateAsync: createCategory, isPending: createPending } = useCreateCategory();
     const { mutateAsync: deleteCategory, isPending } = useDeleteCategory();
 
     const handleAddField = () => {
@@ -74,14 +75,14 @@ export default function RateConfigAdminMain() {
             }
 
             const validFields = fields.filter((f) => f.key.trim() !== "");
-            if (validFields.length === 0){
- return toast({
+            if (validFields.length === 0) {
+                return toast({
                     title: "Error",
                     description: "Please enter valid field keys",
                     variant: "destructive",
                 });
             }
-               
+
 
             await createCategory({
                 organizationId,
@@ -119,7 +120,7 @@ export default function RateConfigAdminMain() {
     if (isChildRoute) return <Outlet />;
 
     return (
-        <div className="space-y-6 max-h-full overflow-y-auto">
+        <div className="space-y-6">
             {/* Header */}
             <header className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
@@ -132,9 +133,18 @@ export default function RateConfigAdminMain() {
                     </p>
                 </div>
 
-                {canCreate && <div>
-                    <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button>
-                </div>}
+                <section className="flex  gap-3 items-center">
+                    {canCreate && <div>
+                        <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button>
+                    </div>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="materialquote"
+                        />
+                    </div>
+                </section>
             </header>
 
             {/* Create Modal */}
@@ -197,7 +207,7 @@ export default function RateConfigAdminMain() {
             </Dialog>
 
             {/* Category Cards Section */}
-          {canList &&  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {canList && <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
                 {isLoading && <p>Loading categories...</p>}
                 {!isLoading && categories?.length === 0 && (
@@ -244,7 +254,8 @@ export default function RateConfigAdminMain() {
                         </CardContent>
                     </Card>
                 ))}
-            </div>}
+            </div>
+            }
         </div>
     );
 }

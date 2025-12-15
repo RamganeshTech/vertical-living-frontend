@@ -9,10 +9,11 @@ import { Button } from "../../../../components/ui/Button";
 // import { useCreateCategory, useDeleteCategory, useGetCategories } from "../../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 // import { Card, CardContent } from "../../../../components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../../components/ui/Dialog";
-import { useCreateLabourRateConfigCategory,  useGetLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
+import { useCreateLabourRateConfigCategory, useGetLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 import LabourRateConfigSingle from "./LabourRateConfigSingle";
 import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
+import StageGuide from "../../../../shared/StageGuide";
 // import {
 //   Dialog,
 //   DialogContent,
@@ -32,12 +33,12 @@ export default function LabourRateConfigMain() {
 
     // const isChildRoute = location.pathname.includes("laboursingle");
 
-     const { role, permission } = useAuthCheck();
-        const canList = role === "owner" || permission?.materialquote?.list;
-        const canCreate = role === "owner" || permission?.materialquote?.create;
-        // const canDelete = role === "owner" || permission?.materialquote?.delete;
-        // const canEdit = role === "owner" || permission?.materialquote?.edit;
-    
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.materialquote?.list;
+    const canCreate = role === "owner" || permission?.materialquote?.create;
+    // const canDelete = role === "owner" || permission?.materialquote?.delete;
+    // const canEdit = role === "owner" || permission?.materialquote?.edit;
+
 
     const [categoryName, setCategoryName] = useState("Labour and Miscellaneous");
     const [fields, setFields] = useState([{ key: "Category", type: "string", required: false }, { key: "Rs", type: "number", required: false }, { key: "notes", type: "string", required: false },]);
@@ -137,10 +138,23 @@ export default function LabourRateConfigMain() {
                     </p>
                 </div>
 
-                {(categories?.length === 0 && canCreate) && <div>
-                    {/* <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button> */}
-                    <Button onClick={handleCreate} isLoading={createPending}>Create New Category</Button>
-                </div>}
+
+                <section className="flex  gap-3 items-center">
+
+                    {(categories?.length === 0 && canCreate) && <div>
+                        {/* <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button> */}
+                        <Button onClick={handleCreate} isLoading={createPending}>Create New Category</Button>
+                    </div>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="materialquote"
+                        />
+                    </div>
+                </section>
+
+
             </header>
 
             {/* Create Modal */}
@@ -193,23 +207,23 @@ export default function LabourRateConfigMain() {
             </Dialog>
 
 
-             {!isLoading && categories?.length === 0 && (
-                    <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
-                        <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
-                        <h3 className="text-lg font-semibold text-blue-800 mb-1">No Labour Rate Configuration Found</h3>
-                        <p className="text-sm text-gray-500">
-                            Looks like there are no Labour Rate Configuration yet for this organization.<br />
-                            <Button onClick={handleCreate} isLoading={createPending} className="mx-4 my-2">Create New Category</Button> 
-                        </p>
-                    </div>)}
+            {!isLoading && categories?.length === 0 && (
+                <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
+                    <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
+                    <h3 className="text-lg font-semibold text-blue-800 mb-1">No Labour Rate Configuration Found</h3>
+                    <p className="text-sm text-gray-500">
+                        Looks like there are no Labour Rate Configuration yet for this organization.<br />
+                        <Button onClick={handleCreate} isLoading={createPending} className="mx-4 my-2">Create New Category</Button>
+                    </p>
+                </div>)}
 
             {/* Category Cards Section */}
             {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> */}
 
-                {isLoading && <MaterialOverviewLoading />}
-               
+            {isLoading && <MaterialOverviewLoading />}
 
-                {/* {categories?.map((category: any) => (
+
+            {/* {categories?.map((category: any) => (
                     <Card
                         key={category._id}
                         className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg transition-all"
@@ -250,9 +264,9 @@ export default function LabourRateConfigMain() {
                     </Card>
                 ))} */}
 
-                {(canList && categories?.length > 0) && (
-                    <LabourRateConfigSingle />
-                )}
+            {(canList && categories?.length > 0) && (
+                <LabourRateConfigSingle />
+            )}
             {/* </div> */}
         </div>
     );

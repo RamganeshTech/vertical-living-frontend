@@ -21,6 +21,7 @@ import {
 import { toast } from "../../../utils/toast"
 import { Label } from "../../../components/ui/Label"
 import { useAuthCheck } from "../../../Hooks/useAuthCheck"
+import StageGuide from "../../../shared/StageGuide"
 
 const CommonOrdersMain = () => {
     const { organizationId } = useParams<{ organizationId: string }>()
@@ -111,12 +112,23 @@ const CommonOrdersMain = () => {
                     <i className="fas fa-layer-group mr-2" />
                     Common Projects
                 </h1>
-                {(!showInput && canCreate ) && (
-                    <Button variant="primary" onClick={() => setShowInput(true)}>
-                        <i className="fas fa-plus mr-2" />
-                        Create New Project
-                    </Button>
-                )}
+
+                <div className='flex gap-3 items-center'>
+                    {(!showInput && canCreate) && (
+                        <Button variant="primary" onClick={() => setShowInput(true)}>
+                            <i className="fas fa-plus mr-2" />
+                            Create New Project
+                        </Button>
+                    )}
+
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="commonorder"
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* Create Project Form */}
@@ -223,7 +235,7 @@ const CommonOrdersMain = () => {
                                                 <i className="fas fa-check mr-1" />
                                                 Save
                                             </Button>}
-                                           {canEdit && <Button
+                                            {canEdit && <Button
                                                 size="sm"
                                                 variant="ghost"
                                                 onClick={(e) => {
@@ -237,7 +249,7 @@ const CommonOrdersMain = () => {
                                         </>
                                     ) : (
                                         <>
-                                          {canEdit &&  <Button
+                                            {canEdit && <Button
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={(e) => {
@@ -249,7 +261,7 @@ const CommonOrdersMain = () => {
                                                 <i className="fas fa-edit mr-1 text-blue-500" />
                                                 Edit
                                             </Button>}
-                                           {canDelete && <Button
+                                            {canDelete && <Button
                                                 size="sm"
                                                 variant="danger"
                                                 onClick={(e) => {
