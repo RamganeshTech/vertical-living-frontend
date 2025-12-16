@@ -7,6 +7,8 @@ import { useDebounce } from '../../../../Hooks/useDebounce';
 import { useDeletevendorpayments, useGetAllVendorPayments } from '../../../../apiList/Department Api/Accounting Api/vendorPaymentApi';
 import type { CreateVendorPaymentPayload } from './CreateVendorPaymentAcc';
 import VendorPaymentList from './VendorPaymentList';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 
 // import { Breadcrumb } from '../../Breadcrumb';
 
@@ -23,6 +25,14 @@ const VendorPaymentAccMain = () => {
 
         { label: "Vendor Payment", path: `/organizations/${organizationId}/projects/vendorpaymentmain` },
     ];
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.vendorpayment?.list;
+    const canCreate = role === "owner" || permission?.vendorpayment?.create
+    // const canEdit = role === "owner" || permission?.vendorpayment?.edit
+    // const canDelete = role === "owner" || permission?.vendorpayment?.delete
+
 
     // Check if we're on a child route
     const isDetailView = location.pathname.includes('/vendorpaymentsingle') || location.pathname.includes('/create');
@@ -152,12 +162,22 @@ const VendorPaymentAccMain = () => {
 
                 </div>
 
-                <Button
-                    onClick={() => navigate('create')}
-                >
-                    <i className="fas fa-plus mr-2" />
-                    Create Vendor Payment
-                </Button>
+                <div className='flex items-center gap-2'>
+
+                    {canCreate && <Button
+                        onClick={() => navigate('create')}
+                    >
+                        <i className="fas fa-plus mr-2" />
+                        Create Vendor Payment
+                    </Button>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="vendorpayment"
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* Loading State */}
@@ -235,7 +255,7 @@ const VendorPaymentAccMain = () => {
 
 
 
-                                  <div>
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         From CreatedAt Date
@@ -354,8 +374,7 @@ const VendorPaymentAccMain = () => {
                         </div>
                     </div>
 
-                    {/* No vendorPayment Fallback */}
-                    {vendorPayment.length === 0 ? (
+                    {canList && <>                    {vendorPayment.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-wallet text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No vendorPayments Found</h3>
@@ -429,6 +448,7 @@ const VendorPaymentAccMain = () => {
                             )} */}
                         </div>
                     )}
+                    </>}
                 </main>
             )}
         </div>

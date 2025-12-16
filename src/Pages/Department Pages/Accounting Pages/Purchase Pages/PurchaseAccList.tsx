@@ -1,6 +1,7 @@
 import React from 'react'
 import { dateFormate } from '../../../../utils/dateFormator'
 import type { CreatePurchasePayload } from './CreatePurchaseAcc'
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
 type Props = {
     purchase: CreatePurchasePayload,
     index: number,
@@ -9,6 +10,12 @@ type Props = {
     deletePending:boolean
 }
 const PurchaseAccList: React.FC<Props> = ({ purchase, index, handleView, handleDelete, deletePending }) => {
+    const { role, permission } = useAuthCheck();
+            // const canList = role === "owner" || permission?.purchaseorder?.list;
+            // const canCreate = role === "owner" || permission?.purchaseorder?.create
+            // const canEdit = role === "owner" || permission?.purchaseorder?.edit
+            const canDelete = role === "owner" || permission?.purchaseorder?.delete
+        
     return (
         <div
             className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
@@ -70,7 +77,7 @@ const PurchaseAccList: React.FC<Props> = ({ purchase, index, handleView, handleD
                 >
                     <i className="fas fa-eye"></i>
                 </button> */}
-                <button
+              {canDelete &&  <button
                     onClick={(e) => {
                         e.stopPropagation()
                         handleDelete(purchase._id!)
@@ -84,7 +91,7 @@ const PurchaseAccList: React.FC<Props> = ({ purchase, index, handleView, handleD
                     ) : (
                         <i className="fas fa-trash"></i>
                     )}
-                </button>
+                </button>}
             </div>
         </div>
     )

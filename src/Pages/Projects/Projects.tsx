@@ -193,7 +193,9 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
   DESIGNLAB: "design",
   COMMONORDER: "commonorder",
   // ACCOUNTING: "accounts" || "billing" || "payments",
-  ACCOUNTING: ["accounts", "billing", "payments"],
+  ACCOUNTING: ["accounts", "billing", "payments", "vendor", "customer", "invoice",
+     "expense", "billtemplate", "purchaseorder",
+      "vendorpayment", "salesorder",  "retailinvoice"],
 
 
   RATECONIG: "materialquote",

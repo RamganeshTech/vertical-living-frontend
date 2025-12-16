@@ -334,6 +334,11 @@ const ORG_MODULES = [
     'accounts',
     'payments',
     "billing",
+
+    "vendor", "customer", "invoice",
+     "expense", "billtemplate", "purchaseorder",
+      "vendorpayment", "salesorder",  "retailinvoice",
+
     "subcontract",
     "referencedesign",
     "stafftask",

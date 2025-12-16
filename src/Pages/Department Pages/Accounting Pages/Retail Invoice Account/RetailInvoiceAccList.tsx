@@ -1,6 +1,7 @@
 import React from 'react'
 import { dateFormate } from '../../../../utils/dateFormator'
 import type { RetailCreateInvoicePayload } from './CreateRetailInvoiceAcc'
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
 type Props = {
     invoice: RetailCreateInvoicePayload,
     index: number,
@@ -9,6 +10,19 @@ type Props = {
     deleteInvoiceMutation: any
 }
 const RetailInvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, handleDelete, deleteInvoiceMutation }) => {
+
+
+
+
+    
+    
+        const { role, permission } = useAuthCheck();
+        // const canList = role === "owner" || permission?.retailinvoice?.list;
+        // const canCreate = role === "owner" || permission?.retailinvoice?.create
+        // const canEdit = role === "owner" || permission?.retailinvoice?.edit
+        const canDelete = role === "owner" || permission?.retailinvoice?.delete
+    
+    
     return (
         <div
             className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
@@ -70,7 +84,7 @@ const RetailInvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, han
                 >
                     <i className="fas fa-eye"></i>
                 </button> */}
-                <button
+                {canDelete && <button
                     onClick={(e) =>{
                         e.stopPropagation()
                         handleDelete(invoice._id!)
@@ -84,7 +98,7 @@ const RetailInvoiceAccList: React.FC<Props> = ({ invoice, index, handleView, han
                     ) : (
                         <i className="fas fa-trash"></i>
                     )}
-                </button>
+                </button>}
             </div>
         </div>
     )

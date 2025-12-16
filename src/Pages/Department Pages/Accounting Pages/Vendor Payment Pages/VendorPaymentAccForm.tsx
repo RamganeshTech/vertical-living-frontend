@@ -11,6 +11,7 @@ import type { AvailableProjetType } from '../../Logistics Pages/LogisticsShipmen
 import { useSyncVendorPaymentToPaymentsSection } from '../../../../apiList/Department Api/Accounting Api/vendorPaymentApi';
 import { toast } from '../../../../utils/toast';
 import InfoTooltip from '../../../../components/ui/InfoToolTip';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 
 // CAN USE THE OMIT ALSO INSTEAD OF PICK
@@ -88,6 +89,15 @@ const VendorPaymentAccForm: React.FC<Props> = ({
 
     const { data: VendorData } = useGetVendorForDropDown(organizationId)
     const { mutateAsync: syncPaymentsMutation, isPending: syncPaymentsLoading } = useSyncVendorPaymentToPaymentsSection()
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.vendorpayment?.list;
+    const canCreate = role === "owner" || permission?.vendorpayment?.create
+    const canEdit = role === "owner" || permission?.vendorpayment?.edit
+    // const canDelete = role === "owner" || permission?.vendorpayment?.delete
+
 
 
     const defaultFormData: PayloadVendorPayload = {
@@ -424,7 +434,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
 
 
                 <div className='flex gap-2 items-center'>
-                    {isReadOnly && <div className="flex items-center">
+                    {(isReadOnly && (canEdit || canCreate)) && <div className="flex items-center">
                         <Button
                             variant="primary"
                             className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}
@@ -444,7 +454,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                     </div>}
 
 
-                    {currentMode === "view" && (
+                    {(currentMode === "view" && canEdit) && (
                         <div className="flex justify-end">
                             <Button onClick={toggleEdit} className="bg-blue-600 text-white px-6 py-2">
                                 Edit

@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 // import { useState } from 'react';
 import VendorAccountForm from './VendorAccountForm';
-import { toast } from '../../../../utils/toast';    
-import { 
-    useGetVendor, 
-    useUpdateVendor, 
-    useUpdateVendorDocument, 
+import { toast } from '../../../../utils/toast';
+import {
+    useGetVendor,
+    useUpdateVendor,
+    useUpdateVendorDocument,
     useUpdateVendorShopImages
 } from '../../../../apiList/Department Api/Accounting Api/vendorAccApi';
 import type { UpdateVendorPayload, } from '../../../../apiList/Department Api/Accounting Api/vendorAccApi';
@@ -13,17 +13,18 @@ import type { UpdateVendorPayload, } from '../../../../apiList/Department Api/Ac
 const VendorAccSingle = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    
+
     // 1. Fetch Data
     const { data: vendor, isLoading, isError, error, refetch } = useGetVendor(id || '');
-    
+
     // 2. Mutations
     const updateVendorMutation = useUpdateVendor();
     const updateDocumentMutation = useUpdateVendorDocument();
     const updateShopImageMutation = useUpdateVendorShopImages();
 
+
     // 3. Handle Update Logic
-    const handleUpdate = async (data: UpdateVendorPayload, files?: File[],  shopImages?: File[]) => {
+    const handleUpdate = async (data: UpdateVendorPayload, files?: File[], shopImages?: File[]) => {
         try {
             if (!id) return;
 
@@ -60,16 +61,16 @@ const VendorAccSingle = () => {
             }
 
             toast({ title: "Success", description: "Vendor updated successfully" });
-            
+
             // Refresh data to show new values in View mode
             await refetch();
 
         } catch (error: any) {
             console.error("Update failed", error);
-            toast({ 
-                title: "Error", 
+            toast({
+                title: "Error",
                 description: error?.response?.data?.message || error?.message || "Failed to update vendor",
-                variant: "destructive" 
+                variant: "destructive"
             });
         }
     };

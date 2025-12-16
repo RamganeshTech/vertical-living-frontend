@@ -24,6 +24,7 @@ import {
 // import { useGetProjects } from '../../../../apiList/Department Api/Project Api/projectApi'; // Project API
 import { Button } from '../../../../components/ui/Button';
 import { useGetProjects } from '../../../../apiList/projectApi';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 // import { Card } from '../../../../components/ui/Card';
 
 // --- UNDO/REDO HOOK ---
@@ -296,6 +297,14 @@ const BillNewSingle: React.FC<BillNewSingleProps> = ({ mode }) => {
     const { data: billData, isLoading: isBillLoading } = useGetBillNewById({ id: id || '' });
     const { data: projects } = useGetProjects(organizationId!);
 
+    
+            const { role, permission } = useAuthCheck();
+            // const canList = role === "owner" || permission?.billtemplate?.list;
+            const canCreate = role === "owner" || permission?.billtemplate?.create
+            const canEdit = role === "owner" || permission?.billtemplate?.edit
+            // const canDelete = role === "owner" || permission?.billtemplate?.delete
+        
+
     // --- STATE ---
     const { state: components = [], setState: setComponents, undo, redo, canUndo, canRedo, reset: resetHistory } = useUndoRedo<ComponentItem[]>([]);
     const [billMeta, setBillMeta] = useState({ customerName: '', billNumber: '', projectId: '', projectName: '', pdfData: null as any });
@@ -450,7 +459,7 @@ const BillNewSingle: React.FC<BillNewSingleProps> = ({ mode }) => {
                     </div>
                     <div className="flex gap-2">
                         <Button variant="outline" onClick={() => setShowTemplates(!showTemplates)}>{showTemplates ? 'Hide' : 'Show'} Templates</Button>
-                        <Button onClick={handleSave} isLoading={createMutation.isPending || updateMutation.isPending}>Save Bill</Button>
+                       {(canCreate || canEdit) && <Button onClick={handleSave} isLoading={createMutation.isPending || updateMutation.isPending}>Save Bill</Button>}
                     </div>
                 </div>
 

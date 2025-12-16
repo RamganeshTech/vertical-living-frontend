@@ -137,11 +137,11 @@ const StageGuide: React.FC<StageGuideProps> = ({ organizationId, stageName }) =>
     };
 
     return (
-        <div ref={wrapperRef} className="relative z-50 font-sans">
+        <div ref={wrapperRef} className="relative  z-50 font-sans">
             {/* --- The Trigger Icon (Pulse effect to draw attention if closed) --- */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center justify-center w-9 h-9 rounded-full transition-all shadow-md 
+                className={`flex items-center !cursor-pointer justify-center w-9 h-9 rounded-full transition-all shadow-md 
                 ${isOpen ? 'bg-blue-600 text-white rotate-180' : 'bg-white text-blue-600 hover:bg-blue-50'}`}
                 title="Stage Guidelines"
             >
@@ -161,7 +161,7 @@ const StageGuide: React.FC<StageGuideProps> = ({ organizationId, stageName }) =>
                         </h4>
                         <button
                             onClick={() => setIsOpen(false)}
-                            className="text-white/80 hover:text-white transition-colors"
+                            className="text-white/80 cursor-pointer hover:text-white transition-colors"
                         >
                             <i className="fa-solid fa-times text-sm"></i>
                         </button>

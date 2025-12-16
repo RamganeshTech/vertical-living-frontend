@@ -430,6 +430,8 @@ import { Badge } from '../../../../components/ui/Badge';
 import { dateFormate } from '../../../../utils/dateFormator';
 import { useDebounce } from '../../../../Hooks/useDebounce';
 import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 // import { useDebounce } from '../../../../hooks/useDebounce'; // Assuming you have this hook
 
 // --- MINI PREVIEW COMPONENT ---
@@ -487,6 +489,15 @@ const TemplateBillMain = () => {
 
     // Debounced Search to prevent too many API calls
     const debouncedSearch = useDebounce(filters.search, 700);
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.billtemplate?.list;
+    const canCreate = role === "owner" || permission?.billtemplate?.create
+    // const canEdit = role === "owner" || permission?.billtemplate?.edit
+    // const canDelete = role === "owner" || permission?.billtemplate?.delete
+
+
 
     // --- USE INFINITE QUERY ---
     const {
@@ -577,11 +588,21 @@ const TemplateBillMain = () => {
                     {/* <p className="text-xs text-gray-500 mt-1">Design billing layouts</p> */}
                 </div>
 
-                <div className="flex gap-2">
-                    <Button onClick={() => navigate(`create`)}>
-                        <i className="fas fa-plus mr-2"></i> Create Template
-                    </Button>
-                </div>
+                <section className='flex gap-2 items-center'>
+
+                    {canCreate && <div className="flex gap-2">
+                        <Button onClick={() => navigate(`create`)}>
+                            <i className="fas fa-plus mr-2"></i> Create Template
+                        </Button>
+                    </div>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="billtemplate"
+                        />
+                    </div>
+                </section>
             </header>
 
             {/* --- LOADING / ERROR --- */}
@@ -675,7 +696,7 @@ const TemplateBillMain = () => {
                     </div>
 
                     {/* --- RIGHT CONTENT (GRID) --- */}
-                    <div
+                    {canList && <div
                         ref={scrollContainerRef}
                         className="flex-1 overflow-y-auto bg-gray-50/50 p-4"
                     >
@@ -752,7 +773,7 @@ const TemplateBillMain = () => {
                                 )}
                             </>
                         )}
-                    </div>
+                    </div>}
                 </main>
             )}
         </div>

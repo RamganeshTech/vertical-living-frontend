@@ -6,6 +6,8 @@ import { useGetCustomerForDropDown } from '../../../../apiList/Department Api/Ac
 import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
 import { Label } from '../../../../components/ui/Label';
 import type { CreateSalesOrderPayload } from './CreateSalerOrderAcc';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+// import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 interface SalesItem {
     itemName: string;
@@ -48,6 +50,14 @@ const SalesOrderAccountForm: React.FC<SalesOrderAccountFormProps> = ({
     const [currentMode, _setCurrentMode] = useState<'create' | 'view' | 'edit'>(initialMode);
 
     const { data: customerData } = useGetCustomerForDropDown(organizationId)
+
+    const { role, permission } = useAuthCheck();
+        // const canList = role === "owner" || permission?.salesorder?.list;
+        const canCreate = role === "owner" || permission?.salesorder?.create
+        const canEdit = role === "owner" || permission?.salesorder?.edit
+        // const canDelete = role === "owner" || permission?.salesorder?.delete
+    
+    
 
     const defaultFormData: SalesOrderFormData = {
         customerId: '',
@@ -753,7 +763,7 @@ const SalesOrderAccountForm: React.FC<SalesOrderAccountFormProps> = ({
                 </div>
 
                 {/* Action Buttons */}
-                {!isReadOnly && (
+                {!isReadOnly && (canCreate || canEdit) && (
                     <div className="flex justify-end gap-4 pt-6">
                         <Button
                             type="button"

@@ -1055,6 +1055,7 @@ import { Button } from '../../../../components/ui/Button';
 import { type CreateVendorPayload, type UpdateVendorPayload, type Vendor } from '../../../../apiList/Department Api/Accounting Api/vendorAccApi';
 import ImageGalleryExample from '../../../../shared/ImageGallery/ImageGalleryMain';
 import { dateFormate } from '../../../../utils/dateFormator';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 // --- UI Helpers ---
 const SectionHeader = ({ icon, title }: { icon: string, title: string }) => (
@@ -1104,6 +1105,14 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
 }) => {
     const { organizationId } = useParams();
     const navigate = useNavigate();
+
+    
+        const { role, permission } = useAuthCheck();
+        // const canList = role === "owner" || permission?.vendor?.list;
+        // const canCreate = role === "owner" || permission?.vendor?.create
+        const canEdit = role === "owner" || permission?.vendor?.edit
+        // const canDelete = role === "owner" || permission?.vendor?.delete
+    
 
     // --- State ---
     const [currentMode, setCurrentMode] = useState<'create' | 'view' | 'update'>(initialMode);
@@ -1263,7 +1272,7 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
                     </h1>
                 </div>
                 <div className="flex gap-3">
-                    {currentMode === 'view' && (
+                    {(currentMode === 'view' && canEdit) && (
                         <Button onClick={() => setCurrentMode('update')} className="bg-blue-600 text-white shadow-sm">
                             <i className="fas fa-edit mr-2"></i> Edit Details
                         </Button>

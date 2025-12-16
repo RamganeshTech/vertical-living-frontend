@@ -17,6 +17,7 @@ import {
     useCreateNewTemplate
 } from '../../../../apiList/Department Api/Accounting Api/billNew_accounting_api/billNewAccountingApi';
 import { Button } from '../../../../components/ui/Button';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 // --- CUSTOM HOOK: USE UNDO REDO ---
 // This replaces the standard useState to add history tracking
@@ -156,7 +157,7 @@ const defaultStyle: ComponentStyle = {
 
 // --- SUB-COMPONENTS ---
 
-const TableGridSelector = ({ onSelect,  }: { onSelect: (rows: number, cols: number) => void, }) => {
+const TableGridSelector = ({ onSelect, }: { onSelect: (rows: number, cols: number) => void, }) => {
     const [hover, setHover] = useState({ rows: 0, cols: 0 });
     return (
         <div className="absolute top-12 left-0 z-50 bg-white shadow-xl border border-gray-300 p-3 rounded w-48">
@@ -1039,6 +1040,15 @@ export const TemplateBillSingle: React.FC<TemplateBillSingleProps> = ({ mode }) 
     const createMutation = useCreateNewTemplate();
     const updateMutation = useUpdateTemplateLayout();
 
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.billtemplate?.list;
+    const canCreate = role === "owner" || permission?.billtemplate?.create
+    const canEdit = role === "owner" || permission?.billtemplate?.edit
+    // const canDelete = role === "owner" || permission?.billtemplate?.delete
+
+
     // --- REPLACED STATE WITH UNDO/REDO HOOK ---
     const {
         state: components = [], // Default to empty array
@@ -1221,12 +1231,12 @@ export const TemplateBillSingle: React.FC<TemplateBillSingleProps> = ({ mode }) 
                     <button onClick={() => addBlock('data-field')} className="btn-tool"><i className="fa-solid fa-database"></i> Field</button>
                     <div className="relative">
                         <button onClick={() => setShowTableGrid(!showTableGrid)} className="btn-tool"><i className="fa-solid fa-table"></i> Table</button>
-                        {showTableGrid && <TableGridSelector onSelect={addTable}  />}
+                        {showTableGrid && <TableGridSelector onSelect={addTable} />}
                     </div>
                     <button onClick={() => fileInputRef.current?.click()} className="btn-tool"><i className="fa-regular fa-image"></i> Image</button>
                     <input type="file" ref={fileInputRef} className="hidden" onChange={handleImageUpload} />
                 </div>
-                <Button onClick={handleSave} isLoading={createMutation.isPending || updateMutation.isPending}>Save Template</Button>
+               {(canCreate || canEdit) &&  <Button onClick={handleSave} isLoading={createMutation.isPending || updateMutation.isPending}>Save Template</Button> }
             </div>
 
             {/* CANVAS */}

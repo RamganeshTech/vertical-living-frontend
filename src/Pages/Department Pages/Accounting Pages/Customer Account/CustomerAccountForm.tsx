@@ -237,7 +237,7 @@
 //         }
 //     };
 
-   
+
 
 //     // Filter existing documents
 //     const existingImages = initialData?.documents?.filter((f: any) => f.type === 'image') || [];
@@ -356,18 +356,18 @@
 //             )}
 
 
-          
+
 
 
 //             <Card className="p-6">
 //                             <div className="space-y-8">
-            
+
 //                                 {/* --- Section 1: Basic Details --- */}
 //                                 <section>
 //                                     <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100 flex items-center">
 //                                         <i className="fas fa-info-circle mr-2 text-blue-500"></i> Basic Information
 //                                     </h3>
-            
+
 //                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
 //                                         <div>
 //                                             <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name / First Name <span className="text-red-500">*</span></label>
@@ -393,7 +393,7 @@
 //                                             />
 //                                         </div>
 //                                     {/* </div> */}
-            
+
 //                                     {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6"> */}
 //                                         <div className="col-span-1">
 //                                             <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
@@ -408,7 +408,7 @@
 //                                             />
 //                                             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
 //                                         </div>
-            
+
 //                                         <div>
 //                                             <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
 //                                             <input
@@ -434,13 +434,13 @@
 //                                         </div>
 //                                     {/* </div>
 //                                 </section> */}
-            
+
 //                                 {/* --- Section 2: Financial & Location --- */}
 //                                 {/* <section>
 //                                     <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100 flex items-center">
 //                                         <i className="fas fa-coins mr-2 text-blue-500"></i> Financial & Location
 //                                     </h3>
-            
+
 //                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4"> */}
 //                                         <div>
 //                                             <label className="block text-sm font-medium text-gray-700 mb-1">PAN Number</label>
@@ -465,7 +465,7 @@
 //                                             />
 //                                         </div>
 //                                     {/* </div> */}
-            
+
 //                                     {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4"> */}
 //                                         <div>
 //                                             <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
@@ -504,7 +504,7 @@
 //                                             </select>
 //                                         </div> */}
 //                                     </div>
-            
+
 //                                     {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 //                                         <div>
 //                                             <label className="block text-sm font-medium text-gray-700 mb-1">Accounts Payable</label>
@@ -518,15 +518,15 @@
 //                                         </div>
 //                                     </div> */}
 //                                 </section>
-                                
-            
+
+
 //                                 {/* --- Section 3: Documents Display --- */}
 //                                 {(existingImages.length > 0 || existingPdfs.length > 0) && (
 //                                     <section>
 //                                         <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100 flex items-center">
 //                                             <i className="fas fa-folder-open mr-2 text-blue-500"></i> Documents
 //                                         </h3>
-            
+
 //                                         {/* Images Gallery */}
 //                                         {existingImages.length > 0 && (
 //                                             <div className="mb-6">
@@ -545,7 +545,7 @@
 //                                                 />
 //                                             </div>
 //                                         )}
-            
+
 //                                         {/* PDFs List */}
 //                                         {existingPdfs.length > 0 && (
 //                                             <div>
@@ -589,7 +589,7 @@
 //                                         )}
 //                                     </section>
 //                                 )}
-            
+
 //                                 {/* --- Section 4: Upload New Documents (Edit/Create Mode) --- */}
 //                                 {!isReadOnly && (
 //                                     <section>
@@ -597,7 +597,7 @@
 //                                             <i className="fas fa-cloud-upload-alt mr-2 text-blue-500"></i>
 //                                             {currentMode === 'create' ? 'Upload Documents' : 'Add New Documents'}
 //                                         </h3>
-            
+
 //                                         <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors bg-gray-50 flex flex-col items-center justify-center">
 //                                             <input
 //                                                 type="file"
@@ -610,7 +610,7 @@
 //                                             <p className="text-sm text-gray-600 font-medium">Click to upload files</p>
 //                                             <p className="text-xs text-gray-500">PDF, PNG, JPG</p>
 //                                         </div>
-            
+
 //                                         {/* New Files Preview */}
 //                                         {selectedFiles.length > 0 && (
 //                                             <div className="mt-4 space-y-2">
@@ -630,7 +630,7 @@
 //                                         )}
 //                                     </section>
 //                                 )}
-            
+
 //                                 {/* --- Footer Buttons --- */}
 //                                 {!isReadOnly && (
 //                                     <div className="pt-6 mt-6 border-t border-gray-200 flex justify-end gap-4">
@@ -660,6 +660,7 @@ import { Card } from '../../../../components/ui/Card';
 import { Button } from '../../../../components/ui/Button';
 import ImageGalleryExample from '../../../../shared/ImageGallery/ImageGalleryMain';
 import { dateFormate } from '../../../../utils/dateFormator';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 // --- UI Helpers (Same as Vendor Form) ---
 const SectionHeader = ({ icon, title }: { icon: string, title: string }) => (
@@ -716,25 +717,35 @@ const CustomerAccountForm: React.FC<CustomerAccountFormProps> = ({
     const updateImageMutation = useUpdateCustomerMainImage(); 
     */
 
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.customer?.list;
+    // const canCreate = role === "owner" || permission?.customer?.create
+    const canEdit = role === "owner" || permission?.customer?.edit
+    // const canDelete = role === "owner" || permission?.customer?.delete
+
+
     // --- Form State ---
     const [formData, setFormData] = useState({
         organizationId: initialData?.organizationId || organizationId,
         projectId: initialData?.projectId || null,
         clientId: initialData?.clientId || null,
-        
+
         // Basic
         firstName: '',
         companyName: '',
         email: '',
         phone: { work: '', mobile: '' },
-        
+
         // Statutory
         language: 'English',
         currency: 'INR - Indian Rupee',
         pan: '',
         tan: '',
         gstin: '',
-        
+
         // Banking
         bankAccNo: '',
         accHolderName: '',
@@ -812,9 +823,9 @@ const CustomerAccountForm: React.FC<CustomerAccountFormProps> = ({
 
         if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
         if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email format';
-        
+
         if (formData.phone.mobile && formData.phone.mobile.length !== 10) {
-             newErrors['phone.mobile'] = 'Mobile number must be 10 digits';
+            newErrors['phone.mobile'] = 'Mobile number must be 10 digits';
         }
 
         setErrors(newErrors);
@@ -844,7 +855,7 @@ const CustomerAccountForm: React.FC<CustomerAccountFormProps> = ({
 
     return (
         <div className="max-w-full overflow-y-auto mx-auto h-full flex flex-col pb-10 font-sans">
-            
+
             {/* --- Header --- */}
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -855,13 +866,13 @@ const CustomerAccountForm: React.FC<CustomerAccountFormProps> = ({
                     </button>
                     <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                         <span className="bg-blue-100 text-blue-600 w-10 h-10 rounded-full flex items-center justify-center text-lg">
-                             <i className={`fas ${currentMode === 'create' ? 'fa-user-plus' : 'fa-user-tie'}`}></i>
+                            <i className={`fas ${currentMode === 'create' ? 'fa-user-plus' : 'fa-user-tie'}`}></i>
                         </span>
                         {currentMode === 'create' ? 'Create Customer' : 'Customer Details'}
                     </h1>
                 </div>
                 <div className="flex gap-3">
-                    {currentMode === 'view' && (
+                    {(currentMode === 'view' && canEdit) && (
                         <Button onClick={() => setCurrentMode('update')} className="bg-blue-600 text-white shadow-sm">
                             <i className="fas fa-edit mr-2"></i> Edit Details
                         </Button>
@@ -873,11 +884,11 @@ const CustomerAccountForm: React.FC<CustomerAccountFormProps> = ({
                     )}
                     {!isReadOnly && (
                         <Button type="button" onClick={handleSubmit} disabled={isSubmitting} className="">
-                           {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> :  <span className="flex items-center">
-                <i className="fas fa-save mr-2"></i> Save Changes
-            </span>}
-                       </Button>
-                   )}
+                            {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <span className="flex items-center">
+                                <i className="fas fa-save mr-2"></i> Save Changes
+                            </span>}
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -1027,7 +1038,7 @@ const CustomerAccountForm: React.FC<CustomerAccountFormProps> = ({
                     <div >
                         <SectionHeader icon="fa-university" title="Banking Details" />
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                             <div className="lg:col-span-1">
+                            <div className="lg:col-span-1">
                                 <InputLabel>Bank Name</InputLabel>
                                 <ModernInput
                                     name="bankName"

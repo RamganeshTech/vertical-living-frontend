@@ -1,14 +1,26 @@
 import React from 'react'
 import { dateFormate } from '../../../../utils/dateFormator'
 import type { CreateVendorPaymentPayload } from './CreateVendorPaymentAcc'
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
 type Props = {
     vendor: CreateVendorPaymentPayload,
     index: number,
     handleView: (id: string) => any,
     handleDelete: (id: string) => any,
-    deletePending:boolean
+    deletePending: boolean
 }
 const VendorPaymentList: React.FC<Props> = ({ vendor, index, handleView, handleDelete, deletePending }) => {
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.vendorpayment?.list;
+    // const canCreate = role === "owner" || permission?.vendorpayment?.create
+    // const canEdit = role === "owner" || permission?.vendorpayment?.edit
+    const canDelete = role === "owner" || permission?.vendorpayment?.delete
+
+
+
+
     return (
         <div
             className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
@@ -37,7 +49,7 @@ const VendorPaymentList: React.FC<Props> = ({ vendor, index, handleView, handleD
             </div>
 
 
-             <div className="col-span-2 text-gray-600 text-sm">
+            <div className="col-span-2 text-gray-600 text-sm">
                 <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
                 {dateFormate(vendor?.vendorPaymentDate!)}
             </div>
@@ -70,7 +82,7 @@ const VendorPaymentList: React.FC<Props> = ({ vendor, index, handleView, handleD
                 >
                     <i className="fas fa-eye"></i>
                 </button> */}
-                <button
+                {canDelete && <button
                     onClick={(e) => {
                         e.stopPropagation()
                         handleDelete(vendor._id!)
@@ -84,7 +96,7 @@ const VendorPaymentList: React.FC<Props> = ({ vendor, index, handleView, handleD
                     ) : (
                         <i className="fas fa-trash"></i>
                     )}
-                </button>
+                </button>}
             </div>
         </div>
     )

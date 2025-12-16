@@ -214,7 +214,7 @@ export const useToggleUserGuidePref = () => {
                 case "worker":
                     dispatch(updateWorkerGuideStatus(newValue));
                     break;
-                case "worker":
+                case "client":
                     dispatch(updateClientGuideStatus(newValue));
                     break;
                 default:

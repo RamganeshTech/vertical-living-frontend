@@ -12,6 +12,7 @@ import { ORDERMATERIAL_UNIT_OPTIONS } from '../../../Stage Pages/Ordering Materi
 import { downloadImage } from '../../../../utils/downloadFile';
 import { useGetProjects } from '../../../../apiList/projectApi';
 import type { AvailableProjetType } from '../../Logistics Pages/LogisticsShipmentForm';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 // import { useSyncInvoiceToAccounts } from '../../../../apiList/Department Api/Accounting Api/invoiceApi';
 // import { toast } from '../../../../utils/toast';
 // import InfoTooltip from '../../../../components/ui/InfoToolTip';
@@ -123,6 +124,15 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
     //     }
     // }
 
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.invoice?.list;
+    // const canCreate = role === "owner" || permission?.invoice?.create
+    const canEdit = role === "owner" || permission?.invoice?.edit
+    // const canDelete = role === "owner" || permission?.invoice?.delete
 
 
 
@@ -383,7 +393,7 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
 
 
 
-                    {currentMode === 'view' && (
+                    {(currentMode === 'view' && canEdit) && (
                         <Button
                             type="button"
                             onClick={handleEdit}
@@ -434,7 +444,7 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
                                 isLoading={isSubmitting}
                                 onClick={handleSubmit}
                             >
-                                    <><i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i> {isCreateMode ? 'Create Invoice' : 'Update Invoice'}</>
+                                <><i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i> {isCreateMode ? 'Create Invoice' : 'Update Invoice'}</>
                             </Button>
                         </div>
                     )}
@@ -442,7 +452,7 @@ const InvoiceAccountForm: React.FC<InvoiceAccountFormProps> = ({
                 </div>
             </header>
 
-            <form  className="space-y-6">
+            <form className="space-y-6">
                 {/* Invoice Details */}
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">

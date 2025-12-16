@@ -13,6 +13,8 @@ import Slider from 'rc-slider';
 import "rc-slider/assets/index.css";
 
 import { useDebounce } from '../../../../Hooks/useDebounce';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 
 const ExpenseAccountsMain = () => {
     const navigate = useNavigate();
@@ -28,6 +30,17 @@ const ExpenseAccountsMain = () => {
         { label: "Bills", path: `/organizations/${organizationId}/projects/billmain` },
         { label: "Expenses", path: `/organizations/${organizationId}/projects/expensemain` },
     ];
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.expense?.list;
+    const canCreate = role === "owner" || permission?.expense?.create
+    // const canEdit = role === "owner" || permission?.expense?.edit
+    // const canDelete = role === "owner" || permission?.expense?.delete
+
+
+
 
     // Filter states
     const [filters, setFilters] = useState({
@@ -179,7 +192,7 @@ const ExpenseAccountsMain = () => {
                     <Breadcrumb paths={paths} />
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3">
                     {/* <Button
                         onClick={() => navigate('statistics')}
                         variant="outline"
@@ -187,10 +200,17 @@ const ExpenseAccountsMain = () => {
                         <i className="fas fa-chart-bar mr-2" />
                         Statistics
                     </Button> */}
-                    <Button onClick={() => navigate('create')}>
+                    {canCreate && <Button onClick={() => navigate('create')}>
                         <i className="fas fa-plus mr-2" />
                         Create Expense
-                    </Button>
+                    </Button>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="expense"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -547,7 +567,7 @@ const ExpenseAccountsMain = () => {
                     </div>
 
                     {/* No Expenses Fallback */}
-                    {expenses.length === 0 ? (
+                    {canList && <>        {expenses.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-receipt text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Expenses Found</h3>
@@ -617,6 +637,7 @@ const ExpenseAccountsMain = () => {
                             )}
                         </div>
                     )}
+                    </>}
                 </main>
             )}
         </div>

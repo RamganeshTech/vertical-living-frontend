@@ -7,6 +7,8 @@ import { useDebounce } from '../../../../Hooks/useDebounce';
 import { useDeletePurchase, useGetAllPurchase } from '../../../../apiList/Department Api/Accounting Api/purchaseAccApi';
 import type { CreatePurchasePayload } from './CreatePurchaseAcc';
 import PurchaseAccList from './PurchaseAccList';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 
 // import { Breadcrumb } from '../../Breadcrumb';
 
@@ -22,6 +24,15 @@ const PurchaseAccountsMain = () => {
         { label: "Bills", path: `/organizations/${organizationId}/projects/billmain` },
         { label: "Purchase", path: `/organizations/${organizationId}/projects/purchasemain` },
     ];
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.purchaseorder?.list;
+    const canCreate = role === "owner" || permission?.purchaseorder?.create
+    // const canEdit = role === "owner" || permission?.purchaseorder?.edit
+    // const canDelete = role === "owner" || permission?.purchaseorder?.delete
+
 
     // Check if we're on a child route
     const isDetailView = location.pathname.includes('/purchasesingle') || location.pathname.includes('/create');
@@ -61,7 +72,7 @@ const PurchaseAccountsMain = () => {
         fromPurchaseDate: filters.fromPurchaseDate || undefined,
         toPurchaseDate: filters.toPurchaseDate || undefined,
         createdFromDate: filters.createdFromDate || undefined,
-        createdToDate: filters.createdToDate || undefined,        search: debouncedSearch || undefined,
+        createdToDate: filters.createdToDate || undefined, search: debouncedSearch || undefined,
         sortBy: filters.sortBy || undefined,
         sortOrder: filters.sortOrder || undefined,
     });
@@ -151,12 +162,27 @@ const PurchaseAccountsMain = () => {
 
                 </div>
 
-                <Button
-                    onClick={() => navigate('create')}
-                >
-                    <i className="fas fa-plus mr-2" />
-                    Create Purchase Order
-                </Button>
+
+                <div className='flex items-center gap-2'>
+
+
+
+                    {canCreate && <Button
+                        onClick={() => navigate('create')}
+                    >
+                        <i className="fas fa-plus mr-2" />
+                        Create Purchase Order
+                    </Button>}
+
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="purchaseorder"
+                        />
+                    </div>
+                </div>
+
             </div>
 
             {/* Loading State */}
@@ -353,7 +379,7 @@ const PurchaseAccountsMain = () => {
                     </div>
 
                     {/* No purchase Fallback */}
-                    {purchases.length === 0 ? (
+                    {canList && <>    {purchases.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-wallet text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Purchases Found</h3>
@@ -427,6 +453,7 @@ const PurchaseAccountsMain = () => {
                             )} */}
                         </div>
                     )}
+                    </>}
                 </main>
             )}
         </div>

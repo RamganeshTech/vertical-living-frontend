@@ -13,6 +13,7 @@ import type { AvailableProjetType } from '../../Logistics Pages/LogisticsShipmen
 import { ORDERMATERIAL_UNIT_OPTIONS } from '../../../Stage Pages/Ordering Materials/OrderMaterialOverview';
 import { Card, CardContent } from '../../../../components/ui/Card';
 import { downloadImage } from '../../../../utils/downloadFile';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 // import { useSyncRetailInvoiceToAccounts } from '../../../../apiList/Department Api/Accounting Api/retailinvoiceApi';
 // import { toast } from '../../../../utils/toast';
 // import InfoTooltip from '../../../../components/ui/InfoToolTip';
@@ -61,6 +62,14 @@ const RetailInvoiceAccountForm: React.FC<RetailInvoiceAccountFormProps> = ({
     const [currentMode, setCurrentMode] = useState<'create' | 'view' | 'edit'>(initialMode);
 
     const { data: customerData } = useGetCustomerForDropDown(organizationId)
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.retailinvoice?.list;
+    // const canCreate = role === "owner" || permission?.retailinvoice?.create
+    const canEdit = role === "owner" || permission?.retailinvoice?.edit
+    // const canDelete = role === "owner" || permission?.retailinvoice?.delete
+
+
 
     const defaultFormData = {
         customerId: '',
@@ -347,7 +356,7 @@ const RetailInvoiceAccountForm: React.FC<RetailInvoiceAccountFormProps> = ({
         <div className="max-w-full mx-auto space-y-2">
             {/* Header */}
             <header className="sticky top-0 z-20 bg-white border-b border-gray-200 pb-4 pt-2 mb-6 flex justify-between items-center">
-            {/* <header className="flex justify-between items-center"> */}
+                {/* <header className="flex justify-between items-center"> */}
                 <div className='flex justify-between items-center gap-2'>
                     <button
                         type="button"
@@ -401,7 +410,7 @@ const RetailInvoiceAccountForm: React.FC<RetailInvoiceAccountFormProps> = ({
                         /> */}
 
 
-                    {currentMode === 'view' && (
+                    {(currentMode === 'view' && canEdit) && (
                         <Button
                             type="button"
                             onClick={handleEdit}
@@ -431,8 +440,8 @@ const RetailInvoiceAccountForm: React.FC<RetailInvoiceAccountFormProps> = ({
                                 isLoading={isSubmitting}
 
                             >
-                               
-                                    <><i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i> {isCreateMode ? 'Create Invoice' : 'Update Invoice'}</>
+
+                                <><i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i> {isCreateMode ? 'Create Invoice' : 'Update Invoice'}</>
                             </Button>
                         </div>
                     )}
@@ -440,7 +449,7 @@ const RetailInvoiceAccountForm: React.FC<RetailInvoiceAccountFormProps> = ({
                 </div>
             </header>
 
-            <form  className="space-y-6">
+            <form className="space-y-6">
                 {/* Customer Information */}
                 {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">

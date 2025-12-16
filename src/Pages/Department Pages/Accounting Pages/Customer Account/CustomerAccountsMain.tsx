@@ -7,6 +7,8 @@ import { Button } from '../../../../components/ui/Button';
 import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
 import CustomerAccList from './CustomerAccList';
 import { toast } from '../../../../utils/toast';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 // import { Breadcrumb } from '../../Breadcrumb';
 
 const CustomerAccountsMain = () => {
@@ -14,6 +16,17 @@ const CustomerAccountsMain = () => {
     const location = useLocation();
     const { organizationId } = useParams();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.stafftask?.delete;
+    const canList = role === "owner" || permission?.customer?.list;
+    const canCreate = role === "owner" || permission?.customer?.create
+    // const canEdit = role === "owner" || permission?.customer?.edit
+    // const canDelete = role === "owner" || permission?.customer?.delete
+
+
 
     // Check if we're on a child route
     const isDetailView = location.pathname.includes('/customersingle') || location.pathname.includes('/create');
@@ -119,7 +132,7 @@ const CustomerAccountsMain = () => {
             // customerType: '',
             projectId: '',
             createdFromDate: "",
-        createdToDate: "",
+            createdToDate: "",
             sortBy: 'createdAt',
             sortOrder: 'desc'
         });
@@ -148,12 +161,22 @@ const CustomerAccountsMain = () => {
                     <Breadcrumb paths={paths} />
                 </div>
 
-                <Button
-                    onClick={() => navigate('create')}
-                >
-                    <i className="fas fa-plus mr-2" />
-                    Add Customer
-                </Button>
+                <div className="flex items-center gap-3">
+
+                    {canCreate && <Button
+                        onClick={() => navigate('create')}
+                    >
+                        <i className="fas fa-plus mr-2" />
+                        Add Customer
+                    </Button>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="customer"
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* Loading State */}
@@ -295,8 +318,7 @@ const CustomerAccountsMain = () => {
                         </div>
                     </div>
 
-                    {/* No Customers Fallback */}
-                    {customers.length === 0 ? (
+                    {canList && <>   {customers.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-user-slash text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Customers Found</h3>
@@ -309,50 +331,6 @@ const CustomerAccountsMain = () => {
                             </p>
                         </div>
                     ) : (
-
-                        //  <div 
-                        //     ref={scrollContainerRef}
-                        //     className="flex-1 !max-h-[100%] overflow-y-auto"
-                        // >
-                        //     <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-2">
-                        //         {customers.map((customer) => (
-                        //             <CustomerAccCard
-                        //                 key={customer._id}
-                        //                 customer={customer}
-                        //                 onView={() => handleView(customer._id)}
-                        //                 onDelete={() => handleDelete(
-                        //                     customer._id,
-                        //                     customer.customerType === 'business'
-                        //                         ? customer.companyName || 'Customer'
-                        //                         : `${customer.firstName} ${customer.lastName}`
-                        //                 )}
-                        //                 isDeleting={deleteCustomerMutation.isPending}
-                        //             />
-                        //         ))}
-                        //     </div>
-
-                        //     {/* Loading indicator at the bottom */}
-                        //     {isFetchingNextPage && (
-                        //         <div className="flex justify-center py-8">
-                        //             <div className="flex items-center gap-2 text-blue-600">
-                        //                 <i className="fas fa-spinner fa-spin text-2xl"></i>
-                        //                 <span className="text-sm font-medium">Loading more customers...</span>
-                        //             </div>
-                        //         </div>
-                        //     )}
-
-                        //     {/* End of list indicator */}
-                        //     {!hasNextPage && customers.length > 0 && (
-                        //         <div className="flex justify-center py-6">
-                        //             <p className="text-gray-400 text-sm font-medium">
-                        //                 <i className="fas fa-check-circle mr-2"></i>
-                        //                 You've reached the end of the list
-                        //             </p>
-                        //         </div>
-                        //     )}
-                        // </div>
-
-
                         <div
                             ref={scrollContainerRef}
                             className="flex-1 max-h-[100%] overflow-y-auto"
@@ -407,6 +385,7 @@ const CustomerAccountsMain = () => {
                             )}
                         </div>
                     )}
+                    </>}
                 </main>
             )}
         </div>

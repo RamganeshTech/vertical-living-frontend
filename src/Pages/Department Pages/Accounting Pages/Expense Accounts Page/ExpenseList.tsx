@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { dateFormate } from '../../../../utils/dateFormator';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 interface ExpenseAccListProps {
     expense: {
@@ -29,6 +30,17 @@ const ExpenseList: React.FC<ExpenseAccListProps> = ({
     onDelete,
     isDeleting
 }) => {
+
+    
+        const { role, permission } = useAuthCheck();
+        // const canList = role === "owner" || permission?.expense?.list;
+        // const canCreate = role === "owner" || permission?.expense?.create
+        // const canEdit = role === "owner" || permission?.expense?.edit
+        const canDelete = role === "owner" || permission?.expense?.delete
+    
+    
+
+
     return (
         <div onClick={onView} className="grid  cursor-pointer grid-cols-16 gap-4 px-6 py-4 border-b border-gray-100  hover:bg-[#f9fcff] transition-colors items-center">
             {/* S.No */}
@@ -94,14 +106,14 @@ const ExpenseList: React.FC<ExpenseAccListProps> = ({
             {/* Actions */}
             <div className="col-span-2 flex justify-center gap-2">
 
-                <button
+                {canDelete && <button
                     onClick={onDelete}
                     disabled={isDeleting}
                     className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                     title="Delete Expense"
                 >
                     <i className={`fas ${isDeleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
-                </button>
+                </button>}
             </div>
         </div>
     );

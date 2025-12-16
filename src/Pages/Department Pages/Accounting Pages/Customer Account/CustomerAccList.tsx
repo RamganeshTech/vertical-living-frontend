@@ -1,6 +1,7 @@
 import React from "react";
 import type { Customer } from "../../../../apiList/Department Api/Accounting Api/customerAccountApi";
 import { dateFormate } from "../../../../utils/dateFormator";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 
 interface Props {
     customer: Customer;
@@ -19,9 +20,19 @@ const CustomerAccList: React.FC<Props> = ({
 }) => {
     const displayName = customer.firstName;
 
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.stafftask?.delete;
+    // const canList = role === "owner" || permission?.customer?.list;
+    // const canCreate = role === "owner" || permission?.customer?.create
+    // const canEdit = role === "owner" || permission?.customer?.edit
+    const canDelete = role === "owner" || permission?.customer?.delete
+
     // const phone = customer.phone?.work || customer.phone?.mobile || null
 
-    
+
     const workPhone = customer?.phone?.work || null;
     const mobilePhone = customer?.phone?.mobile || null;
 
@@ -78,7 +89,7 @@ const CustomerAccList: React.FC<Props> = ({
                 {phone ? phone : "-"}
             </div> */}
 
-             <div className="col-span-2 text-sm text-gray-700 flex flex-col items-center gap-1">
+            <div className="col-span-2 text-sm text-gray-700 flex flex-col items-center gap-1">
 
                 {/* Work Phone */}
                 {workPhone && (
@@ -115,7 +126,7 @@ const CustomerAccList: React.FC<Props> = ({
                 >
                     <i className="fas fa-eye" />
                 </button> */}
-                <button
+                {canDelete && <button
                     onClick={(e) => {
                         e.stopPropagation()
                         onDelete(customer._id)
@@ -129,7 +140,7 @@ const CustomerAccList: React.FC<Props> = ({
                     ) : (
                         <i className="fas fa-trash" />
                     )}
-                </button>
+                </button>}
             </div>
         </div>
     );

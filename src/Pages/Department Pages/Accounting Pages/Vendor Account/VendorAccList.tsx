@@ -1,6 +1,7 @@
 import React from "react";
 import { dateFormate } from "../../../../utils/dateFormator";
 import type { Vendor } from "../../../../apiList/Department Api/Accounting Api/vendorAccApi";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 
 interface Props {
     vendor: Vendor;
@@ -18,6 +19,17 @@ const VendorAccList: React.FC<Props> = ({
     isDeleting,
 }) => {
     const displayName = vendor?.firstName;
+
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.stafftask?.delete;
+    // const canList = role === "owner" || permission?.vendor?.list;
+    // const canCreate = role === "owner" || permission?.vendor?.create
+    // const canEdit = role === "owner" || permission?.vendor?.edit
+    const canDelete = role === "owner" || permission?.vendor?.delete
 
     // const phone = vendor.phone?.work || vendor.phone?.mobile || null
 
@@ -95,7 +107,7 @@ const VendorAccList: React.FC<Props> = ({
                 >
                     <i className="fas fa-eye" />
                 </button> */}
-                <button
+                {canDelete && <button
                     onClick={(e) => {
                         e.stopPropagation()
                         onDelete(vendor._id)
@@ -109,7 +121,7 @@ const VendorAccList: React.FC<Props> = ({
                     ) : (
                         <i className="fas fa-trash" />
                     )}
-                </button>
+                </button>}
             </div>
         </div>
     );

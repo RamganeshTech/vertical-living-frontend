@@ -7,6 +7,8 @@ import { useDeleteBillNew, useGetAllBillsNew } from '../../../../apiList/Departm
 import { Button } from '../../../../components/ui/Button';
 import { useDebounce } from '../../../../Hooks/useDebounce';
 import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 // import { useDebounce } from '../../../../hooks/useDebounce'; // Ensure this exists
 
 const BillNewMain = () => {
@@ -26,6 +28,17 @@ const BillNewMain = () => {
     });
 
     const debouncedSearch = useDebounce(filters.search, 700);
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.billtemplate?.list;
+    const canCreate = role === "owner" || permission?.billtemplate?.create
+    // const canEdit = role === "owner" || permission?.billtemplate?.edit
+    const canDelete = role === "owner" || permission?.billtemplate?.delete
+
+
 
     // API Hooks
     const {
@@ -121,13 +134,21 @@ const BillNewMain = () => {
 
                 <div className='gap-2 flex items-center'>
 
-                    <Button onClick={() => navigate(`create`)} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    {canCreate && <Button onClick={() => navigate(`create`)} className="bg-blue-600 hover:bg-blue-700 text-white">
                         <i className="fas fa-plus mr-2"></i> Create Bill
-                    </Button>
+                    </Button>}
 
                     <Button onClick={() => navigate(`billtemplate`)} className="bg-blue-600 hover:bg-blue-700 text-white">
                         <i className="fas fa-file-invoice mr-2"></i> Bill Template
                     </Button>
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="billtemplate"
+                        />
+                    </div>
+
 
 
                 </div>
@@ -235,7 +256,7 @@ const BillNewMain = () => {
                     </div>
 
                     {/* --- RIGHT CONTENT (GRID) --- */}
-                    <div
+                    {canList && <div
                         ref={scrollContainerRef}
                         className="flex-1 overflow-y-auto bg-gray-50/50 p-4"
                     >
@@ -270,14 +291,14 @@ const BillNewMain = () => {
                                                             {bill.billNumber}
                                                         </span>
                                                     </div>
-                                                    <Button
+                                                    {canDelete && <Button
                                                         variant="danger"
                                                         size="icon"
                                                         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                                                         onClick={(e) => handleDelete(e, bill._id)}
                                                     >
                                                         <i className="fas fa-trash text-xs"></i>
-                                                    </Button>
+                                                    </Button>}
                                                 </div>
                                                 <CardDescription className="mt-2 text-xs">
                                                     <i className="far fa-calendar mr-1"></i>
@@ -316,7 +337,7 @@ const BillNewMain = () => {
                                 )}
                             </>
                         )}
-                    </div>
+                    </div>}
                 </main>
             )}
         </div>

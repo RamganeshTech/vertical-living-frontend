@@ -6,6 +6,7 @@ import { useGetVendorForDropDown } from '../../../../apiList/Department Api/Acco
 import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
 import { Label } from '../../../../components/ui/Label';
 import type { CreatePurchasePayload, PayloadPurchase, PurchaseItem } from './CreatePurchaseAcc';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 
 
 // CAN USE THE OMIT ALSO INSTEAD OF PICK
@@ -76,6 +77,12 @@ const PurchaseAccForm: React.FC<PurchaseAccFormProps> = ({
     termsAndConditions: ''
 };
 
+ const { role, permission } = useAuthCheck();
+            // const canList = role === "owner" || permission?.purchaseorder?.list;
+            const canCreate = role === "owner" || permission?.purchaseorder?.create
+            const canEdit = role === "owner" || permission?.purchaseorder?.edit
+            // const canDelete = role === "owner" || permission?.purchaseorder?.delete
+        
 
 
     const [enableVendorInput, setEnableVendorInput] = useState<boolean>(false)
@@ -676,7 +683,7 @@ const PurchaseAccForm: React.FC<PurchaseAccFormProps> = ({
                 </div>
 
                 {/* Action Buttons */}
-                {!isReadOnly && (
+                {(!isReadOnly && (canCreate || canEdit)) && (
                     <div className="flex justify-end gap-4 pt-6">
                         <Button
                             type="button"

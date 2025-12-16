@@ -5,12 +5,27 @@ import { toast } from '../../../../utils/toast';
 import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
 import { useDeleteSalesOrder, useGetAllSalesOrders } from '../../../../apiList/Department Api/Accounting Api/salesOrderApi';
 import SalesOrderAccList from './SalesOrderAccList';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 
 const SalesOrderAccountMain = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { organizationId } = useParams();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+
+
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.salesorder?.list;
+    const canCreate = role === "owner" || permission?.salesorder?.create
+    // const canEdit = role === "owner" || permission?.salesorder?.edit
+    // const canDelete = role === "owner" || permission?.salesorder?.delete
+
 
 
     const paths: BreadcrumbItem[] = [
@@ -28,9 +43,9 @@ const SalesOrderAccountMain = () => {
         search: '',
         customerId: '',
         fromSalesOrderDate: "",
-toSalesOrderDate: "",
-createdFromDate: "",
-createdToDate: "",
+        toSalesOrderDate: "",
+        createdFromDate: "",
+        createdToDate: "",
         sortBy: 'createdAt',
         sortOrder: 'desc' as 'asc' | 'desc',
     });
@@ -122,9 +137,9 @@ createdToDate: "",
             search: '',
             customerId: '',
             fromSalesOrderDate: "",
-toSalesOrderDate: "",
-createdFromDate: "",
-createdToDate: "",
+            toSalesOrderDate: "",
+            createdFromDate: "",
+            createdToDate: "",
             sortBy: 'createdAt',
             sortOrder: 'desc'
         });
@@ -155,12 +170,22 @@ createdToDate: "",
 
                 </div>
 
-                <Button
+                <div className='flex items-center gap-2'>
+               
+                {canCreate && <Button
                     onClick={() => navigate('create')}
                 >
                     <i className="fas fa-plus mr-2" />
                     Create Sales Order
-                </Button>
+                </Button>}
+
+                <div className="w-full sm:w-auto flex justify-end sm:block">
+                    <StageGuide
+                        organizationId={organizationId!}
+                        stageName="salesorder"
+                    />
+                </div>
+                </div>
             </div>
 
             {/* Loading State */}
@@ -251,7 +276,7 @@ createdToDate: "",
                                     />
                                 </div> */}
 
-  <div>
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         From CreatedAt Date
@@ -312,7 +337,7 @@ createdToDate: "",
                                     />
                                 </div>
 
-                                
+
 
                                 {/* Customer ID Filter */}
                                 {/* <div>
@@ -370,8 +395,7 @@ createdToDate: "",
                         </div>
                     </div>
 
-                    {/* No orders Fallback */}
-                    {salesOrder.length === 0 ? (
+                    {canList && <>                {salesOrder.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Sales Order Found</h3>
@@ -439,6 +463,7 @@ createdToDate: "",
                             )} */}
                         </div>
                     )}
+                    </>}
                 </main>
             )}
         </div>

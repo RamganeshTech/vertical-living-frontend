@@ -568,13 +568,34 @@ const AccountingMain: React.FC = () => {
 
 
 
+const BILLING_RELATED_MODULES = [
+        "billing",
+        "vendor",
+        "customer",
+        "invoice",
+        "expense",
+        "billtemplate",
+        "purchaseorder",
+        "vendorpayment",
+        "salesorder",
+        "retailinvoice",
+    ];
 
 
     const { role, permission } = useAuthCheck();
     // const canDelete = role === "owner" || permission?.stafftask?.delete;
     const canList = role === "owner" || permission?.accounts?.list;
-    const showBilling = role === "owner" || permission?.billing?.create || permission?.billing?.list || permission?.billing?.delete || permission?.billing?.edit;
+    // const showBilling = role === "owner" || permission?.billing?.create || permission?.billing?.list || permission?.billing?.delete || permission?.billing?.edit;
     const showPayments = role === "owner" || permission?.payments?.create || permission?.payments?.list || permission?.payments?.delete || permission?.payments?.edit
+     const showBilling = role === "owner" || BILLING_RELATED_MODULES.some(moduleKey => {
+        const modulePerms = permission?.[moduleKey];
+        
+        // If no permission object for this module, skip
+        if (!modulePerms) return false;
+
+        // Check if ANY action (list, create, edit, delete) is true
+        return Object.values(modulePerms).some(val => val === true);
+    });
 
 
     const AVAILABLE_SECTIONS = ["Retail Invoice", "Invoice", "Bill", "Expense"]

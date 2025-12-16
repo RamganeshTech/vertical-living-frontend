@@ -18,6 +18,7 @@ import { useDebounce } from '../../../../Hooks/useDebounce';
 import PaymentAccList from './PaymentAccList'; // We will create this next
 import { useDeletePayment, useInfinitePayments } from '../../../../apiList/Department Api/Accounting Api/paymentAccApi';
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 
 const PaymentAccMain = () => {
     const navigate = useNavigate();
@@ -158,6 +159,13 @@ const PaymentAccMain = () => {
                     <i className="fas fa-plus mr-2" />
                     Create Payment
                 </Button> */}
+
+                <div className="w-full sm:w-auto flex justify-end sm:block">
+                    <StageGuide
+                        organizationId={organizationId!}
+                        stageName="payments"
+                    />
+                </div>
             </header>
 
             {/* --- Loading / Error States --- */}
@@ -343,7 +351,7 @@ const PaymentAccMain = () => {
                         </div>
                     </div>
 
-                   {canList && <> {payments.length === 0 ? (
+                    {canList && <> {payments.length === 0 ? (
                         <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center p-8">
                             <div className="bg-blue-50 p-4 rounded-full mb-4">
                                 <i className="fas fa-file-invoice-dollar text-4xl text-blue-400" />
@@ -407,7 +415,7 @@ const PaymentAccMain = () => {
                             )}
                         </div>
                     )}
-                    
+
                     </>}
                 </main>
             )}

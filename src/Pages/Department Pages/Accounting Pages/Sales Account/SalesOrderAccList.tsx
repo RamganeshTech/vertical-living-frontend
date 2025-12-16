@@ -1,6 +1,7 @@
 import React from 'react'
 import { dateFormate } from '../../../../utils/dateFormator'
 import type { CreateSalesOrderPayload } from './CreateSalerOrderAcc'
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
 type Props = {
     salesData: CreateSalesOrderPayload,
     index: number,
@@ -9,6 +10,18 @@ type Props = {
     deleteSalesMutation: any
 }
 const SalesOrderAccList: React.FC<Props> = ({ salesData, index, handleView, handleDelete, deleteSalesMutation }) => {
+
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.salesorder?.list;
+    // const canCreate = role === "owner" || permission?.salesorder?.create
+    // const canEdit = role === "owner" || permission?.salesorder?.edit
+    const canDelete = role === "owner" || permission?.salesorder?.delete
+
+
     return (
         <div
             className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
@@ -63,7 +76,7 @@ const SalesOrderAccList: React.FC<Props> = ({ salesData, index, handleView, hand
                 >
                     <i className="fas fa-eye"></i>
                 </button> */}
-                <button
+                {canDelete && <button
                     onClick={(e) => {
                         e.stopPropagation()
                         handleDelete((salesData as any)._id)
@@ -77,7 +90,7 @@ const SalesOrderAccList: React.FC<Props> = ({ salesData, index, handleView, hand
                     ) : (
                         <i className="fas fa-trash"></i>
                     )}
-                </button>
+                </button>}
             </div>
         </div>
     )

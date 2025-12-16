@@ -9,6 +9,8 @@ import { useDebounce } from '../../../../Hooks/useDebounce';
 
 import Slider from 'rc-slider';
 import "rc-slider/assets/index.css";
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 
 const RetailInvoiceAccountsMain = () => {
     const navigate = useNavigate();
@@ -19,6 +21,14 @@ const RetailInvoiceAccountsMain = () => {
     // Check if we're on a child route
     const isDetailView = location.pathname.includes('/retailinvoicesingle') || location.pathname.includes('/create');
 
+
+
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.retailinvoice?.list;
+    const canCreate = role === "owner" || permission?.retailinvoice?.create
+    // const canEdit = role === "owner" || permission?.retailinvoice?.edit
+    // const canDelete = role === "owner" || permission?.retailinvoice?.delete
 
 
     const paths: BreadcrumbItem[] = [
@@ -188,12 +198,22 @@ const RetailInvoiceAccountsMain = () => {
 
                 </div>
 
-                <Button
-                    onClick={() => navigate('create')}
-                >
-                    <i className="fas fa-plus mr-2" />
-                    Create Retail Invoice
-                </Button>
+                <div className='flex items-center gap-2'>
+
+                    {canCreate && <Button
+                        onClick={() => navigate('create')}
+                    >
+                        <i className="fas fa-plus mr-2" />
+                        Create Retail Invoice
+                    </Button>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="retailinvoice"
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* Loading State */}
@@ -477,8 +497,7 @@ const RetailInvoiceAccountsMain = () => {
                         </div>
                     </div>
 
-                    {/* No Invoices Fallback */}
-                    {invoices.length === 0 ? (
+                    {canList && <>  {invoices.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Invoices Found</h3>
@@ -547,6 +566,7 @@ const RetailInvoiceAccountsMain = () => {
                             )} */}
                         </div>
                     )}
+                    </>}
                 </main>
             )}
         </div>

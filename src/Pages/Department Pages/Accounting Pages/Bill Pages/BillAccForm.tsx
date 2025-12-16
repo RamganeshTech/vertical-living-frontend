@@ -378,7 +378,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         />
                     </div>} */}
 
-                    {isReadOnly && <div className="flex items-center space-y-1">
+                    {(isReadOnly && (canEdit || canCreate) ) && <div className="flex items-center space-y-1">
                         <Button
                             variant="primary"
                             className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}

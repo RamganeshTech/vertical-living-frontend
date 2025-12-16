@@ -9,6 +9,7 @@ import { Button } from "../../../../components/ui/Button";
 import InfoTooltip from "../../../../components/ui/InfoToolTip";
 import { useGetProjects } from "../../../../apiList/projectApi";
 import type { AvailableProjetType } from "../../Logistics Pages/LogisticsShipmentForm";
+import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 // import { useNavigate } from "react-router-dom";
 
 export type ExpenseFormMode = "create" | "edit" | "view";
@@ -73,6 +74,15 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
     }))
 
 
+
+    
+            const { role, permission } = useAuthCheck();
+            // const canList = role === "owner" || permission?.expense?.list;
+            const canCreate = role === "owner" || permission?.expense?.create
+            const canEdit = role === "owner" || permission?.expense?.edit
+            // const canDelete = role === "owner" || permission?.expense?.delete
+        
+        
 
     const today = new Date();
     const dueDate = new Date(today);
@@ -283,7 +293,7 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
 
 
 
-                    {mode === "view" && <div className="flex items-center space-y-1">
+                    {(mode === "view" && (canCreate || canEdit)) && <div className="flex items-center space-y-1">
                         <Button
                             variant="primary"
                             className={`${existingExpense?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}
@@ -305,7 +315,7 @@ const ExpenseAccForm: React.FC<ExpenseFormProps> = ({
 
 
 
-                    {(mode === "edit" || mode === "view") && <button
+                    {((mode === "edit" || mode === "view") && canEdit) && <button
                         type="button"
                         onClick={onEdit}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 

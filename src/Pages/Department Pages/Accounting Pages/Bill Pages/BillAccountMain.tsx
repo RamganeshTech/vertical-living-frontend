@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
 import { Button } from '../../../../components/ui/Button';
 import { toast } from '../../../../utils/toast';
@@ -11,8 +11,21 @@ import NavigationDDWithHeading, { type NavigationSection } from '../../../../sha
 import Slider from 'rc-slider';
 import "rc-slider/assets/index.css";
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import StageGuide from '../../../../shared/StageGuide';
 
 // import { Breadcrumb } from '../../Breadcrumb';
+
+const MENU_PERMISSION_MAPPING: Record<string, string> = {
+    'Invoice': 'invoice',
+    'Retail Invoice': 'retailinvoice',
+    'Sales Order': 'salesorder',
+    'Purchase Orders': 'purchaseorder',
+    'Expense': 'expense',
+    'Design Bills': 'billtemplate', // Assuming this maps to 'billnew' or 'billing'
+    'Vendor Payments': 'vendorpayment',
+    'Customer': 'customer',
+    'Vendor': 'vendor',
+};
 
 const BillAccountsMain = () => {
     const navigate = useNavigate();
@@ -22,13 +35,13 @@ const BillAccountsMain = () => {
 
 
 
-    
-        const { role, permission } = useAuthCheck();
-        // const canDelete = role === "owner" || permission?.billing?.delete;
-        const canList = role === "owner" || permission?.billing?.list;
-        const canCreate = role === "owner" || permission?.billing?.create;
-        // const canEdit = role === "owner" || permission?.billing?.create;
-    
+
+    const { role, permission } = useAuthCheck();
+    // const canDelete = role === "owner" || permission?.billing?.delete;
+    const canList = role === "owner" || permission?.billing?.list;
+    const canCreate = role === "owner" || permission?.billing?.create;
+    // const canEdit = role === "owner" || permission?.billing?.create;
+
 
     const paths: BreadcrumbItem[] = [
         { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
@@ -136,6 +149,36 @@ const BillAccountsMain = () => {
         }
 
     ];
+
+    // 2. ⭐ FILTER LOGIC ⭐
+    // Only show items that the user has at least one permission for (list, create, etc.)
+    const filteredNavigationItems = useMemo(() => {
+        // Owner sees everything
+        if (role === 'owner') return navigationItemNew;
+
+        return navigationItemNew.map(section => {
+            // Filter items inside each section
+            const filteredItems = section.items.filter(item => {
+                const permissionKey = MENU_PERMISSION_MAPPING[item.label];
+
+                // If no mapping found, assume visible (or hidden, your choice)
+                if (!permissionKey) return true;
+
+                const deptPermissions = permission?.[permissionKey];
+
+                // Check if ANY permission is true (list, create, edit, delete)
+                // If deptPermissions is undefined -> false -> item hidden
+                return deptPermissions && Object.values(deptPermissions).some(val => val === true);
+            });
+
+            // Return section with filtered items
+            return {
+                ...section,
+                items: filteredItems
+            };
+        }).filter(section => section.items.length > 0); // Remove empty sections
+    }, [role, permission, navigationItemNew]);
+
 
     // --- Local State ---
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -269,7 +312,8 @@ const BillAccountsMain = () => {
                 isOpen={isDropdownOpen}
                 onClose={() => setIsDropdownOpen(false)}
                 heading="Accounts"
-                sections={navigationItemNew}
+                // sections={navigationItemNew}
+                sections={filteredNavigationItems}
             />
 
             {/* Header */}
@@ -290,22 +334,31 @@ const BillAccountsMain = () => {
                 <div className='flex gap-2'>
 
 
+                    {filteredNavigationItems.length > 0 && (
 
-                    <Button
-                        onClick={() => setIsDropdownOpen(true)}
-                        // className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105"
+                        <Button
+                            onClick={() => setIsDropdownOpen(true)}
+                            // className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105"
 
-                        title="invoices, expense..."
-                    >
-                        <i className="fas fa-bars text-lg mr-2"></i> Menu
-                    </Button>
+                            title="invoices, expense..."
+                        >
+                            <i className="fas fa-bars text-lg mr-2"></i> Menu
+                        </Button>
+                    )}
 
-                   {canCreate && <Button
+                    {canCreate && <Button
                         onClick={() => navigate('create')}
                     >
                         <i className="fas fa-plus mr-2" />
                         Create Bill
                     </Button>}
+
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="billing"
+                        />
+                    </div>
                 </div>
             </header>
 
@@ -575,7 +628,7 @@ const BillAccountsMain = () => {
                     </div>
 
                     {/* No Bills Fallback */}
-                {canList && <> {bills.length === 0 ? (
+                    {canList && <> {bills.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-file-bill text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">No Bills Found</h3>

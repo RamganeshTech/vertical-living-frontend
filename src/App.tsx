@@ -7,8 +7,8 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
-const  StaffPermissionDashboard  = lazy(() => import( './Pages/Organization/Staffs_And_Roles_Pages/StaffPermissionDashboardMain'));
-const StaffPermissionsSingle  = lazy(() => import( './Pages/Organization/Staffs_And_Roles_Pages/StaffPermissionsSingle'));
+const StaffPermissionDashboard = lazy(() => import('./Pages/Organization/Staffs_And_Roles_Pages/StaffPermissionDashboardMain'));
+const StaffPermissionsSingle = lazy(() => import('./Pages/Organization/Staffs_And_Roles_Pages/StaffPermissionsSingle'));
 const CreateProcurementPage = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/CreateProcurementPage'));
 const SingleOrderViewPage = lazy(() => import('./Pages/Stage Pages/Ordering Materials/SingleOrderViewPage'));
 const PublicProcurementRatePage = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/PublicProcurementNew'));
@@ -319,7 +319,7 @@ function App() {
             <Route path='invitestaff'
               element={<ProtectedRoutes allowedRoles={["CTO", "owner", "staff", "worker", "client"]}
                 requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="invitestaff"
-              
+
               >
                 <InviteStaffs />
               </ProtectedRoutes>} />
@@ -431,24 +431,24 @@ function App() {
 
           <Route path='/organizations/:organizationId/projects' element={<Projects projectId={projectId} setProjectId={setProjectId} />} >
             <Route index element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
-            requiredDepartment={["inventory",
-"inviteworker",
-"inviteclient",
-"prerequisites",
-"clientrequirement",
-"sitemeasurement",
-"sampledesign",
-"workschedule",
-"technicalconsultant",
-"paymentconfirmation",
-"modularunit",
-"ordermaterial",
-"materialarrival",
-"installation",
-"qualitycheck",
-"cleaning",
-"projectdelivery"
-]}
+              requiredDepartment={["inventory",
+                "inviteworker",
+                "inviteclient",
+                "prerequisites",
+                "clientrequirement",
+                "sitemeasurement",
+                "sampledesign",
+                "workschedule",
+                "technicalconsultant",
+                "paymentconfirmation",
+                "modularunit",
+                "ordermaterial",
+                "materialarrival",
+                "installation",
+                "qualitycheck",
+                "cleaning",
+                "projectdelivery"
+              ]}
               // ⭐ Allow entry if they can do ANY of these things
               requiredAction={['list', 'create', 'edit', 'delete']}
             >
@@ -541,7 +541,9 @@ function App() {
 
             <Route path="accounting" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               // requiredDepartment={"accounts" || "billing"}
-              requiredDepartment={["accounts", "billing", "payments"]}
+              requiredDepartment={["accounts", "billing", "payments", "vendor", "customer", "invoice",
+     "expense", "billtemplate", "purchaseorder",
+      "vendorpayment", "salesorder",  "retailinvoice",]}
               // ⭐ Allow entry if they can do ANY of these things
               requiredAction={['create', "list", "edit", "delete"]}
             >
@@ -559,61 +561,109 @@ function App() {
 
             </Route>
 
-            <Route path="customermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="customermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="customer"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <CustomerAccountsMain />
             </ProtectedRoutes>} >
 
-              <Route path="customersingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="customersingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="customer"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit", "delete" ]}
+              >
                 <CustomerAccSingle />
               </ProtectedRoutes>} />
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="customer"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create']}
+              >
                 <CreateCustomerAcc />
               </ProtectedRoutes>} />
             </Route>
 
-            <Route path="invoicemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="invoicemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="invoice"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <InvoiceAccountsMain />
             </ProtectedRoutes>} >
 
-              <Route path="invoicesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="invoicesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="invoice"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit",]}
+              >
                 <InvoiceAccSingle />
               </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="invoice"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create',]}
+              >
                 <CreateInvoiceAcc />
               </ProtectedRoutes>} />
 
 
             </Route>
 
-            <Route path="retailinvoicemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="retailinvoicemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="retailinvoice"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <RetailInvoiceAccountsMain />
             </ProtectedRoutes>} >
 
-              <Route path="retailinvoicesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="retailinvoicesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="retailinvoice"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit", ]}
+              >
                 <RetailInvoiceAccSingle />
               </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="retailinvoice"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create']}
+              >
                 <RetailCreateInvoiceAcc />
               </ProtectedRoutes>} />
 
 
             </Route>
 
-            <Route path="salesordermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="salesordermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="salesorder"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <SalesOrderAccountMain />
             </ProtectedRoutes>} >
 
-              <Route path="salessingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="salessingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="salesorder"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit", ]}
+              >
                 <SalesOrderAccSingle />
               </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="salesorder"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', ]}
+              >
                 <CreateSalesOrderAcc />
               </ProtectedRoutes>} />
 
@@ -621,28 +671,52 @@ function App() {
             </Route>
 
 
-            <Route path="vendormain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="vendormain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="vendor"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <VendorAccountsMain />
             </ProtectedRoutes>} >
 
-              <Route path="vendorsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="vendorsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="vendor"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit", "delete"]}
+              >
                 <VendorAccSingle />
               </ProtectedRoutes>} />
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="vendor"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create']}
+              >
                 <CreateVendorAcc />
               </ProtectedRoutes>} />
             </Route>
 
-            <Route path="expensemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="expensemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="expense"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <ExpenseAccountMain />
             </ProtectedRoutes>} >
 
-              <Route path="expensesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="expensesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="expense"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit"]}
+              >
                 <ExpenseAccountSingle />
               </ProtectedRoutes>} />
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="expense"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list"]}
+              >
                 <CreateExpense />
               </ProtectedRoutes>} />
             </Route>
@@ -664,13 +738,7 @@ function App() {
               </ProtectedRoutes>} />
 
 
-              {/* <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
-                requiredDepartment="payments"
-                // ⭐ Allow entry if they can do ANY of these things
-                requiredAction={['create']}
-              >
-                <BillNewSingle mode="create" />
-              </ProtectedRoutes>} /> */}
+             
             </Route>
 
 
@@ -702,30 +770,54 @@ function App() {
 
             </Route>
 
-            <Route path="billnew" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="billnew" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="billtemplate"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <BillNewMain />
             </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="billtemplate"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit"]}
+              >
                 <BillNewSingle mode="edit" />
               </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="billtemplate"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", ]}
+              >
                 <BillNewSingle mode="create" />
               </ProtectedRoutes>} />
 
 
-              <Route path="billtemplate" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="billtemplate" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="billtemplate"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit", "delete"]}
+              >
                 <TemplateBillMain />
               </ProtectedRoutes>} >
 
-                <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="billtemplate"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['create', "list", "edit",]}
+                >
                   <TemplateBillSingle mode="edit" />
                 </ProtectedRoutes>} />
 
 
-                <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+                <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="billtemplate"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['create', "list",]}
+                >
                   <TemplateBillSingle mode="create" />
                 </ProtectedRoutes>} />
               </Route>
@@ -733,35 +825,56 @@ function App() {
 
             </Route>
 
-
-
-
-            <Route path="purchasemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="purchasemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="purchaseorder"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <PurchaseAccountsMain />
             </ProtectedRoutes>} >
 
-              <Route path="purchasesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="purchasesingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="purchaseorder"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit",]}
+              >
                 <PurchasesAccSingle />
               </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="purchaseorder"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list",]}
+              >
                 <CreatePurchaseAcc />
               </ProtectedRoutes>} />
 
 
             </Route>
 
-            <Route path="vendorpaymentmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+            <Route path="vendorpaymentmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="vendorpayment"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
               <VendorPaymentAccMain />
             </ProtectedRoutes>} >
 
-              <Route path="vendorpaymentsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="vendorpaymentsingle/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="vendorpayment"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit", ]}
+              >
                 <VendorPaymentSingle />
               </ProtectedRoutes>} />
 
 
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="vendorpayment"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", ]}
+              >
                 <CreateVendorPaymentAcc />
               </ProtectedRoutes>} />
             </Route>
