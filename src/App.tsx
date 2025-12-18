@@ -7,6 +7,8 @@ import { useAuthCheck } from './Hooks/useAuthCheck';
 import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
+import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
+
 const StaffPermissionDashboard = lazy(() => import('./Pages/Organization/Staffs_And_Roles_Pages/StaffPermissionDashboardMain'));
 const StaffPermissionsSingle = lazy(() => import('./Pages/Organization/Staffs_And_Roles_Pages/StaffPermissionsSingle'));
 const CreateProcurementPage = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/CreateProcurementPage'));
@@ -1863,6 +1865,7 @@ function App() {
           <Route path='/:organizationId/procurement/public' element={<PublicProcurementRatePage />} />
 
           <Route path='/subcontract/share/:subContractId' element={<PublicSubContract />} />
+          <Route path='/privacy-policy' element={<PrivacyPolicy />} />
 
           <Route path="*" element={<NotFound />} />
 

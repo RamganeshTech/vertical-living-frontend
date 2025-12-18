@@ -396,7 +396,7 @@ export const requiredFieldsByRoomArrival: Record<string, string[]> = {
 };
 
 
-export const predefinedOptionsRooms: any = {
+export const predefinedOptionsRooms:any = {
   brandName: {
     carpentry: ["Greenply", "Century", "Kitply", "Archid", "Austin"],
     hardware: ["Hettich", "Hafele", "Blum", "Godrej"],
