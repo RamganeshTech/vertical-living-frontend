@@ -1,0 +1,558 @@
+{
+    "project_name": "RELIANCE MAPPEDU MULTI MODAL LOGISTICS PARK LIMITED (RMMMLPL) - CANTEEN & ADMIN GROUND FURNITURE FLOOR PLAN",
+    "works": [
+        {
+            "work_type": "Carpentry/Furniture Work",
+            "rooms": [
+                {
+                    "room_name": "Office Seating Area",
+                    "items": [
+                        {
+                            "s_no": "MT-1",
+                            "description": "Modular Table Type 1",
+                            "location": "Office Seating Area",
+                            "quantity": 25,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1200",
+                                "b": "600"
+                            }
+                        },
+                        {
+                            "s_no": "MT-2",
+                            "description": "Modular Table Type 2",
+                            "location": "Office Seating Area",
+                            "quantity": 4,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1500",
+                                "b": "1500",
+                                "h": "600"
+                            }
+                        },
+                        {
+                            "s_no": "MT-3",
+                            "description": "Modular Table Type 3",
+                            "location": "Office Seating Area",
+                            "quantity": 3,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1800",
+                                "b": "1800",
+                                "h": "600"
+                            }
+                        },
+                        {
+                            "s_no": "CH-1",
+                            "description": "Executive Chair Mid Back",
+                            "location": "Office Seating Area",
+                            "quantity": 43,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "450",
+                                "b": "450"
+                            }
+                        },
+                        {
+                            "s_no": "PD-1",
+                            "description": "Pedestals Below Table",
+                            "location": "Office Seating Area & Cabins",
+                            "quantity": 31,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "450",
+                                "b": "450"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "room_name": "VP & Director Cabins",
+                    "items": [
+                        {
+                            "s_no": "MT-4",
+                            "description": "Modular Table Type 4",
+                            "location": "VP, Directors Cabin",
+                            "quantity": 3,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "2100",
+                                "b": "2100",
+                                "h": "600"
+                            }
+                        },
+                        {
+                            "s_no": "CH-4",
+                            "description": "Senior Executive Chair with High Back",
+                            "location": "VP & Director Cabin",
+                            "quantity": 3,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "SF-2",
+                            "description": "2 Seater Sofa",
+                            "location": "VP & Director Cabin",
+                            "quantity": 4,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "ST-1",
+                            "description": "Side Table Type 1",
+                            "location": "VP & Director Cabin",
+                            "quantity": 4,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "RC-3",
+                            "description": "VP/Director Cabin Credenza",
+                            "location": "VP & Director Cabin",
+                            "quantity": 3,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1500",
+                                "b": "450"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "room_name": "Conference & Meeting Rooms",
+                    "items": [
+                        {
+                            "s_no": "CT-1",
+                            "description": "Conference Table Type 1",
+                            "location": "Conference Room",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "3000",
+                                "b": "1200"
+                            }
+                        },
+                        {
+                            "s_no": "CT-2",
+                            "description": "Conference Table Type 2",
+                            "location": "Meeting Room 1 & 2",
+                            "quantity": 2,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1500",
+                                "b": "900"
+                            }
+                        },
+                        {
+                            "s_no": "CH-2",
+                            "description": "Conference Chair with High Back",
+                            "location": "Conference Room",
+                            "quantity": 10,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "CH-3",
+                            "description": "Senior Executive Chair with High Back",
+                            "location": "Meeting Room 1 & 2",
+                            "quantity": 8,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "RC-2",
+                            "description": "Conference Room Credenza",
+                            "location": "Conference Room",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "2000",
+                                "b": "450"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "room_name": "Reception & Waiting Area",
+                    "items": [
+                        {
+                            "s_no": "SF-1",
+                            "description": "3 Seater Sofa",
+                            "location": "Reception Area",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "PT-1",
+                            "description": "3 Seater Sofa (Waiting)",
+                            "location": "Reception Area",
+                            "quantity": 2,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "RC-1",
+                            "description": "Reception Credenza",
+                            "location": "Reception Area",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "4400",
+                                "b": "450"
+                            }
+                        },
+                        {
+                            "s_no": "FP-1",
+                            "description": "FRP Planter",
+                            "location": "Cubicals, Waiting Area",
+                            "quantity": 10,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "380",
+                                "b": "400"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "room_name": "Cafeteria",
+                    "items": [
+                        {
+                            "s_no": "DT-1",
+                            "description": "Dining Table",
+                            "location": "Cafeteria Seating",
+                            "quantity": 8,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "DC-1",
+                            "description": "Dining Chair",
+                            "location": "Cafeteria Seating",
+                            "quantity": 32,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        }
+                    ]
+                },
+                {
+                    "room_name": "Creche",
+                    "items": [
+                        {
+                            "s_no": "BT-1",
+                            "description": "Bunk Bed",
+                            "location": "Creche",
+                            "quantity": 3,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        }
+                    ]
+                },
+                {
+                    "room_name": "OHC",
+                    "items": [
+                        {
+                            "s_no": "BT-2",
+                            "description": "Bunk Bed",
+                            "location": "OHC",
+                            "quantity": 2,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "MT-1",
+                            "description": "Modular Table Type 1",
+                            "location": "OHC",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1200",
+                                "b": "600"
+                            }
+                        },
+                        {
+                            "s_no": "CH-1",
+                            "description": "Executive Chair Mid Back",
+                            "location": "OHC",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "450",
+                                "b": "450"
+                            }
+                        },
+                        {
+                            "s_no": "PD-2",
+                            "description": "Pedestals Below Table",
+                            "location": "OHC",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "450",
+                                "b": "450"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "work_type": "Glass Work",
+            "rooms": [
+                {
+                    "room_name": "General Building",
+                    "items": [
+                        {
+                            "s_no": "TP-1",
+                            "description": "Glass Partition",
+                            "location": "Various",
+                            "quantity": 1,
+                            "uom": "SQFT",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "GD1",
+                            "description": "Single Leaf Glass Door",
+                            "location": "Various",
+                            "quantity": 5,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1000",
+                                "h": "2100"
+                            }
+                        },
+                        {
+                            "s_no": "GD2",
+                            "description": "Double Leaf Glass Door",
+                            "location": "Various",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1800",
+                                "h": "2100"
+                            }
+                        },
+                        {
+                            "s_no": "GD3",
+                            "description": "Single Leaf Glass Door",
+                            "location": "Various",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1000",
+                                "h": "2100"
+                            }
+                        },
+                        {
+                            "s_no": "GD4",
+                            "description": "Double Leaf Glass Door",
+                            "location": "Various",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1800",
+                                "h": "2100"
+                            }
+                        },
+                        {
+                            "s_no": "GD5",
+                            "description": "Single Leaf Glass Door",
+                            "location": "Various",
+                            "quantity": 1,
+                            "uom": "NOS",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "l": "1000",
+                                "h": "2100"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "work_type": "Civil/Plumbing Work",
+            "rooms": [
+                {
+                    "room_name": "General Building",
+                    "items": [
+                        {
+                            "s_no": "W-100",
+                            "description": "100mm THK AAC Wall",
+                            "location": "Internal Partitions",
+                            "quantity": 1,
+                            "uom": "SQFT",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "thk": "100"
+                            }
+                        },
+                        {
+                            "s_no": "W-200",
+                            "description": "200mm THK AAC Wall",
+                            "location": "External/Main Walls",
+                            "quantity": 1,
+                            "uom": "SQFT",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "thk": "200"
+                            }
+                        },
+                        {
+                            "s_no": "LW-150",
+                            "description": "150mm THK Ledge Wall",
+                            "location": "Toilets/Service Areas",
+                            "quantity": 1,
+                            "uom": "SQFT",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": {
+                                "thk": "150"
+                            }
+                        },
+                        {
+                            "s_no": "OT-1",
+                            "description": "Carpet Flooring",
+                            "location": "Meeting/Conference Room",
+                            "quantity": 21,
+                            "uom": "SQM",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "RBM",
+                            "description": "Rubber Matting",
+                            "location": "Creche",
+                            "quantity": 14.44,
+                            "uom": "SQM",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "WLP",
+                            "description": "Wall Paper",
+                            "location": "Creche",
+                            "quantity": 52.8,
+                            "uom": "SQM",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "ACW",
+                            "description": "Acoustical Wall Panel",
+                            "location": "Meeting/Conference Room",
+                            "quantity": 33,
+                            "uom": "SQM",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "work_type": "False Ceiling Work",
+            "rooms": [
+                {
+                    "room_name": "General Building",
+                    "items": [
+                        {
+                            "s_no": "MFC",
+                            "description": "Mineral Fiber Ceiling",
+                            "location": "Office/Admin Areas",
+                            "quantity": 1,
+                            "uom": "SQFT",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        },
+                        {
+                            "s_no": "GBC",
+                            "description": "Gypsum Board Ceiling",
+                            "location": "Cabins/Reception",
+                            "quantity": 1,
+                            "uom": "SQFT",
+                            "price": null,
+                            "total_price": null,
+                            "metadata": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "extraction_warnings": [
+        "Quantities for walls and ceilings are not explicitly totaled in the legend and require area calculation from plan dimensions.",
+        "TP-1 Glass Partition quantity is represented as a symbol; total length/area must be measured from drawing."
+    ]
+}

@@ -430,6 +430,8 @@ const FurnitureForm: React.FC<Props> = ({
     </div>
   );
 
+
+
   const renderSimpleItemSection = (
     title: string,
     kind: "fittingsAndAccessories" | "glues" | "nonBrandMaterials"
@@ -568,6 +570,8 @@ const FurnitureForm: React.FC<Props> = ({
       </div>
     </div>
   );
+
+  
 
   return (
     <div className="shadow-md p-4 my-4 border rounded-lg bg-white">

@@ -995,8 +995,8 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                     </div>
                                     <div className="flex-1">
                                         <textarea
-                                            className="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm shadow-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-200 outline-none resize-none overflow-hidden min-h-[46px]"
-                                            rows={1}
+                                            className="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm shadow-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-200 outline-none  overflow-hidden min-h-[46px]"
+                                            rows={3}
                                             placeholder="Describe step..."
                                             value={step.description}
                                             onInput={(e) => { e.currentTarget.style.height = 'auto'; e.currentTarget.style.height = e.currentTarget.scrollHeight + 'px'; }}

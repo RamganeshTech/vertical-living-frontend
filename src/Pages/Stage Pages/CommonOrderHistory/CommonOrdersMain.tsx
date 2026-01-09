@@ -14,7 +14,6 @@ import { Input } from "../../../components/ui/Input"
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle
 } from "../../../components/ui/Card"
@@ -134,7 +133,7 @@ const CommonOrdersMain = () => {
             {/* Create Project Form */}
             {showInput && (
                 <div onClick={() => setShowInput(false)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                    <div onClick={(e) => e.stopPropagation()} className="flex rounded-2xl bg-white flex-col p-6 gap-3 max-w-lg items-start">
+                    <div onClick={(e) => e.stopPropagation()} className="w-100 flex rounded-2xl bg-white flex-col p-6 gap-3 max-w-xl items-start">
                         <Label className="text-2xl">Create Project</Label>
                         <Input
                             placeholder="Enter project name"
@@ -148,13 +147,13 @@ const CommonOrdersMain = () => {
                             }}
 
                         />
-                        <div className="flex gap-2">
+                        <div className="flex w-full  gap-2 justify-end">
                             <Button variant="primary" onClick={handleCreate} isLoading={creating}>
                                 <i className="fas fa-save mr-2" />
                                 Save
                             </Button>
                             <Button
-                                variant="ghost"
+                                variant="secondary"
                                 onClick={() => {
                                     setShowInput(false)
                                     setProjectName("")
@@ -181,7 +180,7 @@ const CommonOrdersMain = () => {
             )}
 
             {/* Project Cards */}
-            {canList && <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+            {/* {canList && <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                 {commonOrders?.map((project: any) => (
                     <div
                         key={project._id}
@@ -219,7 +218,6 @@ const CommonOrdersMain = () => {
                                     <span className="font-medium text-blue-600">{project?.selectedUnits?.length}</span>
                                 </CardDescription>
 
-                                {/* Action Buttons */}
                                 <div className="flex gap-3 flex-wrap">
                                     {editingId === project._id ? (
                                         <>
@@ -292,7 +290,131 @@ const CommonOrdersMain = () => {
                         </Card>
                     </div>
                 ))}
-            </div>}
+            </div>} */}
+
+
+
+            {canList && (
+    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {commonOrders?.map((project: any) => (
+            <div
+                key={project._id}
+                onClick={() => navigate(`${project._id}`)}
+                className="group transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
+            >
+                <Card className="h-full bg-white border border-gray-200 shadow-sm border-l-4 border-l-blue-600 rounded-xl overflow-hidden">
+                    <CardHeader className="p-4 pb-2">
+                        {editingId === project._id ? (
+                            <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                                <Input
+                                    value={editingText}
+                                    onChange={(e) => setEditingText(e.target.value)}
+                                    autoFocus
+                                    className="h-9 text-sm border-blue-200 focus:ring-2 focus:ring-blue-500 rounded-lg"
+                                    placeholder="Project Name"
+                                />
+                            </div>
+                        ) : (
+                            <div className="space-y-1">
+                                <div className="flex justify-between items-start gap-2">
+                                    <CardTitle className="text-lg font-bold text-gray-800 line-clamp-1">
+                                        {project.projectName || "Untitled Project"}
+                                    </CardTitle>
+                                    {/* Status Badge */}
+                                    {/* <span className={`text-[10px] uppercase px-2 py-0.5 rounded-full font-bold border ${
+                                        project.status === 'pending' 
+                                        ? 'bg-amber-50 text-amber-600 border-amber-200' 
+                                        : 'bg-green-50 text-green-600 border-green-200'
+                                    }`}>
+                                        {project.status || 'Active'}
+                                    </span> */}
+                                </div>
+                                <div className="flex items-center gap-2 text-gray-500">
+                                    <i className="fas fa-boxes text-xs text-blue-500" />
+                                    <span className="text-xs font-semibold">
+                                        {project?.orderedItems?.length || 0} Ordered Items
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </CardHeader>
+
+                    <CardContent className="p-4 pt-2">
+                        {/* Summary Info
+                        <div className="flex flex-col gap-1 mb-4 text-[11px] text-gray-400">
+                           <div className="flex items-center justify-between">
+                                <span>Cost:</span>
+                                <span className="font-bold text-gray-700">${project.totalCost || 0}</span>
+                           </div>
+                           <div className="flex items-center justify-between">
+                                <span>Created:</span>
+                                <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                           </div>
+                        </div> */}
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center justify-end gap-2 pt-3">
+                            {editingId === project._id ? (
+                                <div className="flex gap-2 w-full" onClick={(e) => e.stopPropagation()}>
+                                    <Button
+                                        size="sm"
+                                        className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-lg h-8"
+                                        onClick={(e) => { e.stopPropagation(); handleEditSave(); }}
+                                        isLoading={updating}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-8 rounded-lg"
+                                        onClick={(e) => { e.stopPropagation(); setEditingId(null); }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
+                            ) : (
+                                <>
+                                    {canEdit && (
+                                        <button
+                                            title="Edit Name"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingId(project._id);
+                                                setEditingText(project.projectName || "");
+                                            }}
+                                            className="h-8 px-3 flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors"
+                                        >
+                                            <i className="fas fa-edit" />
+                                            Edit
+                                        </button>
+                                    )}
+                                    {canDelete && (
+                                        <button
+                                            title="Delete Project"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(project._id);
+                                            }}
+                                            className="h-8 w-8 flex items-center justify-center text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                                        >
+                                            {deleting ? <i className="fas fa-spinner animate-spin" /> : <i className="fas fa-trash-alt" />}
+                                        </button>
+                                    )}
+                                    <button
+                                        className="h-8 w-8 flex items-center justify-center text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    >
+                                        <i className="fas fa-chevron-right" />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        ))}
+    </div>
+)}
         </div>
     )
 }

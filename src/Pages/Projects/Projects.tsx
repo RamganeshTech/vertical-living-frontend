@@ -191,15 +191,20 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
   PROCUREMENT: "procurement",
   SHORTLIST: "referencedesign",
   DESIGNLAB: "design",
+  CAD: "cad",
+
   COMMONORDER: "commonorder",
+  TOOLMANAGEMENT: "toolmanagement",
+
   // ACCOUNTING: "accounts" || "billing" || "payments",
   ACCOUNTING: ["accounts", "billing", "payments", "vendor", "customer", "invoice",
-     "expense", "billtemplate", "purchaseorder",
-      "vendorpayment", "salesorder",  "retailinvoice"],
-
+    "expense", "billtemplate", "purchaseorder",
+    "vendorpayment", "salesorder", "retailinvoice"],
+    
 
   RATECONIG: "materialquote",
   RATECONIGSTAFF: "materialquote",
+  WORKTEMPLATE: "materialquote",
   INTERNALQUOTE: "materialquote",
   QUOTEVARIENT: "materialquote",
   "QUOTES (CLIENT)": "materialquote",
@@ -231,6 +236,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     SHORTLIST: `/organizations/${organizationId}/projects/shortlistdesign`,
     COMMONORDER: `/organizations/${organizationId}/projects/commonorder`,
     SUBCONTRACT: `/organizations/${organizationId}/projects/subcontractmain`,
+    TOOLMANAGEMENT: `/organizations/${organizationId}/projects/toolhub`,
+    CAD: `/organizations/${organizationId}/projects/cadmain`,
     HR: `/organizations/${organizationId}/projects/hr`,
     LOGISTICS: `/organizations/${organizationId}/projects/logistics`,
     PROCUREMENT: `/organizations/${organizationId}/projects/procurement`,
@@ -238,6 +245,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
+    WORKTEMPLATE: `/organizations/${organizationId}/projects/worktemplates`,
     INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
     QUOTEVARIENT: `/organizations/${organizationId}/projects/quotevariant`,
     "QUOTES (CLIENT)": `/organizations/${organizationId}/projects/clientquotes`,
@@ -257,7 +265,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
   if (lowerRole === "owner" || lowerRole === "cto") {
     // Owner/CTO: Everything EXCEPT SingleStaffTask
-    allowedKeys = allKeys.filter(key => key !== "SINGLESTAFFTASK" );
+    allowedKeys = allKeys.filter(key => key !== "SINGLESTAFFTASK");
   }
   else if (lowerRole === "staff") {
     // Staff: Everything EXCEPT StaffTask (Manager View)
@@ -265,13 +273,11 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
   }
   else if (lowerRole === "worker") {
     // Worker: Strict Whitelist
-    // allowedKeys = ["PROJECTS", "ORGANIZATION", "COMMONORDER", "SUBCONTRACT"];
     allowedKeys = allKeys.filter(key => key !== "STAFFTASK" && key !== "WORKLIBRARY");
 
   }
   else if (lowerRole === "client") {
     // Client: Strict Whitelist
-    // allowedKeys = ["PROJECTS", "ORGANIZATION"];
     allowedKeys = allKeys.filter(key => key !== "STAFFTASK" && key !== "WORKLIBRARY");
 
   }
@@ -308,6 +314,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
       const backendKey = PERMISSION_MAPPING[sidebarKey];
 
+      if (sidebarKey === "CAD" || sidebarKey === "TOOLMANAGEMENT"  || sidebarKey === "WORKTEMPLATES") return;
+
       // If this sidebar item maps to a permission module (e.g. HR, LOGISTICS)
       if (backendKey) {
         // const deptPermissions = permission?.[backendKey];
@@ -332,6 +340,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
       }
     });
   }
+
 
   // =========================================================
   // 6. RESPONSIVE LOGIC

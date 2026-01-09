@@ -759,6 +759,9 @@ const BILLING_RELATED_MODULES = [
             ) : (
                 <main className="flex gap-4 h-[calc(100%-90px)]">
 
+
+
+
                     {/* --- Filter Sidebar --- */}
                     <div className="xl:w-72 w-64 flex-shrink-0 overflow-y-auto custom-scrollbar">
                         <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">

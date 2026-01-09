@@ -12,7 +12,7 @@ const createLabourCategory = async ({
   body
 }: {
   api: AxiosInstance;
-  body: { organizationId: string; name: string, fields:any };
+  body: { organizationId: string; name: string, fields: any };
 }) => {
   const { data } = await api.post(`/quote/labour/rateconfig/categories`, body);
   if (!data.ok) throw new Error(data.message);
@@ -25,7 +25,7 @@ export const useCreateLabourRateConfigCategory = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async (body: { organizationId: string; name: string, fields:any }) => {
+    mutationFn: async (body: { organizationId: string; name: string, fields: any }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
       if (!api) throw new Error("API instance not found for role");
       return await createLabourCategory({ api, body });
@@ -101,30 +101,86 @@ export const useDeleteLabourRateConfigCategory = () => {
 
 const getSingleLabourCost = async ({
   api,
-  organizationId
+  organizationId,
+  categoryId
 }: {
   api: AxiosInstance;
   organizationId: string;
+  categoryId: string;
 }) => {
-  const { data } = await api.get(`/quote/labour/rateconfig/categories/${organizationId}/singlesalary`);
+  const { data } = await api.get(`/quote/labour/rateconfig/categories/${organizationId}/singlesalary/${categoryId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
-export const useGetSingleLabourCost = ( organizationId:string) => {
+export const useGetSingleLabourCost = ({organizationId, categoryId}:{organizationId: string, categoryId:string}) => {
+  const allowedRoles = ["owner", "CTO", "staff"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  
+  return useQuery({
+    queryKey: ["labourcost", organizationId, categoryId],
+    queryFn: async () => {
+      console.log("categoryId", categoryId);
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
+      if (!api) throw new Error("API instance not found for role");
+      return await getSingleLabourCost({ api, organizationId, categoryId });
+    },
+    enabled: !!organizationId && !!categoryId,
+    retry: false
+  });
+};
+
+
+
+//  get by the category name // Updated API call to use Query Parameters for categoryName
+const getSingleLabourCostByCategoryName = async ({
+  api,
+  organizationId,
+  categoryName // Changed from categoryId to name string
+}: {
+  api: AxiosInstance;
+  organizationId: string;
+  categoryName: string;
+}) => {
+  // Pass categoryName as a query parameter (?categoryName=Glass)
+  const { data } = await api.get(
+    `/quote/labour/rateconfig/categories/${organizationId}/singlesalary`, 
+    { params: { categoryName } }
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data; // This returns the total salary number
+};
+export const useGetSingleLabourCostByCategoryName = ({
+  organizationId, 
+  categoryName // Changed from categoryId
+}: {
+  organizationId: string; 
+  categoryName: string;
+}) => {
   const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
   return useQuery({
-    queryKey: ["labourcost", organizationId],
+    // queryKey now tracks the categoryName string
+    queryKey: ["labourcost-categoryName", organizationId, categoryName],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
       if (!api) throw new Error("API instance not found for role");
-      return await getSingleLabourCost({ api, organizationId });
+      
+      return await getSingleLabourCostByCategoryName({ 
+        api, 
+        organizationId, 
+        categoryName 
+      });
     },
-    enabled: !!organizationId,
-    retry:false
+    // Only run if both ID and Name are provided
+    enabled: !!organizationId && !!categoryName,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // Optional: Cache for 5 minutes
   });
 };
 /* --------------------------- ITEM API FUNCTIONS --------------------------- */
@@ -132,16 +188,17 @@ export const useGetSingleLabourCost = ( organizationId:string) => {
 // 4. Create Items (multiple at once)
 const createLabourItems = async ({
   api,
-//   categoryId,
+  //   categoryId,
   organizationId,
-  items
+  items,
+  categoryId,
 }: {
   api: AxiosInstance;
-//   categoryId: string;
+  categoryId: string;
   organizationId: string,
   items: Array<Record<string, any>>; // multiple fields allowed
 }) => {
-  const { data } = await api.post(`/quote/labour/rateconfig/categories/${organizationId}/items`, {items});
+  const { data } = await api.post(`/quote/labour/rateconfig/categories/${organizationId}/${categoryId}/items`, { items });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -153,17 +210,17 @@ export const useCreateLabourRateConfigItems = () => {
 
   return useMutation({
     mutationFn: async ({
-    //   categoryId,
+      categoryId,
       organizationId,
       items
     }: {
-    //   categoryId: string;
+      categoryId: string;
       organizationId: string;
       items: Array<Record<string, any>>;
     }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
       if (!api) throw new Error("API instance not found for role");
-      return await createLabourItems({ api, items , organizationId});
+      return await createLabourItems({ api, items, categoryId, organizationId });
     },
     onSuccess: (_, { organizationId }) => {
       queryClient.invalidateQueries({ queryKey: ["rateconfig", "items", organizationId] });
@@ -174,27 +231,30 @@ export const useCreateLabourRateConfigItems = () => {
 // 5. Get Items by Category
 const getItemsByLabourCategory = async ({
   api,
-  organizationId
+  organizationId,
+  categoryId,
 }: {
   api: AxiosInstance;
   organizationId: string;
+  categoryId: string
 }) => {
-  const { data } = await api.get(`/quote/labour/rateconfig/categories/${organizationId}/items`);
+  const { data } = await api.get(`/quote/labour/rateconfig/categories/${organizationId}/${categoryId}/items`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
-export const useGetItemsByLabourRateConfigCategory = (organizationId: string) => {
+
+export const useGetItemsByLabourRateConfigCategory = (organizationId: string, categoryId: string) => {
   const allowedRoles = ["owner", "CTO", "staff"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
   return useQuery({
-    queryKey: ["rateconfig", "items", organizationId],
+    queryKey: ["rateconfig", "items", organizationId, categoryId],
     queryFn: async () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
       if (!api) throw new Error("API instance not found for role");
-      return await getItemsByLabourCategory({ api, organizationId });
+      return await getItemsByLabourCategory({ api, organizationId, categoryId });
     },
     enabled: !!organizationId,
   });

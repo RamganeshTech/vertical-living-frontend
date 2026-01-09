@@ -13,6 +13,7 @@ export interface NotificationCardProps {
       url: string
       label?: string
     }
+    fromModule?: string,
     createdAt: string
   }
   // onMarkAsRead: (id: string) => void
@@ -93,7 +94,11 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ deleteMutation, not
       // rel="noopener noreferrer"
       // className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
       // onClick={() => onMarkAsRead(notification._id)}
-      onClick={() => onDelete(notification._id)}
+      onClick={() => {
+        if (notification?.fromModule !== "tool") {
+          onDelete(notification._id)
+        }
+      }}
     >
 
       <div
@@ -133,7 +138,12 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ deleteMutation, not
                   // rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
                   // onClick={() => onMarkAsRead(notification._id)}
-                  onClick={() => onDelete(notification._id)}
+                  // onClick={() => onDelete(notification._id)}
+                  onClick={() => {
+                    if (notification?.fromModule !== "tool") {
+                      onDelete(notification._id)
+                    }
+                  }}
                 >
                   {notification.navigation?.label || "View Details"}
                   <i className="fas fa-arrow-right text-xs"></i>

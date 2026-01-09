@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../../../components/ui/Input";
 // import { useCreateItems, useDeleteItem, useGetCategories, useGetItemsByCategory } from "../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 import { Button } from "../../../../components/ui/Button";
@@ -9,14 +9,14 @@ import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 
 export default function LabourRateConfigSingle() {
-    const { organizationId, } = useParams<{
+    const { organizationId, id } = useParams<{
         organizationId: string;
-        // id: string;
+        id: string;
     }>();
-    // const navigate = useNavigate()
+    const navigate = useNavigate()
 
-    const { data: categories } = useGetLabourRateConfigCategories(organizationId!);
-    const { data: existingItems, isLoading, refetch } = useGetItemsByLabourRateConfigCategory(organizationId!);
+    const { data: categories } = useGetLabourRateConfigCategories(organizationId!, );
+    const { data: existingItems, isLoading, refetch } = useGetItemsByLabourRateConfigCategory(organizationId!, id!);
     const { mutateAsync: createItems, isPending: createPending } = useCreateLabourRateConfigItems();
     const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteLabourRateConfigItem();
 
@@ -36,7 +36,7 @@ export default function LabourRateConfigSingle() {
 
 
 
-    const currentCategory = (categories || [])?.find((cat: any) => cat.organizationId === organizationId);
+    const currentCategory = (categories || [])?.find((cat: any) => cat._id === id);
     if (!currentCategory) return <p>Category not found</p>;
 
 
@@ -115,7 +115,7 @@ export default function LabourRateConfigSingle() {
 
 
             await createItems({
-                // categoryId: categoryId!,
+                categoryId: id!,
                 items: newItems,
                 organizationId: organizationId!,
             });
@@ -141,23 +141,24 @@ export default function LabourRateConfigSingle() {
             {/* Sticky Header */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center sticky top-0 bg-white z-10">
                 <div className='flex gap-2 items-center'>
-                    {/* <div onClick={() => navigate(-1)}
+                    <div onClick={() => navigate(-1)}
                         className='bg-slate-50 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
                         <i className='fas fa-arrow-left'></i>
-                    </div> */}
+                    </div>
                     <div>
 
-                        {/* <h2 className="text-2xl font-bold text-gray-800">{currentCategory.name}</h2> */}
+                        <h2 className="text-2xl font-bold text-gray-800">{currentCategory.name}</h2>
 
-                        {currentCategory.name?.toLowerCase() === "Labour and Miscellaneous".toLowerCase() &&
-                            <span className="block absolute -top-[22px] text-[12px] text-gray-500">
+                        {/* {currentCategory.name?.toLowerCase() === "Labour and Miscellaneous".toLowerCase() && */}
+                            <span className="block  text-gray-500">
                                 * Enter the rupees per head (Every field will be added for single labour cost)
-                            </span>}
+                            </span>
+                            {/* } */}
                     </div>
 
 
                 </div>
-                <div className="flex gap-2 mt-3 sm:mt-0 absolute -top-[83px] right-[45px] ">
+                <div className="flex gap-2 mt-3 sm:mt-0  ">
                     {(canEdit || canCreate) && <Button onClick={handleAddRow} variant="primary" className="">
                         + Add Row
                     </Button>}  

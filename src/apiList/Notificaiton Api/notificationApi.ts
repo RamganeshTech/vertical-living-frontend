@@ -108,7 +108,7 @@ export const deleteNotification = async ({
 // hooks 
 
 
-const allowedRoles = ["owner", "staff", "CTO"];
+const allowedRoles = ["owner", "staff", "CTO", "worker"];
 
 
 

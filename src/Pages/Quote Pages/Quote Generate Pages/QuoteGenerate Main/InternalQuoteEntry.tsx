@@ -1,16 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { useCreateMaterialQuote, useEditMaterialQuote } from "../../../../apiList/Quote Api/Internal_Quote_Api/quoteGenerateApi";
+import { useCreateMaterialQuote, useEditMaterialQuote } from "../../../../apiList/Quote Api/Internal_Quote_Api/internalquoteApi";
 import { toast } from "../../../../utils/toast";
-import { useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import type { AvailableProjetType } from "../../../Department Pages/Logistics Pages/LogisticsShipmentForm";
 import { useGetProjects } from "../../../../apiList/projectApi";
 import { Button } from "../../../../components/ui/Button";
 import FurnitureForm from "./FurnitureForm";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/Select";
 import QuoteGenerateList from "../QuoteGenerateList";
-import { useGetSingleLabourCost } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
+import { useGetLabourRateConfigCategories, useGetSingleLabourCost } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 import StageGuide from "../../../../shared/StageGuide";
+// import GlassPartitionTemplate from "../../WorkData_Page/GlassPartitionTemplate";
+// import { Label } from "../../../../components/ui/Label";
+// import SearchSelectNew from "../../../../components/ui/SearchSelectNew";
 
 
 type CoreMaterialRow = {
@@ -57,14 +60,56 @@ export const filterValidSimpleRows = (rows: SimpleItemRow[]) => {
         Boolean(row.itemName?.trim()) || Boolean(row.description?.trim())
     );
 };
+
+
 const InternalQuoteEntryMain = () => {
 
+
+    const navigate = useNavigate()
     const { organizationId } = useParams() as { organizationId: string }
     const { data: projectData } = useGetProjects(organizationId);
-    let { data: labourCost = 0 } = useGetSingleLabourCost(organizationId!);
 
 
+    const [selectedLabourCategory, setSelectedLabourCategory] = useState({
+        categoryId: "",
+        categoryName: ""
+    });
 
+    let { data: labourCost = 0 } = useGetSingleLabourCost({ organizationId, categoryId: selectedLabourCategory.categoryId });
+
+    let { data: allLabourCategory = [] } = useGetLabourRateConfigCategories(organizationId);
+
+    // 2. AUTO-SELECT EFFECT: Set the first category as default once data arrives
+    useEffect(() => {
+        if (allLabourCategory && allLabourCategory?.length > 0 && !selectedLabourCategory.categoryId) {
+            const firstCategory = allLabourCategory[0];
+            setSelectedLabourCategory({
+                categoryId: firstCategory._id,
+                categoryName: firstCategory.name
+            });
+        }
+    }, [allLabourCategory]); // Runs when the list is fetched
+
+    // const allLabourCategoryOptions = useMemo(() => {
+    //     return (allLabourCategory || [])?.map((labour: any) => ({
+    //         value: labour._id,
+    //         label: labour.name,
+    //     }));
+    // }, [allLabourCategory]);
+
+
+    // 3. Effect for Auto-Selection
+    // useEffect(() => {
+    //     // Only run this if we have options and nothing is currently selected
+    //     if (allLabourCategoryOptions.length > 0 && !selectedLabourCategory.categoryId) {
+    //         const firstCategory = allLabourCategoryOptions[0];
+
+    //         setSelectedLabourCategory({
+    //             categoryId: firstCategory.value, // The _id
+    //             categoryName: firstCategory.label // The name
+    //         });
+    //     }
+    // }, [allLabourCategoryOptions, selectedLabourCategory.categoryId]);
 
     const { role, permission } = useAuthCheck();
     // const canList = role === "owner" || permission?.materialquote?.list;
@@ -104,6 +149,8 @@ const InternalQuoteEntryMain = () => {
         setQuoteType(type)
     }
 
+   
+
     const handleQuoteName = () => {
         if (quoteType === "single") {
             return "Single Quote"
@@ -139,6 +186,19 @@ const InternalQuoteEntryMain = () => {
             }
         ]);
     };
+
+    // const handleLabourCategory = (selectedId: string | null) => {
+    //     const selectedCategory = allLabourCategoryOptions.find((s: any) => s.value === selectedId);
+
+    //     if (selectedCategory) {
+    //         setSelectedLabourCategory({
+    //             categoryId: selectedCategory.value, // This is the _id
+    //             categoryName: selectedCategory.label // This is the name
+    //         });
+    //     } else {
+    //         setSelectedLabourCategory({ categoryId: "", categoryName: "" });
+    //     }
+    // };
 
     const handleRemoveFurniture = (indexToRemove: number) => {
         setFurnitures((prev) => prev.filter((_, i) => i !== indexToRemove));
@@ -289,6 +349,11 @@ const InternalQuoteEntryMain = () => {
 
 
 
+    const isChildRoute = location.pathname.includes("internalquotenew");
+
+    if (isChildRoute) return <Outlet />;
+
+
     // console.log("labor cost", labourCost)
 
     return (
@@ -308,11 +373,43 @@ const InternalQuoteEntryMain = () => {
                         </p>}
                 </div>
 
-
-
                 <div className="flex gap-6 items-center ">
+                    <div>
+                        <Button className="flex items-center" onClick={() => {
+                            navigate("internalquotenew")
+                            // setQuoteType("single")
+                        }}><i className="fas fa-new mr-1"> </i> New Version</Button>
+                    </div>
 
-                   {canCreate && <div>
+
+                   
+
+
+                        {/* <div>
+                            <label className="block text-sm font-medium ">Select Work Category
+
+                            </label>
+
+                            <div className="space-y-2">
+                                <Label className="text-gray-700 font-semibold flex items-center gap-2">
+                                    <i className="fas fa-user-check text-blue-600 text-xs"></i>
+                                    Select Salary Category
+                                </Label>
+                                <SearchSelectNew
+                                    options={allLabourCategoryOptions}
+                                    placeholder="Choose staff member"
+                                    searchPlaceholder="Search by name..."
+                                    value={selectedLabourCategory.categoryId}
+                                    onValueChange={handleLabourCategory}
+                                    searchBy="name"
+                                    displayFormat="detailed"
+                                    className="w-full"
+                                />
+                            </div>
+                        </div> */}
+
+
+                    {canCreate && <div>
                         <label className="block text-sm font-medium">Select QuoteType</label>
 
                         <Select onValueChange={(val: any) => handleQuoteType(val)}>
@@ -330,7 +427,7 @@ const InternalQuoteEntryMain = () => {
                     </div>}
 
 
-                   {canCreate && <div>
+                    {canCreate && <div>
                         <label className="block text-sm font-medium">Select Project *</label>
                         <select
                             value={filters.projectId}
@@ -350,7 +447,7 @@ const InternalQuoteEntryMain = () => {
                             ))}
                         </select>
                     </div>
-                    
+
                     }
 
                     {furnitures.length > 0 && <div className="text-right flex gap-2 items-center">
@@ -359,13 +456,13 @@ const InternalQuoteEntryMain = () => {
                     </div>
                     }
 
-                   {canCreate && <Button className="flex items-center" onClick={() => {
+                    {canCreate && <Button className="flex items-center" onClick={() => {
                         setModalOpen(true)
                         // setQuoteType("single")
-                    }}><i className="fas fa-add mr-1"> </i> Product</Button>}
+                    }}><i className="fas fa-add mr-1"> </i> Create</Button>}
 
 
-                     <div className="w-full sm:w-auto flex justify-end sm:block">
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
                         <StageGuide
                             organizationId={organizationId!}
                             stageName="materialquote"
@@ -416,25 +513,7 @@ const InternalQuoteEntryMain = () => {
                 </div>
             )}
 
-
-            {/* {furnitures.length === 0 && (
-                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white  rounded-lg">
-                        <i className="fas fa-couch text-5xl text-blue-400 mb-4"></i>
-                        <h3 className="text-lg font-semibold text-gray-600 mb-1">No Products Created</h3>
-                        <p className="text-sm text-gray-500">
-                            Click the <strong>+ Product</strong>  to create the product<br />
-                        </p>
-
-                        <Button
-                            onClick={() => setModalOpen(true)}
-                            className="bg-blue-600 text-white px-4 py-2 rounded mt-2 flex items-center"
-                        >
-                            <i className="fas fa-add !mr-2"> </i>
-                            Product
-                        </Button>
-                    </div>
-                )} */}
-
+          
             {furnitures.length > 0 && <section className="shadow overflow-y-auto max-h-[86%]">
                 {!editingId && <h1 className="text-2xl text-gray-500">
                     {handleQuoteName()}
@@ -457,7 +536,7 @@ const InternalQuoteEntryMain = () => {
 
 
             {furnitures.length !== 0 && <div className="mt-1 text-right flex gap-2 justify-end">
-              {(canCreate || canEdit) &&<Button
+                {(canCreate || canEdit) && <Button
                     variant="primary"
                     isLoading={isPending || editPending}
                     onClick={editingId ? handleEditSubmit : handleSubmit}
@@ -465,22 +544,20 @@ const InternalQuoteEntryMain = () => {
                 >
                     Save Quote
                 </Button>
-}
+                }
 
                 {!editingId && (canCreate || canEdit) && <Button
                     variant="secondary"
                     onClick={() => {
-
                         setFurnitures([])
                         setQuoteType(null)
-
                     }}
                     className=""
                 >
                     Cancel
                 </Button>}
 
-                {editingId  && <Button
+                {editingId && <Button
                     variant="secondary"
                     onClick={() => {
                         setIsEditingId(null)

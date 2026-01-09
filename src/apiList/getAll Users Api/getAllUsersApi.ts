@@ -13,6 +13,7 @@ export const getUsersApi  = async (
 };
 
 type staffOptions = "staff" | "owner" | "CTO" | "worker" | "client"
+
 export const useGetAllUsers = (organizationId: string, roleToFetch: staffOptions ) => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);

@@ -301,24 +301,6 @@ const OrderMaterialOverview = () => {
         }
     }
 
-    // const handleDeletePdf = async (pdfId: string) => {
-    //     try {
-
-    //         await deletePdf({ projectId: projectId!, pdfId });
-    //         toast({ title: "Success", description: "PDF deleted" });
-    //         setEditShop(false);
-    //         refetch()
-    //     } catch (error: any) {
-    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete" });
-    //     }
-    // };
-
-
-    // const selectRef = useRef<HTMLButtonElement>(null);
-    // const selectedUnits = data?.selectedUnits || [];
-    // const totalCost = data?.totalCost || 0;
-    // const hasUnits = selectedUnits.length > 0;
-
     // Focus input when editing starts
     useEffect(() => {
         if (editingCell && inputRef.current) {
@@ -326,92 +308,6 @@ const OrderMaterialOverview = () => {
             inputRef.current.select();
         }
     }, [editingCell]);
-
-    // Handle auto-save when editing ends
-
-    // START OF OLDER VERSION
-    // const handleSaveEdit = async (unitId: string, subItemId: string, field: string, value: any) => {
-    //     try {
-    //         const unit = selectedUnits.find((u: any) => u._id === unitId);
-    //         const subItem = unit?.subItems?.find((s: any) => s._id === subItemId);
-    //         // console.log("subitem", subItem)
-    //         if (!subItem) return;
-
-
-    //         const updatedData = {
-    //             projectId,
-    //             unitId,
-    //             subItemId,
-    //             subItemName: field === 'name' ? value : subItem.subItemName,
-    //             quantity: field === 'quantity' ? (Number(value) ? Number(value) : 1) : subItem.quantity,
-    //             unit: field === 'unit' ? value : subItem.unit,
-    //         };
-
-    //         await updateSubItem(updatedData);
-    //         toast({ title: "Success", description: "Item updated successfully" });
-    //     } catch (error: any) {
-    //         console.log("filed", error)
-    //         toast({
-    //             title: "Error",
-    //             description: error?.response?.data?.message || "Failed to update item",
-    //             variant: "destructive"
-    //         });
-    //     }
-    // };
-
-    // // Handle new row creation
-    // const handleNewRowSave = async (unitId: string, newData: any) => {
-    //     const rowData: any = newData;
-    //     // console.log("row data", rowData)
-
-    //     if (!rowData && !rowData?.name.trim()) {
-    //         return toast({
-    //             title: "Error",
-    //             description: "Material Name is mandatory",
-    //             variant: "destructive"
-    //         });
-    //     }
-    //     try {
-    //         await addSubItem({
-    //             projectId,
-    //             unitId,
-    //             subItemName: rowData.name,
-    //             quantity: rowData.quantity ?? 1,
-    //             unit: rowData.unit,
-    //         });
-
-    //         // Clear the new row data
-    //         setNewRowData(prev => ({
-    //             ...prev,
-    //             [unitId]: { name: '', quantity: 1, unit: '' }
-    //         }));
-
-    //         toast({ title: "Success", description: "Item created successfully" });
-    //     } catch (error: any) {
-    //         toast({
-    //             title: "Error",
-    //             description: error?.response?.data?.message || "Failed to create item",
-    //             variant: "destructive"
-    //         });
-    //     }
-    // };
-
-    // // Handle delete
-    // const handleDelete = async (unitId: string, subItemId: string) => {
-    //     try {
-    //         await deleteSubItem({ projectId, unitId, subItemId });
-    //         toast({ title: "Success", description: "Item deleted successfully" });
-    //     } catch (error: any) {
-    //         toast({
-    //             title: "Error",
-    //             description: error?.response?.data?.message || "Failed to delete item",
-    //             variant: "destructive"
-    //         });
-    //     }
-    // };
-
-    // END OF OLD VERSION
-
 
 
 
@@ -524,15 +420,6 @@ const OrderMaterialOverview = () => {
 
 
 
-    // Initialize new row data for a unit
-    // const initializeNewRow = (unitId: string) => {
-    //     if (!newRowData[unitId]) {
-    //         setNewRowData(prev => ({
-    //             ...prev,
-    //             [unitId]: { name: '', quantity: 1, unit: '' }
-    //         }));
-    //     }
-    // };
 
 
 
@@ -548,18 +435,6 @@ const OrderMaterialOverview = () => {
         }
     };
 
-
-    // const handleUpdatePdfStatus = async (pdfId: string, status: string) => {
-    //     try {
-    //         await updatePdfStatus({ projectId, pdfId, status });
-
-    //         toast({ title: "Success", description: "Pdf status updated successfully" });
-    //         refetch()
-
-    //     } catch (err: any) {
-    //         toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to update status", variant: "destructive" });
-    //     }
-    // };
 
 
 
@@ -613,678 +488,749 @@ const OrderMaterialOverview = () => {
                     <span className="sm:hidden">Order Material</span>
                 </h2>
 
-                {(canCreate || canEdit) &&
-                    <> <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                        <Button
-                            isLoading={completePending}
-                            onClick={handleCompletionStatus}
-                            className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
-                        >
-                            <i className="fa-solid fa-circle-check mr-2"></i>
-                            Mark as Complete
-                        </Button>
+                <div className="flex gap-2">
+                    {(canCreate || canEdit) &&
+                        <>
+                            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                <Button
+                                    isLoading={completePending}
+                                    onClick={handleCompletionStatus}
+                                    className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
+                                >
+                                    <i className="fa-solid fa-circle-check mr-2"></i>
+                                    Mark as Complete
+                                </Button>
 
-                        <ResetStageButton
-                            projectId={projectId!}
-                            stageNumber={8}
-                            stagePath="orderingmaterial"
-                        />
-
-
-                        {!getAllError && <ShareDocumentWhatsapp
-                            projectId={projectId!}
-                            stageNumber="8"
-                            className="w-full sm:w-fit"
-                            isStageCompleted={data?.status}
-                        />}
-
-                        <AssignStageStaff
-                            stageName="OrderMaterialHistoryModel"
-                            projectId={projectId!}
-                            organizationId={organizationId!}
-                            currentAssignedStaff={data?.assignedTo || null}
-                        />
-                    </div>
-                       
-                    </>
-                }
-
-                 <div className="w-full sm:w-auto flex justify-end sm:block">
-                            <StageGuide
-                                organizationId={organizationId!}
-                                stageName="ordermaterial"
-                            />
-                        </div>
+                                <ResetStageButton
+                                    projectId={projectId!}
+                                    stageNumber={8}
+                                    stagePath="orderingmaterial"
+                                />
 
 
-            </header>
+                                {!getAllError && <ShareDocumentWhatsapp
+                                    projectId={projectId!}
+                                    stageNumber="8"
+                                    className="w-full sm:w-fit"
+                                    isStageCompleted={data?.status}
+                                />}
 
-            {/* Error Display */}
-            {(isError) && (
-                <div className="flex-1 flex items-center justify-center">
-                    <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                        <div className="text-red-600 font-semibold mb-2">
-                            ⚠️ Error Occurred
-                        </div>
-                        <p className="text-red-500 text-sm mb-4">
-                            {(getAllError as any)?.response?.data?.message || "Failed to load ordering material"}
-                        </p>
-                        <Button
-                            isLoading={isLoading}
-                            onClick={() => refetch()}
-                            className="bg-red-600 text-white hover:bg-red-700"
-                        >
-                            Retry
-                        </Button>
-                    </div>
-                </div>
-            )}
-
-            {/* Main Content - Only show if no error */}
-            {!isError && (
-                <div className="flex-1 min-h-0 overflow-y-auto space-y-4 sm:space-y-6">
-                    {/* Timer Card */}
-                    <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
-                        <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
-                            <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
-                            <span>Stage Timings</span>
-                        </div>
-                        <StageTimerInfo
-                            completedAt={data?.timer?.completedAt}
-                            stageName="orderingmaterial"
-                            formId={(data as any)?._id}
-                            projectId={projectId!}
-                            deadLine={data?.timer?.deadLine}
-                            startedAt={data?.timer?.startedAt}
-                            refetchStageMutate={refetch}
-                            deadLineMutate={deadLineAsync}
-                            isPending={deadLinePending}
-                        />
-                    </Card>
-
-                    {!isError && (
-                        <section className="bg-white rounded-3xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
-
-
-                            {/* Shop Details */}
-                            <section className="border-l-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                                <div className="flex justify-between items-center w-full">
-                                    <div>
-                                        <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
-                                            <i className="fa-solid fa-store"></i>
-                                            Shop Details
-                                        </h2>
-                                    </div>
-
-                                    {!editShop ? <div className="gap-2 flex">
-
-                                        <Button onClick={() => navigate("shoplib")}>
-                                            <i className="fas fa-shop mr-2"></i>
-                                            Shop Library
-                                        </Button>
-
-                                        {(canEdit || canCreate) && <button
-                                            onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
-                                            // className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-                                            className=" text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-
-                                        >
-                                            <i className="fa-solid fa-edit mr-1"></i>Edit
-                                        </button>}
-                                    </div>
-                                        :
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
-                                            <SearchSelectNew
-                                                options={shopLibOptions}
-                                                placeholder="Select Shop"
-                                                searchPlaceholder="Search by shop name..."
-                                                value={selectedShop.selectedId || ''}
-                                                onValueChange={(value) => {
-                                                    const shopFound = shops?.find((s: any) => s._id === value)
-                                                    // console.log("sop", shopFound)
-                                                    setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
-                                                }}
-                                                searchBy="name"
-                                                displayFormat="detailed"
-                                                className="w-full"
-                                            />
-                                        </div>
-                                    }
-                                </div>
-                                {editShop ? (
-                                    <div className="space-y-3">
-                                        <Input
-                                            placeholder="Shop Name"
-                                            value={shopForm?.shopName || ""}
-                                            onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
-                                            className="w-full"
-                                        />
-                                        <Input
-                                            placeholder="Contact Person"
-                                            value={shopForm?.contactPerson || ""}
-                                            onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
-                                            className="w-full"
-                                        />
-                                        <Input
-                                            placeholder="Phone Number"
-                                            value={shopForm?.phoneNumber || ""}
-                                            type="tel"
-                                            maxLength={10}
-                                            onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })}
-                                            className="w-full"
-                                        />
-                                        <Input
-                                            placeholder="Address"
-                                            value={shopForm?.address || ""}
-                                            onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
-                                            className="w-full"
-                                        />
-                                        <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
-                                            <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
-                                                <i className="fa-solid fa-save mr-2"></i>Save
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setEditShop(false)}
-                                                className="w-full sm:w-auto"
-                                            >
-                                                <i className="fa-solid fa-times mr-2"></i>Cancel
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-2 text-sm sm:text-base">
-                                        <p><strong>Shop Name:</strong> {data?.shopDetails?.shopName || "-"}</p>
-                                        <p><strong>Contact Person:</strong> {data?.shopDetails?.contactPerson || "-"}</p>
-                                        <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
-                                        <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
-
-
-
-                                    </div>
-                                )}
-                            </section>
-
-                            <div className="border-l-4 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                                <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
-                                    <i className="fa-solid fa-truck"></i>
-                                    Delivery Location
-                                </h2>
-                                {editDelivery ? (
-                                    <div className="space-y-3">
-                                        <Input
-                                            placeholder="Site Name"
-                                            value={deliveryForm?.siteName || ""}
-                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })}
-                                            className="w-full"
-                                        />
-                                        <Input
-                                            placeholder="Site Supervisor"
-                                            value={deliveryForm?.siteSupervisor || ""}
-                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })}
-                                            className="w-full"
-                                        />
-                                        <Input
-                                            placeholder="Phone Number"
-                                            type="tel"
-                                            maxLength={10}
-                                            value={deliveryForm?.phoneNumber || ""}
-                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })}
-                                            className="w-full"
-                                        />
-                                        <Input
-                                            placeholder="Address"
-                                            value={deliveryForm?.address || ""}
-                                            onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
-                                            className="w-full"
-                                        />
-                                        <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
-                                            <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
-                                                <i className="fa-solid fa-save mr-2"></i>Save
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setEditDelivery(false)}
-                                                className="w-full sm:w-auto"
-                                            >
-                                                <i className="fa-solid fa-times mr-2"></i>Cancel
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-2 text-sm sm:text-base">
-                                        <p><strong>Site Name:</strong> {data?.deliveryLocationDetails?.siteName || "-"}</p>
-                                        <p><strong>Supervisor:</strong> {data?.deliveryLocationDetails?.siteSupervisor || "-"}</p>
-                                        <p><strong>Phone:</strong> {data?.deliveryLocationDetails?.phoneNumber || "-"}</p>
-                                        <p><strong>Address:</strong> {data?.deliveryLocationDetails?.address || "-"}</p>
-                                        {(canEdit || canCreate) && <button
-                                            onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
-                                            className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-                                        >
-                                            <i className="fa-solid fa-edit mr-1"></i>Edit
-                                        </button>}
-                                    </div>
-                                )}
+                                <AssignStageStaff
+                                    stageName="OrderMaterialHistoryModel"
+                                    projectId={projectId!}
+                                    organizationId={organizationId!}
+                                    currentAssignedStaff={data?.assignedTo || null}
+                                />
                             </div>
 
+                        </>
+                    }
 
-                            <section className="w-full">
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="ordermaterial"
+                        />
+                    </div>
+
+                </div>
+            </header >
+
+            {/* Error Display */}
+            {
+                (isError) && (
+                    <div className="flex-1 flex items-center justify-center">
+                        <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+                            <div className="text-red-600 font-semibold mb-2">
+                                ⚠️ Error Occurred
+                            </div>
+                            <p className="text-red-500 text-sm mb-4">
+                                {(getAllError as any)?.response?.data?.message || "Failed to load ordering material"}
+                            </p>
+                            <Button
+                                isLoading={isLoading}
+                                onClick={() => refetch()}
+                                className="bg-red-600 text-white hover:bg-red-700"
+                            >
+                                Retry
+                            </Button>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* Main Content - Only show if no error */}
+            {
+                !isError && (
+                    <div className="flex-1 min-h-0 overflow-y-auto space-y-4 sm:space-y-6 ">
+                        {/* Timer Card */}
+                        <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
+                            <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
+                                <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+                                <span>Stage Timings</span>
+                            </div>
+                            <StageTimerInfo
+                                completedAt={data?.timer?.completedAt}
+                                stageName="orderingmaterial"
+                                formId={(data as any)?._id}
+                                projectId={projectId!}
+                                deadLine={data?.timer?.deadLine}
+                                startedAt={data?.timer?.startedAt}
+                                refetchStageMutate={refetch}
+                                deadLineMutate={deadLineAsync}
+                                isPending={deadLinePending}
+                            />
+                        </Card>
+
+                        {!isError && (
+                            <section className="bg-white rounded-3xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
 
 
+                                {/* Shop Details */}
+<div className="flex flex-col md:flex-row gap-4 w-full mb-3">
 
+                                <section className="border-l-4 flex-1 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
+                                    <div className="flex justify-between items-center w-full">
+                                        <div>
+                                            <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
+                                                <i className="fa-solid fa-store"></i>
+                                                Shop Details
+                                            </h2>
+                                        </div>
 
+                                        {!editShop ? <div className="gap-2 flex">
 
+                                            <Button onClick={() => navigate("shoplib")}>
+                                                <i className="fas fa-shop mr-2"></i>
+                                                Shop Library
+                                            </Button>
 
-                                <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                                    <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center">
-                                        <i className="fas fa-folder-open mr-2 text-blue-500"></i> Images
-                                    </h3>
+                                            {(canEdit || canCreate) && <button
+                                                onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
+                                                // className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
+                                                className=" text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
 
-
-
-                                    <div className="flex items-center justify-between w-full relative">
-
-                                        {(canEdit || canCreate) && <Input
-                                            type="file"
-                                            multiple
-                                            accept="image/*"
-                                            placeholder="select files"
-                                            // className="h-10"
-                                            onChange={handleFileChange}
-                                            disabled={imagePending}
-                                            className={imagePending ? "pr-10 opacity-70 cursor-not-allowed w-full mb-4" : "mb-4"}
-                                        />}
-
-                                        {imagePending && (
-                                            <div className="absolute inset-y-0 right-2 flex items-center">
-                                                <svg
-                                                    className="animate-spin h-5 w-5 text-gray-500"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                                    <path
-                                                        className="opacity-75"
-                                                        fill="currentColor"
-                                                        d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 100 16v4l3.5-3.5L12 20v-4a8 8 0 01-8-8z"
-                                                    />
-                                                </svg>
-                                            </div>
-                                        )}
-                                    </div>
-                                    {/* <input
-                                            type="file"
-                                            accept="image/*"
-                                            multiple
-                                            className="mb-1 sm:mb-0 w-full h-full py-2 border-1 px-2 rounded-lg"
-                                            onChange={handleFileChange}
-                                        /> */}
-
-
-                                    {/* Image Gallery */}
-                                    <div className="mb-6">
-                                        {data?.images?.length > 0 ? <ImageGalleryExample
-                                            {...(canDelete ? { handleDeleteFile: (imgId: string) => handleImageDelete(imgId) } : {})}
-
-                                            imageFiles={data?.images}
-                                            height={150}
-                                            minWidth={150}
-                                            maxWidth={200} />
+                                            >
+                                                <i className="fa-solid fa-edit mr-1"></i>Edit
+                                            </button>}
+                                        </div>
                                             :
-                                            <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
-                                                No Images uploaded yet.
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
+                                                <SearchSelectNew
+                                                    options={shopLibOptions}
+                                                    placeholder="Select Shop"
+                                                    searchPlaceholder="Search by shop name..."
+                                                    value={selectedShop.selectedId || ''}
+                                                    onValueChange={(value) => {
+                                                        const shopFound = shops?.find((s: any) => s._id === value)
+                                                        // console.log("sop", shopFound)
+                                                        setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
+                                                    }}
+                                                    searchBy="name"
+                                                    displayFormat="detailed"
+                                                    className="w-full"
+                                                />
                                             </div>
                                         }
                                     </div>
+                                    {editShop ? (
+                                        <div className="space-y-3">
+                                            <Input
+                                                placeholder="Shop Name"
+                                                value={shopForm?.shopName || ""}
+                                                onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
+                                                className="w-full"
+                                            />
+                                            <Input
+                                                placeholder="Contact Person"
+                                                value={shopForm?.contactPerson || ""}
+                                                onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
+                                                className="w-full"
+                                            />
+                                            <Input
+                                                placeholder="Phone Number"
+                                                value={shopForm?.phoneNumber || ""}
+                                                type="tel"
+                                                maxLength={10}
+                                                onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })}
+                                                className="w-full"
+                                            />
+                                            <Input
+                                                placeholder="Address"
+                                                value={shopForm?.address || ""}
+                                                onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
+                                                className="w-full"
+                                            />
+                                            <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
+                                                <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
+                                                    <i className="fa-solid fa-save mr-2"></i>Save
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => setEditShop(false)}
+                                                    className="w-full sm:w-auto"
+                                                >
+                                                    <i className="fa-solid fa-times mr-2"></i>Cancel
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 text-sm sm:text-base">
+                                            <p><strong>Shop Name:</strong> {data?.shopDetails?.shopName || "-"}</p>
+                                            <p><strong>Contact Person:</strong> {data?.shopDetails?.contactPerson || "-"}</p>
+                                            <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
+                                            <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
 
 
 
+                                        </div>
+                                    )}
+                                </section>
+
+                                <div className="border-l-4 flex-1 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
+                                    <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
+                                        <i className="fa-solid fa-truck"></i>
+                                        Delivery Location
+                                    </h2>
+                                    {editDelivery ? (
+                                        <div className="space-y-3">
+                                            <Input
+                                                placeholder="Site Name"
+                                                value={deliveryForm?.siteName || ""}
+                                                onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })}
+                                                className="w-full"
+                                            />
+                                            <Input
+                                                placeholder="Site Supervisor"
+                                                value={deliveryForm?.siteSupervisor || ""}
+                                                onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })}
+                                                className="w-full"
+                                            />
+                                            <Input
+                                                placeholder="Phone Number"
+                                                type="tel"
+                                                maxLength={10}
+                                                value={deliveryForm?.phoneNumber || ""}
+                                                onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })}
+                                                className="w-full"
+                                            />
+                                            <Input
+                                                placeholder="Address"
+                                                value={deliveryForm?.address || ""}
+                                                onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
+                                                className="w-full"
+                                            />
+                                            <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
+                                                <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
+                                                    <i className="fa-solid fa-save mr-2"></i>Save
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => setEditDelivery(false)}
+                                                    className="w-full sm:w-auto"
+                                                >
+                                                    <i className="fa-solid fa-times mr-2"></i>Cancel
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 text-sm sm:text-base">
+                                            <p><strong>Site Name:</strong> {data?.deliveryLocationDetails?.siteName || "-"}</p>
+                                            <p><strong>Supervisor:</strong> {data?.deliveryLocationDetails?.siteSupervisor || "-"}</p>
+                                            <p><strong>Phone:</strong> {data?.deliveryLocationDetails?.phoneNumber || "-"}</p>
+                                            <p><strong>Address:</strong> {data?.deliveryLocationDetails?.address || "-"}</p>
+                                            {(canEdit || canCreate) && <button
+                                                onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
+                                                className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
+                                            >
+                                                <i className="fa-solid fa-edit mr-1"></i>Edit
+                                            </button>}
+                                        </div>
+                                    )}
+                                </div>
+                                </div>
+
+
+                                <section className="w-full">
+                                    <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                                        <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center">
+                                            <i className="fas fa-folder-open mr-2 text-blue-500"></i> Images
+                                        </h3>
+
+
+
+                                        <div className="flex items-center justify-between w-full relative">
+
+                                            {(canEdit || canCreate) && <Input
+                                                type="file"
+                                                multiple
+                                                accept="image/*"
+                                                placeholder="select files"
+                                                // className="h-10"
+                                                onChange={handleFileChange}
+                                                disabled={imagePending}
+                                                className={imagePending ? "pr-10 opacity-70 cursor-not-allowed w-full mb-4" : "mb-4"}
+                                            />}
+
+                                            {imagePending && (
+                                                <div className="absolute inset-y-0 right-2 flex items-center">
+                                                    <svg
+                                                        className="animate-spin h-5 w-5 text-gray-500"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                        <path
+                                                            className="opacity-75"
+                                                            fill="currentColor"
+                                                            d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 100 16v4l3.5-3.5L12 20v-4a8 8 0 01-8-8z"
+                                                        />
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Image Gallery */}
+                                        <div className="mb-6">
+                                            {data?.images?.length > 0 ? <ImageGalleryExample
+                                                {...(canDelete ? { handleDeleteFile: (imgId: string) => handleImageDelete(imgId) } : {})}
+
+                                                imageFiles={data?.images}
+                                                height={150}
+                                                minWidth={150}
+                                                maxWidth={200} />
+                                                :
+                                                <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
+                                                    No Images uploaded yet.
+                                                </div>
+                                            }
+                                        </div>
+
+
+
+
+
+                                    </section>
 
 
                                 </section>
 
+                                {/* Modern header with subtle accent */}
+                                {/* <div className="p-6 border-b mt-4 border-gray-100 relative">
+                        <div className="absolute top-0 left-0 h-full w-1.5 bg-blue-600 "></div>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pl-3">
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-800">Your Orders</h2>
 
-                            </section>
-
-                            {/* Modern header with subtle accent */}
-                            <div className="p-6 border-b mt-4 border-gray-100 relative">
-                                <div className="absolute top-0 left-0 h-full w-1.5 bg-blue-600 "></div>
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pl-3">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-gray-800">Your Orders</h2>
-                                        {/* <p className="text-sm text-gray-500 mt-1">
-                                            {hasUnits ? `${selectedUnits.length} items purchased` : 'No orders yet'}
-                                        </p> */}
-                                    </div>
-                                    <div className="flex gap-2">
+                            </div>
+                            <div className="flex gap-2">
 
 
-                                        <Button variant="primary" className=""
-                                            onClick={() => navigate('siteorders')}>
-                                            <i className="fas fa-box-archive !mr-2"></i>
-                                            View Public Orders
-                                        </Button>
+                                <Button variant="primary" className=""
+                                    onClick={() => navigate('siteorders')}>
+                                    <i className="fas fa-box-archive !mr-2"></i>
+                                    View Public Orders
+                                </Button>
 
-                                        {canDelete && <Button variant="danger" className="bg-red-600 text-white"
-                                            isLoading={deleteAllPending} onClick={handleDeleteAllSubItems}>
-                                            <i className="fas fa-trash !mr-2"></i>
-                                            Delete All SubItems
-                                        </Button>}
+                                {canDelete && <Button variant="danger" className="bg-red-600 text-white"
+                                    isLoading={deleteAllPending} onClick={handleDeleteAllSubItems}>
+                                    <i className="fas fa-trash !mr-2"></i>
+                                    Delete All SubItems
+                                </Button>}
 
-                                        {/* {hasUnits && (
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-gray-500 text-sm">Total:</span>
-                                                <span className="text-xl font-bold text-blue-600">₹{totalCost.toFixed(2)}</span>
-                                            </div>
-                                        )} */}
-                                    </div>
-                                </div>
+                               
+                            </div>
+                        </div>
+                    </div> */}
+
+
+
+
+
+                                {/* Newer version */}
+
+                                <div
+                                    className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
+
+                                >
+                                    {/* <div className="mb-3 ">
+
+                            <div className="flex items-center gap-2">
+                                <i className="fa-solid fa-list text-blue-600"></i>
+                                <h4 className="font-semibold text-blue-800 text-xl">Create Material Order</h4>
+                                <span className="text-sm text-gray-500">(Click to edit, changes save by clicking Enter)</span>
                             </div>
 
+                            <p className="ml-6 text-sm text-gray-500">Order Id: {" "}
+                                <span className="text-lg text-black font-medium">
+                                    {nextOrderMaterialNumber}
+                                </span>
+                            </p>
+                        </div> */}
 
+                                    <div className="flex flex-col md:flex-row md:items-end justify-between pb-4 border-b-2 border-blue-600">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
+                                                    <i className="fa-solid fa-list text-blue-600"></i>
+                                                </div>
+                                                <h4 className="font-bold text-gray-900 text-2xl tracking-tight">
+                                                    Create Material Order
+                                                </h4>
+                                            </div>
+                                            <div className="flex items-center gap-2 ml-10">
+                                                <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                                                    Instruction
+                                                </span>
+                                                <p className="text-xs text-gray-500 italic">
+                                                    Click cells to edit • Press <span className="font-bold text-gray-700">Enter</span> to save
+                                                </p>
+                                            </div>
+                                        </div>
 
+                                        {/* <div className="flex gap-2 items-center">
 
-
-                            {/* Newer version */}
-
-                            <div
-                                className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
-
-                            >
-                                <div className="mb-3 ">
-
-                                    <div className="flex items-center gap-2">
-                                        <i className="fa-solid fa-list text-blue-600"></i>
-                                        <h4 className="font-semibold text-blue-800 text-xl">Create Material Order</h4>
-                                        <span className="text-sm text-gray-500">(Click to edit, changes save by clicking Enter)</span>
-                                    </div>
-
-                                    <p className="ml-6 text-sm text-gray-500">Order Id: {" "}
-                                        {/* <span>{data?.orderedItems[data?.orderedItems.length - 1]?.orderMaterialNumber}</span> */}
-                                        <span className="text-lg text-black font-medium">
-                                            {nextOrderMaterialNumber}
-                                        </span>
-                                    </p>
+                                <div className="mt-4 md:mt-0 flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Order ID</span>
+                                    <span className="text-xl font-mono font-black text-blue-700">
+                                        {nextOrderMaterialNumber}
+                                    </span>
                                 </div>
 
-                                <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
-                                    <div
-                                        className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
-                                    >
-                                        <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
-                                            Ref ID
-                                        </div>
-                                        <div className="col-span-8 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
-                                            Material Name
-                                        </div>
-                                        <div className="col-span-2 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
-                                            Quantity
-                                        </div>
-                                        <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
-                                            Unit
-                                        </div>
-                                        <div className="col-span-1 px-4 py-3 text-sm font-medium text-gray-700">
-                                            Action
+                                  <Button variant="primary" className=""
+                                    onClick={() => navigate('siteorders')}>
+                                    <i className="fas fa-box-archive !mr-2"></i>
+                                    View Public Orders
+                                </Button>
+
+                                {canDelete && <Button variant="danger" className="bg-red-600 text-white"
+                                    isLoading={deleteAllPending} onClick={handleDeleteAllSubItems}>
+                                    <i className="fas fa-trash !mr-2"></i>
+                                    Delete All SubItems
+                                </Button>}
+                            </div> */}
+
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            {/* Compact Order Identifier */}
+                                            <div className="flex items-center self-stretch bg-white rounded-lg border border-gray-200 px-3 py-1 shadow-sm">
+                                                <div className="flex flex-col leading-none border-r border-gray-200 pr-3 mr-3">
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Order ID</span>
+                                                    <span className="text-sm font-mono font-black text-blue-700 mt-0.5">
+                                                        {nextOrderMaterialNumber}
+                                                    </span>
+                                                </div>
+
+                                                {/* Action Buttons Container */}
+                                                <div className="flex items-center gap-1.5">
+                                                    <Button
+                                                        variant="primary"
+                                                        size="sm"
+                                                        className="h-8 text-xs px-3 shadow-none"
+                                                        onClick={() => navigate('siteorders')}
+                                                    >
+                                                        <i className="fas fa-box-archive mr-2"></i>
+                                                        View Public Orders
+                                                    </Button>
+
+                                                    {canDelete && (
+                                                        <Button
+                                                            variant="danger"
+                                                            size="sm"
+                                                            className="h-8 text-xs px-3 bg-red-600 text-white shadow-none"
+                                                            isLoading={deleteAllPending}
+                                                            onClick={handleDeleteAllSubItems}
+                                                        >
+                                                            <i className="fas fa-trash mr-2"></i>
+                                                            Delete All
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
 
-                                    {data.currentOrder.subItems && data.currentOrder?.subItems.length > 0 && data.currentOrder.subItems.map((sub: SubItem) => (
-                                        <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-gray-100 hover:bg-gray-50">
 
-                                            <div className="col-span-3 border-r border-blue-200">
+
+
+                                    <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
+                                        <div
+                                            className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
+                                        >
+                                            <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                                Ref ID
+                                            </div>
+                                            <div className="col-span-8 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                                Material Name
+                                            </div>
+                                            <div className="col-span-2 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                                Quantity
+                                            </div>
+                                            <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                                Unit
+                                            </div>
+                                            <div className="col-span-1 px-4 py-3 text-sm font-medium text-gray-700">
+                                                Action
+                                            </div>
+                                        </div>
+
+
+                                        {data.currentOrder.subItems && data.currentOrder?.subItems.length > 0 && data.currentOrder.subItems.map((sub: SubItem) => (
+                                            <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-gray-100 hover:bg-gray-50">
+
+                                                <div className="col-span-3 border-r border-blue-200">
+
+                                                    <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
+                                                        {sub?.refId || "N/A"}
+                                                    </div>
+                                                </div>
+
+                                                <div className="col-span-8 border-r border-blue-200">
+                                                    {editingCell?.subItemId === sub._id && editingCell?.field === 'name' ? (
+                                                        <input
+                                                            ref={inputRef}
+                                                            type="text"
+                                                            defaultValue={sub.subItemName}
+                                                            className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                                            onBlur={(e) => {
+                                                                handleSaveEdit(sub._id, 'name', e.target.value);
+                                                                setEditingCell(null);
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    const value = (e.target as HTMLInputElement).value;
+                                                                    handleSaveEdit(sub._id, 'name', value);
+                                                                    setEditingCell(null);
+                                                                }
+                                                                if (e.key === 'Escape') {
+                                                                    setEditingCell(null);
+                                                                }
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <div
+                                                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            onClick={() => {
+                                                                if (canCreate || canEdit) {
+                                                                    setEditingCell({ subItemId: sub._id, field: 'name' })
+                                                                }
+                                                            }
+                                                            }
+
+                                                        >
+                                                            {sub.subItemName}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="col-span-2 border-r border-blue-200">
+                                                    {editingCell?.subItemId === sub._id && editingCell?.field === 'quantity' ? (
+                                                        <input
+                                                            ref={inputRef}
+                                                            type="number"
+                                                            defaultValue={sub.quantity}
+                                                            min="0"
+                                                            className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                                            onBlur={(e) => {
+                                                                handleSaveEdit(sub._id, 'quantity', e.target.value);
+                                                                setEditingCell(null);
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    handleSaveEdit(sub._id, 'quantity', e.currentTarget.value);
+                                                                    setEditingCell(null);
+                                                                }
+                                                                if (e.key === 'Escape') {
+                                                                    setEditingCell(null);
+                                                                }
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <div
+                                                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            onClick={() => {
+                                                                if (canCreate || canEdit) {
+                                                                    setEditingCell({ subItemId: sub._id, field: 'quantity' })
+                                                                }
+
+                                                            }
+                                                            }
+                                                        >
+                                                            {sub.quantity}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
+                                                <div className="col-span-3 border-r border-blue-200">
+                                                    {editingCell?.subItemId === sub._id && editingCell?.field === 'unit' ? (
+                                                        <div className="p-2 relative z-50">
+                                                            <select
+                                                                defaultValue={sub.unit}
+                                                                onChange={(e) => {
+                                                                    handleSaveEdit(sub._id, 'unit', e.target.value);
+                                                                    setEditingCell(null);
+                                                                }}
+                                                                className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                                            >
+                                                                <option value="" disabled>Selected unit</option>
+                                                                {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
+                                                                    <option key={unitOption} value={unitOption}>
+                                                                        {unitOption}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            onClick={() => {
+
+                                                                if (canCreate || canEdit) {
+                                                                    setEditingCell({ subItemId: sub._id, field: 'unit' })
+                                                                }
+
+                                                            }
+                                                            }
+                                                        >
+                                                            {sub.unit}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
+                                                {canDelete && <div className="col-span-1 flex items-center justify-center">
+                                                    <Button
+                                                        variant="danger"
+                                                        onClick={() => handleDelete(sub._id)}
+                                                        disabled={deleteItemLoading}
+                                                        isLoading={deleteItemLoading}
+                                                        className="p-2 bg-red-600 text-white  hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                                                        title="Delete item"
+                                                    >
+                                                        <i className="fa fa-trash text-sm"></i>
+                                                    </Button>
+                                                </div>}
+                                            </div>
+                                        ))}
+
+                                        <div className="grid grid-cols-17 gap-0 bg-green-50 border-b border-gray-100">
+
+
+                                            <div className="col-span-3 border-r border-gray-200">
 
                                                 <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
-                                                    {sub?.refId || "N/A"}
+                                                    Ref Id
                                                 </div>
                                             </div>
 
-                                            <div className="col-span-8 border-r border-blue-200">
-                                                {editingCell?.subItemId === sub._id && editingCell?.field === 'name' ? (
-                                                    <input
-                                                        ref={inputRef}
-                                                        type="text"
-                                                        defaultValue={sub.subItemName}
-                                                        className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
-                                                        onBlur={(e) => {
-                                                            handleSaveEdit(sub._id, 'name', e.target.value);
-                                                            setEditingCell(null);
-                                                        }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                const value = (e.target as HTMLInputElement).value;
-                                                                handleSaveEdit(sub._id, 'name', value);
-                                                                setEditingCell(null);
-                                                            }
-                                                            if (e.key === 'Escape') {
-                                                                setEditingCell(null);
-                                                            }
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
-                                                        onClick={() => {
-                                                            if (canCreate || canEdit) {
-                                                                setEditingCell({ subItemId: sub._id, field: 'name' })
-                                                            }
-                                                        }
-                                                        }
 
-                                                    >
-                                                        {sub.subItemName}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="col-span-2 border-r border-blue-200">
-                                                {editingCell?.subItemId === sub._id && editingCell?.field === 'quantity' ? (
-                                                    <input
-                                                        ref={inputRef}
-                                                        type="number"
-                                                        defaultValue={sub.quantity}
-                                                        min="0"
-                                                        className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
-                                                        onBlur={(e) => {
-                                                            handleSaveEdit(sub._id, 'quantity', e.target.value);
-                                                            setEditingCell(null);
-                                                        }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                handleSaveEdit(sub._id, 'quantity', e.currentTarget.value);
-                                                                setEditingCell(null);
-                                                            }
-                                                            if (e.key === 'Escape') {
-                                                                setEditingCell(null);
-                                                            }
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
-                                                        onClick={() => {
-                                                            if (canCreate || canEdit) {
-                                                                setEditingCell({ subItemId: sub._id, field: 'quantity' })
-                                                            }
-
-                                                        }
-                                                        }
-                                                    >
-                                                        {sub.quantity}
-                                                    </div>
-                                                )}
-                                            </div>
-
-
-                                            <div className="col-span-3 border-r border-blue-200">
-                                                {editingCell?.subItemId === sub._id && editingCell?.field === 'unit' ? (
-                                                    <div className="p-2 relative z-50">
-                                                        <select
-                                                            defaultValue={sub.unit}
-                                                            onChange={(e) => {
-                                                                handleSaveEdit(sub._id, 'unit', e.target.value);
-                                                                setEditingCell(null);
-                                                            }}
-                                                            className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
-                                                        >
-                                                            <option value="" disabled>Selected unit</option>
-                                                            {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
-                                                                <option key={unitOption} value={unitOption}>
-                                                                    {unitOption}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                ) : (
-                                                    <div
-                                                        className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
-                                                        onClick={() => {
-
-                                                            if (canCreate || canEdit) {
-                                                                setEditingCell({ subItemId: sub._id, field: 'unit' })
-                                                            }
-
-                                                        }
-                                                        }
-                                                    >
-                                                        {sub.unit}
-                                                    </div>
-                                                )}
-                                            </div>
-
-
-                                            {canDelete && <div className="col-span-1 flex items-center justify-center">
-                                                <Button
-                                                    variant="danger"
-                                                    onClick={() => handleDelete(sub._id)}
-                                                    disabled={deleteItemLoading}
-                                                    isLoading={deleteItemLoading}
-                                                    className="p-2 bg-red-600 text-white  hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                                                    title="Delete item"
-                                                >
-                                                    <i className="fa fa-trash text-sm"></i>
-                                                </Button>
-                                            </div>}
-                                        </div>
-                                    ))}
-
-                                    <div className="grid grid-cols-17 gap-0 bg-green-50 border-b border-gray-100">
-
-
-                                        <div className="col-span-3 border-r border-gray-200">
-
-                                            <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
-                                                Ref Id
-                                            </div>
-                                        </div>
-
-
-                                        <div className="col-span-8 border-r border-gray-200">
-                                            <input
-                                                type="text"
-                                                placeholder="Enter matterial name..."
-                                                value={newRowData?.name || ''}
-                                                onChange={(e) => {
-                                                    setNewRowData(prev => ({
-                                                        ...prev,
-
-                                                        name: e.target.value
-
-                                                    }));
-                                                }}
-                                                onBlur={() => {
-                                                    if (newRowData?.name?.trim() && newRowData.quantity && newRowData.unit) {
-                                                        handleNewRowSave(newRowData);
-                                                    }
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        handleNewRowSave(newRowData);
-                                                    }
-                                                }}
-                                                className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
-                                            />
-                                        </div>
-
-                                        <div className="col-span-2 border-r border-gray-200">
-                                            <input
-                                                type="number"
-                                                placeholder="Qty"
-                                                min="0"
-                                                value={newRowData?.quantity || 1}
-                                                onChange={(e) => {
-                                                    setNewRowData(prev => ({
-                                                        ...prev,
-
-                                                        quantity: Number(e.target.value) || 1
-
-                                                    }));
-                                                }}
-                                                className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
-                                            />
-                                        </div>
-
-                                        <div className="col-span-3 border-r border-gray-200">
-                                            <div className="p-2">
-
-
-                                                <select
-                                                    value={newRowData?.unit || ''}
-                                                    onChange={async (e) => {
-
-                                                        const updatedRow = {
-                                                            ...newRowData,
-                                                            unit: e.target.value
-                                                        };
-
-                                                        // update state
+                                            <div className="col-span-8 border-r border-gray-200">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter matterial name..."
+                                                    value={newRowData?.name || ''}
+                                                    onChange={(e) => {
                                                         setNewRowData(prev => ({
                                                             ...prev,
-                                                            unit: e.target.value
+
+                                                            name: e.target.value
+
                                                         }));
-
-                                                        // setNewRowData(prev => ({
-                                                        //     ...prev,
-                                                        //     [unit._id]: {
-                                                        //         ...prev[unit._id],
-                                                        //         unit: e.target.value
-                                                        //     }
-                                                        // }));
-
-
-                                                        await handleNewRowSave(updatedRow);
-
                                                     }}
-                                                    className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
-                                                >
-                                                    <option value="">Selected unit</option>
-                                                    {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
-                                                        <option key={unitOption} value={unitOption}>
-                                                            {unitOption}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                    onBlur={() => {
+                                                        if (newRowData?.name?.trim() && newRowData.quantity && newRowData.unit) {
+                                                            handleNewRowSave(newRowData);
+                                                        }
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            handleNewRowSave(newRowData);
+                                                        }
+                                                    }}
+                                                    className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
+                                                />
                                             </div>
+
+                                            <div className="col-span-2 border-r border-gray-200">
+                                                <input
+                                                    type="number"
+                                                    placeholder="Qty"
+                                                    min="0"
+                                                    value={newRowData?.quantity || 1}
+                                                    onChange={(e) => {
+                                                        setNewRowData(prev => ({
+                                                            ...prev,
+
+                                                            quantity: Number(e.target.value) || 1
+
+                                                        }));
+                                                    }}
+                                                    className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
+                                                />
+                                            </div>
+
+                                            <div className="col-span-3 border-r border-gray-200">
+                                                <div className="p-2">
+
+
+                                                    <select
+                                                        value={newRowData?.unit || ''}
+                                                        onChange={async (e) => {
+
+                                                            const updatedRow = {
+                                                                ...newRowData,
+                                                                unit: e.target.value
+                                                            };
+
+                                                            // update state
+                                                            setNewRowData(prev => ({
+                                                                ...prev,
+                                                                unit: e.target.value
+                                                            }));
+
+                                                            // setNewRowData(prev => ({
+                                                            //     ...prev,
+                                                            //     [unit._id]: {
+                                                            //         ...prev[unit._id],
+                                                            //         unit: e.target.value
+                                                            //     }
+                                                            // }));
+
+
+                                                            await handleNewRowSave(updatedRow);
+
+                                                        }}
+                                                        className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                                    >
+                                                        <option value="">Selected unit</option>
+                                                        {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
+                                                            <option key={unitOption} value={unitOption}>
+                                                                {unitOption}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
                                         </div>
 
-
+                                        {(!data.currentOrder.subItems || data.currentOrder?.subItems?.length === 0) && (
+                                            <div className="text-center py-8 text-gray-500">
+                                                <i className="fa-solid fa-inbox text-2xl mb-2"></i>
+                                                <p className="text-sm">No sub-items yet. Start typing in the row above to add items.</p>
+                                            </div>
+                                        )}
                                     </div>
-
-                                    {(!data.currentOrder.subItems || data.currentOrder?.subItems?.length === 0) && (
-                                        <div className="text-center py-8 text-gray-500">
-                                            <i className="fa-solid fa-inbox text-2xl mb-2"></i>
-                                            <p className="text-sm">No sub-items yet. Start typing in the row above to add items.</p>
-                                        </div>
-                                    )}
                                 </div>
-                            </div>
 
-                            {/*end of newer  version */}
+                                {/*end of newer  version */}
 
-                            {/* <div className="py-2 overflow-y-auto custom-scrollbar ">
+                                {/* <div className="py-2 overflow-y-auto custom-scrollbar ">
                                 {hasUnits ? (
                                     <div className="grid gap-5">
                                         {selectedUnits.map((unit: any, idx: number) => (
@@ -1688,127 +1634,127 @@ const OrderMaterialOverview = () => {
                                     </div>
                                 )}
                             </div> */}
-                        </section>
-                    )}
+                            </section>
+                        )}
 
 
 
-                    <section>
+                        <section>
 
 
-                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                            <div className="flex-1">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                                    Orders
-                                </h3>
-                                <p className="text-sm text-gray-600">
-                                    view your orders
-                                </p>
-                            </div>
-
-                            {canCreate && <Button
-                                onClick={handleSubmitOrder}
-                                isLoading={isSubmitting}
-                                className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
-                                size="lg"
-                            >
-                                Submit Order
-                            </Button>}
-                        </div>
-
-
-
-
-                        {data?.orderedItems && data?.orderedItems?.length > 0 ?
-
-                            <div className="flex flex-col gap-2">
-
-                                {data?.orderedItems?.map((ele: any) => (
-                                    <Card key={ele._id} className="border-green-200 bg-green-50 shadow ">
-                                        <CardContent className="p-6">
-                                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                                <div className="flex items-center gap-3 flex-1">
-                                                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                                        <i className="fas fa-check-circle text-7reen-600"></i>
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="font-semibold text-blue-700 ">
-                                                            <span className="!text-sm text-gray-600">Order Id: </span> {ele.orderMaterialNumber}
-                                                        </h4>
-                                                        {/* <span className="text-sm text-gray-500">Created At:</span> <span>{dateFormate(ele.createdAt)} - {formatTime(ele.createdAt)}</span> */}
-                                                        <span className="text-sm text-gray-900">Order Material</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto ">
-                                                    <Button
-                                                        variant="outline"
-                                                        onClick={() => navigate(`singleorder/${ele._id}`)}
-                                                        className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
-                                                    >
-                                                        <i className="fas mr-2 fa-external-link-alt"></i>
-                                                        View
-                                                    </Button>
-
-
-
-
-                                                    {(canCreate || canEdit) && <Button
-                                                        variant="outline"
-                                                        onClick={() => handleGenerate(ele._id)}
-                                                        isLoading={generatePending}
-                                                        className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
-                                                    >
-                                                        Generate Pdf
-                                                    </Button>}
-
-                                                    <Button
-                                                        variant="secondary"
-                                                        onClick={() => handleDownloadPdf(ele)}
-                                                        className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
-                                                    >
-                                                        Download PDF
-                                                    </Button>
-
-
-                                                    {(canCreate || canEdit) && <Button
-                                                        variant="outline"
-                                                        onClick={() => handleSendToProcurement(ele._id)}
-                                                        disabled={ele?.isSyncWithProcurement}
-                                                        title={ele?.isSyncWithProcurement ? "already sent to procurement" : ""}
-
-                                                        isLoading={isSending}
-                                                        className="border-green-300 text-blue-700 disabled:cursor-not-allowed hover:bg-blue-100 hover:border-blue-400"
-                                                    >
-                                                        Send To Procurement
-                                                    </Button>}
-
-
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-
-                            :
-                            <>
-                                <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-                                    <i className="fa-solid fa-box text-5xl text-blue-300 mb-4" />
-                                    <h3 className="text-lg font-semibold text-blue-800 mb-1">No Orders Found</h3>
-                                    {/* <p className="text-sm text-gray-500">
-                                        No PDF Generated</p> */}
+                            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                        Orders
+                                    </h3>
+                                    <p className="text-sm text-gray-600">
+                                        view your orders
+                                    </p>
                                 </div>
-                            </>
-                        }
+
+                                {canCreate && <Button
+                                    onClick={handleSubmitOrder}
+                                    isLoading={isSubmitting}
+                                    className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                                    size="lg"
+                                >
+                                    Submit Order
+                                </Button>}
+                            </div>
 
 
 
 
-                    </section>
+                            {data?.orderedItems && data?.orderedItems?.length > 0 ?
 
-                    {/* <section className="mt-4"> */}
-                    {/* <GenerateWhatsappLink
+                                <div className="flex flex-col gap-2">
+
+                                    {data?.orderedItems?.map((ele: any) => (
+                                        <Card key={ele._id} className="border-green-200 bg-green-50 shadow ">
+                                            <CardContent className="p-6">
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                                    <div className="flex items-center gap-3 flex-1">
+                                                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                                            <i className="fas fa-check-circle text-7reen-600"></i>
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="font-semibold text-blue-700 ">
+                                                                <span className="!text-sm text-gray-600">Order Id: </span> {ele.orderMaterialNumber}
+                                                            </h4>
+                                                            {/* <span className="text-sm text-gray-500">Created At:</span> <span>{dateFormate(ele.createdAt)} - {formatTime(ele.createdAt)}</span> */}
+                                                            <span className="text-sm text-gray-900">Order Material</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto ">
+                                                        <Button
+                                                            variant="outline"
+                                                            onClick={() => navigate(`singleorder/${ele._id}`)}
+                                                            className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                        >
+                                                            <i className="fas mr-2 fa-external-link-alt"></i>
+                                                            View
+                                                        </Button>
+
+
+
+
+                                                        {(canCreate || canEdit) && <Button
+                                                            variant="outline"
+                                                            onClick={() => handleGenerate(ele._id)}
+                                                            isLoading={generatePending}
+                                                            className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                        >
+                                                            Generate Pdf
+                                                        </Button>}
+
+                                                        <Button
+                                                            variant="secondary"
+                                                            onClick={() => handleDownloadPdf(ele)}
+                                                            className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                        >
+                                                            Download PDF
+                                                        </Button>
+
+
+                                                        {(canCreate || canEdit) && <Button
+                                                            variant="outline"
+                                                            onClick={() => handleSendToProcurement(ele._id)}
+                                                            disabled={ele?.isSyncWithProcurement}
+                                                            title={ele?.isSyncWithProcurement ? "already sent to procurement" : ""}
+
+                                                            isLoading={isSending}
+                                                            className="border-green-300 text-blue-700 disabled:cursor-not-allowed hover:bg-blue-100 hover:border-blue-400"
+                                                        >
+                                                            Send To Procurement
+                                                        </Button>}
+
+
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+
+                                :
+                                <>
+                                    <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+                                        <i className="fa-solid fa-box text-5xl text-blue-300 mb-4" />
+                                        <h3 className="text-lg font-semibold text-blue-800 mb-1">No Orders Found</h3>
+                                        {/* <p className="text-sm text-gray-500">
+                                        No PDF Generated</p> */}
+                                    </div>
+                                </>
+                            }
+
+
+
+
+                        </section>
+
+                        {/* <section className="mt-4"> */}
+                        {/* <GenerateWhatsappLink
                             projectId={projectId!} context="order material"
                             stage="ordermaterial"
                             data={data?.generatedLink}
@@ -1816,7 +1762,7 @@ const OrderMaterialOverview = () => {
                             generateLink={generateLink} /> */}
 
 
-                    {/* <div className="space-y-4">
+                        {/* <div className="space-y-4">
 
 
 
@@ -1940,8 +1886,8 @@ const OrderMaterialOverview = () => {
                             </div>
                         </div>
                     </section> */}
-                </div>
-            )
+                    </div>
+                )
             }
         </div >
     )

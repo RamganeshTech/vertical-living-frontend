@@ -242,7 +242,7 @@ export default function RateConfigSub() {
                                         {item?.data[field?.key] ?? "—"}
                                     </td>
                                 ))}
-                               {canDelete && <td className="text-center p-4 border border-gray-100">
+                                {canDelete && <td className="text-center p-4 border border-gray-100">
                                     <Button
                                         size="sm"
                                         variant="danger"
@@ -263,9 +263,15 @@ export default function RateConfigSub() {
                         {rows.map((row, rowIndex) => (
                             <tr key={`new-${rowIndex}`} className="group relative border-none !border-b-1 px-4 py-2  cursor-pointer transition-all duration-200
      hover:bg-gray-50 hover:border-gray-300">
+                                <td
+                                    className="border border-gray-100 p-4 font-medium text-center  text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
+                                >
+                                    
+                                </td>
+
                                 {currentCategory.fields.map((field: any) => (
                                     <td key={field.key}
-                                        className="border border-gray-100 px-4 font-medium text-center  text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
+                                        className="border border-gray-100 px-1 font-medium text-center  text-sm text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
                                     >
                                         <Input
                                             type={field.type === "number" ? "number" : "text"}

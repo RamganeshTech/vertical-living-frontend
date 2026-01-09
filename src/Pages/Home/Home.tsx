@@ -91,7 +91,7 @@ export default function HomePage() {
   const navigate = useNavigate()
 
 
-  const handleClose = ()=>{
+  const handleClose = () => {
     setIsMobileMenuOpen(false)
   }
 
@@ -135,40 +135,40 @@ export default function HomePage() {
               </a>
             </nav> */}
 
-          <div>
+            <div>
               <div className="hidden sm:flex items-center space-x-4">
-              <Button onClick={()=> navigate('/login')}  variant="secondary" className="hidden sm:inline-flex cursor-pointer">
-                Sign In
-              </Button>
-              {auth?.isauthenticated && <Button onClick={()=> navigate('/')} className="cursor-pointer">Get Started</Button>}
-            </div>
+                <Button onClick={() => navigate('/login')} variant="secondary" className="hidden sm:inline-flex cursor-pointer">
+                  Sign In
+                </Button>
+                {auth?.isauthenticated && <Button onClick={() => navigate('/')} className="cursor-pointer">Get Started</Button>}
+              </div>
 
               <button className="sm:hidden block p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                 <i className="fas fa-bars text-gray-600"></i>
               </button>
+            </div>
           </div>
-          </div> 
         </div>
       </header>
 
 
-       {/* Mobile Menu */}
-          
-            {/* <div className={`sm:hidden top-0 py-4 border-t absolute z-100 border bg-white min-h-screen  ${isMobileMenuOpen ? "-left-[100%]" : "left-[0%]"} w-[80%] transition-all`}> */}
-            <div className={`fixed top-0 left-0 z-50 h-screen bg-white w-[75%] flex flex-col transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} `}>
-              <nav className="flex flex-col space-y-4 ">
+      {/* Mobile Menu */}
 
-                 <div className="flex items-center justify-between p-4 border-b">
-                          <div className={`flex items-center gap-3`}>
-                            <img src={COMPANY_DETAILS.COMPANY_LOGO} alt="Logo" className="w-10 h-10 rounded-full object-cover" />
-                            <span className="text-lg font-semibold">{COMPANY_DETAILS.COMPANY_NAME}</span>
-                          </div>
-                          <button onClick={handleClose} className="text-xl text-gray-700">
-                            <i className="fas fa-times"></i>
-                          </button>
-                        </div>
-                
-                {/* <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
+      {/* <div className={`sm:hidden top-0 py-4 border-t absolute z-100 border bg-white min-h-screen  ${isMobileMenuOpen ? "-left-[100%]" : "left-[0%]"} w-[80%] transition-all`}> */}
+      <div className={`fixed top-0 left-0 z-50 h-screen bg-white w-[75%] flex flex-col transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} `}>
+        <nav className="flex flex-col space-y-4 ">
+
+          <div className="flex items-center justify-between p-4 border-b">
+            <div className={`flex items-center gap-3`}>
+              <img src={COMPANY_DETAILS.COMPANY_LOGO} alt="Logo" className="w-10 h-10 rounded-full object-cover" />
+              <span className="text-lg font-semibold">{COMPANY_DETAILS.COMPANY_NAME}</span>
+            </div>
+            <button onClick={handleClose} className="text-xl text-gray-700">
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+
+          {/* <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
                   Features
                 </a>
                 <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
@@ -181,16 +181,16 @@ export default function HomePage() {
                   Contact
                 </a> */}
 
-               <ul className="px-4 space-x-2 max-h-screen overflow-y-auto space-y-4 ">
-                <li onClick={()=> navigate('/login')} className="border-b border-gray-300 py-5">
-                   <Link to={'/login'} className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
-                </li>
-                <li onClick={()=> navigate('/organizations')}>
-                <Link to={'/organizations'} className="text-gray-600 hover:text-gray-900 transition-colors">Get Started</Link>
-                </li>
-               </ul>
-              </nav>
-            </div>
+          <ul className="px-4 space-x-2 max-h-screen overflow-y-auto space-y-4 ">
+            <li onClick={() => navigate('/login')} className="border-b border-gray-300 py-5">
+              <Link to={'/login'} className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
+            </li>
+            <li onClick={() => navigate('/organizations')}>
+              <Link to={'/organizations'} className="text-gray-600 hover:text-gray-900 transition-colors">Get Started</Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
 
       {/* Hero Section */}
       <section className="pt-20 pb-16 sm:py-24">
@@ -203,7 +203,7 @@ export default function HomePage() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
               Streamline Your{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-               Work Flows
+                Work Flows
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -211,7 +211,7 @@ export default function HomePage() {
               Everything you need to deliver exceptional interior design projects on time.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={()=> navigate('/organizations')} size="lg" className="text-lg px-8 py-3 cursor-pointer">
+              <Button onClick={() => navigate('/organizations')} size="lg" className="text-lg px-8 py-3 cursor-pointer">
                 Get Started Today
                 <i className="fas fa-arrow-right ml-2"></i>
               </Button>
@@ -672,6 +672,12 @@ export default function HomePage() {
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Privacy Policy
+              </a>
+              <a
+                href="/account-deletion"
+                className="text-gray-400 hover:text-white text-sm transition-colors"
+              >
+                Account Deletion
               </a>
               {/* <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Terms of Service

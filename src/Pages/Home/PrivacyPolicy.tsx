@@ -290,7 +290,7 @@ import { COMPANY_DETAILS } from '../../constants/constants';
 // const PrivacyPolicy = () => {
 //   return (
 //     <div className="min-h-screen bg-white text-slate-800 font-sans">
-      
+
 //       {/* --- HEADER / NAVIGATION --- */}
 //       <header className="sticky top-0 z-50 bg-white border-b border-blue-100 shadow-sm">
 //         <div className="w-full px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -308,7 +308,7 @@ import { COMPANY_DETAILS } from '../../constants/constants';
 //               {COMPANY_DETAILS.COMPANY_NAME}
 //             </span>
 //           </a>
-          
+
 //           <a 
 //             href="/" 
 //             className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
@@ -321,7 +321,7 @@ import { COMPANY_DETAILS } from '../../constants/constants';
 //       {/* --- MAIN CONTENT --- */}
 //       <main className="w-full px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
 //         <article className="max-w-7xl mx-auto">
-          
+
 //           {/* Page Title */}
 //           <div className="mb-12 border-b-2 border-blue-50 pb-6">
 //             <h1 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-4">
@@ -570,27 +570,27 @@ import { COMPANY_DETAILS } from '../../constants/constants';
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-white text-slate-800 font-sans">
-      
+
       {/* --- HEADER / NAVIGATION --- */}
       <header className="sticky top-0 z-50 bg-white border-b border-blue-100 shadow-sm">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <a 
-            href="/" 
+          <a
+            href="/"
             className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
             aria-label="Back to Home"
           >
-            <img 
-              src={COMPANY_DETAILS.COMPANY_LOGO} 
-              alt={`${COMPANY_DETAILS.COMPANY_NAME} Logo`} 
+            <img
+              src={COMPANY_DETAILS.COMPANY_LOGO}
+              alt={`${COMPANY_DETAILS.COMPANY_NAME} Logo`}
               className="h-10 w-10 object-contain"
             />
             <span className="text-xl font-bold text-blue-900 tracking-tight group-hover:text-blue-700 transition-colors">
               {COMPANY_DETAILS.COMPANY_NAME}
             </span>
           </a>
-          
-          <a 
-            href="/" 
+
+          <a
+            href="/"
             className="text-sm font-semibold text-blue-700 hover:text-blue-800 transition-colors"
           >
             Back to Home
@@ -601,7 +601,7 @@ const PrivacyPolicy = () => {
       {/* --- MAIN CONTENT --- */}
       <main className="w-full px-4 sm:px-6 lg:px-12 py-12 lg:py-16">
         <article className="max-w-7xl mx-auto">
-          
+
           {/* Page Title */}
           <div className="mb-10 border-b-2 border-blue-50 pb-6">
             <h1 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-2">
@@ -617,6 +617,15 @@ const PrivacyPolicy = () => {
             <p>
               This Privacy Policy explains how we collect, use, disclose, store, and protect personal information in compliance with applicable Indian laws, including the <strong>Information Technology Act, 2000</strong>, <strong>IT Rules, 2011</strong>, and the <strong>Digital Personal Data Protection Act, 2023 (DPDP Act)</strong>, and aligns with standard global privacy practices.
             </p>
+
+            <p>
+              published by <strong>RAMS TECH CIRCLE OPC PVT LTD</strong>
+            </p>
+
+            <p>
+              This Privacy Policy applies to the <strong>{COMPANY_DETAILS.COMPANY_NAME}</strong> mobile application, our website <strong>houseofram.in</strong>
+            </p>
+
 
             {/* 1. Scope */}
             <section className="pt-8">
@@ -807,29 +816,73 @@ const PrivacyPolicy = () => {
               </p>
             </section>
 
-            {/* 13. Contact Information */}
+
             <section className="pt-12 mt-4 border-t border-blue-50">
-              <h2 className="text-2xl font-bold text-blue-900 mb-4">13. Contact Information</h2>
+              <h2 className="text-2xl font-bold text-blue-900 mb-4">
+                13. Account & Data Deletion
+              </h2>
+
+              <p className="mb-4">
+                Users have the right to request deletion of their account and associated personal data from the {COMPANY_DETAILS.COMPANY_NAME} platform.
+              </p>
+
+              <p className="mb-4">
+                Account deletion requests are reviewed and processed by an administrator to prevent unauthorized or accidental deletion.
+              </p>
+
+              <p className="mb-4">
+                To request account deletion, users must send an email from their registered email address to:
+              </p>
+
+              <a href="mailto:ramstechcircle@gmail.com" className="mb-4 block font-semibold text-blue-700 hover:text-blue-800">
+                ramstechcircle@gmail.com
+              </a>
+
+              <p className="mb-4">
+                Please include your registered name, email address, and phone number in the request for verification purposes.
+              </p>
+
+              <p className="mb-4">
+                Upon successful verification, personal data including account information, will be permanently deleted within <strong>7 working days</strong>
+              </p>
+
+              <p className="text-sm text-slate-600">
+                For more details, users may visit our
+                <a
+                  href="/account-deletion"
+                  className="text-blue-600 underline ml-1"
+                >
+                  Account Deletion page
+                </a>.
+              </p>
+            </section>
+
+            {/* 14. Contact Information */}
+            <section className="pt-12 mt-4 border-t border-blue-50">
+              <h2 className="text-2xl font-bold text-blue-900 mb-4">14. Contact Information</h2>
               <div className="text-lg">
                 <p className="font-bold text-slate-900 mb-2">{COMPANY_DETAILS.COMPANY_NAME}</p>
-                <p className="mb-2">No-22, 13th Main Road, Anna Nagar West, Chennai-600040</p>
+                {/* <p className="mb-2">No-22, 13th Main Road, Anna Nagar West, Chennai-600040</p> */}
+                <p className="mb-2">ram Ias Academy, 13th, Main Road,anna Nagar West, Anna Nagar (chennai), <br /> Chennai, Egmore Nungambakkam, Tamil Nadu, India, 600040.</p>
                 <p className="mb-2">
-                  <span className="font-semibold">Email: </span> 
+                  <span className="font-semibold">Email: </span>
                   <a href="mailto:ramstechcircle@gmail.com" className="text-blue-600 hover:text-blue-800 underline">
                     ramstechcircle@gmail.com
                   </a>
                 </p>
                 <p className="mb-4">
-                  <span className="font-semibold">Phone: </span> 
+                  <span className="font-semibold">Phone: </span>
                   <a href="tel:+919363993814" className="text-blue-600 hover:text-blue-800 underline">
                     +91 93639 93814
-                  </a>  
+                  </a>
                 </p>
                 <p className="text-slate-500 text-base">
                   For privacy-related concerns or data requests, please contact us at the above details.
                 </p>
               </div>
             </section>
+
+
 
           </div>
         </article>

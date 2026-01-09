@@ -7,10 +7,13 @@ import { queryClient } from '../../QueryClient/queryClient';
 import { useNavigate } from 'react-router-dom';
 // import { Badge } from '../../components/ui/Badge';
 import { useCurrentSupervisor } from '../../Hooks/useCurrentSupervisor';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store/store';
 
 const NotificationMain = () => {
     const navigate = useNavigate()
     const currentUser = useCurrentSupervisor()
+    const user = useSelector((state:RootState) => state.authStore )
 
     const {
         data,
@@ -83,46 +86,7 @@ const NotificationMain = () => {
 
         console.log("data.pages.", data?.pages)
 
-    // ✅ Scroll to bottom on initial load
-    // useEffect(() => {
-    //     if (isFirstLoad.current && allNotifications.length > 0 && !isLoading) {
-    //         const container = containerRef.current;
-    //         if (container) {
-    //             container.scrollTop = container.scrollHeight;
-    //             isFirstLoad.current = false;
-    //         }
-    //     }
-    // }, [allNotifications.length, isLoading]);
-
-    // ✅ INTERSECTION OBSERVER FOR LOADING MORE (AT TOP)
-    // useEffect(() => {
-    //     const container = containerRef.current;
-    //     if (!container) return;
-
-    //     const handleScroll = () => {
-    //         // Check if scrolled to top
-    //         if (container.scrollTop < 100 && hasNextPage && !isFetchingNextPage) {
-    //             console.log('📜 Loading older notifications...');
-
-    //             // Save scroll position before fetching
-    //             previousScrollHeight.current = container.scrollHeight;
-
-    //             fetchNextPage().then(() => {
-    //                 // Restore scroll position after new items are added
-    //                 requestAnimationFrame(() => {
-    //                     const newScrollHeight = container.scrollHeight;
-    //                     const heightDifference = newScrollHeight - previousScrollHeight.current;
-    //                     container.scrollTop = heightDifference;
-    //                 });
-    //             });
-    //         }
-    //     };
-
-    //     container.addEventListener('scroll', handleScroll);
-    //     return () => container.removeEventListener('scroll', handleScroll);
-    // }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-
+   
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
@@ -163,14 +127,6 @@ const NotificationMain = () => {
 
     const frontendUrl = import.meta.env.VITE_FRONTEND_URL || "https://houseofram.in"
 
-    // const handleMarkAsRead = async (notificationId: string) => {
-    //     try {
-    //         await markAsRead.mutateAsync({ notificationId });
-
-    //     } catch (error) {
-
-    //     }
-    // };
 
     const handleDelete = async (notificationId: string) => {
         try {
@@ -211,7 +167,7 @@ const NotificationMain = () => {
                         </div>
                         <div>
                             <h1 className="text-xl md:text-2xl font-bold text-slate-900">
-                                Notifications
+                                Notifications {user?.userName ? `for (${user?.userName})` : ""}
                                 {/* <Badge className='ml-2'>
                                     <i className="fa-solid fa-flask mr-2"></i>
                                     In Development
@@ -266,8 +222,7 @@ const NotificationMain = () => {
                             )}
                         </div>
 
-                        {/* Small spacer at bottom for better UX */}
-                        {/* <div className="h-4 " /> */}
+                     
                     </>
                 )}
             </div>

@@ -43,11 +43,6 @@ const TechnicalConsultant: React.FC = () => {
     const canCreate = role === "owner" || permission?.technicalconsultant?.create;
     const canEdit = role === "owner" || permission?.technicalconsultant?.edit;
 
-
-
-
-
-
     const [text, setText] = useState("");
     const [attachments, setAttachments] = useState<File[]>([]);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -82,6 +77,7 @@ const TechnicalConsultant: React.FC = () => {
             // } else {
             //     alert("Please navigate to next stage manually , you havet selected the stage yet")
             // }
+
             navigate('../paymentconfirmation')
         } catch (error: any) {
             toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })

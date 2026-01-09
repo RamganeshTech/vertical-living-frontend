@@ -81,7 +81,9 @@ const CreateDesignLab = () => {
             console.error(error);
             toast({
                 title: "Error",
-                description: error.message || "Failed to create design",
+                // description: error.message || "Failed to create design",
+                description: error?.response?.data?.message || "Failed to update design",
+
                 variant: "destructive"
             });
         }

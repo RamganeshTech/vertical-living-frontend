@@ -15,7 +15,7 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = React.memo(({
     const currentUser = useCurrentSupervisor();
 
     const handlegetUnreadCount = useCallback(() => {
-        console.log('calling 📊 Unread count updated:',);
+        console.log('calling 📊 Unread count updated:', unreadCount);
         // Refetch notifications
         if (unreadCount !== undefined) {
             queryClient.invalidateQueries({ queryKey: ["notifications", "unread-count"] });
@@ -27,6 +27,7 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = React.memo(({
         if (!userId) return;
 
         socket.emit('join_notifications', { userId });
+        console.log(`🔌 Joining notification room for user: ${userId}`);
         socket.on('unread_count_update', handlegetUnreadCount);
 
         return () => {

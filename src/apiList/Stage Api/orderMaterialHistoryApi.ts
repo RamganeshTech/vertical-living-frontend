@@ -311,7 +311,7 @@ export const useGetSingleOrderItem = (projectId: string, orderItemId:string) => 
   });
 };
 
-
+// not in use
 export const useUpdatePdfStatus = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
@@ -864,7 +864,7 @@ const deleteOrderPdf = async (
 };
 
 
-
+//  nto in use
 export const useDeleteOrderMaterialPdf = () => {
   const allowedRoles = ["owner", "staff", "CTO","worker"];
 

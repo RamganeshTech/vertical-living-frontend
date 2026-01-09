@@ -43,12 +43,15 @@ const QuoteGenerateList: React.FC<Props> = ({ setFurnitures, setEditQuoteNo, set
 
     const projects = data?.map((project: AvailableProjetType) => ({ _id: project._id, projectName: project.projectName }))
 
-    const { data: quotes, isLoading } = useGetMaterialQuoteEntries(organizationId!, {
+    const { data: allQuotes, isLoading } = useGetMaterialQuoteEntries(organizationId!, {
         createdAt: filters.createdAt,
         projectId: filters.projectId,
         quoteNo: "",
     });
 
+
+
+    const quotes = allQuotes?.filter((quote: any) => quote.furnitures.length)
 
     const clearFilters = () => {
         setFilters({
@@ -126,10 +129,10 @@ const QuoteGenerateList: React.FC<Props> = ({ setFurnitures, setEditQuoteNo, set
                     </div>
                 </div>
 
-              {canList &&  <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
+                {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
 
                     {isLoading ? (
-                        <p><MaterialOverviewLoading /></p>
+                        <MaterialOverviewLoading />
                     ) : !quotes?.length ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center text-gray-700">
                             <i className="fas fa-file-circle-exclamation text-gray-300 text-7xl mb-4"></i>

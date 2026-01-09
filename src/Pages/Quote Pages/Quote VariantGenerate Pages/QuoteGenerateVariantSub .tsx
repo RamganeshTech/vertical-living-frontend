@@ -9,8 +9,10 @@ import { Button } from "../../../components/ui/Button";
 import { downloadImage } from "../../../utils/downloadFile";
 import SearchSelect from "../../../components/ui/SearchSelect";
 import { Card } from "../../../components/ui/Card";
-import { useGetSingleLabourCost } from "../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
+import { useGetLabourRateConfigCategories, useGetSingleLabourCost } from "../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+// import { Label } from "../../../components/ui/Label";
+import SearchSelectNew from "../../../components/ui/SearchSelectNew";
 
 export const DEFAULT_LAMINATE_RATE_PER_SQFT = 0;
 
@@ -21,7 +23,25 @@ const QuoteGenerateVariantSub = () => {
     const { data: quote, isLoading: quoteLoading } = useGetMaterialQuoteSingleEntry(organizationId!, quoteId!);
     let { data: materialBrands, isLoading: loadingBrands } = useGetMaterialBrands(organizationId!, "plywood");
     let { data: laminateBrands } = useGetMaterialBrands(organizationId!, "Laminate");
-    let { data: labourCost = 0 } = useGetSingleLabourCost(organizationId!);
+
+
+    const [selectedLabourCategory, setSelectedLabourCategory] = useState({
+        categoryId: "",
+        categoryName: ""
+    });
+
+    let { data: labourCost = 0 } = useGetSingleLabourCost({ organizationId: organizationId!, categoryId: selectedLabourCategory.categoryId });
+
+    let { data: allLabourCategory = [] } = useGetLabourRateConfigCategories(organizationId!);
+
+    const allLabourCategoryOptions = (allLabourCategory || []).map((labour: any) => ({
+        value: labour._id,
+        label: labour.name,
+    }))
+
+
+
+    // let { data: labourCost = 0 } = useGetSingleLabourCost({organizationId:organizationId!, categoryId: "djklf"});
 
     const { mutateAsync: generateQuote, isPending: quotePending } = useGenerateQuotePdf()
     const furnitureRefs = useRef<Array<React.RefObject<FurnitureQuoteRef | null>>>([]);
@@ -125,6 +145,21 @@ const QuoteGenerateVariantSub = () => {
         setRawCostWithoutProfit(calculateCostWithoutProfit()); // 👈 Add this line
     };
 
+    const handleLabourCategory = (selectedId: string | null) => {
+        const selectedCategory = allLabourCategoryOptions.find((s: any) => s.value === selectedId);
+
+        if (selectedCategory) {
+            setSelectedLabourCategory({
+                categoryId: selectedCategory.value, // This is the _id
+                categoryName: selectedCategory.label // This is the name
+            });
+        } else {
+            setSelectedLabourCategory({ categoryId: "", categoryName: "" });
+        }
+    };
+
+
+
     const { profitDifference, profitPercentage } = useMemo(() => {
         const diff = grandTotal - rawCostWithoutProfit;
         const percent = rawCostWithoutProfit > 0 ? (diff / rawCostWithoutProfit) * 100 : 0;
@@ -174,34 +209,6 @@ const QuoteGenerateVariantSub = () => {
             const fittingsTotal = furniture.fittingsAndAccessories.reduce((sum, r) => sum + getSimpleRowTotal(r), 0);
             const gluesTotal = furniture.glues.reduce((sum, r) => sum + (r.cost || 0), 0);
             const nbmsTotal = furniture.nonBrandMaterials.reduce((sum, r) => sum + getSimpleRowTotal(r), 0);
-
-
-            // 🔁 Fittings, Glues, NBMs — need to REMOVE profitOnMaterial (if any)
-
-            // const getBaseCostWithoutProfit = (quantity: number, cost: number, profit: number = 0) => {
-            //     const gross = quantity * cost;
-            //     return gross / (1 + (profit / 100));
-            // };
-
-            // const getBaseGlueCostWithoutProfit = (cost: number, profit: number = 0) => {
-            //     return cost / (1 + profit / 100);
-            // };
-
-            // const fittingsTotal = (furniture.fittingsAndAccessories || []).reduce((sum, item) =>
-            //     sum + getBaseCostWithoutProfit(item.quantity || 0, item.cost || 0, item.profitOnMaterial || 0),
-            //     0
-            // );
-
-            // const gluesTotal = (furniture.glues || []).reduce((sum, item) =>
-            //     sum + getBaseGlueCostWithoutProfit(item.cost || 0, item.profitOnMaterial || 0),
-            //     0
-            // );
-
-            // const nbmsTotal = (furniture.nonBrandMaterials || []).reduce((sum, item) =>
-            //     sum + getBaseCostWithoutProfit(item.quantity || 0, item.cost || 0, item.profitOnMaterial || 0),
-            //     0
-            // );
-
             totalRawCost += fittingsTotal + gluesTotal + nbmsTotal;
         });
 
@@ -368,32 +375,50 @@ const QuoteGenerateVariantSub = () => {
                 {/* Bottom Row - Brand Selection */}
                 <div className="flex items-center gap-4">
                     <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-medium text-gray-700 whitespace-nowrap">Plywood Brand:</label>
-                            <SearchSelect
-                                options={brandOptions}
-                                placeholder="Select Plywood Brand"
-                                searchPlaceholder="Search brands..."
-                                onSelect={setSelectedBrand}
-                                selectedValue={selectedBrand || ""}
-                                className="flex-1"
-                            />
-                        </div>
+                        {/* <div className="flex items-center gap-2"> */}
+                        <label className="text-xs font-medium text-gray-700 whitespace-nowrap">Plywood Brand:</label>
+                        <SearchSelect
+                            options={brandOptions}
+                            placeholder="Select Plywood Brand"
+                            searchPlaceholder="Search brands..."
+                            onSelect={setSelectedBrand}
+                            selectedValue={selectedBrand || ""}
+                            className="flex-1"
+                        />
+                        {/* </div> */}
                     </div>
 
                     <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-medium text-gray-700 whitespace-nowrap">Laminate Brand:</label>
-                            <SearchSelect
-                                options={laminateBrandOptions}
-                                placeholder="Select Laminate Brand"
-                                searchPlaceholder="Search brands..."
-                                onSelect={setSelectedLaminateBrand}
-                                selectedValue={selectedLaminateBrand || ""}
-                                className="flex-1"
-                            />
-                        </div>
+                        <label className="text-xs font-medium text-gray-700 whitespace-nowrap">Laminate Brand:</label>
+                        <SearchSelect
+                            options={laminateBrandOptions}
+                            placeholder="Select Laminate Brand"
+                            searchPlaceholder="Search brands..."
+                            onSelect={setSelectedLaminateBrand}
+                            selectedValue={selectedLaminateBrand || ""}
+                            className="flex-1"
+                        />
                     </div>
+
+
+                    <div className="flex-1">
+                        <label className="text-xs font-medium text-gray-700 whitespace-nowrap">
+                            Select Salary Category
+                            </label>
+                        <SearchSelectNew
+                            options={allLabourCategoryOptions}
+                            placeholder="Choose Labour Category"
+                            searchPlaceholder="Search by name..."
+                            value={selectedLabourCategory.categoryId}
+                            onValueChange={handleLabourCategory}
+                            // disabled={isReadOnly}
+                            searchBy="name"
+                            displayFormat="detailed"
+                            className="flex-1"
+                        />
+                    </div>
+
+
                 </div>
 
                 {/* Mobile Financial Summary - Only visible on smaller screens */}
@@ -440,7 +465,7 @@ const QuoteGenerateVariantSub = () => {
                         </div>
                     </Card>
                 </div>
-            </header>
+            </header >
 
             {quoteLoading || loadingBrands ? (
                 <MaterialOverviewLoading />
@@ -480,7 +505,7 @@ const QuoteGenerateVariantSub = () => {
                     </div>
                 </>
             )}
-        </div>
+        </div >
     );
 };
 

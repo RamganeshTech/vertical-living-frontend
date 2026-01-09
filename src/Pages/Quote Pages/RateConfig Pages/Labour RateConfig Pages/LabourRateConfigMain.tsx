@@ -1,37 +1,23 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../../../components/ui/Input";
-// import { Label } from "../../../../components/ui/Label";
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import {  } from "@/hooks/rateconfig";
 import { toast } from "../../../../utils/toast";
 import { Button } from "../../../../components/ui/Button";
-// import { useCreateCategory, useDeleteCategory, useGetCategories } from "../../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
-// import { Card, CardContent } from "../../../../components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../../components/ui/Dialog";
-import { useCreateLabourRateConfigCategory, useGetLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
-import LabourRateConfigSingle from "./LabourRateConfigSingle";
+import { useCreateLabourRateConfigCategory, useDeleteLabourRateConfigCategory, useGetLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
+// import LabourRateConfigSingle from "./LabourRateConfigSingle";
 import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 import StageGuide from "../../../../shared/StageGuide";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-//   DialogClose,
-// } from "@/components/ui/Dialog"; 
-
-
+import { Card, CardContent } from "../../../../components/ui/Card";
 
 
 export default function LabourRateConfigMain() {
     const { organizationId } = useParams<{ organizationId: string }>();
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     // const location = useLocation();
 
-    // const isChildRoute = location.pathname.includes("laboursingle");
+    const isChildRoute = location.pathname.includes("laboursingle");
 
     const { role, permission } = useAuthCheck();
     const canList = role === "owner" || permission?.materialquote?.list;
@@ -40,13 +26,15 @@ export default function LabourRateConfigMain() {
     // const canEdit = role === "owner" || permission?.materialquote?.edit;
 
 
-    const [categoryName, setCategoryName] = useState("Labour and Miscellaneous");
-    const [fields, setFields] = useState([{ key: "Category", type: "string", required: false }, { key: "Rs", type: "number", required: false }, { key: "notes", type: "string", required: false },]);
+    const defaultFieldValues = [{ key: "", type: "string", required: false }, { key: "Rs", type: "number", required: false }, { key: "", type: "", required: false },]
+
+    const [categoryName, setCategoryName] = useState("");
+    const [fields, setFields] = useState(defaultFieldValues);
     const [showCreateForm, setShowCreateForm] = useState(false);
 
     const { data: categories, isLoading, refetch } = useGetLabourRateConfigCategories(organizationId!);
     const { mutateAsync: createCategory, isPending: createPending } = useCreateLabourRateConfigCategory();
-    // const { mutateAsync: deleteCategory, isPending } = useDeleteLabourRateConfigCategory();
+    const { mutateAsync: deleteCategory, isPending } = useDeleteLabourRateConfigCategory();
 
     const handleAddField = () => {
         setFields([...fields, { key: "", type: "string", required: false }]);
@@ -64,36 +52,36 @@ export default function LabourRateConfigMain() {
 
     const handleCreate = async () => {
         try {
-            // if (!organizationId || !categoryName || fields.length === 0) {
-            //     return toast({
-            //         title: "Error",
-            //         description: "Category name and fields are required",
-            //         variant: "destructive",
-            //     });
-            // }
+            if (!organizationId || !categoryName || fields.length === 0) {
+                return toast({
+                    title: "Error",
+                    description: "Category name and fields are required",
+                    variant: "destructive",
+                });
+            }
 
-            // const validFields = fields.filter((f) => f.key.trim() !== "");
-            // if (validFields.length === 0) {
-            //     return toast({
-            //         title: "Error",
-            //         description: "Please enter valid field keys",
-            //         variant: "destructive",
-            //     });
-            // }
-
-
-            // await createCategory({
-            //     organizationId,
-            //     name: categoryName,
-            //     fields: validFields,
-            // });
+            const validFields = fields.filter((f) => f.key.trim() !== "");
+            if (validFields.length === 0) {
+                return toast({
+                    title: "Error",
+                    description: "Please enter valid field keys",
+                    variant: "destructive",
+                });
+            }
 
 
             await createCategory({
-                organizationId: organizationId!,
+                organizationId,
                 name: categoryName,
-                fields: fields,
+                fields: validFields,
             });
+
+
+            // await createCategory({
+            //     organizationId: organizationId!,
+            //     name: categoryName,
+            //     fields: fields,
+            // });
 
             setCategoryName("");
             setFields([{ key: "", type: "string", required: false }]);
@@ -108,21 +96,29 @@ export default function LabourRateConfigMain() {
 
 
 
-    // const handleDelete = (categoryId: string) => {
-    //     try {
-    //         deleteCategory({
-    //             categoryId: categoryId,
-    //             organizationId: organizationId!,
-    //         })
-    //         refetch()
-    //         toast({ title: "Success", description: "Category Deleted Successfully" });
+    const handleDelete = (categoryId: string) => {
+        try {
+            deleteCategory({
+                categoryId: categoryId,
+                organizationId: organizationId!,
+            })
+            refetch()
+            toast({ title: "Success", description: "Category Deleted Successfully" });
 
-    //     }
-    //     catch (error: any) {
-    //         toast({ title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete category", variant: "destructive" });
-    //     }
-    // }
-    // if (isChildRoute) return <Outlet />;
+        }
+        catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete category", variant: "destructive" });
+        }
+    }
+
+
+
+    const handleClose = (val: boolean) => {
+        setFields(defaultFieldValues)
+        setShowCreateForm(val)
+    }
+
+    if (isChildRoute) return <Outlet />;
 
     return (
         <div className="space-y-6 max-h-full overflow-y-auto ">
@@ -141,9 +137,13 @@ export default function LabourRateConfigMain() {
 
                 <section className="flex  gap-3 items-center">
 
-                    {(categories?.length === 0 && canCreate) && <div>
-                        {/* <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button> */}
+                    {/* {(categories?.length === 0 && canCreate) && <div>
                         <Button onClick={handleCreate} isLoading={createPending}>Create New Category</Button>
+                    </div>} */}
+
+                    {canCreate && <div>
+                        <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button>
+                        {/* <Button onClick={handleCreate} isLoading={createPending}>Create New Category</Button> */}
                     </div>}
 
                     <div className="w-full sm:w-auto flex justify-end sm:block">
@@ -158,7 +158,7 @@ export default function LabourRateConfigMain() {
             </header>
 
             {/* Create Modal */}
-            <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
+            <Dialog open={showCreateForm} onOpenChange={handleClose}>
                 <DialogContent className="px-5 py-6">
                     <DialogHeader className="px-0 py-0">
                         <DialogTitle>Create New Labour Category</DialogTitle>
@@ -168,7 +168,7 @@ export default function LabourRateConfigMain() {
                         <Input
                             placeholder="Labour and Miscellaneous"
                             value={categoryName}
-                        // onChange={(e) => setCategoryName(e.target.value)}
+                            onChange={(e) => setCategoryName(e.target.value)}
                         />
 
                         <h4 className="text-base font-semibold">Define Fields</h4>
@@ -178,7 +178,11 @@ export default function LabourRateConfigMain() {
                                     <Input
                                         placeholder="Field key (e.g: Category, Rs, notes)"
                                         value={field.key}
-                                        onChange={(e) => handleFieldChange(index, "key", e.target.value)}
+                                        onChange={(e) => {
+                                            if (field.key !== "Rs") {
+                                                handleFieldChange(index, "key", e.target.value)
+                                            }
+                                        }}
                                         className="flex-1"
                                     />
                                     <select
@@ -218,12 +222,10 @@ export default function LabourRateConfigMain() {
                 </div>)}
 
             {/* Category Cards Section */}
-            {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"> */}
-
             {isLoading && <MaterialOverviewLoading />}
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-
-            {/* {categories?.map((category: any) => (
+                {canList && categories?.map((category: any) => (
                     <Card
                         key={category._id}
                         className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg transition-all"
@@ -262,12 +264,12 @@ export default function LabourRateConfigMain() {
                             </div>
                         </CardContent>
                     </Card>
-                ))} */}
+                ))}
 
-            {(canList && categories?.length > 0) && (
+                {/* {(canList && categories?.length > 0) && (
                 <LabourRateConfigSingle />
-            )}
-            {/* </div> */}
+            )} */}
+            </div>
         </div>
     );
 }

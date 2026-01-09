@@ -200,7 +200,7 @@ const UpdateDesignLab = () => {
             console.error("Update Error:", error);
             toast({
                 title: "Error",
-                description: error.message || "Failed to update design",
+                description: error?.response?.data?.message || "Failed to update design",
                 variant: "destructive"
             });
         }

@@ -211,7 +211,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
         }
     }
 
-    const showNotifications = role && ['owner', 'CTO', 'staff'].includes(role);
+    const showNotifications = role && ['owner', 'CTO', 'staff', "worker"].includes(role);
     const showTickets = role && ['owner', 'CTO', 'staff'].includes(role) && organizationId;
     // const isNotificationActive = pathArray[pathArray.length - 1] === 'notification';
 
