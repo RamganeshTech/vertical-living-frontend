@@ -200,17 +200,18 @@ const PrerequisitesPage = lazy(() => import("./Pages/PreRequireties Pages/PreReq
 // const SelectedUnits = lazy(() => import("./Pages/Modular Units/Selected Units/SelectedUnits"));
 const DocumentationMain = lazy(() => import("./Pages/Documentation/DocumentationMain"));
 const SingleStageDocument = lazy(() => import("./Pages/Documentation/SingleStageDocument"));
-import CreateToolRoom from './Pages/Tools_Pages/ToolRoom/CreateToolRoom';
-import ToolOtpIssueGenerateMain from './Pages/Tools_Pages/Tool_OTP/ToolOtpIssueGenerateMain';
-import ToolOtpVerifyMain from './Pages/Tools_Pages/Tool_OTP/ToolOtpVerifyMain';
-import ToolHistoryMain from './Pages/Tools_Pages/ToolHistory/ToolHistoryMain';
-import ToolHub from './Pages/Tools_Pages/Tool_Hub/ToolHub';
-import WorkDataTemplateMain from './Pages/Quote Pages/WorkData_Page/WorkDataTemplateMain';
-import WorkDataSingleTemplate from './Pages/Quote Pages/WorkData_Page/WorkDataSingleTemplate';
-import InternalQuoteMainNew from './Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuote_New_Version/InternalQuoteMainNew';
-import CreateInternalQuoteNew from './Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuote_New_Version/CreateInternalQuoteNew';
-import InternalQuoteSingleNew from './Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuote_New_Version/InternalQuoteSingleNew';
-import LabourRateConfigSingle from './Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigSingle';
+const CreateToolRoom = lazy(() => import('./Pages/Tools_Pages/ToolRoom/CreateToolRoom'));
+const ToolOtpIssueGenerateMain = lazy(() => import('./Pages/Tools_Pages/Tool_OTP/ToolOtpIssueGenerateMain'));
+const ToolOtpVerifyMain = lazy(() => import('./Pages/Tools_Pages/Tool_OTP/ToolOtpVerifyMain'));
+const ToolHistoryMain = lazy(() => import('./Pages/Tools_Pages/ToolHistory/ToolHistoryMain'));
+const ToolHub = lazy(() => import('./Pages/Tools_Pages/Tool_Hub/ToolHub'));
+const WorkDataTemplateMain = lazy(() => import('./Pages/Quote Pages/WorkData_Page/WorkDataTemplateMain'));
+const WorkDataSingleTemplate = lazy(() => import('./Pages/Quote Pages/WorkData_Page/WorkDataSingleTemplate'));
+const InternalQuoteMainNew = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuote_New_Version/InternalQuoteMainNew'));
+const CreateInternalQuoteNew = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuote_New_Version/CreateInternalQuoteNew'));
+const InternalQuoteSingleNew = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuote_New_Version/InternalQuoteSingleNew'));
+const LabourRateConfigSingle = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/Labour RateConfig Pages/LabourRateConfigSingle'));
+const OrganizationSettings = lazy(() => import('./Pages/Organization/OrganizationSettings'));
 
 const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<MaterialOverviewLoading />}>{children}</Suspense>
@@ -332,10 +333,18 @@ function App() {
             <OrganizationChildrens setOrganizationId={setOrganizationId} />
           </ProtectedRoutes>} >
 
+
+
             <Route index
               element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
                 <OrganizationDetails />
               </ProtectedRoutes>} />
+
+            <Route path='settings'
+              element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                <OrganizationSettings />
+              </ProtectedRoutes>} />
+
 
             <Route path='invitestaff'
               element={<ProtectedRoutes allowedRoles={["CTO", "owner", "staff", "worker", "client"]}

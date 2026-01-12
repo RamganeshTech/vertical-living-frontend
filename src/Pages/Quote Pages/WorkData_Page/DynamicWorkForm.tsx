@@ -40,6 +40,7 @@
 
 import React, { useState } from 'react';
 import { GlassTemplate } from './Templates/GlassTemplate';
+// import { PlyWoodTemplate } from './Templates/GlassTemplate';
 import { LabourCostSection, type ILabourData } from './MultiTab_Components_Quote/LabourCostSection';
 import { MaterialCostSection, type IMaterialData } from './MultiTab_Components_Quote/MaterialCostSection';
 import { GrandSummarySection } from './MultiTab_Components_Quote/GrandSummarySection';
@@ -75,6 +76,7 @@ interface DynamicWorkFormProps {
 const TEMPLATE_COMPONENTS: Record<string, React.FC<any>> = {
     glass: GlassTemplate,
     // future templates like 'plywood' will go here
+    // plywood: PlyWoodTemplate
 };
 
 const DynamicWorkForm: React.FC<DynamicWorkFormProps> = ({ templateName, initialData, onAutoSave, isSubmitting }) => {

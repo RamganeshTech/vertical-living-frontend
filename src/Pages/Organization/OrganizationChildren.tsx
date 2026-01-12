@@ -46,6 +46,7 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
         PLAN: `/organizations/${organizationId}/subscriptionplan`,
         PROFILE: `/organizations/${organizationId}/userprofile`,
         MODULAR: `/organizations/${organizationId}/modularunits`,
+        // SETTINGS: `/organizations/${organizationId}/settings`,
     }
 
     // =========================================================

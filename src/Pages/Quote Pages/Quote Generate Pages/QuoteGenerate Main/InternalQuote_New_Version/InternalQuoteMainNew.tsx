@@ -3,16 +3,17 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useCreateInternalQuote, useUpdateInternalQuote } from '../../../../../apiList/Quote Api/Internal_Quote_Api/internalQuoteNewVersionApi';
 import { toast } from '../../../../../utils/toast';
 import { Button } from '../../../../../components/ui/Button';
-import SearchSelectNew from '../../../../../components/ui/SearchSelectNew';
+// import SearchSelectNew from '../../../../../components/ui/SearchSelectNew';
 import { useGetProjects } from '../../../../../apiList/projectApi';
-import { Label } from '../../../../../components/ui/Label';
+// import { Label } from '../../../../../components/ui/Label';
 import { useDeleteQuote, useGetMaterialQuoteEntries } from '../../../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi';
 import type { AvailableProjetType } from '../../../../Department Pages/Logistics Pages/LogisticsShipmentForm';
 import { useAuthCheck } from '../../../../../Hooks/useAuthCheck';
 import MaterialOverviewLoading from '../../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 import { Card, CardContent } from '../../../../../components/ui/Card';
 import { dateFormate, formatTime } from '../../../../../utils/dateFormator';
-import { Input } from '../../../../../components/ui/Input';
+// import { Input } from '../../../../../components/ui/Input';
+import CreateQuoteModal from './CreateQuoteModal';
 // import { Button } from '../../../components/ui/Button';
 // import SearchSelectNew from '../../../components/ui/SearchSelectNew';
 // import { useCreateInternalQuote, useUpdateInternalQuote } from './useInternalQuoteMutations'; // Path to your mutations
@@ -128,7 +129,7 @@ const InternalQuoteMainNew = () => {
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                         <i className="fas fa-file mr-3 text-blue-600" />
-                        Internal Quote Entry <span className='text-[20px] text-blue-600 ml-4'>(In Development)</span> 
+                        Internal Quote Entry <span className='text-[20px] text-blue-600 ml-4'>(In Development)</span>
                     </h1>
                 </div>
                 <div className="flex gap-6 items-center">
@@ -143,70 +144,15 @@ const InternalQuoteMainNew = () => {
 
             {/* Modal for Create/Update */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-in zoom-in-95">
-                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                            <i className="fas fa-edit text-blue-600"></i>
-                            {isEditing ? 'Update Quote Details' : 'Create New Quote'}
-                        </h2>
+                <CreateQuoteModal
+                    isEditing={isEditing}
+                    formData={formData}
+                    projectsData={projectsData}
+                    setModalOpen={setModalOpen}
+                    setFormData={setFormData}
+                    handleSubmit={handleSubmit}
+                />
 
-                        <div className="space-y-4">
-                            <div>
-                                <label className="text-xs font-bold text-gray-400 uppercase">Quote Name</label>
-                                <Input
-                                    className="w-full p-3 bg-white border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={formData.mainQuoteName}
-                                    onChange={(e) => setFormData({ ...formData, mainQuoteName: e.target.value })}
-                                    placeholder="e.g. Phase 1 Glasswork"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-xs font-bold text-gray-400 uppercase">Category</label>
-                                {/* <select
-                                    className="w-full p-3 bg-white border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
-                                    value={formData.quoteCategory}
-                                    onChange={(e) => setFormData({ ...formData, quoteCategory: e.target.value })}
-                                >
-                                    <option value="commercial">Commercial</option>
-                                    <option value="residential">Residential</option>
-                                </select> */}
-
-                                <SearchSelectNew
-                                    options={["commercial", "residential"].map((p: string) => ({ value: p, label: p }))}
-                                    placeholder="Select Quote Type..."
-                                    value={formData.quoteCategory || ""}
-                                    onValueChange={(val) => setFormData(p => ({ ...p, quoteCategory: val }))}
-                                />
-                            </div>
-
-                            {/* <div>
-                                <label className="text-xs font-bold text-gray-400 uppercase">Select Project</label>
-                                <SearchSelectNew 
-                                    onValueChange={(val) => setFormData({...formData, projectId: val})}
-                                    // Pass project list from your query here
-                                />
-                            </div> */}
-
-                            <div className="space-y-2">
-                                <Label className="text-[10px] uppercase font-black text-gray-400">Project</Label>
-                                <SearchSelectNew
-                                    options={projectsData.map((p: any) => ({ value: p._id, label: p.projectName }))}
-                                    placeholder="Select Project..."
-                                    value={formData.projectId || ""}
-                                    onValueChange={(val) => setFormData(p => ({ ...p, projectId: val }))}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3 mt-8">
-                            <Button variant="outline" className="flex-1" onClick={() => setModalOpen(false)}>Cancel</Button>
-                            <Button className="flex-1 bg-blue-600" onClick={handleSubmit}>
-                                {isEditing ? 'Update' : 'Generate Quote'}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
             )}
 
 
@@ -358,125 +304,230 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, }) => {
 
 
     return (
+        // <Card
+        //     className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg transition-all"
+        // >
+        //     <CardContent className="p-4 space-y-2">
+        //         <div className="flex items-start justify-between">
+        //             <div>
+
+        //                 <div className='my-1 space-y-1'>
+        //                     <h3 className="text-lg font-black text-slate-900 tracking-tight leading-tight uppercase">
+        //                         {quote?.mainQuote.mainQuoteName || "Untitled Quote"}
+        //                     </h3>
+        //                     <h3 className="text-[12px] font-bold text-blue-700 leading-[8px] ">
+        //                         Project: <span className='text-black'>{quote?.projectId?.projectName || "Project"}</span>
+        //                     </h3>
+        //                     <span className="text-[12px] font-semibold text-gray-500">
+        //                         Quote No: <span className='text-black'>{quote.quoteNo || "N/A"}</span>
+        //                     </span>
+        //                 </div>
+
+
+        //                 <p className="text-xs text-gray-500 ">
+        //                     Created on: {dateFormate(quote.createdAt)} -  {formatTime(quote.createdAt)}
+        //                 </p>
+        //             </div>
+        //             <i className="fas fa-file-alt text-gray-400 text-xl" />
+        //         </div>
+
+
+        //         {/* <p className="text-sm text-gray-500 italic">
+        //             <strong>Furnitures: </strong> {quote.furnitures?.length || 0}
+        //         </p> */}
+
+        //         <div className="flex justify-end gap-2 pt-2">
+        //             <Button
+        //                 size="sm"
+        //                 isLoading={isPending}
+        //                 variant="secondary"
+        //                 // className="bg-red-600 text-white"
+        //                 onClick={() => navigate(`single/${quote._id}`)}
+        //             >
+        //                 <i className="fas fa-eye mr-1" /> View
+        //             </Button>
+
+
+        //             {canDelete && <Button
+        //                 size="sm"
+        //                 isLoading={isPending}
+        //                 variant="danger"
+        //                 className="bg-red-600 text-white"
+        //                 onClick={() => handleDelete(quote._id)}
+        //             >
+        //                 <i className="fas fa-trash mr-1" /> Delete
+        //             </Button>}
+
+        //         </div>
+        //     </CardContent>
+        // </Card>
+
+
+
+        //  second version (old)
         <Card
-            className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg transition-all"
-        >
-            <CardContent className="p-4 space-y-2">
-                <div className="flex items-start justify-between">
-                    <div>
-
-                        <div className='my-1'>
-                            <h3 className="text-base font-bold text-blue-700 leading-[8px] ">
-                                Project: <span className='text-black'>{quote?.projectId?.projectName || "Project"}</span>
-                            </h3>
-                            <span className="text-[12px] font-semibold text-gray-500">
-                                Quote No: <span className='text-black'>{quote.quoteNo || "N/A"}</span>
-                            </span>
-                        </div>
-
-
-                        <p className="text-xs text-gray-500 ">
-                            Created on: {dateFormate(quote.createdAt)} -  {formatTime(quote.createdAt)}
+    className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg transition-all"
+>
+    <CardContent className="p-5 space-y-4"> {/* Increased padding for better breathability */}
+        <div className="flex items-start justify-between">
+            <div className="space-y-3"> {/* Standardized vertical spacing between blocks */}
+                
+                <div className='space-y-1.5'> {/* Consistent spacing between header lines */}
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight leading-tight uppercase">
+                        {quote?.mainQuote.mainQuoteName || "Untitled Quote"}
+                    </h3>
+                    
+                    <div className="space-y-0.5"> {/* Tighter grouping for metadata */}
+                        <h3 className="text-[12px] font-bold text-blue-700 leading-normal">
+                            Project: <span className='text-black font-semibold'>{quote?.projectId?.projectName || "Project"}</span>
+                        </h3>
+                        
+                        <p className="text-[12px] font-semibold text-gray-500 leading-normal">
+                            Quote No: <span className='text-black'>{quote.quoteNo || "N/A"}</span>
                         </p>
                     </div>
-                    <i className="fas fa-file-alt text-gray-400 text-xl" />
                 </div>
 
-                {/* <p className="text-sm text-gray-600 mt-2">
-                                    <strong>Grand Total:</strong> ₹{quote.grandTotal.toLocaleString("en-IN")}
-                                </p> */}
-
-                <p className="text-sm text-gray-500 italic">
-                    <strong>Furnitures: </strong> {quote.furnitures?.length || 0}
-                </p>
-
-                <div className="flex justify-end gap-2 pt-2">
-                    {/* <Button
-                        size="sm"
-                        variant="secondary"
-                    onClick={() => navigate(`single/${quote._id}`)}
-                    >
-                        <i className="fas fa-eye mr-1" /> View
-                    </Button> */}
-                    {/* <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => {
-
-
-                            const { furnitures} = quote;
-
-                            const parsedFurniture = furnitures.map((f: any) => ({
-                                furnitureName: f.furnitureName,
-                                coreMaterials: f.coreMaterials.map((cm: any) => ({
-                                    itemName: cm?.itemName || "",
-                                    plywoodNos: cm?.plywoodNos || { quantity: 0, thickness: 0 },
-                                    laminateNos: cm.laminateNos || { quantity: 0, thickness: 0 },
-                                    carpenters: cm.carpenters || 0,
-                                    days: cm.days || 0,
-                                    profitOnMaterial: cm.profitOnMaterial || 0,
-                                    profitOnLabour: cm.profitOnLabour || 0,
-                                    rowTotal: cm.rowTotal || 0,
-                                    remarks: cm.remarks || "",
-                                    imageUrl: cm.imageUrl || "", // 🔁 PRESERVE image
-                                    previewUrl: cm.imageUrl || "", // 🔁 preview if needed
-                                })),
-                                fittingsAndAccessories: f.fittingsAndAccessories || [],
-                                glues: f.glues || [],
-                                nonBrandMaterials: f.nonBrandMaterials || [],
-                                totals: {
-                                    core: f.coreMaterialsTotal || 0,
-                                    fittings: f.fittingsAndAccessoriesTotal || 0,
-                                    glues: f.gluesTotal || 0,
-                                    nbms: f.nonBrandMaterialsTotal || 0,
-                                    furnitureTotal: f.furnitureTotal || 0,
-                                },
-                            }));
-                            console.log("parsedFurniture", parsedFurniture)
-                            setEditQuoteNo(quote?.quoteNo)
-                            setFurnitures(parsedFurniture)
-                            setIsEditingId(quote._id)
-                            setQuoteType(() => {
-                                if (quote?.furnitures?.length > 1) {
-                                    return "residential"
-                                } else {
-                                    return "single"
-                                }
-                            })
-                            
-                            setFiltersMain({
-                                projectId: quote.projectId._id,
-                                projectName: quote.projectId.projectName
-                            })
-                        }}
-                    >
-                        <i className="fas fa-eye mr-1" /> Edit
-                    </Button> */}
-
-                    <Button
-                        size="sm"
-                        isLoading={isPending}
-                        variant="secondary"
-                        // className="bg-red-600 text-white"
-                        onClick={() => navigate(`single/${quote._id}`)}
-                    >
-                        <i className="fas fa-eye mr-1" /> View
-                    </Button>
-
-
-                    {canDelete && <Button
-                        size="sm"
-                        isLoading={isPending}
-                        variant="danger"
-                        className="bg-red-600 text-white"
-                        onClick={() => handleDelete(quote._id)}
-                    >
-                        <i className="fas fa-trash mr-1" /> Delete
-                    </Button>}
-
+                <div className="pt-1">
+                    <p className="text-[11px] text-gray-400 font-medium flex items-center gap-1">
+                        <i className="far fa-clock text-[10px]" />
+                        Created on: {dateFormate(quote.createdAt)} — {formatTime(quote.createdAt)}
+                    </p>
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+
+            {/* Icon remains exact same color/size */}
+            <div className="pt-1">
+                <i className="fas fa-file-alt text-gray-300 text-xl" />
+            </div>
+        </div>
+
+        {/* Action Row - Added a very light border to separate actions from data */}
+        <div className="flex justify-end gap-2 pt-3 border-t border-gray-50">
+            <Button
+                size="sm"
+                isLoading={isPending}
+                variant="secondary"
+                className="h-8 px-4 text-[11px] font-bold uppercase tracking-wider"
+                onClick={() => navigate(`single/${quote._id}`)}
+            >
+                <i className="fas fa-eye mr-1.5" /> View
+            </Button>
+
+            {canDelete && (
+                <Button
+                    size="sm"
+                    isLoading={isPending}
+                    variant="danger"
+                    className="h-8 px-4 text-[11px] font-bold uppercase tracking-wider bg-red-600 text-white"
+                    onClick={() => handleDelete(quote._id)}
+                >
+                    <i className="fas fa-trash mr-1.5" /> Delete
+                </Button>
+            )}
+        </div>
+    </CardContent>
+</Card>
+
+
+        //  SECOND VERSION (NEW)
+        // <Card className="w-full  shadow-sm hover:shadow-md transition-all duration-300 bg-white group overflow-hidden border-l-4 border-l-blue-600">
+        //     <CardContent className="p-5">
+        //         <div className="flex justify-between items-start mb-4">
+        //             <div className="space-y-1">
+        //                 {/* Main Quote Name */}
+        //                 <h3 className="text-lg font-black text-slate-900 tracking-tight leading-tight uppercase">
+        //                     {quote?.mainQuote.mainQuoteName || "Untitled Quote"}
+        //                 </h3>
+
+        //                 {/* Project Name as a Tag */}
+        //                 <div className="flex items-center gap-2">
+        //                     <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded uppercase tracking-wider">
+        //                         {quote?.projectId?.projectName || "General Project"}
+        //                     </span>
+        //                     <span className="text-slate-300 text-xs">|</span>
+        //                     <span className="text-[11px] font-bold text-slate-500 uppercase">
+        //                         ID: {quote.quoteNo || "N/A"}
+        //                     </span>
+        //                 </div>
+        //             </div>
+
+        //             {/* Visual Document Icon */}
+        //             <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
+        //                 <i className="fas fa-file-invoice text-slate-400 group-hover:text-white transition-colors" />
+        //             </div>
+        //         </div>
+
+        //         <div className="grid grid-cols-2 gap-4 py-3 border-y border-slate-50">
+        //             {/* Items/Furniture Count */}
+        //             {(quote.furnitures && quote.furnitures?.length > 0) && <div className="flex items-center gap-2">
+        //                 <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 text-xs">
+        //                     <i className="fas fa-couch" />
+        //                 </div>
+        //                 <div>
+        //                     <p className="text-[9px] font-black text-slate-400 uppercase leading-none">Items</p>
+        //                     <p className="text-sm font-bold text-slate-700">{quote.furnitures?.length || 0} Units</p>
+        //                 </div>
+        //             </div>}
+
+        //             {(quote.mainQuote && quote.mainQuote.works && quote.mainQuote.works?.length > 0) && <div className="flex items-center gap-2">
+        //                 <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 text-xs">
+        //                     <i className="fas fa-couch" />
+        //                 </div>
+        //                 <div>
+        //                     <p className="text-[9px] font-black text-slate-400 uppercase leading-none">Works</p>
+        //                     <p className="text-sm font-bold text-slate-700">{quote.mainQuote.works?.length || 0} Units</p>
+        //                 </div>
+        //             </div>}
+
+        //             {/* Date Information */}
+        //             <div className="flex items-center gap-2">
+        //                 <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 text-xs">
+        //                     <i className="fas fa-calendar-alt" />
+        //                 </div>
+        //                 <div>
+        //                     <p className="text-[9px] font-black text-slate-400 uppercase leading-none">Created</p>
+        //                     <p className="text-[11px] font-bold text-slate-700">
+        //                         {dateFormate(quote.createdAt)}
+        //                     </p>
+        //                 </div>
+        //             </div>
+        //         </div>
+
+        //         <div className="flex items-center justify-end pt-4">
+        //             {/* Timestamp footer */}
+        //             {/* <p className="text-[10px] text-slate-400 font-medium">
+        //                 Last Modified: {formatTime(quote.createdAt)}
+        //             </p> */}
+
+        //             <div className="flex gap-2">
+        //                 <Button
+        //                     size="sm"
+        //                     variant="secondary"
+        //                     className="h-8 px-4 text-[11px] font-bold uppercase tracking-wider bg-slate-100 hover:bg-slate-200 text-slate-700 border-none"
+        //                     onClick={() => navigate(`single/${quote._id}`)}
+        //                 >
+        //                     <i className="fas fa-expand mr-1.5" /> Open
+        //                 </Button>
+
+        //                 {canDelete && (
+        //                     <Button
+        //                         size="sm"
+        //                         isLoading={isPending}
+        //                         variant='danger'
+        //                         className="h-8 px-4 text-[11px] font-bold uppercase tracking-wider hover:bg-red-600 text-red-600 hover:text-white border-none transition-all"
+        //                         onClick={() => handleDelete(quote._id)}
+        //                     >
+        //                         <i className="fas fa-trash-alt mr-1.5" /> Delete
+        //                     </Button>
+        //                 )}
+        //             </div>
+        //         </div>
+        //     </CardContent>
+        // </Card>
+
+
+
     )
 }
 

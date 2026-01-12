@@ -348,20 +348,31 @@ export default function OrganizationDetails() {
 
 
               {/* Right section */}
-              {!isEditing && (
-                <div className="flex justify-end sm:justify-start  w-fit flex-shrink-0">
-                  <Button
-                    variant="outline"
-                    onClick={handleStartEdit}
-                    className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl bg-white/80 backdrop-blur-sm"
-                  >
-                    <i className="fas fa-edit mr-2"></i>
-                    <span className="hidden sm:inline">Edit Name</span>
-                    <span className="sm:hidden">Edit</span>
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-2 ">
+                {!isEditing && (
+                  <div className="flex justify-end sm:justify-start  w-fit flex-shrink-0">
+                    <Button
+                      variant="outline"
+                      onClick={handleStartEdit}
+                      className="border-blue-200 text-blue-600 hover:bg-blue-50 rounded-xl bg-white/80 backdrop-blur-sm"
+                    >
+                      <i className="fas fa-edit mr-2"></i>
+                      <span className="hidden sm:inline">Edit Name</span>
+                      <span className="sm:hidden">Edit</span>
+                    </Button>
+                  </div>
+                )}
 
+
+                <Button
+                  variant="secondary"
+                  onClick={() => navigate("settings")}
+                  className=""
+                >
+                  <i className="fas fa-gear"></i>
+
+                </Button>
+              </div>
 
             </div>
 

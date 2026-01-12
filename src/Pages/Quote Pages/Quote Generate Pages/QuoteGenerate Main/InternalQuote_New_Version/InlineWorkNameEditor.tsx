@@ -33,7 +33,7 @@ const InlineWorkNameEditor: React.FC<Props> = ({  work, quoteId }) => {
             onChange={(e) => setLocalName(e.target.value)}
             className="text-[9px] font-black text-slate-400  tracking-tighter truncate max-w-[140px] 
                        bg-transparent border-b border-transparent hover:border-slate-300 focus:border-blue-500 
-                       focus:text-slate-300 outline-none transition-all cursor-text py-0.5"
+                       focus:text-slate-600 outline-none transition-all cursor-text py-0.5"
             placeholder="ENTER AREA NAME"
         />
     );

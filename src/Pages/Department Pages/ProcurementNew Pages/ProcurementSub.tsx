@@ -1,11 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import {
-//   useGetSingleProcurementDetails,
-//   useUpdateProcurementShopDetails,
-//   useUpdateProcurementDeliveryLocation,
-//   useUpdateProcurementTotalCost
-// } from "../../../apiList/Department Api/Logistics Api/procurementNew.queries";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
@@ -19,6 +13,7 @@ import {
     // useSyncLogistics,
     useProcurementGenerateLink,
     useSyncProcurementToPaymentsSection,
+    useCancelProcurementAutomation,
     // useSyncAccountsProcurement
 } from "../../../apiList/Department Api/Procurement Api/procurementApi";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
@@ -241,6 +236,11 @@ const ProcurementSub: React.FC = () => {
         }
     }
 
+
+
+
+
+
     // const handleGenerateAccounts = async () => {
     //     try {
     //         await syncAccounts({ fromDept: "procurement", organizationId,
@@ -271,7 +271,7 @@ const ProcurementSub: React.FC = () => {
 
 
     if (!canList) {
-        return ;
+        return;
     }
 
 
@@ -333,6 +333,25 @@ const ProcurementSub: React.FC = () => {
                             >
                                 Send To Payments
                             </Button>
+
+                            {/* <Button
+                                variant="danger"
+                                disabled={data.isSyncWithPaymentsSection &&}
+                                isLoading={cancelSyncPaymentsLoading}
+                                className="disabled:cursor-not-allowed"
+                                onClick={handleCancelSyncToPayments}
+                            >
+                                Cancel Automation
+                            </Button> */}
+
+
+                            {!data.isSyncWithPaymentsSection && <AutomationTimerButton
+                                data={data}
+                                refetch={refetch}
+                            />}
+
+
+
 
                             {/* <span className="text-xs text-blue-500 mx-auto">
                                 <strong>*</strong> Click the button to send the <br /> details to  logistics dept
@@ -1033,3 +1052,122 @@ const ProcurementSub: React.FC = () => {
 };
 
 export default ProcurementSub;
+
+
+
+interface AutomationTimerButtonProps {
+    data: any;
+    refetch?: () => void;
+}
+
+const AutomationTimerButton: React.FC<AutomationTimerButtonProps> = ({ data, refetch }) => {
+    // 2 minutes = 120 seconds
+    const [timeLeft, setTimeLeft] = useState(900);
+    const { mutateAsync: cancelSyncPaymentsMutation, isPending: cancelSyncPaymentsLoading } = useCancelProcurementAutomation();
+
+    // useEffect(() => {
+    //     // If already synced, don't start timer
+    //     if (data?.isSyncWithPaymentsSection || timeLeft <= 0) return;
+
+    //     const timer = setInterval(() => {
+    //         setTimeLeft((prev) => {
+    //             if (prev <= 1) {
+    //                 clearInterval(timer);
+    //                 return 0;
+    //             }
+    //             return prev - 1;
+    //         });
+    //     }, 1000);
+
+    //     return () => clearInterval(timer);
+    // }, [data?.isSyncWithPaymentsSection, timeLeft]);
+
+    useEffect(() => {
+        if (data?.isSyncWithPaymentsSection) return;
+
+        const calculateTime = () => {
+            const startTime = new Date(data?.createdAt)?.getTime();
+            const endTime = startTime + 2 * 60 * 1000; // Exact 2-minute mark
+            const now = new Date().getTime();
+            const diff = Math.floor((endTime - now) / 1000);
+
+            if (diff <= 0) {
+                setTimeLeft(0);
+                return false; // Stop interval
+            }
+            setTimeLeft(diff);
+            return true;
+        };
+
+        // Initial calculation
+        const isRunning = calculateTime();
+        if (!isRunning) return;
+
+        const timer = setInterval(() => {
+            const stillRunning = calculateTime();
+            if (!stillRunning) clearInterval(timer);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [data?.createdAt, data?.isSyncWithPaymentsSection]);
+
+    // Format seconds into MM:SS
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const handleCancelSyncToPayments = async () => {
+        try {
+            if (data?.isSyncWithPaymentsSection || timeLeft === 0) {
+                return toast({
+                    variant: "destructive",
+                    title: "Action Restricted",
+                    description: "Automation has already processed this record."
+                });
+            }
+
+            await cancelSyncPaymentsMutation({ id: data._id! });
+
+            refetch?.();
+            toast({
+                title: "Automation Disabled",
+                description: "This procurement will no longer be automatically moved to payments."
+            });
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error?.response?.data?.message || error?.message || "Operation failed"
+            });
+        }
+    };
+
+    // Determine button state
+    const isProcessed = data?.isSyncWithPaymentsSection || timeLeft === 0;
+
+    return (
+        <Button
+            variant="danger"
+            disabled={isProcessed}
+            isLoading={cancelSyncPaymentsLoading}
+            className={`min-w-[140px] flex items-center justify-center gap-2 transition-all ${isProcessed ? "bg-gray-400 opacity-70" : "bg-red-600 hover:bg-red-700"
+                }`}
+            onClick={handleCancelSyncToPayments}
+        >
+            {/* <i className={`fas ${isProcessed ? 'fa-check-circle' : 'fa-clock'}`}></i> */}
+            {/* {isProcessed ? "Automation Done" : `Cancel Auto-Sync (${formatTime(timeLeft)})`} */}
+
+            <div className="flex items-center justify-between w-full gap-3">
+                <span>{isProcessed ? "Automation Done" : "Cancel Automation"}</span>
+                {!isProcessed && (
+                    <span className="bg-white/20 px-2 py-0.5 rounded text-xs font-mono border-l border-white/30">
+                        {formatTime(timeLeft)}
+                    </span>
+                )}
+            </div>
+        </Button>
+    );
+};
+

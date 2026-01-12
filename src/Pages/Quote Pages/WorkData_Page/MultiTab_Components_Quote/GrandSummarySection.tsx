@@ -108,9 +108,9 @@ export const GrandSummarySection: React.FC<SummaryDataProps> = ({ summaryData, s
     const material = Number(summaryData?.materialCost || 0);
     const total = Number(summaryData?.totalTemplateCost || 0);
 
-    // f8fafc
+    // bg-[#f8fafc]
     return (
-        <div className="p-8 h-full space-y-8 bg-[#f8fafc] animate-in fade-in duration-700">
+        <div className="p-8 h-full space-y-8  animate-in fade-in duration-700">
             {/* 1. SECTIONED METRICS: Using light blue backgrounds for contrast */}
             <div className="grid grid-cols-3 gap-6">
                 <div className="bg-white border-l-4 border-blue-500 p-6 rounded-r-2xl shadow-sm">

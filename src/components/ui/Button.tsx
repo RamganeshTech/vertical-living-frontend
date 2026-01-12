@@ -22,7 +22,7 @@
       primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",
       secondary: "bg-blue-100 hover:bg-blue-200 text-blue-700",
       outline: "border border-blue-200 hover:bg-blue-50 text-blue-600",
-      danger: "border border-red-200 hover:bg-red-500 text-red-600",
+      danger: "border border-red-200 bg-red-600 text-white",
       ghost: "hover:bg-gray-100 text-gray-700",
       link: "text-blue-600 hover:underline p-0 h-auto",
     }

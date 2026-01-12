@@ -587,169 +587,169 @@ const OrderMaterialOverview = () => {
 
 
                                 {/* Shop Details */}
-<div className="flex flex-col md:flex-row gap-4 w-full mb-3">
+                                <div className="flex flex-col md:flex-row gap-4 w-full mb-3">
 
-                                <section className="border-l-4 flex-1 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                                    <div className="flex justify-between items-center w-full">
-                                        <div>
-                                            <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
-                                                <i className="fa-solid fa-store"></i>
-                                                Shop Details
-                                            </h2>
-                                        </div>
-
-                                        {!editShop ? <div className="gap-2 flex">
-
-                                            <Button onClick={() => navigate("shoplib")}>
-                                                <i className="fas fa-shop mr-2"></i>
-                                                Shop Library
-                                            </Button>
-
-                                            {(canEdit || canCreate) && <button
-                                                onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
-                                                // className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-                                                className=" text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-
-                                            >
-                                                <i className="fa-solid fa-edit mr-1"></i>Edit
-                                            </button>}
-                                        </div>
-                                            :
-
+                                    <section className="border-l-4 flex-1 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
+                                        <div className="flex justify-between items-center w-full">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
-                                                <SearchSelectNew
-                                                    options={shopLibOptions}
-                                                    placeholder="Select Shop"
-                                                    searchPlaceholder="Search by shop name..."
-                                                    value={selectedShop.selectedId || ''}
-                                                    onValueChange={(value) => {
-                                                        const shopFound = shops?.find((s: any) => s._id === value)
-                                                        // console.log("sop", shopFound)
-                                                        setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
-                                                    }}
-                                                    searchBy="name"
-                                                    displayFormat="detailed"
+                                                <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
+                                                    <i className="fa-solid fa-store"></i>
+                                                    Shop Details
+                                                </h2>
+                                            </div>
+
+                                            {!editShop ? <div className="gap-2 flex">
+
+                                                <Button onClick={() => navigate("shoplib")}>
+                                                    <i className="fas fa-shop mr-2"></i>
+                                                    Shop Library
+                                                </Button>
+
+                                                {(canEdit || canCreate) && <button
+                                                    onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
+                                                    // className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
+                                                    className=" text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
+
+                                                >
+                                                    <i className="fa-solid fa-edit mr-1"></i>Edit
+                                                </button>}
+                                            </div>
+                                                :
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
+                                                    <SearchSelectNew
+                                                        options={shopLibOptions}
+                                                        placeholder="Select Shop"
+                                                        searchPlaceholder="Search by shop name..."
+                                                        value={selectedShop.selectedId || ''}
+                                                        onValueChange={(value) => {
+                                                            const shopFound = shops?.find((s: any) => s._id === value)
+                                                            // console.log("sop", shopFound)
+                                                            setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
+                                                        }}
+                                                        searchBy="name"
+                                                        displayFormat="detailed"
+                                                        className="w-full"
+                                                    />
+                                                </div>
+                                            }
+                                        </div>
+                                        {editShop ? (
+                                            <div className="space-y-3">
+                                                <Input
+                                                    placeholder="Shop Name"
+                                                    value={shopForm?.shopName || ""}
+                                                    onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
                                                     className="w-full"
                                                 />
+                                                <Input
+                                                    placeholder="Contact Person"
+                                                    value={shopForm?.contactPerson || ""}
+                                                    onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
+                                                    className="w-full"
+                                                />
+                                                <Input
+                                                    placeholder="Phone Number"
+                                                    value={shopForm?.phoneNumber || ""}
+                                                    type="tel"
+                                                    maxLength={10}
+                                                    onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })}
+                                                    className="w-full"
+                                                />
+                                                <Input
+                                                    placeholder="Address"
+                                                    value={shopForm?.address || ""}
+                                                    onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
+                                                    className="w-full"
+                                                />
+                                                <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
+                                                    <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
+                                                        <i className="fa-solid fa-save mr-2"></i>Save
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={() => setEditShop(false)}
+                                                        className="w-full sm:w-auto"
+                                                    >
+                                                        <i className="fa-solid fa-times mr-2"></i>Cancel
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        }
+                                        ) : (
+                                            <div className="space-y-2 text-sm sm:text-base">
+                                                <p><strong>Shop Name:</strong> {data?.shopDetails?.shopName || "-"}</p>
+                                                <p><strong>Contact Person:</strong> {data?.shopDetails?.contactPerson || "-"}</p>
+                                                <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
+                                                <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
+
+
+
+                                            </div>
+                                        )}
+                                    </section>
+
+                                    <div className="border-l-4 flex-1 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
+                                        <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
+                                            <i className="fa-solid fa-truck"></i>
+                                            Delivery Location
+                                        </h2>
+                                        {editDelivery ? (
+                                            <div className="space-y-3">
+                                                <Input
+                                                    placeholder="Site Name"
+                                                    value={deliveryForm?.siteName || ""}
+                                                    onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })}
+                                                    className="w-full"
+                                                />
+                                                <Input
+                                                    placeholder="Site Supervisor"
+                                                    value={deliveryForm?.siteSupervisor || ""}
+                                                    onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })}
+                                                    className="w-full"
+                                                />
+                                                <Input
+                                                    placeholder="Phone Number"
+                                                    type="tel"
+                                                    maxLength={10}
+                                                    value={deliveryForm?.phoneNumber || ""}
+                                                    onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })}
+                                                    className="w-full"
+                                                />
+                                                <Input
+                                                    placeholder="Address"
+                                                    value={deliveryForm?.address || ""}
+                                                    onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
+                                                    className="w-full"
+                                                />
+                                                <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
+                                                    <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
+                                                        <i className="fa-solid fa-save mr-2"></i>Save
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={() => setEditDelivery(false)}
+                                                        className="w-full sm:w-auto"
+                                                    >
+                                                        <i className="fa-solid fa-times mr-2"></i>Cancel
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2 text-sm sm:text-base">
+                                                <p><strong>Site Name:</strong> {data?.deliveryLocationDetails?.siteName || "-"}</p>
+                                                <p><strong>Supervisor:</strong> {data?.deliveryLocationDetails?.siteSupervisor || "-"}</p>
+                                                <p><strong>Phone:</strong> {data?.deliveryLocationDetails?.phoneNumber || "-"}</p>
+                                                <p><strong>Address:</strong> {data?.deliveryLocationDetails?.address || "-"}</p>
+                                                {(canEdit || canCreate) && <button
+                                                    onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
+                                                    className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
+                                                >
+                                                    <i className="fa-solid fa-edit mr-1"></i>Edit
+                                                </button>}
+                                            </div>
+                                        )}
                                     </div>
-                                    {editShop ? (
-                                        <div className="space-y-3">
-                                            <Input
-                                                placeholder="Shop Name"
-                                                value={shopForm?.shopName || ""}
-                                                onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
-                                                className="w-full"
-                                            />
-                                            <Input
-                                                placeholder="Contact Person"
-                                                value={shopForm?.contactPerson || ""}
-                                                onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
-                                                className="w-full"
-                                            />
-                                            <Input
-                                                placeholder="Phone Number"
-                                                value={shopForm?.phoneNumber || ""}
-                                                type="tel"
-                                                maxLength={10}
-                                                onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })}
-                                                className="w-full"
-                                            />
-                                            <Input
-                                                placeholder="Address"
-                                                value={shopForm?.address || ""}
-                                                onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
-                                                className="w-full"
-                                            />
-                                            <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
-                                                <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
-                                                    <i className="fa-solid fa-save mr-2"></i>Save
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() => setEditShop(false)}
-                                                    className="w-full sm:w-auto"
-                                                >
-                                                    <i className="fa-solid fa-times mr-2"></i>Cancel
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2 text-sm sm:text-base">
-                                            <p><strong>Shop Name:</strong> {data?.shopDetails?.shopName || "-"}</p>
-                                            <p><strong>Contact Person:</strong> {data?.shopDetails?.contactPerson || "-"}</p>
-                                            <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
-                                            <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
-
-
-
-                                        </div>
-                                    )}
-                                </section>
-
-                                <div className="border-l-4 flex-1 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                                    <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
-                                        <i className="fa-solid fa-truck"></i>
-                                        Delivery Location
-                                    </h2>
-                                    {editDelivery ? (
-                                        <div className="space-y-3">
-                                            <Input
-                                                placeholder="Site Name"
-                                                value={deliveryForm?.siteName || ""}
-                                                onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })}
-                                                className="w-full"
-                                            />
-                                            <Input
-                                                placeholder="Site Supervisor"
-                                                value={deliveryForm?.siteSupervisor || ""}
-                                                onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })}
-                                                className="w-full"
-                                            />
-                                            <Input
-                                                placeholder="Phone Number"
-                                                type="tel"
-                                                maxLength={10}
-                                                value={deliveryForm?.phoneNumber || ""}
-                                                onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })}
-                                                className="w-full"
-                                            />
-                                            <Input
-                                                placeholder="Address"
-                                                value={deliveryForm?.address || ""}
-                                                onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
-                                                className="w-full"
-                                            />
-                                            <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
-                                                <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
-                                                    <i className="fa-solid fa-save mr-2"></i>Save
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() => setEditDelivery(false)}
-                                                    className="w-full sm:w-auto"
-                                                >
-                                                    <i className="fa-solid fa-times mr-2"></i>Cancel
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2 text-sm sm:text-base">
-                                            <p><strong>Site Name:</strong> {data?.deliveryLocationDetails?.siteName || "-"}</p>
-                                            <p><strong>Supervisor:</strong> {data?.deliveryLocationDetails?.siteSupervisor || "-"}</p>
-                                            <p><strong>Phone:</strong> {data?.deliveryLocationDetails?.phoneNumber || "-"}</p>
-                                            <p><strong>Address:</strong> {data?.deliveryLocationDetails?.address || "-"}</p>
-                                            {(canEdit || canCreate) && <button
-                                                onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
-                                                className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-                                            >
-                                                <i className="fa-solid fa-edit mr-1"></i>Edit
-                                            </button>}
-                                        </div>
-                                    )}
-                                </div>
                                 </div>
 
 
@@ -1669,7 +1669,7 @@ const OrderMaterialOverview = () => {
 
                                 <div className="flex flex-col gap-2">
 
-                                    {data?.orderedItems?.map((ele: any) => (
+                                    {data?.orderedItems?.sort((a:any, b:any) => new Date(b?.createdAt).getTime() - new Date(a.createdAt).getTime()).map((ele: any) => (
                                         <Card key={ele._id} className="border-green-200 bg-green-50 shadow ">
                                             <CardContent className="p-6">
                                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">

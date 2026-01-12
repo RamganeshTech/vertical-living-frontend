@@ -102,6 +102,7 @@ export const ORGANIZATION_ICONS:Record<string, string> = {
   PLAN: "fa-solid fa-wallet  text-2xl",
   PROFILE: "fa-solid fa-user-gear  text-2xl",
   MODULAR: "fa-solid fa-box  text-2xl",
+  // SETTINGS: "fa-solid fa-gear  text-2xl",
   // EXTERNAL: "fa-solid fa-boxes-stacked text-2xl",
 }
 
@@ -114,6 +115,7 @@ export const ORGANIZATION_LABELS: Record<string, string> = {
   PLAN: "Upgrade Plan",
   PROFILE: "User Profile",
   MODULAR: "Modular Units",
+  // SETTINGS: "Settings",
   // EXTERNAL: "External Units",
 
 }

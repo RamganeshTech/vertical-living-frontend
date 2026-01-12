@@ -242,6 +242,13 @@ const syncPaymentSectiontoProcurement = async ({ id, api }: { id: string; api: A
 };
 
 
+const cancelProcurement = async ({ id, api }: { id: string; api: AxiosInstance }) => {
+  const { data } = await api.post(`/department/procurement/cancelautomation/${id}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
 
 // PUBLIC APIS
 
@@ -579,6 +586,29 @@ export const useSyncProcurementToPaymentsSection = () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API instance not found for role");
       return await syncPaymentSectiontoProcurement({ id, api });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bills"] });
+    },
+  });
+};
+
+
+
+
+
+
+
+export const useCancelProcurementAutomation = ()=> {
+  const allowedRoles = ["owner", "staff", "CTO"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+      if (!api) throw new Error("API instance not found for role");
+      return await cancelProcurement({ id, api });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bills"] });

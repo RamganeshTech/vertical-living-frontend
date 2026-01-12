@@ -330,7 +330,7 @@ const InternalQuoteForm: React.FC<any> = ({ initialData }) => {
                                         <div key={sub._id} className="group relative">
                                             <div
                                                 onClick={() => { setActiveWorkId(work._id); setActiveTemplateId(sub._id); }}
-                                                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all border ${activeTemplateId === sub._id
+                                                className={`w-full flex cursor-pointer items-center justify-between p-3 rounded-xl transition-all border ${activeTemplateId === sub._id
                                                     // ? 'bg-slate-900 border-slate-900 text-white shadow-md'
                                                     // : 'bg-white border-transparent text-slate-600 hover:bg-slate-50'
                                                     ? 'bg-blue-50/50 border-blue-200 shadow-sm' // Highlighted State
@@ -369,7 +369,7 @@ const InternalQuoteForm: React.FC<any> = ({ initialData }) => {
                                         <div key={temp._id} className="group relative">
                                             <button
                                                 onClick={() => { setActiveWorkId(work._id); setActiveTemplateId(temp._id); }}
-                                                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all border ${activeTemplateId === temp._id
+                                                className={`w-full flex cursor-pointer items-center justify-between p-3 rounded-xl transition-all border ${activeTemplateId === temp._id
                                                     // ? 'bg-slate-900 border-slate-900 text-white shadow-md'
                                                     // : 'bg-white border-transparent text-slate-600 hover:bg-slate-50 hover:border-slate-100'
 
@@ -573,8 +573,8 @@ const InternalQuoteForm: React.FC<any> = ({ initialData }) => {
                             onChange={(e) => setNewWorkName(e.target.value.toUpperCase())}
                         />
                         <div className="flex gap-2">
-                            <Button variant="ghost" className="flex-1 text-[10px] font-bold uppercase text-slate-400" onClick={() => setWorkModalOpen(false)}>Cancel</Button>
-                            <Button className="flex-1 bg-slate-900 text-white rounded-xl py-5 font-black text-[10px] uppercase shadow-lg"
+                            <Button variant="secondary" className="flex-1 text-[10px] font-bold uppercase text-slate-400" onClick={() => setWorkModalOpen(false)}>Cancel</Button>
+                            <Button className="flex-1 bg-bue-600 text-white rounded-xl py-5 font-black text-[10px] uppercase shadow-lg"
                                 onClick={handleCreateWorkArea}
                             >
                                 Confirm
