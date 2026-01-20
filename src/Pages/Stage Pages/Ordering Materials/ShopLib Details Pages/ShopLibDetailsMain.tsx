@@ -4,13 +4,16 @@ import { useGetShopLib, useCreateShopLib, useDeleteShopLib } from "../../../../a
 import { toast } from "../../../../utils/toast";
 import { Button } from "../../../../components/ui/Button";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
+import SmartTagInput from "../../../../shared/SmartTagInput";
 // import { useGetShopLib, useCreateShopLib, useDeleteShopLib } from "../../api/shopLibApi";
 
-interface ShopFormData {
+export interface ShopFormData {
     shopName: string;
     address: string;
     contactPerson: string;
     phoneNumber: string;
+    priority: string[];
+
 }
 
 const ShopLibDetailsMain: React.FC = () => {
@@ -24,6 +27,8 @@ const ShopLibDetailsMain: React.FC = () => {
         address: "",
         contactPerson: "",
         phoneNumber: "",
+        priority: [],
+
     });
 
     const { role, permission } = useAuthCheck();
@@ -51,6 +56,16 @@ const ShopLibDetailsMain: React.FC = () => {
             [e.target.name]: e.target.value,
         });
     };
+
+    // Handler for SmartTagInput
+    const handleSetTags = (newTags: string[] | ((prev: string[]) => string[])) => {
+        setFormData(prev => ({
+            ...prev,
+            priority: typeof newTags === 'function' ? newTags(prev.priority) : newTags
+        }));
+    };
+
+
     const handleCreateShop = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -66,12 +81,7 @@ const ShopLibDetailsMain: React.FC = () => {
 
             const shopData = {
                 organizationId,
-                shopData: {
-                    shopName: formData.shopName,
-                    address: formData.address,
-                    contactPerson: formData.contactPerson,
-                    phoneNumber: formData.phoneNumber,
-                }
+                shopData: formData
             };
 
             await createShopMutation.mutateAsync(shopData);
@@ -87,6 +97,8 @@ const ShopLibDetailsMain: React.FC = () => {
                 address: "",
                 contactPerson: "",
                 phoneNumber: "",
+                priority: [],
+
             });
         } catch (error: any) {
             toast({
@@ -183,7 +195,7 @@ const ShopLibDetailsMain: React.FC = () => {
                             </div>
 
                         </div>
-                       {(canCreate)  && <Button
+                        {(canCreate) && <Button
                             onClick={() => setIsCreateModalOpen(true)}
                             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
                         >
@@ -360,7 +372,7 @@ const ShopLibDetailsMain: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                               {canDelete && <Button
+                                                {canDelete && <Button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleDeleteShop(shop._id);
@@ -450,6 +462,20 @@ const ShopLibDetailsMain: React.FC = () => {
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
+                                </div>
+
+                                <div className="pt-4 border-t border-gray-100">
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                                        <i className="fas fa-tags mr-2 text-blue-500"></i>Priority Tags
+                                    </label>
+                                    <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
+                                        <SmartTagInput
+                                            tags={formData.priority}
+                                            setState={handleSetTags}
+                                            // suggestionFetcher={async () => ['high', 'electrical', 'plumbing', 'general', 'urgent']}
+                                        />
+                                        <p className="text-[10px] text-gray-400 mt-2 italic">These tags are used to filter shops when sending procurement requests.</p>
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-3 pt-4">

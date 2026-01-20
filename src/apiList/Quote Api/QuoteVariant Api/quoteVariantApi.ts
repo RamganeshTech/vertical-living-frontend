@@ -50,7 +50,7 @@ export const getPdfQuotes = async ({
 }: {
     api: AxiosInstance;
     projectId: string;
-    
+
 }) => {
     const { data } = await api.get(`quote/quotegenerate/getquotepdf/quote/${projectId}`);
     if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
@@ -80,6 +80,13 @@ const generatePdf = async ({ api, quoteId, data }: { api: AxiosInstance, quoteId
     return res?.data.data;
 }
 
+
+const generateClientPdf = async ({ api, quoteId, type, projectId }: { api: AxiosInstance, quoteId: string, type: string, projectId:string }) => {
+    const res = await api.put(`quote/quotegenerate/clientquote/generatepdf/${projectId}/${quoteId}`, {type});
+    console.log("res form api", res.data)
+    if (!res?.data.ok) throw new Error(res?.data?.message || "Failed to generate pdf");
+    return res?.data.data;
+}
 
 
 export const useGetMaterialQuoteSingleEntry = (organizationId: string, id: string) => {
@@ -171,7 +178,7 @@ export const useGetMaterialBrands = (organizationId: string, categoryName: strin
         queryFn: async () => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
             if (!api) throw new Error("API instance for role not found");
-    console.log("categrouName", categoryName)
+            console.log("categrouName", categoryName)
 
             return await getMaterialBrand({ api, organizationId, categoryName })
         },
@@ -217,5 +224,27 @@ export const useGenerateQuotePdf = () => {
         onSuccess: (_, { organizationId }) => {
             queryClient.invalidateQueries({ queryKey: ["quote-material-items", organizationId] });
         },
+    });
+};
+
+
+
+
+
+export const useGenerateClientQuotePdf = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ quoteId, projectId, type }: {  quoteId: string, projectId: string, type: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
+            if (!api) throw new Error("API instance for role not found");
+
+            return await generateClientPdf({ api, quoteId, projectId, type });
+        },
+        // onSuccess: (_, { organizationId }) => {
+        //     queryClient.invalidateQueries({ queryKey: ["quote-material-items", organizationId] });
+        // },
     });
 };

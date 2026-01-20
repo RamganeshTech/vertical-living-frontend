@@ -16,7 +16,7 @@ const getAllOrderHistory = async ({ projectId, api }: { projectId: string, api: 
 
 
 
-const getSingleOrderItem = async ({ projectId,orderItemId, api }: { projectId: string, orderItemId: string, api: AxiosInstance }) => {
+const getSingleOrderItem = async ({ projectId, orderItemId, api }: { projectId: string, orderItemId: string, api: AxiosInstance }) => {
   const { data } = await api.get(`/orderingmaterial/${projectId}/${orderItemId}/getsingleorderedItem`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
@@ -104,7 +104,7 @@ export const useUpdateDeliveryLocation = () => {
 
 
 export const useSetOrderingMaterialHistoryDeadline = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker", ];
+  const allowedRoles = ["owner", "staff", "CTO", "worker",];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -128,7 +128,7 @@ export const useSetOrderingMaterialHistoryDeadline = () => {
 };
 
 export const useCompleteOrderingMaterialHistoryStage = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker",];
+  const allowedRoles = ["owner", "staff", "CTO", "worker",];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -216,6 +216,25 @@ const sendToProcruement = async ({
 
 
 
+const sendToProcruementNewVersion = async ({
+  projectId,
+  orderItemId, organizationId,
+  priority,
+  api,
+}: {
+  projectId: string;
+  orderItemId: string,
+  organizationId: string
+  priority: string
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.put(`/orderingmaterial/v1/${projectId}/${orderItemId}/${organizationId}/senttoprocurement`, { priority });
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
 
 const updatePdfStatus = async ({
   projectId,
@@ -274,7 +293,7 @@ export const useOrderHistorySubmitOrder = () => {
 
 
 export const useOrderHistorySendToProcurement = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -292,8 +311,27 @@ export const useOrderHistorySendToProcurement = () => {
 
 
 
+export const useOrderHistorySendToProcurementNewVersion = () => {
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
 
-export const useGetSingleOrderItem = (projectId: string, orderItemId:string) => {
+  return useMutation({
+    mutationFn: async ({ projectId, orderItemId, organizationId, priority }: { projectId: string, orderItemId: string, organizationId: string, priority: string }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await sendToProcruementNewVersion({ projectId, orderItemId, organizationId, api, priority });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+
+
+
+export const useGetSingleOrderItem = (projectId: string, orderItemId: string) => {
   const allowedRoles = ["owner", "staff", "CTO", "worker", "client"]
   const { role } = useGetRole();
   const api = getApiForRole(role!);
@@ -345,7 +383,7 @@ const uploadOrderingMateriaImages = async ({ projectId, files, api }: { projectI
 
 
 export const useUploadOrderingMaterialImages = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -383,7 +421,7 @@ const deleteOrderingMaterialImage = async ({
 
 
 export const useDeleteOrderMaterialImage = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
@@ -643,7 +681,7 @@ const addOrderingMaterialSubItemApi = async ({
 };
 
 export const useAddOrderingMaterialSubItem = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient()
@@ -693,7 +731,7 @@ const deleteOrderingMaterialSubItemApi = async ({
 
 
 export const useDeleteOrderingMaterialSubItem = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient()
@@ -730,7 +768,7 @@ const deleteAllSubUnits = async (
 };
 
 export const useDeleteAllSubItems = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient()
@@ -779,7 +817,7 @@ const updateOrderingMaterialSubItemApi = async ({
 };
 
 export const useUpdateOrderingMaterialSubItem = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
   const queryClient = useQueryClient()
@@ -833,7 +871,7 @@ const updateShopDetailsApi = async (
 };
 
 export const useUpdateShopDetails = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
 
   const { role } = useGetRole();
   const api = getApiForRole(role!);
@@ -866,7 +904,7 @@ const deleteOrderPdf = async (
 
 //  nto in use
 export const useDeleteOrderMaterialPdf = () => {
-  const allowedRoles = ["owner", "staff", "CTO","worker"];
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
 
   const { role } = useGetRole();
   const api = getApiForRole(role!);

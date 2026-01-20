@@ -194,7 +194,7 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
   CAD: "cad",
 
   COMMONORDER: "commonorder",
-  TOOLMANAGEMENT: "toolmanagement",
+  TOOLMANAGEMENT: "toolhardware",
 
   // ACCOUNTING: "accounts" || "billing" || "payments",
   ACCOUNTING: ["accounts", "billing", "payments", "vendor", "customer", "invoice",
@@ -202,12 +202,12 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
     "vendorpayment", "salesorder", "retailinvoice"],
     
 
-  RATECONIG: "materialquote",
-  RATECONIGSTAFF: "materialquote",
+  RATECONIG: "materialrateconfig",
+  RATECONIGSTAFF: "labourratequote",
   WORKTEMPLATE: "materialquote",
-  INTERNALQUOTE: "materialquote",
-  QUOTEVARIENT: "materialquote",
-  "QUOTES (CLIENT)": "materialquote",
+  INTERNALQUOTE: "internalquote",
+  QUOTEVARIENT: "quotevariant",
+  "QUOTES (CLIENT)": "clientquote",
 
   SUBCONTRACT: "subcontract",
 
@@ -314,7 +314,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
       const backendKey = PERMISSION_MAPPING[sidebarKey];
 
-      if (sidebarKey === "CAD" || sidebarKey === "TOOLMANAGEMENT"  || sidebarKey === "WORKTEMPLATES") return;
+      // if (sidebarKey === "CAD" || sidebarKey === "TOOLMANAGEMENT"  || sidebarKey === "WORKTEMPLATES") return;
 
       // If this sidebar item maps to a permission module (e.g. HR, LOGISTICS)
       if (backendKey) {

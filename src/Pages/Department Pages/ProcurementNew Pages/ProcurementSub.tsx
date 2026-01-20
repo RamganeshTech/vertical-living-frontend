@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
@@ -11,9 +11,10 @@ import {
     useProcurementGeneratePdf,
     useDeleteProcurementPdf,
     // useSyncLogistics,
-    useProcurementGenerateLink,
+    // useProcurementGenerateLink,
     useSyncProcurementToPaymentsSection,
     useCancelProcurementAutomation,
+    useConfirmFinalShopQuote,
     // useSyncAccountsProcurement
 } from "../../../apiList/Department Api/Procurement Api/procurementApi";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
@@ -24,18 +25,34 @@ import { dateFormate } from "../../../utils/dateFormator";
 import { Badge } from "../../../components/ui/Badge";
 import { Textarea } from "../../../components/ui/TextArea";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import type { IProcurementNew, IShopQuotes } from "./ProcurementNewMain";
+
+
+
+
+
+
+
+
+
 
 const ProcurementSub: React.FC = () => {
-    const { id, organizationId } = useParams() as { id: string, organizationId: string }
+    const { id } = useParams() as { id: string, organizationId: string }
     const navigate = useNavigate()
-    const { data, isLoading, refetch } = useGetSingleProcurementDetails(id);
+    const location = useLocation()
+
+    const { data, isLoading, refetch } = useGetSingleProcurementDetails(id) as { data: IProcurementNew, isLoading: boolean, refetch: any }
     const { mutateAsync: updateShop } = useUpdateProcurementShopDetails();
     const { mutateAsync: updateDelivery } = useUpdateProcurementDeliveryLocation();
     // const { mutateAsync: updateCost, isPending: totalCostPending } = useUpdateProcurementTotalCost();
     const { mutateAsync: generatePdf, isPending: generatePending } = useProcurementGeneratePdf()
-    const { mutateAsync: generateLink, isPending: linkPending } = useProcurementGenerateLink()
+    // const { mutateAsync: generateLink, isPending: linkPending } = useProcurementGenerateLink()
     const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteProcurementPdf()
     const { mutateAsync: syncPaymentsMutation, isPending: syncPaymentsLoading } = useSyncProcurementToPaymentsSection()
+
+    const { mutateAsync: confirmQuote, isPending: isConfirming } = useConfirmFinalShopQuote();
+
+
 
     // const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
     // const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsProcurement()
@@ -55,11 +72,11 @@ const ProcurementSub: React.FC = () => {
     const canList = role === "owner" || permission?.procurement?.list;
     const canEdit = role === "owner" || permission?.procurement?.edit;
 
-    const tokenEncoded = encodeURIComponent(data?.generatedLink); // encode only once
 
-    const link = `${import.meta.env.VITE_FRONTEND_URL}/${organizationId}/procurement/public?token=${tokenEncoded}&orderId=${id}`;
+    // const tokenEncoded = encodeURIComponent(data?.generatedLink!); // encode only once
+    // const link = `${import.meta.env.VITE_FRONTEND_URL}/${organizationId}/procurement/public?token=${tokenEncoded}&orderId=${id}`;
 
-    const [copied, setCopied] = useState(false);
+    // const [copied, setCopied] = useState(false);
 
     const [editDelivery, setEditDelivery] = useState(false);
     const [deliveryForm, setDeliveryForm] = useState<any>({});
@@ -137,65 +154,65 @@ const ProcurementSub: React.FC = () => {
 
 
 
-    const handleGenerateLink = async () => {
-        try {
-            await generateLink({ orderId: id });
-            refetch()
-            toast({ title: "Success", description: "Link Generated successfully" });
-        } catch (err: any) {
-            toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
-        }
-    };
+    // const handleGenerateLink = async () => {
+    //     try {
+    //         await generateLink({ orderId: id });
+    //         refetch()
+    //         toast({ title: "Success", description: "Link Generated successfully" });
+    //     } catch (err: any) {
+    //         toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
+    //     }
+    // };
 
-    // Copy to clipboard handler
-    const handleCopy = async () => {
+    // // Copy to clipboard handler
+    // const handleCopy = async () => {
 
-        if (!link) return
+    //     if (!link) return
 
-        try {
-            await navigator.clipboard.writeText(link);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-        } catch (err) {
-            toast({ title: "Error", description: "Failed to copy link", variant: "destructive" });
-        }
-    };
-
-
+    //     try {
+    //         await navigator.clipboard.writeText(link);
+    //         setCopied(true);
+    //         setTimeout(() => setCopied(false), 1500);
+    //     } catch (err) {
+    //         toast({ title: "Error", description: "Failed to copy link", variant: "destructive" });
+    //     }
+    // };
 
 
 
-    const handleWhatsappShare = () => {
-        if (!link) return;
-
-        // Pre-filled message
-        // const text = `Hey, please check this items link: ${link}`
-        const text = `Hey, please check this items link:\n\n${link}`;
 
 
-        // Check if phone number exists
-        const phoneNumber = data?.shopDetails?.phoneNumber;
+    // const handleWhatsappShare = () => {
+    //     if (!link) return;
 
-        let waUrl = "";
+    //     // Pre-filled message
+    //     // const text = `Hey, please check this items link: ${link}`
+    //     const text = `Hey, please check this items link:\n\n${link}`;
 
-        if (phoneNumber) {
-            // Send directly to the phone number (must include country code, no + or spaces)
-            // Example: 919876543210
-            // const formattedNumber = phoneNumber.replace(/\D/g, ""); // remove non-digit characters
-            // waUrl = `https://wa.me/${formattedNumber}?text=${text}`;
 
-            // Remove non-digit characters
-            const formattedNumber = phoneNumber.replace(/\D/g, "");
-            waUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(text)}`;
+    //     // Check if phone number exists
+    //     const phoneNumber = data?.shopDetails?.phoneNumber;
 
-        } else {
-            // Fallback: let user choose whom to send
-            waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-        }
+    //     let waUrl = "";
 
-        // Open WhatsApp
-        window.open(waUrl, "_blank");
-    };
+    //     if (phoneNumber) {
+    //         // Send directly to the phone number (must include country code, no + or spaces)
+    //         // Example: 919876543210
+    //         // const formattedNumber = phoneNumber.replace(/\D/g, ""); // remove non-digit characters
+    //         // waUrl = `https://wa.me/${formattedNumber}?text=${text}`;
+
+    //         // Remove non-digit characters
+    //         const formattedNumber = phoneNumber.replace(/\D/g, "");
+    //         waUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(text)}`;
+
+    //     } else {
+    //         // Fallback: let user choose whom to send
+    //         waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    //     }
+
+    //     // Open WhatsApp
+    //     window.open(waUrl, "_blank");
+    // };
 
 
 
@@ -239,6 +256,18 @@ const ProcurementSub: React.FC = () => {
 
 
 
+    const handleConfirmSelection = async (e: React.MouseEvent, quoteId: string) => {
+        try {
+            e.stopPropagation(); // ✋ Stops the card from navigating to the details page
+
+            await confirmQuote({ id: id!, quoteId: quoteId });
+            refetch?.()
+            toast({ title: "Success", description: "Shop quote selected successfully" });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+        }
+    };
+
 
 
     // const handleGenerateAccounts = async () => {
@@ -269,15 +298,17 @@ const ProcurementSub: React.FC = () => {
     }
 
 
+    if (location.pathname.includes("shopquote")) {
+        return <Outlet />
+    }
 
     if (!canList) {
         return;
     }
 
 
-
-    console.log("data", data)
-    console.log("data procuremnet", data.procurementNumber)
+    // console.log("data", data)
+    // console.log("data procuremnet", data.procurementNumber)
 
     return (
         <div className="p-1 max-w-full max-h-full overflow-y-auto space-y-8">
@@ -362,155 +393,7 @@ const ProcurementSub: React.FC = () => {
                 </section>
             </header>
 
-            {/* <div className="border-l-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
-                    <i className="fa-solid fa-store"></i>
-                    Shop Details
-                </h2>
-                {editShop ? (
-                    <div className="space-y-3">
-                        <Input
-                            placeholder="Shop Name"
-                            value={shopForm?.shopName || ""}
-                            onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
-                            className="w-full"
-                        />
-                        <Input
-                            placeholder="Contact Person"
-                            value={shopForm?.contactPerson || ""}
-                            onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
-                            className="w-full"
-                        />
-                        <Input
-                            placeholder="Phone Number"
-                            value={shopForm?.phoneNumber || ""}
-                            type="tel"
-                            maxLength={10}
-                            // onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                // Allow only digits (0–9)
-                                if (/^\d*$/.test(value)) {
-                                    setShopForm({ ...shopForm, phoneNumber: value });
-                                }
-                            }}
-                            className="w-full"
-                        />
-                        <Input
-                            placeholder="upi Id"
-                            value={shopForm?.upiId || ""}
-                            onChange={(e) => setShopForm({ ...shopForm, upiId: e.target.value })}
-                            className="w-full"
-                        />
-                        <Input
-                            placeholder="Address"
-                            value={shopForm?.address || ""}
-                            onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
-                            className="w-full"
-                        />
-                        <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
-                            <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
-                                <i className="fa-solid fa-save mr-2"></i>Save
-                            </Button>
-                            <Button
-                                variant="outline"
-                                onClick={() => setEditShop(false)}
-                                className="w-full sm:w-auto"
-                            >
-                                <i className="fa-solid fa-times mr-2"></i>Cancel
-                            </Button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-2 text-sm sm:text-base">
-                        <p><strong>Shop Name:</strong> {data?.shopDetails?.shopName || "-"}</p>
-                        <p><strong>Contact Person:</strong> {data?.shopDetails?.contactPerson || "-"}</p>
-                        <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
-                        <p><strong>Upi Id:</strong> {data?.shopDetails?.upiId || "-"}</p>
-                        <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
-
-                        <button
-                            onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
-                            className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-                        >
-                            <i className="fa-solid fa-edit mr-1"></i>Edit
-                        </button>
-
-                    </div>
-                )}
-            </div>
-
-            <div className="border-l-4 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
-                    <i className="fa-solid fa-truck"></i>
-                    Delivery Location
-                </h2>
-                {editDelivery ? (
-                    <div className="space-y-3">
-                        <Input
-                            placeholder="Site Name"
-                            value={deliveryForm?.siteName || ""}
-                            onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })}
-                            className="w-full"
-                        />
-                        <Input
-                            placeholder="Site Supervisor"
-                            value={deliveryForm?.siteSupervisor || ""}
-                            onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })}
-                            className="w-full"
-                        />
-                        <Input
-                            placeholder="Phone Number"
-                            type="tel"
-                            maxLength={10}
-                            value={deliveryForm?.phoneNumber || ""}
-                            // onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                // Allow only digits (0–9)
-                                if (/^\d*$/.test(value)) {
-                                    setDeliveryForm({ ...deliveryForm, phoneNumber: value });
-                                }
-                            }}
-                            className="w-full"
-                        />
-                        <Input
-                            placeholder="Address"
-                            value={deliveryForm?.address || ""}
-                            onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
-                            className="w-full"
-                        />
-                        <div className="flex flex-col sm:flex-row gap-2 mt-3 justify-end ">
-                            <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
-                                <i className="fa-solid fa-save mr-2"></i>Save
-                            </Button>
-                            <Button
-                                variant="outline"
-                                onClick={() => setEditDelivery(false)}
-                                className="w-full sm:w-auto"
-                            >
-                                <i className="fa-solid fa-times mr-2"></i>Cancel
-                            </Button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-2 text-sm sm:text-base">
-                        <p><strong>Site Name:</strong> {data?.deliveryLocationDetails?.siteName || "-"}</p>
-                        <p><strong>Supervisor:</strong> {data?.deliveryLocationDetails?.siteSupervisor || "-"}</p>
-                        <p><strong>Phone:</strong> {data?.deliveryLocationDetails?.phoneNumber || "-"}</p>
-                        <p><strong>Address:</strong> {data?.deliveryLocationDetails?.address || "-"}</p>
-                        <button
-                            onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
-                            className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-                        >
-                            <i className="fa-solid fa-edit mr-1"></i>Edit
-                        </button>
-                    </div>
-                )}
-            </div> */}
-
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+            <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 min-h-[140px] divide-y md:divide-y-0 md:divide-x divide-gray-100">
 
                     {/* --- COLUMN 1: SHOP DETAILS (Editable) --- */}
@@ -754,26 +637,20 @@ const ProcurementSub: React.FC = () => {
                                     </span>
                                 </div>
 
-                                {/* Quote Number (if exists) */}
-                                {data?.shopQuoteNumber && (
-                                    <div className="flex justify-between items-center text-xs">
-                                        <span className="text-gray-500">Shop Quote #</span>
-                                        <span className="font-medium text-gray-700">{data.shopQuoteNumber}</span>
-                                    </div>
-                                )}
+
                             </div>
                         </div>
 
                         {/* Payment Status Badge */}
                         <div className="mt-auto">
-                            <div className={`p-2 rounded-lg border flex items-center gap-3 ${data?.isSendToPayment ? 'bg-purple-50 border-purple-100' : 'bg-gray-50 border-gray-100'}`}>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${data?.isSendToPayment ? 'bg-purple-100 text-purple-600' : 'bg-gray-200 text-gray-400'}`}>
-                                    <i className={`fa-solid ${data?.isSendToPayment ? 'fa-file-invoice-dollar' : 'fa-hourglass'}`}></i>
+                            <div className={`p-2 rounded-lg border flex items-center gap-3 ${data?.isSyncWithPaymentsSection ? 'bg-purple-50 border-purple-100' : 'bg-gray-50 border-gray-100'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${data?.isSyncWithPaymentsSection ? 'bg-purple-100 text-purple-600' : 'bg-gray-200 text-gray-400'}`}>
+                                    <i className={`fa-solid ${data?.isSyncWithPaymentsSection ? 'fa-file-invoice-dollar' : 'fa-hourglass'}`}></i>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[10px] uppercase font-bold text-gray-400">Payment Process</span>
-                                    <span className={`text-xs font-bold ${data?.isSendToPayment ? 'text-purple-700' : 'text-gray-500'}`}>
-                                        {data?.isSendToPayment ? "Sent to Payment" : "Not Sent Yet"}
+                                    <span className={`text-xs font-bold ${data?.isSyncWithPaymentsSection ? 'text-purple-700' : 'text-gray-500'}`}>
+                                        {data?.isSyncWithPaymentsSection ? "Sent to Payment" : "Not Sent Yet"}
                                     </span>
                                 </div>
                             </div>
@@ -781,7 +658,111 @@ const ProcurementSub: React.FC = () => {
                     </div>
 
                 </div>
-            </div>
+            </section>
+
+
+
+            {/* --- NEW SECTION: VENDOR QUOTES OVERVIEW --- */}
+            <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-indigo-700 flex items-center gap-2">
+                        <i className="fas fa-file-invoice"></i> Vendor Quotes Received
+                    </h3>
+                    <Badge variant="secondary" className="bg-indigo-50 text-indigo-700">
+                        {data?.shopQuotes?.length || 0} Quotes
+                    </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {data?.shopQuotes?.length > 0 ? (
+                        data.shopQuotes.map((quote: IShopQuotes, idx: number) => {
+                            // Calculate total for this specific quote
+                            const quoteTotal = quote.selectedUnits?.reduce(
+                                (acc: number, curr: any) => acc + (curr.totalCost || 0), 0
+                            );
+
+                            return (
+                                <div
+                                    key={quote._id}
+                                    onClick={() => navigate(`shopquote/${quote._id}`)}
+                                    className="group cursor-pointer bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all relative overflow-hidden"
+                                >
+                                    {/* Decorative side bar */}
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 group-hover:w-1.5 transition-all"></div>
+
+                                    <div className="flex justify-between items-start mb-3 pl-2">
+                                        <div>
+                                            <h4 className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                                {(quote?.shopId as any).shopName || `Vendor ${idx + 1}`}
+                                            </h4>
+                                            {/* <p className="text-[10px] text-gray-500 font-mono mt-0.5">
+                                                Ref: {quote._id.slice(-6).toUpperCase()}
+                                            </p> */}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+
+                                            {/* <Button
+                                                    onClick={(e) => handleConfirmSelection(e, quote._id)}
+                                                    disabled={isConfirming}
+                                                    className="flex items-center justify-center h-7 px-3 rounded-lg bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-tight hover:bg-indigo-700 active:scale-95 transition-all shadow-sm disabled:opacity-50"
+                                                >
+                                                    Select Shop
+                                                </Button>
+                                             
+                                                {(data?.selectedShopId as any)._id === (quote?.shopId as any)?._id && (
+                                                    <div className="h-7 px-3 rounded-lg bg-green-100 text-green-700 text-[10px] font-bold uppercase flex items-center border border-green-200">
+                                                        <i className="fas fa-check mr-1"></i> Selected
+                                                    </div>
+                                                )} */}
+
+                                            {(data?.selectedShopId as any)?._id === (quote?.shopId as any)?._id ? (
+                                                <div className="h-7 px-3 rounded-lg bg-green-100 text-green-700 text-[10px] font-bold uppercase flex items-center border border-green-200 animate-in fade-in zoom-in duration-300">
+                                                    <i className="fas fa-check mr-1"></i> Selected
+                                                </div>
+                                            ) : (
+                                                /* 2. If it is NOT the selected shop, show the Select Button */
+                                                <Button
+                                                    onClick={(e) => handleConfirmSelection(e, quote._id)}
+                                                    disabled={isConfirming}
+                                                    className="flex items-center justify-center h-7 px-3 rounded-lg bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-tight hover:bg-indigo-700 active:scale-95 transition-all shadow-sm disabled:opacity-50"
+                                                >
+                                                    {isConfirming ? <i className="fas fa-spinner fa-spin mr-1"></i> : null}
+                                                    Select Shop
+                                                </Button>
+                                            )}
+
+
+                                        </div>
+                                    </div>
+
+                                    <div className="pl-2 space-y-2">
+                                        <div className="flex justify-between items-end mt-4">
+                                            <span className="text-xs text-gray-500">Total Quoted Price:</span>
+                                            <span className="text-lg font-black text-indigo-700">
+                                                ₹{quoteTotal?.toLocaleString()}
+                                            </span>
+                                        </div>
+
+                                        <div className="pt-2 border-t border-dashed border-gray-100 flex items-center justify-between text-[10px] text-gray-400">
+                                            <span>{quote.selectedUnits?.length || 0} Items quoted</span>
+                                            <span className="group-hover:translate-x-1 transition-transform text-indigo-500 font-bold">
+                                                View Details <i className="fas fa-arrow-right ml-1"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="col-span-full py-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                            <i className="fas fa-link text-gray-300 text-3xl mb-2"></i>
+                            <p className="text-sm text-gray-500 italic">No quotes received from vendors yet.</p>
+                        </div>
+                    )}
+                </div>
+            </section>
+
+
 
             <Card>
                 <CardContent className="py-6 space-y-5">
@@ -795,22 +776,21 @@ const ProcurementSub: React.FC = () => {
 
                             {/* Right Side: Dynamic Status Badge */}
                             <div>
-                                {!data?.generatedLink &&
-                                    // --- RED STATE: ACTION REQUIRED ---
+                                {/* {!data?.generatedLink &&
                                     <div className="flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-full shadow-sm">
                                         <i className="fas fa-exclamation-circle text-red-500 text-lg"></i>
                                         <span className="text-sm font-bold text-red-600 tracking-wide">
                                             Action: Generate & Share Link
                                         </span>
                                     </div>
-                                }
+                                } */}
                             </div>
                         </div>
 
                         {/* Items Table */}
                         <div className="overflow-x-auto rounded border border-gray-200">
                             <table className="min-w-full divide-y divide-gray-100">
-                                <thead className="bg-gray-50 text-sm text-gray-700 font-medium">
+                                <thead className="bg-gray-200 text-sm text-gray-700 font-medium">
                                     <tr>
                                         <th className="px-5 py-2 text-center">S.No</th>
                                         <th className="px-5 py-2 text-center">Item Name</th>
@@ -821,7 +801,7 @@ const ProcurementSub: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100 text-sm">
-                                    {data.selectedUnits.map((item: any, index: number) => (
+                                    {data.selectedUnits?.length > 0 ? data.selectedUnits?.map((item: any, index: number) => (
                                         <tr key={index}>
                                             <td className="px-5 py-2 text-center">{index + 1}</td>
                                             <td className="px-5 py-2 text-center">{item.subItemName}</td>
@@ -830,7 +810,27 @@ const ProcurementSub: React.FC = () => {
                                             <td className="px-5 py-2 text-center">{item.rate}</td>
                                             <td className="px-5 py-2 text-center">{item.totalCost}</td>
                                         </tr>
-                                    ))}
+                                    ))
+                                        : (
+                                            // --- FALLBACK STATE: NO SHOP SELECTED YET ---
+                                            <tr>
+                                                <td colSpan={6} className="px-5 py-12 text-center">
+                                                    <div className="flex flex-col items-center justify-center gap-3">
+                                                        <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center">
+                                                            <i className="fas fa-hand-pointer text-indigo-400 text-xl"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-base font-bold text-slate-700">No Shop Selected</p>
+                                                            <p className="text-xs text-slate-500 max-w-[250px] mx-auto mt-1">
+                                                                Please review the vendor quotes above and click
+                                                                <span className="text-indigo-600 font-bold mx-1">Select Shop</span>
+                                                                to finalize the rates for this order.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
                                 </tbody>
                             </table>
                         </div>
@@ -874,7 +874,7 @@ const ProcurementSub: React.FC = () => {
 
 
             {/* sharable link */}
-            <section className="w-full">
+            {/* <section className="w-full">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-sm w-full ">
                     <div className="flex items-center justify-between mb-3">
                         <h3 className="text-lg font-semibold text-blue-800 flex items-center gap-2">
@@ -882,7 +882,6 @@ const ProcurementSub: React.FC = () => {
                         </h3>
                     </div>
 
-                    {/* Show link after generation */}
                     {data?.generatedLink ? (
                         <div className="flex flex-col sm:flex-row gap-2 items-center">
                             <Input readOnly value={link} className="flex-1 text-sm cursor-default" />
@@ -905,7 +904,7 @@ const ProcurementSub: React.FC = () => {
                         </Button>
                     )}
                 </div>
-            </section>
+            </section> */}
 
 
             {/* PDF GENERATION */}

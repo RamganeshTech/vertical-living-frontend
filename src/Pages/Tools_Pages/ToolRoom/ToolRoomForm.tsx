@@ -38,9 +38,17 @@ const ToolRoomForm: React.FC<ToolRoomFormProps> = ({
 }) => {
     const navigate = useNavigate();
     const [currentMode, setCurrentMode] = useState(initialMode);
-    const { role, permission } = useAuthCheck();
+    // const { role, permission } = useAuthCheck();
 
-    const canEdit = role === "owner" || permission?.tools?.edit;
+    // const canEdit = role === "owner" || permission?.tools?.edit;
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.toolhardware?.list;
+    const canCreate = role === "owner" || permission?.toolhardware?.create;
+    // const canDelete = role === "owner" || permission?.toolhardware?.delete;
+    const canEdit = role === "owner" || permission?.toolhardware?.edit;
+
 
     const { data: staffList = [] } = useGetAllUsers(organizationId!, "staff");
 
@@ -53,7 +61,7 @@ const ToolRoomForm: React.FC<ToolRoomFormProps> = ({
 
     // 3. Single handler to update User ID and Role
     const handleInchargeChange = (selectedId: string | null) => {
-        const selectedStaff = staffOptions.find((s:any) => s.value === selectedId);
+        const selectedStaff = staffOptions.find((s: any) => s.value === selectedId);
         if (selectedStaff) {
             setFormData(prev => ({
                 ...prev,
@@ -200,7 +208,7 @@ const ToolRoomForm: React.FC<ToolRoomFormProps> = ({
                                     searchPlaceholder="Search by name..."
                                     value={formData.inchargeUser}
                                     onValueChange={handleInchargeChange}
-                                    // disabled={isReadOnly}
+                                    enabled={isReadOnly && (canEdit || canCreate)}
                                     searchBy="name"
                                     displayFormat="detailed"
                                     className="w-full"

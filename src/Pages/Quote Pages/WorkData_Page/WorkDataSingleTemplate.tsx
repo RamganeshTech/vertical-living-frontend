@@ -6,6 +6,8 @@ const WorkDataSingleTemplate = () => {
     const { workType } = useParams<{ workType: string }>();
     const navigate = useNavigate();
     
+
+
     // Find the specific work config
     const activeModule = WORK_TEMPLATE.find(m => m.work === workType);
 

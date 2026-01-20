@@ -2,6 +2,7 @@ import type { AxiosInstance } from "axios";
 import useGetRole from "../../../Hooks/useGetRole";
 import { getApiForRole } from "../../../utils/roleCheck";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "../../../QueryClient/queryClient";
 
 export const getAllClientQuotes = async ({
     api,
@@ -35,6 +36,19 @@ export const getSingleClientQuote = async ({
 }) => {
     const { data } = await api.get(`quote/quotegenerate/getsingleclientquote/${organizationId}/${id}`);
     if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
+    return data.data;
+};
+
+
+export const deleteClientQuote = async ({
+    api,
+    id,
+}: {
+    api: AxiosInstance;
+    id: string,
+}) => {
+    const { data } = await api.delete(`quote/quotegenerate/delete/${id}`);
+    if (!data.ok) throw new Error(data?.message || "Failed to delete");
     return data.data;
 };
 
@@ -114,6 +128,25 @@ export const useGetSingleClientQuote = (organizationId: string, id: string) => {
     });
 };
 
+
+
+export const useDeleteClientQuote = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({  id }: {  id: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
+            if (!api) throw new Error("API instance for role not found");
+
+            return await deleteClientQuote({ api, id })
+        },
+        onSuccess:()=>{
+            queryClient.invalidateQueries({queryKey: ["clientquote"]})
+        }
+    });
+};
 
 
 

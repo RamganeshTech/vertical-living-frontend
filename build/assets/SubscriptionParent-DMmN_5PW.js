@@ -1,0 +1,1 @@
+import{p as r,j as s}from"./index-DyM6T-eT.js";import e from"./SubscriptionMain-9JsiNE_V.js";import"./loadScript-B3Gdq1pJ.js";const a=()=>{const{openMobileSidebar:t,isMobile:o}=r();return s.jsx(e,{openMobileSidebar:t,isMobile:o})};export{a as default};

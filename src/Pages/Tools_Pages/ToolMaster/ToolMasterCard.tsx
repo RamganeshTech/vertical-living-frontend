@@ -1,4 +1,5 @@
 import { Button } from "../../../components/ui/Button";
+import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 
 interface ToolCardProps {
     tool: any;
@@ -15,14 +16,23 @@ export const ToolCard = ({ tool, onView, onDelete }: ToolCardProps) => {
         missing: 'bg-red-100 text-red-700 border-red-200',
     };
 
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.toolhardware?.list;
+    // const canCreate = role === "owner" || permission?.toolhardware?.create;
+    const canDelete = role === "owner" || permission?.toolhardware?.delete;
+    // const canEdit = role === "owner" || permission?.toolhardware?.edit;
+
+
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
             {/* Image Section */}
             <div className="h-40 bg-gray-100 relative overflow-hidden">
                 {tool.toolImages?.[0]?.url ? (
-                    <img 
-                        src={tool.toolImages[0].url} 
-                        alt={tool.toolName} 
+                    <img
+                        src={tool.toolImages[0].url}
+                        alt={tool.toolName}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                 ) : (
@@ -62,12 +72,12 @@ export const ToolCard = ({ tool, onView, onDelete }: ToolCardProps) => {
                     <Button onClick={onView} variant="outline" className="flex-1 py-1 h-8 text-xs">
                         Details
                     </Button>
-                    <button 
+                    {canDelete && <button
                         onClick={onDelete}
                         className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                     >
                         <i className="fas fa-trash-alt"></i>
-                    </button>
+                    </button>}
                 </div>
             </div>
         </div>

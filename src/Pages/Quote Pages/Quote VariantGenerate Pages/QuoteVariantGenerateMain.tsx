@@ -23,10 +23,10 @@ const QuoteGenerateVariantMain = () => {
 
 
     const { role, permission } = useAuthCheck();
-    const canList = role === "owner" || permission?.materialquote?.list;
-    // const canCreate = role === "owner" || permission?.materialquote?.create;
-    // const canDelete = role === "owner" || permission?.materialquote?.delete;
-    // const canEdit = role === "owner" || permission?.materialquote?.edit;
+    const canList = role === "owner" || permission?.quotevariant?.list;
+    // const canCreate = role === "owner" || permission?.quotevariant?.create;
+    // const canDelete = role === "owner" || permission?.quotevariant?.delete;
+    // const canEdit = role === "owner" || permission?.quotevariant?.edit;
 
 
     const [searchInput, setSearchInput] = useState("");     // user typing
@@ -72,12 +72,18 @@ const QuoteGenerateVariantMain = () => {
 
     return (
         <div className="p-2 max-h-full overflow-y-auto  min-h-full">
-            <header className="flex justify-between items-center">
-                <div className="flex gap-2">
-                    <i className="fas fa-file-invoice text-4xl text-blue-600" />
-                    <h1 className="text-2xl font-bold mb-4">Quote Variant generator</h1>
-                </div>
+            <header className="flex justify-between items-center mb-2">
+                <div>
+                    <div className="flex gap-2 items-center">
+                        <i className="fas fa-file-invoice text-4xl text-blue-600" />
+                        <div className="">
+                            <h1 className="text-2xl font-bold ">Quote Variant generator</h1>
+                            <p className="text-sm text-gray-500">existing quotes are from the internal quote section</p>
 
+                        </div>
+                    </div>
+
+                </div>
 
                 {/* <div className="flex gap-2">
 

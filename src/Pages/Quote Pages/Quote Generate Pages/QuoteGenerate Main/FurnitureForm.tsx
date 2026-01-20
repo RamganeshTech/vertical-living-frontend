@@ -50,6 +50,7 @@ type Props = {
   labourCost: number;
   updateFurniture?: (updatedFurniture: FurnitureBlock) => void;
   removeFurniture?: () => void;
+  isEditing?: boolean,
 };
 
 // Constants ----------------------------------------
@@ -117,6 +118,7 @@ export const calculateCoreMaterialCosts = (
 const FurnitureForm: React.FC<Props> = ({
   // index,
   data,
+  isEditing,
   labourCost,
   updateFurniture,
   removeFurniture,
@@ -143,6 +145,10 @@ const FurnitureForm: React.FC<Props> = ({
     const updated: any = [...data.coreMaterials];
 
     if (key === "imageUrl") {
+      if (isEditing) {
+        // only in edit mode, track new image file
+        updated[rowIndex].newImageFile = value;
+      }
       updated[rowIndex].imageUrl = value;
       updated[rowIndex].previewUrl = URL.createObjectURL(value);
     } else if (key === "plywoodNos" || key === "laminateNos") {
@@ -291,7 +297,7 @@ const FurnitureForm: React.FC<Props> = ({
                   </td>
                 )}
 
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                <td className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                   <input
                     value={row.itemName}
                     placeholder="TV Unit | Wardrobe"
@@ -301,10 +307,11 @@ const FurnitureForm: React.FC<Props> = ({
                 </td>
                 {["plywoodNos", "laminateNos"].map((field) =>
                   ["quantity", "thickness"].map((sub) => (
-                    <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" key={`${field}-${sub}`}>
+                    <td className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" key={`${field}-${sub}`}>
                       <input
                         type="number"
-                        value={(row as any)[field][sub]}
+                        placeholder={`${sub === "quantity" ? "QTY" : "THK"}`}
+                        value={(row as any)[field][sub] || ""}
                         onChange={(e) => {
                           if (Number(e.target.value) >= 0) {
 
@@ -324,56 +331,60 @@ const FurnitureForm: React.FC<Props> = ({
                   <>
                     <td
                       rowSpan={data.coreMaterials.length}
-                      className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                      className="px-1 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                       <input
                         type="number"
-                        value={row.carpenters}
+                        placeholder={`no of carpentors`}
+                        value={row.carpenters || ""}
                         onChange={(e) =>
                           handleCoreChange(i, "carpenters", Number(e.target.value))
                         }
-                        className="w-full px-2 py-1 text-center outline-none"
+                        className="w-full px-[2px] py-1 text-center outline-none"
                       />
                     </td>
                     <td
                       rowSpan={data.coreMaterials.length}
-                      className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                      className="px-1 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                       <input
                         type="number"
-                        value={row.days}
+                        placeholder={`no of days`}
+                        value={row.days || ""}
                         onChange={(e) =>
                           handleCoreChange(i, "days", Number(e.target.value))
                         }
-                        className="w-full px-2 py-1 text-center outline-none"
+                        className="w-full px-[2px] py-1 text-center outline-none"
                       />
                     </td>
                   </>
                 )}
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                <td className="px-1 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                   <input
                     type="number"
-                    value={row.profitOnMaterial}
+                    placeholder={`profit percent`}
+                    value={row.profitOnMaterial || ""}
                     onChange={(e) =>
                       handleCoreChange(i, "profitOnMaterial", Number(e.target.value))
                     }
-                    className="w-full px-2 py-1 text-center outline-none"
+                    className="w-full px-[2px] py-1 text-center outline-none"
                   />
                 </td>
                 {i === 0 && (
                   <>
                     <td
                       rowSpan={data.coreMaterials.length}
-                      className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                      className="px-1 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                       <input
                         type="number"
-                        value={row.profitOnLabour}
+                        placeholder={`profit percent`}
+                        value={row.profitOnLabour || ""}
                         onChange={(e) =>
                           handleCoreChange(i, "profitOnLabour", Number(e.target.value))
                         }
-                        className="w-full px-2 py-1 text-center outline-none"
+                        className="w-full px-[2px] py-1 text-center outline-none"
                       />
                     </td>
                   </>)}
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                <td className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                   <input
                     value={row.remarks}
                     placeholder="remarks"
@@ -383,8 +394,8 @@ const FurnitureForm: React.FC<Props> = ({
                     className="w-full px-2 py-1 text-center outline-none"
                   />
                 </td>
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">₹{row.rowTotal.toLocaleString("en-IN")}</td>
-                <td className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
+                <td className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">₹{row.rowTotal.toLocaleString("en-IN")}</td>
+                <td className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                   <Button
                     variant="danger"
                     onClick={() => {
@@ -459,7 +470,7 @@ const FurnitureForm: React.FC<Props> = ({
                 className="group relative border-none !border-b-1 px-4 !py-2 transition-all duration-150 hover:bg-gray-50"
               >
                 <td
-                  className="p-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  className="p-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
                     value={row.itemName || ""}
@@ -472,7 +483,7 @@ const FurnitureForm: React.FC<Props> = ({
                   />
                 </td>
                 <td
-                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
                     value={row.description}
@@ -485,11 +496,12 @@ const FurnitureForm: React.FC<Props> = ({
                   />
                 </td>
                 <td
-                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
                     type="number"
-                    value={row.quantity}
+                    placeholder="enter quantity"
+                    value={row.quantity || ""}
                     onChange={(e) => {
                       if (Number(e.target.value) >= 0) {
 
@@ -501,35 +513,39 @@ const FurnitureForm: React.FC<Props> = ({
                   />
                 </td>
                 <td
-                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <input
                     type="number"
-                    value={row.cost}
+                    value={row.cost || ""}
+                    placeholder="enter cost"
                     onChange={(e) =>
                       handleSimpleChange(kind, i, "cost", Number(e.target.value))
                     }
                     className="w-full px-2 py-1 text-center outline-none"
                   />
                 </td>
-                <td 
-                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
-                
+                <td
+                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+
                 >
                   <input
                     type="number"
-                    value={row.profitOnMaterial ?? 0}
+                    placeholder="enter profit"
+                    value={(row.profitOnMaterial ?? 0) || ""}
                     onChange={(e) =>
                       handleSimpleChange(kind, i, "profitOnMaterial", Number(e.target.value))
                     }
-                    className="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm"
+                    // className="w-20 text-center  rounded px-2 py-1 text-sm"
+                    className="w-full px-2 py-1 text-center outline-none"
+
                   />
                 </td>
                 <td
-                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >₹{row.rowTotal.toLocaleString("en-IN")}</td>
                 <td
-                  className="px-2 border border-gray-100 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
                 >
                   <Button
                     variant="danger"
@@ -571,7 +587,7 @@ const FurnitureForm: React.FC<Props> = ({
     </div>
   );
 
-  
+
 
   return (
     <div className="shadow-md p-4 my-4 border rounded-lg bg-white">

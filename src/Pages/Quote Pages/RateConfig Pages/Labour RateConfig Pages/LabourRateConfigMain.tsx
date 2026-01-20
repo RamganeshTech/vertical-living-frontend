@@ -20,10 +20,10 @@ export default function LabourRateConfigMain() {
     const isChildRoute = location.pathname.includes("laboursingle");
 
     const { role, permission } = useAuthCheck();
-    const canList = role === "owner" || permission?.materialquote?.list;
-    const canCreate = role === "owner" || permission?.materialquote?.create;
-    // const canDelete = role === "owner" || permission?.materialquote?.delete;
-    // const canEdit = role === "owner" || permission?.materialquote?.edit;
+    const canList = role === "owner" || permission?.labourratequote?.list;
+    const canCreate = role === "owner" || permission?.labourratequote?.create;
+    // const canDelete = role === "owner" || permission?.labourratequote?.delete;
+    // const canEdit = role === "owner" || permission?.labourratequote?.edit;
 
 
     const defaultFieldValues = [{ key: "", type: "string", required: false }, { key: "Rs", type: "number", required: false }, { key: "", type: "", required: false },]

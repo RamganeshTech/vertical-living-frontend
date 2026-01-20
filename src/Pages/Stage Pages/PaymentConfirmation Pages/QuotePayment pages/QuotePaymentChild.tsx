@@ -113,6 +113,7 @@ const QuotePaymentChild = () => {
                             data={item}
                             index={i}
                             isBlurred={false}
+                            
                             ref={furnitureRefs.current[i] as React.RefObject<FurnitureQuoteRef>}
                         />
                     )

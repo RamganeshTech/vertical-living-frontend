@@ -6,6 +6,7 @@ import { toast } from '../../../utils/toast';
 import { Button } from '../../../components/ui/Button';
 import { ToolCard } from './ToolMasterCard';
 import { Breadcrumb, type BreadcrumbItem } from '../../Department Pages/Breadcrumb';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 // --- CONSTANTS ---
 const CATEGORIES = ["Drill", "Saw", "Grinder", "Cutter", "Laser Level", "Other"];
@@ -25,6 +26,15 @@ const ToolMasterMain = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { organizationId } = useParams<{ organizationId: string }>();
+
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.toolhardware?.list;
+    const canCreate = role === "owner" || permission?.toolhardware?.create;
+    // const canDelete = role === "owner" || permission?.toolhardware?.delete;
+    // const canEdit = role === "owner" || permission?.toolhardware?.edit;
+
+
+
 
     const isDetailView = location.pathname.includes('single') || location.pathname.includes('create') || location.pathname.includes('issueotp');
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -156,13 +166,13 @@ const ToolMasterMain = () => {
                         Tool Rooms
                     </Button> */}
 
-                    <Button
+                    {canCreate && <Button
                         onClick={() => navigate('create')}
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-md"
                     >
                         <i className="fas fa-plus"></i>
                         Create Tool
-                    </Button>
+                    </Button>}
                 </div>
 
 
@@ -286,7 +296,7 @@ const ToolMasterMain = () => {
                 </aside>
 
                 {/* --- LIST AREA (70%) --- */}
-                <section className="flex-1 flex flex-col overflow-hidden">
+                {canList && <section className="flex-1 flex flex-col overflow-hidden">
                     <div
                         ref={scrollContainerRef}
                         className="flex-1 overflow-y-auto custom-scrollbar pr-2"
@@ -319,7 +329,7 @@ const ToolMasterMain = () => {
                             </div>
                         )}
                     </div>
-                </section>
+                </section>}
             </main>
         </div>
     );

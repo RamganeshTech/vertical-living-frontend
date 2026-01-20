@@ -8,10 +8,24 @@ import { toast } from '../../../utils/toast';
 import { useGetAllToolRoomforDD, useGetAllToolsforDD, useInitiateToolIssue, useInitiateToolReturn, useResendOtpInitiateToolIssue, useResendOtpInitiateToolreturn } from '../../../apiList/tools_api/toolOtpApi';
 import { useGetAllUsers } from '../../../apiList/getAll Users Api/getAllUsersApi';
 import { Breadcrumb, type BreadcrumbItem } from '../../Department Pages/Breadcrumb';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 const ToolOtpGenerateMain: React.FC = () => {
     const { organizationId } = useParams() as { organizationId: string };
     const navigate = useNavigate();
+
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.toolhardware?.list;
+    const canCreate = role === "owner" || permission?.toolhardware?.create;
+    const canEdit = role === "owner" || permission?.toolhardware?.edit;
+    // const canDelete = role === "owner" || permission?.toolhardware?.delete;
+
+
+
 
     // --- STATE ---
     const [mode, setMode] = useState<'issue' | 'return'>('issue');
@@ -334,79 +348,79 @@ const ToolOtpGenerateMain: React.FC = () => {
 
                     {/* DYNAMIC FOOTER SECTION */}
                     <div className={`bg-white rounded-3xl border-2 p-8 transition-all ${mode === 'issue' ? 'border-blue-50 bg-blue-50/10' : 'border-orange-50 bg-orange-50/10'}`}>
-                    {mode === 'issue' ? (
-                        <div className="flex items-center justify-between">
-                            {!showResendOTP.issue?.showButton &&
-                                <>
-                                    <div className="space-y-2 w-1/3">
-                                        <Label className="text-[10px] uppercase font-black text-gray-400">Target Return Date</Label>
-                                        <input type="date" value={expectedReturnDate} onChange={(e) => setExpectedReturnDate(e.target.value)} className="w-full p-3 bg-white border border-gray-200 rounded-xl font-bold shadow-sm" />
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-gray-500 mb-4 max-w-xs">A security code will be dispatched to the worker's device immediately.</p>
-                                        <Button onClick={handleAction} disabled={initiateIssueMutation.isPending} className="px-12 py-7 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-2xl shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-1">
-                                            {initiateIssueMutation.isPending ? <i className="fas fa-spinner fa-spin"></i> : 'GENERATE ISSUE OTP'}
-                                        </Button>
-                                    </div>
-                                </>
-                            }
-                        </div>
-                    ) : (
-                        <div className="space-y-8">
-                            {!showResendOTP.return?.showButton && <><div className="grid grid-cols-2 gap-12">
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] uppercase font-black text-gray-400">Condition Assessment</Label>
-                                    <select value={returnCondition} onChange={(e) => setReturnCondition(e.target.value)} className="w-full p-4 border border-gray-200 rounded-2xl bg-white font-bold text-gray-700 shadow-sm focus:ring-2 focus:ring-orange-500">
-                                        <option value="good">Good</option>
-                                        <option value="damaged">Damaged</option>
-                                    </select>
-                                    {returnCondition === 'damaged' && (
-                                        <textarea placeholder="Describe physical damages in detail..." value={damageNotes} onChange={(e) => setDamageNotes(e.target.value)} className="w-full p-4 border border-red-100 rounded-2xl h-24 text-sm bg-red-50/30" />
-                                    )}
-                                </div>
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] uppercase font-black text-gray-400">Physical Evidence</Label>
-                                    <div className="h-40 border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center bg-gray-50 hover:bg-orange-50 transition-colors relative cursor-pointer group">
-                                        <input type="file" multiple className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))} />
-                                        <i className="fas fa-camera text-3xl text-gray-300 group-hover:text-orange-500 transition-colors"></i>
-                                        <p className="text-xs font-bold text-gray-500 mt-3">{selectedFiles.length > 0 ? `${selectedFiles.length} Photos Added` : 'Upload Site Photos'}</p>
-                                    </div>
-                                </div>
+                        {mode === 'issue' ? (
+                            <div className="flex items-center justify-between">
+                                {!showResendOTP.issue?.showButton &&
+                                    <>
+                                        <div className="space-y-2 w-1/3">
+                                            <Label className="text-[10px] uppercase font-black text-gray-400">Target Return Date</Label>
+                                            <input type="date" value={expectedReturnDate} onChange={(e) => setExpectedReturnDate(e.target.value)} className="w-full p-3 bg-white border border-gray-200 rounded-xl font-bold shadow-sm" />
+                                        </div>
+                                       {(canCreate || canEdit) && <div className="text-right">
+                                            <p className="text-sm text-gray-500 mb-4 max-w-xs">A security code will be dispatched to the worker's device immediately.</p>
+                                            <Button onClick={handleAction} disabled={initiateIssueMutation.isPending} className="px-12 py-7 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-2xl shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-1">
+                                                {initiateIssueMutation.isPending ? <i className="fas fa-spinner fa-spin"></i> : 'GENERATE ISSUE OTP'}
+                                            </Button>
+                                        </div>}
+                                    </>
+                                }
                             </div>
-                                <div className="flex justify-end pt-6 border-t border-gray-100">
-                                    <Button onClick={handleAction} disabled={initiateReturnMutation.isPending} className="px-12 py-7 bg-orange-600 hover:bg-orange-700 text-white text-lg rounded-2xl shadow-xl shadow-orange-200 transition-all transform hover:-translate-y-1">
-                                        {initiateReturnMutation.isPending ? <i className="fas fa-spinner fa-spin"></i> : 'GENERATE RETURN OTP'}
-                                    </Button>
+                        ) : (
+                            <div className="space-y-8">
+                                {!showResendOTP.return?.showButton && <><div className="grid grid-cols-2 gap-12">
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] uppercase font-black text-gray-400">Condition Assessment</Label>
+                                        <select value={returnCondition} onChange={(e) => setReturnCondition(e.target.value)} className="w-full p-4 border border-gray-200 rounded-2xl bg-white font-bold text-gray-700 shadow-sm focus:ring-2 focus:ring-orange-500">
+                                            <option value="good">Good</option>
+                                            <option value="damaged">Damaged</option>
+                                        </select>
+                                        {returnCondition === 'damaged' && (
+                                            <textarea placeholder="Describe physical damages in detail..." value={damageNotes} onChange={(e) => setDamageNotes(e.target.value)} className="w-full p-4 border border-red-100 rounded-2xl h-24 text-sm bg-red-50/30" />
+                                        )}
+                                    </div>
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] uppercase font-black text-gray-400">Physical Evidence</Label>
+                                        <div className="h-40 border-2 border-dashed border-gray-200 rounded-3xl flex flex-col items-center justify-center bg-gray-50 hover:bg-orange-50 transition-colors relative cursor-pointer group">
+                                            <input type="file" multiple className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))} />
+                                            <i className="fas fa-camera text-3xl text-gray-300 group-hover:text-orange-500 transition-colors"></i>
+                                            <p className="text-xs font-bold text-gray-500 mt-3">{selectedFiles.length > 0 ? `${selectedFiles.length} Photos Added` : 'Upload Site Photos'}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </>
-                            }
-                        </div>
-                    )}
-
-
-
-                    <div className="flex items-center justify-end gap-4 border-t border-gray-100 pt-6">
-                        {/* RESEND BUTTON - Shows only after initial generation */}
-                        {showResendOTP[mode]?.showButton && (
-                            <Button
-                                onClick={handleResendOtp}
-                                disabled={resendTimer > 0 || resendIssueMutation.isPending || resendReturnMutation.isPending}
-                                className="px-6 py-7 border-2 border-gray-200  text-gray-600 font-bold rounded-2xl transition-all"
-                            >
-                                <i className={`fas fa-sync-alt mr-2 ${resendTimer > 0 ? '' : 'fa-spin'}`}></i>
-                                {resendTimer > 0
-                                    ? `Resend in ${Math.floor(resendTimer / 60)}:${(resendTimer % 60).toString().padStart(2, '0')}`
-                                    : 'Resend OTP'}
-                            </Button>
+                                    {(canCreate || canEdit) &&<div className="flex justify-end pt-6 border-t border-gray-100">
+                                        <Button onClick={handleAction} disabled={initiateReturnMutation.isPending} className="px-12 py-7 bg-orange-600 hover:bg-orange-700 text-white text-lg rounded-2xl shadow-xl shadow-orange-200 transition-all transform hover:-translate-y-1">
+                                            {initiateReturnMutation.isPending ? <i className="fas fa-spinner fa-spin"></i> : 'GENERATE RETURN OTP'}
+                                        </Button>
+                                    </div>}
+                                </>
+                                }
+                            </div>
                         )}
+
+
+
+                        {(canCreate || canEdit) && <div className="flex items-center justify-end gap-4 border-t border-gray-100 pt-6">
+                            {/* RESEND BUTTON - Shows only after initial generation */}
+                            {showResendOTP[mode]?.showButton && (
+                                <Button
+                                    onClick={handleResendOtp}
+                                    disabled={resendTimer > 0 || resendIssueMutation.isPending || resendReturnMutation.isPending}
+                                    className="px-6 py-7 border-2 border-gray-200  text-gray-600 font-bold rounded-2xl transition-all"
+                                >
+                                    <i className={`fas fa-sync-alt mr-2 ${resendTimer > 0 ? '' : 'fa-spin'}`}></i>
+                                    {resendTimer > 0
+                                        ? `Resend in ${Math.floor(resendTimer / 60)}:${(resendTimer % 60).toString().padStart(2, '0')}`
+                                        : 'Resend OTP'}
+                                </Button>
+                            )}
+                        </div>}
+
+
                     </div>
 
 
-                </div>
 
-
-
-        </div >
+                </div >
             </main >
         </div >
     );

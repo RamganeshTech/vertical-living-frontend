@@ -5,43 +5,47 @@ import { Button } from '../../../components/ui/Button'
 // import { toast } from '../../../utils/toast'
 import { useNavigate } from 'react-router-dom'
 import { dateFormate, formatTime } from './../../../utils/dateFormator';
+import { useDeleteClientQuote } from '../../../apiList/Quote Api/ClientQuote/clientQuoteApi';
+import { toast } from '../../../utils/toast';
 // import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 type Props = {
     quote: any
     organizationId?: string
+    canDelete: boolean
 }
-const QuoteClientCard: React.FC<Props> = ({ quote }) => {
+const QuoteClientCard: React.FC<Props> = ({ quote, canDelete }) => {
     const navigate = useNavigate();
 
+    const { mutateAsync:deleteQuote, isPending} = useDeleteClientQuote()
 
   
 
 
     // const { mutateAsync: deleteQuote, isPending } = useDeleteQuote();
 
-    // const handleDelete = async (id: string) => {
-    //     try {
+    const handleDelete = async (id: string) => {
+        try {
 
-    //         await deleteQuote({
-    //             id: id!,
-    //             organizationId: organizationId!,
-    //         });
+            await deleteQuote({
+                id: id!,
+            });
 
-    //         toast({
-    //             title: "Success",
-    //             description: "Items deleted successfully",
-    //         });
+            toast({
+                title: "Success",
+                description: "Items deleted successfully",
+            });
 
-    //         // refetch()
-    //     }
-    //     catch (error: any) {
-    //         toast({
-    //             title: "Error",
-    //             description: error?.response?.data?.message ?? "Operation failed",
-    //         });
-    //     }
-    // };
+            // refetch()
+        }
+        catch (error: any) {
+            console.log("error", error)
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message ?? "Operation failed",
+            });
+        }
+    };
 
 
 
@@ -86,7 +90,7 @@ const QuoteClientCard: React.FC<Props> = ({ quote }) => {
                     >
                         <i className="fas fa-eye mr-1" /> View
                     </Button>
-                    {/* <Button
+                   {canDelete && <Button
                         size="sm"
                         isLoading={isPending}
                         variant="danger"
@@ -94,7 +98,7 @@ const QuoteClientCard: React.FC<Props> = ({ quote }) => {
                         onClick={() => handleDelete(quote._id)}
                     >
                         <i className="fas fa-trash mr-1" /> Delete
-                    </Button> */}
+                    </Button>}
 
                 </div>
             </CardContent>

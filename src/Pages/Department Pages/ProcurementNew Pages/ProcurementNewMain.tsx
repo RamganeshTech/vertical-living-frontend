@@ -32,6 +32,7 @@ export interface OrderMaterialShopDetails {
 
 
 export interface OrderSubItems {
+    _id: string
     subItemName: string,
     refId: string,
     quantity: number,
@@ -40,6 +41,33 @@ export interface OrderSubItems {
     totalCost: number
 }
 
+
+export interface IShopQuotes {
+    _id:string
+    generatedLink: string | null,
+    shopId: string | null | OrderMaterialShopDetails,
+    selectedUnits: IProcurementItemsNew[]
+}
+
+
+
+export interface IProcurementItemsNew extends OrderSubItems {
+    _id: string
+    rate: number,
+    totalCost: number
+}
+
+
+
+export interface IPdfGenerator {
+    _id?: string;   // unique id for each item
+    url: string | null ;
+    refUniquePdf: string
+    pdfName: string | null;
+    status: string,
+}
+
+
 export interface IProcurementNew {
     _id?: string
     organizationId: string,
@@ -47,11 +75,20 @@ export interface IProcurementNew {
         _id: string,
         projectName: string
     } | null,
+
+
+
+
     shopDetails: OrderMaterialShopDetails,
     deliveryLocationDetails: OrderMaterialSiteDetail,
-    selectedUnits: OrderSubItems[],
 
-    shopQuoteNumber: string,
+    shopQuotes: IShopQuotes[]
+
+    selectedUnits: OrderSubItems[],
+    selectedShopId: string | null
+
+    quoteNumber: number,
+    fromDeptRefId: string | null;
     fromDeptNumber: string;
     isConfirmedRate: boolean,
     procurementNumber: string;
@@ -63,6 +100,11 @@ export interface IProcurementNew {
 
     totalCost: number
     refPdfId: string
+
+    procurementPdfs: IPdfGenerator[]
+
+
+    createdAt: string
 }
 
 
@@ -237,22 +279,22 @@ const ProcurementNewMain: React.FC = () => {
                 </div>
 
 
-              <div className="flex gap-2 items-center">
-                  {canCreate && <Button
-                    onClick={() => navigate('create')}
-                >
-                    <i className="fas fa-plus mr-2" />
-                    Create
-                </Button>}
+                <div className="flex gap-2 items-center">
+                    {canCreate && <Button
+                        onClick={() => navigate('create')}
+                    >
+                        <i className="fas fa-plus mr-2" />
+                        Create
+                    </Button>}
 
-                <div className="w-full sm:w-auto flex justify-end sm:block">
-                    <StageGuide
-                        organizationId={organizationId!}
-                        stageName="procurement"
-                    />
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="procurement"
+                        />
+                    </div>
+
                 </div>
-
-              </div>
                 {/* <h2 className="text-3xl font-bold text-blue-600">Logistics Department</h2> */}
 
             </div>

@@ -187,6 +187,7 @@ import dummyData from "./dummycaddata.json";
 import CadUploadHeader from "./CadUploadHeader";
 import SearchSelect from "../../components/ui/SearchSelect";
 import { useGetCategories } from "../../apiList/Quote Api/RateConfig Api/rateConfigApi";
+// import { useAuthCheck } from "../../Hooks/useAuthCheck";
 
 
 
@@ -199,6 +200,13 @@ const CadUploadMain: React.FC = () => {
   let { mutate, data, isPending, isSuccess } = useExtractCAD();
 
   const isDevelopment = true;
+
+  // const { role, permission } = useAuthCheck();
+      // const canList = role === "owner" || permission?.cad?.list;
+      // const canCreate = role === "owner" || permission?.cad?.create;
+      // const canDelete = role === "owner" || permission?.cad?.delete;
+      // const canEdit = role === "owner" || permission?.cad?.edit;
+  
 
 
   // Load AI data into local editable state once success occurs
@@ -417,7 +425,7 @@ const applyToRoom = (workIdx: number, roomIdx: number, matName: string, brandNam
                     {file ? file.name : "Drop your CAD PDF here"}
                   </p>
                   <p className="mt-1 text-sm text-gray-400 font-medium">Supported: High-resolution Layout PDFs (Max 50MB)</p>
-                </div>
+                </div> 
 
                 <div className="mt-8 flex justify-end gap-4">
                   {file && (

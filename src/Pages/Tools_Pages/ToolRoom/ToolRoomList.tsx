@@ -1,12 +1,13 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 interface Props {
     data: any;
     index: number;
     onView: () => void;
     onDelete: (id: string) => void;
-    deletePending:boolean
+    deletePending: boolean
 }
 
 const ToolRoomList: React.FC<Props> = ({ data, index, onView, onDelete, deletePending }) => {
@@ -17,6 +18,14 @@ const ToolRoomList: React.FC<Props> = ({ data, index, onView, onDelete, deletePe
             ? 'bg-green-100 text-green-700 border-green-200'
             : 'bg-red-100 text-red-700 border-red-200';
     };
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.toolhardware?.list;
+    // const canCreate = role === "owner" || permission?.toolhardware?.create;
+    const canDelete = role === "owner" || permission?.toolhardware?.delete;
+    // const canEdit = role === "owner" || permission?.toolhardware?.edit;
+
 
     return (
         <div
@@ -78,7 +87,7 @@ const ToolRoomList: React.FC<Props> = ({ data, index, onView, onDelete, deletePe
 
             <div className="col-span-1 flex justify-center items-center gap-4">
 
-                <Button
+                {canDelete && <Button
                     onClick={(e) => {
                         e.stopPropagation()
                         onDelete(data._id!)
@@ -90,7 +99,7 @@ const ToolRoomList: React.FC<Props> = ({ data, index, onView, onDelete, deletePe
                 >
 
                     <i className="fas fa-trash"></i>
-                </Button>
+                </Button>}
 
                 <i className="fas fa-chevron-right text-[10px] text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all"></i>
 

@@ -4,6 +4,7 @@ import { Button } from '../../../components/ui/Button';
 import { toast } from '../../../utils/toast';
 import { useVerifyToolIssue, useVerifyToolReturn } from '../../../apiList/tools_api/toolOtpApi';
 import { Breadcrumb, type BreadcrumbItem } from '../../Department Pages/Breadcrumb';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 const ToolOtpVerifyMain = () => {
     const { organizationId } = useParams() as { organizationId: string };
@@ -12,6 +13,14 @@ const ToolOtpVerifyMain = () => {
     // --- MODE STATE ---
     // User can toggle between 'issue' (Handover) and 'return' (Collection)
     const [mode, setMode] = useState<'issue' | 'return'>('issue');
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.toolhardware?.list;
+    const canCreate = role === "owner" || permission?.toolhardware?.create;
+    const canEdit = role === "owner" || permission?.toolhardware?.edit;
+    // const canDelete = role === "owner" || permission?.toolhardware?.delete;
+
 
     // --- API HOOKS ---
     const verifyIssueMutation = useVerifyToolIssue();
@@ -180,7 +189,7 @@ const ToolOtpVerifyMain = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-4 pt-4">
+               {(canCreate || canEdit) && <div className="space-y-4 pt-4">
                     <Button
                         onClick={handleVerify}
                         disabled={activeMutation.isPending}
@@ -198,7 +207,7 @@ const ToolOtpVerifyMain = () => {
                     <button onClick={() => navigate(-1)} className="w-full text-sm text-gray-400 hover:text-gray-600 font-medium">
                         Cancel
                     </button>
-                </div>
+                </div>}
 
                 {/* Security/Condition Note */}
                 <div className={`rounded-xl p-4 flex gap-3 border transition-colors ${mode === 'issue' ? 'bg-blue-50 border-blue-100 text-blue-700' : 'bg-orange-50 border-orange-100 text-orange-700'}`}>

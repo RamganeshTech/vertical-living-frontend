@@ -22,10 +22,10 @@ export default function LabourRateConfigSingle() {
 
 
     const { role, permission } = useAuthCheck();
-    // const canList = role === "owner" || permission?.materialquote?.list;
-    const canCreate = role === "owner" || permission?.materialquote?.create;
-    const canDelete = role === "owner" || permission?.materialquote?.delete;
-    const canEdit = role === "owner" || permission?.materialquote?.edit;
+    // const canList = role === "owner" || permission?.labourratequote?.list;
+    const canCreate = role === "owner" || permission?.labourratequote?.create;
+    const canDelete = role === "owner" || permission?.labourratequote?.delete;
+    const canEdit = role === "owner" || permission?.labourratequote?.edit;
 
 
 

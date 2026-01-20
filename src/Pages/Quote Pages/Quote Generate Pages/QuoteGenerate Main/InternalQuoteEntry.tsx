@@ -27,6 +27,7 @@ type CoreMaterialRow = {
     rowTotal: number;
     remarks: string;
     imageUrl?: string;
+    newImageFile?: string;
     previewUrl?: string;
 };
 
@@ -90,6 +91,8 @@ const InternalQuoteEntryMain = () => {
         }
     }, [allLabourCategory]); // Runs when the list is fetched
 
+
+
     // const allLabourCategoryOptions = useMemo(() => {
     //     return (allLabourCategory || [])?.map((labour: any) => ({
     //         value: labour._id,
@@ -112,12 +115,10 @@ const InternalQuoteEntryMain = () => {
     // }, [allLabourCategoryOptions, selectedLabourCategory.categoryId]);
 
     const { role, permission } = useAuthCheck();
-    // const canList = role === "owner" || permission?.materialquote?.list;
-    const canCreate = role === "owner" || permission?.materialquote?.create;
-    // const canDelete = role === "owner" || permission?.materialquote?.delete;
-    const canEdit = role === "owner" || permission?.materialquote?.edit;
-
-
+    // const canList = role === "owner" || permission?.internalquote?.list;
+    const canCreate = role === "owner" || permission?.internalquote?.create;
+    // const canDelete = role === "owner" || permission?.internalquote?.delete;
+    const canEdit = role === "owner" || permission?.internalquote?.edit;
 
 
     const projects: AvailableProjetType[] = useMemo(
@@ -149,7 +150,7 @@ const InternalQuoteEntryMain = () => {
         setQuoteType(type)
     }
 
-   
+
 
     const handleQuoteName = () => {
         if (quoteType === "single") {
@@ -172,6 +173,10 @@ const InternalQuoteEntryMain = () => {
             setModalOpen(true)
         }
     }, [quoteType])
+
+
+
+    console.log("furnitures", furnitures)
 
     const addFurniture = (furnitureName: string) => {
         setFurnitures(prev => [
@@ -248,7 +253,9 @@ const InternalQuoteEntryMain = () => {
                                 const { imageUrl, previewUrl, ...rest } = cm;
                                 return rest;
                             }
-                        }),
+                            return null;
+                        })
+                            .filter(Boolean),
                         // fittingsAndAccessories: f.fittingsAndAccessories,
                         // glues: f.glues,
                         // nonBrandMaterials: f.nonBrandMaterials,
@@ -297,22 +304,29 @@ const InternalQuoteEntryMain = () => {
                 return;
             }
 
-            const payload = {
-                furnitures: furnitures.map((f) => ({
+            const formData = new FormData();
+
+
+            // Prepare furnitures payload & attach new image files
+            const furnituresPayload = furnitures.map((f, fIndex) => {
+                const coreMaterials = f.coreMaterials.map((cm, cmIndex) => {
+                    const { previewUrl, newImageFile, ...rest } = cm;
+
+                    // Attach new image file if present
+                    if (newImageFile) {
+                        // Field name must match backend: images[fIndex][cmIndex]
+                        formData.append(`images[${fIndex}][${cmIndex}]`, newImageFile);
+                    }
+
+                    return {
+                        ...rest,
+                        imageUrl: cm.imageUrl || null, // keep old image if no new file
+                    };
+                });
+
+                return {
                     furnitureName: f.furnitureName,
-                    coreMaterials: f.coreMaterials.map((cm) => {
-                        const {
-                            previewUrl, // ignore
-                            ...rest
-                        } = cm;
-                        return {
-                            ...rest,
-                            imageUrl: cm.imageUrl || null, // preserve uploaded image
-                        };
-                    }),
-                    // fittingsAndAccessories: f.fittingsAndAccessories,
-                    // glues: f.glues,
-                    // nonBrandMaterials: f.nonBrandMaterials,
+                    coreMaterials,
                     fittingsAndAccessories: filterValidSimpleRows(f.fittingsAndAccessories),
                     glues: filterValidSimpleRows(f.glues),
                     nonBrandMaterials: filterValidSimpleRows(f.nonBrandMaterials),
@@ -321,18 +335,52 @@ const InternalQuoteEntryMain = () => {
                     gluesTotal: f.totals.glues,
                     nonBrandMaterialsTotal: f.totals.nbms,
                     furnitureTotal: f.totals.furnitureTotal,
-                })),
-                grandTotal,
-                notes: "Updated via frontend",
-                quoteNo: editQuoteNo
-            };
+                };
+            });
+
+            // Add other fields to FormData
+            formData.append("furnitures", JSON.stringify(furnituresPayload));
+            formData.append("grandTotal", grandTotal.toString());
+            formData.append("notes", "Updated via frontend");
+            if (editQuoteNo) formData.append("quoteNo", editQuoteNo);
+
+
+
+            // const payload = {
+            //     furnitures: furnitures.map((f) => ({
+            //         furnitureName: f.furnitureName,
+            //         coreMaterials: f.coreMaterials.map((cm) => {
+            //             const {
+            //                 previewUrl, // ignore
+            //                 ...rest
+            //             } = cm;
+            //             return {
+            //                 ...rest,
+            //                 imageUrl: cm.imageUrl || null, // preserve uploaded image
+            //             };
+            //         }),
+                    
+            //         fittingsAndAccessories: filterValidSimpleRows(f.fittingsAndAccessories),
+            //         glues: filterValidSimpleRows(f.glues),
+            //         nonBrandMaterials: filterValidSimpleRows(f.nonBrandMaterials),
+            //         coreMaterialsTotal: f.totals.core,
+            //         fittingsAndAccessoriesTotal: f.totals.fittings,
+            //         gluesTotal: f.totals.glues,
+            //         nonBrandMaterialsTotal: f.totals.nbms,
+            //         furnitureTotal: f.totals.furnitureTotal,
+            //     })),
+            //     grandTotal,
+            //     notes: "Updated via frontend",
+            //     quoteNo: editQuoteNo
+            // };
 
 
             if (editingId) {
                 await editQuote({
                     organizationId,
                     projectId: filters.projectId,
-                    formData: payload,
+                    // formData: payload,
+                    formData, // ✅ send FormData with only new files
                     id: editingId,
                 });
 
@@ -382,10 +430,10 @@ const InternalQuoteEntryMain = () => {
                     </div>
 
 
-                   
 
 
-                        {/* <div>
+
+                    {/* <div>
                             <label className="block text-sm font-medium ">Select Work Category
 
                             </label>
@@ -476,7 +524,7 @@ const InternalQuoteEntryMain = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
                     <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md relative animate-scaleIn">
-                        <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Product</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Quote</h3>
 
                         <input
                             className="w-full border border-gray-300 rounded px-3 py-2 mb-4 outline-none focus:ring-2 focus:ring-blue-400"
@@ -513,7 +561,7 @@ const InternalQuoteEntryMain = () => {
                 </div>
             )}
 
-          
+            {/* s.dflskdjkl */}
             {furnitures.length > 0 && <section className="shadow overflow-y-auto max-h-[86%]">
                 {!editingId && <h1 className="text-2xl text-gray-500">
                     {handleQuoteName()}
@@ -530,6 +578,8 @@ const InternalQuoteEntryMain = () => {
                             setFurnitures(updatedArr);
                         }}
                         removeFurniture={() => handleRemoveFurniture(index)}
+                        isEditing={!!editingId}   // ✅ pass editing mode
+
                     />
                 ))}
             </section>}

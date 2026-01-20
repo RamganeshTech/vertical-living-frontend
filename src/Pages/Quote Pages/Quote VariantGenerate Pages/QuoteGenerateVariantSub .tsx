@@ -6,7 +6,7 @@ import FurnitureQuoteVariantForm, { getRateForThickness, type FurnitureQuoteRef 
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
-import { downloadImage } from "../../../utils/downloadFile";
+// import { downloadImage } from "../../../utils/downloadFile";
 import SearchSelect from "../../../components/ui/SearchSelect";
 import { Card } from "../../../components/ui/Card";
 import { useGetLabourRateConfigCategories, useGetSingleLabourCost } from "../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
@@ -49,10 +49,10 @@ const QuoteGenerateVariantSub = () => {
     const [selectedLaminateBrand, setSelectedLaminateBrand] = useState<string | null>(null);
 
     const { role, permission } = useAuthCheck();
-    // const canList = role === "owner" || permission?.materialquote?.list;
-    const canCreate = role === "owner" || permission?.materialquote?.create;
-    // const canDelete = role === "owner" || permission?.materialquote?.delete;
-    const canEdit = role === "owner" || permission?.materialquote?.edit;
+    // const canList = role === "owner" || permission?.quotevariant?.list;
+    const canCreate = role === "owner" || permission?.quotevariant?.create;
+    // const canDelete = role === "owner" || permission?.quotevariant?.delete;
+    const canEdit = role === "owner" || permission?.quotevariant?.edit;
 
 
 
@@ -250,7 +250,7 @@ const QuoteGenerateVariantSub = () => {
             // console.log("✅ Submitting Furnitures for Quote", updatedFurnitures);
             // const updatedGrandTotal = updatedFurnitures.reduce((sum, f: any) => sum + f.furnitureTotal, 0);
 
-            const res: any = await generateQuote({
+             await generateQuote({
                 quoteId: quoteId!,
                 organizationId: organizationId,
                 data: {
@@ -266,7 +266,7 @@ const QuoteGenerateVariantSub = () => {
                 }
             })
             // console.log("reso", res)
-            downloadImage({ src: res.url, alt: res.fileName })
+            // await downloadImage({ src: res.url, alt: res.fileName })
             toast({ title: "success", description: "Successfully created, check it in the Quote for clients section" })
         }
         catch (error: any) {
@@ -404,7 +404,7 @@ const QuoteGenerateVariantSub = () => {
                     <div className="flex-1">
                         <label className="text-xs font-medium text-gray-700 whitespace-nowrap">
                             Select Salary Category
-                            </label>
+                        </label>
                         <SearchSelectNew
                             options={allLabourCategoryOptions}
                             placeholder="Choose Labour Category"

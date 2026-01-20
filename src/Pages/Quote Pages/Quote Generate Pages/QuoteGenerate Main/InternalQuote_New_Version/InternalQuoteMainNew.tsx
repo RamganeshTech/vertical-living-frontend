@@ -272,10 +272,10 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, }) => {
 
     const navigate = useNavigate()
     const { role, permission } = useAuthCheck();
-    // const canList = role === "owner" || permission?.materialquote?.list;
-    // const canCreate = role === "owner" || permission?.materialquote?.create;
-    const canDelete = role === "owner" || permission?.materialquote?.delete;
-    // const canEdit = role === "owner" || permission?.materialquote?.edit;
+    // const canList = role === "owner" || permission?.internalquote?.list;
+    // const canCreate = role === "owner" || permission?.internalquote?.create;
+    const canDelete = role === "owner" || permission?.internalquote?.delete;
+    // const canEdit = role === "owner" || permission?.internalquote?.edit;
 
 
     const handleDelete = async (id: string) => {

@@ -4,15 +4,9 @@ import { useGetShopLib, useUpdateShopLib } from "../../../../apiList/Stage Api/s
 import { toast } from "../../../../utils/toast";
 import { Button } from "../../../../components/ui/Button";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
-// import { useGetShopLib, useUpdateShopLib } from "../../api/shopLibApi";
-// import toast from "react-hot-toast";
-
-interface ShopFormData {
-    shopName: string;
-    address: string;
-    contactPerson: string;
-    phoneNumber: string;
-}
+import SmartTagInput from "../../../../shared/SmartTagInput";
+import type { ShopFormData } from "./ShopLibDetailsMain";
+// import SmartTagInput from "../../../../components/SmartTagInput"; // Assuming the path
 
 const ShopDetailSingle: React.FC = () => {
     const { shopId } = useParams<{ shopId: string }>();
@@ -25,6 +19,7 @@ const ShopDetailSingle: React.FC = () => {
         address: "",
         contactPerson: "",
         phoneNumber: "",
+        priority: [],
     });
 
     const { data: shops, isLoading, error } = useGetShopLib(organizationId);
@@ -53,6 +48,7 @@ const ShopDetailSingle: React.FC = () => {
                 address: currentShop.address || "",
                 contactPerson: currentShop.contactPerson || "",
                 phoneNumber: currentShop.phoneNumber || "",
+                priority: currentShop.priority || []
             });
         }
     }, [currentShop]);
@@ -62,6 +58,15 @@ const ShopDetailSingle: React.FC = () => {
             ...formData,
             [e.target.name]: e.target.value,
         });
+    };
+
+
+    // Handler for SmartTagInput
+    const handleSetTags = (newTags: string[] | ((prev: string[]) => string[])) => {
+        setFormData(prev => ({
+            ...prev,
+            priority: typeof newTags === 'function' ? newTags(prev.priority) : newTags
+        }));
     };
 
     const handleUpdateShop = async (e: React.FormEvent) => {
@@ -84,6 +89,7 @@ const ShopDetailSingle: React.FC = () => {
                     address: formData.address,
                     contactPerson: formData.contactPerson,
                     phoneNumber: formData.phoneNumber,
+                    priority: formData.priority,
                 }
             };
 
@@ -173,6 +179,7 @@ const ShopDetailSingle: React.FC = () => {
                 address: currentShop.address || "",
                 contactPerson: currentShop.contactPerson || "",
                 phoneNumber: currentShop.phoneNumber || "",
+                priority: currentShop.priority || []
             });
         }
         setIsEditMode(false);
@@ -296,6 +303,24 @@ const ShopDetailSingle: React.FC = () => {
                                 </div>
                             </div>
 
+
+
+                            {/* Display Priority Tags in View Mode */}
+                            <div className="pt-4 border-t">
+                                <label className="text-sm text-gray-500 block mb-2"><i className="fas fa-tags mr-2"></i>Priority Tags</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {currentShop.priority && currentShop.priority.length > 0 ? (
+                                        currentShop.priority.map((tag: string, index: number) => (
+                                            <span key={index} className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full border border-blue-200 uppercase">
+                                                {tag}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-gray-400 italic text-sm">No tags assigned</span>
+                                    )}
+                                </div>
+                            </div>
+
                             {/* Additional Info */}
                             {/* <div className="pt-6 border-t">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500">
@@ -369,6 +394,22 @@ const ShopDetailSingle: React.FC = () => {
                                         onChange={handleInputChange}
                                         rows={3}
                                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+
+
+                            {/* Integrated SmartTagInput */}
+                            <div className="pt-4 border-t">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <i className="fas fa-tags mr-2 text-blue-500"></i>Priority Automation Tags
+                                    <span className="text-[10px] text-gray-400 ml-2">(Type and hit Enter to add. Use tags like 'high', 'electrical', etc.)</span>
+                                </label>
+                                <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
+                                    <SmartTagInput
+                                        tags={formData.priority}
+                                        setState={handleSetTags}
+                                        // suggestionFetcher={async () => ['high', 'electrical', 'plumbing', 'general', 'urgent']}
                                     />
                                 </div>
                             </div>

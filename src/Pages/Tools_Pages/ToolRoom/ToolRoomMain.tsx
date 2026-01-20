@@ -6,6 +6,7 @@ import { toast } from '../../../utils/toast';
 import { Button } from '../../../components/ui/Button';
 import ToolRoomList from './ToolRoomList';
 import { Breadcrumb, type BreadcrumbItem } from '../../Department Pages/Breadcrumb';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 interface ToolRoomFilters {
     search: string;
@@ -26,6 +27,13 @@ const ToolRoomMain = () => {
     // ];
 
 
+      const { role, permission } = useAuthCheck();
+        const canList = role === "owner" || permission?.toolhardware?.list;
+        const canCreate = role === "owner" || permission?.toolhardware?.create;
+        // const canDelete = role === "owner" || permission?.toolhardware?.delete;
+        // const canEdit = role === "owner" || permission?.toolhardware?.edit;
+    
+    
 
 
     const paths: BreadcrumbItem[] = [
@@ -134,13 +142,13 @@ const ToolRoomMain = () => {
 
                 <div className="flex gap-3 items-center">
                     {/* Primary Action Button */}
-                    <Button
+                   {canCreate && <Button
                         onClick={() => navigate('create')}
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-md transition-all"
                     >
                         <i className="fas fa-plus"></i>
                         New Tool Room
-                    </Button>
+                    </Button>}
                 </div>
             </header>
 
@@ -355,7 +363,7 @@ const ToolRoomMain = () => {
 
 
                 {/* --- LIST AREA (70%) --- */}
-                <section className="flex-1 flex flex-col overflow-hidden">
+               {canList && <section className="flex-1 flex flex-col overflow-hidden">
                     {isLoading ? (
                         <div className="flex-1 flex justify-center items-center bg-white rounded-xl border border-gray-200">
                             <i className="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
@@ -373,6 +381,7 @@ const ToolRoomMain = () => {
                             </p>
                         </div>
                     ) : (
+
                         <div
                             ref={scrollContainerRef}
                             className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto custom-scrollbar flex flex-col"
@@ -422,7 +431,7 @@ const ToolRoomMain = () => {
                             )}
                         </div>
                     )}
-                </section>
+                </section>}
             </main>
         </div>
     );

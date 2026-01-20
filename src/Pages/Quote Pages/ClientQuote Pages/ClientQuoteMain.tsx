@@ -23,12 +23,11 @@ const ClientQuoteMain = () => {
 
 
 
-
     const { role, permission } = useAuthCheck();
-    const canList = role === "owner" || permission?.materialquote?.list;
-    // const canCreate = role === "owner" || permission?.materialquote?.create;
-    // const canDelete = role === "owner" || permission?.materialquote?.delete;
-    // const canEdit = role === "owner" || permission?.materialquote?.edit;
+    const canList = role === "owner" || permission?.clientquote?.list;
+    // const canCreate = role === "owner" || permission?.clientquote?.create;
+    const canDelete = role === "owner" || permission?.clientquote?.delete;
+    // const canEdit = role === "owner" || permission?.clientquote?.edit;
 
 
 
@@ -250,7 +249,7 @@ const ClientQuoteMain = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {quotes.map((quote: any) => (
                                 <>
-                                    <QuoteClientCard key={quote._id} quote={quote} organizationId={organizationId!} />
+                                    <QuoteClientCard key={quote._id} canDelete={canDelete} quote={quote} organizationId={organizationId!} />
                                 </>
                             ))}
                         </div>

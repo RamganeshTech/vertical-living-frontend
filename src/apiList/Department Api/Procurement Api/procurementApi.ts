@@ -143,7 +143,7 @@ export const getProcurementNewDetailsApi = async ({
 
     if (filters.minAmount !== undefined) params.append("minAmount", String(filters.minAmount));
     if (filters.maxAmount !== undefined) params.append("maxAmount", String(filters.maxAmount));
-    
+
     if (filters.fromDate) params.append("fromDate", filters.fromDate);
     if (filters.toDate) params.append("toDate", filters.toDate);
   }
@@ -168,7 +168,7 @@ export const getSingleProcurementDetailsApi = async ({
   return data.data;
 };
 
-
+// not used
 export const updateProcurementTotalCostApi = async ({
   id,
   payload,
@@ -235,11 +235,31 @@ const deleteProcurementPdf = async (
 
 
 
+
+
 const syncPaymentSectiontoProcurement = async ({ id, api }: { id: string; api: AxiosInstance }) => {
   const { data } = await api.post(`/department/procurement/synctopayments/${id}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
+
+
+
+export const confirmFinalShopQuoteApi = async ({
+  id,
+  quoteId,
+  api,
+}: {
+  id: string;
+  quoteId: string;
+  api: AxiosInstance;
+}) => {
+  // Matches route: /confirmquote/:id/:quoteId
+  const { data } = await api.put(`/department/procurement/confirmquote/${id}/${quoteId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
 
 
 const cancelProcurement = async ({ id, api }: { id: string; api: AxiosInstance }) => {
@@ -271,11 +291,13 @@ const backendPublicBase = `${import.meta.env.VITE_API_URL}/api/department/procur
 export const getProcurementItemsPublicApi = async ({
   orderId,
   token,
+  quoteId
 }: {
   orderId: string
   token: string;
+  quoteId: string
 }) => {
-  const { data } = await axios.get(`${backendPublicBase}/public/get?token=${token}&orderId=${orderId}`);
+  const { data } = await axios.get(`${backendPublicBase}/public/get?token=${token}&orderId=${orderId}&quoteId=${quoteId}`);
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -296,6 +318,7 @@ export const submitProcurementItemRateByShop = async ({
 };
 
 
+//  not used
 export const updatePublicProcurementItemRateByShop = async ({
   orderId,
   itemId,
@@ -308,6 +331,27 @@ export const updatePublicProcurementItemRateByShop = async ({
   payload: any;
 }) => {
   const { data } = await axios.put(`${backendPublicBase}/public/item/update?token=${token}&orderId=${orderId}&itemId=${itemId}`, payload);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+
+export const updatePublicProcurementItemRateByShopNewVersion = async ({
+  orderId,
+  itemId,
+  token,
+  quoteId,
+  rate,
+}: {
+  orderId: string;
+  itemId: string;
+  token: string;
+  quoteId: string;
+  rate: any;
+}) => {
+  const { data } = await axios.put(`${backendPublicBase}/v1/public/item/update?token=${token}&orderId=${orderId}&itemId=${itemId}&quoteId=${quoteId}`, { rate });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -595,11 +639,30 @@ export const useSyncProcurementToPaymentsSection = () => {
 
 
 
+export const useConfirmFinalShopQuote = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ id, quoteId }: { id: string; quoteId: string }) => {
+      // Security & Role Check
+      if (!role || !allowedRoles.includes(role)) throw new Error("Access Denied: Unauthorized role");
+      if (!api) throw new Error("API instance not found for current role");
+
+      return await confirmFinalShopQuoteApi({ id, quoteId, api });
+    },
+    onSuccess: (_, { id }) => {
+      // Invalidate procurement lists and the specific procurement detail page
+      queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
+      queryClient.invalidateQueries({ queryKey: ["procurement", "single", id] });
+    }
+  });
+};
 
 
 
 
-export const useCancelProcurementAutomation = ()=> {
+export const useCancelProcurementAutomation = () => {
   const allowedRoles = ["owner", "staff", "CTO"];
   const { role } = useGetRole();
   const api = getApiForRole(role!);
@@ -646,11 +709,11 @@ export const useProcurementGenerateLink = () => {
 
 
 
-export const useGetProcurementItemsPublic = (token: string, orderId: string) => {
+export const useGetProcurementItemsPublic = (token: string, orderId: string, quoteId: string) => {
   return useQuery({
     queryKey: ["procurement", "public", token],
     queryFn: async () => {
-      return await getProcurementItemsPublicApi({ token, orderId });
+      return await getProcurementItemsPublicApi({ token, orderId, quoteId });
     },
     enabled: !!token,
     retry: false,
@@ -698,6 +761,31 @@ export const usePublicUpdateProcurementItemRate = () => {
       payload: Array<any>;
     }) => {
       return await updatePublicProcurementItemRateByShop({ token, payload, orderId, itemId });
+    },
+  });
+};
+
+
+
+
+
+export const usePublicUpdateProcurementItemRateNewVersion = () => {
+  return useMutation({
+    mutationFn: async ({
+      orderId,
+      itemId,
+      token,
+      quoteId,
+      rate,
+    }: {
+
+      orderId: string;
+      itemId: string
+      token: string;
+      quoteId: string,
+      rate: number;
+    }) => {
+      return await updatePublicProcurementItemRateByShopNewVersion({ token, rate, orderId, itemId, quoteId });
     },
   });
 };

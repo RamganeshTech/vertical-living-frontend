@@ -12,7 +12,9 @@ import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 // import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
 // import { NO_IMAGE } from "../../../constants/constants";
-import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialImage, useGetAllOrderingMaterialHistory, useOrderHistoryGneratePdf, useOrderHistorySendToProcurement, useOrderHistorySubmitOrder, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdateShopDetails, useUploadOrderingMaterialImages } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
+import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialImage, useGetAllOrderingMaterialHistory, useOrderHistoryGneratePdf, 
+    // useOrderHistorySendToProcurement, useOrderHistorySendToProcurementNewVersion,
+     useOrderHistorySubmitOrder, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdateShopDetails, useUploadOrderingMaterialImages } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 // import GenerateWhatsappLink from "../../../shared/GenerateWhatsappLink";
 import { useEffect, useRef, useState } from "react";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
@@ -23,6 +25,7 @@ import SearchSelectNew from "../../../components/ui/SearchSelectNew";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
+import { ProcurementPriorityDropdown } from "./ProcurementPriorityDropdown";
 // import { dateFormate, formatTime } from "../../../utils/dateFormator";
 
 
@@ -102,7 +105,9 @@ const OrderMaterialOverview = () => {
     const { mutateAsync: deleteAllSubItems, isPending: deleteAllPending } = useDeleteAllSubItems();
     // const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
 
-    const { mutateAsync: sendToProcurement, isPending: isSending } = useOrderHistorySendToProcurement();
+    // const { mutateAsync: sendToProcurement, isPending: isSending } = useOrderHistorySendToProcurement();
+    // const { mutateAsync: sendToProcurement, isPending: isSending } = useOrderHistorySendToProcurementNewVersion();
+
 
 
     const [editDelivery, setEditDelivery] = useState(false);
@@ -235,14 +240,14 @@ const OrderMaterialOverview = () => {
 
 
 
-    const handleSendToProcurement = async (orderItemId: string) => {
-        try {
-            await sendToProcurement({ projectId: projectId!, orderItemId: orderItemId!, organizationId: organizationId! });
-            toast({ description: 'Sent to Procurement', title: "Success" });
-        } catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
-        }
-    };
+    // const handleSendToProcurement = async (orderItemId: string, priority: string) => {
+    //     try {
+    //         await sendToProcurement({ projectId: projectId!, priority, orderItemId: orderItemId!, organizationId: organizationId! });
+    //         toast({ description: 'Sent to Procurement', title: "Success" });
+    //     } catch (error: any) {
+    //         toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
+    //     }
+    // };
 
 
     const handleUpdateDelivery = async () => {
@@ -1669,13 +1674,15 @@ const OrderMaterialOverview = () => {
 
                                 <div className="flex flex-col gap-2">
 
-                                    {data?.orderedItems?.sort((a:any, b:any) => new Date(b?.createdAt).getTime() - new Date(a.createdAt).getTime()).map((ele: any) => (
-                                        <Card key={ele._id} className="border-green-200 bg-green-50 shadow ">
-                                            <CardContent className="p-6">
-                                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                    {data?.orderedItems?.sort((a: any, b: any) => new Date(b?.createdAt).getTime() - new Date(a.createdAt).getTime()).map((ele: any) => (
+                                        <Card key={ele._id}
+                            
+                                            className="border-green-200  !relative bg-green-50 shadow  border-0 rounded-2xl ">
+                                            <CardContent className="p-6 ">
+                                                <div className="flex flex-col sm:flex-row items-start  sm:items-center gap-4">
                                                     <div className="flex items-center gap-3 flex-1">
                                                         <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                                            <i className="fas fa-check-circle text-7reen-600"></i>
+                                                            <i className="fas fa-check-circle text-green-600"></i>
                                                         </div>
                                                         <div>
                                                             <h4 className="font-semibold text-blue-700 ">
@@ -1686,7 +1693,7 @@ const OrderMaterialOverview = () => {
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto ">
+                                                    <div className="flex flex-col  sm:flex-row gap-2 w-full sm:w-auto ">
                                                         <Button
                                                             variant="outline"
                                                             onClick={() => navigate(`singleorder/${ele._id}`)}
@@ -1717,7 +1724,7 @@ const OrderMaterialOverview = () => {
                                                         </Button>
 
 
-                                                        {(canCreate || canEdit) && <Button
+                                                        {/* {(canCreate || canEdit) && <Button
                                                             variant="outline"
                                                             onClick={() => handleSendToProcurement(ele._id)}
                                                             disabled={ele?.isSyncWithProcurement}
@@ -1727,7 +1734,17 @@ const OrderMaterialOverview = () => {
                                                             className="border-green-300 text-blue-700 disabled:cursor-not-allowed hover:bg-blue-100 hover:border-blue-400"
                                                         >
                                                             Send To Procurement
-                                                        </Button>}
+                                                        </Button>} */}
+
+
+                                                        {(canCreate || canEdit) && (
+                                                            <ProcurementPriorityDropdown
+                                                                ele={ele}
+                                                                projectId={projectId}
+                                                                organizationId={organizationId}
+                                                                refetch={refetch}
+                                                            />
+                                                        )}
 
 
                                                     </div>

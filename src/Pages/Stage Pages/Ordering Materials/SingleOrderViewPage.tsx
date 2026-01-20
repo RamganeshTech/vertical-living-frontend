@@ -6,10 +6,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/Button";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { toast } from "../../../utils/toast";
-import { useGetSingleOrderItem, useOrderHistoryGneratePdf, useOrderHistorySendToProcurement } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
+import {
+    useGetSingleOrderItem, useOrderHistoryGneratePdf,
+    // useOrderHistorySendToProcurement
+} from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 import { downloadImage } from "../../../utils/downloadFile";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import { ProcurementPriorityDropdown } from "./ProcurementPriorityDropdown";
+
 
 const SingleOrderViewPage = () => {
     const { projectId, orderItemId, organizationId } = useParams<{ projectId: string; orderItemId: string, organizationId: string }>();
@@ -31,17 +36,17 @@ const SingleOrderViewPage = () => {
     const { data: orderData, isLoading, isError, refetch } = useGetSingleOrderItem(projectId!, orderItemId!);
     const { mutateAsync: generateLink, isPending: generatePending } = useOrderHistoryGneratePdf();
 
-    const { mutateAsync: sendToProcurement, isPending: isSending } = useOrderHistorySendToProcurement();
+    // const { mutateAsync: sendToProcurement, isPending: isSending } = useOrderHistorySendToProcurement();
 
-    const handleSendToProcurement = async () => {
-        try {
+    // const handleSendToProcurement = async () => {
+    //     try {
 
-            await sendToProcurement({ projectId: projectId!, orderItemId: orderItemId!, organizationId: organizationId! });
-            toast({ description: 'Sent to Procurement', title: "Success" });
-        } catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
-        }
-    };
+    //         await sendToProcurement({ projectId: projectId!, orderItemId: orderItemId!, organizationId: organizationId! });
+    //         toast({ description: 'Sent to Procurement', title: "Success" });
+    //     } catch (error: any) {
+    //         toast({ title: "Error", description: error?.response?.data?.message || error.message || "Failed to update completion status", variant: "destructive" })
+    //     }
+    // };
 
 
     // --- Handlers ---
@@ -139,7 +144,7 @@ const SingleOrderViewPage = () => {
                             </span>
                         )}
 
-                        {(canCreate || canEdit) && <Button
+                        {/* {(canCreate || canEdit) && <Button
                             variant="primary"
                             onClick={handleSendToProcurement}
                             disabled={orderData?.isSyncWithProcurement}
@@ -148,7 +153,17 @@ const SingleOrderViewPage = () => {
                             className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 disabled:cursor-not-allowed"
                         >
                             Send To Procurement
-                        </Button>}
+                        </Button>} */}
+
+
+                        {(canCreate || canEdit) && (
+                            <ProcurementPriorityDropdown
+                                ele={orderData}
+                                projectId={projectId}
+                                organizationId={organizationId}
+                                refetch={refetch}
+                            />
+                        )}
 
                     </div>
 
@@ -346,7 +361,7 @@ const SingleOrderViewPage = () => {
                                     >
                                         <i className="fas fa-download mr-2"></i> Download
                                     </Button>
-                                   {(canEdit || canCreate) && <Button
+                                    {(canEdit || canCreate) && <Button
                                         variant="ghost"
                                         isLoading={generatePending}
                                         onClick={handleGeneratePdf}
@@ -358,14 +373,14 @@ const SingleOrderViewPage = () => {
                                 </>
                             ) : (
                                 <>
-                               {(canEdit || canCreate) && <Button
-                                    onClick={handleGeneratePdf}
-                                    isLoading={generatePending}
-                                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8"
-                                >
-                                    <i className="fas fa-file-pdf mr-2"></i> Generate & Save PDF
-                                </Button>}
-                            </>
+                                    {(canEdit || canCreate) && <Button
+                                        onClick={handleGeneratePdf}
+                                        isLoading={generatePending}
+                                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8"
+                                    >
+                                        <i className="fas fa-file-pdf mr-2"></i> Generate & Save PDF
+                                    </Button>}
+                                </>
                             )}
                         </div>
                     </div>

@@ -264,14 +264,21 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
     onQuickUpload,
     // refetch
 }) => {
+
+
     const navigate = useNavigate();
     const { organizationId } = useParams() as { organizationId: string }
     const [currentMode, setCurrentMode] = useState(initialMode);
+
     const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.toolhardware?.list;
+    // const canCreate = role === "owner" || permission?.toolhardware?.create;
+    // const canDelete = role === "owner" || permission?.toolhardware?.delete;
+    const canEdit = role === "owner" || permission?.toolhardware?.edit;
 
-    const canEdit = role === "owner" || permission?.tools?.edit;
-    // const canCreate = role === "owner" || permission?.tools?.create;
 
+
+   
     // --- STATE ---
     const defaultFormData: ToolFormData = {
         toolName: '',

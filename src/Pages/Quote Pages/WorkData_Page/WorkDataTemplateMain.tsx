@@ -1,4 +1,5 @@
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 export interface TemplateField {
     name: string;
@@ -58,7 +59,7 @@ export const WORK_TEMPLATE: WorkModule[] = [
             {
                 section: "E. Joints & Hardware",
                 fields: [
-                    { name: "jointType", label: "Joint Type", type: "text",  },
+                    { name: "jointType", label: "Joint Type", type: "text", },
                     { name: "hardwareSet", label: "Hardware Set", type: "select", options: ["Yes", "No"] },
                     { name: "doorIncluded", label: "Door Included?", type: "select", options: ["Yes", "No"] }
                 ]
@@ -145,6 +146,14 @@ export const WORK_TEMPLATE: WorkModule[] = [
 const WorkDataTemplateMain = () => {
     const navigate = useNavigate();
 
+    const { role, permission } = useAuthCheck();
+    const canList = role === "owner" || permission?.worktemplates?.list;
+    // const canCreate = role === "owner" || permission?.worktemplates?.create;
+    // const canDelete = role === "owner" || permission?.worktemplates?.delete;
+    // const canEdit = role === "owner" || permission?.worktemplates?.edit;
+
+
+
 
     const isSubPage = location.pathname.includes("single");
     if (isSubPage) return <Outlet />;
@@ -165,10 +174,9 @@ const WorkDataTemplateMain = () => {
             </header>
 
             {/* Table Container */}
-            <div
+            {canList && <div
                 className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto custom-scrollbar flex flex-col"
             >
-                {/* Sticky Header with 14-Column Grid */}
                 <div className="sticky top-0 z-10 bg-white border-b border-blue-200 shadow-sm">
                     <div className="grid grid-cols-13 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm uppercase tracking-wider">
                         <div className="col-span-1 text-center">S.No</div>
@@ -176,12 +184,10 @@ const WorkDataTemplateMain = () => {
                         <div className="col-span-4">Internal Description</div>
                         <div className="col-span-2 text-center">Sections</div>
                         <div className="col-span-2 text-center">Total Fields</div>
-                        {/* <div className="col-span-1">Status</div> */}
                         <div className="col-span-1 text-center">Action</div>
                     </div>
                 </div>
 
-                {/* List Items Mapping */}
                 <div className="divide-y divide-gray-100">
                     {WORK_TEMPLATE.map((item, index) => (
                         <WorkDataTemplateList
@@ -192,7 +198,7 @@ const WorkDataTemplateMain = () => {
                         />
                     ))}
                 </div>
-            </div>
+            </div>}
         </div>
     );
 };

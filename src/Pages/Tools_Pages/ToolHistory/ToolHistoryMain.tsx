@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import ToolHistoryTimeline from './ToolHistoryTimeline';
 import { Label } from '../../../components/ui/Label';
 import { Breadcrumb, type BreadcrumbItem } from '../../Department Pages/Breadcrumb';
+// import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 
 
@@ -17,6 +18,15 @@ const ToolHistoryMain: React.FC<ToolHistoryMainProps> = ({
 }) => {
     const [toolId, setToolId] = useState<string | null>(null);
     const { organizationId } = useParams() as { organizationId: string }
+
+    // const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.toolhardware?.list;
+    // const canCreate = role === "owner" || permission?.toolhardware?.create;
+    // const canDelete = role === "owner" || permission?.toolhardware?.delete;
+    // const canEdit = role === "owner" || permission?.toolhardware?.edit;
+
+
+
     const { data: tools = [] } = useGetAllToolsforDD(organizationId);
 
 
