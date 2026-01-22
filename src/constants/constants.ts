@@ -19,6 +19,7 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   // INVOICEACCOUNT: "Invoice",
   RATECONIG: "Rate Config (Material)",
   RATECONIGSTAFF: "Rate Config (Staff)",
+  RATECONIGMATERIALWITHSTAFF: "Rate Config (Material & Staff)",
   WORKTEMPLATE: "Work Data Templates",
   INTERNALQUOTE: "Internal Quote",
   QUOTEVARIENT: "Quote Varient",
@@ -93,7 +94,7 @@ export const LOGIN_LABELS = {
   PUBLICORDERS: `Public Orders`,
 }
 
-export const ORGANIZATION_ICONS:Record<string, string> = {
+export const ORGANIZATION_ICONS: Record<string, string> = {
   INVITECTO: "fa-solid fa-user-tie text-2xl",
   INVITESTAFFS: "fa-solid fa-user text-2xl",
   ROLESPERMISSIONS: "fa-solid fa-dashboard text-2xl",
@@ -120,7 +121,7 @@ export const ORGANIZATION_LABELS: Record<string, string> = {
 
 }
 
-export const PROJECTS_LABELS:Record<string, string> = {
+export const PROJECTS_LABELS: Record<string, string> = {
   // MATERIALS: "Materials",
   // LABOURS: "Labours",
   // TRANSPORTATION: "Transportation",
@@ -151,7 +152,7 @@ export const PROJECTS_LABELS:Record<string, string> = {
 }
 
 
-export const PROJECTS_ICONS:Record<string, string> = {
+export const PROJECTS_ICONS: Record<string, string> = {
   // MATERIALS: "fa-solid fa-cubes-stacked text-2xl",
   // LABOURS: "fa-solid fa-users text-2xl",
   // TRANSPORTATION: "fa-solid fa-road text-2xl",
@@ -406,7 +407,7 @@ export const requiredFieldsByRoomArrival: Record<string, string[]> = {
 };
 
 
-export const predefinedOptionsRooms:any = {
+export const predefinedOptionsRooms: any = {
   brandName: {
     carpentry: ["Greenply", "Century", "Kitply", "Archid", "Austin"],
     hardware: ["Hettich", "Hafele", "Blum", "Godrej"],

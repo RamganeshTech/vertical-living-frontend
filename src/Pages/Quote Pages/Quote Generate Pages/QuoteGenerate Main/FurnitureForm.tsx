@@ -162,23 +162,30 @@ const FurnitureForm: React.FC<Props> = ({
 
     const updatedRows = calculateCoreMaterialCosts(updated, labourCost);
 
+    // 2. NEW LOGIC: Calculate Average Core Cost for Glues
+    // Formula: Total Cost of Core Materials / Number of Core Material Rows
+    const totalCoreCost = updatedRows.reduce((sum, row) => sum + (row.rowTotal || 0), 0);
+    const coreRowCount = updatedRows.length;
+    const avgCoreCost = coreRowCount > 0 ? Math.round(totalCoreCost / coreRowCount) : 0;
 
     const inheritedProfit = updatedRows?.[0]?.profitOnMaterial || 0;
 
     const applyProfitAndRecalculate = (rows: SimpleItemRow[], isGlue = false): SimpleItemRow[] =>
       rows.map(item => {
-        // if (item.wasManuallyEdited) return item;
 
         const profitOnMaterial = inheritedProfit;
-        const base = isGlue
-          ? item.cost || 0
-          : (item.quantity || 0) * (item.cost || 0);
-
+        // const base = isGlue
+        //   ? item.cost || 0
+        //   : (item.quantity || 0) * (item.cost || 0);
+        const base = isGlue ? avgCoreCost : (item.quantity || 0) * (item.cost || 0);
         const profit = base * (profitOnMaterial / 100);
         const rowTotal = Math.round(base + profit);
 
         return {
           ...item,
+          itemName: isGlue ? "Glue" : item.itemName,
+          quantity: isGlue ? 1 : item.quantity,
+          cost: isGlue ? avgCoreCost : item.cost, // Automatically update the cost field for glues
           profitOnMaterial,
           rowTotal,
         };
@@ -199,6 +206,42 @@ const FurnitureForm: React.FC<Props> = ({
     updateFurniture?.(updatedFurniture);
   };
 
+  const syncFurnitureState = (updatedCoreRows: CoreMaterialRow[]) => {
+    // 1. Calculate the new Average Cost
+    const totalCoreCost = updatedCoreRows.reduce((sum, row) => sum + (row.rowTotal || 0), 0);
+    const coreRowCount = updatedCoreRows.length;
+    const avgCoreCost = coreRowCount > 0 ? Math.round(totalCoreCost / coreRowCount) : 0;
+
+    // 2. Get the inherited profit from the first row
+    const inheritedProfit = updatedCoreRows?.[0]?.profitOnMaterial || 0;
+
+    // 3. Helper to apply updates to simple sections (Glues, Fittings, etc.)
+    const applyUpdates = (rows: SimpleItemRow[], isGlue = false): SimpleItemRow[] =>
+      rows.map(item => {
+        const currentCost = isGlue ? avgCoreCost : (item.cost || 0);
+        const base = isGlue ? currentCost : (item.quantity || 0) * currentCost;
+        const profit = base * (inheritedProfit / 100);
+
+        return {
+          ...item,
+          cost: currentCost,
+          profitOnMaterial: inheritedProfit,
+          rowTotal: Math.round(base + profit),
+        };
+      });
+
+    // 4. Construct the final object
+    const updatedFurniture: FurnitureBlock = {
+      ...data,
+      coreMaterials: updatedCoreRows,
+      fittingsAndAccessories: applyUpdates(data.fittingsAndAccessories),
+      glues: applyUpdates(data.glues, true),
+      nonBrandMaterials: applyUpdates(data.nonBrandMaterials),
+    };
+
+    updatedFurniture.totals = computeTotals(updatedFurniture);
+    updateFurniture?.(updatedFurniture);
+  };
 
 
   const handleSimpleChange = (
@@ -209,12 +252,6 @@ const FurnitureForm: React.FC<Props> = ({
   ) => {
     const section: any = [...data[kind]];
     section[i][key] = value;
-    // if (kind !== "glues") {
-    //   section[i].rowTotal = section[i].quantity * section[i].cost;
-    // }
-    // else {
-    //   section[i].rowTotal = section[i].cost;
-    // }
 
     if (kind !== "glues") {
       const base = (section[i].quantity || 0) * (section[i].cost || 0);
@@ -399,16 +436,26 @@ const FurnitureForm: React.FC<Props> = ({
                   <Button
                     variant="danger"
                     onClick={() => {
+                      // const updated = [...data.coreMaterials];
+                      // updated.splice(i, 1);
+                      // const recalculated = calculateCoreMaterialCosts(updated, labourCost);
+
+                      // const updatedFurniture: FurnitureBlock = {
+                      //   ...data,
+                      //   coreMaterials: recalculated,
+                      // };
+                      // updatedFurniture.totals = computeTotals(updatedFurniture);
+                      // updateFurniture?.(updatedFurniture);
+
                       const updated = [...data.coreMaterials];
                       updated.splice(i, 1);
-                      const recalculated = calculateCoreMaterialCosts(updated, labourCost);
 
-                      const updatedFurniture: FurnitureBlock = {
-                        ...data,
-                        coreMaterials: recalculated,
-                      };
-                      updatedFurniture.totals = computeTotals(updatedFurniture);
-                      updateFurniture?.(updatedFurniture);
+                      // Recalculate core row totals first (for the new count/distribution)
+                      const recalculatedCore = calculateCoreMaterialCosts(updated, labourCost);
+
+                      // Use our helper to sync the Glues and everything else
+
+                      syncFurnitureState(recalculatedCore)
                     }}
                     className="px-1 text-xs bg-red-600 text-white"
                   >
@@ -615,4 +662,3 @@ const FurnitureForm: React.FC<Props> = ({
 };
 
 export default FurnitureForm;
-

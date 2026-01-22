@@ -103,7 +103,7 @@ const InternalQuoteMainNew = () => {
 
                 console.log("response", response)
                 // Navigate using the data._id from backend response
-                navigate(`create/${response._id}`);
+                navigate(`create/${response._id}/${response.quoteCategory}`);
             }
             setModalOpen(false);
             resetForm();
@@ -113,7 +113,7 @@ const InternalQuoteMainNew = () => {
     };
 
     const resetForm = () => {
-        setFormData({ mainQuoteName: '', quoteCategory: 'commercial', projectId: '' });
+        setFormData({ mainQuoteName: '', quoteCategory: '', projectId: '' });
         setIsEditing(false);
         setSelectedQuoteId(null);
     };
@@ -409,7 +409,7 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, }) => {
                 isLoading={isPending}
                 variant="secondary"
                 className="h-8 px-4 text-[11px] font-bold uppercase tracking-wider"
-                onClick={() => navigate(`single/${quote._id}`)}
+                onClick={() => navigate(`single/${quote._id}/${quote?.quoteCategory}`)}
             >
                 <i className="fas fa-eye mr-1.5" /> View
             </Button>

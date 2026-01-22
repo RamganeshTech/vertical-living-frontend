@@ -58,7 +58,7 @@ const QuoteClientCard: React.FC<Props> = ({ quote, canDelete }) => {
                     <div>
 
                         <div className='my-1'>
-                            <h3 className="text-base font-bold text-blue-700 leading-[8px] ">
+                            <h3 className="text-sm font-bold text-blue-700 ">
                                 Project: <span className='text-black'>{quote?.projectId?.projectName || "Project"}</span>
                             </h3>
                             <span className="text-[12px] font-semibold text-gray-500">

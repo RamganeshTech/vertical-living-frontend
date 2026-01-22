@@ -6,9 +6,10 @@ import InternalQuoteForm from './InternalQuoteNewForm';
 
 const InternalQuoteSingleNew = () => {
     // 1. Extract IDs from URL parameters
-    const { id, organizationId } = useParams() as {
+    const { id:quoteId, organizationId , quoteType} = useParams() as {
         id: string;
         organizationId: string;
+        quoteType: string;
     };
 
     // 2. Fetch the specific Quote Document
@@ -18,7 +19,7 @@ const InternalQuoteSingleNew = () => {
         isError,
         error,
         // refetch
-    } = useGetSingleInternalQuote(organizationId, id);
+    } = useGetSingleInternalQuote(organizationId, quoteId);
 
     // 3. Mutation for Updating Metadata (Name, Category, Project)
     const updateQuoteMutation = useUpdateInternalQuote();
@@ -59,6 +60,8 @@ const InternalQuoteSingleNew = () => {
             */}
             <InternalQuoteForm
                 mode="view"
+                quoteType={quoteType}
+                quoteId={quoteId}
                 organizationId={organizationId}
                 initialData={quote}
                 // onSubmit={handleUpdate}

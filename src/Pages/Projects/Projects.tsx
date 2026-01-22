@@ -204,6 +204,7 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
 
   RATECONIG: "materialrateconfig",
   RATECONIGSTAFF: "labourratequote",
+  RATECONIGMATERIALWITHSTAFF: "materialwithlabourratequote",
   WORKTEMPLATE: "materialquote",
   INTERNALQUOTE: "internalquote",
   QUOTEVARIENT: "quotevariant",
@@ -245,6 +246,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
+    RATECONIGMATERIALWITHSTAFF: `/organizations/${organizationId}/projects/materialwithlabourrate`,
     WORKTEMPLATE: `/organizations/${organizationId}/projects/worktemplates`,
     INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
     QUOTEVARIENT: `/organizations/${organizationId}/projects/quotevariant`,

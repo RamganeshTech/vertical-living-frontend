@@ -15,7 +15,7 @@ interface ModularUnitFormProps {
 }
 
 export interface ModularFormValues {
-    productName: string;
+    // productName: string;
     serialNo: string;
     category: string;
     description: string;
@@ -29,6 +29,7 @@ export interface ModularFormValues {
     fabricationCost: string;
     timeRequired: string;
     attributes: string[];
+    parts: any[]; // Add this line
 }
 
 const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
@@ -36,14 +37,14 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
     const { organizationId } = useParams<{ organizationId: string }>();
 
     // Hooks
-    const { mutate: createUnit, isPending: isCreating } = useCreateModularUnitNew();
+    const { mutateAsync: createUnit, isPending: isCreating } = useCreateModularUnitNew();
     const { mutateAsync: updateUnit, isPending: isUpdating } = useUpdateModularUnitNew();
     const { data: existingUnit, isLoading: isLoadingUnit } = useGetModularUnitByIdNew(
         mode === "edit" && unitId ? unitId : ""
     );
 
 
-    
+
     const { role, permission } = useAuthCheck();
     // const canDelete = role === "owner" || permission?.modularunit?.delete;
     // const canList = role === "owner" || permission?.modularunit?.list;
@@ -51,9 +52,23 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
     const canEdit = role === "owner" || permission?.modularunit?.edit;
 
 
+    // 1. Define the dynamic headers state
+    const [columns, setColumns] = useState([
+        { key: "no", label: "No" },
+        { key: "partCode", label: "Part Code" },
+        { key: "partName", label: "Part Name" },
+        { key: "l", label: "L" },
+        { key: "w", label: "W" },
+        { key: "t", label: "T" },
+        { key: "coreMaterial", label: "Core Material" },
+        { key: "externalFinish", label: "External Finish" },
+        { key: "internalFinish", label: "Internal Finish" },
+        { key: "grain", label: "Grain" }
+    ]);
+
 
     const defaultValues = {
- productName: "",
+        productName: "",
         serialNo: "",
         category: "",
         description: "",
@@ -67,7 +82,13 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
         fabricationCost: "",
         timeRequired: "",
         attributes: [],
+        parts: [{
+            no: 1, partCode: "", partName: "", l: 0, w: 0, t: 0,
+            coreMaterial: "", externalFinish: "", internalFinish: "", grain: ""
+        }]
     }
+
+
     // Form State
     const [formValues, setFormValues] = useState<ModularFormValues>(defaultValues);
 
@@ -81,10 +102,14 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
     const [images3d, setImages3d] = useState<File[]>([]);
     const [images3dPreviews, setImages3dPreviews] = useState<string[]>([]);
 
+
+    const [cutlistDoc, setCutlistDoc] = useState<File[]>([]);
+
     // Replace image flags (for edit mode)
     const [replaceProductImages, setReplaceProductImages] = useState(false);
     const [replace2dImages, setReplace2dImages] = useState(false);
     const [replace3dImages, setReplace3dImages] = useState(false);
+    const [replaceCutlistDoc, setReplaceCutlistDoc] = useState(false);
 
     // Attribute input
     const [attributeInput, setAttributeInput] = useState("");
@@ -93,7 +118,7 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
     useEffect(() => {
         if (mode === "edit" && existingUnit) {
             setFormValues({
-                productName: existingUnit.productName || "",
+                // productName: existingUnit.productName || "",
                 serialNo: existingUnit.serialNo || "",
                 category: existingUnit.category || "",
                 description: existingUnit.description || "",
@@ -107,6 +132,7 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                 fabricationCost: existingUnit.fabricationCost?.toString() || "",
                 timeRequired: existingUnit.timeRequired?.toString() || "",
                 attributes: existingUnit.attributes || [],
+                parts: existingUnit.parts || [],
             });
 
             if (existingUnit.productImages) {
@@ -157,6 +183,74 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
         if (mode === "edit") setReplace3dImages(true);
     };
 
+
+    const handleCutListDocChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        setCutlistDoc(files);
+        if (mode === "edit") setReplaceCutlistDoc(true);
+    };
+
+
+
+
+    const addFieldGlobally = () => {
+        const label = prompt("Enter new field name (e.g., Edge Banding):");
+        if (!label) return;
+        const key = label.toLowerCase().replace(/\s+/g, '_');
+
+        // Add header
+        setColumns(prev => [...prev, { key, label }]);
+
+        // Add empty key to all existing rows in data
+        setFormValues(prev => ({
+            ...prev,
+            parts: prev.parts.map(part => ({ ...part, [key]: "" }))
+        }));
+    };
+
+    const removeFieldGlobally = (keyToRemove: string) => {
+        if (keyToRemove === 'no') return; // Don't allow deleting the index
+
+        // Remove header
+        setColumns(prev => prev.filter(col => col.key !== keyToRemove));
+
+        // Delete property from all objects in parts array
+        setFormValues(prev => ({
+            ...prev,
+            parts: prev.parts.map(part => {
+                const updatedPart = { ...part };
+                delete updatedPart[keyToRemove];
+                return updatedPart;
+            })
+        }));
+    };
+
+    const handlePartChange = (index: number, key: string, value: any) => {
+        setFormValues((prev) => {
+            const updatedParts = [...prev.parts];
+            updatedParts[index] = { ...updatedParts[index], [key]: value };
+            return { ...prev, parts: updatedParts };
+        });
+    };
+
+    const addPartRow = () => {
+        setFormValues((prev) => ({
+            ...prev,
+            parts: [...prev.parts, {
+                no: prev.parts.length + 1, partCode: "", partName: "",
+                l: 0, w: 0, t: 0, coreMaterial: "", externalFinish: "",
+                internalFinish: "", grain: ""
+            }]
+        }));
+    };
+
+    const removePartRow = (index: number) => {
+        setFormValues((prev) => ({
+            ...prev,
+            parts: prev.parts.filter((_, i) => i !== index)
+        }));
+    };
+
     // Add Attribute
     const handleAddAttribute = () => {
         if (attributeInput.trim()) {
@@ -181,10 +275,10 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
         e.preventDefault();
 
         // Validation
-        if (!formValues.productName.trim()) {
-            toast({ title: "Error", description: "Product name is required", variant: "destructive" });
-            return;
-        }
+        // if (!formValues.productName.trim()) {
+        //     toast({ title: "Error", description: "Product name is required", variant: "destructive" });
+        //     return;
+        // }
 
         if (!formValues.category) {
             toast({ title: "Error", description: "Category is required", variant: "destructive" });
@@ -206,6 +300,7 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
             totalAreaSqFt: formValues.totalAreaSqFt || undefined,
             fabricationCost: formValues.fabricationCost || undefined,
             timeRequired: formValues.timeRequired || undefined,
+            parts: JSON.stringify(formValues.parts), // Add this line
         };
 
         try {
@@ -216,6 +311,8 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                     productImages,
                     images2d,
                     images3d,
+                    cutlistDoc,
+
                 });
                 toast({ title: "Success", description: "Product created successfully!" });
                 setFormValues(defaultValues)
@@ -226,9 +323,11 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                     productImages,
                     images2d,
                     images3d,
+                    cutlistDoc,
                     replaceProductImages,
                     replace2dImages,
                     replace3dImages,
+                    replaceCutlistDoc,
                 });
                 toast({ title: "Success", description: "Product updated successfully!" });
             }
@@ -279,7 +378,7 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 {/* Product Images */}
                                 <div className="space-y-2">
                                     <Label htmlFor="productImages" className="text-sm font-medium">
@@ -354,6 +453,33 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                                         </div>
                                     )}
                                 </div>
+
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="images3d" className="text-sm font-medium">
+                                        <i className="fas fa-file mr-1 text-indigo-600" />
+                                        Cutlist Document
+                                    </Label>
+                                    <Input
+                                        id="cutlistdoc"
+                                        type="file"
+                                        accept="pdf/*"
+                                        multiple
+                                        onChange={handleCutListDocChange}
+                                        className="cursor-pointer text-xs"
+                                    />
+                                    {cutlistDoc.length > 0 && (
+                                        <div className="mt-2 space-y-1">
+                                            {cutlistDoc.map((file, i) => (
+                                                <p key={i} className="text-xs text-gray-500 truncate">
+                                                    <i className="far fa-file-pdf mr-1 text-red-500" />
+                                                    {file.name}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
                             </div>
                         </CardContent>
                     </Card>
@@ -366,10 +492,10 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                                 Product Details
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-2">
                             {/* Row 1: Product Name & Fabrication Cost */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
+                                {/* <div className="space-y-2">
                                     <Label htmlFor="productName">
                                         Product Name <span className="text-red-500">*</span>
                                     </Label>
@@ -380,25 +506,8 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                                         onChange={(e) => handleInputChange("productName", e.target.value)}
                                         required
                                     />
-                                </div>
+                                </div> */}
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="fabricationCost">
-                                        Fabrication Cost (₹) <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Input
-                                        id="fabricationCost"
-                                        type="number"
-                                        placeholder="Enter fabrication cost"
-                                        value={formValues.fabricationCost}
-                                        onChange={(e) => handleInputChange("fabricationCost", e.target.value)}
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Row 2: Category & Serial Number */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="category">
                                         Category <span className="text-red-500">*</span>
@@ -426,6 +535,31 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                                         onChange={(e) => handleInputChange("category", e.target.value)}
                                     />
                                 </div>
+
+
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="fabricationCost">
+                                        Fabrication Cost (₹) <span className="text-red-500">*</span>
+                                    </Label>
+                                    <Input
+                                        id="fabricationCost"
+                                        type="number"
+                                        placeholder="Enter fabrication cost"
+                                        value={formValues.fabricationCost}
+                                        onChange={(e) => handleInputChange("fabricationCost", e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+
+
+
+                            </div>
+
+                            {/* Row 2: Category & Serial Number */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
 
                                 {/* <div className="space-y-2">
                                     <Label htmlFor="serialNo">Serial Number</Label>
@@ -525,6 +659,97 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                                 />
                             </div>
 
+
+                            <Card className="!shadow-none !p-0">
+                                <CardHeader className="flex !p-0 flex-row items-center justify-between">
+                                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                                        <i className="fas fa-th-list text-green-600" />
+                                        Cutlist Details
+                                    </CardTitle>
+                                    <div className="flex gap-2">
+                                        <Button type="button" size="sm" variant="outline" onClick={addFieldGlobally}>
+                                            <i className="fas fa-columns mr-2" /> Add Field
+                                        </Button>
+                                        <Button type="button" size="sm" variant="outline" onClick={addPartRow}>
+                                            <i className="fas fa-plus mr-2" /> Add Row
+                                        </Button>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="!p-2 overflow-x-auto border-t border-gray-300">
+                                    <table
+                                        className="w-full text-left border-collapse min-w-[1000px]">
+                                        <thead
+                                            className="bg-gray-50 text-[10px] uppercase text-gray-600">
+                                            <tr>
+                                                {columns.map((col, index) => (
+                                                    <th key={col.key}
+                                                        // className="p-2 border relative group"
+                                                        className={`p-2 border-b border-r bg-blue-50 border-blue-100 text-[11px] font-bold uppercase tracking-wider text-blue-700 relative group
+                                                             ${index === 0 ? "rounded-tl-xl" : ""}
+                                                                       
+                                                            `}
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            {col.label}
+                                                            {col.key !== 'no' && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeFieldGlobally(col.key)}
+                                                                    className="ml-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                >
+                                                                    <i className="fas fa-times-circle" />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </th>
+                                                ))}
+                                                {/* <th className="p-2 border text-center"> */}
+                                                <th className="p-2 border-b rounded-tr-xl border-blue-100 text-[11px] font-bold uppercase tracking-wider text-blue-700 text-center bg-blue-50">
+                                                    Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-xs">
+                                            {formValues.parts.map((part, index) => (
+                                                <tr
+                                                    key={index}
+                                                    // className="hover:bg-gray-50"
+                                                    className="hover:bg-blue-50/40 transition-colors group"
+                                                >
+                                                    {columns.map((col) => (
+                                                        <td key={col.key} className="p-0 border border-r border-blue-200">
+                                                            {col.key === 'no' ? (
+                                                                <div className="text-center font-medium p-2">{index + 1}</div>
+                                                            ) : (
+                                                                <input
+                                                                    type={["l", "w", "t"].includes(col.key) ? "number" : "text"}
+                                                                    value={part[col.key] || ""}
+                                                                    onChange={(e) => handlePartChange(index, col.key, e.target.value)}
+                                                                    // className="w-full p-2 bg-transparent outline-none focus:bg-white focus:ring-1 focus:ring-blue-500"
+                                                                    className={`w-full p-3 bg-transparent outline-none transition-all
+                                                                       
+                                                                            focus:bg-white focus:ring-2 focus:ring-inset focus:ring-blue-500 cursor-text
+                                                                        `}
+                                                                />
+                                                            )}
+                                                        </td>
+                                                    ))}
+                                                    <td className="p-1 border border-blue-200 text-center">
+                                                        <button type="button" onClick={() => removePartRow(index)}
+                                                            //  className="text-red-500 hover:text-red-700"
+                                                            className="p-2 cursor-pointer text-slate-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                                        >
+                                                            <i className="fas fa-trash" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </CardContent>
+                            </Card>
+
+
                             {/* Row 6: Attributes */}
                             <div className="space-y-2">
                                 <Label className="text-sm font-medium flex items-center gap-2">
@@ -593,7 +818,7 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
                     </Card>
 
                     {/* Submit Buttons */}
-                  {(canCreate || canEdit) &&  <div className="flex items-center justify-end gap-4 sticky bottom-0 bg-white p-4  rounded-lg shadow-lg">
+                    {(canCreate || canEdit) && <div className="flex items-center justify-end gap-4 sticky bottom-0 bg-white p-4  rounded-lg shadow-lg">
                         <Button
                             type="button"
                             variant="outline"

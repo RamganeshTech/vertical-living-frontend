@@ -49,15 +49,78 @@ const ModularUnitMainNew = () => {
         category: "",
         minPrice: "0",
         maxPrice: "100000",
+
+        // New Dimension Filters
+        minHeight: "",
+        maxHeight: "",
+        minWidth: "",
+        maxWidth: "",
+        minDepth: "",
+        maxDepth: "",
+
+        // Temporary fields for UI logic
+        minHeightFeet: "",
+        maxHeightFeet: "",
+        minWidthFeet: "",
+        maxWidthFeet: "",
+        minDepthFeet: "",
+        maxDepthFeet: "",
+
+
         sortBy: "createdAt",
         sortOrder: "desc" as "asc" | "desc",
     });
+
+
+    useEffect(() => {
+        const FEET_TO_MM = 304.8;
+
+        // setFilters(prev => ({
+        //     ...prev,
+        //     minHeight: prev.minHeightFeet ? (parseFloat(prev.minHeightFeet) * FEET_TO_MM).toFixed(0) : prev.minHeight,
+        //     maxHeight: prev.maxHeightFeet ? (parseFloat(prev.maxHeightFeet) * FEET_TO_MM).toFixed(0) : prev.maxHeight,
+        //     minWidth: prev.minWidthFeet ? (parseFloat(prev.minWidthFeet) * FEET_TO_MM).toFixed(0) : prev.minWidth,
+        //     maxWidth: prev.maxWidthFeet ? (parseFloat(prev.maxWidthFeet) * FEET_TO_MM).toFixed(0) : prev.maxWidth,
+        //     minDepth: prev.minDepthFeet ? (parseFloat(prev.minDepthFeet) * FEET_TO_MM).toFixed(0) : prev.minDepth,
+        //     maxDepth: prev.maxDepthFeet ? (parseFloat(prev.maxDepthFeet) * FEET_TO_MM).toFixed(0) : prev.maxDepth,
+        // }));
+
+        setFilters(prev => {
+            // Helper function to handle the conversion and clearing logic
+            const convertOrClear = (feetValue: any, currentMmValue: any) => {
+                // If the feet input is empty, clear the MM value
+                if (feetValue === "") return "";
+
+                const parsed = parseFloat(feetValue);
+                // If it's a valid number, convert it; otherwise keep current
+                return !isNaN(parsed) ? (parsed * FEET_TO_MM).toFixed(0) : currentMmValue;
+            };
+
+            return {
+                ...prev,
+                minHeight: convertOrClear(prev.minHeightFeet, prev.minHeight),
+                maxHeight: convertOrClear(prev.maxHeightFeet, prev.maxHeight),
+                minWidth: convertOrClear(prev.minWidthFeet, prev.minWidth),
+                maxWidth: convertOrClear(prev.maxWidthFeet, prev.maxWidth),
+                minDepth: convertOrClear(prev.minDepthFeet, prev.minDepth),
+                maxDepth: convertOrClear(prev.maxDepthFeet, prev.maxDepth),
+            };
+        });
+    }, [filters.minHeightFeet, filters.maxHeightFeet, filters.minWidthFeet, filters.maxWidthFeet, filters.minDepthFeet, filters.maxDepthFeet]);
+
 
     // Debounced search
     const debouncedSearch = useDebounce(filters.search, 500);
     const debouncedCategory = useDebounce(filters.category, 500);
     const debouncedMinMrp = useDebounce(filters.minPrice, 800);
     const debouncedMaxMrp = useDebounce(filters.maxPrice, 800);
+
+    const debouncedMinHeight = useDebounce(filters.minHeight, 500);
+    const debouncedMaxHeight = useDebounce(filters.maxHeight, 500);
+    const debouncedMinWidth = useDebounce(filters.minWidth, 500);
+    const debouncedMaxWidth = useDebounce(filters.maxWidth, 500);
+    const debouncedMinDepth = useDebounce(filters.minDepth, 500);
+    const debouncedMaxDepth = useDebounce(filters.maxDepth, 500);
 
     //   useEffect(() => {
     //     const timer = setTimeout(() => {
@@ -85,6 +148,15 @@ const ModularUnitMainNew = () => {
         minPrice: debouncedMinMrp ? Number(debouncedMinMrp) : undefined,
         maxPrice: debouncedMaxMrp ? Number(debouncedMaxMrp) : undefined,
         search: debouncedSearch || undefined,
+
+        minHeight: debouncedMinHeight ? Number(debouncedMinHeight) : undefined,
+        maxHeight: debouncedMaxHeight ? Number(debouncedMaxHeight) : undefined,
+        minWidth: debouncedMinWidth ? Number(debouncedMinWidth) : undefined,
+        maxWidth: debouncedMaxWidth ? Number(debouncedMaxWidth) : undefined,
+        minDepth: debouncedMinDepth ? Number(debouncedMinDepth) : undefined,
+        maxDepth: debouncedMaxDepth ? Number(debouncedMaxDepth) : undefined,
+
+
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
     });
@@ -123,6 +195,22 @@ const ModularUnitMainNew = () => {
             minPrice: "0",
             maxPrice: "100000",
             sortBy: "createdAt",
+            minHeight: "",
+            maxHeight: "",
+            minWidth: "",
+            maxWidth: "",
+            minDepth: "",
+            maxDepth: "",
+
+            minHeightFeet: "",
+            maxHeightFeet: "",
+            minWidthFeet: "",
+            maxWidthFeet: "",
+            minDepthFeet: "",
+            maxDepthFeet: "",
+
+
+
             sortOrder: "desc",
         });
     };
@@ -142,7 +230,7 @@ const ModularUnitMainNew = () => {
             });
             toast({
                 title: "Success",
-                description: `${unit.productName} updated to cart`,
+                description: `updated to cart`,
             });
         } catch (error: any) {
             toast({
@@ -158,6 +246,22 @@ const ModularUnitMainNew = () => {
             (item: any) => item.productId.toString() === unitId.toString()
         );
         return cartItem?.quantity || 0;
+    };
+
+
+    const handleDimensionChange = (field: string, value: any) => {
+        // Allow empty string so users can clear the input
+        if (value === "") {
+            setFilters(prev => ({ ...prev, [field]: "" }));
+            return;
+        }
+
+        const numValue = parseFloat(value);
+
+        // Only update state if the value is 0 or greater
+        if (numValue >= 0) {
+            setFilters(prev => ({ ...prev, [field]: value }));
+        }
     };
 
 
@@ -267,7 +371,7 @@ const ModularUnitMainNew = () => {
                                 )}
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 {/* Search */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -295,6 +399,82 @@ const ModularUnitMainNew = () => {
                                         onChange={(e) => setFilters((f) => ({ ...f, category: e.target.value }))}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
+                                </div>
+
+                                <div className="space-y-3">
+                                    <h4 className="text-sm font-semibold text-gray-700 flex items-center">
+                                        <i className="fas fa-search-plus mr-2 text-blue-500"></i>
+                                        Dimention (Feet)
+                                    </h4>
+
+                                    {/* Height Feet */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-gray-700 font-bold uppercase tracking-wider">Height (ft)</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Min ft"
+                                                value={filters.minHeightFeet}
+                                                onChange={(e) => handleDimensionChange('minHeightFeet', e.target.value)}
+                                                className="h-9 text-sm border-blue-100"
+                                            />
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Max ft"
+                                                value={filters.maxHeightFeet}
+                                                onChange={(e) => handleDimensionChange('maxHeightFeet', e.target.value)}
+                                                className="h-9 text-sm border-blue-100"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Width Feet */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-gray-700 font-bold uppercase tracking-wider">Width (ft)</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Min ft"
+                                                value={filters.minWidthFeet}
+                                                onChange={(e) => handleDimensionChange('minWidthFeet', e.target.value)}
+                                                className="h-9 text-sm border-green-100"
+                                            />
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Max ft"
+                                                value={filters.maxWidthFeet}
+                                                onChange={(e) => handleDimensionChange('maxWidthFeet', e.target.value)}
+                                                className="h-9 text-sm border-green-100"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Depth Feet */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-gray-700 font-bold uppercase tracking-wider">Depth (ft)</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Min ft"
+                                                value={filters.minDepthFeet}
+                                                onChange={(e) => handleDimensionChange('minDepthFeet', e.target.value)}
+                                                className="h-9 text-sm border-orange-100"
+                                            />
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Max ft"
+                                                value={filters.maxDepthFeet}
+                                                onChange={(e) => handleDimensionChange('maxDepthFeet', e.target.value)}
+                                                className="h-9 text-sm border-orange-100"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Price Range Slider */}
@@ -382,6 +562,160 @@ const ModularUnitMainNew = () => {
                                     </div>
                                 </div>
 
+
+                                {/* Dimension Filters Section */}
+                                {/* <div className="pt-4 border-t border-gray-100 space-y-4">
+                                    <h4 className="text-sm font-semibold text-gray-900 flex items-center">
+                                        <i className="fas fa-ruler-combined mr-2 text-blue-500"></i>
+                                        Dimensions (mm)
+                                    </h4>
+
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-gray-500 font-medium">Height</label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                type="number"
+                                                placeholder="Min"
+                                                value={filters.minHeight}
+                                                onChange={(e) => setFilters(f => ({ ...f, minHeight: e.target.value }))}
+                                                className="h-9 text-sm"
+                                            />
+                                            <Input
+                                                type="number"
+                                                placeholder="Max"
+                                                value={filters.maxHeight}
+                                                onChange={(e) => setFilters(f => ({ ...f, maxHeight: e.target.value }))}
+                                                className="h-9 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-gray-500 font-medium">Width</label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                type="number"
+                                                placeholder="Min"
+                                                value={filters.minWidth}
+                                                onChange={(e) => setFilters(f => ({ ...f, minWidth: e.target.value }))}
+                                                className="h-9 text-sm"
+                                            />
+                                            <Input
+                                                type="number"
+                                                placeholder="Max"
+                                                value={filters.maxWidth}
+                                                onChange={(e) => setFilters(f => ({ ...f, maxWidth: e.target.value }))}
+                                                className="h-9 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-gray-500 font-medium">Depth</label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                type="number"
+                                                placeholder="Min"
+                                                value={filters.minDepth}
+                                                onChange={(e) => setFilters(f => ({ ...f, minDepth: e.target.value }))}
+                                                className="h-9 text-sm"
+                                            />
+                                            <Input
+                                                type="number"
+                                                placeholder="Max"
+                                                value={filters.maxDepth}
+                                                onChange={(e) => setFilters(f => ({ ...f, maxDepth: e.target.value }))}
+                                                className="h-9 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                </div> */}
+
+
+
+
+                                <div className="space-y-3 pt-4 border-t border-gray-100">
+                                    <h4 className="text-sm font-semibold text-gray-900 flex items-center">
+                                        <i className="fas fa-ruler-combined mr-2 text-slate-500"></i>
+                                        Dimensions (mm)
+                                    </h4>
+
+                                    {/* Height MM */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-gray-500 font-medium uppercase">Height Range</label>
+                                        <div className="flex gap-2 items-center">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Min mm"
+                                                value={filters.minHeight}
+                                                onChange={(e) => handleDimensionChange('minHeight', e.target.value)}
+                                                className="h-9 text-sm bg-gray-50/50"
+                                            />
+                                            <span className="text-gray-300">-</span>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Max mm"
+                                                value={filters.maxHeight}
+                                                onChange={(e) => handleDimensionChange('maxHeight', e.target.value)}
+                                                className="h-9 text-sm bg-gray-50/50"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Width MM */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-gray-500 font-medium uppercase">Width Range</label>
+                                        <div className="flex gap-2 items-center">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Min mm"
+                                                value={filters.minWidth}
+                                                onChange={(e) => handleDimensionChange('minWidth', e.target.value)}
+                                                className="h-9 text-sm bg-gray-50/50"
+                                            />
+                                            <span className="text-gray-300">-</span>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Max mm"
+                                                value={filters.maxWidth}
+                                                onChange={(e) => handleDimensionChange('maxWidth', e.target.value)}
+                                                className="h-9 text-sm bg-gray-50/50"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Depth MM */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-gray-500 font-medium uppercase">Depth Range</label>
+                                        <div className="flex gap-2 items-center">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Min mm"
+                                                value={filters.minDepth}
+                                                onChange={(e) => handleDimensionChange('minDepth', e.target.value)}
+                                                className="h-9 text-sm bg-gray-50/50"
+                                            />
+                                            <span className="text-gray-300">-</span>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Max mm"
+                                                value={filters.maxDepth}
+                                                onChange={(e) => handleDimensionChange('maxDepth', e.target.value)}
+                                                className="h-9 text-sm bg-gray-50/50"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
                                 {/* Sort By */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -393,7 +727,7 @@ const ModularUnitMainNew = () => {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option value="createdAt">Created Date</option>
-                                        <option value="productName">Product Name</option>
+                                        {/* <option value="productName">Product Name</option> */}
                                         <option value="price">Price</option>
                                         <option value="timeRequired">Time Required</option>
                                     </select>
@@ -420,7 +754,7 @@ const ModularUnitMainNew = () => {
                     </section>
 
                     {/* No Products Fallback */}
-                   {canList && <>{allUnits.length === 0 ? (
+                    {canList && <>{allUnits.length === 0 ? (
                         <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                             <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
                             <h3 className="text-lg font-semibold text-blue-800 mb-1">
@@ -478,7 +812,7 @@ const ModularUnitMainNew = () => {
                                 </div>
                             )}
                         </div>
-                    )}</>} 
+                    )}</>}
                 </main>
             )}
         </div>

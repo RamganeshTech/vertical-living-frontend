@@ -11,6 +11,7 @@ const createModularUnitNewApi = async (
     productImages: File[],
     images2d: File[],
     images3d: File[],
+    cutlistDoc: File[],
     api: AxiosInstance
 ) => {
     const formData = new FormData();
@@ -43,6 +44,11 @@ const createModularUnitNewApi = async (
         formData.append("3dImages", file);
     });
 
+    // Add 3D images
+    cutlistDoc.forEach((file) => {
+        formData.append("cutlistDoc", file);
+    });
+
     const { data } = await api.post(
         `/modularunitnew/create/${organizationId}`,
         formData,
@@ -62,9 +68,11 @@ const updateModularUnitNewApi = async (
     productImages: File[],
     images2d: File[],
     images3d: File[],
+    cutlistDoc: File[],
     replaceProductImages: boolean,
     replace2dImages: boolean,
     replace3dImages: boolean,
+    replaceCutlistDoc: boolean,
     api: AxiosInstance
 ) => {
     const formData = new FormData();
@@ -82,7 +90,7 @@ const updateModularUnitNewApi = async (
     //     }
     // });
 
-        // ✅ CRITICAL FIX: Extract dimention BEFORE looping
+    // ✅ CRITICAL FIX: Extract dimention BEFORE looping
     const { dimention, attributes, ...restValues } = formValues;
 
     // Add all form fields EXCEPT dimention and attributes
@@ -112,6 +120,7 @@ const updateModularUnitNewApi = async (
     formData.append("replaceProductImages", String(replaceProductImages));
     formData.append("replace2dImages", String(replace2dImages));
     formData.append("replace3dImages", String(replace3dImages));
+    formData.append("replaceCutlistDoc", String(replaceCutlistDoc));
 
     // Add product images
     productImages.forEach((file) => {
@@ -126,6 +135,11 @@ const updateModularUnitNewApi = async (
     // Add 3D images
     images3d.forEach((file) => {
         formData.append("3dImages", file);
+    });
+
+    // Add 3D images
+    cutlistDoc.forEach((file) => {
+        formData.append("cutlistDoc", file);
     });
 
     const { data } = await api.put(
@@ -148,6 +162,13 @@ const deleteModularUnitNewApi = async (unitId: string, api: AxiosInstance) => {
     return data.data;
 };
 
+const generatePdfModularUnitNewApi = async(unitId: string, api: AxiosInstance) => {
+    const { data } = await api.post(`/modularunitnew/generatepdf/${unitId}`);
+
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+}
+
 // ==================== GET SINGLE MODULAR UNIT ====================
 const getModularUnitByIdNewApi = async (unitId: string, api: AxiosInstance) => {
     const { data } = await api.get(`/modularunitnew/getunits/${unitId}`);
@@ -164,7 +185,18 @@ interface GetAllModularUnitsParams {
     category?: string;
     minPrice?: number;
     maxPrice?: number;
+
+
     search?: string;
+
+    // New Dimension Fields
+    minHeight?: number;
+    maxHeight?: number;
+    minWidth?: number;
+    maxWidth?: number;
+    minDepth?: number;
+    maxDepth?: number;
+
     sortBy?: string;
     sortOrder?: "asc" | "desc";
 }
@@ -180,6 +212,16 @@ const getAllModularUnitsNewApi = async (
     if (params.category) queryParams.append("category", params.category);
     if (params.minPrice) queryParams.append("minPrice", String(params.minPrice));
     if (params.maxPrice) queryParams.append("maxPrice", String(params.maxPrice));
+
+    // Append Dimension Filters to Query String
+    if (params.minHeight) queryParams.append("minHeight", String(params.minHeight));
+    if (params.maxHeight) queryParams.append("maxHeight", String(params.maxHeight));
+    if (params.minWidth) queryParams.append("minWidth", String(params.minWidth));
+    if (params.maxWidth) queryParams.append("maxWidth", String(params.maxWidth));
+    if (params.minDepth) queryParams.append("minDepth", String(params.minDepth));
+    if (params.maxDepth) queryParams.append("maxDepth", String(params.maxDepth));
+
+
     if (params.search) queryParams.append("search", params.search);
     if (params.sortBy) queryParams.append("sortBy", params.sortBy);
     if (params.sortOrder) queryParams.append("sortOrder", params.sortOrder);
@@ -207,12 +249,14 @@ export const useCreateModularUnitNew = () => {
             productImages = [],
             images2d = [],
             images3d = [],
+            cutlistDoc = []
         }: {
             organizationId: string;
             formValues: any;
             productImages?: File[];
             images2d?: File[];
             images3d?: File[];
+            cutlistDoc?: File[];
         }) => {
             if (!role) throw new Error("Not Authorized");
             if (!allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
@@ -224,6 +268,7 @@ export const useCreateModularUnitNew = () => {
                 productImages,
                 images2d,
                 images3d,
+                cutlistDoc,
                 api
             );
         },
@@ -246,18 +291,25 @@ export const useUpdateModularUnitNew = () => {
             productImages = [],
             images2d = [],
             images3d = [],
+            cutlistDoc = [],
+
             replaceProductImages = false,
             replace2dImages = false,
             replace3dImages = false,
+            replaceCutlistDoc = false
+
         }: {
             unitId: string;
             formValues: any;
             productImages?: File[];
             images2d?: File[];
             images3d?: File[];
+            cutlistDoc?: File[];
+
             replaceProductImages?: boolean;
             replace2dImages?: boolean;
             replace3dImages?: boolean;
+            replaceCutlistDoc?: boolean;
         }) => {
             if (!role) throw new Error("Not Authorized");
             if (!allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
@@ -269,9 +321,11 @@ export const useUpdateModularUnitNew = () => {
                 productImages,
                 images2d,
                 images3d,
+                cutlistDoc,
                 replaceProductImages,
                 replace2dImages,
                 replace3dImages,
+                replaceCutlistDoc,
                 api
             );
         },
@@ -302,6 +356,29 @@ export const useDeleteModularUnitNew = () => {
     });
 };
 
+
+
+// ==================== Generate MODULAR UNIT HOOK ====================
+export const useGeneratePdfModularUnitNew = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const allowedRoles = ["owner", "staff", "CTO"];
+
+    return useMutation({
+        mutationFn: async ({ unitId }: { unitId: string }) => {
+            if (!role) throw new Error("Not Authorized");
+            if (!allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+
+            return await generatePdfModularUnitNewApi(unitId, api);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["modularUnitsNew"] });
+        },
+    });
+};
+
+
 // ==================== GET SINGLE MODULAR UNIT HOOK ====================
 export const useGetModularUnitByIdNew = (unitId: string) => {
     const { role } = useGetRole();
@@ -329,6 +406,13 @@ export const useGetAllModularUnitsNew = ({
     category,
     minPrice,
     maxPrice,
+
+    // New dimensions destructured here
+    minHeight, maxHeight,
+    minWidth, maxWidth,
+    minDepth, maxDepth,
+
+
     search,
     sortBy = "createdAt",
     sortOrder = "desc",
@@ -338,6 +422,16 @@ export const useGetAllModularUnitsNew = ({
     category?: string;
     minPrice?: number;
     maxPrice?: number;
+
+    // New Dimension Fields
+    minHeight?: number;
+    maxHeight?: number;
+    minWidth?: number;
+    maxWidth?: number;
+    minDepth?: number;
+    maxDepth?: number;
+
+
     search?: string;
     sortBy?: string;
     sortOrder?: "asc" | "desc";
@@ -350,7 +444,15 @@ export const useGetAllModularUnitsNew = ({
         queryKey: [
             "modularUnitsNew",
             organizationId,
-            { category, minPrice, maxPrice, search, sortBy, sortOrder },
+            {
+                category, minPrice, maxPrice, search, sortBy, sortOrder,
+                minHeight,
+                maxHeight,
+                minWidth,
+                maxWidth,
+                minDepth,
+                maxDepth,
+            },
         ],
         queryFn: async ({ pageParam = 1 }) => {
             if (!role) throw new Error("Not Authorized");
@@ -365,6 +467,13 @@ export const useGetAllModularUnitsNew = ({
                     category,
                     minPrice,
                     maxPrice,
+
+                    // Pass dimensions to the API function
+                    minHeight, maxHeight,
+                    minWidth, maxWidth,
+                    minDepth, maxDepth,
+
+
                     search,
                     sortBy,
                     sortOrder,
@@ -378,6 +487,6 @@ export const useGetAllModularUnitsNew = ({
         },
         initialPageParam: 1,
         enabled: !!organizationId && !!role && !!api,
-        retry:false
+        retry: false
     });
 };

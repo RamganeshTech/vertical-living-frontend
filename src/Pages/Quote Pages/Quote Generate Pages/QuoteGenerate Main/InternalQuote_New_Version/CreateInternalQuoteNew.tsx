@@ -4,7 +4,7 @@ import { useCreateInternalQuote } from '../../../../../apiList/Quote Api/Interna
 import InternalQuoteForm from './InternalQuoteNewForm';
 
  const CreateInternalQuoteNew = () => {
-    const { organizationId } = useParams() as { organizationId: string;  };
+    const { organizationId , quoteType, id:quoteId  } = useParams() as { organizationId: string; quoteType:string, id:string  };
     // const navigate = useNavigate();
     const createMutation = useCreateInternalQuote();
 
@@ -31,6 +31,8 @@ import InternalQuoteForm from './InternalQuoteNewForm';
             mode="create"
             organizationId={organizationId}
             // onSubmit={handleSubmit}
+            quoteType={quoteType}
+            quoteId={quoteId}
             isSubmitting={createMutation.isPending}
         />
     );

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from '../../../../../components/ui/Button';
 import { WORK_TEMPLATE, type WorkModule } from '../../../WorkData_Page/WorkDataTemplateMain';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import DynamicWorkForm from '../../../WorkData_Page/DynamicWorkForm';
 import { toast } from '../../../../../utils/toast';
 import { useAddWorkItem, useDeleteTemplate, useDeleteWorkItem, useUpdateSubletFields, useUpdateTemplateFields, useUpsertTemplateData } from '../../../../../apiList/Quote Api/Internal_Quote_Api/internalQuoteNewVersionApi';
@@ -9,10 +9,20 @@ import { useDebounce } from '../../../../../Hooks/useDebounce';
 import InlineWorkNameEditor from './InlineWorkNameEditor';
 import SublettingTemplate from '../../../WorkData_Page/Subletting_Template/SublettingTemplate';
 
-const InternalQuoteForm: React.FC<any> = ({ initialData }) => {
-    const { id: quoteId } = useParams() as { id: string };
+
+interface InternalQuoteFormProps {
+    initialData?: any, quoteId: string, 
+    quoteType: string,
+     mode:string,
+      organizationId:string,
+       isSubmitting:boolean
+}
+
+const InternalQuoteForm: React.FC<InternalQuoteFormProps> = ({ initialData, quoteId, quoteType }) => {
+    // const { id } = useParams() as { id: string };
     const navigate = useNavigate();
 
+    console.log("quoteType", quoteType);
     const [activeWorkId, setActiveWorkId] = useState<string | null>(null);
     const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
 
