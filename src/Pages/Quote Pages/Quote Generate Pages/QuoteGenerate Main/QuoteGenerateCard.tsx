@@ -6,33 +6,38 @@ import { toast } from '../../../../utils/toast'
 import type { FurnitureBlock } from './FurnitureForm'
 import { dateFormate, formatTime } from './../../../../utils/dateFormator';
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
+import { useNavigate } from 'react-router-dom'
 
 
 type Props = {
     quote: any
     organizationId: string
-    setFurnitures: React.Dispatch<React.SetStateAction<FurnitureBlock[]>>
-    setIsEditingId: React.Dispatch<React.SetStateAction<string | null>>
-    setQuoteType: React.Dispatch<React.SetStateAction<"single" | "residential" | null>>
-    setFiltersMain: React.Dispatch<React.SetStateAction<{
+    setFurnitures?: React.Dispatch<React.SetStateAction<FurnitureBlock[]>>
+    setIsEditingId?: React.Dispatch<React.SetStateAction<string | null>>
+    setQuoteType?: React.Dispatch<React.SetStateAction<"single" | "residential" | null>>
+    setFiltersMain?: React.Dispatch<React.SetStateAction<{
         projectId: string;
         projectName: string;
     }>>
-    setEditQuoteNo: React.Dispatch<React.SetStateAction<string | null>>
+    setEditQuoteNo?: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 
 
-const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, setFurnitures, setIsEditingId, setQuoteType,  setEditQuoteNo, setFiltersMain }) => {
+const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
+    //  setFurnitures, setIsEditingId, setQuoteType,  setEditQuoteNo, setFiltersMain 
+}) => {
 
+
+    const navigate = useNavigate()
     const { mutateAsync: deleteQuote, isPending } = useDeleteQuote();
 
-     const { role, permission } = useAuthCheck();
-        // const canList = role === "owner" || permission?.internalquote?.list;
-        // const canCreate = role === "owner" || permission?.internalquote?.create;
-        const canDelete = role === "owner" || permission?.internalquote?.delete;
-        // const canEdit = role === "owner" || permission?.internalquote?.edit;
-    
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.internalquote?.list;
+    // const canCreate = role === "owner" || permission?.internalquote?.create;
+    const canDelete = role === "owner" || permission?.internalquote?.delete;
+    // const canEdit = role === "owner" || permission?.internalquote?.edit;
+
 
     const handleDelete = async (id: string) => {
         try {
@@ -69,8 +74,11 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, setFurnitur
 
                         <div className='my-1'>
                             <h3 className="text-sm font-bold text-blue-700  ">
-                                Project: <span className='text-black'>{quote?.projectId?.projectName || "Project"}</span>
+                                Quote Name: <span className='text-black'>{quote?.mainQuoteName|| "Quote"}</span>
                             </h3>
+                            <p className="text-sm font-semibold text-blue-700  ">
+                                Project: <span className='text-black'>{quote?.projectId?.projectName || "Project"}</span>
+                            </p>
                             <span className="text-[12px] font-semibold text-gray-500">
                                 Quote No: <span className='text-black'>{quote.quoteNo || "N/A"}</span>
                             </span>
@@ -103,56 +111,58 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId, setFurnitur
                     <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => {
-                            const { furnitures} = quote;
+                        onClick={() => { navigate(`single/${quote._id}/${quote.quoteCategory}`) }}
 
-                            const parsedFurniture = furnitures.map((f: any) => ({
-                                furnitureName: f.furnitureName,
-                                coreMaterials: f.coreMaterials.map((cm: any) => ({
-                                    itemName: cm?.itemName || "",
-                                    plywoodNos: cm?.plywoodNos || { quantity: 0, thickness: 0 },
-                                    laminateNos: cm.laminateNos || { quantity: 0, thickness: 0 },
-                                    carpenters: cm.carpenters || 0,
-                                    days: cm.days || 0,
-                                    profitOnMaterial: cm.profitOnMaterial || 0,
-                                    profitOnLabour: cm.profitOnLabour || 0,
-                                    rowTotal: cm.rowTotal || 0,
-                                    remarks: cm.remarks || "",
-                                    imageUrl: cm.imageUrl || "", // 🔁 PRESERVE image
-                                    previewUrl: cm.imageUrl || "", // 🔁 preview if needed
-                                })),
-                                fittingsAndAccessories: f.fittingsAndAccessories || [],
-                                glues: f.glues || [],
-                                nonBrandMaterials: f.nonBrandMaterials || [],
-                                totals: {
-                                    core: f.coreMaterialsTotal || 0,
-                                    fittings: f.fittingsAndAccessoriesTotal || 0,
-                                    glues: f.gluesTotal || 0,
-                                    nbms: f.nonBrandMaterialsTotal || 0,
-                                    furnitureTotal: f.furnitureTotal || 0,
-                                },
-                            }));
-                            console.log("parsedFurniture", parsedFurniture)
-                            setEditQuoteNo(quote?.quoteNo)
-                            setFurnitures(parsedFurniture)
-                            setIsEditingId(quote._id)
-                            setQuoteType(() => {
-                                if (quote?.furnitures?.length > 1) {
-                                    return "residential"
-                                } else {
-                                    return "single"
-                                }
-                            })
-                            
-                            setFiltersMain({
-                                projectId: quote.projectId._id,
-                                projectName: quote.projectId.projectName
-                            })
-                        }}
+                    // onClick={() => {
+                    //     const { furnitures} = quote;
+
+                    //     const parsedFurniture = furnitures.map((f: any) => ({
+                    //         furnitureName: f.furnitureName,
+                    //         coreMaterials: f.coreMaterials.map((cm: any) => ({
+                    //             itemName: cm?.itemName || "",
+                    //             plywoodNos: cm?.plywoodNos || { quantity: 0, thickness: 0 },
+                    //             laminateNos: cm.laminateNos || { quantity: 0, thickness: 0 },
+                    //             carpenters: cm.carpenters || 0,
+                    //             days: cm.days || 0,
+                    //             profitOnMaterial: cm.profitOnMaterial || 0,
+                    //             profitOnLabour: cm.profitOnLabour || 0,
+                    //             rowTotal: cm.rowTotal || 0,
+                    //             remarks: cm.remarks || "",
+                    //             imageUrl: cm.imageUrl || "", // 🔁 PRESERVE image
+                    //             previewUrl: cm.imageUrl || "", // 🔁 preview if needed
+                    //         })),
+                    //         fittingsAndAccessories: f.fittingsAndAccessories || [],
+                    //         glues: f.glues || [],
+                    //         nonBrandMaterials: f.nonBrandMaterials || [],
+                    //         totals: {
+                    //             core: f.coreMaterialsTotal || 0,
+                    //             fittings: f.fittingsAndAccessoriesTotal || 0,
+                    //             glues: f.gluesTotal || 0,
+                    //             nbms: f.nonBrandMaterialsTotal || 0,
+                    //             furnitureTotal: f.furnitureTotal || 0,
+                    //         },
+                    //     }));
+                    //     console.log("parsedFurniture", parsedFurniture)
+                    //     setEditQuoteNo(quote?.quoteNo)
+                    //     setFurnitures(parsedFurniture)
+                    //     setIsEditingId(quote._id)
+                    //     setQuoteType(() => {
+                    //         if (quote?.furnitures?.length > 1) {
+                    //             return "residential"
+                    //         } else {
+                    //             return "single"
+                    //         }
+                    //     })
+
+                    //     setFiltersMain({
+                    //         projectId: quote.projectId._id,
+                    //         projectName: quote.projectId.projectName
+                    //     })
+                    // }}
                     >
                         <i className="fas fa-eye mr-1" /> Edit
                     </Button>
-                   {canDelete && <Button
+                    {canDelete && <Button
                         size="sm"
                         isLoading={isPending}
                         variant="danger"

@@ -16,6 +16,36 @@ interface UseCreateMaterialQuoteParams {
     formData: FormData;
 }
 
+
+
+
+/**
+ * 1. Create Main Internal Quote
+ */
+const createInternalMainQuote = async ({
+    organizationId,
+    projectId,
+    mainQuoteName, quoteCategory,
+    api
+}: {
+    organizationId: string;
+    projectId: string;
+    mainQuoteName: string, quoteCategory: string,
+    api: AxiosInstance;
+}) => {
+    const { data } = await api.post(
+        `/quote/quotegenerate/createmainquote`,
+        {
+            organizationId,
+            projectId,
+            mainQuoteName, quoteCategory,
+        }
+    );
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
 export const createMaterialQuote = async ({
     api,
     organizationId,
@@ -65,6 +95,47 @@ export const getMaterialItemsByCategory = async ({
     return data.data;
 };
 
+
+
+export const getSingleQuoteResidentialVersion = async ({
+    api,
+    id,
+}: {
+    api: AxiosInstance;
+    id: string;
+}) => {
+    const { data } = await api.get(`/quote/quotegenerate/getsinglequote/${id}`);
+    if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
+    return data.data;
+};
+
+
+
+
+
+
+
+export const useCreateInternalMainQuote = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const ALLOWED_ROLES = ["owner", "staff", "CTO"];
+    return useMutation({
+        mutationFn: async ({ organizationId, projectId, mainQuoteName, quoteCategory }: {
+            organizationId: string;
+            projectId: string;
+            mainQuoteName: string; quoteCategory: string
+        }) => {
+            if (!role || !ALLOWED_ROLES.includes(role)) throw new Error("Unauthorized access");
+            if (!api) throw new Error("API configuration missing");
+
+            return await createInternalMainQuote({ organizationId, projectId, mainQuoteName, quoteCategory, api });
+        },
+        onSuccess: (_, { organizationId }) => {
+            // Invalidate queries for the list of quotes to refresh the UI
+            queryClient.invalidateQueries({ queryKey: ["quote-material-items", organizationId] });
+        },
+    });
+};
 
 
 export const useCreateMaterialQuote = () => {
@@ -128,6 +199,26 @@ export const useGetMaterialItems = (organizationId: string, category: string) =>
             return await getMaterialItemsByCategory({ api, organizationId, category })
         },
         enabled: !!organizationId && !!category,
+    });
+};
+
+
+
+
+export const useGetSingleInternalResidentialVersion = ({organizationId, id}:{organizationId: string, id: string}) => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useQuery({
+        queryKey: ["material-item", organizationId, id],
+        queryFn: async () => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
+            if (!api) throw new Error("API instance for role not found");
+
+            return await getSingleQuoteResidentialVersion({ api, id })
+        },
+        enabled: !!organizationId && !!id,
     });
 };
 

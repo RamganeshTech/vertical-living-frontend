@@ -1,0 +1,627 @@
+import { useEffect, useState } from 'react'
+import {
+    // useCreateMaterialQuote,
+    useEditMaterialQuote, useGetSingleInternalResidentialVersion
+} from '../../../../apiList/Quote Api/Internal_Quote_Api/internalquoteApi';
+import type { CoreMaterialRow, FurnitureBlock, SimpleItemRow } from './FurnitureForm';
+import { useGetLabourRateConfigCategories, useGetSingleLabourCost } from '../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi';
+import { Button } from '../../../../components/ui/Button';
+import FurnitureForm, { RATES } from './FurnitureForm';
+import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import { filterValidSimpleRows } from './InternalQuoteEntry';
+import { toast } from '../../../../utils/toast';
+import { useNavigate, useParams } from 'react-router-dom';
+import MaterialOverviewLoading from '../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
+
+const InternalQuoteEntrySingle = () => {
+
+    const navigate = useNavigate()
+    const { organizationId, id, quoteType } = useParams() as { organizationId: string, id: string, quoteType: string }
+
+    const { data, isLoading } = useGetSingleInternalResidentialVersion({ organizationId, id })
+
+    useEffect(() => {
+
+        if (quoteType === "null" || quoteType === null || quoteType === "residential") {
+            //   if(data?.furnitures) setFurnitures(data?.furnitures)
+
+            if (data?.furnitures && Array.isArray(data.furnitures)) {
+
+                // Transform the API data to match your local FurnitureBlock type
+                const transformedFurnitures: FurnitureBlock[] = data.furnitures.map((item: any) => ({
+                    ...item,
+                    coreMaterials: item.coreMaterials.map((cm: any) => ({
+                        ...cm,
+                        // If API returns old 'laminateNos', map it to outer as a default
+                        innerLaminate: cm.innerLaminate || { quantity: 0, thickness: 0 },
+                        outerLaminate: cm.outerLaminate || { quantity: 0, thickness: 0 },
+                    })),
+                    totals: {
+                        core: item.coreMaterialsTotal || 0,
+                        fittings: item.fittingsAndAccessoriesTotal || 0,
+                        glues: item.gluesTotal || 0,
+                        nbms: item.nonBrandMaterialsTotal || 0,
+                        furnitureTotal: item.furnitureTotal || 0,
+                    }
+                }));
+
+                setFurnitures(transformedFurnitures);
+            }
+        }
+
+    }, [data])
+
+    // Inside InternalQuoteEntrySingle
+    const [globalTransportation, setGlobalTransportation] = useState<number>(
+        // data?.globalTransportation || 0
+        0
+    );
+    const [globalProfitPercent, setGlobalProfitPercent] = useState<number>(
+        // data?.globalProfitPercent || 0
+        0
+    );
+
+    useEffect(() => {
+        if (data) {
+            setGlobalTransportation(data.globalTransportation || 0);
+            setGlobalProfitPercent(data.globalProfitPercent || 0);
+        }
+    }, [data]); // This resets the overheads if a different quote is loaded
+
+
+    const [furnitures, setFurnitures] = useState<FurnitureBlock[]>([]);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [tempFurnitureName, setTempFurnitureName] = useState("");
+    // const [editingId, setIsEditingId] = useState<string | null>(null)
+
+    // const [quoteType, setQuoteType] = useState<"single" | "residential" | null>(null)
+    // const [editQuoteNo, setEditQuoteNo] = useState<string | null>(null)
+
+
+
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.internalquote?.list;
+    const canCreate = role === "owner" || permission?.internalquote?.create;
+    // const canDelete = role === "owner" || permission?.internalquote?.delete;
+    const canEdit = role === "owner" || permission?.internalquote?.edit;
+
+
+    const [selectedLabourCategory, setSelectedLabourCategory] = useState({
+        categoryId: "",
+        categoryName: ""
+    });
+
+    let { data: labourCost = 0 } = useGetSingleLabourCost({ organizationId, categoryId: selectedLabourCategory.categoryId });
+
+    let { data: allLabourCategory = [] } = useGetLabourRateConfigCategories(organizationId);
+
+    // 2. AUTO-SELECT EFFECT: Set the first category as default once data arrives
+    useEffect(() => {
+        if (allLabourCategory && allLabourCategory?.length > 0 && !selectedLabourCategory.categoryId) {
+            const firstCategory = allLabourCategory[0];
+            setSelectedLabourCategory({
+                categoryId: firstCategory._id,
+                categoryName: firstCategory.name
+            });
+        }
+    }, [allLabourCategory]); // Runs when the list is fetched
+
+
+    // Helper to calculate total rows across all products
+    const getTotalRowCount = () => {
+        return furnitures.reduce((acc, f) => {
+            return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
+        }, 0);
+    };
+
+
+
+    //  used when  we chagne the global transportationa and the global profit percentage
+
+    useEffect(() => {
+        // If global values are 0, we allow FurnitureForm to handle calculations exclusively
+        // if (globalTransportation === 0 && globalProfitPercent === 0) return;
+
+        const totalRowsCount = getTotalRowCount();
+        const transportPerRow = totalRowsCount > 0 ? globalTransportation / totalRowsCount : 0;
+        // const globalProfitMultiplier = 1 + (globalProfitPercent / 100);
+
+        setFurnitures(prevFurnitures => prevFurnitures.map((f) => {
+            if (f.coreMaterials.length === 0) return f;
+
+            // ✅ PRIORITY LOGIC: 
+            // If Global Profit > 0, use it for everything.
+            // Otherwise, use the individual Furniture Profit (furnitureProfit).
+            const effectiveProfitPercent = globalProfitPercent > 0
+                ? globalProfitPercent
+                : (f.furnitureProfit || 0);
+
+            const profitMultiplier = 1 + (effectiveProfitPercent / 100);
+
+            // 1. MIRROR FurnitureForm LABOUR LOGIC
+            // It takes carpenters/days from the first row (index 0)
+            const base = f.coreMaterials[0];
+            const totalLabourBase = (base.carpenters || 0) * (base.days || 0) * labourCost;
+
+            // Apply the local labour profit defined in the first row
+            const labourWithLocalProfit = totalLabourBase * (1 + (base.profitOnLabour || 0) / 100);
+
+            // Spread it equally across ONLY the rows of THIS furniture block
+            const labourPerRow = labourWithLocalProfit / f.coreMaterials.length;
+
+            // 2. PROCESS CORE MATERIALS
+            const updatedCore = f.coreMaterials.map((cm) => {
+                const plywoodCost = (cm.plywoodNos?.quantity || 0) * RATES.plywood;
+                const inLamCost = (cm.innerLaminate?.quantity || 0) * RATES.innerLaminate;
+                const outLamCost = (cm.outerLaminate?.quantity || 0) * RATES.outerLaminate;
+
+                const materialBase = plywoodCost + inLamCost + outLamCost;
+                const materialWithLocalProfit = materialBase * (1 + (cm.profitOnMaterial || 0) / 100);
+
+                // Calculation: ((Material + Labour) * Global Profit) + Transport
+                // Note: rowTotal remains a float for precise Grand Total summation
+                return {
+                    ...cm,
+                    // rowTotal: ((materialWithLocalProfit + labourPerRow) * globalProfitMultiplier) + transportPerRow
+                    rowTotal: ((materialWithLocalProfit + labourPerRow) * profitMultiplier) + transportPerRow
+                };
+            });
+
+            // 3. PROCESS SIMPLE SECTIONS (Fittings, Glues, NBMs)
+            // Glue logic mirrors your handleCoreChange: avgCoreCost calculation
+            const totalCoreCost = updatedCore.reduce((sum, row) => sum + row.rowTotal, 0);
+            const avgCoreCost = updatedCore.length > 0 ? totalCoreCost / updatedCore.length : 0;
+            // const localMaterialProfit = base.profitOnMaterial || 0;
+
+            const updateSection = (section: SimpleItemRow[], isGlue = false) => section.map(item => {
+
+                // If it is Glue, the baseValue is avgCoreCost (which is already profit-inflated)
+                // So we DON'T multiply by globalProfitMultiplier again.
+                if (isGlue) {
+                    return {
+                        ...item,
+                        rowTotal: avgCoreCost + transportPerRow // Just add transport
+                    };
+                }
+
+
+                const baseValue = isGlue ? avgCoreCost : ((item.quantity || 0) * (item.cost || 0));
+                const localProfit = 1 + ((item.profitOnMaterial || 0) / 100);
+                // Simple items also get global profit and transport
+                return {
+                    ...item,
+                    // rowTotal: (baseValue * localProfit * globalProfitMultiplier) + transportPerRow
+                    rowTotal: (baseValue * localProfit * profitMultiplier) + transportPerRow
+                };
+            });
+
+            const updatedFittings = updateSection(f.fittingsAndAccessories);
+            const updatedGlues = updateSection(f.glues, true);
+            const updatedNbms = updateSection(f.nonBrandMaterials);
+
+            // 4. PRECISE TOTALS
+            const coreSum = updatedCore.reduce((s, r) => s + r.rowTotal, 0);
+            const fitSum = updatedFittings.reduce((s, r) => s + r.rowTotal, 0);
+            const glueSum = updatedGlues.reduce((s, r) => s + r.rowTotal, 0);
+            const nbmSum = updatedNbms.reduce((s, r) => s + r.rowTotal, 0);
+
+            return {
+                ...f,
+                coreMaterials: updatedCore,
+                fittingsAndAccessories: updatedFittings,
+                glues: updatedGlues,
+                nonBrandMaterials: updatedNbms,
+                totals: {
+                    core: Math.round(coreSum),
+                    fittings: Math.round(fitSum),
+                    glues: Math.round(glueSum),
+                    nbms: Math.round(nbmSum),
+                    furnitureTotal: Math.round(coreSum + fitSum + glueSum + nbmSum)
+                }
+            };
+        }));
+
+        // We removed labourCost from dependencies as requested.
+        // If labourCost changes, the next user input in transport/profit will catch it.
+    }, [globalTransportation, globalProfitPercent, labourCost]);
+
+    // const { mutateAsync: createQuote, isPending } = useCreateMaterialQuote();
+    const { mutateAsync: editQuote, isPending: editPending } = useEditMaterialQuote();
+
+
+    const grandTotal = furnitures.length > 0 ? furnitures?.reduce((sum, f) => sum + f?.totals?.furnitureTotal, 0) : 0;
+
+
+
+    //  NOW CURRENTLY THIS CREATE (HANDLE SUBMIT IS NOT USED ONLY THE HANDLE EDIT IS USED)
+
+    // const handleSubmit = async () => {
+    //     try {
+
+
+    //         if (!data.projectId) {
+    //             toast({ title: "Error", description: "Please select a project", variant: "destructive" });
+    //             return;
+    //         }
+
+    //         const formData = new FormData();
+
+    //         formData.append("furnitures", JSON.stringify(
+    //             furnitures.map((f) => {
+    //                 return {
+    //                     furnitureName: f.furnitureName,
+    //                     coreMaterials: f.coreMaterials.map(cm => {
+    //                         if (Object.values(cm).some(value => Boolean(value))) {
+    //                             const { imageUrl, previewUrl, ...rest } = cm;
+    //                             return rest;
+    //                         }
+    //                         return null;
+    //                     })
+    //                         .filter(Boolean),
+    //                     // fittingsAndAccessories: f.fittingsAndAccessories,
+    //                     // glues: f.glues,
+    //                     // nonBrandMaterials: f.nonBrandMaterials,
+    //                     fittingsAndAccessories: filterValidSimpleRows(f.fittingsAndAccessories),
+    //                     glues: filterValidSimpleRows(f.glues),
+    //                     nonBrandMaterials: filterValidSimpleRows(f.nonBrandMaterials),
+    //                     coreMaterialsTotal: f.totals.core,
+    //                     fittingsAndAccessoriesTotal: f.totals.fittings,
+    //                     gluesTotal: f.totals.glues,
+    //                     nonBrandMaterialsTotal: f.totals.nbms,
+    //                     furnitureTotal: f.totals.furnitureTotal,
+    //                 };
+    //             })
+    //         ));
+
+    //         furnitures.forEach((f, fIdx) => {
+    //             f.coreMaterials.forEach((cm, cmIdx) => {
+    //                 if (cm.imageUrl) {
+    //                     formData.append(`images[${fIdx}][${cmIdx}]`, cm.imageUrl);
+    //                 }
+    //             });
+    //         });
+
+    //         formData.append("grandTotal", grandTotal.toString());
+    //         // formData.append("quoteNo", `Q-${Date.now()}`); // optional
+    //         formData.append("notes", "Generated"); // optional
+
+    //         await createQuote({ organizationId, projectId: data.projectId, formData });
+
+    //         toast({ title: "Success", description: "Created Successfully, Visit in Quote Generator Section" });
+    //         // setFurnitures([])
+    //         // setQuoteType(null)
+
+    //     }
+    //     catch (error: any) {
+    //         toast({ title: "Error", description: error?.response?.data?.message || error?.message || "failed to generate the items", variant: "destructive" });
+    //     }
+    // };
+
+    const handleEditSubmit = async () => {
+        try {
+            if (!data.projectId) {
+                toast({ title: "Error", description: "Please select a project", variant: "destructive" });
+                return;
+            }
+
+            const formData = new FormData();
+
+            // Prepare furnitures payload & attach new image files
+            const furnituresPayload = furnitures.map((f, fIndex) => {
+                const coreMaterials = f.coreMaterials.map((cm, cmIndex) => {
+                    const { previewUrl, newImageFile, ...rest } = cm as any;
+
+                    // Attach new image file if present
+                    if (newImageFile) {
+                        // Field name must match backend: images[fIndex][cmIndex]
+                        formData.append(`images[${fIndex}][${cmIndex}]`, newImageFile);
+                    }
+
+                    return {
+                        ...rest,
+                        imageUrl: cm.imageUrl || null, // keep old image if no new file
+                    };
+                });
+
+                return {
+                    furnitureName: f.furnitureName,
+                    furnitureProfit: f.furnitureProfit,
+                    coreMaterials,
+                    fittingsAndAccessories: filterValidSimpleRows(f.fittingsAndAccessories),
+                    glues: filterValidSimpleRows(f.glues),
+                    nonBrandMaterials: filterValidSimpleRows(f.nonBrandMaterials),
+                    coreMaterialsTotal: f.totals.core,
+                    fittingsAndAccessoriesTotal: f.totals.fittings,
+                    gluesTotal: f.totals.glues,
+                    nonBrandMaterialsTotal: f.totals.nbms,
+                    furnitureTotal: f.totals.furnitureTotal,
+                };
+            });
+
+            // Add other fields to FormData
+            formData.append("furnitures", JSON.stringify(furnituresPayload));
+            formData.append("grandTotal", grandTotal.toString());
+            formData.append("notes", "Updated via frontend");
+            formData.append("globalTransportation", globalTransportation.toString());
+            formData.append("globalProfitPercent", globalProfitPercent.toString());
+            // if (editQuoteNo) formData.append("quoteNo", editQuoteNo);
+
+            // if (editingId) {
+            await editQuote({
+                organizationId,
+                projectId: data.projectId,
+                // formData: payload,
+                formData, // ✅ send FormData with only new files
+                // id: editingId,
+                id: id,
+            });
+
+            toast({ title: "Updated!", description: "Quote edited successfully." });
+            // setFurnitures([])
+            // setQuoteType(null)
+            // setIsEditingId(null);
+            // }
+        }
+        catch (error: any) {
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to Update the Quote", variant: "destructive" });
+        }
+    };
+
+
+
+    const addFurniture = (furnitureName: string) => {
+        setFurnitures(prev => [
+            ...prev,
+            {
+                furnitureName,
+                coreMaterials: [emptyCoreMaterial()],
+                fittingsAndAccessories: [emptySimpleItem()],
+                glues: [emptySimpleItem()],
+                nonBrandMaterials: [emptySimpleItem()],
+                totals: { core: 0, fittings: 0, glues: 0, nbms: 0, furnitureTotal: 0 },
+            }
+        ]);
+    };
+
+    const handleRemoveFurniture = (indexToRemove: number) => {
+        setFurnitures((prev) => prev.filter((_, i) => i !== indexToRemove));
+    };
+
+
+
+    const emptyCoreMaterial = (): CoreMaterialRow => ({
+        itemName: "",
+        plywoodNos: { quantity: 0, thickness: 0 },
+        // laminateNos: { quantity: 0, thickness: 0 },
+        innerLaminate: { quantity: 0, thickness: 0 }, // New field
+        outerLaminate: { quantity: 0, thickness: 0 }, // New field
+        carpenters: 0,
+        days: 0,
+        profitOnMaterial: 0,
+        profitOnLabour: 0,
+        rowTotal: 0,
+        remarks: "",
+    });
+
+    const emptySimpleItem = (): SimpleItemRow => ({
+        itemName: "",
+        description: "",
+        quantity: 0,
+        cost: 0,
+        rowTotal: 0,
+    });
+
+
+    if (isLoading) return <MaterialOverviewLoading />
+
+
+    return (
+        <div className='max-h-full overflow-y-auto'>
+
+            <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-1 border-b-1 border-[#818283]">
+
+
+
+                <div className="flex gap-3 items-center">
+
+
+
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="bg-gray-50 cursor-pointer hover:bg-gray-100 shadow-sm flex items-center justify-center w-10 h-10 border border-gray-200 text-gray-600 rounded-lg transition-all"
+                    >
+                        <i className="fas fa-arrow-left" />
+                    </button>
+
+
+                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                        <i className="fas fa-file mr-3 text-blue-600" />
+                        {data.mainQuoteName || "Internal Quote"}
+                    </h1>
+                </div>
+
+                <div className="flex items-center justify-between gap-6">
+
+                    {furnitures?.length > 0 && (
+                        <div className="flex items-center gap-10">
+
+                            {/* Labour Cost */}
+                            <div>
+                                <p className="text-xs text-gray-500 tracking-wide">
+                                    Single Labour Cost
+                                </p>
+                                <p className="text-[15px] font-semibold text-gray-900">
+                                    ₹{labourCost?.toLocaleString("en-IN")}
+                                </p>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="h-8 w-px bg-gray-300" />
+
+                            {/* Grand Total */}
+                            <div className="text-right">
+                                <p className="text-xs text-gray-500 uppercase tracking-widest">
+                                    Grand Total
+                                </p>
+                                <p className="text-xl font-bold text-green-600">
+                                    ₹{grandTotal?.toLocaleString("en-IN")}
+                                </p>
+                            </div>
+
+                        </div>
+                    )}
+
+                    {canCreate && (
+                        <Button
+                            className="flex items-center"
+                            onClick={() => setModalOpen(true)}
+                        >
+                            <i className="fas fa-add mr-1" />
+                            Create Product
+                        </Button>
+                    )}
+                </div>
+
+            </header>
+
+
+
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
+                    <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md relative animate-scaleIn">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Quote</h3>
+
+                        <input
+                            className="w-full border border-gray-300 rounded px-3 py-2 mb-4 outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Enter Product Name"
+                            value={tempFurnitureName}
+                            autoFocus
+                            onChange={(e) => setTempFurnitureName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    if (!tempFurnitureName.trim()) return;
+                                    addFurniture(tempFurnitureName);
+                                    setTempFurnitureName("");
+                                    setModalOpen(false);
+                                }
+                            }}
+                        />
+
+                        <div className="flex justify-end gap-3 mt-4">
+                            <Button variant="secondary" onClick={() => setModalOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    if (!tempFurnitureName.trim()) return;
+                                    addFurniture(tempFurnitureName);
+                                    setTempFurnitureName("");
+                                    setModalOpen(false);
+                                }}
+                            >
+                                Create
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+
+            {furnitures?.length === 0 &&
+                <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
+                    <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
+                    {/* <h3 className="text-lg font-semibold text-blue-800 mb-1">Create</h3> */}
+                    <p className="text-sm text-gray-500">
+                        Cick on the Create button to start creating the quote<br />
+                        <Button onClick={() => setModalOpen(true)} className="mx-4 my-2">
+
+                            <i className='fas fa-plus mr-1 '></i>
+                            Create Product</Button>
+                    </p>
+                </div>
+            }
+
+            {/* s.dflskdjkl */}
+            {furnitures?.length > 0 && <section className="shadow overflow-y-auto max-h-[86%]">
+                {/* {!editingId && <h1 className="text-2xl text-gray-500">
+                     {handleQuoteName()} 
+                </h1>} */}
+                {furnitures?.map((furniture, index) => (
+                    <FurnitureForm
+                        key={index}
+                        index={index}
+                        labourCost={labourCost}
+                        data={furniture}
+                        updateFurniture={(updated) => {
+                            const updatedArr = [...furnitures];
+                            updatedArr[index] = updated;
+                            setFurnitures(updatedArr);
+                        }}
+                        removeFurniture={() => handleRemoveFurniture(index)}
+                        // isEditing={!!editingId}   // ✅ pass editing mode
+                        isEditing={true}   // ✅ pass editing mode
+
+                    />
+                ))}
+            </section>}
+
+
+            <div className="flex items-center justify-between gap-4 bg-white border border-blue-100 p-3 rounded-xl shadow-sm">
+                <div className="flex items-center gap-4" >
+                    <div className="flex flex-col">
+                        <label className="text-[9px] font-extrabold text-blue-500 uppercase tracking-tighter">Transport Cost</label>
+                        <div className="flex items-center">
+                            <span className="text-gray-400 mr-1 text-sm">₹</span>
+                            <input
+                                type="number"
+                                className="w-20 font-semibold focus:outline-none text-gray-800"
+                                value={globalTransportation}
+                                onChange={(e) => setGlobalTransportation(Math.max(0, Number(e.target.value)))}
+                            />
+                        </div>
+                    </div>
+                    <div className="h-8 w-px bg-gray-100" />
+                    <div className="flex flex-col">
+                        <label className="text-[9px] font-extrabold text-green-500 uppercase tracking-tighter">Global Profit Margin</label>
+                        <div className="flex items-center">
+                            <input
+                                type="number"
+                                className="w-12 text-right font-semibold focus:outline-none text-gray-800"
+                                value={globalProfitPercent}
+                                onChange={(e) => setGlobalProfitPercent(Math.max(0, Number(e.target.value)))}
+                            />
+                            <span className="text-gray-400 ml-1 text-sm">%</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                {furnitures.length !== 0 && <div className="mt-1 text-right flex gap-2 justify-end">
+                    {(canCreate || canEdit) && <Button
+                        variant="primary"
+                        isLoading={editPending}
+                        // onClick={editingId ? handleEditSubmit : handleSubmit}
+                        // onClick={true ? handleEditSubmit : handleSubmit}
+                        onClick={handleEditSubmit}
+                        className="px-6 py-2 bg-blue-600 text-white rounded"
+                    >
+                        Save Quote
+                    </Button>
+                    }
+                </div>}
+            </div>
+
+
+
+
+
+        </div>
+    )
+}
+
+export default InternalQuoteEntrySingle
+
+
+

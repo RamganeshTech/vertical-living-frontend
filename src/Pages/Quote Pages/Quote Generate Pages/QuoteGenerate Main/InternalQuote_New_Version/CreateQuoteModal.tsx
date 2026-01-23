@@ -15,7 +15,7 @@ export interface QuoteFormData {
 interface CreateQuoteModalProps {
   // State and Data
 //   isOpen: boolean;
-  isEditing: boolean;
+  isEditing?: boolean;
   formData: QuoteFormData;
   projectsData: Array<{ _id: string; projectName: string }>;
   

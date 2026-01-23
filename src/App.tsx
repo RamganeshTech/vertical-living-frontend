@@ -103,6 +103,7 @@ const QuoteGenerateVariantSub = lazy(() => import('./Pages/Quote Pages/Quote Var
 const RateConfigAdminMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigAdminMain'));
 const RateConfigSub = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigSub'));
 const InternalQuoteEntryMain = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuoteEntry'));
+const InternalQuoteEntrySingle = lazy(() => import('./Pages/Quote Pages/Quote Generate Pages/QuoteGenerate Main/InternalQuoteEntrySingle'));
 const QuoteVariantGenerateMain = lazy(() => import('./Pages/Quote Pages/Quote VariantGenerate Pages/QuoteVariantGenerateMain'));
 const LogisticsMain = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsMain'));
 const LogisticsSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsSingle'));
@@ -1094,6 +1095,17 @@ function App() {
             >
               <InternalQuoteEntryMain />
             </ProtectedRoutes>} >
+
+            <Route path="single/:id/:quoteType" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="internalquote"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <InternalQuoteEntrySingle />
+            </ProtectedRoutes>} />
+
+
+
 
 
               <Route path="internalquotenew" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}

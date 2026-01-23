@@ -217,7 +217,7 @@ export default function LabourRateConfigMain() {
                     <h3 className="text-lg font-semibold text-blue-800 mb-1">No Labour Rate Configuration Found</h3>
                     <p className="text-sm text-gray-500">
                         Looks like there are no Labour Rate Configuration yet for this organization.<br />
-                        <Button onClick={()=> setShowCreateForm(true)} isLoading={createPending} className="mx-4 my-2">Create New Category</Button>
+                        <Button onClick={()=> setShowCreateForm(true)}  className="mx-4 my-2">Create New Category</Button>
                     </p>
                 </div>)}
 

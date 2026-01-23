@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "../../../utils/toast";
 import {
-    useGeneratePdfModularUnitNew,
+    // useGeneratePdfModularUnitNew,
     useGetModularUnitByIdNew,
     useUpdateModularUnitNew,
 } from "../../../apiList/Modular Unit Api/modularUnitNewApi";
@@ -30,7 +30,7 @@ const ModularUnitSingleNew = () => {
     // Hooks
     const { data: unit, isLoading } = useGetModularUnitByIdNew(unitId!)
     const { mutateAsync: updateUnit, isPending: isUpdating } = useUpdateModularUnitNew();
-    const { mutateAsync: generatePdf, isPending: isgenerating } = useGeneratePdfModularUnitNew();
+    // const { mutateAsync: generatePdf, isPending: isgenerating } = useGeneratePdfModularUnitNew();
 
     // 1. Define the dynamic headers state
     const [columns, setColumns] = useState([
@@ -332,20 +332,20 @@ const ModularUnitSingleNew = () => {
 
 
     // Save Changes
-    const handleGeneratePdf = async () => {
-        try {
-            await generatePdf({
-                unitId: unitId!,
-            });
-            toast({ title: "Success", description: "Pdf Generated successfully!" });
-        } catch (error: any) {
-            toast({
-                title: "Error",
-                description: error?.response?.data?.message || "Failed to generate pdf",
-                variant: "destructive",
-            });
-        }
-    };
+    // const handleGeneratePdf = async () => {
+    //     try {
+    //         await generatePdf({
+    //             unitId: unitId!,
+    //         });
+    //         toast({ title: "Success", description: "Pdf Generated successfully!" });
+    //     } catch (error: any) {
+    //         toast({
+    //             title: "Error",
+    //             description: error?.response?.data?.message || "Failed to generate pdf",
+    //             variant: "destructive",
+    //         });
+    //     }
+    // };
 
 
 
@@ -512,13 +512,13 @@ const ModularUnitSingleNew = () => {
 
 
 
-                        <Button
+                        {/* <Button
                             onClick={handleGeneratePdf}
                             isLoading={isgenerating}
                             className="min-w-[120px]"
                         >
                             Generate Pdf
-                        </Button>
+                        </Button> */}
 
                         {isEditMode && (
                             <>

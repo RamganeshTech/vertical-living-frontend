@@ -9,18 +9,25 @@ import type { FurnitureBlock } from './QuoteGenerate Main/FurnitureForm';
 import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 
 type Props = {
-    setFurnitures: React.Dispatch<React.SetStateAction<FurnitureBlock[]>>
-    setIsEditingId: React.Dispatch<React.SetStateAction<string | null>>
-    setQuoteType: React.Dispatch<React.SetStateAction<"single" | "residential" | null>>
-    setFiltersMain: React.Dispatch<React.SetStateAction<{
+    setFurnitures?: React.Dispatch<React.SetStateAction<FurnitureBlock[]>>
+    setIsEditingId?: React.Dispatch<React.SetStateAction<string | null>>
+    setQuoteType?: React.Dispatch<React.SetStateAction<"single" | "residential" | null>>
+    setFiltersMain?: React.Dispatch<React.SetStateAction<{
         projectId: string;
         projectName: string;
     }>>
-    setEditQuoteNo: React.Dispatch<React.SetStateAction<string | null>>
+    setEditQuoteNo?: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 
-const QuoteGenerateList: React.FC<Props> = ({ setFurnitures, setEditQuoteNo, setIsEditingId, setFiltersMain, setQuoteType }) => {
+const QuoteGenerateList: React.FC<Props> = ({ 
+    // setFurnitures, 
+    // setEditQuoteNo,
+    //  setIsEditingId, 
+    //  setFiltersMain, 
+    //  setQuoteType 
+    }) => {
+
     const { organizationId } = useParams();
     const [filters, setFilters] = useState({
         // status: "",
@@ -150,7 +157,14 @@ const QuoteGenerateList: React.FC<Props> = ({ setFurnitures, setEditQuoteNo, set
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {quotes?.map((quote: any) => (
                                 <>
-                                    <QuoteGenerateCard setEditQuoteNo={setEditQuoteNo} setFurnitures={setFurnitures} setIsEditingId={setIsEditingId} setQuoteType={setQuoteType} setFiltersMain={setFiltersMain} key={quote._id} quote={quote} organizationId={organizationId!} />
+                                    <QuoteGenerateCard 
+                                    // setEditQuoteNo={setEditQuoteNo} 
+                                    // setFurnitures={setFurnitures} 
+                                    // setIsEditingId={setIsEditingId}
+                                    //  setQuoteType={setQuoteType}
+                                    //   setFiltersMain={setFiltersMain} 
+                                      key={quote._id} quote={quote}
+                                       organizationId={organizationId!} />
                                 </>
                             ))}
                         </div>

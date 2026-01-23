@@ -27,6 +27,7 @@ const ORG_MODULES = [
     "internalquote",
     "quotevariant",
     "clientquote",
+    "materialwithlabourratequote",
     "worktemplates",
 
     "referencedesign",
