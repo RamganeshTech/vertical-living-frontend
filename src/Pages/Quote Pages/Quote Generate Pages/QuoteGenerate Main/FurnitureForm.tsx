@@ -705,6 +705,7 @@ export type SimpleItemRow = {
 export type FurnitureBlock = {
   furnitureName: string;
   furnitureProfit?: number; // 🆕 Added for product-specific override
+  fabricationCost?: number; // 🆕 Track factory cost for this product
   coreMaterials: CoreMaterialRow[];
   fittingsAndAccessories: SimpleItemRow[];
   glues: SimpleItemRow[];
@@ -717,7 +718,9 @@ export type FurnitureBlock = {
     furnitureTotal: number;
   };
   plywoodBrand?: string | null,
-  laminateBrand?: string | null,
+  // laminateBrand?: string | null,
+  innerLaminateBrand?: string | null
+  outerLaminateBrand?: string | null
 };
 
 type Props = {
@@ -764,11 +767,17 @@ const emptySimpleItem = (): SimpleItemRow => ({
 export const calculateCoreMaterialCosts = (
   coreRows: CoreMaterialRow[],
   labourCost: number,
-  furnitureProfit: number = 0 // 🆕 Added parameter
+  furnitureProfit: number = 0,// 🆕 Added parameter
+  fabricationCost: number = 0 // 🆕 Added parameter
 ): CoreMaterialRow[] => {
   if (coreRows.length === 0) return [];
 
   const totalRows = coreRows.length;
+
+  // Use a helper or logic to get total row count across ALL sections 
+  // For the split logic (Core + Fittings + Glue + NBMs)
+  // For now, let's assume it's divided by core rows as per your current structure
+  const fabPerRow = fabricationCost / totalRows;
 
   const base = coreRows[0];
   const totalLabour = base.carpenters * base.days * labourCost;
@@ -794,14 +803,33 @@ export const calculateCoreMaterialCosts = (
     const innerQty = row.innerLaminate?.quantity || 0;
     const outerQty = row.outerLaminate?.quantity || 0;
 
-    const materialBaseWithLocalProfit =
-      (plywoodQty * RATES.plywood +
-        innerQty * RATES.innerLaminate +
-        outerQty * RATES.outerLaminate) *
-      (1 + (row.profitOnMaterial || 0) / 100);
+    // const materialBaseWithLocalProfit =
+    //   (plywoodQty * RATES.plywood +
+    //     innerQty * RATES.innerLaminate +
+    //     outerQty * RATES.outerLaminate) *
+    //   (1 + (row.profitOnMaterial || 0) / 100);
 
 
-    const finalRowTotal = (materialBaseWithLocalProfit + labourPerRow) * productMultiplier;
+
+    // ✅ FABRICATION is added to base before profit multiplier
+    // const finalRowTotal = (materialBaseWithLocalProfit + labourPerRow + fabPerRow) * productMultiplier;
+
+
+    const materialBase = (plywoodQty * RATES.plywood +
+      innerQty * RATES.innerLaminate +
+      outerQty * RATES.outerLaminate);
+
+    // ✅ CHECK FOR LOCAL OVERRIDE
+    const hasLocalMargin = (row.profitOnMaterial || 0) > 0;
+
+    // If local margin exists, we apply it to material and SKIP the productMultiplier
+    const materialWithLocalProfit = materialBase * (1 + (row.profitOnMaterial || 0) / 100);
+
+    // If local margin exists, row total = (Material+Margin) + Labour + Fab
+    // If local margin is 0, row total = (Material + Labour + Fab) * productMultiplier
+    const finalRowTotal = hasLocalMargin
+      ? (materialWithLocalProfit + labourPerRow + fabPerRow)
+      : (materialBase + labourPerRow + fabPerRow) * productMultiplier;
 
     return {
       ...row,
@@ -907,14 +935,16 @@ const FurnitureForm: React.FC<Props> = ({
 
     const applyProfitAndRecalculate = (rows: SimpleItemRow[], isGlue = false): SimpleItemRow[] =>
       rows.map(item => {
+
+
         if (isGlue || item.itemName === "Glue") {
           // ✅ GLUE FIX: Use avgCoreCost as-is to avoid double-dipping profit
           return {
             ...item,
             itemName: "Glue",
             quantity: 1,
-            cost: avgCoreCost,
             profitOnMaterial: item.profitOnMaterial,
+            cost: avgCoreCost,
             rowTotal: avgCoreCost,
           };
         }
@@ -922,8 +952,15 @@ const FurnitureForm: React.FC<Props> = ({
         // ✅ OTHERS FIX: Apply local profit AND the furnitureProfit multiplier
         const base = (item.quantity || 0) * (item.cost || 0);
         // const profit = base * (inheritedProfit / 100);
-        const localProfit = base * ((item.profitOnMaterial || 0) / 100);
-        const rowTotal = (base + localProfit) * furnitureProfitMultiplier;
+        const manualMargin = item.profitOnMaterial || 0;
+        // const localProfit = base * ((item.profitOnMaterial || 0) / 100);
+        // const rowTotal = (base + localProfit) * furnitureProfitMultiplier;
+
+        // ✅ PRIORITY CHECK: If row has its own profit, use only that. 
+        // If not, use the product-level overlay multiplier.
+        const rowTotal = manualMargin > 0
+          ? base * (1 + (manualMargin / 100))
+          : base * furnitureProfitMultiplier;
 
         return {
           ...item,
@@ -991,12 +1028,18 @@ const FurnitureForm: React.FC<Props> = ({
 
         // ✅ For Fittings and Non-Branded: Use their OWN profitOnMaterial
         const base = (item.quantity || 0) * (item.cost || 0);
-        const localProfit = base * ((item.profitOnMaterial || 0) / 100);
+        // const localProfit = base * ((item.profitOnMaterial || 0) / 100);
+        const hasLocalProfit = (item.profitOnMaterial || 0) > 0;
+
+        const rowTotal = hasLocalProfit
+          ? base * (1 + ((item.profitOnMaterial || 0) / 100)) // Use ONLY local
+          : base * furnitureProfitMultiplier;         // Use Product Overlay
 
         return {
           ...item,
           // Apply local margin + the product-level profit overlay
-          rowTotal: (base + localProfit) * furnitureProfitMultiplier,
+          // rowTotal: (base + localProfit) * furnitureProfitMultiplier,
+          rowTotal: rowTotal
         };
       });
 
@@ -1007,6 +1050,68 @@ const FurnitureForm: React.FC<Props> = ({
       fittingsAndAccessories: applyUpdates(data.fittingsAndAccessories),
       glues: applyUpdates(data.glues, true),
       nonBrandMaterials: applyUpdates(data.nonBrandMaterials),
+    };
+
+    updatedFurniture.totals = computeTotals(updatedFurniture);
+    updateFurniture?.(updatedFurniture);
+  };
+
+
+
+  const spreadOverheads = (profit: number, fabCost: number, shouldReset: boolean) => {
+
+    // ✅ RESET: When Product Profit changes, clear all individual row margins
+    const coreToProcess = shouldReset
+      ? data.coreMaterials.map(row => ({ ...row, profitOnMaterial: 0 , profitOnLabour: 0}))
+      : data.coreMaterials;
+
+    const fittingsToProcess = shouldReset
+      ? data.fittingsAndAccessories.map(item => ({ ...item, profitOnMaterial: 0 }))
+      : data.fittingsAndAccessories;
+
+    const gluesToProcess = shouldReset
+      ? data.glues.map(item => ({ ...item, profitOnMaterial: 0 }))
+      : data.glues;
+
+    const nbmToProcess = shouldReset
+      ? data.nonBrandMaterials.map(item => ({ ...item, profitOnMaterial: 0 }))
+      : data.nonBrandMaterials;
+
+    // const multiplier = 1 + (profit / 100);
+
+    // 1. Calculate Core with Fabrication split
+    const updatedCore = calculateCoreMaterialCosts(coreToProcess, labourCost, profit, fabCost);
+
+    // 2. Determine Avg for Glues
+    const totalCore = updatedCore.reduce((sum, r) => sum + r.rowTotal, 0);
+    const avgCore = updatedCore.length > 0 ? totalCore / updatedCore.length : 0;
+
+    const updateSimple = (section: SimpleItemRow[], isGlue = false) =>
+      section.map(item => {
+        if (isGlue || item.itemName === "Glue") return { ...item, cost: avgCore, rowTotal: avgCore };
+        // const base = (item.quantity * item.cost) * (1 + (item.profitOnMaterial || 0) / 100);
+        // return { ...item, rowTotal: base * multiplier };
+
+        // Since we reset profitOnMaterial to 0 above, this will just use the new multiplier
+        const base = (item.quantity * item.cost);
+        const manualMargin = item.profitOnMaterial || 0;
+        // return { ...item, rowTotal: base * (1 + (profit / 100)) };
+        return {
+          ...item,
+          rowTotal: manualMargin > 0
+            ? (base * (1 + manualMargin / 100))
+            : (base * (1 + profit / 100))
+        };
+      });
+
+    const updatedFurniture = {
+      ...data,
+      furnitureProfit: profit,
+      fabricationCost: fabCost,
+      coreMaterials: updatedCore,
+      fittingsAndAccessories: updateSimple(fittingsToProcess),
+      glues: updateSimple(gluesToProcess, true),
+      nonBrandMaterials: updateSimple(nbmToProcess),
     };
 
     updatedFurniture.totals = computeTotals(updatedFurniture);
@@ -1081,12 +1186,7 @@ const FurnitureForm: React.FC<Props> = ({
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Total</th>
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Actions</th>
             </tr>
-            {/* <tr>
-              <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-              <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Thk</th>
-              <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-              <th className="text-center px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Thk</th>
-            </tr> */}
+
 
             <tr className="">
               {/* Plywood Sub-headers */}
@@ -1155,10 +1255,10 @@ const FurnitureForm: React.FC<Props> = ({
                 {/*  Replace the map that currently iterates over ["plywoodNos", "laminateNos"] */}
                 {["plywoodNos", "innerLaminate", "outerLaminate"].map((field) =>
                   ["quantity", "thickness"].map((sub) => (
-                    <td key={`${field}-${sub}`} 
-                    // className="..."
-                     className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" 
-                     
+                    <td key={`${field}-${sub}`}
+                      // className="..."
+                      className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+
 
                     >
                       <input
@@ -1169,7 +1269,7 @@ const FurnitureForm: React.FC<Props> = ({
                           if (Number(e.target.value) >= 0) {
                             handleCoreChange(i, field as any, {
                               ...(row as any)[field],
-                              [sub]: Number(e.target.value),
+                              [sub]: Math.max(0, Number(e.target.value)),
                             });
                           }
                         }}
@@ -1190,7 +1290,7 @@ const FurnitureForm: React.FC<Props> = ({
                         placeholder={`no of carpentors`}
                         value={row.carpenters || ""}
                         onChange={(e) =>
-                          handleCoreChange(i, "carpenters", Number(e.target.value))
+                          handleCoreChange(i, "carpenters", Math.max(0, Number(e.target.value)))
                         }
                         className="w-full px-[2px] py-1 text-center outline-none"
                       />
@@ -1203,7 +1303,7 @@ const FurnitureForm: React.FC<Props> = ({
                         placeholder={`no of days`}
                         value={row.days || ""}
                         onChange={(e) =>
-                          handleCoreChange(i, "days", Number(e.target.value))
+                          handleCoreChange(i, "days", Math.max(0, Number(e.target.value)))
                         }
                         className="w-full px-[2px] py-1 text-center outline-none"
                       />
@@ -1216,7 +1316,7 @@ const FurnitureForm: React.FC<Props> = ({
                     placeholder={`profit percent`}
                     value={row.profitOnMaterial || ""}
                     onChange={(e) =>
-                      handleCoreChange(i, "profitOnMaterial", Number(e.target.value))
+                      handleCoreChange(i, "profitOnMaterial", Math.max(0, Number(e.target.value)))
                     }
                     className="w-full px-[2px] py-1 text-center outline-none"
                   />
@@ -1231,7 +1331,7 @@ const FurnitureForm: React.FC<Props> = ({
                         placeholder={`profit percent`}
                         value={row.profitOnLabour || ""}
                         onChange={(e) =>
-                          handleCoreChange(i, "profitOnLabour", Number(e.target.value))
+                          handleCoreChange(i, "profitOnLabour", Math.max(0, Number(e.target.value)))
                         }
                         className="w-full px-[2px] py-1 text-center outline-none"
                       />
@@ -1250,7 +1350,7 @@ const FurnitureForm: React.FC<Props> = ({
                 <td className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900">
                   {/* ₹{row.rowTotal.toLocaleString("en-IN")} */}
                   ₹{row.rowTotal.toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
+                    minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
                   })}
                 </td>
@@ -1318,7 +1418,10 @@ const FurnitureForm: React.FC<Props> = ({
   ) => (
     <div className="mt-6">
       <h3 className="font-semibold text-md mb-2">
-        {title} - Total: ₹{(data as any)?.totals[kind === "fittingsAndAccessories" ? "fittings" : kind]?.toLocaleString("en-IN")}
+        {title} - Total: ₹{(data as any)?.totals[kind === "fittingsAndAccessories" ? "fittings" : kind]?.toLocaleString("en-IN", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2,
+        })}
       </h3>
       <div className="overflow-x-auto  rounded-md">
         <table className="min-w-full text-sm bg-white shadow-sm">
@@ -1374,7 +1477,7 @@ const FurnitureForm: React.FC<Props> = ({
                     onChange={(e) => {
                       if (Number(e.target.value) >= 0) {
 
-                        handleSimpleChange(kind, i, "quantity", Number(e.target.value))
+                        handleSimpleChange(kind, i, "quantity", Math.max(0, Number(e.target.value)))
                       }
                     }
                     }
@@ -1389,7 +1492,7 @@ const FurnitureForm: React.FC<Props> = ({
                     value={row.cost || ""}
                     placeholder="enter cost"
                     onChange={(e) =>
-                      handleSimpleChange(kind, i, "cost", Number(e.target.value))
+                      handleSimpleChange(kind, i, "cost", Math.max(0, Number(e.target.value)))
                     }
                     className="w-full px-2 py-1 text-center outline-none"
                   />
@@ -1403,7 +1506,7 @@ const FurnitureForm: React.FC<Props> = ({
                     placeholder="enter profit"
                     value={(row.profitOnMaterial ?? 0) || ""}
                     onChange={(e) =>
-                      handleSimpleChange(kind, i, "profitOnMaterial", Number(e.target.value))
+                      handleSimpleChange(kind, i, "profitOnMaterial", Math.max(0, Number(e.target.value)))
                     }
                     // className="w-20 text-center  rounded px-2 py-1 text-sm"
                     className="w-full px-2 py-1 text-center outline-none"
@@ -1415,7 +1518,7 @@ const FurnitureForm: React.FC<Props> = ({
                 >
                   {/* ₹{row.rowTotal.toLocaleString("en-IN")} */}
                   ₹{row.rowTotal.toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
+                    minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
                   })}
                 </td>
@@ -1486,62 +1589,44 @@ const FurnitureForm: React.FC<Props> = ({
         Product Total: ₹{data.totals.furnitureTotal.toLocaleString("en-IN")}
       </div> */}
 
+      {/* 🆕 Factory Fabrication & Product Profit Section */}
+      <div className="mt-6 flex flex-wrap items-center justify-end gap-4 border-t pt-4">
 
-      {/* 🆕 Product-Level Profit Input section */}
-      <div className="mt-6 flex items-center justify-end gap-4  pt-4">
-        <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100">
-          <label className="text-[11px] font-bold text-blue-600 uppercase">Product Profit (%)</label>
+        {/* Factory Fabrication Input */}
+        <div className="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-lg border border-orange-100 shadow-sm">
+          <label className="text-[11px] font-bold text-orange-600 uppercase tracking-tight">
+            Fabrication Cost
+          </label>
+          <div className="flex items-center">
+            <span className="text-orange-600 mr-1 text-sm">₹</span>
+            <input
+              type="number"
+              className="w-20 text-right font-bold bg-transparent outline-none text-orange-800"
+              value={data.fabricationCost ?? ""}
+              placeholder="0"
+              onChange={(e) => spreadOverheads(data.furnitureProfit || 0, Math.max(0, Number(e.target.value)), false)}
+            />
+          </div>
+        </div>
+
+        {/* Product Profit Input */}
+        <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100 shadow-sm">
+          <label className="text-[11px] font-bold text-blue-600 uppercase tracking-tight">
+            Product Profit Overlay
+          </label>
           <div className="flex items-center">
             <input
               type="number"
-              className="w-14 text-right font-bold bg-transparent outline-none text-blue-800"
+              className="w-12 text-right font-bold bg-transparent outline-none text-blue-800"
               value={data.furnitureProfit ?? ""}
               placeholder="0"
-              onChange={(e) => {
-                const newProfit = Number(e.target.value);
-
-                if (newProfit < 0) return
-                // 1. Recalculate Core Materials with the new furnitureProfit
-                // This already returns rows multiplied by (1 + furnitureProfit/100)
-                const updatedCore = calculateCoreMaterialCosts(data.coreMaterials, labourCost, newProfit);
-
-                // 2. Determine the Average Core Cost from the NEWLY calculated core rows
-                const totalCore = updatedCore.reduce((sum, r) => sum + r.rowTotal, 0);
-                const avgCore = updatedCore.length > 0 ? totalCore / updatedCore.length : 0;
-
-                // 3. Update all other sections
-                const multiplier = 1 + (newProfit / 100);
-                const updateSimpleSection = (section: SimpleItemRow[], isGlue = false) =>
-                  section.map(item => {
-                    // GLUE FIX: Use avgCore directly. 
-                    // Do not multiply by 'multiplier' again because avgCore already has it.
-                    if (isGlue || item.itemName === "Glue") {
-                      return { ...item, cost: avgCore, rowTotal: avgCore };
-                    }
-
-                    // Fittings and Non-Branded still need the furnitureProfit multiplier
-                    const base = (item.quantity * item.cost) * (1 + (item.profitOnMaterial || 0) / 100);
-                    return { ...item, rowTotal: base * multiplier };
-                  });
-
-                const updatedFurniture = {
-                  ...data,
-                  furnitureProfit: newProfit,
-                  coreMaterials: updatedCore,
-                  fittingsAndAccessories: updateSimpleSection(data.fittingsAndAccessories),
-                  glues: updateSimpleSection(data.glues, true),
-                  nonBrandMaterials: updateSimpleSection(data.nonBrandMaterials),
-                };
-
-                updatedFurniture.totals = computeTotals(updatedFurniture);
-                updateFurniture?.(updatedFurniture);
-              }}
+              onChange={(e) => spreadOverheads(Math.max(0, Number(e.target.value)), data.fabricationCost || 0, true)}
             />
             <span className="text-blue-600 font-bold ml-1 text-sm">%</span>
           </div>
         </div>
 
-        <div className="text-right text-xl text-green-700 font-bold">
+        <div className="text-right text-xl text-green-700 font-bold ml-4">
           Product Total: ₹{Math.round(data.totals.furnitureTotal).toLocaleString("en-IN")}
         </div>
       </div>

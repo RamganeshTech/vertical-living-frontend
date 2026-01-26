@@ -200,7 +200,8 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
   ACCOUNTING: ["accounts", "billing", "payments", "vendor", "customer", "invoice",
     "expense", "billtemplate", "purchaseorder",
     "vendorpayment", "salesorder", "retailinvoice"],
-    
+
+  CUTLIST: "cutlist",
 
   RATECONIG: "materialrateconfig",
   RATECONIGSTAFF: "labourratequote",
@@ -244,6 +245,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     PROCUREMENT: `/organizations/${organizationId}/projects/procurement`,
     ACCOUNTING: `/organizations/${organizationId}/projects/accounting`,
     DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
+    CUTLIST: `/organizations/${organizationId}/projects/cutlistmain`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
     RATECONIGMATERIALWITHSTAFF: `/organizations/${organizationId}/projects/materialwithlabourrate`,
@@ -276,12 +278,10 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
   else if (lowerRole === "worker") {
     // Worker: Strict Whitelist
     allowedKeys = allKeys.filter(key => key !== "STAFFTASK" && key !== "WORKLIBRARY");
-
   }
   else if (lowerRole === "client") {
     // Client: Strict Whitelist
     allowedKeys = allKeys.filter(key => key !== "STAFFTASK" && key !== "WORKLIBRARY");
-
   }
   else {
     // Default / No Role: Show nothing or just Projects

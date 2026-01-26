@@ -13,6 +13,8 @@ import { toast } from '../../../../utils/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import MaterialOverviewLoading from '../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 
+
+
 const InternalQuoteEntrySingle = () => {
 
     const navigate = useNavigate()
@@ -22,7 +24,7 @@ const InternalQuoteEntrySingle = () => {
 
     useEffect(() => {
 
-        if (quoteType === "null" || quoteType === null || quoteType === "residential") {
+        if (quoteType === "null" || quoteType === null || quoteType === "residential" || quoteType === "basic") {
             //   if(data?.furnitures) setFurnitures(data?.furnitures)
 
             if (data?.furnitures && Array.isArray(data.furnitures)) {
@@ -61,12 +63,25 @@ const InternalQuoteEntrySingle = () => {
         0
     );
 
+
+
     useEffect(() => {
         if (data) {
-            setGlobalTransportation(data.globalTransportation || 0);
-            setGlobalProfitPercent(data.globalProfitPercent || 0);
+            setGlobalTransportation(data?.globalTransportation || 0);
+            setGlobalProfitPercent(data?.globalProfitPercent || 0);
+            setCommonProfitOverride(data?.commonProfitOverride || 0)
         }
     }, [data]); // This resets the overheads if a different quote is loaded
+
+
+
+    //  // Helper to calculate total rows across all products
+    // const getTotalRowCount = () => {
+    //     return furnitures.reduce((acc, f) => {
+    //         return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
+    //     }, 0);
+    // };
+
 
 
     const [furnitures, setFurnitures] = useState<FurnitureBlock[]>([]);
@@ -76,6 +91,153 @@ const InternalQuoteEntrySingle = () => {
 
     // const [quoteType, setQuoteType] = useState<"single" | "residential" | null>(null)
     // const [editQuoteNo, setEditQuoteNo] = useState<string | null>(null)
+
+
+
+
+    // 1. Add this state at the top of your component
+    const [commonMaterials, setCommonMaterials] = useState<SimpleItemRow[]>([]);
+    const [commonProfitOverride, setCommonProfitOverride] = useState<number>(0);
+
+    // 2. Add this helper to initialize or handle API data for common items
+    useEffect(() => {
+        if (data?.commonMaterials) {
+            setCommonMaterials(data.commonMaterials);
+        }
+    }, [data]);
+
+    // Handler for the Common Material Profit Input
+    const handleCommonProfitOverride = (newProfit: number) => {
+        setCommonProfitOverride(newProfit);
+        // The useEffect will catch this if we add it to dependencies, 
+        // or we can trigger a manual recalculation if needed.
+
+        // 2. ✅ RESET: Map through common materials and wipe individual row profits
+        setCommonMaterials(prev => prev.map(item => ({
+            ...item,
+            profitOnMaterial: 0
+        })));
+    };
+
+
+    // 3. Update the Row Count logic to include Common Items
+    const getTotalRowCount = () => {
+        const furnitureRows = furnitures.reduce((acc, f) => {
+            return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
+        }, 0);
+        // Add common items to the total count for transport splitting
+        return furnitureRows + commonMaterials.length;
+    };
+
+
+
+
+    // Handler for Common Items
+    const handleCommonItemChange = (i: number, key: keyof SimpleItemRow, value: any) => {
+        const updated = [...commonMaterials];
+        updated[i] = { ...updated[i], [key]: value };
+
+        // Calculate rowTotal immediately for local feedback
+        const base = (Number(updated[i].quantity) || 0) * (Number(updated[i].cost) || 0);
+        const localProfitMultiplier = 1 + ((Number(updated[i].profitOnMaterial) || 0) / 100);
+        const globalMultiplier = 1 + (globalProfitPercent / 100);
+
+        // Note: Transport will be applied accurately by the useEffect automatically
+        updated[i].rowTotal = base * localProfitMultiplier * globalMultiplier;
+
+        // 👉 Auto-add new row on typing in last row
+        const isLastRow = i === updated.length - 1;
+        if (isLastRow && (updated[i].itemName || updated[i].cost)) {
+            updated.push(emptySimpleItem());
+        }
+
+        setCommonMaterials(updated);
+    };
+
+    const removeCommonItem = (index: number) => {
+        setCommonMaterials(prev => prev.filter((_, i) => i !== index));
+    };
+
+
+
+
+
+
+
+
+    const rendercommonMaterialsTable = () => (
+        <div className="overflow-x-auto rounded-md">
+            <table className="min-w-full text-sm bg-white shadow-sm">
+                <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
+                    <tr>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Profit %</th>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Total</th>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {(commonMaterials.length > 0 ? commonMaterials : [emptySimpleItem()]).map((row, i) => (
+                        <tr key={i} className="hover:bg-gray-50 border-b border-gray-100">
+                            <td className="p-2 border-r border-gray-100">
+                                <input
+                                    value={row.itemName || ""}
+                                    onChange={(e) => handleCommonItemChange(i, "itemName", e.target.value)}
+                                    className="w-full text-center outline-none bg-transparent"
+                                    placeholder="e.g. Screws"
+                                />
+                            </td>
+                            <td className="p-2 border-r border-gray-100">
+                                <input
+                                    value={row.description || ""}
+                                    onChange={(e) => handleCommonItemChange(i, "description", e.target.value)}
+                                    className="w-full text-center outline-none bg-transparent"
+                                    placeholder="details"
+                                />
+                            </td>
+                            <td className="p-2 border-r border-gray-100">
+                                <input
+                                    type="number"
+                                    value={row.quantity || ""}
+                                    onChange={(e) => handleCommonItemChange(i, "quantity", Number(e.target.value))}
+                                    className="w-full text-center outline-none bg-transparent"
+                                />
+                            </td>
+                            <td className="p-2 border-r border-gray-100">
+                                <input
+                                    type="number"
+                                    value={row.cost || ""}
+                                    onChange={(e) => handleCommonItemChange(i, "cost", Number(e.target.value))}
+                                    className="w-full text-center outline-none bg-transparent"
+                                />
+                            </td>
+                            <td className="p-2 border-r border-gray-100">
+                                <input
+                                    type="number"
+                                    value={row.profitOnMaterial || ""}
+                                    onChange={(e) => handleCommonItemChange(i, "profitOnMaterial", Number(e.target.value))}
+                                    className="w-full text-center outline-none bg-transparent"
+                                    placeholder="0"
+                                />
+                            </td>
+                            <td className="p-2 border-r border-gray-100 font-bold text-gray-700 text-center">
+                                ₹{row.rowTotal?.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                            </td>
+                            <td className="p-2 text-center">
+                                <Button variant="danger" size="sm" onClick={() => removeCommonItem(i)}>
+                                    {/* <i className="fas fa-trash" /> */}
+                                    Remove
+                                </Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 
 
 
@@ -108,12 +270,12 @@ const InternalQuoteEntrySingle = () => {
     }, [allLabourCategory]); // Runs when the list is fetched
 
 
-    // Helper to calculate total rows across all products
-    const getTotalRowCount = () => {
-        return furnitures.reduce((acc, f) => {
-            return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
-        }, 0);
-    };
+    // // Helper to calculate total rows across all products
+    // const getTotalRowCount = () => {
+    //     return furnitures.reduce((acc, f) => {
+    //         return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
+    //     }, 0);
+    // };
 
 
 
@@ -133,9 +295,26 @@ const InternalQuoteEntrySingle = () => {
             // ✅ PRIORITY LOGIC: 
             // If Global Profit > 0, use it for everything.
             // Otherwise, use the individual Furniture Profit (furnitureProfit).
-            const effectiveProfitPercent = globalProfitPercent > 0
+            const effectiveProfitPercent = (globalProfitPercent !== null && globalProfitPercent !== undefined)
                 ? globalProfitPercent
                 : (f.furnitureProfit || 0);
+
+
+
+
+            // const effectiveProfitPercent = globalProfitPercent > 0
+            //     ? globalProfitPercent
+            //     : (f.furnitureProfit || 0);
+
+
+            //  ✅ NEW LOGIC: Product Profit overrides Global Profit ( dont use this the each product percnetage value is not getting chaged if the global percentage is gettng changed)
+            // If the product has a specific profit (1%), use it. 
+            // Otherwise, fall back to the Global Profit (2%).
+            // const effectiveProfitPercent = (f.furnitureProfit !== undefined && f.furnitureProfit > 0)
+            //     ? f.furnitureProfit
+            //     : globalProfitPercent;
+
+
 
             const profitMultiplier = 1 + (effectiveProfitPercent / 100);
 
@@ -208,6 +387,7 @@ const InternalQuoteEntrySingle = () => {
 
             return {
                 ...f,
+                furnitureProfit: effectiveProfitPercent,
                 coreMaterials: updatedCore,
                 fittingsAndAccessories: updatedFittings,
                 glues: updatedGlues,
@@ -222,15 +402,50 @@ const InternalQuoteEntrySingle = () => {
             };
         }));
 
+
+        // --- UPDATED: Recalculate Common Items with Override Logic ---
+        // ✅ Logic: Use manual override if it exists (even 0), otherwise use global.
+        const effectiveCommonProfit = commonProfitOverride ?? globalProfitPercent;
+        const commonMultiplier = 1 + (effectiveCommonProfit / 100);
+
+        // --- NEW: Recalculate Common Items ---
+        setCommonMaterials(prev => prev.map(item => {
+            const base = (item.quantity || 0) * (item.cost || 0);
+            const localProfit = 1 + ((item.profitOnMaterial || 0) / 100);
+
+            return {
+                ...item,
+                // These always use Global Profit + Transport
+                rowTotal: (base * localProfit * commonMultiplier) + transportPerRow
+            };
+        }));
+
+
         // We removed labourCost from dependencies as requested.
         // If labourCost changes, the next user input in transport/profit will catch it.
-    }, [globalTransportation, globalProfitPercent, labourCost]);
+    }, [globalTransportation, globalProfitPercent, labourCost, commonProfitOverride]);
 
     // const { mutateAsync: createQuote, isPending } = useCreateMaterialQuote();
     const { mutateAsync: editQuote, isPending: editPending } = useEditMaterialQuote();
 
 
-    const grandTotal = furnitures.length > 0 ? furnitures?.reduce((sum, f) => sum + f?.totals?.furnitureTotal, 0) : 0;
+    const furnitureTotal =
+        furnitures?.reduce(
+            (sum, f) => sum + (f?.totals?.furnitureTotal || 0),
+            0
+        ) || 0;
+
+    const commonTotal =
+        commonMaterials?.reduce(
+            (sum, item) => sum + (item?.rowTotal || 0),
+            0
+        ) || 0;
+
+    const grandTotal = furnitures?.length > 0
+        ? furnitureTotal + commonTotal
+        : 0;
+
+    // const grandTotal = furnitures.length > 0 ? furnitures?.reduce((sum, f) => sum + f?.totals?.furnitureTotal, 0) : 0;
 
 
 
@@ -339,8 +554,15 @@ const InternalQuoteEntrySingle = () => {
                 };
             });
 
+            const validcommonMaterials = commonMaterials.filter(item => item.itemName || item.cost > 0);
+
+
+
+
             // Add other fields to FormData
             formData.append("furnitures", JSON.stringify(furnituresPayload));
+            formData.append("commonMaterials", JSON.stringify(validcommonMaterials)); // 🆕 Add this
+            formData.append("commonProfitOverride", commonProfitOverride.toString()); // 🆕 Add this
             formData.append("grandTotal", grandTotal.toString());
             formData.append("notes", "Updated via frontend");
             formData.append("globalTransportation", globalTransportation.toString());
@@ -567,8 +789,56 @@ const InternalQuoteEntrySingle = () => {
                 ))}
             </section>}
 
+            {/* --- COMMON FITTINGS & MATERIALS SECTION --- */}
+            {furnitures.length > 0 && (
+                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mt-8 mb-6 shadow-inner">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                            <i className="fas fa-boxes mr-3 text-orange-500" />
+                            General/Common Site Materials - Total: ₹{commonMaterials.reduce((s, i) => s + (i.rowTotal || 0), 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                        </h2>
 
-            <div className="flex items-center justify-between gap-4 bg-white border border-blue-100 p-3 rounded-xl shadow-sm">
+                        {/* ✅ NEW: Profit Override Input for Common Materials */}
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-lg border border-orange-100 shadow-sm">
+                                <label className="text-[11px] font-bold text-orange-600 uppercase tracking-tight">
+                                    Common Profit Overlay
+                                </label>
+                                <div className="flex items-center">
+                                    <input
+                                        type="number"
+                                        className="w-12 text-right font-bold bg-transparent outline-none text-orange-800"
+                                        // Show manual override if exists, else show global
+                                        value={commonProfitOverride ?? globalProfitPercent}
+                                        placeholder="0"
+                                        onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }}
+                                        onChange={(e) => {
+                                            const val = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                            handleCommonProfitOverride(val);
+                                        }}
+                                    />
+                                    <span className="text-orange-600 font-bold ml-1 text-sm">%</span>
+                                </div>
+                            </div>
+
+                            <div className="text-right text-xl text-green-700 font-bold">
+                                Total: ₹{commonMaterials.reduce((s, i) => s + (i.rowTotal || 0), 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {rendercommonMaterialsTable()}
+
+                    <div className="mt-3 text-right">
+                        <Button onClick={() => setCommonMaterials([...commonMaterials, emptySimpleItem()])} variant="secondary" size="sm">
+                            + Add Common Item
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            {furnitures.length !== 0 && <div className="flex items-center justify-between gap-4 bg-white border border-blue-100 p-3 rounded-xl shadow-sm">
                 <div className="flex items-center gap-4" >
                     <div className="flex flex-col">
                         <label className="text-[9px] font-extrabold text-blue-500 uppercase tracking-tighter">Transport Cost</label>
@@ -590,7 +860,20 @@ const InternalQuoteEntrySingle = () => {
                                 type="number"
                                 className="w-12 text-right font-semibold focus:outline-none text-gray-800"
                                 value={globalProfitPercent}
-                                onChange={(e) => setGlobalProfitPercent(Math.max(0, Number(e.target.value)))}
+                                onChange={(e) => {
+                                    setGlobalProfitPercent(Math.max(0, Number(e.target.value)))
+                                    setCommonProfitOverride(Math.max(0, Number(e.target.value)));
+
+                                    setFurnitures(prev => prev.map(f => ({
+                                        ...f,
+                                        furnitureProfit: 0, // Reset product level
+                                        coreMaterials: f.coreMaterials.map(r => ({ ...r, profitOnMaterial: 0, profitOnLabour: 0 })),
+                                        fittingsAndAccessories: f.fittingsAndAccessories.map(i => ({ ...i, profitOnMaterial: 0 })),
+                                        nonBrandMaterials: f.nonBrandMaterials.map(i => ({ ...i, profitOnMaterial: 0 }))
+                                    })));
+                                    setCommonMaterials(prev => prev.map(item => ({ ...item, profitOnMaterial: 0 })));
+
+                                }}
                             />
                             <span className="text-gray-400 ml-1 text-sm">%</span>
                         </div>
@@ -598,7 +881,7 @@ const InternalQuoteEntrySingle = () => {
                 </div>
 
 
-                {furnitures.length !== 0 && <div className="mt-1 text-right flex gap-2 justify-end">
+                <div className="mt-1 text-right flex gap-2 justify-end">
                     {(canCreate || canEdit) && <Button
                         variant="primary"
                         isLoading={editPending}
@@ -610,8 +893,8 @@ const InternalQuoteEntrySingle = () => {
                         Save Quote
                     </Button>
                     }
-                </div>}
-            </div>
+                </div>
+            </div>}
 
 
 
@@ -622,6 +905,5 @@ const InternalQuoteEntrySingle = () => {
 }
 
 export default InternalQuoteEntrySingle
-
 
 

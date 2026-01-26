@@ -3,26 +3,28 @@ import { Button } from '../../../../../components/ui/Button'
 import SearchSelectNew from '../../../../../components/ui/SearchSelectNew'
 import { Label } from '../../../../../components/ui/Label'
 import { Input } from '../../../../../components/ui/Input'
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../../components/ui/Select'
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/Select";
 
 
 export interface QuoteFormData {
-  mainQuoteName: string;
-  quoteCategory: string | null;
-  projectId: string | null;
+    mainQuoteName: string;
+    quoteType: string;
+    quoteCategory: string;
+    projectId: string | null;
 }
 
 interface CreateQuoteModalProps {
-  // State and Data
-//   isOpen: boolean;
-  isEditing?: boolean;
-  formData: QuoteFormData;
-  projectsData: Array<{ _id: string; projectName: string }>;
-  
-  // Actions
-  setModalOpen: (open: boolean) => void;
-  setFormData: React.Dispatch<React.SetStateAction<QuoteFormData>>;
-  handleSubmit: () => void;
+    // State and Data
+    //   isOpen: boolean;
+    isEditing?: boolean;
+    formData: QuoteFormData;
+    projectsData: Array<{ _id: string; projectName: string }>;
+
+    // Actions
+    setModalOpen: (open: boolean) => void;
+    setFormData: React.Dispatch<React.SetStateAction<QuoteFormData>>;
+    handleSubmit: () => void;
 }
 
 
@@ -37,10 +39,30 @@ const CreateQuoteModal: React.FC<CreateQuoteModalProps> = ({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl animate-in zoom-in-95">
-                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <i className="fas fa-edit text-blue-600"></i>
-                    {isEditing ? 'Update Quote Details' : 'Create New Quote'}
-                </h2>
+                <header className='flex justify-between items-center'>
+
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                        <i className="fas fa-edit text-blue-600"></i>
+                        {isEditing ? 'Update Quote Details' : 'Create New Quote'}
+                    </h2>
+
+                    <div>
+                        <Select onValueChange={(val: any) => {
+                             setFormData(p => ({ ...p, quoteType: val }))
+                        }}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Template Type" selectedValue={formData.quoteType[0].toUpperCase()+formData.quoteType.slice(1)} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {["basic", "advanced"].map((option) => (
+                                    <SelectItem key={option} value={option.toString()}>
+                                        {option[0].toUpperCase()+option.slice(1)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </header>
 
                 <div className="space-y-4">
                     <div>
@@ -68,7 +90,7 @@ const CreateQuoteModal: React.FC<CreateQuoteModalProps> = ({
                             options={["commercial", "residential"].map((p: string) => ({ value: p, label: p }))}
                             placeholder="Select Quote Type..."
                             value={formData.quoteCategory || ""}
-                            onValueChange={(val) => setFormData(p => ({ ...p, quoteCategory: val }))}
+                            onValueChange={(val) => setFormData((p:any) => ({ ...p, quoteCategory: val }))}
                         />
                     </div>
 

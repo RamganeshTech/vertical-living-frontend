@@ -17,6 +17,7 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   DESIGNLAB: "Design Lab",
   // CUSTOMERACCOUNT: "Customer",
   // INVOICEACCOUNT: "Invoice",
+  CUTLIST: "Cutlist Generation",
   RATECONIG: "Rate Config (Material)",
   RATECONIGSTAFF: "Rate Config (Staff)",
   RATECONIGMATERIALWITHSTAFF: "Rate Config (Material & Staff)",
@@ -56,6 +57,7 @@ export const SIDEBAR_ICONS: Record<string, string> = {
 
   // CUSTOMERACCOUNT: "fas fa-user text-2xl",
   // INVOICEACCOUNT: "fas fa-note text-2xl",
+  CUTLIST: "fas fa-measurement text-2xl",
   RATECONIG: "fas fa-box-archive text-2xl",
   RATECONIGSTAFF: "fa-solid fa-person-digging text-2xl",
   WORKTEMPLATE: "fa-solid fa-person-digging text-2xl",

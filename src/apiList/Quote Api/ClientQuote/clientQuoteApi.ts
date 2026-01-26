@@ -25,6 +25,23 @@ export const getAllClientQuotes = async ({
 };
 
 
+
+export const getAllClientQuotesforDropDown = async ({
+    api,
+    organizationId,
+    projectId
+   
+}: {
+    api: AxiosInstance;
+    organizationId: string;
+    projectId: string;
+}) => {
+    const { data } = await api.get(`quote/quotegenerate/getallclientquote/dropdown/${organizationId}/${projectId}`);
+    if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
+    return data.data;
+};
+
+
 export const getSingleClientQuote = async ({
     api,
     organizationId,
@@ -105,6 +122,24 @@ export const useGetAllClientQuotes = (organizationId: string, filters: {
             return await getAllClientQuotes({ api, organizationId, filters })
         },
         enabled: !!organizationId,
+    });
+};
+
+
+export const useGetAllClientQuotesForDropDown = (organizationId: string, projectId: string) => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useQuery({
+        queryKey: ["clientquote", "dropdown", organizationId, projectId],
+        queryFn: async () => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
+            if (!api) throw new Error("API instance for role not found");
+
+            return await getAllClientQuotesforDropDown({ api, organizationId, projectId })
+        },
+        enabled: !!organizationId && !!projectId,
     });
 };
 

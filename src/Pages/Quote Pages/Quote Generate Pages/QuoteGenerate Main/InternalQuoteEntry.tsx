@@ -721,11 +721,14 @@ const InternalQuoteEntryMain = () => {
 
     const [formData, setFormData] = useState<{
         mainQuoteName: string;
-        quoteCategory: string | null;
+
+        quoteType: string;
+        quoteCategory: string;
         projectId: string | null;
     }>({
         mainQuoteName: '',
-        quoteCategory: 'commercial',
+        quoteCategory: 'residential',
+        quoteType: "basic",
         projectId: ''
     });
 
@@ -789,7 +792,7 @@ const InternalQuoteEntryMain = () => {
 
 
     const handleSubmit = async () => {
-        if (!formData.mainQuoteName || !formData.projectId || !formData.quoteCategory) {
+        if (!formData.mainQuoteName || !formData.projectId || !formData.quoteType) {
             return toast({ title: "Error", description: "Please fill all fields", variant: "destructive" });
         }
 
@@ -806,12 +809,14 @@ const InternalQuoteEntryMain = () => {
                 const response = await createMutation.mutateAsync({
                     organizationId: organizationId,
                     projectId: formData.projectId,
-                    mainQuoteName: formData.mainQuoteName, quoteCategory: formData.quoteCategory
+                    mainQuoteName: formData.mainQuoteName,
+                    quoteType: formData.quoteType,
+                    quoteCategory: formData.quoteCategory
                 });
 
                 console.log("response", response)
                 // Navigate using the data._id from backend response
-                navigate(`single/${response._id}/${response.quoteCategory}`);
+                navigate(`single/${response._id}/${response.quoteType}`);
             // }
             setModalOpen(false);
             resetForm();
@@ -821,7 +826,7 @@ const InternalQuoteEntryMain = () => {
     };
 
     const resetForm = () => {
-        setFormData({ mainQuoteName: '', quoteCategory: '', projectId: '' });
+        setFormData({ mainQuoteName: '', quoteCategory: '', quoteType: "", projectId: '' });
         
     };
 

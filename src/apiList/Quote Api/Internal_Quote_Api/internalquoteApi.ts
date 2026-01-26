@@ -26,10 +26,12 @@ const createInternalMainQuote = async ({
     organizationId,
     projectId,
     mainQuoteName, quoteCategory,
+    quoteType,
     api
 }: {
     organizationId: string;
     projectId: string;
+    quoteType: string,
     mainQuoteName: string, quoteCategory: string,
     api: AxiosInstance;
 }) => {
@@ -39,6 +41,7 @@ const createInternalMainQuote = async ({
             organizationId,
             projectId,
             mainQuoteName, quoteCategory,
+            quoteType
         }
     );
     if (!data.ok) throw new Error(data.message);
@@ -120,15 +123,15 @@ export const useCreateInternalMainQuote = () => {
     const api = getApiForRole(role!);
     const ALLOWED_ROLES = ["owner", "staff", "CTO"];
     return useMutation({
-        mutationFn: async ({ organizationId, projectId, mainQuoteName, quoteCategory }: {
+        mutationFn: async ({ organizationId, projectId, mainQuoteName, quoteCategory, quoteType }: {
             organizationId: string;
             projectId: string;
-            mainQuoteName: string; quoteCategory: string
+            mainQuoteName: string; quoteCategory: string, quoteType: string
         }) => {
             if (!role || !ALLOWED_ROLES.includes(role)) throw new Error("Unauthorized access");
             if (!api) throw new Error("API configuration missing");
 
-            return await createInternalMainQuote({ organizationId, projectId, mainQuoteName, quoteCategory, api });
+            return await createInternalMainQuote({ organizationId, quoteType, projectId, mainQuoteName, quoteCategory, api });
         },
         onSuccess: (_, { organizationId }) => {
             // Invalidate queries for the list of quotes to refresh the UI

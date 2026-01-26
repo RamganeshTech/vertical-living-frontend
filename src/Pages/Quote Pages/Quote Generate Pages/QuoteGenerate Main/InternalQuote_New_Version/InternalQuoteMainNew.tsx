@@ -39,11 +39,14 @@ const InternalQuoteMainNew = () => {
     // Form State
     const [formData, setFormData] = useState<{
         mainQuoteName: string;
-        quoteCategory: string | null;
+        quoteCategory: string;
+        quoteType: string;
+
         projectId: string | null;
     }>({
         mainQuoteName: '',
         quoteCategory: 'commercial',
+        quoteType: 'basic',
         projectId: ''
     });
 
@@ -113,7 +116,7 @@ const InternalQuoteMainNew = () => {
     };
 
     const resetForm = () => {
-        setFormData({ mainQuoteName: '', quoteCategory: '', projectId: '' });
+        setFormData({ mainQuoteName: '', quoteCategory: '', projectId: '' , quoteType: ""});
         setIsEditing(false);
         setSelectedQuoteId(null);
     };
