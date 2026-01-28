@@ -853,7 +853,7 @@ const InternalQuoteEntryMain = () => {
     // console.log("labor cost", labourCost)
 
     return (
-        <div className={`h-full mx-auto max-h-full`}>
+        <div className={`h-full mx-auto max-h-full overflow-hidden`}>
 
 
             <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-1 border-b-1 border-[#818283]">
@@ -867,12 +867,7 @@ const InternalQuoteEntryMain = () => {
                 </div>
 
                 <div className="flex gap-6 items-center ">
-                    {/* <div>
-                        <Button className="flex items-center" onClick={() => {
-                            navigate("internalquotenew")
-                            // setQuoteType("single")
-                        }}><i className="fas fa-new mr-1"> </i> New Version</Button>
-                    </div> */}
+                  
                    
 
                     {canCreate && <Button className="flex items-center" onClick={() => {
@@ -897,7 +892,7 @@ const InternalQuoteEntryMain = () => {
             {/* Modal for Create/Update */}
             {isModalOpen && (
                 <CreateQuoteModal
-                    // isEditing={isEditing}
+                    isEditing={false}
                     formData={formData}
                     projectsData={projectData}
                     setModalOpen={setModalOpen}
@@ -909,7 +904,7 @@ const InternalQuoteEntryMain = () => {
 
 
 
-            <section className="my-4">
+            <section className="my-2 h-[100%] ">
 
                 {/* <h1 className="text-2xl text-gray-700  font-semibold">Quote List</h1> */}
                 <QuoteGenerateList

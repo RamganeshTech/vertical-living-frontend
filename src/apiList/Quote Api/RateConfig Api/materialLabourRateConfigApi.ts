@@ -259,7 +259,7 @@ export const useGetItemsByMaterialWithLabourRateConfigCategory = (organizationId
       if (!api) throw new Error("API instance not found for role");
       return await getItemsByMaterialWithLabourCategory({ api, organizationId, categoryId });
     },
-    enabled: !!organizationId,
+    enabled: !!organizationId && !!categoryId
   });
 };
 

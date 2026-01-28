@@ -9,15 +9,19 @@ import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 import { useCreateMaterialWithLabourRateConfigItems, useDeleteMaterialWithLabourRateConfigItem, useGetItemsByMaterialWithLabourRateConfigCategory, useGetMaterialWithLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/materialLabourRateConfigApi";
 
-export default function MaterialWithLabourSingle() {
+export default function MaterialWithLabourSingle({
+    categoryId
+}: { categoryId?: string }) {
     const { organizationId, id } = useParams<{
         organizationId: string;
         id: string;
     }>();
     const navigate = useNavigate()
 
-    const { data: categories } = useGetMaterialWithLabourRateConfigCategories(organizationId!, );
-    const { data: existingItems, isLoading, refetch } = useGetItemsByMaterialWithLabourRateConfigCategory(organizationId!, id!);
+    console.log("categoryId", categoryId)
+
+    const { data: categories } = useGetMaterialWithLabourRateConfigCategories(organizationId!,);
+    const { data: existingItems, isLoading, refetch } = useGetItemsByMaterialWithLabourRateConfigCategory(organizationId!, categoryId!);
     const { mutateAsync: createItems, isPending: createPending } = useCreateMaterialWithLabourRateConfigItems();
     const { mutateAsync: deleteItem, isPending: deletePending } = useDeleteMaterialWithLabourRateConfigItem();
 
@@ -37,7 +41,7 @@ export default function MaterialWithLabourSingle() {
 
 
 
-    const currentCategory = (categories || [])?.find((cat: any) => cat._id === id);
+    const currentCategory = (categories || [])?.find((cat: any) => cat._id === categoryId);
     if (!currentCategory) return <p>Category not found</p>;
 
 
@@ -140,30 +144,30 @@ export default function MaterialWithLabourSingle() {
     return (
         <div className="space-y-4  ">
             {/* Sticky Header */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center sticky top-0 bg-white z-10">
-                <div className='flex gap-2 items-center'>
-                    <div onClick={() => navigate(-1)}
+            <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center sticky top-0 bg-white z-10">
+              {!categoryId &&  <div className='flex gap-2 items-center'>
+                    <button onClick={() => navigate(-1)}
                         className='bg-slate-50 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
                         <i className='fas fa-arrow-left'></i>
-                    </div>
+                    </button>
                     <div>
 
                         <h2 className="text-2xl font-bold text-gray-800">{currentCategory.name}</h2>
 
-                            {/* <span className="block  text-gray-500">
+                         <span className="block  text-gray-500">
                                 * Enter the rupees per head (Every field will be added for single labour cost)
-                            </span> */}
+                            </span> 
                     </div>
 
 
-                </div>
-                <div className="flex gap-2 mt-3 sm:mt-0  ">
+                </div>}
+                <div className="flex gap-2 mt-3 sm:mt-0  absolute top-[-73px] right-[43px]  ">
                     {(canEdit || canCreate) && <Button onClick={handleAddRow} variant="primary" className="">
                         + Add Row
-                    </Button>}  
-                        {(canEdit || canCreate) && <Button onClick={handleSave} isLoading={createPending} className="bg-blue-600 hover:bg-blue-700 text-white">
-                            <i className="fas fa-file mr-2"></i> Save Items
-                        </Button> }
+                    </Button>}
+                    {(canEdit || canCreate) && <Button onClick={handleSave} isLoading={createPending} className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <i className="fas fa-file mr-2"></i> Save Items
+                    </Button>}
                 </div>
             </div>
 

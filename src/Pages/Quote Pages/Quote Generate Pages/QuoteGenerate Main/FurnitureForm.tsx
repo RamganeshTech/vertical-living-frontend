@@ -721,12 +721,18 @@ export type FurnitureBlock = {
   // laminateBrand?: string | null,
   innerLaminateBrand?: string | null
   outerLaminateBrand?: string | null
+
+  plywoodBrandId?: string | null
+  innerLaminateBrandId?: string | null
+  outerLaminateBrandId?: string | null
+
 };
 
 type Props = {
   index: number;
   data: FurnitureBlock;
   labourCost: number;
+  duplicateFurniture?: () => void; // Add this
   updateFurniture?: (updatedFurniture: FurnitureBlock) => void;
   removeFurniture?: () => void;
   isEditing?: boolean,
@@ -845,6 +851,7 @@ const FurnitureForm: React.FC<Props> = ({
   data,
   isEditing,
   labourCost,
+  duplicateFurniture,
   updateFurniture,
   removeFurniture,
 }) => {
@@ -1062,7 +1069,7 @@ const FurnitureForm: React.FC<Props> = ({
 
     // ✅ RESET: When Product Profit changes, clear all individual row margins
     const coreToProcess = shouldReset
-      ? data.coreMaterials.map(row => ({ ...row, profitOnMaterial: 0 , profitOnLabour: 0}))
+      ? data.coreMaterials.map(row => ({ ...row, profitOnMaterial: 0, profitOnLabour: 0 }))
       : data.coreMaterials;
 
     const fittingsToProcess = shouldReset
@@ -1173,8 +1180,7 @@ const FurnitureForm: React.FC<Props> = ({
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Image</th>
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Item Name</th>
               <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider border-x border-gray-200" colSpan={2}>Plywood</th>
-              {/* <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider" colSpan={2}>Laminate</th> */}
-              {/* Updated: Spans 4 columns for Inner and Outer */}
+
               <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider border-x border-gray-200" colSpan={4}>
                 Laminate
               </th>
@@ -1190,16 +1196,20 @@ const FurnitureForm: React.FC<Props> = ({
 
             <tr className="">
               {/* Plywood Sub-headers */}
-              <th className="px-2 py-2 text-[10px] uppercase text-gray-500 border-r border-gray-200">Qty</th>
               <th className="px-2 py-2 text-[10px] uppercase text-gray-500 border-r border-gray-200">Thk</th>
+              <th className="px-2 py-2 text-[10px] uppercase text-gray-500 border-r border-gray-200">Qty</th>
 
-              {/* 🆕 INNER LAMINATE - Separately Mentioned */}
-              <th className="px-2 py-2 text-[10px]  text-gray-500 uppercase border-r border-gray-200">Inner Qty</th>
-              <th className="px-2 py-2 text-[10px]  text-gray-500 uppercase border-r border-gray-200">Inner Thk</th>
+
 
               {/* 🆕 OUTER LAMINATE - Separately Mentioned */}
-              <th className="px-2 py-2 text-[10px]  text-gray-500 uppercase">Outer Qty</th>
               <th className="px-2 py-2 text-[10px]  text-gray-500 uppercase border-r border-gray-200">Outer Thk</th>
+              <th className="px-2 py-2 text-[10px]  text-gray-500 uppercase border-r border-gray-200">Outer Qty</th>
+
+
+              {/* 🆕 INNER LAMINATE - Separately Mentioned */}
+              <th className="px-2 py-2 text-[10px]  text-gray-500 uppercase border-r border-gray-200">Inner Thk</th>
+              <th className="px-2 py-2 text-[10px]  text-gray-500 uppercase border-r border-gray-200">Inner Qty</th>
+
             </tr>
           </thead>
           <tbody>
@@ -1214,8 +1224,22 @@ const FurnitureForm: React.FC<Props> = ({
                       className="w-full px-2 py-3 text-center outline-none"
                       onChange={(e) => handleCoreChange(0, "imageUrl", e.target.files?.[0])}
                     />
-                    {row.previewUrl && (
+                    {/* {row.previewUrl && (
                       <img src={row.previewUrl} className="h-10 mt-2 mx-auto" />
+                    )} */}
+
+                    {/* ✅ FIX: Check both previewUrl (local) and imageUrl (S3) */}
+                    {(row.previewUrl || row.imageUrl) && (
+                      <div className="mt-2 relative group">
+                        <img
+                          src={row.previewUrl || row.imageUrl}
+                          className="h-16 w-16 object-cover mt-2 mx-auto rounded-lg border shadow-sm"
+                          alt="Product"
+                        />
+                        {/* <div className="absolute inset-0 flex items-center justify-center rounded-lg">
+                          <i className="fas fa-camera text-white text-xs"></i>
+                        </div> */}
+                      </div>
                     )}
                   </td>
                 )}
@@ -1253,8 +1277,8 @@ const FurnitureForm: React.FC<Props> = ({
                 )} */}
 
                 {/*  Replace the map that currently iterates over ["plywoodNos", "laminateNos"] */}
-                {["plywoodNos", "innerLaminate", "outerLaminate"].map((field) =>
-                  ["quantity", "thickness"].map((sub) => (
+                {["plywoodNos", "outerLaminate", "innerLaminate"].map((field) =>
+                  ["thickness", "quantity"].map((sub) => (
                     <td key={`${field}-${sub}`}
                       // className="..."
                       className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
@@ -1569,7 +1593,7 @@ const FurnitureForm: React.FC<Props> = ({
 
   return (
     <div className="shadow-md p-4 my-4 border rounded-lg bg-white">
-      <div className="flex justify-between items-center mb-2">
+      {/* <div className="flex justify-between items-center mb-2">
         <h2 className="text-xl font-semibold text-gray-700">
           Product: {data.furnitureName}
         </h2>
@@ -1578,6 +1602,30 @@ const FurnitureForm: React.FC<Props> = ({
             Remove Product
           </Button>
         )}
+      </div> */}
+
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-bold text-gray-400 uppercase">Product Name:</label>
+          <input
+            value={data.furnitureName}
+            onChange={(e) => updateFurniture?.({ ...data, furnitureName: e.target.value })}
+            className="text-xl font-semibold text-gray-700 border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none bg-transparent"
+          />
+        </div>
+
+        <div className="flex gap-2">
+          {duplicateFurniture && (
+            <Button size="sm" onClick={duplicateFurniture} className="bg-blue-600 text-white">
+              Duplicate Product
+            </Button>
+          )}
+          {removeFurniture && (
+            <Button variant="danger" size="sm" onClick={removeFurniture} className="bg-red-600 text-white">
+              Remove Product
+            </Button>
+          )}
+        </div>
       </div>
 
       {renderCoreMaterials()}

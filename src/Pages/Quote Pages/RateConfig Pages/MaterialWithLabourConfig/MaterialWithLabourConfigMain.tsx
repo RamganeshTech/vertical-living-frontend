@@ -1,125 +1,132 @@
-import { useState } from "react";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
-import { Input } from "../../../../components/ui/Input";
-import { toast } from "../../../../utils/toast";
-import { Button } from "../../../../components/ui/Button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../../components/ui/Dialog";
+// import { useState } from "react";
+import {   useParams } from "react-router-dom";
+// import { Input } from "../../../../components/ui/Input";
+// import { toast } from "../../../../utils/toast";
+// import { Button } from "../../../../components/ui/Button";
+// import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../../components/ui/Dialog";
 // import { useCreateLabourRateConfigCategory, useDeleteLabourRateConfigCategory, useGetLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 // import LabourRateConfigSingle from "./LabourRateConfigSingle";
-import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
+// import MaterialOverviewLoading from "../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
 import StageGuide from "../../../../shared/StageGuide";
-import { Card, CardContent } from "../../../../components/ui/Card";
-import { useCreateMaterialWithLabourRateConfigCategory, useDeleteMaterialWithLabourRateConfigCategory, useGetMaterialWithLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/materialLabourRateConfigApi";
+// import { Card, CardContent } from "../../../../components/ui/Card";
+import {
+    //  useCreateMaterialWithLabourRateConfigCategory, useDeleteMaterialWithLabourRateConfigCategory, 
+    useGetMaterialWithLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/materialLabourRateConfigApi";
+import MaterialWithLabourSingle from "./MaterialWithLabourConfigSingle";
 
 
 export default function MaterialWithLabourRateMain() {
     const { organizationId } = useParams<{ organizationId: string }>();
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     // const location = useLocation();
 
-    const isChildRoute = location.pathname.includes("single");
+    // const isChildRoute = location.pathname.includes("single");
 
     const { role, permission } = useAuthCheck();
     const canList = role === "owner" || permission?.materialwithlabourratequote?.list;
-    const canCreate = role === "owner" || permission?.materialwithlabourratequote?.create;
+    // const canCreate = role === "owner" || permission?.materialwithlabourratequote?.create;
     // const canDelete = role === "owner" || permission?.materialwithlabourratequote?.delete;
     // const canEdit = role === "owner" || permission?.materialwithlabourratequote?.edit;
 
 
-    const defaultFieldValues = [{ key: "", type: "string", required: false }, { key: "Rs", type: "number", required: false }, { key: "", type: "", required: false },]
+    // const defaultFieldValues = [{ key: "", type: "string", required: false }, { key: "Rs", type: "number", required: false }, { key: "", type: "", required: false },]
 
-    const [categoryName, setCategoryName] = useState("");
-    const [fields, setFields] = useState(defaultFieldValues);
-    const [showCreateForm, setShowCreateForm] = useState(false);
+    // const [categoryName, setCategoryName] = useState("");
+    // const [fields, setFields] = useState(defaultFieldValues);
+    // const [showCreateForm, setShowCreateForm] = useState(false);
 
-    const { data: categories, isLoading, refetch } = useGetMaterialWithLabourRateConfigCategories(organizationId!);
-    const { mutateAsync: createCategory, isPending: createPending } = useCreateMaterialWithLabourRateConfigCategory();
-    const { mutateAsync: deleteCategory, isPending } = useDeleteMaterialWithLabourRateConfigCategory();
+    const { data: categories } = useGetMaterialWithLabourRateConfigCategories(organizationId!);
+    // console.log("categories", categories)
+    const firstCategory = categories?.[0]?._id || null
+    // console.log("firstCategory", firstCategory)
 
-    const handleAddField = () => {
-        setFields([...fields, { key: "", type: "string", required: false }]);
-    };
+    // const { mutateAsync: createCategory, isPending: createPending } = useCreateMaterialWithLabourRateConfigCategory();
+    // const { mutateAsync: deleteCategory, isPending } = useDeleteMaterialWithLabourRateConfigCategory();
 
-    const handleFieldChange = (
-        index: number,
-        field: keyof typeof fields[number],
-        value: any
-    ) => {
-        const updated: any = [...fields];
-        updated[index][field] = value;
-        setFields(updated);
-    };
+    // const handleAddField = () => {
+    //     setFields([...fields, { key: "", type: "string", required: false }]);
+    // };
 
-    const handleCreate = async () => {
-        try {
-            if (!organizationId || !categoryName || fields.length === 0) {
-                return toast({
-                    title: "Error",
-                    description: "Category name and fields are required",
-                    variant: "destructive",
-                });
-            }
+    // const handleFieldChange = (
+    //     index: number,
+    //     field: keyof typeof fields[number],
+    //     value: any
+    // ) => {
+    //     const updated: any = [...fields];
+    //     updated[index][field] = value;
+    //     setFields(updated);
+    // };
 
-            const validFields = fields.filter((f) => f.key.trim() !== "");
-            if (validFields.length === 0) {
-                return toast({
-                    title: "Error",
-                    description: "Please enter valid field keys",
-                    variant: "destructive",
-                });
-            }
+    // const handleCreate = async () => {
+    //     try {
+    //         if (!organizationId || !categoryName || fields.length === 0) {
+    //             return toast({
+    //                 title: "Error",
+    //                 description: "Category name and fields are required",
+    //                 variant: "destructive",
+    //             });
+    //         }
 
-
-            await createCategory({
-                organizationId,
-                name: categoryName,
-                fields: validFields,
-            });
+    //         const validFields = fields.filter((f) => f.key.trim() !== "");
+    //         if (validFields.length === 0) {
+    //             return toast({
+    //                 title: "Error",
+    //                 description: "Please enter valid field keys",
+    //                 variant: "destructive",
+    //             });
+    //         }
 
 
-            // await createCategory({
-            //     organizationId: organizationId!,
-            //     name: categoryName,
-            //     fields: fields,
-            // });
-
-            setCategoryName("");
-            setFields([{ key: "", type: "string", required: false }]);
-            setShowCreateForm(false);
-            refetch()
-            toast({ title: "Success", description: "Category Created Successfully" });
-        }
-        catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "failed to create category", variant: "destructive" });
-        }
-    };
+    //         await createCategory({
+    //             organizationId,
+    //             name: categoryName,
+    //             fields: validFields,
+    //         });
 
 
+    //         // await createCategory({
+    //         //     organizationId: organizationId!,
+    //         //     name: categoryName,
+    //         //     fields: fields,
+    //         // });
 
-    const handleDelete = (categoryId: string) => {
-        try {
-            deleteCategory({
-                categoryId: categoryId,
-                organizationId: organizationId!,
-            })
-            refetch()
-            toast({ title: "Success", description: "Category Deleted Successfully" });
-
-        }
-        catch (error: any) {
-            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete category", variant: "destructive" });
-        }
-    }
+    //         setCategoryName("");
+    //         setFields([{ key: "", type: "string", required: false }]);
+    //         setShowCreateForm(false);
+    //         refetch()
+    //         toast({ title: "Success", description: "Category Created Successfully" });
+    //     }
+    //     catch (error: any) {
+    //         toast({ title: "Error", description: error?.response?.data?.message || error?.message || "failed to create category", variant: "destructive" });
+    //     }
+    // };
 
 
 
-    const handleClose = (val: boolean) => {
-        setFields(defaultFieldValues)
-        setShowCreateForm(val)
-    }
+    // const handleDelete = (categoryId: string) => {
+    //     try {
+    //         deleteCategory({
+    //             categoryId: categoryId,
+    //             organizationId: organizationId!,
+    //         })
+    //         refetch()
+    //         toast({ title: "Success", description: "Category Deleted Successfully" });
 
-    if (isChildRoute) return <Outlet />;
+    //     }
+    //     catch (error: any) {
+    //         toast({ title: "Error", description: error?.response?.data?.message || error?.message || "failed to delete category", variant: "destructive" });
+    //     }
+    // }
+
+
+
+    // const handleClose = (val: boolean) => {
+    //     setFields(defaultFieldValues)
+    //     setShowCreateForm(val)
+    // }
+
+    // if (isChildRoute) return <Outlet />;
 
     return (
         <div className="space-y-6 max-h-full overflow-y-auto ">
@@ -142,10 +149,9 @@ export default function MaterialWithLabourRateMain() {
                         <Button onClick={handleCreate} isLoading={createPending}>Create New Category</Button>
                     </div>} */}
 
-                    {canCreate && <div>
+                    {/* {canCreate && <div>
                         <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button>
-                        {/* <Button onClick={handleCreate} isLoading={createPending}>Create New Category</Button> */}
-                    </div>}
+                    </div>} */}
 
                     <div className="w-full sm:w-auto flex justify-end sm:block">
                         <StageGuide
@@ -159,7 +165,7 @@ export default function MaterialWithLabourRateMain() {
             </header>
 
             {/* Create Modal */}
-            <Dialog open={showCreateForm} onOpenChange={handleClose}>
+            {/* <Dialog open={showCreateForm} onOpenChange={handleClose}>
                 <DialogContent className="px-5 py-6">
                     <DialogHeader className="px-0 py-0">
                         <DialogTitle>Create New Category</DialogTitle>
@@ -195,7 +201,6 @@ export default function MaterialWithLabourRateMain() {
                                     >
                                         <option value="string">text</option>
                                         <option value="number">number</option>
-                                        {/* <option value="boolean">boolean</option> */}
                                     </select>
                                 </div>
                             ))}
@@ -209,21 +214,19 @@ export default function MaterialWithLabourRateMain() {
                         </div>
                     </div>
                 </DialogContent>
-            </Dialog>
+            </Dialog> */}
 
-
+            {/* 
             {!isLoading && categories?.length === 0 && (
                 <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
                     <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
                     <h3 className="text-lg font-semibold text-blue-800 mb-1">No Category Configuration Found</h3>
                     <p className="text-sm text-gray-500">
                         Looks like there are no Labour and Material Rate Configuration yet for this organization.<br />
-                        {/* <Button onClick={handleCreate} isLoading={createPending} className="mx-4 my-2">Create New Category</Button> */}
                         <Button onClick={()=> setShowCreateForm(true)} isLoading={createPending} className="mx-4 my-2">Create New Category</Button>
                     </p>
                 </div>)}
 
-            {/* Category Cards Section */}
             {isLoading && <MaterialOverviewLoading />}
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
@@ -266,12 +269,12 @@ export default function MaterialWithLabourRateMain() {
                             </div>
                         </CardContent>
                     </Card>
-                ))}
+                ))} */}
 
-                {/* {(canList && categories?.length > 0) && (
-                <LabourRateConfigSingle />
-            )} */}
-            </div>
+            {(canList && firstCategory) && (
+                <MaterialWithLabourSingle categoryId={firstCategory} />
+            )}
         </div>
+
     );
 }

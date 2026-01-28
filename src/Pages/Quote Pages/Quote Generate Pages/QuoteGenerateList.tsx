@@ -58,7 +58,7 @@ const QuoteGenerateList: React.FC<Props> = ({
 
 
 
-    const quotes = allQuotes?.filter((quote: any) => quote.furnitures.length)
+    const quotes = allQuotes?.filter((quote: any) => quote.mainQuote === null)
 
     const clearFilters = () => {
         setFilters({
@@ -71,8 +71,7 @@ const QuoteGenerateList: React.FC<Props> = ({
 
 
     return (
-        <div>
-            <main className="flex gap-2 !max-h-[80vh]">
+            <main className="flex gap-2 h-full !max-h-[92%] ">
 
                 <div className="xl:w-80 flex-shrink-0">
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
@@ -136,7 +135,7 @@ const QuoteGenerateList: React.FC<Props> = ({
                     </div>
                 </div>
 
-                {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
+                {canList && <section className="w-full !max-h-full gap-2 overflow-y-auto h-full">
 
                     {isLoading ? (
                         <MaterialOverviewLoading />
@@ -172,7 +171,6 @@ const QuoteGenerateList: React.FC<Props> = ({
                 </section>}
 
             </main>
-        </div>
     )
 }
 

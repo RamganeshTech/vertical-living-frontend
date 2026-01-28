@@ -86,7 +86,7 @@ const QuoteClientCard: React.FC<Props> = ({ quote, canDelete }) => {
                     <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => navigate(`single/${quote._id}`)}
+                        onClick={() => navigate(`single/${quote._id}/${quote?.quoteType}`)}
                     >
                         <i className="fas fa-eye mr-1" /> View
                     </Button>

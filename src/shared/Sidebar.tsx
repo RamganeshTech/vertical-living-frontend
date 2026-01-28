@@ -253,16 +253,28 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
         <>
             {showSideBar ?
                 <aside onMouseLeave={() => setShowSideBar(false)} className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
+
+                    {/* --- STATIC HEADER SECTION (Won't Scroll) --- */}
+                    <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b border-[#3a3b45] px-2 py-2 bg-[#2f303a] z-10`}>
+                        <span className='text-xl font-bold truncate pr-2'>
+                            {isProjectDetailRoute ? (projectName || "Project") : COMPANY_DETAILS.COMPANY_NAME}
+                        </span>
+                        <div className='w-[30px] h-[30px] flex-shrink-0'>
+                            <img className='w-full h-full object-contain' src={COMPANY_DETAILS.COMPANY_LOGO} alt="LOGO" />
+                        </div>
+                    </div>
                     <div className="flex flex-col flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar p-2 large-scrollbar">
+
+                        {/*                         
                         <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b-1 py-2`}>
                             <span className='text-xl'>{isProjectDetailRoute ? (projectName || "Project") : COMPANY_DETAILS.COMPANY_NAME}</span>
                             <div className='w-[30px] h-[30px]' >
                                 <img className='w-full h-full' src={COMPANY_DETAILS.COMPANY_LOGO} alt="LOGO" />
                             </div>
 
-                        </div>
+                        </div> */}
 
-                        <section className="py-2 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
+                        <section className="py-0 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
                             {Object.entries(labels).map(([key, value]) => {
                                 const isActive = activeSidebar === value;
 
@@ -326,7 +338,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                                     isActive={false}
                                 />
                             )}
-                       
+
                             {showTickets && (
                                 <TicketOperationIcon
                                     isExpanded={false}
@@ -341,7 +353,14 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                 </aside>
                 :
                 <aside onMouseEnter={() => setShowSideBar(true)} className="flex flex-col relative justify-between bg-[#2f303a] w-[6%]  max-h-full  text-[#9ca3af] transition-all duration-300 ">
-                    <div className='max-h-[95%] overflow-y-auto overflow-x-hidden custom-scrollbar '>
+                    {/* --- STATIC LOGO FOR COLLAPSED STATE --- */}
+                    <div onClick={handleNav} className="flex justify-center items-center border-b border-[#3a3b45] pt-2 bg-[#2f303a] z-10 cursor-pointer">
+                        <div className='w-[30px] h-[30px]'>
+                            <img className='w-full h-full object-contain' src={COMPANY_DETAILS.COMPANY_LOGO} alt="LOGO" />
+                        </div>
+                    </div>
+                    {/* <div className='max-h-[95%] overflow-y-auto overflow-x-hidden custom-scrollbar '> */}
+                    <div className='flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar py-4'>
                         <div className='flex items-center flex-col justify-between w-full'>
 
                             {/* <SidebarIcons path icons={icons} activeSidebar={activeSidebar} setActiveSidebar={setActiveSidebar} /> */}

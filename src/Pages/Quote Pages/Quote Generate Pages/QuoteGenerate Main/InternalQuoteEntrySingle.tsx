@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import {
     // useCreateMaterialQuote,
-    useEditMaterialQuote, useGetSingleInternalResidentialVersion
+    useEditMaterialQuote, useGetSingleInternalResidentialVersion,
+    useUpdateInternalMainQuote
 } from '../../../../apiList/Quote Api/Internal_Quote_Api/internalquoteApi';
 import type { CoreMaterialRow, FurnitureBlock, SimpleItemRow } from './FurnitureForm';
 import { useGetLabourRateConfigCategories, useGetSingleLabourCost } from '../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi';
@@ -12,19 +13,63 @@ import { filterValidSimpleRows } from './InternalQuoteEntry';
 import { toast } from '../../../../utils/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import MaterialOverviewLoading from '../../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
-
-
+import CreateQuoteModal from './InternalQuote_New_Version/CreateQuoteModal';
+import { useGetProjects } from '../../../../apiList/projectApi';
+import SqftRateInternalWork from './SqftRateInternalwork';
+import { useDebounce } from '../../../../Hooks/useDebounce';
 
 const InternalQuoteEntrySingle = () => {
-
     const navigate = useNavigate()
     const { organizationId, id, quoteType } = useParams() as { organizationId: string, id: string, quoteType: string }
 
-    const { data, isLoading } = useGetSingleInternalResidentialVersion({ organizationId, id })
+    const { data, isLoading, refetch } = useGetSingleInternalResidentialVersion({ organizationId, id })
+
+    const [isMainModalOpen, setMainModalOpen] = useState(false);
+
+    const { data: projectData = [] } = useGetProjects(organizationId);
+
+    const updateMutation = useUpdateInternalMainQuote();
+    const [formData, setFormData] = useState<{
+        mainQuoteName: string;
+        quoteCategory: string;
+        quoteType: string
+        projectId: string | null;
+    }>({
+        mainQuoteName: '',
+        quoteCategory: 'residential',
+        quoteType: 'basic',
+        projectId: ''
+    });
+
+    const handleUpdateSubmit = async () => {
+        console.log("Submitting Form Data:", formData); // CHECK THIS LOG
+        if (!formData.mainQuoteName || !formData.projectId || !formData.quoteCategory) {
+            return toast({ title: "Error", description: "Please fill all fields", variant: "destructive" });
+        }
+        try {
+            console.log("Calling API..."); // IF YOU DON'T SEE THIS, VALIDATION FAILED
+            await updateMutation.mutateAsync({
+                organizationId: organizationId,
+                id: id,
+                projectId: formData.projectId,
+                mainQuoteName: formData.mainQuoteName,
+                quoteCategory: formData.quoteCategory,
+                quoteType: formData.quoteType
+            });
+            // if(res?.ok){
+            setMainModalOpen(false);
+            // }
+            toast({ title: "Success", description: "Updated successfully" });
+            refetch()
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" });
+        }
+    };
+
 
     useEffect(() => {
-
-        if (quoteType === "null" || quoteType === null || quoteType === "residential" || quoteType === "basic") {
+        // if (quoteType === "null" || quoteType === null || quoteType === "residential" || quoteType === "basic") {
+        if (quoteType === "basic") {
             //   if(data?.furnitures) setFurnitures(data?.furnitures)
 
             if (data?.furnitures && Array.isArray(data.furnitures)) {
@@ -75,22 +120,9 @@ const InternalQuoteEntrySingle = () => {
 
 
 
-    //  // Helper to calculate total rows across all products
-    // const getTotalRowCount = () => {
-    //     return furnitures.reduce((acc, f) => {
-    //         return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
-    //     }, 0);
-    // };
-
-
-
     const [furnitures, setFurnitures] = useState<FurnitureBlock[]>([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [tempFurnitureName, setTempFurnitureName] = useState("");
-    // const [editingId, setIsEditingId] = useState<string | null>(null)
-
-    // const [quoteType, setQuoteType] = useState<"single" | "residential" | null>(null)
-    // const [editQuoteNo, setEditQuoteNo] = useState<string | null>(null)
 
 
 
@@ -157,11 +189,6 @@ const InternalQuoteEntrySingle = () => {
     const removeCommonItem = (index: number) => {
         setCommonMaterials(prev => prev.filter((_, i) => i !== index));
     };
-
-
-
-
-
 
 
 
@@ -239,9 +266,6 @@ const InternalQuoteEntrySingle = () => {
         </div>
     );
 
-
-
-
     const { role, permission } = useAuthCheck();
     // const canList = role === "owner" || permission?.internalquote?.list;
     const canCreate = role === "owner" || permission?.internalquote?.create;
@@ -270,14 +294,6 @@ const InternalQuoteEntrySingle = () => {
     }, [allLabourCategory]); // Runs when the list is fetched
 
 
-    // // Helper to calculate total rows across all products
-    // const getTotalRowCount = () => {
-    //     return furnitures.reduce((acc, f) => {
-    //         return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
-    //     }, 0);
-    // };
-
-
 
     //  used when  we chagne the global transportationa and the global profit percentage
 
@@ -298,9 +314,6 @@ const InternalQuoteEntrySingle = () => {
             const effectiveProfitPercent = (globalProfitPercent !== null && globalProfitPercent !== undefined)
                 ? globalProfitPercent
                 : (f.furnitureProfit || 0);
-
-
-
 
             // const effectiveProfitPercent = globalProfitPercent > 0
             //     ? globalProfitPercent
@@ -513,12 +526,12 @@ const InternalQuoteEntrySingle = () => {
     //     }
     // };
 
-    const handleEditSubmit = async () => {
+    const handleEditSubmit = async (isManualSave: boolean = true) => {
         try {
-            if (!data.projectId) {
-                toast({ title: "Error", description: "Please select a project", variant: "destructive" });
-                return;
-            }
+            // if (!data?.projectId) {
+            //     toast({ title: "Error", description: "Please select a project", variant: "destructive" });
+            //     return;
+            // }
 
             const formData = new FormData();
 
@@ -579,7 +592,10 @@ const InternalQuoteEntrySingle = () => {
                 id: id,
             });
 
-            toast({ title: "Updated!", description: "Quote edited successfully." });
+            if (isManualSave) {
+                toast({ title: "Updated!", description: "Quote edited successfully." });
+            }
+
             // setFurnitures([])
             // setQuoteType(null)
             // setIsEditingId(null);
@@ -589,6 +605,42 @@ const InternalQuoteEntrySingle = () => {
             toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to Update the Quote", variant: "destructive" });
         }
     };
+
+
+
+
+
+    // 1. Wrap the changing data in your custom useDebounce hook
+    // We watch furnitures, commonMaterials, and global overheads
+    const debouncedFurnitures = useDebounce(furnitures, 700); // 2 second delay
+    const debouncedCommonMaterials = useDebounce(commonMaterials, 700);
+    const debouncedGlobalTransportation = useDebounce(globalTransportation, 700);
+    const debouncedGlobalProfit = useDebounce(globalProfitPercent, 700);
+    const debouncedCommonProfit = useDebounce(commonProfitOverride, 700);
+
+    // 2. Create the Auto-Save Effect
+    useEffect(() => {
+        // Only auto-save for this specific type
+        // if (quoteType !== "sqft_rate") return;
+
+        // // Prevent saving if the initial data is still loading or if array is empty (optional check)
+        if (!data?.projectId || furnitures.length === 0) return;
+
+        const triggerAutoSave = async () => {
+            console.log("Auto-saving quote...");
+            await handleEditSubmit(false);
+        };
+
+        triggerAutoSave();
+
+        // The effect runs when debounced values stabilize
+    }, [
+        debouncedFurnitures,
+        debouncedCommonMaterials,
+        debouncedGlobalTransportation,
+        debouncedGlobalProfit,
+        debouncedCommonProfit
+    ]);
 
 
 
@@ -608,6 +660,15 @@ const InternalQuoteEntrySingle = () => {
 
     const handleRemoveFurniture = (indexToRemove: number) => {
         setFurnitures((prev) => prev.filter((_, i) => i !== indexToRemove));
+    };
+
+
+    const handleDuplicateFurniture = (index: number) => {
+        const furnitureToCopy = JSON.parse(JSON.stringify(furnitures[index])); // Deep clone the product
+        const updatedArr = [...furnitures];
+        // Insert the copy immediately after the original
+        updatedArr.splice(index + 1, 0, furnitureToCopy);
+        setFurnitures(updatedArr);
     };
 
 
@@ -639,268 +700,363 @@ const InternalQuoteEntrySingle = () => {
 
 
     return (
-        <div className='max-h-full overflow-y-auto'>
-
-            <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 py-1 border-b-1 border-[#818283]">
+        <>
 
 
 
-                <div className="flex gap-3 items-center">
+
+            {data?.quoteType === "sqft_rate" ? (
+                <SqftRateInternalWork
+                    data={data}
+                    id={id}
+                    organizationId={organizationId}
+                    projectData={projectData}
+                />
+            )
+                :
+                (
+
+                    <div className='max-h-full overflow-y-auto'>
+
+
+                        <header className="flex sticky top-0 z-50 !bg-white flex-col md:flex-row md:items-center md:justify-between gap-4 py-1 border-b-1 border-[#818283]">
 
 
 
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="bg-gray-50 cursor-pointer hover:bg-gray-100 shadow-sm flex items-center justify-center w-10 h-10 border border-gray-200 text-gray-600 rounded-lg transition-all"
-                    >
-                        <i className="fas fa-arrow-left" />
-                    </button>
-
-
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-file mr-3 text-blue-600" />
-                        {data.mainQuoteName || "Internal Quote"}
-                    </h1>
-                </div>
-
-                <div className="flex items-center justify-between gap-6">
-
-                    {furnitures?.length > 0 && (
-                        <div className="flex items-center gap-10">
-
-                            {/* Labour Cost */}
-                            <div>
-                                <p className="text-xs text-gray-500 tracking-wide">
-                                    Single Labour Cost
-                                </p>
-                                <p className="text-[15px] font-semibold text-gray-900">
-                                    ₹{labourCost?.toLocaleString("en-IN")}
-                                </p>
-                            </div>
-
-                            {/* Divider */}
-                            <div className="h-8 w-px bg-gray-300" />
-
-                            {/* Grand Total */}
-                            <div className="text-right">
-                                <p className="text-xs text-gray-500 uppercase tracking-widest">
-                                    Grand Total
-                                </p>
-                                <p className="text-xl font-bold text-green-600">
-                                    ₹{grandTotal?.toLocaleString("en-IN")}
-                                </p>
-                            </div>
-
-                        </div>
-                    )}
-
-                    {canCreate && (
-                        <Button
-                            className="flex items-center"
-                            onClick={() => setModalOpen(true)}
-                        >
-                            <i className="fas fa-add mr-1" />
-                            Create Product
-                        </Button>
-                    )}
-                </div>
-
-            </header>
+                            {/* <div className="flex gap-3 items-center">
 
 
 
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
-                    <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md relative animate-scaleIn">
-                        <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Quote</h3>
+                                <button
+                                    onClick={() => navigate(-1)}
+                                    className="bg-gray-50 cursor-pointer hover:bg-gray-100 shadow-sm flex items-center justify-center w-10 h-10 border border-gray-200 text-gray-600 rounded-lg transition-all"
+                                >
+                                    <i className="fas fa-arrow-left" />
+                                </button>
 
-                        <input
-                            className="w-full border border-gray-300 rounded px-3 py-2 mb-4 outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="Enter Product Name"
-                            value={tempFurnitureName}
-                            autoFocus
-                            onChange={(e) => setTempFurnitureName(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    if (!tempFurnitureName.trim()) return;
-                                    addFurniture(tempFurnitureName);
-                                    setTempFurnitureName("");
-                                    setModalOpen(false);
-                                }
-                            }}
-                        />
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-blue-50 p-2 rounded-lg hidden sm:block">
+                                        <i className="fas fa-file-invoice text-blue-600 text-xl" />
+                                    </div>
+                                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+                                        {data.mainQuoteName || "Internal Quote"}
+                                    </h1>
 
-                        <div className="flex justify-end gap-3 mt-4">
-                            <Button variant="secondary" onClick={() => setModalOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button
-                                onClick={() => {
-                                    if (!tempFurnitureName.trim()) return;
-                                    addFurniture(tempFurnitureName);
-                                    setTempFurnitureName("");
-                                    setModalOpen(false);
-                                }}
-                            >
-                                Create
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                                    <Button
+                                        onClick={() => {
+                                            setFormData(() => {
+                                                return {
+                                                    mainQuoteName: data?.mainQuoteName,
+                                                    quoteCategory: data?.quoteCategory,
+                                                    quoteType: data?.quoteType,
+                                                    projectId: data?.projectId
+                                                }
+                                            })
+
+                                            setMainModalOpen(true)
+                                        }
+                                        }
+                                        size='sm'
+                                        className="flex items-center gap-2 font-bold uppercase tracking-widest shadow-sm"
+                                    >
+                                        <i className="fas fa-pen-to-square" />
+                                        Edit
+                                    </Button>
+                                </div>
+                            </div> */}
 
 
+                            <div className="flex items-center gap-4">
+                                <button onClick={() => navigate(-1)} className="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors">
+                                    <i className="fas fa-arrow-left" />
+                                </button>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h1 className="text-2xl font-black text-slate-900">{data?.mainQuoteName}</h1>
+                                        <button
+                                            onClick={() => {
+                                                setFormData(() => {
+                                                    return {
+                                                        mainQuoteName: data?.mainQuoteName,
+                                                        quoteCategory: data?.quoteCategory,
+                                                        quoteType: data?.quoteType,
+                                                        projectId: data?.projectId
+                                                    }
+                                                })
+                                                setMainModalOpen(true)
+                                            }
+                                            }
+                                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+                                            <i className="fas fa-edit text-sm" />
+                                        </button>
+                                    </div>
+                                    <div>
 
-            {furnitures?.length === 0 &&
-                <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
-                    <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
-                    {/* <h3 className="text-lg font-semibold text-blue-800 mb-1">Create</h3> */}
-                    <p className="text-sm text-gray-500">
-                        Cick on the Create button to start creating the quote<br />
-                        <Button onClick={() => setModalOpen(true)} className="mx-4 my-2">
-
-                            <i className='fas fa-plus mr-1 '></i>
-                            Create Product</Button>
-                    </p>
-                </div>
-            }
-
-            {/* s.dflskdjkl */}
-            {furnitures?.length > 0 && <section className="shadow overflow-y-auto max-h-[86%]">
-                {/* {!editingId && <h1 className="text-2xl text-gray-500">
-                     {handleQuoteName()} 
-                </h1>} */}
-                {furnitures?.map((furniture, index) => (
-                    <FurnitureForm
-                        key={index}
-                        index={index}
-                        labourCost={labourCost}
-                        data={furniture}
-                        updateFurniture={(updated) => {
-                            const updatedArr = [...furnitures];
-                            updatedArr[index] = updated;
-                            setFurnitures(updatedArr);
-                        }}
-                        removeFurniture={() => handleRemoveFurniture(index)}
-                        // isEditing={!!editingId}   // ✅ pass editing mode
-                        isEditing={true}   // ✅ pass editing mode
-
-                    />
-                ))}
-            </section>}
-
-            {/* --- COMMON FITTINGS & MATERIALS SECTION --- */}
-            {furnitures.length > 0 && (
-                <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mt-8 mb-6 shadow-inner">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                            <i className="fas fa-boxes mr-3 text-orange-500" />
-                            General/Common Site Materials - Total: ₹{commonMaterials.reduce((s, i) => s + (i.rowTotal || 0), 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                        </h2>
-
-                        {/* ✅ NEW: Profit Override Input for Common Materials */}
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-lg border border-orange-100 shadow-sm">
-                                <label className="text-[11px] font-bold text-orange-600 uppercase tracking-tight">
-                                    Common Profit Overlay
-                                </label>
-                                <div className="flex items-center">
-                                    <input
-                                        type="number"
-                                        className="w-12 text-right font-bold bg-transparent outline-none text-orange-800"
-                                        // Show manual override if exists, else show global
-                                        value={commonProfitOverride ?? globalProfitPercent}
-                                        placeholder="0"
-                                        onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }}
-                                        onChange={(e) => {
-                                            const val = e.target.value === "" ? 0 : parseFloat(e.target.value);
-                                            handleCommonProfitOverride(val);
-                                        }}
-                                    />
-                                    <span className="text-orange-600 font-bold ml-1 text-sm">%</span>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">{data?.projectId?.projectName || "Project"}</p>
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Basic Quote • {data?.quoteNo}</p>
                                 </div>
                             </div>
 
-                            <div className="text-right text-xl text-green-700 font-bold">
-                                Total: ₹{commonMaterials.reduce((s, i) => s + (i.rowTotal || 0), 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                            <div className="flex items-center justify-between gap-6">
+
+
+
+                                {editPending && (
+                                    <span className="text-[10px] text-blue-500 animate-pulse font-bold uppercase">
+                                        <i className="fas fa-sync fa-spin mr-1" /> Auto-saving...
+                                    </span>
+                                )}
+                                {!editPending && (
+                                    <span className="text-[10px] text-gray-400 font-bold uppercase">
+                                        <i className="fas fa-check-circle mr-1" /> All changes saved
+                                    </span>
+                                )}
+
+                                {furnitures?.length > 0 && (
+                                    <div className="flex items-center gap-10">
+
+                                        {/* Labour Cost */}
+                                        <div>
+                                            <p className="text-xs text-gray-500 tracking-wide">
+                                                Single Labour Cost
+                                            </p>
+                                            <p className="text-[15px] font-semibold text-gray-900">
+                                                ₹{labourCost?.toLocaleString("en-IN")}
+                                            </p>
+                                        </div>
+
+                                        {/* Divider */}
+                                        <div className="h-8 w-px bg-gray-300" />
+
+                                        {/* Grand Total */}
+                                        <div className="text-right">
+                                            <p className="text-xs text-gray-500 uppercase tracking-widest">
+                                                Grand Total
+                                            </p>
+                                            <p className="text-xl font-bold text-green-600">
+                                                ₹{grandTotal?.toLocaleString("en-IN")}
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                )}
+
+                                {canCreate && (
+                                    <Button
+                                        className="flex items-center"
+                                        onClick={() => setModalOpen(true)}
+                                    >
+                                        <i className="fas fa-add mr-1" />
+                                        Create Product
+                                    </Button>
+                                )}
                             </div>
-                        </div>
-                    </div>
+
+                        </header>
 
 
-                    {rendercommonMaterialsTable()}
+                        {isModalOpen && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
+                                <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md relative animate-scaleIn">
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Quote</h3>
 
-                    <div className="mt-3 text-right">
-                        <Button onClick={() => setCommonMaterials([...commonMaterials, emptySimpleItem()])} variant="secondary" size="sm">
-                            + Add Common Item
-                        </Button>
-                    </div>
-                </div>
+                                    <input
+                                        className="w-full border border-gray-300 rounded px-3 py-2 mb-4 outline-none focus:ring-2 focus:ring-blue-400"
+                                        placeholder="Enter Product Name"
+                                        value={tempFurnitureName}
+                                        autoFocus
+                                        onChange={(e) => setTempFurnitureName(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                if (!tempFurnitureName.trim()) return;
+                                                addFurniture(tempFurnitureName);
+                                                setTempFurnitureName("");
+                                                setModalOpen(false);
+                                            }
+                                        }}
+                                    />
+
+                                    <div className="flex justify-end gap-3 mt-4">
+                                        <Button variant="secondary" onClick={() => setModalOpen(false)}>
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            onClick={() => {
+                                                if (!tempFurnitureName.trim()) return;
+                                                addFurniture(tempFurnitureName);
+                                                setTempFurnitureName("");
+                                                setModalOpen(false);
+                                            }}
+                                        >
+                                            Create
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+
+
+                        {furnitures?.length === 0 &&
+                            <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
+                                <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
+                                {/* <h3 className="text-lg font-semibold text-blue-800 mb-1">Create</h3> */}
+                                <p className="text-sm text-gray-500">
+                                    Cick on the Create button to start creating the quote<br />
+                                    <Button onClick={() => setModalOpen(true)} className="mx-4 my-2">
+
+                                        <i className='fas fa-plus mr-1 '></i>
+                                        Create Product</Button>
+                                </p>
+                            </div>
+                        }
+
+                        {furnitures?.length > 0 && <section className="shadow overflow-y-auto max-h-[86%]">
+
+                            {furnitures?.map((furniture, index) => (
+                                <FurnitureForm
+                                    key={index}
+                                    index={index}
+                                    labourCost={labourCost}
+                                    data={furniture}
+                                    duplicateFurniture={() => handleDuplicateFurniture(index)} // Pass the function
+                                    updateFurniture={(updated) => {
+                                        const updatedArr = [...furnitures];
+                                        updatedArr[index] = { ...updated };
+                                        setFurnitures(updatedArr);
+                                    }}
+                                    removeFurniture={() => handleRemoveFurniture(index)}
+                                    isEditing={true}   // ✅ pass editing mode
+
+                                />
+                            ))}
+                        </section>}
+
+                        {/* --- COMMON FITTINGS & MATERIALS SECTION --- */}
+                        {furnitures.length > 0 && (
+                            <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mt-8 mb-6 shadow-inner">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                                        <i className="fas fa-boxes mr-3 text-orange-500" />
+                                        General/Common Site Materials - Total: ₹{commonMaterials.reduce((s, i) => s + (i.rowTotal || 0), 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                                    </h2>
+
+                                    {/* ✅ NEW: Profit Override Input for Common Materials */}
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-lg border border-orange-100 shadow-sm">
+                                            <label className="text-[11px] font-bold text-orange-600 uppercase tracking-tight">
+                                                Common Profit Overlay
+                                            </label>
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="number"
+                                                    className="w-12 text-right font-bold bg-transparent outline-none text-orange-800"
+                                                    // Show manual override if exists, else show global
+                                                    value={commonProfitOverride ?? globalProfitPercent}
+                                                    placeholder="0"
+                                                    onKeyDown={(e) => { if (e.key === '-' || e.key === 'e') e.preventDefault(); }}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                                                        handleCommonProfitOverride(val);
+                                                    }}
+                                                />
+                                                <span className="text-orange-600 font-bold ml-1 text-sm">%</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="text-right text-xl text-green-700 font-bold">
+                                            Total: ₹{commonMaterials.reduce((s, i) => s + (i.rowTotal || 0), 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                {rendercommonMaterialsTable()}
+
+                                <div className="mt-3 text-right">
+                                    <Button onClick={() => setCommonMaterials([...commonMaterials, emptySimpleItem()])} variant="secondary" size="sm">
+                                        + Add Common Item
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {furnitures.length !== 0 && <div className="flex items-center justify-between gap-4 bg-white border border-blue-100 p-3 rounded-xl shadow-sm">
+                            <div className="flex items-center gap-4" >
+                                <div className="flex flex-col">
+                                    <label className="text-[9px] font-extrabold text-blue-500 uppercase tracking-tighter">Transport Cost</label>
+                                    <div className="flex items-center">
+                                        <span className="text-gray-400 mr-1 text-sm">₹</span>
+                                        <input
+                                            type="number"
+                                            className="w-20 font-semibold focus:outline-none text-gray-800"
+                                            value={globalTransportation}
+                                            onChange={(e) => setGlobalTransportation(Math.max(0, Number(e.target.value)))}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="h-8 w-px bg-gray-100" />
+                                <div className="flex flex-col">
+                                    <label className="text-[9px] font-extrabold text-green-500 uppercase tracking-tighter">Global Profit Margin</label>
+                                    <div className="flex items-center">
+                                        <input
+                                            type="number"
+                                            className="w-12 text-right font-semibold focus:outline-none text-gray-800"
+                                            value={globalProfitPercent}
+                                            onChange={(e) => {
+                                                setGlobalProfitPercent(Math.max(0, Number(e.target.value)))
+                                                setCommonProfitOverride(Math.max(0, Number(e.target.value)));
+
+                                                setFurnitures(prev => prev.map(f => ({
+                                                    ...f,
+                                                    furnitureProfit: 0, // Reset product level
+                                                    coreMaterials: f.coreMaterials.map(r => ({ ...r, profitOnMaterial: 0, profitOnLabour: 0 })),
+                                                    fittingsAndAccessories: f.fittingsAndAccessories.map(i => ({ ...i, profitOnMaterial: 0 })),
+                                                    nonBrandMaterials: f.nonBrandMaterials.map(i => ({ ...i, profitOnMaterial: 0 }))
+                                                })));
+                                                setCommonMaterials(prev => prev.map(item => ({ ...item, profitOnMaterial: 0 })));
+
+                                            }}
+                                        />
+                                        <span className="text-gray-400 ml-1 text-sm">%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div className="mt-1 text-right flex gap-2 justify-end">
+                                {(canCreate || canEdit) && <Button
+                                    variant="primary"
+                                    isLoading={editPending}
+                                    // onClick={editingId ? handleEditSubmit : handleSubmit}
+                                    // onClick={true ? handleEditSubmit : handleSubmit}
+                                    onClick={() => handleEditSubmit(true)}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded"
+                                >
+                                    Save Quote
+                                </Button>
+                                }
+                            </div>
+                        </div>}
+
+
+                    </div >
+                )}
+
+            {/* MOVE THE MODAL TO THE END - OUTSIDE ALL CONDITIONS */}
+            {isMainModalOpen && (
+                <CreateQuoteModal
+                    isEditing={true}
+                    formData={formData}
+                    projectsData={projectData}
+                    setModalOpen={setMainModalOpen}
+                    setFormData={setFormData}
+                    handleSubmit={handleUpdateSubmit}
+                />
             )}
 
-            {furnitures.length !== 0 && <div className="flex items-center justify-between gap-4 bg-white border border-blue-100 p-3 rounded-xl shadow-sm">
-                <div className="flex items-center gap-4" >
-                    <div className="flex flex-col">
-                        <label className="text-[9px] font-extrabold text-blue-500 uppercase tracking-tighter">Transport Cost</label>
-                        <div className="flex items-center">
-                            <span className="text-gray-400 mr-1 text-sm">₹</span>
-                            <input
-                                type="number"
-                                className="w-20 font-semibold focus:outline-none text-gray-800"
-                                value={globalTransportation}
-                                onChange={(e) => setGlobalTransportation(Math.max(0, Number(e.target.value)))}
-                            />
-                        </div>
-                    </div>
-                    <div className="h-8 w-px bg-gray-100" />
-                    <div className="flex flex-col">
-                        <label className="text-[9px] font-extrabold text-green-500 uppercase tracking-tighter">Global Profit Margin</label>
-                        <div className="flex items-center">
-                            <input
-                                type="number"
-                                className="w-12 text-right font-semibold focus:outline-none text-gray-800"
-                                value={globalProfitPercent}
-                                onChange={(e) => {
-                                    setGlobalProfitPercent(Math.max(0, Number(e.target.value)))
-                                    setCommonProfitOverride(Math.max(0, Number(e.target.value)));
-
-                                    setFurnitures(prev => prev.map(f => ({
-                                        ...f,
-                                        furnitureProfit: 0, // Reset product level
-                                        coreMaterials: f.coreMaterials.map(r => ({ ...r, profitOnMaterial: 0, profitOnLabour: 0 })),
-                                        fittingsAndAccessories: f.fittingsAndAccessories.map(i => ({ ...i, profitOnMaterial: 0 })),
-                                        nonBrandMaterials: f.nonBrandMaterials.map(i => ({ ...i, profitOnMaterial: 0 }))
-                                    })));
-                                    setCommonMaterials(prev => prev.map(item => ({ ...item, profitOnMaterial: 0 })));
-
-                                }}
-                            />
-                            <span className="text-gray-400 ml-1 text-sm">%</span>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div className="mt-1 text-right flex gap-2 justify-end">
-                    {(canCreate || canEdit) && <Button
-                        variant="primary"
-                        isLoading={editPending}
-                        // onClick={editingId ? handleEditSubmit : handleSubmit}
-                        // onClick={true ? handleEditSubmit : handleSubmit}
-                        onClick={handleEditSubmit}
-                        className="px-6 py-2 bg-blue-600 text-white rounded"
-                    >
-                        Save Quote
-                    </Button>
-                    }
-                </div>
-            </div>}
-
-
-
-
-
-        </div>
+        </>
     )
 }
 

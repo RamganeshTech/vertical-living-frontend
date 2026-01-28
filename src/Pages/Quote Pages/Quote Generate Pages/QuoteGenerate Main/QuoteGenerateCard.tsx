@@ -7,6 +7,7 @@ import type { FurnitureBlock } from './FurnitureForm'
 import { dateFormate, formatTime } from './../../../../utils/dateFormator';
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck'
 import { useNavigate } from 'react-router-dom'
+import { useCopyInternalQuote } from '../../../../apiList/Quote Api/Internal_Quote_Api/internalquoteApi'
 
 
 type Props = {
@@ -32,11 +33,14 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
     const navigate = useNavigate()
     const { mutateAsync: deleteQuote, isPending } = useDeleteQuote();
 
+    // ✅ Initialize the Copy Mutation
+    const { mutateAsync: copyQuote, isPending: isCopying } = useCopyInternalQuote();
+
     const { role, permission } = useAuthCheck();
     // const canList = role === "owner" || permission?.internalquote?.list;
-    // const canCreate = role === "owner" || permission?.internalquote?.create;
+    const canCreate = role === "owner" || permission?.internalquote?.create;
     const canDelete = role === "owner" || permission?.internalquote?.delete;
-    // const canEdit = role === "owner" || permission?.internalquote?.edit;
+    const canEdit = role === "owner" || permission?.internalquote?.edit;
 
 
     const handleDelete = async (id: string) => {
@@ -63,6 +67,27 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
     };
 
 
+    // ✅ Handle the Copy Logic
+    const handleCopy = async (id: string) => {
+        try {
+            await copyQuote({
+                id: id,
+                organizationId: organizationId
+            });
+            toast({
+                title: "Success",
+                description: "Quote duplicated successfully",
+            });
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message ?? "Failed to copy quote",
+                variant: "destructive"
+            });
+        }
+    };
+
+
 
     return (
         <Card
@@ -74,7 +99,7 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
 
                         <div className='my-1'>
                             <h3 className="text-sm font-bold text-blue-700  ">
-                                Quote Name: <span className='text-black'>{quote?.mainQuoteName|| "Quote"}</span>
+                                Quote Name: <span className='text-black'>{quote?.mainQuoteName || "Quote"}</span>
                             </h3>
                             <p className="text-sm font-semibold text-blue-700  ">
                                 Project: <span className='text-black'>{quote?.projectId?.projectName || "Project"}</span>
@@ -96,9 +121,17 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
                                     <strong>Grand Total:</strong> ₹{quote.grandTotal.toLocaleString("en-IN")}
                                 </p> */}
 
-                <p className="text-sm text-gray-500 italic">
+                {quote?.furnitures?.length > 0 ? <p className="text-sm text-gray-500 italic">
                     <strong>Furnitures: </strong> {quote.furnitures?.length || 0}
                 </p>
+                    :
+                    (quote?.sqftRateWork?.length > 0 ? <p className="text-sm text-gray-500 italic">
+                        <strong>Works: </strong> {quote?.sqftRateWork?.length || 0}
+                    </p>
+                        : <div className='h-6'></div>
+                    )
+
+                }
 
                 <div className="flex justify-end gap-2 pt-2">
                     {/* <Button
@@ -108,59 +141,28 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
                     >
                         <i className="fas fa-eye mr-1" /> View
                     </Button> */}
+
+                    {/* ✅ Copy Button */}
+                    {(canEdit || canCreate) && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className=" text-blue-700  border-blue-200"
+                            isLoading={isCopying}
+                            onClick={() => handleCopy(quote._id)}
+                        >
+                            <i className="fas fa-copy mr-1" /> Copy
+                        </Button>
+                    )}
+
+
                     <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => { navigate(`single/${quote._id}/${quote.quoteCategory}`) }}
+                        onClick={() => { navigate(`single/${quote._id}/${quote?.quoteType}`) }}
 
-                    // onClick={() => {
-                    //     const { furnitures} = quote;
-
-                    //     const parsedFurniture = furnitures.map((f: any) => ({
-                    //         furnitureName: f.furnitureName,
-                    //         coreMaterials: f.coreMaterials.map((cm: any) => ({
-                    //             itemName: cm?.itemName || "",
-                    //             plywoodNos: cm?.plywoodNos || { quantity: 0, thickness: 0 },
-                    //             laminateNos: cm.laminateNos || { quantity: 0, thickness: 0 },
-                    //             carpenters: cm.carpenters || 0,
-                    //             days: cm.days || 0,
-                    //             profitOnMaterial: cm.profitOnMaterial || 0,
-                    //             profitOnLabour: cm.profitOnLabour || 0,
-                    //             rowTotal: cm.rowTotal || 0,
-                    //             remarks: cm.remarks || "",
-                    //             imageUrl: cm.imageUrl || "", // 🔁 PRESERVE image
-                    //             previewUrl: cm.imageUrl || "", // 🔁 preview if needed
-                    //         })),
-                    //         fittingsAndAccessories: f.fittingsAndAccessories || [],
-                    //         glues: f.glues || [],
-                    //         nonBrandMaterials: f.nonBrandMaterials || [],
-                    //         totals: {
-                    //             core: f.coreMaterialsTotal || 0,
-                    //             fittings: f.fittingsAndAccessoriesTotal || 0,
-                    //             glues: f.gluesTotal || 0,
-                    //             nbms: f.nonBrandMaterialsTotal || 0,
-                    //             furnitureTotal: f.furnitureTotal || 0,
-                    //         },
-                    //     }));
-                    //     console.log("parsedFurniture", parsedFurniture)
-                    //     setEditQuoteNo(quote?.quoteNo)
-                    //     setFurnitures(parsedFurniture)
-                    //     setIsEditingId(quote._id)
-                    //     setQuoteType(() => {
-                    //         if (quote?.furnitures?.length > 1) {
-                    //             return "residential"
-                    //         } else {
-                    //             return "single"
-                    //         }
-                    //     })
-
-                    //     setFiltersMain({
-                    //         projectId: quote.projectId._id,
-                    //         projectName: quote.projectId.projectName
-                    //     })
-                    // }}
                     >
-                        <i className="fas fa-eye mr-1" /> Edit
+                        <i className="fas fa-eye mr-1" /> View
                     </Button>
                     {canDelete && <Button
                         size="sm"

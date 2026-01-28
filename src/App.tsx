@@ -1206,7 +1206,7 @@ function App() {
 
 
               <Route
-                path="single/:quoteId"
+                path="single/:quoteId/:quoteType"
                 element={
 
                   <ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}

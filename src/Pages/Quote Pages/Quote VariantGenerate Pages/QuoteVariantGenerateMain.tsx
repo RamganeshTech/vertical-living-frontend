@@ -36,13 +36,16 @@ const QuoteGenerateVariantMain = () => {
     const projects = data?.map((project: AvailableProjetType) => ({ _id: project._id, projectName: project.projectName }))
     const navigate = useNavigate();
 
-    const { data: quotes, isLoading } = useGetMaterialQuoteEntries(organizationId!, {
+    const { data: allQuotes, isLoading } = useGetMaterialQuoteEntries(organizationId!, {
         createdAt: filters.createdAt,
         projectId: filters.projectId,
         quoteNo: searchTerm,
     });
 
 
+
+
+    const quotes = allQuotes?.filter((quote: any) => quote.mainQuote === null && quote?.sqftRateWork && quote?.sqftRateWork?.length === 0)
 
 
 

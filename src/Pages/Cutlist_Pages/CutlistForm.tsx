@@ -61,7 +61,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                 versionNo: initialData.versionNo || '1.0'
             });
             setRooms(initialData.rooms?.length ? initialData.rooms : [defaultRoom]);
-            setSummary(initialData.summary || summary);
+            setSummary(initialData?.summary || summary);
         }
     }, [initialData]);
 
@@ -69,9 +69,10 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
     const [summary, setSummary] = useState({
         fabricationRate: 0,
         unit: 'sqmm',
-        plywoodSheetSizeW: 2440,
-        plywoodSheetSizeH: 1220,
-        kerf: 0
+        plywoodSheetSizeW: 1220,
+        plywoodSheetSizeH: 2440,
+        kerf: 0,
+        materialSummary: []
     });
 
     const { data: projectsData = [] } = useGetProjects(organizationId);
@@ -191,6 +192,77 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
         }));
     };
 
+    // --- ADVANCED MATERIAL SUMMARY CALCULATOR ---
+    const calculatedMaterialSummary = useMemo(() => {
+
+        const sheetWidth = Number(summary.plywoodSheetSizeW) || 0;
+        const sheetHeight = Number(summary.plywoodSheetSizeH) || 0;
+
+
+        // const sheetWidth = summary.plywoodSheetSizeW || 0;
+
+        // const sheetHeight = summary.plywoodSheetSizeH || 0;
+        const kerf = Number(summary.kerf) || 0;
+
+        // Area of one full sheet in sqmm
+        const areaPerSheet = sheetWidth * sheetHeight;
+
+        if (areaPerSheet <= 0) return [];
+
+        // Grouping by thickness
+        const groups: Record<string, number> = {};
+
+        rooms.forEach(room => {
+            room.items.forEach((item: any) => {
+                const thickness = item.plyThickness;
+                if (!thickness) return;
+
+                // Parse "1990 x 720"
+                const parts = item.measurement?.toLowerCase().replace(/mm/gi, "").split(/[x*×]/);
+                if (parts?.length === 2) {
+                    const h = parseFloat(parts[0]) || 0;
+                    const w = parseFloat(parts[1]) || 0;
+
+
+                    if (!isNaN(h) && !isNaN(w) && h > 0 && w > 0) {
+                        const itemAreaWithWaste = (h + kerf) * (w + kerf);
+                        groups[thickness] = (groups[thickness] || 0) + itemAreaWithWaste;
+                    }
+
+                    // We add the kerf to each dimension to account for the material lost during cutting
+                    // const itemAreaWithWaste = (h + kerf) * (w + kerf);
+
+                    // if (!groups[thickness]) groups[thickness] = 0;
+                    // groups[thickness] += itemAreaWithWaste;
+                }
+            });
+        });
+
+        // Convert total area per thickness into number of sheets
+        return Object.entries(groups).map(([thickness, totalArea]) => {
+            // Math.ceil ensures we always round up to the next full sheet
+            const sheetsNeeded = Math.ceil(totalArea / areaPerSheet);
+            return {
+                thickness,
+                // sheetsNeeded: isFinite(sheetsNeeded) ? sheetsNeeded : 0 || 0
+                sheetsNeeded: sheetsNeeded
+            };
+        });
+    }, [rooms, summary.plywoodSheetSizeW, summary.plywoodSheetSizeH, summary.kerf]);
+
+    // 2. NEW: Sync the calculation into the 'summary' state automatically
+    // Sync calculation to state ONLY if valid items exist
+    useEffect(() => {
+        // Only update the state if the calculation has found at least one valid measurement
+        if (calculatedMaterialSummary && calculatedMaterialSummary.length > 0) {
+            setSummary((prev: any) => ({
+                ...prev,
+                materialSummary: calculatedMaterialSummary
+            }));
+        }
+    }, [calculatedMaterialSummary]);
+
+    
     return (
         <div className="bg-[#f4f6f9] max-h-full font-sans text-slate-900 w-full">
 
@@ -371,14 +443,30 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                             <tr className="bg-white">
                                                 <td rowSpan={2} className="border border-slate-300 p-3 text-center font-bold text-slate-400">{item.sNo}</td>
                                                 <td rowSpan={2} className="border border-slate-300 p-3">
-                                                    <input className="w-full p-2 bg-[#fffde7] border border-[#fbc02d] rounded-md font-bold text-slate-700 outline-none" value={item.measurement} onChange={(e) => {
-                                                        const n = [...rooms]; n[rIdx].items[iIdx].measurement = e.target.value; setRooms(n);
-                                                    }} />
+                                                    <input className="w-full p-2 bg-[#fffde7] border border-[#fbc02d] rounded-md font-bold text-slate-700 outline-none" value={item.measurement}
+                                                        onChange={(e) => {
+                                                            // const n = [...rooms]; n[rIdx].items[iIdx].measurement = e.target.value; setRooms(n);
+
+                                                            const value = e.target.value;
+                                                            const newRooms = [...rooms]; // 1. Copy rooms array
+                                                            newRooms[rIdx] = {
+                                                                ...newRooms[rIdx],
+                                                                items: [...newRooms[rIdx].items] // 2. Copy items array
+                                                            };
+                                                            newRooms[rIdx].items[iIdx] = {
+                                                                ...newRooms[rIdx].items[iIdx],
+                                                                measurement: value // 3. Update the specific value
+                                                            };
+                                                            setRooms(newRooms); // 4. This new reference triggers useMemo
+                                                        }} />
                                                 </td>
                                                 <td rowSpan={2} className="border border-slate-300 p-3 text-center">
-                                                    <input className="w-16 p-2 border border-slate-200 rounded-md text-center font-bold text-slate-600" value={item.plyThickness} onChange={(e) => {
-                                                        const n = [...rooms]; n[rIdx].items[iIdx].plyThickness = e.target.value; setRooms(n);
-                                                    }} />
+                                                    <input className="w-16 p-2 border border-slate-200 rounded-md text-center font-bold text-slate-600" value={item.plyThickness}
+                                                        onChange={(e) => {
+                                                            const n = [...rooms];
+                                                            n[rIdx].items[iIdx].plyThickness = e.target.value;
+                                                            setRooms(n);
+                                                        }} />
                                                 </td>
                                                 <td className="border border-slate-300 p-3 font-black text-[#2e7d32] bg-[#f1f8e9]/50 text-center uppercase">Inner</td>
                                                 <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.innerFace.laminateThickness} onChange={(e) => {
@@ -387,7 +475,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                                 <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.innerFace.laminateBrand} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].innerFace.laminateBrand = e.target.value; setRooms(n);
                                                 }} /></td>
-                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none italic text-slate-400" placeholder="Code" value={item.innerFace.laminateNameCode} onChange={(e) => {
+                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" placeholder="Code and Name" value={item.innerFace.laminateNameCode} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].innerFace.laminateNameCode = e.target.value; setRooms(n);
                                                 }} /></td>
 
@@ -409,7 +497,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                                 <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.outerFace.laminateBrand} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].outerFace.laminateBrand = e.target.value; setRooms(n);
                                                 }} /></td>
-                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none italic text-slate-400" placeholder="Code" value={item.outerFace.laminateNameCode} onChange={(e) => {
+                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" placeholder="Code and Name" value={item.outerFace.laminateNameCode} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].outerFace.laminateNameCode = e.target.value; setRooms(n);
                                                 }} /></td>
                                             </tr>
@@ -487,13 +575,13 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                         <label className="text-xs font-black text-slate-500 uppercase block tracking-wider">1. Plywood Sheet Configuration</label>
                         <div className="flex items-center gap-6 bg-slate-50/50 p-4 rounded-xl border border-slate-200 w-max">
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-bold text-slate-400 mb-1">WIDTH (MM)</span>
-                                <input className="w-24 p-2 border border-slate-300 rounded-lg text-center font-bold text-slate-600" value={summary.plywoodSheetSizeW} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeW: Number(e.target.value) })} />
+                                <span className="text-[9px] font-bold text-slate-400 mb-1">HEIGHT (MM)</span>
+                                <input className="w-24 p-2 border border-slate-300 rounded-lg text-center font-bold text-slate-600" value={summary.plywoodSheetSizeH} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeH: Number(e.target.value) })} />
                             </div>
                             <span className="mt-4 text-slate-300 font-black">×</span>
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-bold text-slate-400 mb-1">HEIGHT (MM)</span>
-                                <input className="w-24 p-2 border border-slate-300 rounded-lg text-center font-bold text-slate-600" value={summary.plywoodSheetSizeH} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeH: Number(e.target.value) })} />
+                                <span className="text-[9px] font-bold text-slate-400 mb-1">WIDTH (MM)</span>
+                                <input className="w-24 p-2 border border-slate-300 rounded-lg text-center font-bold text-slate-600" value={summary.plywoodSheetSizeW} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeW: Number(e.target.value) })} />
                             </div>
                             <div className="flex flex-col ml-4">
                                 <span className="text-[9px] font-bold text-slate-400 mb-1">KERF (MM)</span>
@@ -513,7 +601,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                         <th className="border border-slate-200 p-3 text-center">Sheets Required</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white font-medium">
+                                {/* <tbody className="bg-white font-medium">
                                     {Array.from(new Set(rooms.flatMap(r => r.items.map((i: any) => i.plyThickness)))).filter(t => t).map((thick, idx) => (
                                         <tr key={idx} className="hover:bg-slate-50 transition-colors">
                                             <td className="border border-slate-200 p-3 font-bold text-slate-700">{thick} mm</td>
@@ -524,6 +612,29 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                     ))}
                                     {rooms.flatMap(r => r.items).filter(i => i.plyThickness).length === 0 && (
                                         <tr><td colSpan={2} className="p-4 text-center text-slate-400 italic font-bold">No thickness data entered in the tables above.</td></tr>
+                                    )}
+                                </tbody> */}
+
+                                <tbody className="bg-white font-medium">
+                                    {summary.materialSummary.map((item: any, idx: number) => (
+                                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                            <td className="border border-slate-200 p-3 font-bold text-slate-700">
+                                                {item.thickness} mm
+                                            </td>
+                                            <td className="border border-slate-200 p-3 text-center">
+                                                <span className="bg-blue-50 border border-blue-200 px-6 py-1 rounded-full font-black text-blue-600 text-sm">
+                                                    {item.sheetsNeeded}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+
+                                    {summary.materialSummary.length === 0 && (
+                                        <tr>
+                                            <td colSpan={2} className="p-4 text-center text-slate-400 italic font-bold">
+                                                No valid measurements entered to calculate sheet requirements.
+                                            </td>
+                                        </tr>
                                     )}
                                 </tbody>
                             </table>
