@@ -59,7 +59,7 @@ export function ShortListImageGallerySub({
     showSiteSelectButton,
     onSiteImageConfirm,
     onPopupOpenChange
-    
+
 
 }: ImageGalleryProps) {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
@@ -260,6 +260,21 @@ export function ShortListImageGallerySub({
                             </button>}
 
                             {/* ✅ SELECT / UNSELECT Button */}
+                            {/* {showSelectButton && onToggleSelect && currentImage && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const selected = isSelected?.(currentImage) ?? false;
+                                        onToggleSelect(currentImage, !selected);
+                                    }}
+                                    className={`bg-${isSelected?.(currentImage) ? "red" : "green"}-600 cursor-pointer hover:bg-${isSelected?.(currentImage) ? "red" : "green"}-700 text-white rounded-full p-1 transition-all duration-200`}
+                                    title={isSelected?.(currentImage) ? "Unselect this image" : "Select this image"}
+                                >
+                                    <i className={`fas ${isSelected?.(currentImage) ? "fa-xmark" : "fa-check"} text-lg`}></i>
+                                   
+                                </button>
+                            )} */}
+
                             {showSelectButton && onToggleSelect && currentImage && (
                                 <button
                                     onClick={(e) => {
@@ -267,21 +282,35 @@ export function ShortListImageGallerySub({
                                         const selected = isSelected?.(currentImage) ?? false;
                                         onToggleSelect(currentImage, !selected);
                                     }}
-                                    className={`bg-${isSelected?.(currentImage) ? "red" : "green"}-600 hover:bg-${isSelected?.(currentImage) ? "red" : "green"}-700 text-white rounded-full p-3 transition-all duration-200`}
+                                    className={`
+      flex items-center gap-2 px-5 py-2 cursor-pointer rounded-md 
+      transition-all duration-300 ease-in-out border backdrop-blur-md
+      ${isSelected?.(currentImage)
+                                            ? "bg-red-500/90 border-red-400 text-white shadow-lg shadow-red-900/30"
+                                            : "bg-green-600 border-white/20 text-white hover:bg-green-600/80 hover:border-green-400"
+                                        }
+    `}
                                     title={isSelected?.(currentImage) ? "Unselect this image" : "Select this image"}
                                 >
-                                    <i className={`fas ${isSelected?.(currentImage) ? "fa-xmark" : "fa-check"} text-lg`}></i>
+                                    <div className="flex items-center justify-center">
+                                        <i className={`fas ${isSelected?.(currentImage) ? "fa-circle-minus" : "fa-circle-plus"
+                                            } text-sm`}
+                                        />
+                                    </div>
+                                    <span className="text-[11px] font-bold uppercase tracking-widest">
+                                        {isSelected?.(currentImage) ? "Unselect" : "Select"}
+                                    </span>
                                 </button>
                             )}
 
 
-                            {showSiteSelectButton && (
+                            {/* {showSiteSelectButton && (
                                 <button
                                     onClick={(e) => onSiteImageConfirm?.(e, currentImage)}
                                     className={`${selectedSiteImage?._id === currentImage._id
-                                            ? "bg-red-600 hover:bg-red-700"
-                                            : "bg-blue-600 hover:bg-blue-700"
-                                        } text-white rounded-full p-3 transition-all duration-200`}
+                                        ? "bg-red-600 hover:bg-red-700"
+                                        : "bg-blue-600 hover:bg-blue-700"
+                                        } text-white rounded-full p-1 cursor-pointer transition-all duration-200`}
                                     title={
                                         selectedSiteImage?._id === currentImage._id
                                             ? "Unselect this site image"
@@ -290,10 +319,37 @@ export function ShortListImageGallerySub({
                                 >
                                     <i
                                         className={`fas ${selectedSiteImage?._id === currentImage._id
-                                                ? "fa-xmark"
-                                                : "fa-check"
+                                            ? "fa-xmark"
+                                            : "fa-check"
                                             } text-lg`}
                                     ></i>
+                                </button>
+                            )} */}
+
+
+                            {showSiteSelectButton && (
+                                <button
+                                    onClick={(e) => onSiteImageConfirm?.(e, currentImage)}
+                                    
+                                    className={`
+      flex items-center gap-2 px-4 py-2 cursor-pointer rounded-md 
+      transition-all duration-300 ease-in-out border backdrop-blur-sm
+      ${selectedSiteImage?._id === currentImage._id
+                                            ? "bg-red-500/90 border-red-400 text-white shadow-lg shadow-red-900/20"
+                                            : "bg-green-600 border-white/20 text-white hover:bg-green-600/80 hover:border-green-400"
+                                        }
+    `}
+                                    title={selectedSiteImage?._id === currentImage._id ? "Unselect this image" : "Select this image"}
+                                >
+                                    <div className="relative flex items-center justify-center">
+                                        {/* Icon with a subtle pulse if selected */}
+                                        <i className={`fas ${selectedSiteImage?._id === currentImage._id ? "fa-circle-xmark" : "fa-circle-plus"
+                                            } text-sm`}
+                                        />
+                                    </div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider">
+                                        {selectedSiteImage?._id === currentImage._id ? "Unselect" : "Select"}
+                                    </span>
                                 </button>
                             )}
 

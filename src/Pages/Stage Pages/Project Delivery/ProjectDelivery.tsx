@@ -17,7 +17,7 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { downloadImage } from "../../../utils/downloadFile";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
@@ -170,12 +170,12 @@ export default function ProjectDeliveryPanel() {
           </Button>
 
 
-          {!fetchError && <ShareDocumentWhatsapp
+          {/* {!fetchError && <ShareDocumentWhatsapp
             projectId={projectId!}
             stageNumber="14"
             className="w-full sm:w-fit"
             isStageCompleted={data?.status}
-          />}
+          />} */}
 
           <AssignStageStaff
             projectId={projectId}

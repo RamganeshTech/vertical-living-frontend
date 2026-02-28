@@ -97,6 +97,7 @@ export interface IProcurementNew {
 
     generatedLink?: string
     isSyncWithPaymentsSection: boolean,
+    isSyncWithLogistics: boolean
 
     totalCost: number
     refPdfId: string

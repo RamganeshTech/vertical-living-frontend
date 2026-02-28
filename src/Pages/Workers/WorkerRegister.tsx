@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 
 import { useState, useEffect } from "react"
@@ -8,11 +6,12 @@ import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
-import { useRegisterWorker } from "../../apiList/workerApi"
+// import { useRegisterWorker } from "../../apiList/workerApi"
 import { toast } from "../../utils/toast"
 import { useDispatch } from "react-redux"
 import { setRole } from "../../features/authSlice"
 import { setWorkerProfileData } from "../../features/workerSlice"
+import { useCreateCommonUser } from "../../apiList/commonAuthApi"
 
 export default function WorkerRegister() {
   const navigate = useNavigate()
@@ -32,7 +31,9 @@ export default function WorkerRegister() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [inviteData, setInviteData] = useState<any>(null)
 
-  const registerWorker = useRegisterWorker()
+  // const registerWorker = useRegisterWorker()
+  const { mutateAsync: registerCommonUser, isPending } = useCreateCommonUser();
+
 
   useEffect(() => {
     if (!invite) {
@@ -115,33 +116,105 @@ export default function WorkerRegister() {
     }
   }
 
+
+  // old version used during the seperate login form 
+  // const handleSubmit = async (e: React.FormEvent) => {
+
+  //   try {
+  //     e.preventDefault()
+
+  //     if (!invite) {
+  //       toast({
+  //         title: "Error",
+  //         description: "Invalid invitation token",
+  //         variant: "destructive",
+  //       })
+  //       return
+  //     }
+
+  //     if (!validateForm()) {
+  //       return
+  //     }
+
+
+  //     const data = await registerWorker.mutateAsync({
+  //       invite,
+  //       payload: {
+  //         email: formData.email,
+  //         password: formData.password,
+  //         phoneNo: formData.phoneNo,
+  //         workerName: formData.workerName,
+  //       }
+  //     })
+
+
+  //     const workerData = data?.data;
+
+  //     // ✅ If you want auto-login immediately after register:
+
+  //     dispatch(setRole({
+  //       role: workerData?.role,
+  //       isauthenticated: true,
+  //       _id: workerData?._id,
+  //       userName: workerData?.workerName
+  //     }));
+
+  //     dispatch(setWorkerProfileData({
+  //       workerId: workerData?._id,
+  //       workerName: workerData?.workerName,
+  //       email: workerData?.email,
+  //       phoneNo: workerData?.phoneNo,
+  //       role: workerData?.role,
+  //       isauthenticated: true
+  //     }));
+
+
+  //     toast({
+  //       title: "Success",
+  //       description: "Registration successful! You can now login with your credentials.",
+  //     })
+
+  //     // Redirect to worker login page
+  //     setTimeout(() => {
+  //       navigate("/organizations")
+  //     }, 2000)
+  //   } catch (error: any) {
+  //     toast({
+  //       title: "Registration Failed",
+  //       description: error?.response?.data?.message || "Failed to register. Please try again.",
+  //       variant: "destructive",
+  //     })
+  //   }
+
+  // }
+
+
   const handleSubmit = async (e: React.FormEvent) => {
-   
+
     try {
-    e.preventDefault()
+      e.preventDefault()
 
-    if (!invite) {
-      toast({
-        title: "Error",
-        description: "Invalid invitation token",
-        variant: "destructive",
-      })
-      return
-    }
+      if (!invite) {
+        toast({
+          title: "Error",
+          description: "Invalid invitation token",
+          variant: "destructive",
+        })
+        return
+      }
 
-    if (!validateForm()) {
-      return
-    }
+      if (!validateForm()) {
+        return
+      }
 
-      
-      const data = await registerWorker.mutateAsync({
-        invite,
-        payload: {
+
+      const data = await registerCommonUser({
+          invite,
           email: formData.email,
           password: formData.password,
           phoneNo: formData.phoneNo,
-          workerName: formData.workerName,
-        }
+          name: formData.workerName,
+        
       })
 
 
@@ -152,12 +225,12 @@ export default function WorkerRegister() {
       dispatch(setRole({
         role: workerData?.role,
         isauthenticated: true,
-        _id: workerData?._id,
+        _id: workerData?.workerId,
         userName: workerData?.workerName
       }));
 
       dispatch(setWorkerProfileData({
-        workerId: workerData?._id,
+        workerId: workerData?.workerId,
         workerName: workerData?.workerName,
         email: workerData?.email,
         phoneNo: workerData?.phoneNo,
@@ -184,6 +257,9 @@ export default function WorkerRegister() {
     }
 
   }
+
+
+  
 
   if (!invite) {
     return (
@@ -401,9 +477,9 @@ export default function WorkerRegister() {
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
-                isLoading={registerWorker.isPending}
+                isLoading={isPending}
               >
-                {registerWorker.isPending ? (
+                {isPending ? (
                   <>
                     Registering...
                   </>

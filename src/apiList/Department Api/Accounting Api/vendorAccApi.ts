@@ -13,7 +13,7 @@ import { queryClient } from '../../../QueryClient/queryClient';
 
 // Types
 export interface CreateVendorPayload {
-        organizationId: string;
+    organizationId: string;
     clientId: string | null;
 
     // Basic
@@ -62,11 +62,11 @@ export interface CreateVendorPayload {
     // File Uploads (Raw Files)
     mainImage?: File;       // Single file
     shopImages?: File[];    // Array of files
-    files?: File[]; 
+    files?: File[];
 }
 
 export interface UpdateVendorPayload {
-   firstName?: string | null;
+    firstName?: string | null;
     companyName?: string | null;
     shopDisplayName?: string | null;
     vendorCategory?: string | null;
@@ -79,9 +79,9 @@ export interface UpdateVendorPayload {
     };
 
     shopFullAddress?: string | null;
-    
+
     // Updating mapUrl triggers lat/lng update on backend
-    mapUrl?: string | null; 
+    mapUrl?: string | null;
     location?: {
         latitude?: number | null;
         longitude?: number | null;
@@ -145,7 +145,7 @@ export interface Vendor {
     shopFullAddress?: string | null;
 
     // Location (mapUrl is at root now)
-    mapUrl?: string | null; 
+    mapUrl?: string | null;
     location?: {
         latitude: number | null;
         longitude: number | null;
@@ -156,19 +156,19 @@ export interface Vendor {
         type: "image" | "pdf";
         url: string;
         originalName?: string;
-        uploadedAt?: string, 
+        uploadedAt?: string,
     } | null;
     shopImages?: {
         type: "image";
         url: string;
         originalName?: string;
-        uploadedAt?: string, 
+        uploadedAt?: string,
     }[];
     documents?: {
         type: "image" | "pdf";
         url: string;
         originalName?: string;
-        uploadedAt?: string, 
+        uploadedAt?: string,
     }[];
 
     // Statutory Details
@@ -191,6 +191,7 @@ export interface Vendor {
     // currency?: string;
     openingBalance?: number;
     paymentTerms?: string;
+    priority?: string[]
 
     createdAt: string;
     updatedAt: string;
@@ -261,7 +262,7 @@ export const createVendor = async ({
     if (location) {
         formData.append('location', JSON.stringify(location));
     }
-    
+
 
     // if (mainImage) {
     //     formData.append('mainImage', mainImage);
@@ -275,7 +276,7 @@ export const createVendor = async ({
         });
     }
 
-     if (shopImages && shopImages.length > 0) {
+    if (shopImages && shopImages.length > 0) {
         shopImages.forEach((file) => {
             formData.append('shopImages', file);
         });
@@ -350,12 +351,16 @@ export const getVendorById = async ({
 
 export const getAllCustomeforDD = async ({
     organizationId,
+    priority,
     api
 }: {
     organizationId: string;
+    priority?: string;
     api: AxiosInstance;
 }) => {
-    const { data } = await api.get(`/department/accounting/vendor/getallvendorname/${organizationId}`);
+    const { data } = await api.get(`/department/accounting/vendor/getallvendorname/${organizationId}`, {
+        params: {priority}
+    });
     if (!data.ok) throw new Error(data.message);
 
     return data.data;
@@ -550,12 +555,12 @@ export const useGetVendor = (VendorId: string, enabled: boolean = true) => {
 
 
 
-export const useGetVendorForDropDown = (organizationId: string, enabled: boolean = true) => {
+export const useGetVendorForDropDown = (organizationId: string, enabled: boolean = true, priority?:string) => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useQuery({
-        queryKey: ["allvendorsname", organizationId],
+        queryKey: ["allvendorsname", organizationId, priority],
         queryFn: async () => {
             if (!role || !ALLOWED_ROLES.includes(role)) {
                 throw new Error("Not allowed to make this API call");
@@ -563,7 +568,7 @@ export const useGetVendorForDropDown = (organizationId: string, enabled: boolean
             if (!api) {
                 throw new Error("API instance not found for role");
             }
-            return await getAllCustomeforDD({ organizationId, api });
+            return await getAllCustomeforDD({ organizationId, priority, api });
         },
         enabled: enabled && !!role && ALLOWED_ROLES.includes(role) && !!organizationId
     });

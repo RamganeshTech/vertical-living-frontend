@@ -709,15 +709,11 @@ export const filterValidSimpleRows = (rows: SimpleItemRow[]) => {
 
 
 const InternalQuoteEntryMain = () => {
-
-
     const navigate = useNavigate()
     const { organizationId } = useParams() as { organizationId: string }
     const { data: projectData = [] } = useGetProjects(organizationId);
 
-
     const createMutation = useCreateInternalMainQuote();
-
 
     const [formData, setFormData] = useState<{
         mainQuoteName: string;
@@ -898,6 +894,7 @@ const InternalQuoteEntryMain = () => {
                     setModalOpen={setModalOpen}
                     setFormData={setFormData}
                     handleSubmit={handleSubmit}
+                    isSubmitting={createMutation.isPending}
                 />
 
             )}

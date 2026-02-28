@@ -8,10 +8,27 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
-import ProtectedSingleShopQuote from './Pages/Department Pages/ProcurementNew Pages/ProtectedSingleShopQuote';
-import CutlistMain from './Pages/Cutlist_Pages/CutlistMain';
-import CutlistSingle from './Pages/Cutlist_Pages/CutlistSingle';
-import CreateCutlist from './Pages/Cutlist_Pages/CreateCutlist';
+import RateConfigDescription from './Pages/Quote Pages/RateConfig Pages/RateConfigDescription';
+const LogisticsPublicSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsPublicSingle'));
+const PublicPaymentTransactionMain = lazy(() => import('./Pages/publicPaymentTransaction/PublicPaymentTransactionMain'));
+const ShopMaterialDocumentMain = lazy(() => import('./Pages/ShopMaterialDocument_Pages/ShopMaterialDocumentMain'));
+const ShopMaterialDocumentSingle = lazy(() => import('./Pages/ShopMaterialDocument_Pages/ShopMaterialDocumentSingle'));
+const ShopMaterialDocumentCreate = lazy(() => import('./Pages/ShopMaterialDocument_Pages/ShopMaterialDocumentCreate'));
+const CalculatorMain = lazy(() => import('./Pages/Calculator_Pages/CalculatorMain'));
+const RateConfigPreSalesMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfig_PreSales_Pages/RateConfigPreSalesMain'));
+const RateConfigPreSalesSub = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfig_PreSales_Pages/RateConfigPreSalesSub'));
+const PublicQuoteGenerator = lazy(() => import('./Pages/PublicQuote_Generator/PublicQuoteGenerator'));
+const PreSalesQuoteMain = lazy(() => import('./Pages/Quote Pages/PreSalesQuote_Pages/PreSalesQuoteMain'));
+const PreSalesQuoteSingle = lazy(() => import('./Pages/Quote Pages/PreSalesQuote_Pages/PreSalesQuoteSingle'));
+const CommonLogin = lazy(() => import('./Pages/Login/CommonLogin'));
+const CommonForgotPassword = lazy(() => import('./Pages/Login/CommonForgotPassword'));
+const CommonResetPassword = lazy(() => import('./Pages/Login/CommonResetPassword'));
+const ProtectedSingleShopQuote = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/ProtectedSingleShopQuote'));
+const CutlistMain = lazy(() => import('./Pages/Cutlist_Pages/CutlistMain'));
+const CutlistSingle = lazy(() => import('./Pages/Cutlist_Pages/CutlistSingle'));
+const CreateCutlist = lazy(() => import('./Pages/Cutlist_Pages/CreateCutlist'));
+// import LabourList from './Pages/Labour/LabourList/LabourList';
+// import MaterialList from './Pages/Material/MaterialList/MaterialList';
 const MaterialWithLabourRateMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/MaterialWithLabourConfig/MaterialWithLabourConfigMain'));
 const MaterialWithLabourSingle = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/MaterialWithLabourConfig/MaterialWithLabourConfigSingle'));
 const CadUploadMain = lazy(() => import('./Pages/CAD_Pages/CadUploadMain'));
@@ -126,8 +143,8 @@ const HRMainPage = lazy(() => import('./Pages/Department Pages/Hr Pages/HRMainPa
 const CommonOrdersMain = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrdersMain'));
 const CommonOrderProject = lazy(() => import('./Pages/Stage Pages/CommonOrderHistory/CommonOrderProject'));
 // const RoomDetailCardNew = lazy(() => import("./Pages/Stage Pages/MaterialSelectionRoom/RoomDetailCardNew"));
-const ForgotPassword = lazy(() => import('./Pages/Forgot Password/ForgotPassword'));
-const ResetPassword = lazy(() => import('./Pages/Forgot Password/ResetPassword'));
+// const ForgotPassword = lazy(() => import('./Pages/Forgot Password/ForgotPassword'));
+// const ResetPassword = lazy(() => import('./Pages/Forgot Password/ResetPassword'));
 const ShortlistMain = lazy(() => import('./Pages/Stage Pages/Sample design/ShortList/ShortListMain'));
 const MaterialArrivalOverviewNew = lazy(() => import('./Pages/Stage Pages/MaterialArrival/MaterialArrivalOverviewNew'));
 // import ProjectStageRedirect from './Pages/Projects/ProjectStageRedirect';
@@ -137,24 +154,24 @@ const Issues = lazy(() => import("./Pages/Issues/Issues"));
 const Phase = lazy(() => import("./Pages/Phases/Phase"));
 const Tasks = lazy(() => import("./Pages/Tasks/Tasks"));
 const Projects = lazy(() => import("./Pages/Projects/Projects"));
-const Login = lazy(() => import("./Pages/Login/Login"));
+// const Login = lazy(() => import("./Pages/Login/Login"));
 const ProjectDetails = lazy(() => import("./Pages/Projects/ProjectDetails"));
 const ProjectLists = lazy(() => import("./Pages/Projects/ProjectLists"));
 const NotFound = lazy(() => import("./Pages/Not Found/NotFound"));
 const Organization = lazy(() => import("./Pages/Organization/Organization"));
 const OrganizationDetails = lazy(() => import("./Pages/Organization/OrganizationDetails"));
 const StaffRegister = lazy(() => import("./Pages/Staff/StaffRegister"));
-const StaffLogin = lazy(() => import("./Pages/Staff/StaffLogin"));
+// const StaffLogin = lazy(() => import("./Pages/Staff/StaffLogin"));
 const Workers = lazy(() => import("./Pages/Workers/Workers"));
 const WorkerRegister = lazy(() => import("./Pages/Workers/WorkerRegister"));
-const WorkerLogin = lazy(() => import("./Pages/Workers/WorkerLogin"));
+// const WorkerLogin = lazy(() => import("./Pages/Workers/WorkerLogin"));
 const UnAuthorized = lazy(() => import("./Pages/UnAuthorized/UnAuthorized"));
 const InviteStaffs = lazy(() => import("./Pages/Organization/InviteStaffs"));
 const InviteCTO = lazy(() => import("./Pages/Organization/InviteCTO"));
 const OrganizationChildrens = lazy(() => import("./Pages/Organization/OrganizationChildren"));
 const CTORegister = lazy(() => import("./Pages/CTO/CTORegister"));
-const CTOLogin = lazy(() => import("./Pages/CTO/CTOLogin"));
-const ClientLogin = lazy(() => import("./Pages/Client/ClientLogin"));
+// const CTOLogin = lazy(() => import("./Pages/CTO/CTOLogin"));
+// const ClientLogin = lazy(() => import("./Pages/Client/ClientLogin"));
 const ClientRegister = lazy(() => import("./Pages/Client/ClientRegister"));
 const InviteClient = lazy(() => import("./Pages/Organization/inviteClient"));
 const RequirementFormPublic = lazy(() => import("./Pages/RequirementForm/components/RequirementFormPublic"));
@@ -305,28 +322,37 @@ function App() {
 
 
           <Route path="/login" element={<LoginGroup />}>
-            <Route index element={<Login />} /> {/* this is your default owner login */}
-            <Route path="cto" element={<CTOLogin />} />
+            {/* <Route index element={<Login />} /> //this is your default owner login */}
+            {/* <Route path="cto" element={<CTOLogin />} />
             <Route path="staff" element={<StaffLogin />} />
             <Route path="worker" element={<WorkerLogin />} />
-            <Route path="client" element={<ClientLogin />} />
+            <Route path="client" element={<ClientLogin />} /> */}
+            <Route path="common" element={<CommonLogin />} />
           </Route>
 
           <Route path="/home" element={<Home />} />
           <Route path="/unauthorized" element={<UnAuthorized />} />
 
-          <Route path='/stafflogin' element={<StaffLogin />} />
+          {/* <Route path='/stafflogin' element={<StaffLogin />} />
           <Route path="/login" element={<Login />} />
           <Route path='/workerlogin' element={<WorkerLogin />} />
           <Route path='/ctologin' element={<CTOLogin />} />
-          <Route path='/clientlogin' element={<ClientLogin />} />
+          <Route path='/clientlogin' element={<ClientLogin />} /> */}
+          <Route path="commonlogin" element={<CommonLogin />} />
+
 
           <Route path='/staffregister' element={<StaffRegister />} />
           <Route path='/workerregister' element={<WorkerRegister />} />
           <Route path='/ctoregister' element={<CTORegister />} />
           <Route path='/clientregister' element={<ClientRegister />} />
-          <Route path='/reset-password/:role' element={<ResetPassword />} />
-          <Route path='/forgotpassword/:role' element={<ForgotPassword />} />
+
+
+
+
+          {/* <Route path='/reset-password/:role' element={<ResetPassword />} />
+          <Route path='/forgotpassword/:role' element={<ForgotPassword />} /> */}
+          <Route path='/common/reset-password' element={<CommonResetPassword />} />
+          <Route path='/common/forgotpassword' element={<CommonForgotPassword />} />
 
           <Route path="/subscription" element={<SubscriptionPlans />} />
 
@@ -786,9 +812,21 @@ function App() {
                 <PaymentAccSingle />
               </ProtectedRoutes>} />
 
+              <Route path="publicpayment" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="payments"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["list"]}
+              >
+                <PublicPaymentTransactionMain />
+              </ProtectedRoutes>} />
+
 
 
             </Route>
+
+
+
+
 
 
             <Route path="billmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
@@ -1045,6 +1083,78 @@ function App() {
 
 
 
+            <Route path="calculator" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="calculator"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <CalculatorMain />
+            </ProtectedRoutes>} >
+              {/* 
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="presalesmaterialrateconfig"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <RateConfigPreSalesSub />
+              </ProtectedRoutes>} /> */}
+            </Route>
+
+
+            <Route path="shopmaterialdoc" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="shopmaterialdoc"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <ShopMaterialDocumentMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:catalogueId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="shopmaterialdoc"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <ShopMaterialDocumentSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="shopmaterialdoc"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <ShopMaterialDocumentCreate />
+              </ProtectedRoutes>} />
+            </Route>
+
+
+            <Route path="rateconfigpresales" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="presalesmaterialrateconfig"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <RateConfigPreSalesMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="presalesmaterialrateconfig"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <RateConfigPreSalesSub />
+              </ProtectedRoutes>} >
+
+              <Route path="description" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="materialrateconfig"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <RateConfigDescription />
+              </ProtectedRoutes>} />
+
+              </Route>
+
+            </Route>
 
             <Route path="rateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="materialrateconfig"
@@ -1060,7 +1170,28 @@ function App() {
                 requiredAction={['list', 'edit', "create", "delete"]}
               >
                 <RateConfigSub />
-              </ProtectedRoutes>} />
+              </ProtectedRoutes>} >
+
+
+                {/* <Route path="catalogue/:catalogueId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]} */}
+                <Route path="catalogue" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="materialrateconfig"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'edit', "create", "delete"]}
+                >
+                  <ShopMaterialDocumentSingle />
+                </ProtectedRoutes>} ></Route>
+
+                <Route path="description" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="materialrateconfig"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'edit', "create", "delete"]}
+                >
+                  <RateConfigDescription />
+                </ProtectedRoutes>} ></Route>
+
+
+              </Route>
             </Route>
 
             <Route path="labourrateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
@@ -1118,6 +1249,36 @@ function App() {
 
 
             </Route>
+
+
+
+            <Route path="presalesquote" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="presales"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <PreSalesQuoteMain />
+            </ProtectedRoutes>} >
+
+              {/* <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="presales"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["create",]}
+              >
+                <PreSalesQuoteSingle />
+              </ProtectedRoutes>} /> */}
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="presales"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "delete"]}
+              >
+                <PreSalesQuoteSingle />
+              </ProtectedRoutes>} />
+            </Route>
+
+
+
 
             <Route path="internalquote" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="internalquote"
@@ -1495,11 +1656,10 @@ function App() {
           </ProtectedRoutes>}>
 
 
-            {/* <Route index element={<ProjectStageRedirect />} /> */}
 
             {/* <Route path="labourlist" element={<LabourList />} />
-          <Route path="materiallist" element={<MaterialList />} />
-          <Route path="transportationlist" element={<Transportationlist />} /> */}
+          <Route path="materiallist" element={<MaterialList />} /> */}
+            {/* <Route path="transportationlist" element={<Transportationlist />} /> */}
 
             <Route path="prerequisites" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff",
@@ -2142,6 +2302,7 @@ function App() {
 
           {/* REQUIREMENT FORM LINK */}
 
+          <Route path='/quotecalculator' element={<PublicQuoteGenerator />} />
           <Route path='/requirementform/:projectId/:token' element={<RequirementFormPublic />} />
           <Route path='/ordermaterial/public/:projectId/:token' element={<PublicOrderHistory />} />
           <Route path='/materialarrival/public/:projectId/:token' element={<PublicMaterialArrival />} />
@@ -2149,6 +2310,7 @@ function App() {
           <Route path='/ordermaterial/setup' element={<PublicOrgOrderMaterialSetup />} />
           <Route path='/:organizationId/ordermaterial' element={<PublicOrderMaterialMain />} />
           <Route path='/:organizationId/procurement/public' element={<PublicProcurementRatePage />} />
+          <Route path='/:organizationId/logistics/public/:id' element={<LogisticsPublicSingle />} />
 
           <Route path='/subcontract/share/:subContractId' element={<PublicSubContract />} />
           <Route path='/privacy-policy' element={<PrivacyPolicy />} />

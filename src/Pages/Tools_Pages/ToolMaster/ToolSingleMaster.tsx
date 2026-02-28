@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useGetToolById, useUpdateToolContent, useUpdateToolImages } from '../../../apiList/tools_api/toolMasterApi';
+import { useGetToolById, useUpdateToolContent, useUpdateToolImages, useUpdateToolWarrantyFiles } from '../../../apiList/tools_api/toolMasterApi';
 import { toast } from '../../../utils/toast';
 import MaterialOverviewLoading from '../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 import ToolMasterForm from './ToolMasterForm';
@@ -11,6 +11,7 @@ const ToolSingleMaster = () => {
     const { data: tool, isLoading, isError, error, refetch } = useGetToolById(id);
     const updateContentMutation = useUpdateToolContent();
     const updateImagesMutation = useUpdateToolImages();
+    const updateToolWarrantyFiles = useUpdateToolWarrantyFiles();
 
     const handleUpdate = async (data: any, newFiles: File[]) => {
         try {
@@ -38,8 +39,21 @@ const ToolSingleMaster = () => {
             const imgFormData = new FormData();
             newFiles.forEach(file => imgFormData.append('files', file));
             await updateImagesMutation.mutateAsync({ id, formData: imgFormData });
-            await refetch();
+            // await refetch();
             toast({ title: "Success", description: "images updloaded" });
+        } catch (error: any) {
+            toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+        }
+    }
+
+    const handleQuickUploadWarrrantyFiles = async (newFiles: File[]) => {
+        try {
+
+            const imgFormData = new FormData();
+            newFiles.forEach(file => imgFormData.append('warrantyFiles', file));
+            await updateToolWarrantyFiles.mutateAsync({ id, formData: imgFormData });
+            // await refetch();
+            toast({ title: "Success", description: "warranty files updloaded" });
         } catch (error: any) {
             toast({ title: "Update Failed", description: error.message, variant: "destructive" });
         }
@@ -50,7 +64,7 @@ const ToolSingleMaster = () => {
     if (isError) return <div className="p-10 text-center text-red-500">Error: {(error as any).message}</div>;
 
     return (
-        <main className='max-h-full space-y-2 overflow-y-auto p-2 !bg-white/20'>
+        <main className='max-h-full space-y-2 overflow-y-auto  !bg-white/20'>
             <ToolMasterForm
                 mode="view"
                 initialData={tool}
@@ -58,7 +72,10 @@ const ToolSingleMaster = () => {
                 onSubmit={handleUpdate}
                 refetch={refetch}
                 onQuickUpload={handleQuickUploadClick}
+                onQuickUploadWarranty={handleQuickUploadWarrrantyFiles}
                 isSubmitting={updateContentMutation.isPending || updateImagesMutation.isPending}
+                isWarrantyUploading={updateToolWarrantyFiles.isPending}
+                isToolUploading={updateImagesMutation.isPending}
             />
 
             <ToolHistoryTimeline toolId={id} organizationId={organizationId} />

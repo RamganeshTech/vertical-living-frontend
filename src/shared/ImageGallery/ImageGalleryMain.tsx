@@ -3,6 +3,12 @@ import { useState, useEffect } from "react"
 import { NO_IMAGE } from "../../constants/constants"
 import { downloadImage } from "../../utils/downloadFile"
 import { createPortal } from "react-dom"
+import { useUpdateReferenceImageTag } from "../../apiList/Stage Api/shortlistReferenceDesignApi"
+import { useParams } from "react-router-dom"
+import { Button } from "../../components/ui/Button"
+import SmartTagInput from "../SmartTagInput"
+import { fetchSuggestions } from "../../Pages/Stage Pages/Sample design/ShortList/ShortListMain"
+import { toast } from "../../utils/toast"
 
 
 // interface ImageFile {
@@ -17,6 +23,7 @@ interface ImageFile {
   url: string
   originalName?: string
   comment?: string
+  tags?: string[]
 }
 
 interface ImageGalleryProps {
@@ -30,7 +37,7 @@ interface ImageGalleryProps {
   className?: string,
   heightClass?: number,
 
-
+  showTags?: boolean;
   isComments?: boolean; // enable/disable comment UI
   editingId?: string | null;
   tempComment?: Record<string, string>;
@@ -51,6 +58,7 @@ export function ImageGallery({
   maxWidth = 100,
   heightClass = 0,
   isComments,
+  showTags,
 
 
   editingId,
@@ -59,11 +67,50 @@ export function ImageGallery({
   setTempComment,
   onUpdateComment,
 }: ImageGalleryProps) {
+  const { organizationId } = useParams() as { organizationId: string }
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [hoveredCommentId, setHoveredCommentId] = useState<string | null>(null);
 
   const [imageHeights, setImageHeights] = useState<{ [key: string]: number }>({})
+
+
+  // Inside ImageGallery component
+  const [isEditingTags, setIsEditingTags] = useState(false);
+  const [tempTags, setTempTags] = useState<string[]>([]);
+  const { mutateAsync: updateTags, isPending: isUpdatingTags } = useUpdateReferenceImageTag();
+
+
+  const handleSaveTags = async () => {
+    try {
+      if (!currentImage) return;
+      await updateTags({
+        organizationId: organizationId, // Ensure this exists in your image object
+        imageId: currentImage._id,
+        tags: tempTags,
+      });
+
+      // ✅ 1. Update the local object so the UI reflects changes immediately
+      currentImage.tags = tempTags;
+
+      // ✅ 2. Stop the editing mode but DON'T close the popup
+      setIsEditingTags(false);
+
+
+      // ❌ 3. REMOVE or DELAY the refetch
+      // If you call refetch() here, the parent re-renders and might kill the modal.
+      // Instead, rely on the queryClient.invalidateQueries in the hook 
+      // which handles the background sync.
+
+      toast({ title: "Success", description: "tags updated successfully" })
+      // if (refetch) await refetch();
+    } catch (error: any) {
+      console.error("Failed to update tags", error);
+      toast({ title: "Error", description: error?.response.data.message || error?.message || "operation failed", variant: "destructive" })
+    }
+  };
+
+
 
   const handleImageLoad = (imageId: string, naturalWidth: number, naturalHeight: number) => {
     const aspectRatio = naturalHeight / naturalWidth
@@ -88,28 +135,6 @@ export function ImageGallery({
     setSelectedImageIndex(null)
   }
 
-  // const goToPrevious = () => {
-  //   if (selectedImageIndex !== null){
-  //     if( selectedImageIndex > 0) {
-  //     setSelectedImageIndex(selectedImageIndex - 1)
-  //   } else if(selectedImageIndex === 0){
-  //       setSelectedImageIndex(images.length -1)
-  //   }
-  // }
-  // }
-
-  // const goToNext = () => {
-  //   if (selectedImageIndex !== null){
-  //     if( selectedImageIndex < images.length - 1) {
-  //     setSelectedImageIndex(selectedImageIndex + 1)
-  //   }
-  //   else if(selectedImageIndex === images.length - 1){
-  //       setSelectedImageIndex(0)
-  //   }
-  // }
-  // }
-
-
 
   const goToPrevious = () => {
     if (selectedImageIndex !== null) {
@@ -129,28 +154,6 @@ export function ImageGallery({
       );
     }
   };
-
-  //   useEffect(() => {
-  //   const handleEscape = (e: KeyboardEvent) => {
-  //     if (e.key === "Escape") {
-  //       closePopup()
-  //     }
-  //   }
-
-  //   if (isPopupOpen) {
-  //     document.addEventListener("keydown", handleEscape)
-  //     document.addEventListener("keydown", handleEscape)
-  //     document.addEventListener("keydown", handleEscape)
-  //     document.body.style.overflow = "hidden"
-  //   }
-
-
-
-  //   return () => {
-  //     document.removeEventListener("keydown", handleEscape)
-  //     document.body.style.overflow = "unset"
-  //   }
-  // }, [isPopupOpen])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -222,6 +225,16 @@ export function ImageGallery({
       : null
 
 
+
+  // Sync tempTags when the current image changes in the popup
+  useEffect(() => {
+    if (currentImage && isPopupOpen) {
+      setTempTags(currentImage.tags || []);
+      setIsEditingTags(false); // Reset edit mode when navigating
+    }
+  }, [currentImage, isPopupOpen]);
+
+
   // const width = 120
 
   return (
@@ -254,7 +267,7 @@ export function ImageGallery({
                   minWidth: `${minWidth}px`,
                   maxWidth: `${maxWidth}px`,
                   height: isComments
-                    ? `${(heightClass || height) + 40 }px` // extra space for comment box
+                    ? `${(heightClass || height) + 40}px` // extra space for comment box
                     : `${heightClass || height}px`,
 
                 }}
@@ -280,12 +293,12 @@ export function ImageGallery({
                     onMouseLeave={() => setHoveredCommentId(null)}
                     onClick={(e) => {
                       e.stopPropagation()
-                          setEditingId?.(image._id);
-                          setTempComment?.((prev) => ({
-                            ...prev,
-                            [image._id]: image.comment || "",
-                          }));
-                        }}
+                      setEditingId?.(image._id);
+                      setTempComment?.((prev) => ({
+                        ...prev,
+                        [image._id]: image.comment || "",
+                      }));
+                    }}
                   >
                     {editingId === image._id ? (
                       <input
@@ -305,7 +318,7 @@ export function ImageGallery({
                       />
                     ) : (
                       <div
-                        
+
                         className="cursor-pointer p-1 hover:bg-gray-100 rounded"
                       >
                         <div className="flex items-start gap-1">
@@ -315,10 +328,10 @@ export function ImageGallery({
                               <span className="italic text-gray-400">Add a comment</span>
                             )}
                           </p>
-                          
-                            {hoveredCommentId === (image as any)._id && (
-                              <i className="fas fa-pen ml-auto text-gray-400 text-xs mt-1" />
-                            )}
+
+                          {hoveredCommentId === (image as any)._id && (
+                            <i className="fas fa-pen ml-auto text-gray-400 text-xs mt-1" />
+                          )}
                         </div>
                       </div>
                     )}
@@ -327,7 +340,7 @@ export function ImageGallery({
 
 
               </div>
-             
+
 
             </>
           )
@@ -405,7 +418,7 @@ export function ImageGallery({
             )}
 
             <div
-              className="relative flex items-center justify-center"
+              className="relative flex flex-col items-center justify-center"
               style={{
                 width: "70vw",
                 height: "70vh",
@@ -420,6 +433,72 @@ export function ImageGallery({
                 className="max-w-full max-h-full object-contain"
               />
 
+              {/* {showTags && currentImage?.tags && currentImage?.tags?.length > 0 && (
+                <div className="mt-4 flex flex-wrap justify-center gap-2 max-w-full">
+                  {currentImage?.tags?.map((tag: string, i: number) => (
+                    <span
+                      key={i}
+                      className="bg-blue-600/80 text-white text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full border border-blue-400/50 shadow-sm"
+                    >
+                      <i className="fas fa-tag mr-1.5 opacity-70"></i>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )} */}
+
+
+
+              {/* Inside the Popup Modal container, under the img tag */}
+            {showTags &&  <div className="mt-4 w-full max-w-lg flex flex-col items-center">
+                <div className="flex items-center justify-between w-full mb-2">
+                  <span className="text-white/70 text-xs font-medium uppercase tracking-widest">Tags</span>
+                  {showTags && (
+                    <button
+                      onClick={() => setIsEditingTags(!isEditingTags)}
+                      className="text-blue-400 cursor-pointer hover:text-blue-300 text-xs font-bold transition-colors"
+                    >
+                      {isEditingTags ? "Cancel" : "Edit Tags"}
+                    </button>
+                  )}
+                </div>
+
+                {isEditingTags ? (
+                  <div className="w-full bg-white/90 p-3 rounded-lg border border-white/20">
+                    <SmartTagInput
+                      tags={tempTags}
+                      setState={setTempTags}
+                      // inputClassName="!bg-white"
+                      suggestionFetcher={(q) => fetchSuggestions({ query: q, organizationId: organizationId })}
+                    />
+                    <div className="flex justify-end mt-2">
+                      <Button
+                        size="sm"
+                        disabled={isUpdatingTags}
+                        onClick={handleSaveTags}
+                        className="bg-blue-600 hover:bg-blue-700 text-white h-7 text-[10px]"
+                      >
+                        {isUpdatingTags ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {currentImage?.tags && currentImage?.tags?.length > 0 ? (
+                      currentImage?.tags?.map((tag: string, i: number) => (
+                        <span key={i} className="bg-blue-600/80 text-white text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full border border-blue-400/50">
+                          <i className="fas fa-tag mr-1.5 opacity-70"></i>
+                          {tag}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-white/30 text-[10px] italic">No tags assigned</span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+      }
               {/* ✅ Show comments only if enabled */}
               {isComments && (
                 <div className="absolute bottom-0 w-full bg-black/40 text-white text-xs p-1">
@@ -449,6 +528,7 @@ export default function ImageGalleryExample({ imageFiles = [], height, refetch, 
 
   isComments = false,
   editingId,
+  showTags,
   tempComment,
   setEditingId,
   setTempComment,
@@ -461,6 +541,7 @@ export default function ImageGalleryExample({ imageFiles = [], height, refetch, 
 
     editingId?: string | null;
     tempComment?: Record<string, string>;
+    showTags?: boolean;
     setEditingId?: (id: string | null) => void;
     setTempComment?: React.Dispatch<React.SetStateAction<Record<string, string>>>;
     onUpdateComment?: (imageId: string, newComment: string) => void;
@@ -482,7 +563,7 @@ export default function ImageGalleryExample({ imageFiles = [], height, refetch, 
         minWidth={minWidth}
         maxWidth={maxWidth}
         isComments={isComments}
-
+        showTags={showTags}
 
         editingId={editingId}
         tempComment={tempComment}

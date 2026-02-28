@@ -34,6 +34,7 @@ export default function OrganizationSettings() {
     const handleSave = async (field: string) => {
         try {
 
+            console.log("field")
             if (field === "organizationPhoneNo") {
                 const phoneRegex = /^\d{10}$/;
                 if (!phoneRegex.test(tempValue)) {
@@ -59,16 +60,21 @@ export default function OrganizationSettings() {
             }
 
 
-            await updateMutation.mutateAsync({
+            console.log("111111111111")
+
+
+           const res =  await updateMutation.mutateAsync({
                 orgsId: organizationId!,
                 updateField: { [field]: tempValue },
             });
+
+            console.log("res", res)
             toast({ title: "Success", description: `${field} updated successfully` });
             setEditingField(null);
         } catch (error: any) {
             toast({
                 title: "Error",
-                description: error?.response?.data?.message || "Update failed",
+                description: error?.response?.data?.message || error?.message || "Update failed",
                 variant: "destructive",
             });
         }
@@ -176,6 +182,23 @@ export default function OrganizationSettings() {
                         loading={updateMutation.isPending}
                     />
 
+
+                    <SettingCard
+                        label="Registered Entiry"
+                        icon="fa-building"
+                        value={organization?.registeredEntity}
+                        isEditing={editingField === "registeredEntity"}
+                        onEdit={() => handleStartEdit("registeredEntity", organization?.registeredEntity)}
+                        onSave={() => handleSave("registeredEntity")}
+                        onCancel={() => setEditingField(null)}
+                        onChange={setTempValue}
+                        tempValue={tempValue}
+                        loading={updateMutation.isPending}
+
+                    />
+
+
+
                     <SettingCard
                         label="Contact Phone"
                         icon="fa-phone-alt"
@@ -183,6 +206,51 @@ export default function OrganizationSettings() {
                         isEditing={editingField === "organizationPhoneNo"}
                         onEdit={() => handleStartEdit("organizationPhoneNo", organization?.organizationPhoneNo)}
                         onSave={() => handleSave("organizationPhoneNo")}
+                        onCancel={() => setEditingField(null)}
+                        onChange={setTempValue}
+                        tempValue={tempValue}
+                        loading={updateMutation.isPending}
+                    />
+
+                    <SettingCard
+                        label="Secondary Contact"
+                        icon="fa-phone-volume"
+                        value={organization?.secondaryPhoneNo}
+                        inputType="tel"
+                        isEditing={editingField === "secondaryPhoneNo"}
+                        onEdit={() => handleStartEdit("secondaryPhoneNo", organization?.secondaryPhoneNo)}
+                        onSave={() => handleSave("secondaryPhoneNo")}
+                        onCancel={() => setEditingField(null)}
+                        onChange={setTempValue}
+                        tempValue={tempValue}
+                        loading={updateMutation.isPending}
+                    />
+
+
+
+                    {/* GROUP 2: CONTACT INFORMATION */}
+                    <SettingCard
+                        label="Official Email"
+                        icon="fa-envelope"
+                        value={organization?.email}
+                        inputType="email"
+                        isEditing={editingField === "email"}
+                        onEdit={() => handleStartEdit("email", organization?.email)}
+                        onSave={() => handleSave("email")}
+                        onCancel={() => setEditingField(null)}
+                        onChange={setTempValue}
+                        tempValue={tempValue}
+                        loading={updateMutation.isPending}
+                    />
+
+                    <SettingCard
+                        label="Website"
+                        icon="fa-globe"
+                        value={organization?.website}
+                        inputType="url"
+                        isEditing={editingField === "website"}
+                        onEdit={() => handleStartEdit("website", organization?.website)}
+                        onSave={() => handleSave("website")}
                         onCancel={() => setEditingField(null)}
                         onChange={setTempValue}
                         tempValue={tempValue}
@@ -204,6 +272,12 @@ export default function OrganizationSettings() {
                             isTextArea
                         />
                     </div>
+
+
+
+
+
+
 
                 </div>
             </div>

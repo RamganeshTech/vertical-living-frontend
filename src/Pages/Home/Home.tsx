@@ -60,7 +60,7 @@ const Button: React.FC<{
   const variantClasses = {
     primary: "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700",
     secondary: "bg-white text-gray-900 border border-gray-300 hover:bg-gray-50",
-    outline: "border-2 border-current bg-transparent hover:bg-current hover:text-white",
+    outline: "border-2 border-current bg-transparent hover:bg-current ",
   }
 
   const sizeClasses = {
@@ -137,7 +137,17 @@ export default function HomePage() {
 
             <div>
               <div className="hidden sm:flex items-center space-x-4">
-                <Button onClick={() => navigate('/login')} variant="secondary" className="hidden sm:inline-flex cursor-pointer">
+                {/* NEW: Quote Calculator Button */}
+                {/* <Button
+                  onClick={() => navigate('/quotecalculator')}
+                  variant="outline"
+                  // className="border-blue-600 text-blue-600 hover:text-blue-600 hover:bg-transparent cursor-pointer"
+                  className="border-blue-600 text-blue-600 hover:text-blue-600 hover:border-blue-600 hover:bg-transparent cursor-pointer"
+                >
+                  <i className="fas fa-calculator mr-2"></i>
+                  Calculate Quote
+                </Button> */}
+                <Button onClick={() => navigate('/login/common')} variant="secondary" className="hidden sm:inline-flex cursor-pointer">
                   Sign In
                 </Button>
                 {auth?.isauthenticated && <Button onClick={() => navigate('/')} className="cursor-pointer">Get Started</Button>}

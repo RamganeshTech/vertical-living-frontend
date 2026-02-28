@@ -19,8 +19,20 @@ export default function ShortListReferenceDesignMain() {
     //   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const { organizationId } = useParams() as { organizationId: string }
 
+
+
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [tags, setTags] = useState<string[]>([]);
+    // 1. Separate State for Searching
+    const [searchTags, setSearchTags] = useState<string[]>([]);
+
+
     const { data: imageData, refetch, isFetching } = useGetReferenceDesigns({
         organizationId,
+        // search: searchTags.join(","),
+        search: searchTags.length > 0 ? searchTags.join(",") : "",
     });
 
 
@@ -35,9 +47,7 @@ export default function ShortListReferenceDesignMain() {
 
     const { mutateAsync: uploadImages, isPending: uploadPending } = useUploadReferenceDesigns();
     const { mutateAsync: deleteImage, } = useDeleteReferenceDesign();
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [tags, setTags] = useState<string[]>([]);
+
 
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,7 +150,9 @@ export default function ShortListReferenceDesignMain() {
                 <SmartTagInput
                     tags={tags}
                     setState={setTags}
-                    suggestionFetcher={fetchSuggestions}
+                    // suggestionFetcher={fetchSuggestions}
+                    suggestionFetcher={(q) => fetchSuggestions({ query: q, organizationId })}
+
                 />
 
             </div>
@@ -187,7 +199,34 @@ export default function ShortListReferenceDesignMain() {
             {/* Image Gallery */}
             {canList && <div className="mt-5">
 
-                <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images</h1>
+                {/* <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images</h1> */}
+
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+                    <div className="flex-1">
+                        <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images Gallery</h1>
+                        <label className="block text-sm font-medium text-gray-600 mb-1">Filter gallery by tags</label>
+                        <div className="max-w-md">
+                            <SmartTagInput
+                                tags={searchTags}
+                                setState={setSearchTags}
+                                // suggestionFetcher={fetchSuggestions}
+                                suggestionFetcher={(q) => fetchSuggestions({ query: q, organizationId })}
+
+                            />
+                        </div>
+                    </div>
+
+                    {searchTags.length > 0 && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSearchTags([])}
+                            className="text-red-500 hover:text-red-700"
+                        >
+                            Clear Filters
+                        </Button>
+                    )}
+                </div>
 
                 {isFetching ? (
                     <div className="text-center text-gray-600">
@@ -199,8 +238,10 @@ export default function ShortListReferenceDesignMain() {
                             imageFiles={imageData?.referenceImages || []}
                             refetch={refetch}
                             height={190}
-                            minWidth={156}
+                            // minWidth={156}
+                            minWidth={193}
                             maxWidth={200}
+                            showTags={true}
                             {...(canDelete ? { handleDeleteFile: handleDelete } : {})}
 
                         // handleDeleteFile={handleDelete}

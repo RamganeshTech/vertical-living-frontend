@@ -4,7 +4,32 @@ import { getApiForRole } from "../../../utils/roleCheck";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../../../QueryClient/queryClient";
 
-export const getAllClientQuotes = async ({
+//  not in use currrently, but it might be used in mobile version
+// export const getAllClientQuotes = async ({
+//     api,
+//     organizationId,
+//     filters,
+// }: {
+//     api: AxiosInstance;
+//     organizationId: string;
+//     filters: {
+//        projectId?: string;
+//         startDate?: string,
+//         endDate?: string,
+//         search?:string,
+//         quoteType?: string;
+//     };
+// }) => {
+//     const { data } = await api.get(`quote/quotegenerate/getallquotevarients/${organizationId}`, {
+//         params: filters,
+//     });
+//     if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
+//     return data.data;
+// };
+
+
+
+export const getAllClientQuotesv1 = async ({
     api,
     organizationId,
     filters,
@@ -12,12 +37,14 @@ export const getAllClientQuotes = async ({
     api: AxiosInstance;
     organizationId: string;
     filters: {
-        createdAt?: string;
-        projectId?: string;
-        quoteNo?: string;
+       projectId?: string;
+        startDate?: string,
+        endDate?: string,
+        search?:string,
+        quoteType?: string;
     };
 }) => {
-    const { data } = await api.get(`quote/quotegenerate/getallquotevarients/${organizationId}`, {
+    const { data } = await api.get(`quote/quotegenerate/v1/getallquotevarients/${organizationId}`, {
         params: filters,
     });
     if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
@@ -26,11 +53,12 @@ export const getAllClientQuotes = async ({
 
 
 
+
 export const getAllClientQuotesforDropDown = async ({
     api,
     organizationId,
     projectId
-   
+
 }: {
     api: AxiosInstance;
     organizationId: string;
@@ -55,6 +83,15 @@ export const getSingleClientQuote = async ({
     if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
     return data.data;
 };
+
+
+
+const updateClientQuote = async ({ api, id, formData }: { api: AxiosInstance, id: string, formData: any }) => {
+    const res = await api.put(`quote/quotegenerate/${id}/update`, formData);
+    console.log("res form api", res.data)
+    if (!res?.data.ok) throw new Error(res?.data?.message || "Failed to delete materials");
+    return res?.data.data;
+}
 
 
 export const deleteClientQuote = async ({
@@ -96,15 +133,38 @@ export const toggleBlur = async ({
 }: {
     api: AxiosInstance;
     organizationId: string;
-    isBlured:boolean,
+    isBlured: boolean,
     id: string,
 }) => {
-    const { data } = await api.patch(`quote/quotegenerate/toggleblur/${organizationId}/${id}`, {isBlured});
+    const { data } = await api.patch(`quote/quotegenerate/toggleblur/${organizationId}/${id}`, { isBlured });
     if (!data.ok) throw new Error(data?.message || "Failed to fetch materials");
     return data.data;
 };
 
-export const useGetAllClientQuotes = (organizationId: string, filters: {
+//  not in use currrently, but it might be used in mobile version
+// export const useGetAllClientQuotes = (organizationId: string, filters: {
+//     createdAt?: string;
+//     projectId?: string;
+//     quoteNo?: string;
+// }) => {
+//     const allowedRoles = ["owner", "staff", "CTO"];
+//     const { role } = useGetRole();
+//     const api = getApiForRole(role!);
+
+//     return useQuery({
+//         queryKey: ["clientquote", organizationId, filters],
+//         queryFn: async () => {
+//             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
+//             if (!api) throw new Error("API instance for role not found");
+
+//             return await getAllClientQuotes({ api, organizationId, filters })
+//         },
+//         enabled: !!organizationId,
+//     });
+// };
+
+
+export const useGetAllClientQuotesv1 = (organizationId: string, filters: {
     createdAt?: string;
     projectId?: string;
     quoteNo?: string;
@@ -119,7 +179,7 @@ export const useGetAllClientQuotes = (organizationId: string, filters: {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
             if (!api) throw new Error("API instance for role not found");
 
-            return await getAllClientQuotes({ api, organizationId, filters })
+            return await getAllClientQuotesv1({ api, organizationId, filters })
         },
         enabled: !!organizationId,
     });
@@ -171,17 +231,44 @@ export const useDeleteClientQuote = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({  id }: {  id: string }) => {
+        mutationFn: async ({ id }: { id: string }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
             if (!api) throw new Error("API instance for role not found");
 
             return await deleteClientQuote({ api, id })
         },
-        onSuccess:()=>{
-            queryClient.invalidateQueries({queryKey: ["clientquote"]})
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["clientquote"] })
         }
     });
 };
+
+
+
+
+
+export const useUpdateClientQuote = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ id, formData }: { id: string, formData: any }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
+            if (!api) throw new Error("API instance for role not found");
+
+            return await updateClientQuote({ api, id, formData })
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["clientquote"] })
+        }
+    });
+};
+
+
+
+
+
 
 
 
@@ -209,7 +296,7 @@ export const useToggleBlurring = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({ organizationId, id, isBlured }: { organizationId: string, id: string, isBlured:boolean }) => {
+        mutationFn: async ({ organizationId, id, isBlured }: { organizationId: string, id: string, isBlured: boolean }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
             if (!api) throw new Error("API instance for role not found");
 

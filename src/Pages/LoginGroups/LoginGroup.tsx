@@ -7,11 +7,12 @@ import { LOCAL_KEY } from "../Stage Pages/Ordering Materials/Public OrderMateria
 
 // Define your paths as an object
 const path = {
-    ADMIN: `/login`, // Owner login
-    CTO: `/login/cto`,
-    STAFF: `/login/staff`,
-    WORKER: `/login/worker`,
-    CLIENT: `/login/client`,
+    // ADMIN: `/login`, // Owner login
+    // CTO: `/login/cto`,
+    // STAFF: `/login/staff`,
+    // WORKER: `/login/worker`,
+    // CLIENT: `/login/client`,
+    COMMONLOGIN: `/login/common`,
     PUBLICORDERS: `/ordermaterial/setup`,
 };
 
@@ -25,7 +26,7 @@ export default function LoginGroup() {
     }
 
 
-      
+
     const orgId = localStorage.getItem(LOCAL_KEY)
 
     if (orgId) {
@@ -41,6 +42,20 @@ export default function LoginGroup() {
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+
+
+    // =========================================================
+    // DATA STRUCTURE FOR SIDEBAR (Flat List for Login Group)
+    // =========================================================
+
+    const loginMenuStructure = Object.entries(LOGIN_LABELS).map(([key, value]) => ({
+        type: 'item',
+        key: key,
+        label: value
+    }));
+
+
 
     // console.log("shallow paths", currentPath)
     // console.log("orgId", orgId)
@@ -59,6 +74,7 @@ export default function LoginGroup() {
                     path={path}
                     labels={LOGIN_LABELS}
                     icons={LOGIN_ICONS_LOGIN_GROUP}
+                    menuStructure={loginMenuStructure} // Pass the structured items here
                 />
             )
             }

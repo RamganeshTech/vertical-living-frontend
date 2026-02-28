@@ -671,12 +671,18 @@
 
 
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../../../../components/ui/Button";
+import SearchSelectNew from "../../../../components/ui/SearchSelectNew";
+import { getItemsBycategoryNameForAllCategories, getItemsBycategoryNameForFittings } from "../../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
+import useGetRole from "../../../../Hooks/useGetRole";
+import { getApiForRole } from "../../../../utils/roleCheck";
+import { useParams } from "react-router-dom";
 
 // Types ----------------------------------------
 export type CoreMaterialRow = {
   itemName: string;
+  materialUsed: string,
   plywoodNos: { quantity: number; thickness: number };
   // laminateNos: { quantity: number; thickness: number };
   innerLaminate: { quantity: number; thickness: number };
@@ -694,15 +700,29 @@ export type CoreMaterialRow = {
 export type SimpleItemRow = {
   itemName: string;
   description: string;
+  brandName: string,
+  brandId: string,
+  imageUrl?: string
   quantity: number;
   cost: number;
   rowTotal: number;
   profitOnMaterial?: number
-  wasManuallyEdited?: boolean; // 🆕
-
 };
+// sjdkflsjdflsdflskfls
+// kkkkkkkkkkkkkkkkkkkkkkkk
+// jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+// jjjjjjjjjjjjjjjjjjjjjjjshsjsjjds
+// lsdjfl;ksjf;lsjf;lsajfl;jld;jlj
+// s;ldkjfkl;sjf;lsjfl;sj;kl
+
 
 export type FurnitureBlock = {
+  dimention: {
+    height: number,
+    width: number,
+    depth: number,
+  },
+  scopeOfWork?: string;
   furnitureName: string;
   furnitureProfit?: number; // 🆕 Added for product-specific override
   fabricationCost?: number; // 🆕 Track factory cost for this product
@@ -749,6 +769,7 @@ export const RATES = {
 
 const emptyCoreMaterial = (): CoreMaterialRow => ({
   itemName: "",
+  materialUsed: "plywood",
   plywoodNos: { quantity: 0, thickness: 0 },
   // laminateNos: { quantity: 0, thickness: 0 },
   innerLaminate: { quantity: 0, thickness: 0 }, // New field
@@ -763,6 +784,8 @@ const emptyCoreMaterial = (): CoreMaterialRow => ({
 
 const emptySimpleItem = (): SimpleItemRow => ({
   itemName: "",
+  brandName: "",
+  brandId: "",
   description: "",
   quantity: 0,
   cost: 0,
@@ -856,6 +879,198 @@ const FurnitureForm: React.FC<Props> = ({
   removeFurniture,
 }) => {
 
+  const { organizationId, } = useParams() as { organizationId: string }
+
+  const [fittingsOptionsMap, setFittingsOptionsMap] = useState<Record<number, any[]>>({});
+  const [nbmOptionsMap, setNbmOptionsMap] = useState<Record<number, any[]>>({});
+  const debounceTimers = useRef<Record<number, any>>({});
+
+
+  const { role } = useGetRole();
+  const allowedRoles = ["owner", "CTO", "staff"];
+
+  const api = getApiForRole(role!);
+
+
+  const fetchFittingsBrands = async (index: number, itemName: string) => {
+    if (!itemName) return;
+    try {
+
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
+      if (!api) throw new Error("API instance not found for role");
+
+
+      const results = await getItemsBycategoryNameForFittings({
+        api,
+        organizationId,
+        categoryName: "Accessories/Hardware",
+        itemName: itemName
+      });
+
+
+      // console.log("results", results)
+
+
+
+      //  OLD VERSION
+      // const formatted = results.map((item: any) => ({
+      //   label: item.data?.Brand,
+
+      //   value: item?._id ? String(item._id) : "",
+
+      //   rate: item.data?.Rs
+      // }));
+
+
+
+      //  NEW VERSION
+      const formatted = results.map((item: any) => {
+        // Extract brand and image dynamically
+        const brand = item.data?.Brand || item.data?.brand || item.data.BrandName || "Unknown";
+        const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";
+
+        return {
+          label: brand,
+          value: item?._id ? String(item._id) : "",
+          rate: item.data?.Rs || item.data?.rs || 0,
+          imageUrl: img // 🆕 Extracted image
+        };
+      });
+
+      // console.log("formatted", formatted)
+
+      setFittingsOptionsMap(prev => ({ ...prev, [index]: formatted }));
+    } catch (error) {
+      console.error("Error fetching fitting brands:", error);
+    }
+  };
+
+
+  // 🆕 New fetch function for Non-Branded (Global Search)
+  const fetchAllCategoryItems = async (index: number, itemName: string) => {
+    if (!itemName) return;
+    try {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("API instance not found");
+
+      const results = await getItemsBycategoryNameForAllCategories({
+        api,
+        organizationId,
+        itemName: itemName
+      });
+
+      const formatted = results.map((item: any) => {
+        // ✅ FIX: Prioritize Brand so you see "Hettich" instead of "hinges"
+        // ✅ This is just the Brand name (e.g., "Hettich")
+        const brandOnly =
+          item.data?.Brand ||
+          item.data?.BrandName ||
+          item.data?.brand ||
+          item.data?.brandName ||
+          item.data?.["Brands light name"] ||
+          item.data?.["Brand "] ||
+          item.data?.["Brands "] ||
+          'Unknown';
+
+        const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";
+
+
+        return {
+          // This will now result in "Hettich (Accessories/Hardware)"
+          label: `${brandOnly} (${item.categoryName?.trim() || 'No Cat'})`,
+          value: item?._id ? String(item._id) : "",
+          rate: item.data?.Rs || item.data?.rs || item?.data?.RS || 0,
+          brandOnly: brandOnly,
+          imageUrl: img // 🆕 Extracted image
+        };
+      });
+
+      setNbmOptionsMap(prev => ({ ...prev, [index]: formatted }));
+    } catch (error) {
+      console.error("Error fetching all category items:", error);
+    }
+  };
+
+
+  //  OLD VERSION OF USE EFFECT TO GET FITTING BRAND AUTOMATICALLY
+  // useEffect(() => {
+  //   // Prime the options map with already saved data so labels show up on load
+  //   const initialMap: Record<number, any[]> = {};
+
+  //   data.fittingsAndAccessories.forEach((row, i) => {
+  //     if (row.brandId && row.brandName) {
+  //       initialMap[i] = [{
+  //         label: row.brandName,
+  //         value: String(row.brandId),
+  //         rate: row.cost // Use existing cost as fallback
+  //       }];
+  //     }
+  //   });
+
+  //   setFittingsOptionsMap(prev => ({ ...prev, ...initialMap }));
+  // }, []); // Run once on mount
+
+
+
+  //  NEW VERSION OF USE EFFECT TO GET FITTING BRAND AND ALL BRANDS AUTOMATICALLY
+
+  useEffect(() => {
+    // 1. Setup temporary maps to build the initial state
+    const initialFittingsMap: Record<number, any[]> = {};
+    const initialNbmMap: Record<number, any[]> = {};
+
+    // 2. Prime Fittings and Accessories
+    data.fittingsAndAccessories?.forEach((row, i) => {
+      if (row.brandId && row.brandName) {
+        initialFittingsMap[i] = [{
+          label: row.brandName,
+          value: String(row.brandId),
+          rate: row.cost,
+          imageUrl: row.imageUrl
+        }];
+      }
+    });
+
+    // 3. Prime Non-Branded Materials (🆕 Added this part)
+    // We use brandId/brandName here as well since your table row uses those fields to store selection
+    // data.nonBrandMaterials?.forEach((row, i) => {
+    //   if (row.brandId && row.brandName) {
+    //     initialNbmMap[i] = [{
+    //       label: row.brandName,
+    //       value: String(row.brandId),
+    //       rate: row.cost
+    //     }];
+    //   }
+    // });
+
+    // 2. Prime Non-Branded Materials & Trigger Silent Fetch
+    data.nonBrandMaterials?.forEach((row, i) => {
+      if (row.brandId && row.brandName) {
+        // Set the initial label (Brand Name only since Category is missing)
+        initialNbmMap[i] = [{
+          label: row.brandName,
+          value: String(row.brandId),
+          brandOnly: row.brandName,
+          rate: row.cost,
+          imageUrl: row.imageUrl // 🆕 Preserve saved image
+        }];
+
+        // ✅ Trigger fetchAllCategoryItems immediately for existing rows
+        // This will overwrite initialNbmMap[i] with the "Brand (Category)" label once finished
+        if (row.itemName) {
+          fetchAllCategoryItems(i, row.itemName);
+        }
+      }
+    });
+
+    // 4. Update both states
+    setFittingsOptionsMap(prev => ({ ...prev, ...initialFittingsMap }));
+    setNbmOptionsMap(prev => ({ ...prev, ...initialNbmMap }));
+
+  }, []); // Run once on mount to populate existing data labels
+  // }, [data.fittingsAndAccessories, data.nonBrandMaterials]);
+
+
 
 
   const computeTotals = (fb: FurnitureBlock) => {
@@ -911,9 +1126,9 @@ const FurnitureForm: React.FC<Props> = ({
 
     // 2. NEW LOGIC: Calculate Average Core Cost for Glues
     // Formula: Total Cost of Core Materials / Number of Core Material Rows
-    const totalCoreCost = updatedRows.reduce((sum, row) => sum + (row.rowTotal || 0), 0);
-    const coreRowCount = updatedRows.length;
-    const avgCoreCost = coreRowCount > 0 ? Math.round(totalCoreCost / coreRowCount) : 0;
+    // const totalCoreCost = updatedRows.reduce((sum, row) => sum + (row.rowTotal || 0), 0);
+    // const coreRowCount = updatedRows.length;
+    // const avgCoreCost = coreRowCount > 0 ? Math.round(totalCoreCost / coreRowCount) : 0;
 
     // const inheritedProfit = updatedRows?.[0]?.profitOnMaterial || 0;
 
@@ -940,21 +1155,21 @@ const FurnitureForm: React.FC<Props> = ({
 
 
 
-    const applyProfitAndRecalculate = (rows: SimpleItemRow[], isGlue = false): SimpleItemRow[] =>
+    const applyProfitAndRecalculate = (rows: SimpleItemRow[]): SimpleItemRow[] =>
       rows.map(item => {
 
 
-        if (isGlue || item.itemName === "Glue") {
-          // ✅ GLUE FIX: Use avgCoreCost as-is to avoid double-dipping profit
-          return {
-            ...item,
-            itemName: "Glue",
-            quantity: 1,
-            profitOnMaterial: item.profitOnMaterial,
-            cost: avgCoreCost,
-            rowTotal: avgCoreCost,
-          };
-        }
+        // if (isGlue || item.itemName === "Glue") {
+        //   // ✅ GLUE FIX: Use avgCoreCost as-is to avoid double-dipping profit
+        //   return {
+        //     ...item,
+        //     itemName: "Glue",
+        //     quantity: 1,
+        //     profitOnMaterial: item.profitOnMaterial,
+        //     cost: avgCoreCost,
+        //     rowTotal: avgCoreCost,
+        //   };
+        // }
 
         // ✅ OTHERS FIX: Apply local profit AND the furnitureProfit multiplier
         const base = (item.quantity || 0) * (item.cost || 0);
@@ -980,7 +1195,7 @@ const FurnitureForm: React.FC<Props> = ({
       ...data,
       coreMaterials: updatedRows,
       fittingsAndAccessories: applyProfitAndRecalculate(data.fittingsAndAccessories),      // false = not glue
-      glues: applyProfitAndRecalculate(data.glues, true),                                  // glue = needs special calc
+      glues: applyProfitAndRecalculate(data.glues),                                  // glue = needs special calc
       nonBrandMaterials: applyProfitAndRecalculate(data.nonBrandMaterials),                // false = not glue
     };
 
@@ -991,9 +1206,9 @@ const FurnitureForm: React.FC<Props> = ({
 
   const syncFurnitureState = (updatedCoreRows: CoreMaterialRow[]) => {
     // 1. Calculate the new Average Cost
-    const totalCoreCost = updatedCoreRows.reduce((sum, row) => sum + (row.rowTotal || 0), 0);
-    const coreRowCount = updatedCoreRows.length;
-    const avgCoreCost = coreRowCount > 0 ? Math.round(totalCoreCost / coreRowCount) : 0;
+    // const totalCoreCost = updatedCoreRows.reduce((sum, row) => sum + (row.rowTotal || 0), 0);
+    // const coreRowCount = updatedCoreRows.length;
+    // const avgCoreCost = coreRowCount > 0 ? Math.round(totalCoreCost / coreRowCount) : 0;
 
     // 2. Get the inherited profit from the first row
     // const inheritedProfit = updatedCoreRows?.[0]?.profitOnMaterial || 0;
@@ -1017,21 +1232,21 @@ const FurnitureForm: React.FC<Props> = ({
     //   });
 
     // 3. Helper to apply updates without forced inheritance
-    const applyUpdates = (rows: SimpleItemRow[], isGlue = false): SimpleItemRow[] =>
+    const applyUpdates = (rows: SimpleItemRow[]): SimpleItemRow[] =>
       rows.map(item => {
-        if (isGlue || item.itemName === "Glue") {
-          // ✅ Uses Glue's OWN current profitOnMaterial
-          // ✅ Uses avgCoreCost directly (already includes furnitureProfit)
-          return {
-            ...item,
-            itemName: "Glue",
-            quantity: 1,
-            cost: avgCoreCost,
-            // Removed inheritedProfit; uses the manual value already in state
-            profitOnMaterial: item.profitOnMaterial,
-            rowTotal: avgCoreCost,
-          };
-        }
+        // if (isGlue || item.itemName === "Glue") {
+        //   // ✅ Uses Glue's OWN current profitOnMaterial
+        //   // ✅ Uses avgCoreCost directly (already includes furnitureProfit)
+        //   return {
+        //     ...item,
+        //     itemName: "Glue",
+        //     quantity: 1,
+        //     cost: avgCoreCost,
+        //     // Removed inheritedProfit; uses the manual value already in state
+        //     profitOnMaterial: item.profitOnMaterial,
+        //     rowTotal: avgCoreCost,
+        //   };
+        // }
 
         // ✅ For Fittings and Non-Branded: Use their OWN profitOnMaterial
         const base = (item.quantity || 0) * (item.cost || 0);
@@ -1055,15 +1270,13 @@ const FurnitureForm: React.FC<Props> = ({
       ...data,
       coreMaterials: updatedCoreRows,
       fittingsAndAccessories: applyUpdates(data.fittingsAndAccessories),
-      glues: applyUpdates(data.glues, true),
+      glues: applyUpdates(data.glues),
       nonBrandMaterials: applyUpdates(data.nonBrandMaterials),
     };
 
     updatedFurniture.totals = computeTotals(updatedFurniture);
     updateFurniture?.(updatedFurniture);
   };
-
-
 
   const spreadOverheads = (profit: number, fabCost: number, shouldReset: boolean) => {
 
@@ -1163,8 +1376,6 @@ const FurnitureForm: React.FC<Props> = ({
     };
     updatedFurniture.totals = computeTotals(updatedFurniture);
     updateFurniture && updateFurniture(updatedFurniture);
-
-
   };
 
   // Render core material table
@@ -1179,6 +1390,7 @@ const FurnitureForm: React.FC<Props> = ({
             <tr>
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Image</th>
               <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Item Name</th>
+              {/* <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" rowSpan={2}>Brand Name</th> */}
               <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider border-x border-gray-200" colSpan={2}>Plywood</th>
 
               <th className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider border-x border-gray-200" colSpan={4}>
@@ -1252,29 +1464,23 @@ const FurnitureForm: React.FC<Props> = ({
                     className="w-full px-2 py-1 text-center outline-none"
                   />
                 </td>
-                {/* {["plywoodNos", "laminateNos"].map((field) =>
-                  ["quantity", "thickness"].map((sub) => (
-                    <td
-                     className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900" key={`${field}-${sub}`}>
-                      <input
-                        type="number"
-                        placeholder={`${sub === "quantity" ? "QTY" : "THK"}`}
-                        value={(row as any)[field][sub] || ""}
-                        onChange={(e) => {
-                          if (Number(e.target.value) >= 0) {
 
-                            handleCoreChange(i, field as any, {
-                              ...(row as any)[field],
-                              [sub]: Number(e.target.value),
-                            })
-                          }
-                        }
-                        }
-                        className="w-full px-2 py-1 text-center outline-none"
-                      />
-                    </td>
-                  ))
-                )} */}
+                {/* <td
+                  // className="border p-2 text-center italic text-blue-600 bg-blue-50/30"
+                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+
+                >
+                  Selected in Next Stage
+                </td>
+                <td
+                  // className="border p-2 text-center font-semibold text-gray-500"
+                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+
+
+                >
+                  Plywood
+                </td> */}
+
 
                 {/*  Replace the map that currently iterates over ["plywoodNos", "laminateNos"] */}
                 {["plywoodNos", "outerLaminate", "innerLaminate"].map((field) =>
@@ -1439,155 +1645,265 @@ const FurnitureForm: React.FC<Props> = ({
   const renderSimpleItemSection = (
     title: string,
     kind: "fittingsAndAccessories" | "glues" | "nonBrandMaterials"
-  ) => (
-    <div className="mt-6">
-      <h3 className="font-semibold text-md mb-2">
-        {title} - Total: ₹{(data as any)?.totals[kind === "fittingsAndAccessories" ? "fittings" : kind]?.toLocaleString("en-IN", {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2,
-        })}
-      </h3>
-      <div className="overflow-x-auto  rounded-md">
-        <table className="min-w-full text-sm bg-white shadow-sm">
-          <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
-            <tr>
-              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
-              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
-              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Profit %</th>
-              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-              <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data[kind].map((row, i) => (
-              <tr key={i}
-                className="group relative border-none !border-b-1 px-4 !py-2 transition-all duration-150 hover:bg-gray-50"
-              >
-                <td
-                  className="p-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
-                >
-                  <input
-                    value={row.itemName || ""}
-                    placeholder="Item Name"
-                    onChange={(e) =>
-                      handleSimpleChange(kind, i, "itemName", e.target.value)
-                    }
-                    className="w-full px-2 py-1 text-center outline-none"
+  ) => {
+    const isFittings = kind === "fittingsAndAccessories";
+    const isNonBranded = kind === "nonBrandMaterials";
+    // const isGlues = kind === "glues";
 
-                  />
-                </td>
-                <td
-                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
-                >
-                  <input
-                    value={row.description}
-                    placeholder="description"
-                    onChange={(e) =>
-                      handleSimpleChange(kind, i, "description", e.target.value)
-                    }
-                    className="w-full px-2 py-1 text-center outline-none"
 
-                  />
-                </td>
-                <td
-                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
-                >
-                  <input
-                    type="number"
-                    placeholder="enter quantity"
-                    value={row.quantity || ""}
-                    onChange={(e) => {
-                      if (Number(e.target.value) >= 0) {
+    return (
+      <div className="mt-6">
+        <h3 className="font-semibold text-md mb-2">
+          {title} - Total: ₹{
 
-                        handleSimpleChange(kind, i, "quantity", Math.max(0, Number(e.target.value)))
-                      }
-                    }
-                    }
-                    className="w-full px-2 py-1 text-center outline-none"
-                  />
-                </td>
-                <td
-                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
-                >
-                  <input
-                    type="number"
-                    value={row.cost || ""}
-                    placeholder="enter cost"
-                    onChange={(e) =>
-                      handleSimpleChange(kind, i, "cost", Math.max(0, Number(e.target.value)))
-                    }
-                    className="w-full px-2 py-1 text-center outline-none"
-                  />
-                </td>
-                <td
-                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+            (data as any)?.totals[
+              // kind === "fittingsAndAccessories" ? "fittings" : kind
+              kind === "fittingsAndAccessories"
+                ? "fittings"
+                : kind === "nonBrandMaterials"
+                  ? "nbms" // 👈 Map 'nonBrandMaterials' to the 'nbms' total key
+                  : "glues"
 
-                >
-                  <input
-                    type="number"
-                    placeholder="enter profit"
-                    value={(row.profitOnMaterial ?? 0) || ""}
-                    onChange={(e) =>
-                      handleSimpleChange(kind, i, "profitOnMaterial", Math.max(0, Number(e.target.value)))
-                    }
-                    // className="w-20 text-center  rounded px-2 py-1 text-sm"
-                    className="w-full px-2 py-1 text-center outline-none"
+            ]?.toLocaleString("en-IN", {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2,
+            })
 
-                  />
-                </td>
-                <td
-                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
-                >
-                  {/* ₹{row.rowTotal.toLocaleString("en-IN")} */}
-                  ₹{row.rowTotal.toLocaleString("en-IN", {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  })}
-                </td>
-                <td
-                  className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
-                >
-                  <Button
-                    variant="danger"
-                    onClick={() => {
-                      const updated = [...data[kind]];
-                      updated.splice(i, 1);
-                      const updatedFurniture: FurnitureBlock = {
-                        ...data,
-                        [kind]: updated,
-                      };
-                      updatedFurniture.totals = computeTotals(updatedFurniture);
-                      updateFurniture && updateFurniture(updatedFurniture);
-                    }}
-                    className="px-1 text-xs bg-red-600 text-white"
-                  >
-                    Remove
-                  </Button>
-                </td>
+          }
+        </h3>
+        {/* <div className="overflow-x-auto  rounded-md">
+          <table className="min-w-full text-sm bg-white shadow-sm"> */}
+
+        <div className="overflow-x-auto rounded-md pb-[200px] -mb-[200px]">
+          <table className="min-w-full text-sm bg-white shadow-sm border-separate border-spacing-0">
+            <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
+              <tr>
+                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Item Name</th>
+                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                {(isFittings || isNonBranded) && <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>}
+                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Profit %</th>
+                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                <th className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+
+
+            </thead>
+            <tbody className="!overflow-visible">
+              {data[kind].map((row, i) => (
+                <tr key={i}
+                  className="group relative border-none !border-b-1 px-4 !py-2 transition-all duration-150 hover:bg-gray-50 hover:z-[100] focus-within:z-[100]"
+                >
+                  <td
+                    className="p-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  >
+                    <input
+                      value={row.itemName || ""}
+                      placeholder="Item Name"
+                      // onChange={(e) =>
+                      //   handleSimpleChange(kind, i, "itemName", e.target.value)
+
+                      // }
+
+
+                      onChange={(e) => {
+                        const val = e.target.value;
+
+                        // 1. Immediate UI update for the text
+                        handleSimpleChange(kind, i, "itemName", val);
+
+                        // 2. Clear existing timer for this specific row index
+                        if (debounceTimers.current[i]) {
+                          clearTimeout(debounceTimers.current[i]);
+                        }
+
+                        // 3. Set new timer: Call API only after 800ms of no typing
+                        debounceTimers.current[i] = setTimeout(() => {
+                          // fetchFittingsBrands(i, val);
+                          // 🆕 Check 'kind' to decide which function to call
+                          if (kind === "fittingsAndAccessories") {
+                            fetchFittingsBrands(i, val);
+                          } else if (kind === "nonBrandMaterials") {
+                            fetchAllCategoryItems(i, val);
+                          }
+                        }, 600);
+                      }}
+                      className="w-full px-2 py-1 text-center outline-none"
+
+                    />
+                  </td>
+
+
+
+                  <td
+                    className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  >
+                    <input
+                      value={row.description}
+                      placeholder="description"
+                      onChange={(e) =>
+                        handleSimpleChange(kind, i, "description", e.target.value)
+                      }
+                      className="w-full px-2 py-1 text-center outline-none"
+
+                    />
+                  </td>
+
+
+
+                  {(isFittings || isNonBranded) && (
+                    <td className="p-2 border border-gray-200 min-w-[200px] !static lg:!relative">
+                      {/* We use a div inside the TD to create a local "anchor". 
+      By making this overflow-visible and the SearchSelect relative/absolute, 
+      it will float above other rows.
+    */}
+                      {/* <div className="relative w-full overflow-visible z-[50]"> */}
+                      <div className="relative w-full !overflow-visible z-[70]">
+                        <SearchSelectNew
+                          // options={fittingsOptionsMap[i] || []}
+                          options={kind === "fittingsAndAccessories" ? fittingsOptionsMap[i] : nbmOptionsMap[i] || []}
+                          value={row?.brandId || ""}
+                          placeholder={row?.itemName ? "Select Brand" : "Type item first"}
+                          onFocus={() => {
+                            // Cast 'kind' as string or use its full union type to bypass the overlap check
+                            const currentKind = kind as string;
+
+                            if (currentKind === "fittingsAndAccessories" && (!fittingsOptionsMap[i] || fittingsOptionsMap[i]?.length <= 1)) {
+                              fetchFittingsBrands(i, row.itemName);
+                            }
+                            else if (currentKind === "nonBrandMaterials" && (!nbmOptionsMap[i] || nbmOptionsMap[i]?.length <= 1)) {
+                              fetchAllCategoryItems(i, row.itemName);
+                            }
+                          }}
+                          // This ensures the dropdown menu itself is forced to the front
+                          // className="relative z-[100] w-full"
+                          className="!overflow-visible relative z-[110]"
+                          onValueChange={(val) => {
+                            // const options = fittingsOptionsMap[i] || [];
+
+                            const options = kind === "fittingsAndAccessories" ? fittingsOptionsMap[i] : nbmOptionsMap[i] || [];
+                            const selected = options.find((opt: any) => String(opt.value) === String(val));
+                            if (selected) {
+                              handleSimpleChange(kind, i, "brandId" as any, selected?.value);
+                              // For fittings, if you haven't added 'brandOnly' there, you can use a fallback
+                              const isNBM = kind === "nonBrandMaterials";
+                              const nameToStore = isNBM ? (selected?.brandOnly || selected?.label) : selected?.label;
+
+                              console.log("Selected Object:", selected); // 👈 Check if imageUrl exists here
+                              console.log("Kind being processed:", kind);   // 👈 Check if it's exactly "nonBrandMaterials"
+
+                              handleSimpleChange(kind, i, "brandName" as any, nameToStore);
+                              handleSimpleChange(kind, i, "cost", selected?.rate);
+                              // 3. ✅ SAVE IMAGE URL TO DATABASE FIELD
+                              handleSimpleChange(kind, i, "imageUrl" as any, selected?.imageUrl || "");
+                            }
+
+                          }}
+                        />
+                      </div>
+                    </td>
+                  )}
+
+
+                  <td
+                    className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  >
+                    <input
+                      type="number"
+                      placeholder="enter quantity"
+                      value={row.quantity || ""}
+                      onChange={(e) => {
+                        if (Number(e.target.value) >= 0) {
+
+                          handleSimpleChange(kind, i, "quantity", Math.max(0, Number(e.target.value)))
+                        }
+                      }
+                      }
+                      className="w-full px-2 py-1 text-center outline-none"
+                    />
+                  </td>
+                  <td
+                    className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  >
+                    <input
+                      type="number"
+                      value={row.cost || ""}
+                      placeholder="enter cost"
+                      onChange={(e) =>
+                        handleSimpleChange(kind, i, "cost", Math.max(0, Number(e.target.value)))
+                      }
+                      className="w-full px-2 py-1 text-center outline-none"
+                    />
+                  </td>
+                  <td
+                    className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+
+                  >
+                    <input
+                      type="number"
+                      placeholder="enter profit"
+                      value={(row.profitOnMaterial ?? 0) || ""}
+                      onChange={(e) =>
+                        handleSimpleChange(kind, i, "profitOnMaterial", Math.max(0, Number(e.target.value)))
+                      }
+                      // className="w-20 text-center  rounded px-2 py-1 text-sm"
+                      className="w-full px-2 py-1 text-center outline-none"
+
+                    />
+                  </td>
+                  <td
+                    className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  >
+                    {/* ₹{row.rowTotal.toLocaleString("en-IN")} */}
+                    ₹{row.rowTotal.toLocaleString("en-IN", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
+                  <td
+                    className="px-2 border border-gray-200 text-center text-sm text-gray-700 font-medium transition-colors duration-200 group-hover:text-gray-900"
+                  >
+                    <Button
+                      variant="danger"
+                      onClick={() => {
+                        const updated = [...data[kind]];
+                        updated.splice(i, 1);
+                        const updatedFurniture: FurnitureBlock = {
+                          ...data,
+                          [kind]: updated,
+                        };
+                        updatedFurniture.totals = computeTotals(updatedFurniture);
+                        updateFurniture && updateFurniture(updatedFurniture);
+                      }}
+                      className="px-1 text-xs bg-red-600 text-white"
+                    >
+                      Remove
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-2 text-right">
+          <Button
+            onClick={() => {
+              const updated = [...data[kind], emptySimpleItem()];
+              const updatedFurniture: FurnitureBlock = {
+                ...data,
+                [kind]: updated,
+              };
+              updatedFurniture.totals = computeTotals(updatedFurniture);
+              updateFurniture && updateFurniture(updatedFurniture);
+            }}
+          >
+            + Add {title} Item
+          </Button>
+        </div>
       </div>
-      <div className="mt-2 text-right">
-        <Button
-          onClick={() => {
-            const updated = [...data[kind], emptySimpleItem()];
-            const updatedFurniture: FurnitureBlock = {
-              ...data,
-              [kind]: updated,
-            };
-            updatedFurniture.totals = computeTotals(updatedFurniture);
-            updateFurniture && updateFurniture(updatedFurniture);
-          }}
-        >
-          + Add {title} Item
-        </Button>
-      </div>
-    </div>
-  );
+    )
+  }
 
 
 
@@ -1605,16 +1921,68 @@ const FurnitureForm: React.FC<Props> = ({
       </div> */}
 
       <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-bold text-gray-400 uppercase">Product Name:</label>
-          <input
-            value={data.furnitureName}
-            onChange={(e) => updateFurniture?.({ ...data, furnitureName: e.target.value })}
-            className="text-xl font-semibold text-gray-700 border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none bg-transparent"
-          />
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-bold text-gray-400 uppercase">Product Name:</label>
+            <input
+              value={data.furnitureName}
+              onChange={(e) => updateFurniture?.({ ...data, furnitureName: e.target.value })}
+              className="text-xl font-semibold text-gray-700 border-b border-transparent hover:border-gray-300 focus:border-blue-500 outline-none bg-transparent"
+            />
+          </div>
+
+          <div className="flex items-center gap-4 mt-2 p-1.5 bg-gray-50/50 rounded-lg w-fit">
+            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+              Dimensions (ft)
+            </label>
+
+            <div className="flex items-center gap-3">
+              {/* Height - Blue Theme */}
+              <div className="flex items-center bg-blue-50 border border-blue-100 rounded-md px-2 py-0.5">
+                <span className="text-[10px] font-bold text-blue-500 mr-1">H</span>
+                <input
+                  type="number"
+                  value={data.dimention?.height || 0}
+                  onChange={(e) => updateFurniture?.({
+                    ...data,
+                    dimention: { ...data.dimention, height: Number(e.target.value) }
+                  })}
+                  className="w-12 bg-transparent text-sm font-medium text-blue-700 outline-none text-center"
+                />
+              </div>
+
+              {/* Width - Green Theme */}
+              <div className="flex items-center bg-green-50 border border-green-100 rounded-md px-2 py-0.5">
+                <span className="text-[10px] font-bold text-green-500 mr-1">W</span>
+                <input
+                  type="number"
+                  value={data.dimention?.width || 0}
+                  onChange={(e) => updateFurniture?.({
+                    ...data,
+                    dimention: { ...data.dimention, width: Number(e.target.value) }
+                  })}
+                  className="w-12 bg-transparent text-sm font-medium text-green-700 outline-none text-center"
+                />
+              </div>
+
+              {/* Depth - Purple Theme */}
+              <div className="flex items-center bg-purple-50 border border-purple-100 rounded-md px-2 py-0.5">
+                <span className="text-[10px] font-bold text-purple-500 mr-1">D</span>
+                <input
+                  type="number"
+                  value={data.dimention?.depth || 0}
+                  onChange={(e) => updateFurniture?.({
+                    ...data,
+                    dimention: { ...data.dimention, depth: Number(e.target.value) }
+                  })}
+                  className="w-12 bg-transparent text-sm font-medium text-purple-700 outline-none text-center"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 self-start">
           {duplicateFurniture && (
             <Button size="sm" onClick={duplicateFurniture} className="bg-blue-600 text-white">
               Duplicate Product

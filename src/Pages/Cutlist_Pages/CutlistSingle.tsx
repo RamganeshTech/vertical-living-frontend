@@ -73,9 +73,9 @@ const CutlistSingle = () => {
             try {
                 const res = await generatePdf.mutateAsync({ id });
     
-                await downloadImage({ src: res?.pdfUrl, alt: "Order Material" })
+                await downloadImage({ src: res?.pdfUrl, alt: "Cutlist Generation" })
                 toast({ title: "Success", description: "Pdf Generated successfully" });
-                refetch()
+                // refetch()
             } catch (err: any) {
                 toast({ title: "Error", description: err?.response?.data?.message || err?.message || "Failed to generate link", variant: "destructive" });
             }
@@ -86,7 +86,7 @@ const CutlistSingle = () => {
     if (isError) return <div className="p-10 text-center text-red-500">Error: {(error as any).message}</div>;
 
     return (
-        <main className='max-h-full overflow-y-auto p-4'>
+        <main className='max-h-full h-full overflow-y-auto '>
             <CutlistForm 
                 mode="view" 
                 initialData={cutlist} 

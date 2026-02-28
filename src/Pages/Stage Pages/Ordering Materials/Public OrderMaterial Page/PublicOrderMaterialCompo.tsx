@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import {
     useGetAllOrderMaterialPublicUnits,
@@ -12,8 +12,9 @@ import { toast } from '../../../../utils/toast';
 import { useState } from 'react';
 import { Input } from '../../../../components/ui/Input';
 import { Button } from '../../../../components/ui/Button';
-import { useGetShopLib } from '../../../../apiList/Stage Api/shopLibDetailApi';
+// import { useGetShopLib } from '../../../../apiList/Stage Api/shopLibDetailApi';
 import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
+import { useGetVendorForDropDown } from '../../../../apiList/Department Api/Accounting Api/vendorAccApi';
 
 type Props = {
     selectedProjectId: string,
@@ -25,7 +26,9 @@ const PublicOrderMaterialCompo: React.FC<Props> = ({
     organizationId
 }) => {
 
-    const { data: shops } = useGetShopLib(organizationId);
+    // const { data: shops } = useGetShopLib(organizationId);
+    const { data: vendors } = useGetVendorForDropDown(organizationId);
+
 
     const [editShop, setEditShop] = useState(false);
 
@@ -40,20 +43,48 @@ const PublicOrderMaterialCompo: React.FC<Props> = ({
 
 
 
+    // useEffect(() => {
+    //     if (selectedShop.selectedId) {
+    //         const shop = shops?.find((shop: any) => shop._id === selectedShop.selectedId)
+    //         // console.log("shop", shop)
+    //         if (shop) {
+    //             setShopForm(shop)
+    //         }
+    //     }
+    // }, [selectedShop.selectedId, shops])
+
+    // const shopLibOptions = (shops || [])?.map((shop: any) => ({
+    //     value: shop._id,
+    //     label: shop.shopName
+    // }))
+
+
+    // Inside your useEffect to update the form
     useEffect(() => {
-        if (selectedShop.selectedId) {
-            const shop = shops?.find((shop: any) => shop._id === selectedShop.selectedId)
-            // console.log("shop", shop)
-            if (shop) {
-                setShopForm(shop)
+        if (selectedShop.selectedId && vendors.length > 0) {
+            const vendor = vendors.find((v: any) => v._id === selectedShop.selectedId);
+            if (vendor) {
+                setShopForm({
+                    shopName: vendor?.shopName,
+                    address: vendor?.address,
+                    contactPerson: vendor?.vendorName,
+                    phoneNumber: vendor?.phoneNo, // Matches 'phoneNo' from your backend map
+                    priority: vendor?.priority || []
+                });
             }
         }
-    }, [selectedShop.selectedId, shops])
+    }, [selectedShop.selectedId, vendors]);
 
-    const shopLibOptions = (shops || [])?.map((shop: any) => ({
-        value: shop._id,
-        label: shop.shopName
-    }))
+
+    // 2. Map the data specifically for SearchSelectNew options
+    const shopLibOptions = useMemo(() => {
+        return vendors?.map((vendor: any) => ({
+            value: vendor._id,
+            // Match the 'shopName' key you defined in your backend 'modifiedvendor'
+            label: vendor.shopName || vendor.vendorName,
+            subLabel: vendor.contactPerson
+        }));
+    }, [vendors]);
 
 
 
@@ -260,26 +291,40 @@ const PublicOrderMaterialCompo: React.FC<Props> = ({
                             Edit
                         </button>
                     )
-                :
+                        :
 
-                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Shop Selection</label>
-                <SearchSelectNew
-                    options={shopLibOptions}
-                    placeholder="Select Shop"
-                    searchPlaceholder="Search by shop name..."
-                    value={selectedShop.selectedId || ''}
-                    onValueChange={(value) => {
-                        const shopFound = shops?.find((s: any) => s._id === value)
-                        // console.log("sop", shopFound)
-                        setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
-                    }}
-                    searchBy="name"
-                    displayFormat="detailed"
-                    className="w-full"
-                />
-            </div>
-                }
+                        <div className="w-[25%] animate-in fade-in duration-300 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Shop Selection</label>
+                            <SearchSelectNew
+                                options={shopLibOptions}
+                                placeholder="Select Shop"
+                                searchPlaceholder="Search by shop name..."
+                                value={selectedShop.selectedId || ''}
+                                // onValueChange={(value) => {
+                                //     const shopFound = shops?.find((s: any) => s._id === value)
+                                //     // console.log("sop", shopFound)
+                                //     setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
+                                // }}
+
+
+                                onValueChange={(value) => {
+                                    // Search in the 'vendors' local variable we created above
+                                    const vendorFound = vendors.find((v: any) => v._id === value);
+                                    if (vendorFound) {
+                                        setSelectedShop({
+                                            selectedId: vendorFound._id,
+                                            shopName: vendorFound.shopName
+                                        });
+                                    }
+                                }}
+
+
+                                searchBy="name"
+                                displayFormat="detailed"
+                                className="w-full"
+                            />
+                        </div>
+                    }
                 </div>
 
                 {editShop ? (

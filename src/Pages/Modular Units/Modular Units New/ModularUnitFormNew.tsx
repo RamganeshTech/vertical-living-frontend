@@ -292,11 +292,12 @@ const ModularUnitFormNew = ({ mode, unitId }: ModularUnitFormProps) => {
 
         const submitData = {
             ...formValues,
-            dimention: {
-                height: formValues.dimention.height || undefined,
-                width: formValues.dimention.width || undefined,
-                depth: formValues.dimention.depth || undefined,
-            },
+            // dimention: {
+            //     height: formValues.dimention.height || undefined,
+            //     width: formValues.dimention.width || undefined,
+            //     depth: formValues.dimention.depth || undefined,
+            // },
+            dimention: JSON.stringify(formValues.dimention),
             totalAreaSqFt: formValues.totalAreaSqFt || undefined,
             fabricationCost: formValues.fabricationCost || undefined,
             timeRequired: formValues.timeRequired || undefined,

@@ -160,19 +160,19 @@ const ProtectedSingleShopQuote = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-1">
                         <div>
                             <span className="text-[10px] text-gray-400 uppercase font-semibold block">Shop Name</span>
-                            <p className="font-bold text-gray-900 text-base">{shop?.shopName || "N/A"}</p>
+                            <p className="font-bold text-gray-900 text-base">{shop?.shopDisplayName || "N/A"}</p>
                         </div>
                         <div>
                             <span className="text-[10px] text-gray-400 uppercase font-semibold block">Contact Person</span>
-                            <p className="text-sm text-gray-700 font-medium">{shop?.contactPerson || "N/A"}</p>
+                            <p className="text-sm text-gray-700 font-medium">{shop?.firstName || "N/A"}</p>
                         </div>
                         <div>
                             <span className="text-[10px] text-gray-400 uppercase font-semibold block">Phone Number</span>
-                            <p className="text-sm text-gray-700 font-mono">{shop?.phoneNumber || "N/A"}</p>
+                            <p className="text-sm text-gray-700 font-mono">{shop?.phone?.mobile || shop?.phone?.work || "N/A"}</p>
                         </div>
                         <div>
                             <span className="text-[10px] text-gray-400 uppercase font-semibold block">Address</span>
-                            <p className="text-sm text-gray-600 line-clamp-2">{shop?.address || "N/A"}</p>
+                            <p className="text-sm text-gray-600 line-clamp-2">{shop?.shopFullAddress || "N/A"}</p>
                         </div>
                     </div>
                 </div>

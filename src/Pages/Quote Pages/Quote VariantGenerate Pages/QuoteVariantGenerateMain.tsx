@@ -1,24 +1,46 @@
 import { useParams, useLocation, Outlet, useNavigate } from "react-router-dom";
-import { Button } from "../../../components/ui/Button";
+// import { Button } from "../../../components/ui/Button";
 import { useGetMaterialQuoteEntries } from "../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 
 import type { AvailableProjetType } from "../../Department Pages/Logistics Pages/LogisticsShipmentForm";
 import { useGetProjects } from "../../../apiList/projectApi";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import QuoteVarientCard from "./QuoteVarientCard";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
+import { useDebounce } from "../../../Hooks/useDebounce";
+import { QUOTE_TYPE } from "../Quote Generate Pages/QuoteGenerate Main/InternalQuote_New_Version/CreateQuoteModal";
 
 const QuoteGenerateVariantMain = () => {
     const { organizationId } = useParams();
 
     const [filters, setFilters] = useState({
-        // status: "",
         projectId: "",
         projectName: "",
-        createdAt: "",
+        startDate: '',     // Transaction Date From
+        endDate: '',       // Transaction Date To
+        quoteType: "",
+        search: "",
     });
+
+
+
+    const debouncedSearch = useDebounce(filters.search, 800);
+    const debouncedStartDate = useDebounce(filters.startDate, 800);
+    const debouncedEndDate = useDebounce(filters.endDate, 800);
+
+
+    // --- Construct Final Filter Object for API ---
+    const apiFilters = useMemo(() => ({
+        projectId: filters.projectId,
+        startDate: debouncedStartDate, // <--- Used here
+        endDate: debouncedEndDate,     // <--- Used here
+        quoteType: filters.quoteType,
+        // minAmount: debouncedMinAmount,
+        // maxAmount: debouncedMaxAmount,
+        search: debouncedSearch,
+    }), [filters.projectId, filters.startDate, filters.endDate, debouncedSearch, debouncedEndDate, debouncedStartDate, filters.quoteType]);
 
 
 
@@ -29,18 +51,14 @@ const QuoteGenerateVariantMain = () => {
     // const canEdit = role === "owner" || permission?.quotevariant?.edit;
 
 
-    const [searchInput, setSearchInput] = useState("");     // user typing
-    const [searchTerm, setSearchTerm] = useState<string>(""); // value used for sending to the api
+    // const [searchInput, setSearchInput] = useState("");     // user typing
+    // const [searchTerm, setSearchTerm] = useState<string>(""); // value used for sending to the api
     const { data } = useGetProjects(organizationId!)
     // console.log("data", data)
     const projects = data?.map((project: AvailableProjetType) => ({ _id: project._id, projectName: project.projectName }))
     const navigate = useNavigate();
 
-    const { data: allQuotes, isLoading } = useGetMaterialQuoteEntries(organizationId!, {
-        createdAt: filters.createdAt,
-        projectId: filters.projectId,
-        quoteNo: searchTerm,
-    });
+    const { data: allQuotes, isLoading } = useGetMaterialQuoteEntries(organizationId!, apiFilters);
 
 
 
@@ -63,7 +81,11 @@ const QuoteGenerateVariantMain = () => {
         setFilters({
             projectId: "",
             projectName: "",
-            createdAt: "",
+            // createdAt: "",
+            startDate: '',     // Transaction Date From
+            endDate: '',       // Transaction Date To
+            quoteType: "",
+            search: "",
         });
     };
     const activeFiltersCount = Object.values(filters).filter(Boolean).length;
@@ -123,9 +145,14 @@ const QuoteGenerateVariantMain = () => {
             </header>
 
 
-            <main className="flex gap-2 !max-h-[87%]">
 
-                <div className="xl:w-80 flex-shrink-0">
+{/* kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaaaaaaaaaaaaaaaaaaaaa kkkkkkkkkkkkkkkkkkk */}
+
+{/* kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaaaaaaaaaaaaaaaaaaaaa kkkkkkkkkkkkkkkkkkk */}
+
+            <main className="flex gap-4 w-full h-[calc(100vh-108px)] overflow-hidden">
+
+                <section className="xl:w-80 flex-shrink-0  h-full overflow-y-auto">
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -144,64 +171,48 @@ const QuoteGenerateVariantMain = () => {
 
                         <div className="space-y-6">
                             {/* <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Status
-                                  </label>
-                                  <select
-                                    value={filters.status || ''}
-                                    onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  >
-                                    <option value="">All Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="assigned">Assigned</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="in_transit">In Transit</option>
-                                    <option value="cancelled">Cancelled</option>
-                                  </select>
-                                </div> */}
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                        Created Date
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        onChange={(e) => setFilters((f) => ({ ...f, createdAt: e.target.value }))}
+                                                        value={filters.createdAt}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    />
+                                                </div> */}
 
-
-                            <div className="">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Search By Quote No
-                                </label>
-                                <div className="flex gap-2">
-
-                                    <input
-                                        type="text"
-                                        placeholder="Search and Press Enter"
-                                        value={searchInput}
-                                        autoFocus
-                                        onChange={(e) => setSearchInput(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter") {
-                                                setSearchTerm(searchInput);  // ✅ Only triggers on Enter
-                                            }
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                    />
-
-                                    <Button
-                                        onClick={() => setSearchTerm(searchInput)}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded"
-                                    >
-                                        <i className="fas fa-search"> </i>
-                                    </Button>
-                                </div>
-
-                            </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Created Date
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+
                                 <input
-                                    type="date"
-                                    onChange={(e) => setFilters((f) => ({ ...f, createdAt: e.target.value }))}
-                                    value={filters.createdAt}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    type="text"
+                                    placeholder="Search Quote No, Quote Name"
+                                    value={filters.search}
+                                    autoFocus
+                                    onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+
+                                // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
+                            </div>
+
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Quote Type</label>
+                                <select
+                                    value={filters.quoteType || ''}
+                                    onChange={(e) => setFilters((f) => ({ ...f, quoteType: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                                >
+                                    <option value="">All Type</option>
+                                    {QUOTE_TYPE.map(option => {
+                                        return <option key={option} value={option}>
+                                            {option === "sqft_rate" ? "Sqft Rate" :
+                                                option[0].toUpperCase() + option.slice(1)}</option>
+                                    })}
+                                </select>
                             </div>
 
 
@@ -232,11 +243,38 @@ const QuoteGenerateVariantMain = () => {
                                     ))}
                                 </select>
                             </div>
+
+
+                            {/* 5. Date Range Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                                <div className="space-y-2">
+                                    <div>
+                                        <span className="text-xs text-gray-500 mb-1 block">From</span>
+                                        <input
+                                            type="date"
+                                            value={filters.startDate}
+                                            onChange={(e) => setFilters(f => ({ ...f, startDate: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-gray-500 mb-1 block">To</span>
+                                        <input
+                                            type="date"
+                                            value={filters.endDate}
+                                            onChange={(e) => setFilters(f => ({ ...f, endDate: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-                </div>
+                </section>
 
-                {canList && <section className="w-full max-h-full  gap-2  overflow-y-auto  min-h-full">
+                {canList && <section className="flex-1 h-full overflow-y-auto custom-scrollbar pb-10">
 
                     {isLoading ? (
                         <p><MaterialOverviewLoading /></p>

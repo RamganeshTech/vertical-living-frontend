@@ -138,19 +138,19 @@ export const useLogoutUser = () => {
 }
 
 
-export const useforgotPasswordUser = () => {
-    return useMutation({
-        mutationFn: forgotPassworduser
-    })
-}
+    export const useforgotPasswordUser = () => {
+        return useMutation({
+            mutationFn: forgotPassworduser
+        })
+    }
 
 
 
-export const useResetPasswordUser = () => {
-    return useMutation({
-        mutationFn: resetPasswordUser
-    })
-}
+    export const useResetPasswordUser = () => {
+        return useMutation({
+            mutationFn: resetPasswordUser
+        })
+    }
 
 
 

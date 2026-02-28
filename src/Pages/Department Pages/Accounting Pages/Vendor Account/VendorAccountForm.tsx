@@ -1056,6 +1056,7 @@ import { type CreateVendorPayload, type UpdateVendorPayload, type Vendor } from 
 import ImageGalleryExample from '../../../../shared/ImageGallery/ImageGalleryMain';
 import { dateFormate } from '../../../../utils/dateFormator';
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import SmartTagInput from '../../../../shared/SmartTagInput';
 
 // --- UI Helpers ---
 const SectionHeader = ({ icon, title }: { icon: string, title: string }) => (
@@ -1106,13 +1107,13 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
     const { organizationId } = useParams();
     const navigate = useNavigate();
 
-    
-        const { role, permission } = useAuthCheck();
-        // const canList = role === "owner" || permission?.vendor?.list;
-        // const canCreate = role === "owner" || permission?.vendor?.create
-        const canEdit = role === "owner" || permission?.vendor?.edit
-        // const canDelete = role === "owner" || permission?.vendor?.delete
-    
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.vendor?.list;
+    // const canCreate = role === "owner" || permission?.vendor?.create
+    const canEdit = role === "owner" || permission?.vendor?.edit
+    // const canDelete = role === "owner" || permission?.vendor?.delete
+
 
     // --- State ---
     const [currentMode, setCurrentMode] = useState<'create' | 'view' | 'update'>(initialMode);
@@ -1144,7 +1145,8 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
         mapUrl: "",
         openingBalance: 0,
         paymentTerms: 'Due on Receipt',
-        location: { latitude: 0, longitude: 0 }
+        location: { latitude: 0, longitude: 0 },
+        priority: [] as string[]
     });
 
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -1187,7 +1189,8 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
                 location: {
                     latitude: initialData?.location?.latitude || 0,
                     longitude: initialData?.location?.longitude || 0
-                }
+                },
+                priority: initialData?.priority || []
             }));
         }
     }, [initialData, organizationId]);
@@ -1220,8 +1223,19 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
         if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email';
         if (formData.phone.mobile && formData.phone.mobile.length !== 10) newErrors['phone.mobile'] = 'Must be 10 digits';
         setErrors(newErrors);
+        console.log("mew errors", newErrors)
         return Object.keys(newErrors).length === 0;
     };
+
+
+    const handleSetTags = (newTags: string[] | ((prev: string[]) => string[])) => {
+        setFormData((prev: any) => ({
+            ...prev,
+            priority: typeof newTags === 'function' ? newTags(prev.priority) : newTags
+        }));
+    };
+
+
 
     const handleSubmit = async () => {
         if (!validateForm()) return;
@@ -1471,6 +1485,22 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
                                         maxLength={12}
                                         placeholder="STD + Number"
                                     />
+                                </div>
+                            </div>
+
+
+                            <div className="pt-4 border-t border-gray-100">
+                                {/* <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    <i className="fas fa-tags mr-2 text-blue-500"></i>Priority Tags
+                                </label> */}
+                                <InputLabel>Tags</InputLabel>
+                                <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
+                                    <SmartTagInput
+                                        tags={formData.priority}
+                                        setState={handleSetTags}
+                                    // suggestionFetcher={async () => ['high', 'electrical', 'plumbing', 'general', 'urgent']}
+                                    />
+                                    <p className="text-[10px] text-gray-400 mt-2 italic">These tags are used to filter shops when sending procurement requests.</p>
                                 </div>
                             </div>
                         </div>

@@ -8,7 +8,8 @@ const initialState = {
     phoneNo: "",
     isauthenticated: false,
     permission: {} as Record<string, Record<string, boolean>>,
-    isGuideRequired: undefined // <-- add this
+    isGuideRequired: undefined, // <-- add this
+    ownerId:"",
 
 }
 
@@ -17,7 +18,7 @@ const clientSlice = createSlice({
     initialState,
     reducers: {
         setClientProfileData: (state, action) => {
-            const { clientId, clientName, email, phoneNo, isauthenticated, role, permission, isGuideRequired } = action.payload
+            const { clientId, clientName, email, phoneNo, isauthenticated, role, permission, isGuideRequired , ownerId} = action.payload
 
             return {
                 ...state,
@@ -27,7 +28,7 @@ const clientSlice = createSlice({
                 phoneNo,
                 role,
                 isauthenticated,
-                permission, isGuideRequired
+                permission, isGuideRequired, ownerId
             };
         },
         updateClientGuideStatus: (state, action) => {

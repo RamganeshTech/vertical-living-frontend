@@ -166,7 +166,7 @@ const ForgotPassword = () => {
                                         type="email"
                                         value={emailInput}
                                         onChange={(e) => setEmailInput(e.target.value)}
-                                        placeholder="arun@gmail.com"
+                                        placeholder="Enter your Registered Mail Address"
                                         className="pl-10 border-2 border-blue-200 focus:border-blue-500 transition-all duration-200 bg-white/70 backdrop-blur-sm"
                                     />
                                 </div>

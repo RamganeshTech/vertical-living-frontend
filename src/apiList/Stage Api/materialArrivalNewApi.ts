@@ -6,6 +6,7 @@ import axios, { type AxiosInstance } from "axios";
 
 
 // PUT /materialarrivalcheck/updateImage/:projectId/:fieldId
+// not used
 export const updateMaterialArrivalItemApi = async (
     projectId: string,
     orderNumber: string,
@@ -16,6 +17,33 @@ export const updateMaterialArrivalItemApi = async (
     return res.data;
 };
 
+
+// PUT /materialarrivalcheck/updateImage/:projectId/:fieldId
+export const updateMaterialArrivalItemV1Api = async (
+    projectId: string,
+    orderNumber: string,
+    subItemId: string,
+    formData: FormData
+) => {
+    const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/materialarrivalcheck/updateImage/v1/${projectId}/${orderNumber}/${subItemId}`, 
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+    return res.data;
+};
+
+export const deleteMaterialArrivalImagePublicApi = async (
+    projectId: string,
+    orderNumber: string,
+    subItemId: string,
+    imageId: string
+) => {
+    const res = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/materialarrivalcheck/deleteImage/v1/${projectId}/${orderNumber}/${subItemId}/${imageId}`
+    );
+    return res.data;
+};
 
 
 // PUT /materialarrivalcheck/updateImage/:projectId/:fieldId
@@ -44,9 +72,34 @@ export const uploadMatArrImageByStaff = async (
 };
 
 
+export const uploadMatArrImageByStaffV1 = async (
+    projectId: string,
+    orderNumber: string,
+    subItemId: string,
+    formData: FormData,
+    api: AxiosInstance
+) => {
+    const res = await api.put(`/materialarrivalcheck/uploadimage/v1/staff/${projectId}/${orderNumber}/${subItemId}`, formData);
+    return res.data;
+};
 
 
 
+export const deleteMatArrImageByStaffV1 = async (
+    projectId: string,
+    orderNumber: string,
+    subItemId: string,
+    imageId:string,
+    api: AxiosInstance
+) => {
+    const res = await api.patch(`/materialarrivalcheck/deleteimage/v1/staff/${projectId}/${orderNumber}/${subItemId}/${imageId}`);
+    return res.data;
+};
+
+
+
+
+//  not used
 export const useUpdateMaterialArrivalItemNew = () => {
     const queryClient = useQueryClient();
 
@@ -70,7 +123,45 @@ export const useUpdateMaterialArrivalItemNew = () => {
 };
 
 
+//  public hook
 
+export const useUpdateMaterialArrivalItemV1 = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ projectId, orderNumber, subItemId, formData }: {
+            projectId: string;
+            orderNumber: string;
+            subItemId: string;
+            formData: FormData;
+        }) => updateMaterialArrivalItemV1Api(projectId, orderNumber, subItemId, formData),
+        
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["material-arrival-public", projectId] });
+        },
+    });
+};
+
+export const useDeleteMaterialArrivalImagePublic = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ projectId, orderNumber, subItemId, imageId }: {
+            projectId: string;
+            orderNumber: string;
+            subItemId: string;
+            imageId: string;
+        }) => deleteMaterialArrivalImagePublicApi(projectId, orderNumber, subItemId, imageId),
+        
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["material-arrival-public", projectId] });
+        },
+       
+    });
+};
+
+
+//  not used 
 export const useUpdateStaffMatArrivalItemImage = () => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
@@ -94,6 +185,73 @@ export const useUpdateStaffMatArrivalItemImage = () => {
 
 
             return await uploadMatArrImageByStaff(projectId, orderNumber, subItemId, formData, api);
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
+        },
+    });
+};
+
+
+
+export const useUpdateStaffMatArrivalItemImageV1 = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const queryClient = useQueryClient();
+    const allowedRoles = ["owner", "staff", "CTO"]
+
+
+    return useMutation({
+        mutationFn: async ({
+            projectId,
+            orderNumber, subItemId,
+            formData,
+        }: {
+            projectId: string;
+            orderNumber: string,
+            subItemId: string,
+            formData: FormData;
+        }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+            if (!api) throw new Error("API instance not available");
+
+
+            return await uploadMatArrImageByStaffV1(projectId, orderNumber, subItemId, formData, api);
+        },
+        onSuccess: (_, { projectId }) => {
+            queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
+        },
+    });
+};
+
+
+
+
+
+
+export const useDeleteStaffMatArrivalItemImageV1 = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+    const queryClient = useQueryClient();
+    const allowedRoles = ["owner", "staff", "CTO"]
+
+
+    return useMutation({
+        mutationFn: async ({
+            projectId,
+            orderNumber, subItemId,
+            imageid,
+        }: {
+            projectId: string;
+            orderNumber: string,
+            subItemId: string,
+            imageid: string;
+        }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+            if (!api) throw new Error("API instance not available");
+
+
+            return await deleteMatArrImageByStaffV1(projectId, orderNumber, subItemId, imageid, api);
         },
         onSuccess: (_, { projectId }) => {
             queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });

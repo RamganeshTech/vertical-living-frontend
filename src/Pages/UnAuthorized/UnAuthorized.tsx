@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 const UnAuthorized: React.FC = () => {
 
 
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const handleGoHome = () => {
+  const handleGoBack = () => {
     navigate(-1);
   };
 
@@ -22,8 +22,8 @@ const UnAuthorized: React.FC = () => {
           <p className="text-gray-600 text-base md:text-lg">
             Sorry, you don&apos;t have permission to view this page.
           </p>
-            <button
-            onClick={handleGoHome}
+          <button
+            onClick={handleGoBack}
             className="mt-4 px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-full transition"
           >
             Go Back

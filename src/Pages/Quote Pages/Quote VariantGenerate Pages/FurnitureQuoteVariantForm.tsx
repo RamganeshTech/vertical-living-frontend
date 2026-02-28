@@ -530,77 +530,77 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>((props, r
 
 
   const isInitialized = useRef(false);
-// 1. Unified Plywood Sync
-useEffect(() => {
+  // 1. Unified Plywood Sync
+  useEffect(() => {
     if (!brandOptions.length) return;
 
     const savedId = data.plywoodBrandId;
     const globalFound = brandOptions.find(o => o.label === selectedBrand || o.value === selectedBrand);
 
     if (!isInitialized.current && savedId) {
-        // --- HYDRATION: Use the ID saved in the database for THIS product ---
-        const savedObj = brandOptions.find(o => o.value === savedId);
-        setCoreSelectedBrand(savedObj?.label || null);
-        setCoreSelectedBrandId(savedId);
-    } 
-    else if (isInitialized.current && selectedBrand) {
-        // --- SYNC: Only follow global prop AFTER initial load is finished ---
-        setCoreSelectedBrand(globalFound?.label || selectedBrand);
-        setCoreSelectedBrandId(globalFound?.value || null);
+      // --- HYDRATION: Use the ID saved in the database for THIS product ---
+      const savedObj = brandOptions.find(o => o.value === savedId);
+      setCoreSelectedBrand(savedObj?.label || null);
+      setCoreSelectedBrandId(savedId);
     }
-}, [selectedBrand, brandOptions, data.plywoodBrandId]);
+    else if (isInitialized.current && selectedBrand) {
+      // --- SYNC: Only follow global prop AFTER initial load is finished ---
+      setCoreSelectedBrand(globalFound?.label || selectedBrand);
+      setCoreSelectedBrandId(globalFound?.value || null);
+    }
+  }, [selectedBrand, brandOptions, data.plywoodBrandId]);
 
-// 2. Unified Inner Laminate Sync
-useEffect(() => {
+  // 2. Unified Inner Laminate Sync
+  useEffect(() => {
     if (!innerOptions.length) return;
 
     const savedId = data.innerLaminateBrandId;
     const globalFound = innerOptions.find(o => o.label === selectedInnerBrand || o.value === selectedInnerBrand);
 
     if (!isInitialized.current && savedId) {
-        // --- HYDRATION: Use specific product ID ---
-        const savedObj = innerOptions.find(o => o.value === savedId);
-        setCoreSelectedInnerBrand(savedObj?.label || null);
-        setCoreSelectedInnerBrandId(savedId);
-    } 
-    else if (isInitialized.current && selectedInnerBrand) {
-        // --- SYNC: Follow global change ---
-        setCoreSelectedInnerBrand(globalFound?.label || selectedInnerBrand);
-        setCoreSelectedInnerBrandId(globalFound?.value || null);
+      // --- HYDRATION: Use specific product ID ---
+      const savedObj = innerOptions.find(o => o.value === savedId);
+      setCoreSelectedInnerBrand(savedObj?.label || null);
+      setCoreSelectedInnerBrandId(savedId);
     }
-}, [selectedInnerBrand, innerOptions, data.innerLaminateBrandId]);
+    else if (isInitialized.current && selectedInnerBrand) {
+      // --- SYNC: Follow global change ---
+      setCoreSelectedInnerBrand(globalFound?.label || selectedInnerBrand);
+      setCoreSelectedInnerBrandId(globalFound?.value || null);
+    }
+  }, [selectedInnerBrand, innerOptions, data.innerLaminateBrandId]);
 
-// 3. Unified Outer Laminate Sync
-useEffect(() => {
+  // 3. Unified Outer Laminate Sync
+  useEffect(() => {
     if (!outerOptions.length) return;
 
     const savedId = data.outerLaminateBrandId;
     const globalFound = outerOptions.find(o => o.label === selectedOuterBrand || o.value === selectedOuterBrand);
 
     if (!isInitialized.current && savedId) {
-        // --- HYDRATION: Use specific product ID ---
-        const savedObj = outerOptions.find(o => o.value === savedId);
-        setCoreSelectedOuterBrand(savedObj?.label || null);
-        setCoreSelectedOuterBrandId(savedId);
-    } 
+      // --- HYDRATION: Use specific product ID ---
+      const savedObj = outerOptions.find(o => o.value === savedId);
+      setCoreSelectedOuterBrand(savedObj?.label || null);
+      setCoreSelectedOuterBrandId(savedId);
+    }
     else if (isInitialized.current && selectedOuterBrand) {
-        // --- SYNC: Follow global change ---
-        setCoreSelectedOuterBrand(globalFound?.label || selectedOuterBrand);
-        setCoreSelectedOuterBrandId(globalFound?.value || null);
+      // --- SYNC: Follow global change ---
+      setCoreSelectedOuterBrand(globalFound?.label || selectedOuterBrand);
+      setCoreSelectedOuterBrandId(globalFound?.value || null);
     }
-}, [selectedOuterBrand, outerOptions, data.outerLaminateBrandId]);
+  }, [selectedOuterBrand, outerOptions, data.outerLaminateBrandId]);
 
-// --- CRITICAL FIX: Master Initialization Lock ---
-useEffect(() => {
+  // --- CRITICAL FIX: Master Initialization Lock ---
+  useEffect(() => {
     if (brandOptions.length > 0 && innerOptions.length > 0 && outerOptions.length > 0) {
-        // We use a small timeout to ensure the "Hydration" effects above 
-        // finish processing the database IDs before we allow global overrides.
-        const timer = setTimeout(() => {
-            isInitialized.current = true;
-        }, 300); 
-        return () => clearTimeout(timer);
+      // We use a small timeout to ensure the "Hydration" effects above 
+      // finish processing the database IDs before we allow global overrides.
+      const timer = setTimeout(() => {
+        isInitialized.current = true;
+      }, 300);
+      return () => clearTimeout(timer);
     }
-}, [brandOptions.length, innerOptions.length, outerOptions.length]);
+  }, [brandOptions.length, innerOptions.length, outerOptions.length]);
 
 
   // Update your handle function to catch both pieces of data
@@ -716,7 +716,7 @@ useEffect(() => {
         plywoodBrand: coreSelectedBrand,
         innerLaminateBrand: coreSelectedInnerBrand,
         outerLaminateBrand: coreSelectedOuterBrand,
-
+        dimention: data?.dimention,
 
 
         // 🆕 Brand IDs (New fields for DB)
@@ -750,53 +750,107 @@ useEffect(() => {
 
   useEffect(() => { onFurnitureChange(); }, [coreSelectedBrand, coreSelectedInnerBrand, coreSelectedOuterBrand]);
 
-  const renderSimpleSection = (title: string, rows: SimpleItemRow[], kind: "Fittings" | "Glues" | "NBMs") => (
-    <div className="mt-6">
-      <h3 className="font-semibold text-md mb-2 text-gray-800">{title} - Total: ₹{Math.round(kind === "Fittings" ? fittingsTotal : kind === "Glues" ? gluesTotal : nbmsTotal).toLocaleString("en-IN")}</h3>
-      <table className="min-w-full text-sm bg-white shadow-sm border border-gray-200">
-        <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
-          <tr>
-            <th className="px-6 py-3 border-r">Item Name</th>
-            <th className="px-6 py-3 border-r">Description</th>
-            <th className="px-6 py-3 border-r">Quantity</th>
-            <th className="px-6 py-3 border-r">Cost</th>
-            <th className="px-6 py-3 border-r">Profit %</th>
-            <th className="px-6 py-3">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((item, i) => (
-            <tr key={i} className="border-t hover:bg-gray-50">
-              <td className="p-2 border-r text-center">{item.itemName || "—"}</td>
-              <td className="p-2 border-r text-center">{item.description || "—"}</td>
-              <td className="p-2 border-r text-center">{item.quantity}</td>
-              <td className="p-2 border-r text-center">₹{item.cost}</td>
-              <td className="p-2 border-r text-center">
-                <input
-                  type="number"
-                  value={item.profitOnMaterial || 0}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value) || 0;
-                    if (kind === "Fittings") { const u = [...fittings]; u[i].profitOnMaterial = val; setFittings(u); }
-                    else if (kind === "Glues") { const u = [...glues]; u[i].profitOnMaterial = val; setGlues(u); }
-                    else { const u = [...nbms]; u[i].profitOnMaterial = val; setNbms(u); }
-                    onFurnitureChange();
-                  }}
-                  className="w-16 text-center border border-blue-200 rounded py-1 font-semibold"
-                />
-              </td>
-              <td className="p-2 text-center font-bold text-green-700">₹{Math.round(getSimpleTotal(item, kind === "Glues")).toLocaleString("en-IN")}</td>
+  const renderSimpleSection = (title: string, rows: SimpleItemRow[], kind: "Fittings" | "Glues" | "NBMs") => {
+
+
+    const isFittings = kind === "Fittings";
+    const isNonBranded = kind === "NBMs";
+
+
+    return (
+      <div className="mt-6">
+        <h3 className="font-semibold text-md mb-2 text-gray-800">{title} - Total: ₹{Math.round(kind === "Fittings" ? fittingsTotal : kind === "Glues" ? gluesTotal : nbmsTotal).toLocaleString("en-IN")}</h3>
+        <table className="min-w-full text-sm bg-white shadow-sm border border-gray-200">
+          <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
+            <tr>
+              <th className="px-6 py-3 border-r">Item Name</th>
+              <th className="px-6 py-3 border-r">Description</th>
+              {(isFittings || isNonBranded) && <th className="px-6 py-3 border-r">Brand</th>}
+              <th className="px-6 py-3 border-r">Quantity</th>
+              <th className="px-6 py-3 border-r">Cost</th>
+              <th className="px-6 py-3 border-r">Profit %</th>
+              <th className="px-6 py-3">Total</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+          </thead>
+          <tbody>
+            {rows.map((item, i) => (
+              <tr key={i} className="border-t hover:bg-gray-50">
+                <td className="p-2 border-r text-center">{item.itemName || "—"}</td>
+                <td className="p-2 border-r text-center">{item.description || "—"}</td>
+                {(isFittings || isNonBranded) && <td className="p-2 border-r text-center">{item?.brandName || "—"}</td>}
+
+                <td className="p-2 border-r text-center">{item.quantity}</td>
+                <td className="p-2 border-r text-center">₹{item.cost}</td>
+                <td className="p-2 border-r text-center">
+                  <input
+                    type="number"
+                    value={item.profitOnMaterial || 0}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value) || 0;
+                      if (kind === "Fittings") { const u = [...fittings]; u[i].profitOnMaterial = val; setFittings(u); }
+                      else if (kind === "Glues") { const u = [...glues]; u[i].profitOnMaterial = val; setGlues(u); }
+                      else { const u = [...nbms]; u[i].profitOnMaterial = val; setNbms(u); }
+                      onFurnitureChange();
+                    }}
+                    className="w-16 text-center border border-blue-200 rounded py-1 font-semibold"
+                  />
+                </td>
+                <td className="p-2 text-center font-bold text-green-700">₹{Math.round(getSimpleTotal(item, kind === "Glues")).toLocaleString("en-IN")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
 
   return (
     <div className="shadow-lg p-6 my-6 border rounded-xl bg-white">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-blue-700">Product {index + 1}: {data.furnitureName}</h2>
+        {/* <h2 className="text-2xl font-bold text-blue-700">Product {index + 1}: {data.furnitureName}</h2> */}
+
+        <div className="flex flex-col gap-1">
+          {/* Product Name */}
+          <h2 className="text-2xl font-bold text-blue-700">
+            Product {index + 1}: {data.furnitureName}
+          </h2>
+
+          {/* READ-ONLY DIMENSIONS LABELS */}
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+              Dimensions:
+            </span>
+
+            <div className="flex items-center gap-2">
+              {/* Height Label */}
+              <div className="flex items-center bg-blue-50 border border-blue-100 rounded-md px-2 py-0.5">
+                <span className="text-[10px] font-bold text-blue-500 mr-1.5">H</span>
+                <span className="text-xs font-bold text-blue-700">
+                  {data.dimention?.height || 0} <small className="text-[9px] opacity-70">mm</small>
+                </span>
+              </div>
+
+              {/* Width Label */}
+              <div className="flex items-center bg-green-50 border border-green-100 rounded-md px-2 py-0.5">
+                <span className="text-[10px] font-bold text-green-500 mr-1.5">W</span>
+                <span className="text-xs font-bold text-green-700">
+                  {data.dimention?.width || 0} <small className="text-[9px] opacity-70">mm</small>
+                </span>
+              </div>
+
+              {/* Depth Label */}
+              <div className="flex items-center bg-purple-50 border border-purple-100 rounded-md px-2 py-0.5">
+                <span className="text-[10px] font-bold text-purple-500 mr-1.5">D</span>
+                <span className="text-xs font-bold text-purple-700">
+                  {data.dimention?.depth || 0} <small className="text-[9px] opacity-70">mm</small>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
         <div className="flex items-center gap-6">
           <section className="flex flex-col items-end">
             <label className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">

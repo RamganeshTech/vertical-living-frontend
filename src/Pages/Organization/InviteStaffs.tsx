@@ -7,14 +7,10 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { toast } from '../../utils/toast';
 import { Label } from '../../components/ui/Label';
 import { Input } from '../../components/ui/Input';
-// import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar';
-// import { COMPANY_DETAILS } from '../../constants/constants';
 import type { OrganizationOutletTypeProps } from './OrganizationChildren';
 import { useAuthCheck } from '../../Hooks/useAuthCheck';
-// import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/Select';
-// import { roles } from '../../constants/constants';
-
+import { useCreateCommonUser } from '../../apiList/commonAuthApi';
+import { SidePanel } from '../../shared/SidePanel/SidePanel';
 
 
 
@@ -25,9 +21,7 @@ const InviteStaffs: React.FC = () => {
 
   const navigate = useNavigate()
 
-
-
-  const { role, permission } = useAuthCheck();
+  const { role, permission, ownerId } = useAuthCheck();
 
 
   const canDelete = role === "owner" || permission?.invitestaff?.delete;
@@ -46,11 +40,27 @@ const InviteStaffs: React.FC = () => {
   const [searchEmail, setSearchEmail] = useState("")
   const [searchPhone, setSearchPhone] = useState("")
 
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+
+
+  // Form State
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phoneNo: '',
+    password: '',
+    role: 'staff'
+  });
+
   const { data: staffs, isLoading: staffsLoading, error: staffsError, isError: staffIsError } = useGetStaffsByOrganization(organizationId!)
 
-
+  const createUser = useCreateCommonUser();
   const removeStaff = useRemoveStaffFromOrganization()
   const inviteStaff = useInviteStaffToOrganization()
+
+
+
+
 
 
   const filteredStaffs = staffs?.filter((staff: any) => {
@@ -136,11 +146,47 @@ const InviteStaffs: React.FC = () => {
   }
 
 
+
+
   const handleShareWhatsApp = () => {
     const message = `You're invited to join in the organization! Click this link to register: ${inviteLink}`
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
   }
+
+
+
+
+  const handleCreateStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Create the invite token (Mocking the structure your controller expects)
+    const inviteData = {
+      organizationId,
+      role: formData.role,
+      expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 Days
+      ownerId: ownerId
+    };
+
+    const inviteToken = btoa(JSON.stringify(inviteData));
+
+    try {
+      await createUser.mutateAsync({
+        ...formData,
+        invite: inviteToken
+      });
+
+      setIsPanelOpen(false);
+      setFormData({ name: '', email: '', phoneNo: '', password: '', role: 'staff' });
+      toast({ title: "Success", description: "Staff created successfully" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to create staff",
+        variant: "destructive"
+      });
+    }
+  };
 
 
 
@@ -213,7 +259,8 @@ const InviteStaffs: React.FC = () => {
   return (
     <div className="min-h-full max-h-full overflow-y-auto min-w-full bg-gradient-to-br from-blue-50 to-white gap-6">
 
-      <header>
+      {/* <header> */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
           <div className="max-w-full mx-auto px-2 lg:px-4 py-4">
             <div className="flex items-center justify-between">
@@ -233,101 +280,93 @@ const InviteStaffs: React.FC = () => {
                   <i className="fas fa-user text-blue-600 text-xl"></i>
                 </div>
               </div>
-              <div className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-lg">
-                <i className="fas fa-users mr-2"></i>
-                {staffs?.length} {staffs?.length > 1 ? "Members" : "Member"}
-              </div>
+
+
+              <section className='flex gap-2 items-center'>
+
+                <div className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-lg">
+                  <i className="fas fa-users mr-2"></i>
+                  {staffs?.length} {staffs?.length > 1 ? "Members" : "Member"}
+                </div>
+
+
+                {/* Zoho-style Add Icon */}
+                <button
+                  onClick={() => setIsPanelOpen(true)}
+                  className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105"
+                  title="Add New Staff"
+                >
+                  <i className="fa-solid fa-plus text-lg"></i>
+                </button>
+
+              </section>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="w-full flex flex-col  p-4 gap-6 h-full">
-        {/* invitiation link */}
-        {/* <div className="bg-white  h-fit w-full   p-6 rounded-2xl shadow-lg space-y-6 flex flex-col justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-blue-900 mb-2 flex items-center">
-              <i className="fas fa-user-plus mr-2" /> Invite Staffs
-            </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Invite Staffs to your organization by generating a link.
-            </p>
 
 
-            <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Staff Role</Label>
-             
-              <Select
-                value={workerRole}
-                onValueChange={(val) => {
-                  setWorkerRole(val);
-                }}
-              >
-                <SelectTrigger className="w-full bg-white">
-                  <SelectValue placeholder="Select Role" selectedValue={workerRole} />
-                </SelectTrigger>
-                <SelectContent>
-                  {["HR", "Logistics", "Accounting", "Factory", "Legal", "Procurement Department"].map(ele => {
-
-                    return (
-                      <SelectItem key={ele} value={ele}>
-                        {ele}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-
-              <p className="text-xs text-gray-500">Specify the type of staff needed for this project</p>
-            </div>
-
-            {!inviteLink ? (
-              <Button
-                onClick={handleGenerateInviteLink}
-                isLoading={inviteStaff.isPending}
-                className="w-full bg-blue-600 text-white py-3"
-              >
-                <i className="fas fa-link mr-2" /> Generate Invitation Link
-              </Button>
-            ) : (
-              <>
-                <div className="space-y-4 h-fit mt-2">
-                  <Label>Invitation Link</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={inviteLink}
-                      readOnly
-                      className="bg-blue-50 text-blue-800 flex-1"
-                    />
-                    <Button onClick={handleCopyLink}>
-                      <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
-                    </Button>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleShareWhatsApp}
-                      className="w-full bg-green-600 text-white"
-                    >
-                      <i className="fab fa-whatsapp mr-2" /> Share on WhatsApp
-                    </Button>
-                    <Button
-                      onClick={handleCopyLink}
-                      className="w-full border border-blue-400 text-blue-700"
-                    >
-                      <i className="fas fa-copy mr-2" /> Copy
-                    </Button>
-                  </div>
-                  <Button
-                    onClick={handleGenerateInviteLink}
-                    className="w-full bg-purple-600 text-white"
-                  >
-                    <i className="fas fa-sync-alt mr-2" /> Generate New Link
-                  </Button>
-                </div>
-              </>
-            )}
+      {/* Reusable Side Panel with the Form */}
+      <SidePanel
+        isOpen={isPanelOpen}
+        onClose={() => setIsPanelOpen(false)}
+        title="Quick Create Staff"
+      >
+        <form onSubmit={handleCreateStaff} className="space-y-5">
+          <div className="space-y-2">
+            <Label>Full Name</Label>
+            <Input
+              required
+              placeholder="Enter staff name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
           </div>
-        </div> */}
+          <div className="space-y-2">
+            <Label>Email Address</Label>
+            <Input
+              required type="email"
+              placeholder="staff@company.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Phone Number</Label>
+            <Input
+              required
+              placeholder="e.g. 9876543210"
+              value={formData.phoneNo}
+              onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Password</Label>
+            <Input
+              required type="password"
+              placeholder="Set initial password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full h-12 mt-4 text-base bg-blue-600 hover:bg-blue-700"
+            isLoading={createUser.isPending}
+          >
+            Register Staff
+          </Button>
+
+          <p className="text-xs text-center text-gray-500 mt-4">
+            Staff will be assigned to the current organization automatically.
+          </p>
+        </form>
+      </SidePanel>
+
+      <div className="w-full flex flex-col  p-4 gap-6 h-full">
+
 
 
         <div className="bg-white w-full max-w-full mx-auto p-6 sm:p-8 rounded-xl shadow-lg">
@@ -344,64 +383,6 @@ const InviteStaffs: React.FC = () => {
 
           {/* Grid container for form and actions */}
           <div className={`grid grid-cols-1  md:grid-cols-3 md:gap-6 ${inviteLink ? "items-start" : "items-end"}`}>
-
-            {/* Role Selection */}
-            {/* <div className="md:col-span-1  space-y-2">
-              <Label className="block text-sm text-gray-700 font-medium">Staff Role</Label>
-              <Select
-                value={specificRole}
-                onValueChange={(val) => setSpecificRole(val)}
-              >
-                <SelectTrigger className="w-full bg-white text-sm border-gray-300 rounded-md shadow-sm h-10">
-                  <SelectValue placeholder="Select Role" selectedValue={specificRole} />
-                </SelectTrigger>
-                <SelectContent>
-                  {roles?.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {role}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-             
-            </div> */}
-
-
-            {/* Role Selection - UPDATED UI
-            <div className="md:col-span-1 space-y-3">
-              <Label className="block text-sm text-gray-700 font-medium">Specific Roles</Label>
-              
-              <div className="flex flex-wrap gap-2">
-                {roles.map((role) => {
-                  const isSelected = specificRoles.includes(role);
-                  return (
-                    <div
-                      key={role}
-                      onClick={() => handleRoleToggle(role)}
-                      className={`
-                        cursor-pointer px-3 py-1.5 rounded-md border text-xs sm:text-sm font-medium transition-all duration-200 select-none flex items-center gap-2 w-fit
-                        ${isSelected 
-                          ? "bg-blue-600 text-white border-blue-600 shadow-sm" 
-                          : "bg-white text-gray-600 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-                        }
-                      `}
-                    >
-                      <div className={`
-                        w-3.5 h-3.5 rounded flex items-center justify-center border transition-colors
-                        ${isSelected ? "border-white bg-transparent" : "border-gray-400 bg-white"}
-                      `}>
-                         {isSelected && <i className="fas fa-check text-[8px] text-white"></i>}
-                      </div>
-                      
-                      <span className="capitalize">{role}</span>
-                    </div>
-                  )
-                })}
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Selected: {specificRoles.length > 0 ? specificRoles.join(", ") : "None"}
-              </p>
-            </div> */}
 
 
             {/* Invite Link and Buttons */}
@@ -473,64 +454,6 @@ const InviteStaffs: React.FC = () => {
         </div>
 
 
-        {/*old invited memebers */}
-        {/* <div className="bg-white p-6 py-2 w-full  !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] md:w-1/2 rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
-          <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
-            <i className="fas fa-users mr-2" /> Staff Members ({staffs?.length})
-          </h2>
-          {staffs.length === 0 ? (
-            <div className="text-center text-blue-700 p-8">
-              <i className="fas fa-user-slash text-3xl mb-2"></i>
-              <p>No Staffs have been added yet.</p>
-              <p className="text-sm">Generate a link to invite.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {staffs?.map((staff: any) => (
-                <div
-                  key={staff._id}
-                  className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100 hover:shadow-md transition"
-                >
-                  <div className="flex items-center gap-4">
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage
-                        src={staff?.avatarUrl || COMPANY_DETAILS.COMPANY_LOGO}
-                      />
-                      <AvatarFallback className="bg-blue-600 text-white">
-                        {getInitials(staff.staffName)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h4 className="text-blue-900 font-semibold">{staff?.staffName}</h4>
-                      <p className="text-sm text-gray-600">
-                        <i className="fas fa-envelope mr-1" />
-                        {staff.email}
-                      </p>
-                      {staff.phoneNo && (
-                        <p className="text-sm text-gray-600">
-                          <i className="fas fa-phone-alt mr-1" />
-                          {staff.phoneNo}
-                        </p>
-                      )}
-                      <Badge className="mt-1 text-blue-800 border-blue-300">
-                        {staff.role}
-                      </Badge>
-                    </div>
-                  </div>
-                  <Button
-                    variant='danger'
-                    onClick={() => handleRemoveStaff(staff._id, staff.staffName)}
-                    isLoading={inviteStaff.isPending}
-                    className="text-white bg-red-600 border border-red-200 hover:bg-red-700"
-                  >
-                    <i className="fas fa-user-minus mr-1" /> Remove
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div> */}
-
 
         {canList && <div className="bg-white p-6 py-2 w-full !min-h-[65vh] sm:!min-h-[70vh] lg:!min-h-[85vh] rounded-2xl shadow-lg overflow-y-auto max-h-[90%] custom-scrollbar">
           <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
@@ -572,29 +495,10 @@ const InviteStaffs: React.FC = () => {
 
               <div className="space-y-0.5 ">
                 <p className="font-semibold text-gray-900 text-base">{staff.staffName}</p>
-                {/* <p className="text-sm text-gray-500 flex items-center gap-1">
-                  <i className="fas fa-envelope text-gray-400"></i> {staff.email}
-                </p>
-                <p className="text-sm text-gray-500 flex items-center gap-1">
-                  <i className="fas fa-phone-alt text-gray-400"></i> {staff.phoneNo}
-                </p> */}
+
               </div>
 
-              {/* <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
-      {roles.map((role) => (
-        <button
-          key={role}
-          className={`px-3 py-1 rounded-full text-sm font-medium border transition-all duration-150 flex items-center gap-1
-            ${
-              staff.role === role
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
-            }`}
-        >
-          <i className="fas fa-user-tag"></i> {role}
-        </button>
-      ))}
-    </div> */}
+
 
               {canDelete && <div className="mt-2 md:mt-0 md:text-center">
                 <Button

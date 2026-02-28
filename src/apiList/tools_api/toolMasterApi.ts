@@ -13,6 +13,12 @@ export const createToolApi = async (formData: FormData, api: AxiosInstance) => {
     return data.data;
 };
 
+export const createToolApiV1 = async (formData: FormData, api: AxiosInstance) => {
+    const { data } = await api.post(`/toolmaster/v1/create`, formData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
 // 2. Update Tool Content (JSON)
 export const updateToolContentApi = async ({ id, updateData, api }: { id: string; updateData: any; api: AxiosInstance }) => {
     const { data } = await api.patch(`/toolmaster/updatecontent/${id}`, updateData);
@@ -55,6 +61,28 @@ export const deleteToolApi = async (id: string, api: AxiosInstance) => {
 };
 
 
+// 2. Update Warranty Files
+export const updateToolWarrantyApi = async (id: string, formData: FormData, api: AxiosInstance) => {
+    const { data } = await api.patch(`/toolmaster/updatewarrantyfiles/${id}`, formData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+// 3. Delete Tool Image
+export const deleteToolImageApi = async (toolId: string, fileId: string, api: AxiosInstance) => {
+    const { data } = await api.delete(`/toolmaster/tools/${toolId}/tool-image/${fileId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+// 4. Delete Warranty File
+export const deleteWarrantyFileApi = async (toolId: string, fileId: string, api: AxiosInstance) => {
+    const { data } = await api.delete(`/toolmaster/tools/${toolId}/warranty-file/${fileId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
 const allowedRoles = ["owner", "staff", "CTO"];
 
 
@@ -69,6 +97,24 @@ export const useCreateTool = () => {
             if (!api) throw new Error("API instance not found for role");
 
             return await createToolApi(formData, api!);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["toolmaster"] });
+        }
+    });
+};
+
+
+// 1. Hook: Create Tool new version
+export const useCreateToolV1 = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async (formData: FormData) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await createToolApi(formData, api);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["toolmaster"] });
@@ -168,6 +214,58 @@ export const useDeleteTool = () => {
             if (!api) throw new Error("API instance not found for role");
 
             return await deleteToolApi(id, api!);
+        },
+        onSuccess: (_, id) => {
+            queryClient.invalidateQueries({ queryKey: ["toolmaster", id] });
+        }
+    });
+};
+
+
+
+export const useUpdateToolWarrantyFiles = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ id, formData }: { id: string, formData: FormData }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await updateToolWarrantyApi(id, formData, api);
+        },
+        onSuccess: (_, {id}) => {
+            queryClient.invalidateQueries({ queryKey: ["toolmaster", id] });
+        }
+    });
+};
+
+// 3. Hook: Delete Tool Image
+export const useDeleteToolImage = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ toolId, fileId }: { toolId: string, fileId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await deleteToolImageApi(toolId, fileId, api);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["toolmaster"] });
+        }
+    });
+};
+
+// 4. Hook: Delete Warranty File
+export const useDeleteWarrantyFile = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ toolId, fileId }: { toolId: string, fileId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await deleteWarrantyFileApi(toolId, fileId, api);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["toolmaster"] });

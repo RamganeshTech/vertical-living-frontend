@@ -9,7 +9,7 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import SummaryCostEstimation from "./SummaryCostEstimation";
 import AssignStageStaff from "../../../shared/AssignStaff";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 
 // Define context type
 type ProjectDetailsOutlet = {
@@ -90,12 +90,12 @@ const CostEstimationContainer = () => {
                   className="flex-1 sm:flex-initial min-w-max"
                 />
 
-                {!getAllError && <ShareDocumentWhatsapp
+                {/* {!getAllError && <ShareDocumentWhatsapp
                   projectId={projectId!}
                   stageNumber="6"
                   className="w-full sm:w-fit"
                   isStageCompleted={data?.status}
-                />}
+                />} */}
 
                 <AssignStageStaff
                   stageName="CostEstimation"

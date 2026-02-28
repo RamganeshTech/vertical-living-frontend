@@ -15,9 +15,10 @@ import { useGetSingleClientQuote, useSendQuoteToPaymentStage } from "../../../..
 import { Label } from './../../../../components/ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/Select";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
-import { useGenerateClientQuotePdf } from "../../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
+import { useCreateOrderMaterialFromQuoteVariant, useGenerateClientQuotePdf } from "../../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
 import { downloadImage } from "../../../../utils/downloadFile";
 import SqftRateClientQuote from "./SqftRateClientQuote";
+import ClientQuoteType4 from "./ClientQuoteType4";
 
 export const DEFAULT_LAMINATE_RATE_PER_SQFT = 0;
 
@@ -40,15 +41,18 @@ const ClientQuoteSingle = () => {
     // const { mutateAsync: generateQuote, isPending: quotePending } = useGenerateQuotePdf()
     const { mutateAsync: sendtoPayment, isPending: paymentPending } = useSendQuoteToPaymentStage()
     const { mutateAsync: generateQuotePdf, isPending: quotePending } = useGenerateClientQuotePdf()
+    const { mutateAsync: createOrderMaterial, isPending: orderPending } = useCreateOrderMaterialFromQuoteVariant()
+
 
     const furnitureRefs = useRef<Array<React.RefObject<FurnitureQuoteRef | null>>>([]);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isBlured, setIsBlured] = useState<boolean>(true);
-    const [templateType, setTemplateType] = useState<"type 1" | "type 2" | "type 3">("type 1");
+    const [templateType, setTemplateType] = useState<"type 1" | "type 2" | "type 3" | "type 4">("type 4");
 
     const [furnitures, setFurnitures] = useState<FurnitureBlock[]>([]);
     const [grandTotal, setGrandTotal] = useState(quote?.grandTotal || 0);
 
+    const isTypeFour = templateType === "type 4";
     useEffect(() => {
         setGrandTotal(quote?.grandTotal);
     }, [quote])
@@ -77,6 +81,23 @@ const ClientQuoteSingle = () => {
                 description: error?.response?.data?.message ?? "Operation failed",
             });
         }
+    }
+
+    const handleCreateOrderMat = async () => {
+        try {
+            await createOrderMaterial({
+                quoteId: quoteId!,
+            })
+            toast({ title: "success", description: "Successfully created, check it in the Order Material page of this project" })
+        }
+        catch (error: any) {
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message ?? "Operation failed",
+                variant: "destructive"
+            });
+        }
+
     }
 
     const handleGenerateClientQuotePdf = async () => {
@@ -142,7 +163,10 @@ const ClientQuoteSingle = () => {
         if (!quote?.furnitures) return;
 
         const transformed: FurnitureBlock[] = quote.furnitures.map((f: any) => ({
+            _id: f._id,
             furnitureName: f.furnitureName,
+            scopeOfWork: f?.scopeOfWork,
+            dimention: f?.dimention,
             coreMaterials: f.coreMaterials || [],
             fittingsAndAccessories: f.fittingsAndAccessories || [],
             glues: f.glues || [],
@@ -183,10 +207,21 @@ const ClientQuoteSingle = () => {
         );
     }, [furnitures]);
 
+
+    const TEMPLATE_OPTIONS: {
+        value: string;
+        label: string;
+    }[] = [
+            { value: "type 1", label: "Detailed Quote for Architects" },
+            { value: "type 2", label: "Type 2" },
+            { value: "type 3", label: "Type 3" },
+            { value: "type 4", label: "Type 4" }
+        ];
+
     return (
         <div className="p-2 max-h-full overflow-y-auto">
 
-            <header className="bg-white border-b border-gray-200 pb-4 space-y-3">
+            <header className="sticky -top-2 z-50  bg-white border-b border-gray-200 py-4 space-y-3">
                 {/* Top Row - Project Info, Financial Summary, and Generate Button */}
                 <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
@@ -204,9 +239,14 @@ const ClientQuoteSingle = () => {
                         </div>
                     </div>
 
-                    <div className="flex gap-2 justify-between  items-center">
+                    {/* <div className="flex gap-2 justify-between  items-center">
+
+                        {(canCreate || canEdit) && <Button onClick={handleCreateOrderMat} isLoading={orderPending} className="flex-shrink-0">
+                            Create Order from Quote
+                        </Button>}
+
+
                         <div className="px-4 text-center">
-                            {/* <p className="text-xs text-gray-600">Quote</p> */}
                             <p className="text-md text-gray-600">Total Cost</p>
                             <p className="text-md font-bold text-green-600">₹{grandTotal?.toLocaleString("en-in")}</p>
                         </div>
@@ -215,16 +255,12 @@ const ClientQuoteSingle = () => {
                             {paymentPending ? "Sending..." : "Send to Payment"}
                         </Button>}
 
-                        {(canCreate || canEdit) && <Button onClick={handleGenerateClientQuotePdf} isLoading={quotePending} className="flex-shrink-0 px-4 ">
+                        {templateType !== "type 4" && (canCreate || canEdit) && <Button onClick={handleGenerateClientQuotePdf} isLoading={quotePending} className="flex-shrink-0 px-4 ">
                             Generate Pdf
                         </Button>}
 
                         <div className="flex gap-2 w-fit px-4 justify-center">
-                            {/* <input checked={!isBlured}  type="checkbox" id="blurinput" onClick={handletoggleBlur}
-                                className="cursor-pointer" /> */}
-                            {/* <Label htmlFor="blurinput" className=" cursor-pointer flex flex-4/2" >Show Stats</Label> */}
 
-                            {/* <div className="flex items-center space-x-2"> */}
                             <label className="relative inline-flex items-center cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -242,162 +278,275 @@ const ClientQuoteSingle = () => {
                                     ></div>
                                 </div>
                             </label>
-                            {/* <label className="text-sm font-medium text-gray-700">This work is required for the project</label> */}
-                            {/* </div> */}
-                            <Label htmlFor="blurinput" className=" cursor-pointer flex flex-4/2" >Show Stats</Label>
+
+                            <Label htmlFor="blurinput" className=" cursor-pointer flex flex-4/2" >
+                                Show Stats</Label>
 
                         </div>
 
-                        {!isSqftRateQuote && <div className="w-full">
+                        {!isSqftRateQuote && <div className="w-full !min-w-24">
                             <Select onValueChange={(val: any) => {
                                 setTemplateType(val)
                             }}>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select Template Type" selectedValue={templateType[0].toUpperCase() + templateType.slice(1)} />
+                                    <SelectValue placeholder="Select Template Type" selectedValue={
+                                        // templateType[0].toUpperCase() + templateType.slice(1)
+                                        TEMPLATE_OPTIONS?.find(opt => opt.value === templateType)?.label
+                                    } />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {["type 1", "type 2", "type 3"].map((option) => (
-                                        <SelectItem key={option} value={option.toString()}>
-                                            {option[0].toUpperCase() + option.slice(1)}
+
+                                    {TEMPLATE_OPTIONS.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>}
+                    </div> */}
+
+                    <div className="flex items-center gap-3">
+                        {/* ACTION: Primary Order Creation */}
+                        {(canCreate || canEdit) && (
+                            <Button
+                                onClick={handleCreateOrderMat}
+                                isLoading={orderPending}
+                                variant="primary"
+                                className="shadow-sm px-5"
+                            >
+                                <i className="fas fa-plus-circle mr-2"></i>
+                                Create Order from Quote
+                            </Button>
+                        )}
+
+                        {/* DIVIDER */}
+                        <div className="h-10 w-[1px] bg-gray-200 hidden md:block"></div>
+
+                        {/* STATS: Financials */}
+                        <div className="text-right flex flex-col justify-center">
+                            <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest leading-none mb-1">Total Cost</span>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-lg font-extrabold text-green-600">
+                                    ₹{grandTotal?.toLocaleString("en-in")}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* DIVIDER */}
+                        <div className="h-10 w-[1px] bg-gray-200 hidden lg:block"></div>
+
+                        {/* ACTIONS: Payment & PDF */}
+                        <div className="flex items-center gap-2">
+                            {((canCreate || canEdit) && !isSqftRateQuote) && (
+                                <Button
+                                    onClick={handleSendToPayment}
+                                    disabled={paymentPending}
+                                    variant="outline"
+                                    className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                                >
+                                    {paymentPending ? "Sending..." : "Send to Payment"}
+                                </Button>
+                            )}
+
+                            {templateType !== "type 4" && (canCreate || canEdit) && (
+                                <Button
+                                    onClick={handleGenerateClientQuotePdf}
+                                    isLoading={quotePending}
+                                    variant="secondary"
+                                >
+                                    <i className="fas fa-file-pdf mr-2"></i>
+                                    Generate PDF
+                                </Button>
+                            )}
+                        </div>
+
+                        {/* CONFIGS: Settings & Template */}
+                        <div className="flex items-center gap-4 pl-2 border-l border-gray-100">
+                            {/* Toggle Switch Container */}
+                            <div className="flex items-center gap-3">
+                                <label className="relative inline-flex items-center cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        checked={isBlured}
+                                        onChange={handletoggleBlur}
+                                        className="sr-only"
+                                        id="blurinput"
+                                    />
+                                    <div className={`w-11 h-6 rounded-full transition-all duration-200 ${!isBlured ? "bg-blue-600" : "bg-gray-300"}`}>
+                                        <div className={`absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transition-transform duration-200 ${!isBlured ? "translate-x-5" : "translate-x-0"}`} />
+                                    </div>
+                                </label>
+                                <Label htmlFor="blurinput" className="text-xs font-bold text-gray-600 cursor-pointer whitespace-nowrap">Show Stats</Label>
+                            </div>
+
+                            {/* Template Selector */}
+                            {!isSqftRateQuote && (
+                                <div className="w-full !min-w-24">
+                                    <Select onValueChange={(val:any) => setTemplateType(val)} value={templateType}>
+                                        <SelectTrigger className="h-10 w-full text-xs font-semibold bg-gray-50 border-gray-300">
+                                            <SelectValue placeholder="Template Type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {TEMPLATE_OPTIONS.map((option) => (
+                                                <SelectItem key={option.value} value={option.value} className="text-xs">
+                                                    {option.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                 </div>
             </header>
 
-            {isSqftRateQuote ? <>
+            {
 
 
-                <SqftRateClientQuote
-                    data={quote}
-                    isBlured={isBlured} // Pass the state of your visibility toggle here
-                />
-
-            </> : <>  {quoteLoading
-                ? (
-                    <MaterialOverviewLoading />
-                ) : (
-                    <>
-                        <div className="space-y-6">
-                            {furnitures.map((furniture, index) => (
-                                <ClientFurnitures
-                                    key={index}
-                                    index={index}
-                                    data={furniture}
-                                    ref={furnitureRefs.current[index] as React.RefObject<FurnitureQuoteRef>} // 🔄 Pass the ref down
-                                    templateType={templateType}
-                                    isBlurred={isBlured}
-                                    onImageClick={setSelectedImage}
-
-                                />
-                            ))}
+                isSqftRateQuote ? <>
 
 
-                            {/* --- COMMON MATERIALS SECTION (FOR CLIENT VIEW) --- */}
-                            {/* --- COMMON MATERIALS SECTION (REPLICATING SIMPLE SECTION UI) --- */}
-                            {templateType !== "type 2" && quote?.commonMaterials?.length > 0 && (
-                                <div className="mt-10 bg-white border border-gray-200 rounded-lg p-4 shadow-md">
-                                    <h3 className="font-semibold text-md mb-2 text-gray-800 flex items-center gap-2">
-                                        {/* <i className="fas fa-boxes text-blue-500" /> */}
-                                        Common Site Materials
-                                        <span className="text-sm  ml-1">
-                                            (Total: ₹{quote.commonMaterials.reduce((sum: number, item: any) => sum + (item.rowTotal || 0), 0).toLocaleString("en-IN")})
-                                        </span>
-                                    </h3>
+                    <SqftRateClientQuote
+                        data={quote}
+                        isBlured={isBlured} // Pass the state of your visibility toggle here
+                    />
 
-                                    <div className="overflow-x-auto rounded-md border border-gray-100">
-                                        {(templateType !== "type 3") && (<table className="min-w-full text-sm bg-white shadow-sm">
-                                            <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
-                                                <tr>
-                                                    <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
-                                                    <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
-                                                    <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
-                                                    <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th>
-                                                    <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Total</th>
-                                                    <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {quote.commonMaterials.map((item: any, i: number) => (
-                                                    <tr key={i} className="border-b hover:bg-gray-50/50 transition-colors">
-                                                        <td className="text-center border p-2">
-                                                            <span className={isBlured ? "blur-sm select-none" : ""}>
-                                                                {item?.itemName || "—"}
-                                                            </span>
-                                                        </td>
-                                                        <td className="text-center border p-2">
-                                                            <span className={isBlured ? "blur-sm select-none" : ""}>
-                                                                {item?.description || "—"}
-                                                            </span>
-                                                        </td>
-                                                        <td className="text-center border p-2">
-                                                            <span className={isBlured ? "blur-sm select-none" : ""}>
-                                                                {item?.quantity || 0}
-                                                            </span>
-                                                        </td>
-                                                        <td className="text-center border p-2">
+                </> : <>  {
+
+                    isTypeFour ?
+
+                        <ClientQuoteType4
+
+                            data={quote}
+                            furnitures={furnitures}
+                            isBlurred={isBlured}
+                        />
+
+                        :
+                        quoteLoading
+                            ? (
+                                <MaterialOverviewLoading />
+                            ) : (
+                                <>
+                                    <div className="space-y-6">
+                                        {furnitures.map((furniture, index) => (
+                                            <ClientFurnitures
+                                                key={index}
+                                                index={index}
+                                                data={furniture}
+                                                ref={furnitureRefs.current[index] as React.RefObject<FurnitureQuoteRef>} // 🔄 Pass the ref down
+                                                templateType={templateType}
+                                                isBlurred={isBlured}
+                                                onImageClick={setSelectedImage}
+
+                                            />
+                                        ))}
+
+
+                                        {/* --- COMMON MATERIALS SECTION (FOR CLIENT VIEW) --- */}
+                                        {/* --- COMMON MATERIALS SECTION (REPLICATING SIMPLE SECTION UI) --- */}
+                                        {templateType !== "type 2" && quote?.commonMaterials?.length > 0 && (
+                                            <div className="mt-10 bg-white border border-gray-200 rounded-lg p-4 shadow-md">
+                                                <h3 className="font-semibold text-md mb-2 text-gray-800 flex items-center gap-2">
+                                                    {/* <i className="fas fa-boxes text-blue-500" /> */}
+                                                    Common Site Materials
+                                                    <span className="text-sm  ml-1">
+                                                        (Total: ₹{quote.commonMaterials.reduce((sum: number, item: any) => sum + (item.rowTotal || 0), 0).toLocaleString("en-IN")})
+                                                    </span>
+                                                </h3>
+
+                                                <div className="overflow-x-auto rounded-md border border-gray-100">
+                                                    {(templateType !== "type 3") && (<table className="min-w-full text-sm bg-white shadow-sm">
+                                                        <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
+                                                            <tr>
+                                                                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
+                                                                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
+                                                                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
+                                                                {/* <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th> */}
+                                                                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Total</th>
+                                                                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {quote.commonMaterials.map((item: any, i: number) => (
+                                                                <tr key={i} className="border-b hover:bg-gray-50/50 transition-colors">
+                                                                    <td className="text-center border p-2">
+                                                                        <span className={isBlured ? "blur-sm select-none" : ""}>
+                                                                            {item?.itemName || "—"}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="text-center border p-2">
+                                                                        <span className={isBlured ? "blur-sm select-none" : ""}>
+                                                                            {item?.description || "—"}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="text-center border p-2">
+                                                                        <span className={isBlured ? "blur-sm select-none" : ""}>
+                                                                            {item?.quantity || 0}
+                                                                        </span>
+                                                                    </td>
+                                                                    {/* <td className="text-center border p-2">
                                                             <span className={isBlured ? "blur-sm select-none" : ""}>
                                                                 ₹{item?.cost?.toLocaleString("en-IN") || 0}
                                                             </span>
-                                                        </td>
-                                                        <td className="text-center border p-2 text-green-700 font-bold">
-                                                            <span className={isBlured ? "blur-sm select-none" : ""}>
-                                                                ₹{(item.rowTotal || 0).toLocaleString("en-IN")}
-                                                            </span>
-                                                        </td>
-                                                        <td className="text-center border p-2 text-gray-400">—</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                                        </td> */}
+                                                                    <td className="text-center border p-2 text-green-700 font-bold">
+                                                                        <span className={isBlured ? "blur-sm select-none" : ""}>
+                                                                            ₹{(item.rowTotal || 0).toLocaleString("en-IN")}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="text-center border p-2 text-gray-400">—</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                    )}
+                                                </div>
+                                            </div>
                                         )}
+
+                                        <div className="mt-10 text-right">
+                                            <div className="inline-block bg-green-50 border border-green-200 rounded-md px-6 py-4">
+                                                <p className="text-md font-medium text-gray-700 mb-1">
+                                                    Total Estimate
+                                                </p>
+
+                                                <p className="text-2xl font-bold text-green-700">
+                                                    ₹{grandTotal?.toLocaleString("en-in")}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                </>
                             )}
 
-                            <div className="mt-10 text-right">
-                                <div className="inline-block bg-green-50 border border-green-200 rounded-md px-6 py-4">
-                                    <p className="text-md font-medium text-gray-700 mb-1">
-                                        Total Estimate
-                                    </p>
 
-                                    <p className="text-2xl font-bold text-green-700">
-                                        ₹{grandTotal?.toLocaleString("en-in")}
-                                    </p>
-                                </div>
+                    {/* Image Popup Modal */}
+                    {selectedImage && (
+                        <div
+                            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 animate-in fade-in duration-200"
+                            onClick={() => setSelectedImage(null)}
+                        >
+                            <div className="relative max-w-4xl max-h-[90vh]">
+                                <button
+                                    className="absolute -top-10 right-0 text-white text-3xl hover:text-gray-300 transition-colors"
+                                    onClick={() => setSelectedImage(null)}
+                                >
+                                    <i className="fas fa-times"></i>
+                                </button>
+                                <img
+                                    src={selectedImage}
+                                    className="rounded-lg shadow-2xl max-w-full max-h-[85vh] object-contain border-4 border-white/10"
+                                    alt="Enlarged view"
+                                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
+                                />
                             </div>
                         </div>
-                    </>
-                )}
-
-
-                {/* Image Popup Modal */}
-                {selectedImage && (
-                    <div
-                        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4 animate-in fade-in duration-200"
-                        onClick={() => setSelectedImage(null)}
-                    >
-                        <div className="relative max-w-4xl max-h-[90vh]">
-                            <button
-                                className="absolute -top-10 right-0 text-white text-3xl hover:text-gray-300 transition-colors"
-                                onClick={() => setSelectedImage(null)}
-                            >
-                                <i className="fas fa-times"></i>
-                            </button>
-                            <img
-                                src={selectedImage}
-                                className="rounded-lg shadow-2xl max-w-full max-h-[85vh] object-contain border-4 border-white/10"
-                                alt="Enlarged view"
-                                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
-                            />
-                        </div>
-                    </div>
-                )}
-            </>}
+                    )}
+                </>}
 
         </div>
     );

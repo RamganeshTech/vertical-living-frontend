@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
     // useCreateMaterialQuote,
     useEditMaterialQuote, useGetSingleInternalResidentialVersion,
@@ -17,6 +17,10 @@ import CreateQuoteModal from './InternalQuote_New_Version/CreateQuoteModal';
 import { useGetProjects } from '../../../../apiList/projectApi';
 import SqftRateInternalWork from './SqftRateInternalwork';
 import { useDebounce } from '../../../../Hooks/useDebounce';
+import { getItemsBycategoryNameForAllCategories } from '../../../../apiList/Quote Api/RateConfig Api/rateConfigApi';
+// import useGetRole from '../../../../Hooks/useGetRole';
+import { getApiForRole } from '../../../../utils/roleCheck';
+import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
 
 const InternalQuoteEntrySingle = () => {
     const navigate = useNavigate()
@@ -65,6 +69,170 @@ const InternalQuoteEntrySingle = () => {
             toast({ title: "Error", description: error.message, variant: "destructive" });
         }
     };
+
+
+    //  OLD VERSION OF FETCHING THE BRANDS 
+    // const [commonMaterialBrands, setcommonMaterialBrands] = useState<Record<number, any[]>>({});
+    // const debounceTimers = useRef<Record<number, any>>({});
+
+    // const { role, permission } = useAuthCheck();
+
+    // const allowedRoles = ["owner", "CTO", "staff"];
+
+    // const api = getApiForRole(role!);
+
+
+
+    // useEffect(() => {
+    //     // Prime the options map with already saved data so labels show up on load
+    //     const initialMap: Record<number, any[]> = {};
+
+    //     data?.commonMaterials?.forEach((row: any, i: number) => {
+    //         if (row.brandId && row.brandName) {
+    //             initialMap[i] = [{
+    //                 label: row.brandName,
+    //                 value: String(row.brandId),
+    //                 rate: row.cost // Use existing cost as fallback
+    //             }];
+    //         }
+    //     });
+
+    //     setcommonMaterialBrands(prev => ({ ...prev, ...initialMap }));
+
+
+    // }, [data?.commonMaterials]);
+
+    // const fetchFittingsBrands = async (index: number, itemName: string) => {
+
+
+    //     if (!itemName) return;
+    //     try {
+
+    //         if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
+    //         if (!api) throw new Error("API instance not found for role");
+
+
+    //         const results = await getItemsBycategoryNameForFittings({
+    //             api,
+    //             organizationId,
+    //             categoryName: "Accessories/Hardware",
+    //             itemName: itemName
+    //         });
+
+
+    //         console.log("results", results)
+
+    //         const formatted = results.map((item: any) => ({
+    //             label: item.data?.Brand,
+    //             // ✅ FIX: _id is at the top level, not inside item.data
+    //             // value: item?._id,
+    //             value: item?._id ? String(item._id) : "",
+    //             rate: item.data?.Rs
+    //         }));
+
+
+    //         console.log("formatted", formatted)
+
+    //         setcommonMaterialBrands(prev => ({ ...prev, [index]: formatted }));
+    //     } catch (error) {
+    //         console.error("Error fetching fitting brands:", error);
+    //     }
+    // };
+
+
+    const [commonMaterialBrands, setcommonMaterialBrands] = useState<Record<number, any[]>>({});
+    const debounceTimers = useRef<Record<number, any>>({});
+
+    const { role, permission } = useAuthCheck();
+
+    const allowedRoles = ["owner", "CTO", "staff"];
+
+    const api = getApiForRole(role!);
+
+
+
+    // 🆕 New fetch function for Non-Branded (Global Search)
+    const fetchAllCategoryItems = async (index: number, itemName: string) => {
+        if (!itemName) return;
+        try {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+            if (!api) throw new Error("API instance not found");
+
+            const results = await getItemsBycategoryNameForAllCategories({
+                api,
+                organizationId,
+                itemName: itemName
+            });
+
+            const formatted = results.map((item: any) => {
+                // ✅ FIX: Prioritize Brand so you see "Hettich" instead of "hinges"
+                // ✅ This is just the Brand name (e.g., "Hettich")
+                const brandOnly =
+                    item.data?.Brand ||
+                    item.data?.BrandName ||
+                    item.data?.brand ||
+                    item.data?.brandName ||
+                    item.data?.["Brands light name"] ||
+                    item.data?.["Brand "] ||
+                    item.data?.["Brands "] ||
+                    'Unknown';
+
+                const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";
+
+
+                return {
+                    // This will now result in "Hettich (Accessories/Hardware)"
+                    label: `${brandOnly} (${item.categoryName?.trim() || 'No Cat'})`,
+                    value: item?._id ? String(item._id) : "",
+                    rate: item.data?.Rs || item.data?.rs || item?.data?.RS || 0,
+                    brandOnly: brandOnly,
+                    imageUrl: img // 🆕 Extracted image
+                };
+            });
+
+            setcommonMaterialBrands(prev => ({ ...prev, [index]: formatted }));
+        } catch (error) {
+            console.error("Error fetching all category items:", error);
+        }
+    };
+
+    useEffect(() => {
+        // Prime the options map with already saved data so labels show up on load
+        const initialMap: Record<number, any[]> = {};
+
+
+        // 2. Prime common materials Materials & Trigger Silent Fetch
+        data?.commonMaterials?.forEach((row: any, i: number) => {
+            if (row.brandId && row.brandName) {
+
+                // Set the initial label (Brand Name only since Category is missing)
+                initialMap[i] = [{
+                    label: row.brandName,
+                    value: String(row.brandId),
+                    brandOnly: row.brandName,
+                    rate: row.cost,
+                    imageUrl: row.imageUrl // 🆕 Preserve saved image
+                }];
+
+                // ✅ Trigger fetchAllCategoryItems immediately for existing rows
+                // This will overwrite initialNbmMap[i] with the "Brand (Category)" label once finished
+                if (row.itemName) {
+                    fetchAllCategoryItems(i, row.itemName);
+                }
+
+            }
+        });
+
+        setcommonMaterialBrands(prev => ({ ...prev, ...initialMap }));
+
+
+    }, []);
+
+
+
+
+
+
 
 
     useEffect(() => {
@@ -166,24 +334,61 @@ const InternalQuoteEntrySingle = () => {
 
     // Handler for Common Items
     const handleCommonItemChange = (i: number, key: keyof SimpleItemRow, value: any) => {
-        const updated = [...commonMaterials];
-        updated[i] = { ...updated[i], [key]: value };
+        // const updated = [...commonMaterials];
+        // updated[i] = { ...updated[i], [key]: value };
 
-        // Calculate rowTotal immediately for local feedback
-        const base = (Number(updated[i].quantity) || 0) * (Number(updated[i].cost) || 0);
-        const localProfitMultiplier = 1 + ((Number(updated[i].profitOnMaterial) || 0) / 100);
-        const globalMultiplier = 1 + (globalProfitPercent / 100);
+        // // Calculate rowTotal immediately for local feedback
+        // const base = (Number(updated[i].quantity) || 0) * (Number(updated[i].cost) || 0);
+        // const localProfitMultiplier = 1 + ((Number(updated[i].profitOnMaterial) || 0) / 100);
+        // const globalMultiplier = 1 + (globalProfitPercent / 100);
 
-        // Note: Transport will be applied accurately by the useEffect automatically
-        updated[i].rowTotal = base * localProfitMultiplier * globalMultiplier;
+        // // Note: Transport will be applied accurately by the useEffect automatically
+        // updated[i].rowTotal = base * localProfitMultiplier * globalMultiplier;
 
-        // 👉 Auto-add new row on typing in last row
-        const isLastRow = i === updated.length - 1;
-        if (isLastRow && (updated[i].itemName || updated[i].cost)) {
-            updated.push(emptySimpleItem());
-        }
+        // // 👉 Auto-add new row on typing in last row
+        // const isLastRow = i === updated.length - 1;
+        // if (isLastRow && (updated[i].itemName || updated[i].cost)) {
+        //     updated.push(emptySimpleItem());
+        // }
 
-        setCommonMaterials(updated);
+        // console.log("updated", updated)
+
+        // setCommonMaterials(updated);
+
+
+        // ✅ Use the functional updater (prev) to ensure we always have the latest data
+        setCommonMaterials((prev) => {
+            const updated = [...prev];
+
+            // Use updated[i] as the base to merge the new key/value
+            const currentRow = { ...updated[i], [key]: value };
+
+            // Recalculate rowTotal using current values
+            const qty = Number(currentRow.quantity) || 0;
+            const cost = Number(currentRow.cost) || 0;
+            const profit = Number(currentRow.profitOnMaterial) || 0;
+
+            const base = qty * cost;
+            const localProfitMultiplier = 1 + (profit / 100);
+            const globalMultiplier = 1 + (globalProfitPercent / 100);
+
+            currentRow.rowTotal = base * localProfitMultiplier * globalMultiplier;
+
+            // Update the array with the merged row
+            updated[i] = currentRow;
+
+            // 👉 Auto-add new row logic
+            const isLastRow = i === updated.length - 1;
+            if (isLastRow && (currentRow.itemName || currentRow.cost > 0)) {
+                // Only add if the last row isn't already empty
+                updated.push(emptySimpleItem());
+            }
+
+
+            console.log("updated", updated)
+            console.log("State updated successfully for:", key, value);
+            return updated;
+        });
     };
 
     const removeCommonItem = (index: number) => {
@@ -193,12 +398,13 @@ const InternalQuoteEntrySingle = () => {
 
 
     const rendercommonMaterialsTable = () => (
-        <div className="overflow-x-auto rounded-md">
-            <table className="min-w-full text-sm bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-md  pb-[200px] -mb-[200px] !overflow-y-visible">
+            <table className="min-w-full text-sm bg-white shadow-sm border-separate border-spacing-0 !overflow-visible">
                 <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
                     <tr>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Brand</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Profit %</th>
@@ -206,13 +412,42 @@ const InternalQuoteEntrySingle = () => {
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="!overflow-visible">
                     {(commonMaterials.length > 0 ? commonMaterials : [emptySimpleItem()]).map((row, i) => (
-                        <tr key={i} className="hover:bg-gray-50 border-b border-gray-100">
+                        <tr key={i}
+                            // className="hover:bg-gray-50 border-b border-gray-100"
+                            className="group relative border-none !border-b-1 px-4 !py-2 transition-all duration-150 hover:bg-gray-50 hover:z-[100] focus-within:z-[100]"
+
+
+                        >
                             <td className="p-2 border-r border-gray-100">
                                 <input
                                     value={row.itemName || ""}
-                                    onChange={(e) => handleCommonItemChange(i, "itemName", e.target.value)}
+                                    // onChange={(e) => {
+                                    //     handleCommonItemChange(i, "itemName", e.target.value)
+
+
+                                    // }
+                                    // }
+
+
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+
+                                        // 1. Immediate UI update for the text
+                                        handleCommonItemChange(i, "itemName", val);
+
+                                        // 2. Clear existing timer for this specific row index
+                                        if (debounceTimers.current[i]) {
+                                            clearTimeout(debounceTimers.current[i]);
+                                        }
+
+                                        // 3. Set new timer: Call API only after 800ms of no typing
+                                        debounceTimers.current[i] = setTimeout(() => {
+                                            // fetchFittingsBrands(i, val);
+                                            fetchAllCategoryItems(i, val)
+                                        }, 600);
+                                    }}
                                     className="w-full text-center outline-none bg-transparent"
                                     placeholder="e.g. Screws"
                                 />
@@ -225,11 +460,52 @@ const InternalQuoteEntrySingle = () => {
                                     placeholder="details"
                                 />
                             </td>
+
+                            <td className="p-2 border border-gray-200 min-w-[200px] !static lg:!relative">
+                                {/* We use a div inside the TD to create a local "anchor". 
+                                  By making this overflow-visible and the SearchSelect relative/absolute, 
+                                  it will float above other rows.
+                                */}
+                                {/* <div className="relative w-full overflow-visible z-[50]"> */}
+                                <div className="relative w-full !overflow-visible z-[70]">
+                                    <SearchSelectNew
+                                        options={commonMaterialBrands[i] || []}
+                                        value={row?.brandId || ""}
+                                        placeholder={row?.itemName ? "Select Brand" : "Type item first"}
+                                        onFocus={() => {
+                                            if (!commonMaterialBrands[i] || commonMaterialBrands[i].length <= 1) {
+                                                // fetchFittingsBrands(i, row.itemName);
+                                                fetchAllCategoryItems(i, row.itemName);
+                                            }
+                                        }}
+                                        // This ensures the dropdown menu itself is forced to the front
+                                        // className="relative z-[100] w-full"
+                                        className="!overflow-visible relative z-[110]"
+                                        onValueChange={(val) => {
+                                            const options = commonMaterialBrands[i] || [];
+                                            console.log("options", options)
+                                            const selected = options.find((opt: any) => String(opt.value) === String(val));
+
+                                            console.log("selected", selected)
+                                            if (selected) {
+                                                const nameToStore = selected?.brandOnly || selected?.label;
+                                                handleCommonItemChange(i, "brandId" as any, selected?.value);
+                                                // handleCommonItemChange(i, "brandName" as any, selected?.label);
+                                                handleCommonItemChange(i, "brandName" as any, nameToStore);
+                                                handleCommonItemChange(i, "cost", selected?.rate);
+                                                handleCommonItemChange(i, "imageUrl" as any, selected?.imageUrl || "");
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </td>
+
+
                             <td className="p-2 border-r border-gray-100">
                                 <input
                                     type="number"
                                     value={row.quantity || ""}
-                                    onChange={(e) => handleCommonItemChange(i, "quantity", Number(e.target.value))}
+                                    onChange={(e) => handleCommonItemChange(i, "quantity", Math.max(0, Number(e.target.value)))}
                                     className="w-full text-center outline-none bg-transparent"
                                 />
                             </td>
@@ -237,7 +513,7 @@ const InternalQuoteEntrySingle = () => {
                                 <input
                                     type="number"
                                     value={row.cost || ""}
-                                    onChange={(e) => handleCommonItemChange(i, "cost", Number(e.target.value))}
+                                    onChange={(e) => handleCommonItemChange(i, "cost", Math.max(0, Number(e.target.value)))}
                                     className="w-full text-center outline-none bg-transparent"
                                 />
                             </td>
@@ -245,7 +521,7 @@ const InternalQuoteEntrySingle = () => {
                                 <input
                                     type="number"
                                     value={row.profitOnMaterial || ""}
-                                    onChange={(e) => handleCommonItemChange(i, "profitOnMaterial", Number(e.target.value))}
+                                    onChange={(e) => handleCommonItemChange(i, "profitOnMaterial", Math.max(0, Number(e.target.value)))}
                                     className="w-full text-center outline-none bg-transparent"
                                     placeholder="0"
                                 />
@@ -266,7 +542,6 @@ const InternalQuoteEntrySingle = () => {
         </div>
     );
 
-    const { role, permission } = useAuthCheck();
     // const canList = role === "owner" || permission?.internalquote?.list;
     const canCreate = role === "owner" || permission?.internalquote?.create;
     // const canDelete = role === "owner" || permission?.internalquote?.delete;
@@ -554,6 +829,7 @@ const InternalQuoteEntrySingle = () => {
 
                 return {
                     furnitureName: f.furnitureName,
+                    dimention: f.dimention,
                     furnitureProfit: f.furnitureProfit,
                     coreMaterials,
                     fittingsAndAccessories: filterValidSimpleRows(f.fittingsAndAccessories),
@@ -567,14 +843,17 @@ const InternalQuoteEntrySingle = () => {
                 };
             });
 
-            const validcommonMaterials = commonMaterials.filter(item => item.itemName || item.cost > 0);
+            // const validCommonMaterials = commonMaterials.filter(item => item.itemName || item.cost > 0);
+            const validCommonMaterials = commonMaterials.filter(item =>
+                item.brandId || (item.itemName && item.cost > 0)
+            );
 
 
 
 
             // Add other fields to FormData
             formData.append("furnitures", JSON.stringify(furnituresPayload));
-            formData.append("commonMaterials", JSON.stringify(validcommonMaterials)); // 🆕 Add this
+            formData.append("commonMaterials", JSON.stringify(validCommonMaterials)); // 🆕 Add this
             formData.append("commonProfitOverride", commonProfitOverride.toString()); // 🆕 Add this
             formData.append("grandTotal", grandTotal.toString());
             formData.append("notes", "Updated via frontend");
@@ -649,6 +928,11 @@ const InternalQuoteEntrySingle = () => {
             ...prev,
             {
                 furnitureName,
+                dimention: {
+                    height: 0,
+                    width: 0,
+                    depth: 0
+                },
                 coreMaterials: [emptyCoreMaterial()],
                 fittingsAndAccessories: [emptySimpleItem()],
                 glues: [emptySimpleItem()],
@@ -665,16 +949,19 @@ const InternalQuoteEntrySingle = () => {
 
     const handleDuplicateFurniture = (index: number) => {
         const furnitureToCopy = JSON.parse(JSON.stringify(furnitures[index])); // Deep clone the product
-        const updatedArr = [...furnitures];
+        // const updatedArr = [...furnitures];
         // Insert the copy immediately after the original
-        updatedArr.splice(index + 1, 0, furnitureToCopy);
-        setFurnitures(updatedArr);
+        // updatedArr.splice(index + 1, 0, furnitureToCopy);
+        // setFurnitures(updatedArr);
+
+        setFurnitures([...furnitures, furnitureToCopy]);
     };
 
 
 
     const emptyCoreMaterial = (): CoreMaterialRow => ({
         itemName: "",
+        materialUsed: "plywood",
         plywoodNos: { quantity: 0, thickness: 0 },
         // laminateNos: { quantity: 0, thickness: 0 },
         innerLaminate: { quantity: 0, thickness: 0 }, // New field
@@ -689,6 +976,8 @@ const InternalQuoteEntrySingle = () => {
 
     const emptySimpleItem = (): SimpleItemRow => ({
         itemName: "",
+        brandId: "",
+        brandName: "",
         description: "",
         quantity: 0,
         cost: 0,
@@ -719,54 +1008,10 @@ const InternalQuoteEntrySingle = () => {
                     <div className='max-h-full overflow-y-auto'>
 
 
-                        <header className="flex sticky top-0 z-50 !bg-white flex-col md:flex-row md:items-center md:justify-between gap-4 py-1 border-b-1 border-[#818283]">
+                        <header className="flex sticky top-0 z-110 !bg-white flex-col md:flex-row md:items-center md:justify-between gap-4 py-1 border-b-1 border-[#818283]">
 
 
-
-                            {/* <div className="flex gap-3 items-center">
-
-
-
-                                <button
-                                    onClick={() => navigate(-1)}
-                                    className="bg-gray-50 cursor-pointer hover:bg-gray-100 shadow-sm flex items-center justify-center w-10 h-10 border border-gray-200 text-gray-600 rounded-lg transition-all"
-                                >
-                                    <i className="fas fa-arrow-left" />
-                                </button>
-
-                                <div className="flex items-center gap-3">
-                                    <div className="bg-blue-50 p-2 rounded-lg hidden sm:block">
-                                        <i className="fas fa-file-invoice text-blue-600 text-xl" />
-                                    </div>
-                                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-                                        {data.mainQuoteName || "Internal Quote"}
-                                    </h1>
-
-                                    <Button
-                                        onClick={() => {
-                                            setFormData(() => {
-                                                return {
-                                                    mainQuoteName: data?.mainQuoteName,
-                                                    quoteCategory: data?.quoteCategory,
-                                                    quoteType: data?.quoteType,
-                                                    projectId: data?.projectId
-                                                }
-                                            })
-
-                                            setMainModalOpen(true)
-                                        }
-                                        }
-                                        size='sm'
-                                        className="flex items-center gap-2 font-bold uppercase tracking-widest shadow-sm"
-                                    >
-                                        <i className="fas fa-pen-to-square" />
-                                        Edit
-                                    </Button>
-                                </div>
-                            </div> */}
-
-
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 ">
                                 <button onClick={() => navigate(-1)} className="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors">
                                     <i className="fas fa-arrow-left" />
                                 </button>
@@ -857,7 +1102,7 @@ const InternalQuoteEntrySingle = () => {
 
 
                         {isModalOpen && (
-                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
+                            <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
                                 <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md relative animate-scaleIn">
                                     <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Quote</h3>
 
@@ -912,7 +1157,7 @@ const InternalQuoteEntrySingle = () => {
                             </div>
                         }
 
-                        {furnitures?.length > 0 && <section className="shadow overflow-y-auto max-h-[86%]">
+                        {furnitures?.length > 0 && <section className="shadow max-h-[86%]">
 
                             {furnitures?.map((furniture, index) => (
                                 <FurnitureForm
@@ -1053,6 +1298,7 @@ const InternalQuoteEntrySingle = () => {
                     setModalOpen={setMainModalOpen}
                     setFormData={setFormData}
                     handleSubmit={handleUpdateSubmit}
+                    isSubmitting={updateMutation.isPending}
                 />
             )}
 
@@ -1061,5 +1307,3 @@ const InternalQuoteEntrySingle = () => {
 }
 
 export default InternalQuoteEntrySingle
-
-

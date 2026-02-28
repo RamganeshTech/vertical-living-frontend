@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { SIDEBAR_LABELS } from "../../constants/constants";
 import CreateProject, { type ProjectInput } from "../../components/CreateProject";
 import SingleProject from "../../shared/SingleProject";
@@ -11,6 +11,7 @@ import type { OrganizationOutletTypeProps } from "../Organization/OrganizationCh
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
 
 
 const ProjectLists = () => {
@@ -20,6 +21,7 @@ const ProjectLists = () => {
   const { role } = useSelector((state: RootState) => state.authStore)
   const [showForm, setShowForm] = useState<boolean>(false);
   const [isEditing, setisEditing] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const [editForm, setEditForm] = useState<ProjectInput>({
     projectName: "",
@@ -37,8 +39,17 @@ const ProjectLists = () => {
 
   let { data: getProjects, refetch, isPending, error, isLoading } = useGetProjects(organizationId!)
 
+  // 2. Frontend Filter Logic
+  // We use useMemo to ensure we only re-filter when the data or query changes
+  const filteredProjects = useMemo(() => {
+    if (!getProjects) return [];
+    return getProjects?.filter((project: any) =>
+      project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [getProjects, searchQuery]);
+
   const allowedRoles = ["owner", "CTO", "staff"]
-  
+
   const handleEdit = useCallback((project: IProject, id: string) => {
     const projectInput = mapProjectToProjectInput(project);
     setEditForm(projectInput);
@@ -89,19 +100,32 @@ const ProjectLists = () => {
           </h2>
         </div>
 
-        {allowedRoles.includes(role!) && <div
-          onClick={() => {
-            setShowForm(!showForm)
-          }}
-          className="bg-blue-600  cursor-pointer !h-[40px] !w-[40px] flex justify-center items-center rounded-full"
-        >
-          <i
-            className={`fa-solid fa-plus text-white transition-transform duration-300 ${showForm ? "rotate-135" : "rotate-0"
-              }`}
-          ></i>
-        </div>}
 
-        
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
+            <Input
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10" // Space for an icon
+            />
+            <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+
+          {allowedRoles.includes(role!) && <div
+            onClick={() => {
+              setShowForm(!showForm)
+            }}
+            className="bg-blue-600  cursor-pointer !h-[40px] !w-[40px] flex justify-center items-center rounded-full"
+          >
+            <i
+              className={`fa-solid fa-plus text-white transition-transform duration-300 ${showForm ? "rotate-135" : "rotate-0"
+                }`}
+            ></i>
+          </div>}
+        </div>
+
+
       </header>
       <hr className="my-2 border-b-1 border-gray-300" />
 
@@ -143,7 +167,7 @@ const ProjectLists = () => {
 
         {isPending && [...Array(6)].map((_, i) => <Fragment key={i}><ProjectCardLoading /></Fragment>)}
 
-        {!isPending && getProjects?.length > 0 && getProjects?.map((project: IProject & { _id: string }, index: number) => {
+        {/* {!isPending && getProjects?.length > 0 && getProjects?.map((project: IProject & { _id: string }, index: number) => {
 
           return (
             <>
@@ -155,7 +179,27 @@ const ProjectLists = () => {
               </div>
             </>
           );
-        })}
+        })} */}
+
+
+        {filteredProjects?.length > 0 ? (
+          filteredProjects?.map((project: IProject & { _id: string }, index: number) => (
+            <>
+              <div
+                key={(project as any)._id}
+                className="h-[256px] sm:!h-[270px] md:!h-[330px] lg:!h-[282px] flex flex-col shadow-md rounded-xl overflow-hidden border-l-8 border-blue-600 bg-white"
+              >
+                <SingleProject
+                  refetch={refetch} onEdit={handleEditProject} index={index} project={project} organizationId={organizationId!}
+                />
+              </div>
+            </>
+          ))
+        ) : (
+          <div className="col-span-full text-center py-10 text-gray-500">
+            No projects found matching "{searchQuery}"
+          </div>
+        )}
       </div>}
 
       {showForm && (

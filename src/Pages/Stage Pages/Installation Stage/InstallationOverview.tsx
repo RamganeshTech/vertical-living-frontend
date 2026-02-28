@@ -12,7 +12,7 @@ import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import AssignStageStaff from "../../../shared/AssignStaff";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 // import { NO_IMAGE } from './../../../constants/constants';
 // import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
@@ -148,12 +148,12 @@ export default function InstallationOverview() {
               />
 
 
-              {!getAllError && <ShareDocumentWhatsapp
+              {/* {!getAllError && <ShareDocumentWhatsapp
                 projectId={projectId!}
                 stageNumber="11"
                 className="w-full sm:w-fit"
                 isStageCompleted={data?.status}
-              />}
+              />} */}
 
               <AssignStageStaff
                 stageName="InstallationModel"

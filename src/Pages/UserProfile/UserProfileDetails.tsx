@@ -14,8 +14,7 @@ import { setClientProfileData } from "../../features/clientSlice";
 import { setCTOProfileData } from "../../features/CTOSlice";
 import { setStaffProfileData } from "../../features/staffSlices";
 import { setWorkerProfileData } from "../../features/workerSlice";
-import RazorpayConfig from "../RazorPay Config/RazorPayConfig";
-
+// import RazorpayConfig from "../RazorPay Config/RazorPayConfig";
 
 // type ProfileUnion =
 //     | RootState["userProfileStore"]
@@ -384,7 +383,7 @@ export default function ProfileDetails() {
       </div>
 
 
-      {role && ["owner", "CTO", "staff"].includes(role) && <RazorpayConfig />}
+      {/* {role && ["owner"].includes(role) && <RazorpayConfig />} */}
     </div>
   );
 }

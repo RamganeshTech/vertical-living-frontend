@@ -13,7 +13,7 @@ import {
 } from "../../../apiList/Stage Api/cleaningStageApi";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import type { ProjectDetailsOutlet } from "../../../types/types";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
 
@@ -148,12 +148,12 @@ export default function CleaningOverview() {
                 />
 
 
-                {!getAllError && <ShareDocumentWhatsapp
+                {/* {!getAllError && <ShareDocumentWhatsapp
                   projectId={projectId!}
                   stageNumber="13"
                   className="w-full sm:w-fit"
                   isStageCompleted={data?.status}
-                />}
+                />} */}
 
                 <AssignStageStaff
                   stageName="CleaningAndSanitationModel"

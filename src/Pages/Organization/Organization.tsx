@@ -22,11 +22,12 @@ export default function Organization() {
 
 
   const path = {
-    ADMIN: `/login`,
-    STAFF: `/login/staff`,
-    CTO: `/login/cto`,
-    WORKER: `/login/worker`,
-    CLIENT: `/login/client`,
+    // ADMIN: `/login`,
+    // STAFF: `/login/staff`,
+    // CTO: `/login/cto`,
+    // WORKER: `/login/worker`,
+    // CLIENT: `/login/client`,
+    COMMONLOGIN: `/login/common`,
     PUBLICORDERS: `/ordermaterial/setup`,
   }
 
@@ -56,9 +57,25 @@ export default function Organization() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // =========================================================
+  // DATA STRUCTURE FOR SIDEBAR (Login/Public Items)
+  // =========================================================
 
+  // Convert LOGIN_LABELS to the menuStructure format (without alphetical order)
+  // const loginMenuStructure = Object.entries(LOGIN_LABELS).map(([key, value]) => ({
+  //   type: 'item',
+  //   key: key,
+  //   label: value
+  // }));
 
-
+  // (with alphetical order)
+  const loginMenuStructure = Object.entries(LOGIN_LABELS)
+  .map(([key, value]) => ({
+    type: 'item',
+    key: key,
+    label: value as string
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label)); // Alphabetical Sort
 
 
   if (isLoading) {
@@ -141,6 +158,7 @@ export default function Organization() {
           path={path}
           labels={LOGIN_LABELS}
           icons={LOGIN_ICONS_LOGIN_GROUP}
+          menuStructure={loginMenuStructure} // Pass the new structure here
         />
       )}
 
@@ -256,7 +274,7 @@ export default function Organization() {
             )}
 
 
-          
+
             <CreateOrganizationModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
           </div>
         </div>

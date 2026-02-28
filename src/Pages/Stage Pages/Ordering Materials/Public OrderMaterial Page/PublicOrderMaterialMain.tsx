@@ -9,6 +9,7 @@ import {
 } from '../../../../apiList/Stage Api/publicOrderMaterialApi';
 // import { downloadImage } from '../../../../utils/downloadFile';
 import PublicOrderMaterialCompo from './PublicOrderMaterialCompo';
+import { COMPANY_DETAILS } from '../../../../constants/constants';
 
 interface AvailableProjetType {
     _id: string;
@@ -107,7 +108,7 @@ const PublicOrderMaterialMain = () => {
 
                             </Button>
                             <div className=''>
-                                <h1 className="text-2xl font-bold text-gray-900">Vertical Living</h1>
+                                <h1 className="text-2xl font-bold text-gray-900">{COMPANY_DETAILS.COMPANY_NAME}</h1>
                                 <span className="text-sm text-gray-500"> Order Materials</span>
                             </div>
                         </div>

@@ -18,7 +18,7 @@ import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionL
 import { downloadImage } from "../../../utils/downloadFile";
 import type { IConsultationMessage, ITechnicalConsultation } from "../../../types/types";
 import { Badge } from "../../../components/ui/Badge";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
 // import { useGetStageSelection } from "../../../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi";
@@ -197,12 +197,12 @@ const TechnicalConsultant: React.FC = () => {
                             className="flex-1 sm:flex-initial min-w-max"
                         />}
 
-                        {(!getMessageError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
+                        {/* {(!getMessageError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
                             projectId={projectId!}
                             stageNumber="4"
                             className="w-full sm:w-fit"
                             isStageCompleted={techDoc?.status}
-                        />}
+                        />} */}
 
                         {(canCreate || canEdit) && <AssignStageStaff
                             stageName="TechnicalConsultationModel"

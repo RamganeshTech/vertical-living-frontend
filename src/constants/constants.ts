@@ -18,10 +18,14 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   // CUSTOMERACCOUNT: "Customer",
   // INVOICEACCOUNT: "Invoice",
   CUTLIST: "Cutlist Generation",
+  CALCULATOR: "Calculator",
+  MATERIAL_SHOP_DOCS: "Shop Quotations",
+  RATECONIGPRESALES: "Rate Config (Pre Sales)",
   RATECONIG: "Rate Config (Material)",
   RATECONIGSTAFF: "Rate Config (Staff)",
   RATECONIGMATERIALWITHSTAFF: "Rate Config (Material & Staff)",
   WORKTEMPLATE: "Work Data Templates",
+  PRESALESQUOTE:"Pre Sales Quote",
   INTERNALQUOTE: "Internal Quote",
   QUOTEVARIENT: "Quote Varient",
   "QUOTES (CLIENT)": "Quotes for Clients",
@@ -57,15 +61,21 @@ export const SIDEBAR_ICONS: Record<string, string> = {
 
   // CUSTOMERACCOUNT: "fas fa-user text-2xl",
   // INVOICEACCOUNT: "fas fa-note text-2xl",
-  CUTLIST: "fas fa-measurement text-2xl",
+  // CUTLIST: "fas fa-measurement text-2xl",
+  CUTLIST: "fas fa-scissors text-2xl",
+  CALCULATOR: "fas fa-calculator text-2xl",
+  MATERIAL_SHOP_DOCS: "fas fa-file-invoice text-2xl",
+  RATECONIGPRESALES:"fas fa-box-archive text-2xl",
   RATECONIG: "fas fa-box-archive text-2xl",
   RATECONIGSTAFF: "fa-solid fa-person-digging text-2xl",
-  WORKTEMPLATE: "fa-solid fa-person-digging text-2xl",
+  RATECONIGMATERIALWITHSTAFF : "fa-solid fa-calculator text-2xl",
+  WORKTEMPLATE: "fa-solid fa-clipboard-list text-2xl",
+  PRESALESQUOTE: "fas fa-file-alt text-2xl",
   INTERNALQUOTE: "fas fa-file text-2xl",
   QUOTEVARIENT: "fas fa-file-invoice text-2xl",
   "QUOTES (CLIENT)": "fas fa-users text-2xl",
   WORKLIBRARY: "fas fa-code-fork text-2xl",
-  STAFFTASK: "fas fa-object-group text-2xl",
+  STAFFTASK: "fa-solid fa-list-check text-2xl",
   SINGLESTAFFTASK: "fas fa-object-group text-2xl",
   MATERIALINVENTORY: "fa-solid fa-object-group text-2xl",
   // NOTIFICATION: "fas fa-message",
@@ -78,21 +88,23 @@ export const SIDEBAR_ICONS: Record<string, string> = {
 
 
 export const LOGIN_ICONS_LOGIN_GROUP = {
-  ADMIN: "fas fa-user-tie text-2xl",
-  STAFF: "fas fa-user-gear text-2xl",
-  CTO: "fas fa-users-gear text-2xl",
-  WORKER: "fas fa-hard-hat text-2xl",
-  CLIENT: "fas fa-user text-2xl",
+  // ADMIN: "fas fa-user-tie text-2xl",
+  // STAFF: "fas fa-user-gear text-2xl",
+  // CTO: "fas fa-users-gear text-2xl",
+  // WORKER: "fas fa-hard-hat text-2xl",
+  // CLIENT: "fas fa-user text-2xl",
+  COMMONLOGIN: "fas fa-user-tie text-2xl", // 👈 Add this line
   PUBLICORDERS: `fas fa-box text-2xl`,
 
 }
 
 export const LOGIN_LABELS = {
-  ADMIN: `Admin Login`,
-  STAFF: `Staff Login`,
-  CTO: `CTO Login`,
-  WORKER: `Worker Login`,
-  CLIENT: `Client Login`,
+  // ADMIN: `Admin Login`,
+  // STAFF: `Staff Login`,
+  // CTO: `CTO Login`,
+  // WORKER: `Worker Login`,
+  // CLIENT: `Client Login`,
+  COMMONLOGIN: "Login", // 👈 Add this line
   PUBLICORDERS: `Public Orders`,
 }
 
@@ -120,7 +132,6 @@ export const ORGANIZATION_LABELS: Record<string, string> = {
   MODULAR: "Modular Units",
   // SETTINGS: "Settings",
   // EXTERNAL: "External Units",
-
 }
 
 export const PROJECTS_LABELS: Record<string, string> = {

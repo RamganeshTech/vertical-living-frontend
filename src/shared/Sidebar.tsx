@@ -32,6 +32,7 @@ type SidebarProp = {
     path: Record<string, string>,
     setProjectName?: React.Dispatch<React.SetStateAction<string>>,
     projectName?: string
+    menuStructure?: any[]
 }
 
 
@@ -137,7 +138,7 @@ export const getSidebarConfig = (
 
 
 
-const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, projectName }) => {
+const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, projectName, menuStructure }) => {
     const [showSideBar, setShowSideBar] = useState(false)
     const { projectId } = useParams() as { projectId: string }
     const navigate = useNavigate()
@@ -148,6 +149,15 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
     const dispatch = useDispatch()
     const { role } = useSelector((state: RootState) => state.authStore)
     const [activeSidebar, setActiveSidebar] = useState<string>('');
+
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+    const toggleGroup = (groupId: string) => {
+        setOpenGroups(prev => ({
+            ...prev,
+            [groupId]: !prev[groupId]
+        }));
+    };
 
     // const { data: stageSelectionData, isLoading: selectStagePending } = useGetStageSelection(projectId)
     const { data: projectDetails, isLoading: projectDetailPending } = useGetProjectDetails(projectId)
@@ -188,6 +198,23 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
         }
     }, [location.pathname, showSideBar])
 
+    // 1. Logic to initialize the open state based on the menuStructure data
+    useEffect(() => {
+        if (menuStructure) {
+            const initialState: Record<string, boolean> = {};
+
+            menuStructure?.forEach((node: any) => {
+                // If the node is a group and we specifically told it to be open
+                if (node?.type === 'group' && node?.isOpenByDefault) {
+                    initialState[node.id] = true;
+                }
+            });
+
+            // Use functional update to merge with existing state or replace it
+            setOpenGroups(prev => ({ ...prev, ...initialState }));
+        }
+    }, [menuStructure]);
+
     useSidebarShortcut(handleSideBarOpen, handleSideBarClose);
 
     // const stageType = !selectStagePending && stageSelectionData?.mode; // "Manual Flow" | "Modular Units" | null
@@ -201,9 +228,20 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
     //  to make the navbar navigate to project list page because there is no navigation for back 
     const isInStageNavBar = pathArray[2] === "projectdetails"
     const isLoginNavBar = pathArray[1] === "login"
+
     const handleNav = () => {
+        const pathSegments = location.pathname.split('/').filter(Boolean);
         if (isInStageNavBar) {
             navigate(`/organizations/${organizationId}/projects`)
+            return
+        }
+
+        // CASE 2: Inside a specific Org Module (HR, Accounting, Logistics, etc.)
+        // URL: /organizations/orgId/projects/hr  OR /organizations/orgId/projects
+        if (pathSegments.includes("projects") || pathSegments.length > 2) {
+            // Navigate back to the main Organization Dashboard
+            navigate(`/organizations/${organizationId}`);
+            return;
         }
 
         if (isLoginNavBar) {
@@ -254,9 +292,8 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
             {showSideBar ?
                 <aside onMouseLeave={() => setShowSideBar(false)} className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
 
-                    {/* --- STATIC HEADER SECTION (Won't Scroll) --- */}
                     <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b border-[#3a3b45] px-2 py-2 bg-[#2f303a] z-10`}>
-                        <span className='text-xl font-bold truncate pr-2'>
+                        <span  className='text-xl cursor-pointer font-bold truncate pr-2'>
                             {isProjectDetailRoute ? (projectName || "Project") : COMPANY_DETAILS.COMPANY_NAME}
                         </span>
                         <div className='w-[30px] h-[30px] flex-shrink-0'>
@@ -264,21 +301,13 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                         </div>
                     </div>
                     <div className="flex flex-col flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar p-2 large-scrollbar">
+                        {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
 
-                        {/*                         
-                        <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b-1 py-2`}>
-                            <span className='text-xl'>{isProjectDetailRoute ? (projectName || "Project") : COMPANY_DETAILS.COMPANY_NAME}</span>
-                            <div className='w-[30px] h-[30px]' >
-                                <img className='w-full h-full' src={COMPANY_DETAILS.COMPANY_LOGO} alt="LOGO" />
-                            </div>
-
-                        </div> */}
-
-                        <section className="py-0 space-y-2"> {/*here is where the proejcts, lists, collaborations are rendered from the side bar*/}
+                        {/* old version before grouping */}
+                        {/* <section className="py-0 space-y-2">
                             {Object.entries(labels).map(([key, value]) => {
                                 const isActive = activeSidebar === value;
 
-                                // <Link key={value} to={`/${value.toLowerCase()}`} className='outline-none'>
                                 return (path[key] && <Link key={value as string} to={path[key]} className='outline-none'>
                                     <div
                                         onClick={() => setActiveSidebar(value as string)}
@@ -303,6 +332,70 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
 
 
 
+                        </section> */}
+
+
+                        <section className="py-0 space-y-2">
+                            {menuStructure?.map((node: any) => {
+                                // IF IT IS A STANDALONE ITEM
+                                if (node.type === 'item') {
+                                    const key = node.key;
+                                    const value = node.label;
+                                    const isActive = activeSidebar === value;
+
+                                    return (path[key] && (
+                                        <Link key={key} to={path[key]} className='outline-none'>
+                                            <div
+                                                onClick={() => setActiveSidebar(value)}
+                                                className={`cursor-pointer flex justify-between max-w-[95%] py-4 px-4 ${isActive ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
+                                                    }`}
+                                            >
+                                                <span className='text-lg'>{value}</span>
+                                                <span><i className="fa-solid fa-chevron-right"></i></span>
+                                            </div>
+                                        </Link>
+                                    ));
+                                }
+
+                                // IF IT IS A GROUP (ACCORDION)
+                                if (node.type === 'group') {
+                                    const isOpen = openGroups[node.id];
+
+                                    return (
+                                        <div key={node.id} className="flex flex-col">
+                                            <div
+                                                onClick={() => toggleGroup(node.id)}
+                                                className="cursor-pointer flex justify-between max-w-[95%] py-4 px-4 rounded-xl hover:bg-[#3a3b45] text-[#9ca3af]"
+                                            >
+                                                <span className='text-lg font-semibold'>{node.label}</span>
+                                                <span>
+                                                    <i className={`fa-solid ${isOpen ? 'fa-chevron-down' : 'fa-chevron-right'} transition-transform`}></i>
+                                                </span>
+                                            </div>
+
+                                            {/* Sub-items logic */}
+                                            {isOpen && (
+                                                <div className="ml-2 border-l-2 border-[#3a3b45] mt-1 space-y-1">
+                                                    {node.keys.map((childKey: string) => (
+                                                        labels[childKey] && path[childKey] && (
+                                                            <Link key={childKey} to={path[childKey]} className="outline-none">
+                                                                <div
+                                                                    onClick={() => setActiveSidebar(labels[childKey])}
+                                                                    className={`cursor-pointer py-3 px-4 rounded-lg text-[18px] hover:text-white hover:bg-[#3a3b45] ${activeSidebar === labels[childKey] ? 'text-white bg-[#3a3b45]' : ''
+                                                                        }`}
+                                                                >
+                                                                    {labels[childKey]}
+                                                                </div>
+                                                            </Link>
+                                                        )
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })}
                         </section>
 
                     </div>

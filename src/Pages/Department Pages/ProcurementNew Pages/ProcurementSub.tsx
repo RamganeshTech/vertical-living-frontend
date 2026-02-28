@@ -10,7 +10,7 @@ import {
     // useUpdateProcurementTotalCost,
     useProcurementGeneratePdf,
     useDeleteProcurementPdf,
-    // useSyncLogistics,
+    useSyncLogistics,
     // useProcurementGenerateLink,
     useSyncProcurementToPaymentsSection,
     useCancelProcurementAutomation,
@@ -54,7 +54,7 @@ const ProcurementSub: React.FC = () => {
 
 
 
-    // const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
+    const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
     // const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsProcurement()
 
     // const [editCost, setEditCost] = useState(false);
@@ -227,15 +227,14 @@ const ProcurementSub: React.FC = () => {
     };
 
 
-    // const handleGenerateLogistics = async () => {
-    //     try {
-
-    //         await syncLogistics({ id });
-    //         toast({ title: "Success", description: "Details sent to Logistics Department" });
-    //     } catch (error: any) {
-    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
-    //     }
-    // }
+    const handleGenerateLogistics = async () => {
+        try {
+            await syncLogistics({ id });
+            toast({ title: "Success", description: "Details sent to Logistics Department" });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+        }
+    }
 
 
     const handleSyncToPayments = async () => {
@@ -363,6 +362,16 @@ const ProcurementSub: React.FC = () => {
                                 onClick={handleSyncToPayments}
                             >
                                 Send To Payments
+                            </Button>
+
+                            <Button
+                                variant="primary"
+                                disabled={data.isSyncWithLogistics}
+                                isLoading={syncLogisticsLoading}
+                                className="disabled:cursor-not-allowed"
+                                onClick={handleGenerateLogistics}
+                            >
+                                Send To Logistics
                             </Button>
 
                             {/* <Button
@@ -693,7 +702,7 @@ const ProcurementSub: React.FC = () => {
                                     <div className="flex justify-between items-start mb-3 pl-2">
                                         <div>
                                             <h4 className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                                                {(quote?.shopId as any).shopName || `Vendor ${idx + 1}`}
+                                                {(quote?.shopId as any)?.shopDisplayName || `Vendor ${idx + 1}`}
                                             </h4>
                                             {/* <p className="text-[10px] text-gray-500 font-mono mt-0.5">
                                                 Ref: {quote._id.slice(-6).toUpperCase()}
@@ -1064,29 +1073,12 @@ const AutomationTimerButton: React.FC<AutomationTimerButtonProps> = ({ data, ref
     const [timeLeft, setTimeLeft] = useState(900);
     const { mutateAsync: cancelSyncPaymentsMutation, isPending: cancelSyncPaymentsLoading } = useCancelProcurementAutomation();
 
-    // useEffect(() => {
-    //     // If already synced, don't start timer
-    //     if (data?.isSyncWithPaymentsSection || timeLeft <= 0) return;
-
-    //     const timer = setInterval(() => {
-    //         setTimeLeft((prev) => {
-    //             if (prev <= 1) {
-    //                 clearInterval(timer);
-    //                 return 0;
-    //             }
-    //             return prev - 1;
-    //         });
-    //     }, 1000);
-
-    //     return () => clearInterval(timer);
-    // }, [data?.isSyncWithPaymentsSection, timeLeft]);
-
     useEffect(() => {
         if (data?.isSyncWithPaymentsSection) return;
 
         const calculateTime = () => {
             const startTime = new Date(data?.createdAt)?.getTime();
-            const endTime = startTime + 2 * 60 * 1000; // Exact 2-minute mark
+            const endTime = startTime + 15 * 60 * 1000; // Exact 2-minute mark
             const now = new Date().getTime();
             const diff = Math.floor((endTime - now) / 1000);
 

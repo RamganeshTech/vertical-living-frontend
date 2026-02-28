@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from '../../utils/toast';
 // import { useSaveCutlist } from '../../apiList/CutlistApi'; // Path to your hooks
 import CutlistForm from './CutlistForm';
@@ -6,10 +6,11 @@ import { useSaveCutlist } from '../../apiList/cutlist_Api/cutlistApi';
 // import { ICutlist } from '../../types/cutlist';
 
 const CreateCutlist = () => {
+    const navigate = useNavigate()
     const { organizationId } = useParams() as { organizationId: string };
     const saveMutation = useSaveCutlist();
 
-    const handleSubmit = async (data: any, roomsWithFiles: any[], summaryData: any) => {
+    const handleSubmit = async (data: any, roomsWithFiles: any[], summaryData: any, creatorName:string) => {
         try {
             const formData = new FormData();
             
@@ -22,6 +23,7 @@ const CreateCutlist = () => {
             formData.append('quoteId', data.selectedQuoteId || null);
             formData.append('versionNo', data.versionNo || '1.0');
             formData.append('summary', JSON.stringify(summaryData));
+            formData.append('creatorName', creatorName || "");
 
             // Map rooms and extract files
             const roomsData = roomsWithFiles.map((room, index) => {
@@ -46,7 +48,7 @@ const CreateCutlist = () => {
 
             await saveMutation.mutateAsync({ formData });
             toast({ title: "Success", description: "Cutlist created successfully" });
-            // navigate(-1);
+            navigate(-1);
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -57,7 +59,7 @@ const CreateCutlist = () => {
     };
 
     return (
-        <main className='max-h-full overflow-y-auto p-4'>
+        <main className='max-h-full h-full overflow-y-auto'>
             <CutlistForm 
                 mode="create" 
                 organizationId={organizationId} 

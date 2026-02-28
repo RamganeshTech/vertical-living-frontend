@@ -7,6 +7,8 @@ interface AuthState {
   userName: string | null,
   permission: Record<string, Record<string, boolean>>, // <-- add this
   isGuideRequired: boolean | undefined
+  ownerId: string,
+
 
 }
 
@@ -16,7 +18,9 @@ const initialState: AuthState = {
   _id: null,
   userName: null,
   permission: {} as Record<string, Record<string, boolean>>,
-  isGuideRequired: undefined // <-- add this
+  isGuideRequired: undefined, // <-- add this
+    ownerId: "",
+
 };
 
 const authSlice = createSlice({
@@ -39,5 +43,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setRole, logout,updateAuthGuideStatus } = authSlice.actions;
+export const { setRole, logout, updateAuthGuideStatus } = authSlice.actions;
 export default authSlice.reducer;

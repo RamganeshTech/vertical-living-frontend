@@ -83,7 +83,7 @@ const ModularUnitCardNew = ({
             onClick={onView}
             title={unit.productName}
           >
-            {unit.productName || "Untitled Product"}
+            {unit.category || "Untitled Product"}
           </h3>
           {/* {unit.fabricationCost && (
             <div className="text-xs text-gray-600 bg-orange-50 px-2 py-1 rounded whitespace-nowrap">

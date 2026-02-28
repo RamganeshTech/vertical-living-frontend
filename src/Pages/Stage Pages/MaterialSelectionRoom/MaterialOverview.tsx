@@ -14,7 +14,7 @@ import { Button } from "../../../components/ui/Button";
 import MaterialOverviewLoading from "./MaterailSelectionLoadings/MaterialOverviewLoading";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import { useEffect, useState } from "react";
 import type { IPackage } from "../../../types/types";
 import { downloadImage } from "../../../utils/downloadFile";
@@ -171,12 +171,12 @@ console.log("value", val)
                                     className="flex-1 sm:flex-initial min-w-max"
                                 />
 
-                                {!getRoomsError && <ShareDocumentWhatsapp
+                                {/* {!getRoomsError && <ShareDocumentWhatsapp
                                     projectId={projectId!}
                                     stageNumber="5"
                                     className="w-full sm:w-fit"
                                     isStageCompleted={data?.status}
-                                />}
+                                />} */}
 
                                 <AssignStageStaff
                                     stageName="MaterialRoomConfirmationModel"

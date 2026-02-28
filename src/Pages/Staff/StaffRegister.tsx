@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 
 import { useState, useEffect } from "react"
@@ -8,11 +6,12 @@ import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
-import { useRegisterStaff} from "../../apiList/staffApi"
+// import { useRegisterStaff } from "../../apiList/staffApi"
 import { toast } from "../../utils/toast"
 import { useDispatch } from "react-redux"
 import { setStaffProfileData } from "../../features/staffSlices"
 import { setRole } from "../../features/authSlice"
+import { useCreateCommonUser } from "../../apiList/commonAuthApi"
 
 export default function StaffRegister() {
   const navigate = useNavigate()
@@ -30,7 +29,8 @@ export default function StaffRegister() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const registerStaff = useRegisterStaff()
+  // const registerStaff = useRegisterStaff()
+  const { mutateAsync: registerCommonUser, isPending } = useCreateCommonUser();
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function StaffRegister() {
 
     if (!formData.phoneNo.trim()) {
       newErrors.phoneNo = "Phone number is required"
-} else if (!/^\d{10}$/.test(formData.phoneNo.trim())) {
+    } else if (!/^\d{10}$/.test(formData.phoneNo.trim())) {
       newErrors.phoneNo = "Please enter a valid phone number"
     }
 
@@ -99,6 +99,71 @@ export default function StaffRegister() {
     }
   }
 
+  // // old version seperate login form version
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault()
+
+  //   if (!invite) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Invalid invitation token",
+  //       variant: "destructive",
+  //     })
+  //     return
+  //   }
+
+  //   if (!validateForm()) {
+  //     return
+  //   }
+
+  //   try {
+  //     const data = await registerStaff.mutateAsync({
+  //       invite,
+  //       email: formData.email,
+  //       password: formData.password,
+  //       phoneNo: formData.phoneNo,
+  //       staffName: formData.staffName,
+  //     })
+
+  //     toast({
+  //       title: "Success",
+  //       description: "Registration successful! You can now login with your credentials.",
+  //     })
+
+
+  //      const staffData = data.data;
+
+  //   dispatch(setRole({
+  //     _id: staffData._id,
+  //     role: staffData.role,
+  //     isauthenticated: true,
+  //     userName: staffData?.staffName
+  //   }));
+
+  //   dispatch(setStaffProfileData({
+  //     staffId: staffData._id,   // staffId comes as _id in register
+  //     staffName: staffData.staffName,
+  //     email: staffData.email,
+  //     phoneNo: staffData.phoneNo,
+  //     role: staffData.role,
+  //     isauthenticated: true
+  //   }));
+
+  //     // Redirect to login page
+  //     setTimeout(() => {
+  //       navigate("/")
+  //     }, 2000)
+  //   } catch (error: any) {
+  //     toast({
+  //       title: "Registration Failed",
+  //       description: error.message || "Failed to register. Please try again.",
+  //       variant: "destructive",
+  //     })
+  //   }
+  // }
+
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -116,12 +181,12 @@ export default function StaffRegister() {
     }
 
     try {
-      const data = await registerStaff.mutateAsync({
+      const data = await registerCommonUser({
         invite,
         email: formData.email,
         password: formData.password,
         phoneNo: formData.phoneNo,
-        staffName: formData.staffName,
+        name: formData.staffName,
       })
 
       toast({
@@ -130,32 +195,32 @@ export default function StaffRegister() {
       })
 
 
-       const staffData = data.data;
+      const staffData = data?.data;
 
-    dispatch(setRole({
-      _id: staffData._id,
-      role: staffData.role,
-      isauthenticated: true,
-      userName: staffData?.staffName
-    }));
+      dispatch(setRole({
+        _id: staffData.staffId,
+        role: staffData.role,
+        isauthenticated: true,
+        userName: staffData?.staffName
+      }));
 
-    dispatch(setStaffProfileData({
-      staffId: staffData._id,   // staffId comes as _id in register
-      staffName: staffData.staffName,
-      email: staffData.email,
-      phoneNo: staffData.phoneNo,
-      role: staffData.role,
-      isauthenticated: true
-    }));
+      dispatch(setStaffProfileData({
+        staffId: staffData.staffId,   // staffId comes as _id in register
+        staffName: staffData.staffName,
+        email: staffData.email,
+        phoneNo: staffData.phoneNo,
+        role: staffData.role,
+        isauthenticated: true
+      }));
 
       // Redirect to login page
       setTimeout(() => {
         navigate("/")
-      }, 2000)
+      }, 1500)
     } catch (error: any) {
       toast({
         title: "Registration Failed",
-        description: error.message || "Failed to register. Please try again.",
+        description: error?.response?.data?.message || "Failed to register. Please try again.",
         variant: "destructive",
       })
     }
@@ -185,10 +250,10 @@ export default function StaffRegister() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
 
-        <Button variant="primary" onClick={() => navigate(-1)} className="!absolute z-[10] top-[5%]  right-[5%] sm:right-[10%]">
-              <i className="fas fa-arrow-left"></i>
-            </Button>
-      
+      <Button variant="primary" onClick={() => navigate(-1)} className="!absolute z-[10] top-[5%]  right-[5%] sm:right-[10%]">
+        <i className="fas fa-arrow-left"></i>
+      </Button>
+
       <div className="relative w-full sm:max-w-lg max-w-full">
         <Card className="bg-white/80 backdrop-blur-lg border-0 shadow-2xl">
           <CardHeader className="text-center pb-6">
@@ -221,9 +286,8 @@ export default function StaffRegister() {
                     value={formData.staffName}
                     onChange={handleChange}
                     placeholder="Enter your full name"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.staffName ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.staffName ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.staffName}
                   />
                 </div>
@@ -245,9 +309,8 @@ export default function StaffRegister() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email address"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.email ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.email}
                   />
                 </div>
@@ -270,9 +333,8 @@ export default function StaffRegister() {
                     value={formData.phoneNo}
                     onChange={handleChange}
                     placeholder="Enter your phone number"
-                    className={`pl-10 border-2 transition-all duration-200 ${
-                      errors.phoneNo ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 border-2 transition-all duration-200 ${errors.phoneNo ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.phoneNo}
                   />
                 </div>
@@ -294,9 +356,8 @@ export default function StaffRegister() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Create a password"
-                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${
-                      errors.password ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.password ? "border-red-300 focus:border-red-500" : "border-blue-200 focus:border-blue-500"
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.password}
                   />
                   <button
@@ -325,11 +386,10 @@ export default function StaffRegister() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="Confirm your password"
-                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${
-                      errors.confirmPassword
+                    className={`pl-10 pr-12 border-2 transition-all duration-200 ${errors.confirmPassword
                         ? "border-red-300 focus:border-red-500"
                         : "border-blue-200 focus:border-blue-500"
-                    } bg-white/70 backdrop-blur-sm`}
+                      } bg-white/70 backdrop-blur-sm`}
                     error={errors.confirmPassword}
                   />
                   <button
@@ -368,9 +428,9 @@ export default function StaffRegister() {
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
-                isLoading={registerStaff.isPending}
+                isLoading={isPending}
               >
-                {registerStaff.isPending ? (
+                {isPending ? (
                   <>
                     Registering...
                   </>

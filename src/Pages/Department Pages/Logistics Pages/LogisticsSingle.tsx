@@ -258,12 +258,12 @@ import { type IShipmentItem } from "./LogisticsMain";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { Button } from "../../../components/ui/Button";
 import { toast } from "../../../utils/toast";
-// import { useLogisticsWebSocket } from "./useLogisticsWebSocket";
-// import { LiveTrackingMap } from "./LiveTrackingMap";
+import { useLogisticsWebSocket } from "./useLogisticsWebSocket";
 import InfoTooltip from "../../../components/ui/InfoToolTip";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
-// import { LiveTrackingMap } from "./LiveTrackingMap"; // 🚀 NEW COMPONENT
-// import { useLogisticsWebSocket } from "../../../apiList/Department Api/Logistics Api/useLogisticsWebSocket"; // 🚀 WebSocket Hook
+// import { LiveTrackingMap } from "./LiveTrackingMap";
+import { LiveTrackingMap } from "./LiveTrackingMap"; // 🚀 NEW COMPONENT
+import { useDriverLocationSender } from "./useDriverLocationSender";
 
 const InfoRow: React.FC<{ label: string; value?: React.ReactNode; }> = ({ label, value }) => (
     <div className="text-sm font-medium text-gray-700">
@@ -306,6 +306,30 @@ const LogisticsSingle: React.FC = () => {
     const [editingShipment, setEditingShipment] = useState<any | null>(null);
     const [showForm, setShowForm] = useState(false);
 
+    const [isSharing, setIsSharing] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const [isAttemptingToStart, setIsAttemptingToStart] = useState(false);
+
+    // Use the new sender hook
+    // const { isUpdating } =useDriverLocationSender(id, isSharing);
+
+    const { isUpdating } = useDriverLocationSender(id!, isAttemptingToStart, () => {
+        setIsSharing(true);
+        setIsAttemptingToStart(false);
+        toast({ title: "Tracking Active", description: "Location is now being shared live." });
+    });
+
+    const handleToggleSharing = () => {
+        if (isSharing) {
+            // Stop sharing immediately
+            setIsSharing(false);
+            setIsAttemptingToStart(false);
+        } else {
+            // Start the attempt
+            setIsAttemptingToStart(true);
+        }
+    };
+
 
     const { role, permission } = useAuthCheck();
 
@@ -317,25 +341,27 @@ const LogisticsSingle: React.FC = () => {
 
 
     // 🚀 WebSocket for real-time location updates
-    // const { isConnected } = useLogisticsWebSocket({
-    //     organizationId,
-    //     enabled: !!shipment && ["in_transit", "pickedup"].includes(shipment?.shipmentStatus || ""),
-    //     onLocationUpdate: (data) => {
-    //         if (data.shipmentId === id) {
-    //             console.log("📍 Location updated for current shipment:", data);
-    //             refetch(); // Refetch to update UI with latest location
-    //         }
-    //     },
-    //     onTrackingStopped: (data) => {
-    //         if (data.shipmentId === id) {
-    //             toast({
-    //                 title: "Tracking Stopped",
-    //                 description: `Shipment ${data.status === 'delivered' ? 'delivered' : 'cancelled'}`
-    //             });
-    //             refetch();
-    //         }
-    //     }
-    // });
+     useLogisticsWebSocket({
+        organizationId,
+        enabled: !!shipment && ["in_transit", "pickedup"].includes(shipment?.shipmentStatus || ""),
+        onLocationUpdate: (data) => {
+            if (data.shipmentId === id) {
+                console.log("📍 Location updated for current shipment:", data);
+                refetch(); // Refetch to update UI with latest location
+            }
+        },
+        onTrackingStopped: (data) => {
+            if (data.shipmentId === id) {
+                toast({
+                    title: "Tracking Stopped",
+                    description: `Shipment ${data.status === 'delivered' ? 'delivered' : 'cancelled'}`
+                });
+                refetch();
+            }
+        }
+    });
+
+    
 
     const handleGenerateAccounts = async () => {
         try {
@@ -356,6 +382,21 @@ const LogisticsSingle: React.FC = () => {
         }
     };
 
+    const handleCopyLink = () => {
+        const subpath = `${organizationId}/logistics/public/${id}`;
+        const link = `${import.meta.env.VITE_FRONTEND_URL}/${subpath}`;
+
+        //      const subpath = `${organizationId}/logistics/public/${id}`
+
+        // const link = `${import.meta.env.VITE_FRONTEND_URL}/${subpath}`
+
+
+        navigator.clipboard.writeText(link);
+        setCopied(true);
+        toast({ title: "Link Copied", description: "Tracking link copied to clipboard" });
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     if (isLoading) return <MaterialOverviewLoading />;
 
     const vehicle = shipment?.vehicleDetails;
@@ -371,7 +412,9 @@ const LogisticsSingle: React.FC = () => {
 
     // ✅ Check if tracking is active and location data exists
     // const isTrackingActive = ["in_transit", "pickedup"].includes(shipment?.shipmentStatus || "");
-    // const hasLocationData = shipment?.currentLocation?.latitude && shipment?.currentLocation?.longitude;
+    const isTrackingActive = true;
+    const hasLocationData = shipment?.currentLocation?.latitude && shipment?.currentLocation?.longitude;
+
 
     return (
         <div className="max-h-full overflow-y-auto max-w-full space-y-4">
@@ -390,7 +433,33 @@ const LogisticsSingle: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2 items-start">
-                    <div className="flex items-center space-y-1">
+                    <div className="flex gap-2 items-center space-y-1">
+
+                        {/* <Button
+                            variant={isSharing ? "danger" : "primary"}
+                            isLoading={isUpdating}
+                            onClick={() => setIsSharing(!isSharing)}
+                        >
+                            {isSharing ? "Stop Sharing My Location" : "Start Sharing My Location"}
+                        </Button> */}
+
+                        <Button
+                            // Color only turns Red (danger) AFTER success
+                            variant={isSharing ? "danger" : "primary"}
+
+                            // Show loading spinner while waiting for the first success
+                            isLoading={isAttemptingToStart || (isSharing && isUpdating)}
+
+                            className="font-bold"
+                            onClick={handleToggleSharing}
+                        >
+                            <i className={`fas ${isSharing ? 'fa-stop-circle' : 'fa-play-circle'} mr-2 text-xl`} />
+                            <span>
+                                {isAttemptingToStart ? "Connecting GPS..." : isSharing ? "Stop Sharing" : "Start Sharing"}
+                            </span>
+                        </Button>
+
+
                         <Button
                             variant="primary"
                             isLoading={syncAccountsLoading}
@@ -531,6 +600,30 @@ const LogisticsSingle: React.FC = () => {
                         </>
 
 
+                        <Separator />
+                        <Section title="Live Tracking URL">
+                            <div className="flex items-center gap-2 mt-2">
+                                <div className="flex-1 bg-slate-50 border border-slate-200 rounded-md px-3 py-2 overflow-hidden">
+                                    <p className="text-sm text-blue-600 font-medium truncate">
+                                        {import.meta.env.VITE_FRONTEND_URL}/{organizationId}/logistics/public/{id}
+                                    </p>
+                                </div>
+                                <Button
+                                    size="sm"
+                                    variant={copied ? "primary" : "outline"}
+                                    className="flex-shrink-0 gap-2 h-10"
+                                    onClick={handleCopyLink}
+                                >
+                                    <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
+                                    {copied ? "Copied" : "Copy Link"}
+                                </Button>
+                            </div>
+                            <p className="text-[10px] text-gray-500 mt-1 italic">
+                                * Share this URL with the driver to start live GPS tracking.
+                            </p>
+                        </Section>
+
+
                         {/* Notes */}
                         {
                             <>
@@ -544,80 +637,157 @@ const LogisticsSingle: React.FC = () => {
                 </Card>
 
                 {/* 🚀 LIVE TRACKING SECTION - Show if tracking is active (regardless of location data) */}
-                {/* {isTrackingActive && (
-                    <Card className="w-1/2">
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-xl font-bold text-blue-700">
-                                    <i className="fas fa-map-marker-alt mr-2" />
-                                    Live Tracking
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                    <span className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                                    <span className="text-sm font-medium text-gray-600">
-                                        {isConnected ? 'Live' : 'Connecting...'}
-                                    </span>
+                <div className="flex-1 flex-col  w-1/2 gap-2">
+
+                    <div className="flex flex-col">
+                        <h3 className="text-xl font-bold text-slate-700 flex items-center gap-2">
+                            <i className="fas fa-satellite-dish" />
+                            Native Live Tracking
+                        </h3>
+                        <p className="text-[10px] text-slate-400 uppercase font-bold leading-6 tracking-widest">Vertical Living Tracking</p>
+                    </div>
+
+                    {isTrackingActive ? (
+                        <Card className="">
+                            <CardContent className="p-6">
+                                {/* {hasLocationData && 
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-xl font-bold text-blue-700">
+                                        <i className="fas fa-map-marker-alt mr-2" />
+                                        Live Tracking
+                                    </h3>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                                        <span className="text-sm font-medium text-gray-600">
+                                            {isConnected ? 'Live' : 'Connecting...'}
+                                        </span>
+                                    </div>
+                                </div>} */}
+
+                                {hasLocationData ? (
+                                    <>
+                                        <LiveTrackingMap
+                                            shipment={shipment}
+                                            currentLocation={shipment.currentLocation}
+                                            locationHistory={shipment.locationHistory || []}
+                                            origin={shipment.origin}
+                                            destination={shipment.destination}
+                                        />
+
+                                        {/* {shipment.lastLocationUpdate && (
+                                            <p className="text-xs text-gray-500 mt-2">
+                                                Last updated: {new Date(shipment.lastLocationUpdate).toLocaleString()}
+                                            </p>
+                                        )} */}
+                                    </>
+                                ) : (
+                                    // <div className="flex items-center justify-center py-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                                    //     <div>
+                                    //         <i className="fas fa-satellite-dish text-5xl text-gray-300 mb-4 animate-pulse" />
+                                    //         <h4 className="text-lg font-semibold text-gray-700">Waiting for location data...</h4>
+                                    //         <p className="text-sm text-gray-500 mt-2">
+                                    //             Driver needs to start the mobile app and share location
+                                    //         </p>
+                                    //         <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                                    //             <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                                    //             <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                    //             <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                                    //         </div>
+                                    //     </div>
+                                    // </div>
+
+                                    <div className="flex flex-col items-center justify-center py-16 text-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                                        <div className="bg-white p-4 rounded-full shadow-sm mb-4">
+                                            <i className="fas fa-satellite-dish text-4xl text-blue-400 animate-pulse" />
+                                        </div>
+                                        <h4 className="text-lg font-bold text-slate-800">Waiting for GPS Signal</h4>
+                                        <p className="text-sm text-slate-500 max-w-xs mx-auto mt-2 mb-6">
+                                            The driver hasn't started sharing their location yet. Please share the tracking link with the driver.
+                                        </p>
+
+                                        {/* Actionable Link Section */}
+                                        <div className="w-full max-w-sm bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between gap-2">
+                                            <code className="text-[10px] text-blue-600 truncate font-mono">
+                                                {import.meta.env.VITE_FRONTEND_URL}/{organizationId}/logistics/public/{id}
+                                            </code>
+                                            <Button size="sm" variant="outline" onClick={handleCopyLink} className="h-8 text-xs gap-1">
+                                                <i className="fas fa-copy" /> Copy
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )
+                        : (
+                            /* 🚀 PROFESSIONAL FALLBACK: NO DATA RECEIVED YET */
+                            <div className="flex flex-col items-center justify-center py-16 text-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                                <div className="bg-white p-4 rounded-full shadow-sm mb-4">
+                                    <i className="fas fa-satellite-dish text-4xl text-blue-400 animate-pulse" />
+                                </div>
+                                <h4 className="text-lg font-bold text-slate-800">Waiting for GPS Signal</h4>
+                                <p className="text-sm text-slate-500 max-w-xs mx-auto mt-2 mb-6">
+                                    The driver hasn't started sharing their location yet. Please share the tracking link with the driver.
+                                </p>
+
+                                {/* Actionable Link Section */}
+                                <div className="w-full max-w-sm bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between gap-2">
+                                    <code className="text-[10px] text-blue-600 truncate font-mono">
+                                        {import.meta.env.VITE_FRONTEND_URL}/{organizationId}/logistics/public/{id}
+                                    </code>
+                                    <Button size="sm" variant="outline" onClick={handleCopyLink} className="h-8 text-xs gap-1">
+                                        <i className="fas fa-copy" /> Copy
+                                    </Button>
                                 </div>
                             </div>
+                        )
+                    }
 
-                            {hasLocationData ? (
-                                <>
-                                    <LiveTrackingMap
-                                        shipment={shipment}
-                                        currentLocation={shipment.currentLocation}
-                                        locationHistory={shipment.locationHistory || []}
-                                        origin={shipment.origin}
-                                        destination={shipment.destination}
-                                    />
 
-                                    {shipment.lastLocationUpdate && (
-                                        <p className="text-xs text-gray-500 mt-2">
-                                            Last updated: {new Date(shipment.lastLocationUpdate).toLocaleString()}
-                                        </p>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="flex items-center justify-center py-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <Separator className="my-7" />
+
+                    <div className="flex-1 mt-4">
+
+                        <div className="flex flex-col mb-4">
+                            <h3 className="text-xl font-bold text-slate-700 flex items-center gap-2">
+                                <i className="fas fa-external-link-alt" />
+                                External Application Tracking
+                            </h3>
+                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Porter / Rapido / External Link</p>
+                        </div>
+
+                        {shipment.trackingLink ?
+                            <div>
+
+                                <iframe src={shipment.trackingLink} width="100%" height="600px" />
+
+
+
+                            </div>
+
+                            :
+                            <>
+                                <div className="flex items-center justify-center py-12 text-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-300">
                                     <div>
-                                        <i className="fas fa-satellite-dish text-5xl text-gray-300 mb-4 animate-pulse" />
-                                        <h4 className="text-lg font-semibold text-gray-700">Waiting for location data...</h4>
-                                        <p className="text-sm text-gray-500 mt-2">
-                                            Driver needs to start the mobile app and share location
+                                        <i className="fas fa-location text-5xl text-slate-300 mb-4 animate-pulse" />
+                                        <h4 className="text-lg font-semibold text-slate-700">Track the Vehicle by pasting the link</h4>
+                                        <p className="text-sm text-slate-500 mt-2">
+                                            paste the porter or rapido tracking link by clicking edit option
                                         </p>
-                                        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
-                                            <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
-                                            <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                            <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                                        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
+                                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                            <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                                         </div>
                                     </div>
                                 </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                )} */}
-
-                <div className="flex-1 w-1/2">
-                    {shipment.trackingLink ? <iframe src={shipment.trackingLink} width="100%" height="600px" /> :
-                        <>
-                            <div className="flex items-center justify-center py-12 text-center bg-slate-50 rounded-lg border-2 border-dashed border-slate-300">
-                                <div>
-                                    <i className="fas fa-location text-5xl text-slate-300 mb-4 animate-pulse" />
-                                    <h4 className="text-lg font-semibold text-slate-700">Track the Vehicle by pasting the link</h4>
-                                    <p className="text-sm text-slate-500 mt-2">
-                                        paste the porter or rapido tracking link by clicking edit option
-                                    </p>
-                                    <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
-                                        <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
-                                        <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                        <div className="h-2 w-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
+                            </>
 
 
-                    }
+                        }
+                    </div>
                 </div>
+
                 {/* <iframe src="https://shorturl.rapido.bike/RAPIDO/jzDvGb" width="100%" height="600px" /> */}
             </section>
 

@@ -7,10 +7,10 @@ import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
 import { toast } from "../../utils/toast"
-import { useRegisterClient } from "../../apiList/clientApi"
 import { useDispatch } from "react-redux"
 import { setRole } from "../../features/authSlice"
 import { setClientProfileData } from "../../features/clientSlice"
+import { useCreateCommonUser } from "../../apiList/commonAuthApi"
 
 export default function ClientRegister() {
     const navigate = useNavigate()
@@ -29,7 +29,8 @@ export default function ClientRegister() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [errors, setErrors] = useState<Record<string, string>>({})
 
-    const registerClient = useRegisterClient()
+    // const registerClient = useRegisterClient()
+    const { mutateAsync: registerCommonUser, isPending } = useCreateCommonUser();
 
     useEffect(() => {
         if (!invite) {
@@ -97,7 +98,76 @@ export default function ClientRegister() {
         }
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
+
+  // old version used during the seperate login form 
+
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault()
+
+    //     if (!invite) {
+    //         toast({
+    //             title: "Error",
+    //             description: "Invalid invitation token",
+    //             variant: "destructive",
+    //         })
+    //         return
+    //     }
+
+    //     if (!validateForm()) {
+    //         return
+    //     }
+
+    //     try {
+    //         const data = await registerClient.mutateAsync({
+    //             token: invite,
+    //             payload: {
+    //                 email: formData.email,
+    //                 password: formData.password,
+    //                 phoneNo: formData.phoneNo,
+    //                 clientName: formData.clientName,
+    //             }
+    //         })
+
+
+
+    //         const clientData = data.data;
+
+    //         dispatch(setRole({
+    //             role: clientData.role,
+    //             isauthenticated: true,
+    //             _id: clientData._id
+    //         }));
+
+    //         dispatch(setClientProfileData({
+    //             clientId: clientData._id,
+    //             clientName: clientData.clientName,
+    //             email: clientData.email,
+    //             phoneNo: clientData.phoneNo,
+    //             role: clientData.role,
+    //             isauthenticated: true
+    //         }));
+
+
+    //         toast({
+    //             title: "Success",
+    //             description: "Registration successful! You can now login with your credentials.",
+    //         })
+
+    //         // Redirect to login page
+    //         setTimeout(() => {
+    //             navigate("/organizations")
+    //         }, 2000)
+    //     } catch (error: any) {
+    //         toast({
+    //             title: "Registration Failed",
+    //             description: error?.response?.data?.message || "Failed to register. Please try again.",
+    //             variant: "destructive",
+    //         })
+    //     }
+    // }
+
+
+     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if (!invite) {
@@ -114,14 +184,13 @@ export default function ClientRegister() {
         }
 
         try {
-            const data = await registerClient.mutateAsync({
-                token: invite,
-                payload: {
+            const data = await registerCommonUser({
                     email: formData.email,
                     password: formData.password,
                     phoneNo: formData.phoneNo,
-                    clientName: formData.clientName,
-                }
+                    name: formData.clientName,
+                    invite
+                
             })
 
 
@@ -131,11 +200,11 @@ export default function ClientRegister() {
             dispatch(setRole({
                 role: clientData.role,
                 isauthenticated: true,
-                _id: clientData._id
+                _id: clientData.clientId
             }));
 
             dispatch(setClientProfileData({
-                clientId: clientData._id,
+                clientId: clientData.clientId,
                 clientName: clientData.clientName,
                 email: clientData.email,
                 phoneNo: clientData.phoneNo,
@@ -364,9 +433,9 @@ export default function ClientRegister() {
                             <Button
                                 type="submit"
                                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
-                                isLoading={registerClient.isPending}
+                                isLoading={isPending}
                             >
-                                {registerClient.isPending ? (
+                                {isPending ? (
                                     <>
                                         <i className="fas fa-spinner fa-spin mr-2"></i>
                                         Registering...

@@ -52,13 +52,13 @@ export const ToolCard = ({ tool, onView, onDelete }: ToolCardProps) => {
             <div className="p-4">
                 <div className="mb-3">
                     <h3 className="font-bold text-gray-900 truncate">{tool.toolName}</h3>
-                    <p className="text-xs text-gray-500">{tool.brand} • {tool.toolCategory}</p>
+                    <p className="text-xs text-gray-500">{tool.brand} • {tool?.toolCategory}</p>
                 </div>
 
                 <div className="space-y-2 border-t pt-3">
                     <div className="flex justify-between text-[11px]">
-                        <span className="text-gray-400">Serial No:</span>
-                        <span className="font-medium text-gray-700">{tool.serialNumber}</span>
+                        <span className="text-gray-400">Model No:</span>
+                        <span className="font-medium text-gray-700">{tool?.modelNumber}</span>
                     </div>
                     <div className="flex justify-between text-[11px]">
                         <span className="text-gray-400">Condition:</span>

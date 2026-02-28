@@ -64,7 +64,8 @@ const ToolMasterMain = () => {
     } = useGetAllToolsInfinite({
         organizationId,
         ...filters,
-        toolName: debouncedSearch // Backend uses toolName for search
+        // toolName: debouncedSearch // Backend uses toolName for search
+        search: debouncedSearch
     });
 
     const deleteMutation = useDeleteTool();

@@ -35,6 +35,7 @@ const PERMISSION_MAPPING: Record<string, string> = {
   CLEANINGSANITATION: "cleaning",
   PROJECTDELIVERY: "projectdelivery"
 };
+
 const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organizationId, setOrganizationId }) => {
 
   const location = useLocation()
@@ -109,35 +110,10 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
   const allKeys = Object.keys(PROJECTS_LABELS);
   let allowedKeys: string[] = [];
 
-  // if (lowerRole === "client") {
-  //   // Client Whitelist
-  //   allowedKeys = [
-  //     "REQUIREMENTFORM",
-  //     "SITEMEASUREMENT",
-  //     "PAYMENTCONFIRMATION",
-  //     "PROJECTDELIVERY"
-  //   ];
-  // }
-  // else if (lowerRole === "worker") {
-  //   // Worker Whitelist
-  //   allowedKeys = [
-  //     "WORKSCHEDULE",
-  //     "TECHNICALCONSULTANT",
-  //     "ORDERMATERIALS",
-  //     "MATERIALARRIVED",
-  //     "INSTALLATION",
-  //     "QUALITYCHECK",
-  //     "CLEANINGSANITATION",
-  //   ];
-  // }
-  // else {
-  //   // Owner, CTO, Staff start with everything
-  //   // (We will filter Staff by permissions in the next step)
-  //   allowedKeys = allKeys;
-  // }
+
 
   allowedKeys = allKeys
-  
+
   let sidebarLabels: any = {};
   let sidebarIcons: any = {};
   let sidebarPath: any = {};
@@ -178,53 +154,52 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     });
   }
 
-  //  START OF OLD VERION
-  // let sidebarLabels = { ...PROJECTS_LABELS };
-  // let sidebarIcons = { ...PROJECTS_ICONS };
-  // let sidebarPath = { ...path };
-
-
-  // if (role?.toLowerCase() === "client") {
-  //   const allowedKeys = [
-  //     "REQUIREMENTFORM",
-  //     "SITEMEASUREMENT",
-  //     "PAYMENTCONFIRMATION",
-  //     "PROJECTDELIVERY"
-  //   ];
-
-  //   Object.keys(sidebarLabels).forEach((key) => {
-  //     if (!allowedKeys.includes(key)) {
-  //       delete sidebarLabels[key];
-  //       delete sidebarIcons[key];
-  //       delete sidebarPath[key];
-  //     }
-  //   });
-  // }
-
-
-  // if (role?.toLowerCase() === "worker") {
-  //   const allowedKeys = [
-  //     "WORKSCHEDULE",
-  //     "TECHNICALCONSULTANT",
-  //     "ORDERMATERIALS",
-  //     "MATERIALARRIVED",
-  //     "INSTALLATION",
-  //     "QUALITYCHECK",
-  //     "CLEANINGSANITATION",
-  //   ];
-
-  //   Object.keys(sidebarLabels).forEach((key) => {
-  //     if (!allowedKeys.includes(key)) {
-  //       delete sidebarLabels[key];
-  //       delete sidebarIcons[key];
-  //       delete sidebarPath[key];
-  //     }
-  //   });
-  // }
-
   // =========================================================
-  // 4. CONSTRUCT INITIAL OBJECTS
+  // 6. PROJECT-SPECIFIC GROUPING (Core Operations First)
   // =========================================================
+
+  const CORE_GROUP = {
+    id: "CORE_OPS",
+    label: "Core Operations",
+    // keys: ["INVENTORY", "MODULARUNIT"]
+    isOpenByDefault: true,
+    keys: ["WORKERS", "INVITECLIENT", "PREREQUISTIES", "REQUIREMENTFORM",
+      "SITEMEASUREMENT",
+      "SAMPLEDESIGN",
+      "WORKSCHEDULE",
+      "TECHNICALCONSULTANT",
+      "PAYMENTCONFIRMATION",
+      "ORDERMATERIALS",
+      "MATERIALARRIVED",
+      "INSTALLATION",
+      "QUALITYCHECK",
+      "CLEANINGSANITATION",
+      "PROJECTDELIVERY",
+
+
+    ]
+  };
+
+  // 1. Identify keys that will be moved into the group
+  const coreKeys = CORE_GROUP.keys;
+
+  // 2. Separate standalone items (everything EXCEPT Inventory and Modular Units)
+  // We keep them in the order they appear in PROJECTS_LABELS
+  const standaloneProjectItems = Object.entries(sidebarLabels)
+    .filter(([key]) => !coreKeys.includes(key))
+    .map(([key, value]) => ({ type: 'item', key, label: value }));
+
+  // 3. Check if any items for the Core Group exist (Permission safe)
+  const activeCoreGroup = coreKeys.some(key => sidebarLabels[key])
+    ? [{ type: 'group', ...CORE_GROUP }]
+    : [];
+
+  // 4. Combine: Core Operations Group FIRST, then everything else
+  const projectMenuStructure = [
+    ...activeCoreGroup,
+    ...standaloneProjectItems
+  ];
+
 
 
 
@@ -248,6 +223,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
             icons={sidebarIcons}
             setProjectName={setProjectName}
             projectName={projectName}
+            menuStructure={projectMenuStructure} // Pass the new structure here
           />
         )}
 

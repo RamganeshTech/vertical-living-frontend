@@ -1,7 +1,7 @@
 // LiveTrackingMap.tsx
 
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -43,13 +43,46 @@ interface LiveTrackingMapProps {
   };
 }
 
+
+// ✅ 1. CUSTOM BUTTON COMPONENT INSIDE MAP
+const RecenterButton: React.FC<{ center: [number, number] }> = ({ center }) => {
+  const map = useMap();
+
+  const handleRecenter = () => {
+    map.flyTo(center, 15, {
+      animate: true,
+      duration: 1.5
+    });
+  };
+
+  return (
+    <div className="leaflet-bottom leaflet-right" style={{ marginBottom: '20px', marginRight: '10px' }}>
+      <div className="leaflet-control  border-none shadow-none">
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            handleRecenter();
+          }}
+          className="bg-white hover:bg-slate-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-all border-2 border-blue-100 active:scale-90"
+          title="Recenter to Driver"
+          style={{ cursor: 'pointer' }}
+        >
+          <i className="fas fa-crosshairs text-xl" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 // Custom component to handle map centering
 const MapController: React.FC<{ center: [number, number] }> = ({ center }) => {
   const map = useMap();
-  
+
   useEffect(() => {
     if (center[0] && center[1]) {
-      map.setView(center, 13, { animate: true });
+      // map.setView(center, 13, { animate: true });
+      map.panTo(center, { animate: true });
     }
   }, [center, map]);
 
@@ -84,9 +117,9 @@ const createVehicleIcon = () => {
 export const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
   shipment,
   currentLocation,
-  locationHistory = [],
-//   origin,
-//   destination
+  // locationHistory = [],
+  //   origin,
+  //   destination
 }) => {
   const mapRef = useRef<any>(null);
 
@@ -108,9 +141,9 @@ export const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
   const center: [number, number] = [lat, lng];
 
   // Convert location history to path coordinates
-  const pathCoordinates: [number, number][] = locationHistory
-    .filter(loc => loc.latitude && loc.longitude)
-    .map(loc => [loc.latitude, loc.longitude]);
+  // const pathCoordinates: [number, number][] = locationHistory
+  //   .filter(loc => loc.latitude && loc.longitude)
+  //   .map(loc => [loc.latitude, loc.longitude]);
 
   return (
     <div className="space-y-4 min-w-full">
@@ -119,17 +152,21 @@ export const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
         <MapContainer
           center={center}
           zoom={13}
+          // zoomControl={false}
           style={{ height: '100%', width: '100%' }}
           ref={mapRef}
         >
           {/* OpenStreetMap Tiles (FREE) */}
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
           {/* Auto-center map on location change */}
           <MapController center={center} />
+
+          {/* This is your Google Maps style floating button */}
+        <RecenterButton center={center} />
 
           {/* Current Location Marker */}
           <Marker position={center} icon={createVehicleIcon()}>
@@ -145,8 +182,8 @@ export const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
                   Status: <span className="font-semibold">{shipment?.shipmentStatus || 'N/A'}</span>
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Last updated: {currentLocation.updatedAt 
-                    ? new Date(currentLocation.updatedAt).toLocaleTimeString() 
+                  Last updated: {currentLocation.updatedAt
+                    ? new Date(currentLocation.updatedAt).toLocaleTimeString()
                     : 'N/A'}
                 </p>
                 <p className="text-xs text-gray-400 mt-1 font-mono">
@@ -157,7 +194,7 @@ export const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
           </Marker>
 
           {/* Draw traveled path */}
-          {pathCoordinates.length > 1 && (
+          {/* {pathCoordinates.length > 1 && (
             <Polyline
               positions={pathCoordinates}
               color="#4285F4"
@@ -165,12 +202,12 @@ export const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
               opacity={0.7}
               dashArray="10, 10"
             />
-          )}
+          )} */}
         </MapContainer>
       </div>
 
       {/* Location Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
         <div className="bg-blue-50 p-3 rounded-lg">
           <p className="text-gray-600 font-medium">Current Position</p>
           <p className="text-blue-700 font-mono text-xs mt-1">
@@ -195,10 +232,10 @@ export const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
             </p>
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs text-gray-600 bg-gray-50 p-2 rounded">
+      {/* <div className="flex items-center gap-4 text-xs text-gray-600 bg-gray-50 p-2 rounded">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
           <span>Current Location</span>
@@ -209,7 +246,7 @@ export const LiveTrackingMap: React.FC<LiveTrackingMapProps> = ({
             <span>Traveled Path</span>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -11,7 +11,7 @@ import { Card } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import AssignStageStaff from "../../../shared/AssignStaff";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
 
@@ -141,12 +141,12 @@ export default function QualityCheckOverview() {
                 className="w-full sm:w-auto"
               />
 
-              {!getAllError && <ShareDocumentWhatsapp
+              {/* {!getAllError && <ShareDocumentWhatsapp
                 projectId={projectId!}
                 stageNumber="12"
                 className="w-full sm:w-fit"
                 isStageCompleted={data?.status}
-              />}
+              />} */}
 
               <AssignStageStaff
                 stageName="QualityCheckupModel"

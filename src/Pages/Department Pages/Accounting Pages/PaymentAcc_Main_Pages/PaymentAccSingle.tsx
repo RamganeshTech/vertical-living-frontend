@@ -52,7 +52,7 @@ const PaymentAccSingle: React.FC = () => {
     const handleItemPay = (itemId: string, _amount: number) => {
         setProcessingItems(prev => new Set(prev).add(itemId));
         toast({
-            title: "Dummy Payment",
+            title: "In Developement",
             description: "Payment integration coming soon",
             variant: "default"
         });

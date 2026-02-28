@@ -78,9 +78,7 @@ export default function ClientLogin() {
         _id: clientData.clientId, // or _id
         userName: clientData?.clientName,
         permission: clientData?.permission || {},
-                isGuideRequired: clientData.isGuideRequired
-
-
+        isGuideRequired: clientData.isGuideRequired
       }));
 
       dispatch(setClientProfileData({
@@ -91,7 +89,7 @@ export default function ClientLogin() {
         role: clientData.role,
         isauthenticated: true,
         permission: clientData?.permission || {},
-                isGuideRequired: clientData.isGuideRequired
+        isGuideRequired: clientData.isGuideRequired
 
 
       }));

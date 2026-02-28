@@ -1,201 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { Button } from '../../../components/ui/Button';
-// import { Label } from '../../../components/ui/Label';
-// import ImageGalleryExample from '../../../shared/ImageGallery/ImageGalleryMain';
-// import { Textarea } from '../../../components/ui/TextArea';
-
-// interface ToolMasterFormProps {
-//     mode: 'create' | 'view' | 'edit';
-//     initialData?: any;
-//     onSubmit: (data: any, files: File[]) => void;
-//     isSubmitting: boolean;
-//     organizationId: string;
-//     refetch?: () => void;
-// }
-
-// const ToolMasterForm: React.FC<ToolMasterFormProps> = ({ mode: initialMode, initialData, onSubmit, isSubmitting, organizationId, refetch }) => {
-//     const navigate = useNavigate();
-//     const [mode, setMode] = useState(initialMode);
-//     // const { role, permission } = useAuthCheck();
-
-//     const isView = mode === 'view';
-//     const isEdit = mode === 'edit';
-//     const isCreate = mode === 'create';
-
-//     // const canEdit = role === "owner" || permission?.tools?.edit;
-
-//     const [formData, setFormData] = useState({
-//         toolName: '',
-//         toolCategory: 'Drill',
-//         brand: '',
-//         modelNumber: '',
-//         serialNumber: '',
-//         purchaseDate: '',
-//         purchaseValue: 0,
-//         remarks: '',
-//     });
-
-//     const [newFiles, setNewFiles] = useState<File[]>([]);
-
-//     useEffect(() => {
-//         if (initialData) {
-//             setFormData({
-//                 toolName: initialData.toolName || '',
-//                 toolCategory: initialData.toolCategory || 'Drill',
-//                 brand: initialData.brand || '',
-//                 modelNumber: initialData.modelNumber || '',
-//                 serialNumber: initialData.serialNumber || '',
-//                 purchaseDate: initialData.purchaseDate ? new Date(initialData.purchaseDate).toISOString().split('T')[0] : '',
-//                 purchaseValue: initialData.purchaseValue || 0,
-//                 remarks: initialData.remarks || '',
-//             });
-//         }
-//     }, [initialData]);
-
-//     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-//         const { name, value } = e.target;
-//         setFormData(prev => ({ ...prev, [name]: value }));
-//     };
-
-//     const handleSubmit = (e: React.FormEvent) => {
-//         e.preventDefault();
-//         onSubmit(formData, newFiles);
-//         if (isEdit) {
-//             setMode('view');
-//         }
-//     };
-
-//     return (
-//         <div className="max-w-full mx-auto space-y-6 bg-blue-50">
-//             {/* Header */}
-//             <header className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100 sticky top-0 z-10 shadow-sm">
-//                 <div className="flex items-center gap-4">
-//                     <button type="button" onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-//                         <i className="fas fa-arrow-left text-gray-600"></i>
-//                     </button>
-//                     <div>
-//                         <h1 className="text-2xl font-bold text-gray-900">
-//                             {isCreate ? 'Register New Tool' : isEdit ? 'Edit Tool Details' : 'Tool Overview'}
-//                         </h1>
-//                         <p className="text-sm text-gray-500">{formData.toolName || 'Asset Information'}</p>
-//                     </div>
-//                 </div>
-
-//                 <div className="flex gap-3">
-//                     {isView && (
-//                         <Button onClick={() => setMode('edit')} variant="outline" className="gap-2">
-//                             <i className="fas fa-edit"></i> Edit Tool
-//                         </Button>
-//                     )}
-//                     {(isCreate || isEdit) && (
-//                         <>
-//                             <Button onClick={() => isEdit ? setMode('view') : navigate(-1)} variant="ghost">Cancel</Button>
-//                             <Button onClick={handleSubmit} disabled={isSubmitting} className="gap-2 bg-blue-600">
-//                                 {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-save"></i>}
-//                                 {isCreate ? 'Save Tool' : 'Update Details'}
-//                             </Button>
-//                         </>
-//                     )}
-//                 </div>
-//             </header>
-
-//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-//                 {/* Information Column */}
-//                 <div className="lg:col-span-2 space-y-6">
-//                     <section className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
-//                         <h3 className="font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
-//                             <i className="fas fa-info-circle text-blue-500"></i> General Specifications
-//                         </h3>
-//                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                             <div className="space-y-1">
-//                                 <Label>Tool Name</Label>
-//                                 <input name="toolName" value={formData.toolName} onChange={handleInputChange} disabled={isView} className="form-input-styled w-full border p-2 rounded-lg" placeholder="e.g. Cordless Hammer Drill" />
-//                             </div>
-//                             <div className="space-y-1">
-//                                 <Label>Category</Label>
-//                                 <select name="toolCategory" value={formData.toolCategory} onChange={handleInputChange} disabled={isView} className="form-input-styled w-full border p-2 rounded-lg bg-white">
-//                                     {["Drill", "Saw", "Grinder", "Cutter", "Laser Level", "Other"].map(cat => <option key={cat} value={cat}>{cat}</option>)}
-//                                 </select>
-//                             </div>
-//                             <div className="space-y-1">
-//                                 <Label>Brand</Label>
-//                                 <input name="brand" value={formData.brand} onChange={handleInputChange} disabled={isView} className="form-input-styled w-full border p-2 rounded-lg" />
-//                             </div>
-//                             <div className="space-y-1">
-//                                 <Label>Serial Number</Label>
-//                                 <input name="serialNumber" value={formData.serialNumber} onChange={handleInputChange} disabled={isView} className="form-input-styled w-full border p-2 rounded-lg" />
-//                             </div>
-//                         </div>
-//                     </section>
-
-//                     <section className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
-//                         <h3 className="font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
-//                             <i className="fas fa-history text-orange-500"></i> Procurement Details
-//                         </h3>
-//                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                             <div className="space-y-1">
-//                                 <Label>Purchase Date</Label>
-//                                 <input type="date" name="purchaseDate" value={formData.purchaseDate} onChange={handleInputChange} disabled={isView} className="form-input-styled w-full border p-2 rounded-lg" />
-//                             </div>
-//                             <div className="space-y-1">
-//                                 <Label>Purchase Value (₹)</Label>
-//                                 <input type="number" name="purchaseValue" value={formData.purchaseValue} onChange={handleInputChange} disabled={isView} className="form-input-styled w-full border p-2 rounded-lg" />
-//                             </div>
-//                         </div>
-//                     </section>
-//                 </div>
-
-//                 {/* Media Column */}
-//                 <div className="space-y-6">
-//                     <section className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
-//                         <h3 className="font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
-//                             <i className="fas fa-camera text-purple-500"></i> Tool Images
-//                         </h3>
-
-//                         {/* Existing Images (View/Edit) */}
-//                         {initialData?.toolImages?.length > 0 && (
-//                             <div className="space-y-2">
-//                                 <Label className="text-xs text-gray-400">Existing Media</Label>
-//                                 <ImageGalleryExample
-//                                     imageFiles={initialData.toolImages.map((img: any) => ({ ...img, url: img.url }))}
-//                                     height={120}
-//                                     // isReadOnly={isView}
-//                                     handleDeleteFile={(id: string) => {/* Add delete logic */ }}
-//                                 />
-//                             </div>
-//                         )}
-
-//                         {/* Upload New (Create/Edit) */}
-//                         {!isView && (
-//                             <div className="space-y-2 pt-4">
-//                                 <Label className="text-xs text-gray-400">Upload New Photos</Label>
-//                                 {/* <MultiFileUploader onFilesChange={setNewFiles} accept="image/*" /> */}
-
-//                                 <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 bg-gray-50 flex flex-col items-center justify-center">
-//                                     {/* <input type="file" multiple accept="image/*,.pdf" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" /> */}
-//                                     <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-//                                     <p className="text-sm text-gray-600">Click to upload files</p>
-//                                 </div>
-//                             </div>
-//                         )}
-//                     </section>
-
-//                     <section className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
-//                         <Label>Remarks / Internal Notes</Label>
-//                         <Textarea name="remarks" value={formData.remarks} onChange={handleInputChange} disabled={isView} placeholder="Any specific maintenance notes..." rows={4} />
-//                     </section>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default ToolMasterForm;
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';// import React, { useState, useEffect } from 'react';
 import { Button } from '../../../components/ui/Button';
@@ -205,25 +7,23 @@ import { Textarea } from '../../../components/ui/TextArea';
 import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 import SearchSelectNew from '../../../components/ui/SearchSelectNew';
 import { useGetAllToolRoomforDD } from '../../../apiList/tools_api/toolOtpApi';
-
-
-// Define the categories and conditions as per your backend schema
-// const CATEGORIES = ["Drill", "Saw", "Grinder", "Cutter", "Laser Level", "Other"];
+import { useDeleteToolImage, useDeleteWarrantyFile } from '../../../apiList/tools_api/toolMasterApi';
+import { toast } from '../../../utils/toast';
 
 const CATEGORIES = [
-  "carpentry",
-  "tiling",
-  "electrical",
-  "plumbing",
-  "falseCeiling",
-  "painting",
-  "finishing",
-  "measurement",
-  "handTools",
-  "powerTools",
-  "safety",
-  "cleaning",
-  "other"
+    "carpentry",
+    "tiling",
+    "electrical",
+    "plumbing",
+    "falseCeiling",
+    "painting",
+    "finishing",
+    "measurement",
+    "handTools",
+    "powerTools",
+    "safety",
+    "cleaning",
+    "other"
 ];
 
 const CONDITIONS = ["new", "good", "repair"];
@@ -242,7 +42,14 @@ export interface ToolFormData {
     purchaseDate: string;
     purchaseValue: number;
     remarks: string;
+
+    warrantyDuration: string;
+    serviceLocation: string;
+warrantyDetails: string;
+
+
     images: File[]; // For new uploads
+    warrantyFiles: File[]; // Add this
 }
 
 interface ToolMasterFormProps {
@@ -250,9 +57,12 @@ interface ToolMasterFormProps {
     initialData?: any;
     organizationId: string;
     isSubmitting: boolean;
-    onSubmit: (data: any, newFiles: File[]) => Promise<void>;
+    onSubmit: (data: any, newFiles: File[], warrantyFiles: File[]) => Promise<void>;
     onQuickUpload?: (files: File[]) => Promise<void>;
+    onQuickUploadWarranty?: (files: File[]) => Promise<void>; // Add this
     refetch?: () => void;
+    isWarrantyUploading?: boolean,
+    isToolUploading?: boolean,
 }
 
 const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
@@ -262,6 +72,9 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
     isSubmitting,
     onSubmit,
     onQuickUpload,
+    onQuickUploadWarranty,
+    isWarrantyUploading,
+    isToolUploading
     // refetch
 }) => {
 
@@ -278,7 +91,7 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
 
 
 
-   
+
     // --- STATE ---
     const defaultFormData: ToolFormData = {
         toolName: '',
@@ -292,11 +105,19 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
         purchaseDate: new Date().toISOString().split('T')[0],
         purchaseValue: 0,
         remarks: '',
-        images: []
+
+        warrantyDuration: "",
+        serviceLocation: '',
+        warrantyDetails: '',
+        images: [],
+        warrantyFiles: [] // Add this
     };
 
     const { data: toolRoom = [] } = useGetAllToolRoomforDD(organizationId);
     // const [toolRoomId, setToolRoomId] = useState<string | null>(null);
+
+    const deleteToolImageMutation = useDeleteToolImage();
+    const deleteWarrantyFileMutation = useDeleteWarrantyFile();
 
 
     const [formData, setFormData] = useState<ToolFormData>(defaultFormData);
@@ -311,12 +132,17 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
                 modelNumber: initialData.modelNumber || '',
                 // serialNumber: initialData.serialNumber || '',
                 // availabilityStatus: initialData.availabilityStatus || "",
-                toolRoomId: initialData?.toolRoomId._id || null,
-                conditionStatus: initialData.conditionStatus || "",
-                purchaseDate: initialData.purchaseDate ? new Date(initialData.purchaseDate).toISOString().split('T')[0] : '',
-                purchaseValue: initialData.purchaseValue || 0,
-                remarks: initialData.remarks || '',
-                images: []
+                toolRoomId: initialData?.toolRoomId?._id || null,
+                conditionStatus: initialData?.conditionStatus || "",
+                purchaseDate: initialData?.purchaseDate ? new Date(initialData?.purchaseDate).toISOString().split('T')[0] : '',
+                purchaseValue: initialData?.purchaseValue || 0,
+                remarks: initialData?.remarks || '',
+
+                warrantyDuration: initialData?.warrantyDuration,
+                serviceLocation: initialData?.serviceLocation,
+                warrantyDetails: initialData?.warrantyDetails,
+                images: [],
+                warrantyFiles: [] // Add this
             });
         }
     }, [initialData, currentMode]);
@@ -327,23 +153,96 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setFormData(p => ({ ...p, images: [...p.images, ...Array.from(e.target.files || [])] }));
+    // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     if (e.target.files) {
+    //         setFormData(p => ({ ...p, images: [...p.images, ...Array.from(e.target.files || [])] }));
+    //     }
+    // };
+
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0 && onQuickUpload) {
+            const selectedFiles = Array.from(e.target.files);
+            await onQuickUpload(selectedFiles);
+        }
+    };
+    // const removeFile = (index: number) => {
+    //     setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+    // };
+
+    // const handleWarrantyFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     if (e.target.files) {
+    //         setFormData(p => ({
+    //             ...p,
+    //             warrantyFiles: [...p.warrantyFiles, ...Array.from(e.target.files || [])]
+    //         }));
+    //     }
+    // };
+
+    const handleWarrantyFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0 && onQuickUploadWarranty) {
+            const selectedFiles = Array.from(e.target.files);
+            await onQuickUploadWarranty(selectedFiles);
         }
     };
 
-    const removeFile = (index: number) => {
-        setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
-    };
+    // const removeWarrantyFile = (index: number) => {
+    //     setFormData(prev => ({
+    //         ...prev,
+    //         warrantyFiles: prev.warrantyFiles.filter((_, i) => i !== index)
+    //     }));
+    // };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const { images, ...textData } = formData;
-        await onSubmit(textData, images);
+        const { images, warrantyFiles, ...textData } = formData;
+        // Pass both file arrays to the parent
+        await onSubmit(textData, images, warrantyFiles);
         if (currentMode === 'edit') setCurrentMode('view');
     };
 
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     const { images, ...textData } = formData;
+    //     await onSubmit(textData, images);
+    //     if (currentMode === 'edit') setCurrentMode('view');
+    // };
+
+
+    // Handler for Tool Images
+    const handleDeleteToolImage = async (fileId: string) => {
+        try {
+            // initialData._id is the toolId
+            await deleteToolImageMutation.mutateAsync({
+                toolId: initialData._id,
+                fileId
+            });
+            toast({ title: "Success", description: "Tool image removed successfully" });
+        } catch (error: any) {
+            toast({
+                title: "Delete Failed",
+                description: error?.message || "Could not delete tool image",
+                variant: "destructive"
+            });
+        }
+    };
+
+    // Handler for Warranty Files
+    const handleDeleteWarrantyFile = async (fileId: string) => {
+        try {
+            await deleteWarrantyFileMutation.mutateAsync({
+                toolId: initialData._id,
+                fileId
+            });
+            toast({ title: "Success", description: "Warranty file removed successfully" });
+        } catch (error: any) {
+            toast({
+                title: "Delete Failed",
+                description: error?.message || "Could not delete warranty file",
+                variant: "destructive"
+            });
+        }
+    };
 
 
     const toolRoomOptions = toolRoom.map((t: any) => ({
@@ -353,15 +252,29 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
     }));
 
     const handleToolRoomSelection = (id: string | null) => {
-        setFormData(p => ({ ...p, toolRoomId: id}));
+        setFormData(p => ({ ...p, toolRoomId: id }));
     };
 
-    const handleQuickUploadClick = async () => {
-        if (formData.images.length > 0 && onQuickUpload) {
-            await onQuickUpload(formData.images);
-            setFormData(p => ({ ...p, images: [] }));
-        }
-    };
+    // const handleQuickUploadClick = async () => {
+    //     if (formData.images.length > 0 && onQuickUpload) {
+    //         await onQuickUpload(formData.images);
+    //         setFormData(p => ({ ...p, images: [] }));
+    //     }
+    // };
+
+    // For Warranty Files (Images or PDFs)
+    // const handleQuickUploadWarranty = async () => {
+    //     if (formData.warrantyFiles.length > 0 && onQuickUploadWarranty) {
+    //         await onQuickUploadWarranty(formData.warrantyFiles);
+    //         setFormData(p => ({ ...p, warrantyFiles: [] }));
+    //     }
+    // };
+
+
+    // Inside ToolMasterForm component
+    const warrantyPhotos = initialData?.warrantyFiles?.filter((file: any) => file.type === 'image') || [];
+    const warrantyPDFs = initialData?.warrantyFiles?.filter((file: any) => file.type === 'pdf') || [];
+
 
     const isReadOnly = currentMode === 'view';
     const isCreateMode = currentMode === 'create';
@@ -369,7 +282,7 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
     const toggleEdit = () => setCurrentMode(p => p === 'view' ? 'edit' : 'view');
 
     return (
-        <div className="max-w-full mx-auto space-y-4">
+        <div className="max-w-full mx-auto space-y-0">
             {/* --- HEADER --- */}
             <header className="sticky top-0 z-20 bg-white border-b border-gray-200 pb-2 mb-3 flex justify-between items-center">
                 <div className='flex items-center gap-3'>
@@ -409,7 +322,7 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
 
             <form className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* --- MAIN DETAILS (2/3 Width) --- */}
-                <div className="lg:col-span-2 space-y-6">
+                <section className="lg:col-span-2 space-y-6">
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                         <h3 className="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center">
                             <i className="fas fa-info-circle mr-2"></i> Identity & Brand
@@ -422,7 +335,7 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
                             <div>
                                 <Label>Category</Label>
                                 <select name="toolCategory" value={formData.toolCategory} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white mt-1">
-                                    {CATEGORIES.map(c => <option key={c} value={c}>{c[0].toUpperCase()+c.slice(1)}</option>)}
+                                    {CATEGORIES.map(c => <option key={c} value={c}>{c[0].toUpperCase() + c.slice(1)}</option>)}
                                 </select>
                             </div>
                             <div>
@@ -482,99 +395,219 @@ const ToolMasterForm: React.FC<ToolMasterFormProps> = ({
                             </div>
                             <div>
                                 <Label>Purchase Value (₹)</Label>
-                                <input type="number" name="purchaseValue" value={formData.purchaseValue} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border rounded-lg mt-1" />
+                                <input type="number" name="purchaseValue" value={formData.purchaseValue || ""} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border rounded-lg mt-1" />
                             </div>
                         </div>
                     </div>
 
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <h3 className="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center">
+                            <i className="fas fa-shield-alt mr-2"></i> Warranty & Service
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <Label>Warranty Expires In</Label>
+                                <input name="warrantyDuration" value={formData.warrantyDuration} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border rounded-lg mt-1" />
+                            </div>
+                            <div>
+                                <Label>Service Location / Center</Label>
+                                <input name="serviceLocation" value={formData.serviceLocation} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border rounded-lg mt-1" placeholder="e.g. Authorized Bosch Center" />
+                            </div>
+                            <div className="md:col-span-2">
+                                <Label>Warranty Policy Details</Label>
+                                <Textarea name="warrantyDetails" value={formData.warrantyDetails} onChange={handleInputChange} rows={4} disabled={isReadOnly} className="w-full px-3 py-2 border rounded-lg mt-1" placeholder="e.g. 1 Year limited warranty on motor" />
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                         <Label>Remarks & Maintenance Notes</Label>
                         <Textarea name="remarks" value={formData.remarks} onChange={handleInputChange} disabled={isReadOnly} className="w-full mt-2" placeholder="Describe current condition or missing accessories..." rows={4} />
                     </div>
-                </div>
+                </section>
 
                 {/* --- MEDIA & DOCUMENTS (1/3 Width) --- */}
-                <div className="space-y-6">
-                    {/* Existing Images */}
-                    {isReadOnly && initialData?.toolImages?.length > 0 && (
+                <section className='flex flex-col gap-3'>
+                    {/* <div className="space-y-6">
+                        {isReadOnly && initialData?.toolImages?.length > 0 && (
+                            <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                                <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 border-b pb-2 flex items-center">
+                                    <i className="fas fa-images mr-2 text-blue-500"></i> Gallery
+                                </h3>
+                                <ImageGalleryExample
+                                    imageFiles={initialData.toolImages.map((img: any) => ({ ...img, url: img.url }))}
+                                    height={120}
+                                    minWidth={120}
+                                    handleDeleteFile={handleDeleteToolImage}
+                                />
+                            </section>
+                        )}
+
                         <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 border-b pb-2 flex items-center">
-                                <i className="fas fa-images mr-2 text-blue-500"></i> Gallery
+                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 pb-2 border-b flex justify-between items-center">
+                                <span><i className="fas fa-camera mr-2 text-blue-500"></i> {isCreateMode ? 'Upload Photos' : 'Add New Photos'}</span>
                             </h3>
-                            <ImageGalleryExample
-                                imageFiles={initialData.toolImages.map((img: any) => ({ ...img, url: img.url }))}
-                                height={120}
-                                minWidth={120}
-                            // isReadOnly={true}
-                            />
-                        </section>
-                    )}
 
-                    {/* New Upload Section */}
-                    <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                        <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-4 pb-2 border-b flex justify-between items-center">
-                            <span><i className="fas fa-camera mr-2 text-blue-500"></i> {isCreateMode ? 'Upload Photos' : 'Add New Photos'}</span>
-                        </h3>
+                            <div className={`relative w-full h-32 border-2 border-dashed rounded-xl transition-colors flex flex-col items-center justify-center ${isReadOnly ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-300 hover:border-blue-500'}`}>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*,.pdf"
+                                    onChange={handleFileChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                />
+                                <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight text-center px-4">
+                                    Drag or Click to upload tool images
+                                </p>
+                            </div>
 
-                        {/* Transparent Input Wrapper */}
-                        <div className={`relative w-full h-32 border-2 border-dashed rounded-xl transition-colors flex flex-col items-center justify-center ${isReadOnly ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-300 hover:border-blue-500'}`}>
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*,.pdf"
-                                onChange={handleFileChange}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                            />
-                            <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight text-center px-4">
-                                Drag or Click to upload tool images
-                            </p>
-                        </div>
-
-                        {/* Pending Files List */}
-                        {formData.images.length > 0 && (
-                            <div className="mt-4 space-y-2">
-                                {formData.images.map((file, index) => (
-                                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
-                                        <div className="flex items-center gap-2 truncate">
-                                            <i className="fas fa-file-image text-blue-500"></i>
-                                            <span className="text-[11px] font-medium text-gray-700 truncate">{file.name}</span>
+                            {formData.images.length > 0 && (
+                                <div className="mt-4 space-y-2">
+                                    {formData.images.map((file, index) => (
+                                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <i className="fas fa-file-image text-blue-500"></i>
+                                                <span className="text-[11px] font-medium text-gray-700 truncate">{file.name}</span>
+                                            </div>
+                                            <button type="button" onClick={() => removeFile(index)} className="text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors">
+                                                <i className="fas fa-times"></i>
+                                            </button>
                                         </div>
-                                        <button type="button" onClick={() => removeFile(index)} className="text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors">
-                                            <i className="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                ))}
+                                    ))}
 
-                                {isReadOnly && (
-                                    <div className="flex justify-end pt-2">
-                                        <Button type="button" onClick={handleQuickUploadClick} disabled={isSubmitting} className="h-8 text-xs bg-blue-600">
-                                            {isSubmitting ? 'Uploading...' : 'Quick Upload Now'}
-                                        </Button>
+                                    {isReadOnly && (
+                                        <div className="flex justify-end pt-2">
+                                            <Button type="button" onClick={handleQuickUploadClick} disabled={isSubmitting} className="h-8 text-xs bg-blue-600">
+                                                {isSubmitting ? 'Uploading...' : 'Quick Upload Now'}
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </section>
+
+                    </div> */}
+
+
+
+
+
+                    <div className="space-y-6">
+                        {/* --- 1. TOOL PHOTOS SECTION --- */}
+                        <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                            <header className="flex items-center justify-between border-b pb-2 mb-4">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center">
+                                        <i className="fas fa-camera-retro mr-2 text-blue-500"></i> Tool Photos
+                                    </h3>
+                                    {/* {isToolUploading && <i className="fas fa-spinner fa-spin text-blue-500 text-xs"></i>} */}
+                                </div>
+
+                                {/* QUICK ADD BUTTON IN HEADER */}
+                                <label className="cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold transition-colors flex items-center gap-1">
+                                    {isToolUploading ? <><i className="fas fa-spinner fa-spin text-blue-500 text-xs"></i> Uploading</> : <><i className="fas fa-plus"></i> ADD</>}
+                                    <input type="file" multiple accept="image/*" onChange={handleFileChange} className="hidden" disabled={isToolUploading} />
+                                </label>
+                            </header>
+
+
+                            {initialData?.toolImages?.length > 0 ? (
+
+                                <div className='h-[300px] max-h-[300px] overflow-y-auto'>
+                                    <ImageGalleryExample
+                                        imageFiles={initialData.toolImages.map((img: any) => ({ ...img, url: img.url }))}
+                                        height={120}
+                                        minWidth={120}
+                                        handleDeleteFile={handleDeleteToolImage}
+
+                                    />
+                                </div>
+
+                            ) : (
+                                <div className="py-8 flex flex-col items-center justify-center bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                                    <i className="fas fa-images text-gray-300 text-2xl mb-2"></i>
+                                    <p className="text-[11px] font-medium text-gray-400">No photos available.</p>
+                                </div>
+                            )}
+                        </section>
+
+                        {/* --- 2. WARRANTY MEDIA SECTION --- */}
+                        <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                            <header className="flex items-center justify-between border-b pb-2 mb-4">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center">
+                                        <i className="fas fa-shield-alt mr-2 text-red-500"></i> Warranty Media
+                                    </h3>
+                                    {/* {isWarrantyUploading && <i className="fas fa-spinner fa-spin text-red-500 text-xs"></i>} */}
+                                </div>
+
+                                {/* QUICK ADD BUTTON IN HEADER */}
+                                <label className="cursor-pointer bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-bold transition-colors flex items-center gap-1">
+                                    {/* <i className="fas fa-plus"></i> ADD */}
+                                    {isWarrantyUploading ? <><i className="fas fa-spinner fa-spin text-red-500 text-xs"></i> Uploading</> : <><i className="fas fa-plus"></i> ADD</>}
+
+                                    <input type="file" multiple accept="image/*,.pdf" onChange={handleWarrantyFileChange} className="hidden" disabled={isWarrantyUploading} />
+                                </label>
+                            </header>
+
+                            {/* Photo Proofs Sub-section */}
+                            <div className="mb-6">
+                                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Photo Proofs</p>
+
+                                {warrantyPhotos.length > 0 ? (
+                                <div className='max-h-[300px] overflow-y-auto'>
+                                    <ImageGalleryExample
+                                        imageFiles={warrantyPhotos.map((img: any) => ({ ...img, url: img.url }))}
+                                        height={100}
+                                        minWidth={100}
+                                        handleDeleteFile={handleDeleteWarrantyFile}
+                                    />
+                                    </div>
+
+                                ) : (
+                                    <div className="py-4 border border-dashed border-gray-100 rounded-lg flex items-center justify-center bg-gray-50/30">
+                                        <span className="text-[10px] text-gray-400 italic">No image proofs uploaded.</span>
                                     </div>
                                 )}
                             </div>
-                        )}
-                    </section>
 
-                    {/* Status Overview Card */}
-                    {!isCreateMode && (
-                        <div className={`p-6 rounded-xl border flex items-center justify-between shadow-sm ${initialData?.availabilityStatus === 'available' ? 'bg-green-50 border-green-100' : 'bg-orange-50 border-orange-100'
-                            }`}>
+                            {/* Document Proofs Sub-section */}
                             <div>
-                                <p className="text-[10px] font-black uppercase text-gray-500 tracking-tighter">Current Status</p>
-                                <p className={`text-xl font-bold capitalize ${initialData?.availabilityStatus === 'available' ? 'text-green-700' : 'text-orange-700'
-                                    }`}>
-                                    {initialData?.availabilityStatus}
-                                </p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Document Proofs (PDF)</p>
+                                {warrantyPDFs.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {warrantyPDFs.map((doc: any) => (
+                                            <div key={doc._id} className="flex items-center justify-between p-2 bg-gray-50 border rounded-lg group">
+                                                <a href={doc.url} target="_blank" rel="noreferrer" className="flex items-center gap-2 flex-1 truncate">
+                                                    <i className="fas fa-file-pdf text-red-500"></i>
+                                                    <span className="text-[11px] font-semibold text-gray-700 truncate">{doc.originalName}</span>
+                                                </a>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteWarrantyFile(doc._id)}
+                                                    className="text-gray-300 hover:text-red-500 transition-colors"
+                                                >
+                                                    <i className="fas fa-trash-alt text-xs"></i>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="p-3 border border-dashed border-gray-100 rounded-lg bg-gray-50/30">
+                                        <span className="text-[10px] text-gray-400 italic">No PDF documents found.</span>
+                                    </div>
+                                )}
                             </div>
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${initialData?.availabilityStatus === 'available' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'
-                                }`}>
-                                <i className={`fas ${initialData?.availabilityStatus === 'available' ? 'fa-check-circle' : 'fa-hand-holding'}`}></i>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                        </section>
+                    </div>
+
+
+                   
+                </section>
+
             </form>
         </div>
     );

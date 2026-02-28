@@ -32,7 +32,7 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
     const { organizationId } = useParams<{ organizationId: string }>()
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
-    
+
     // Get Auth Info
     const { role, permission } = useAuthCheck();
     const lowerRole = role?.toLowerCase() || "";
@@ -59,15 +59,15 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
     if (lowerRole === "owner") {
         // Owner sees everything
         allowedKeys = allKeys;
-    } 
+    }
     else if (lowerRole === "cto" || lowerRole === "staff") {
         // Staff/CTO see everything EXCEPT 'ROLESPERMISSIONS' and 'PLAN'
         // (Unless you want CTO to see Plan, add it back)
-        allowedKeys = allKeys.filter(key => 
-            key !== "ROLESPERMISSIONS" && 
+        allowedKeys = allKeys.filter(key =>
+            key !== "ROLESPERMISSIONS" &&
             key !== "PLAN"
         );
-    } 
+    }
     else {
         // Worker/Client: Strictly limited
         // allowedKeys = [
@@ -75,8 +75,8 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
         //     "DETAILS", 
         //     "PROFILE"
         // ];
-         allowedKeys = allKeys.filter(key => 
-            key !== "ROLESPERMISSIONS" && 
+        allowedKeys = allKeys.filter(key =>
+            key !== "ROLESPERMISSIONS" &&
             key !== "PLAN"
         );
     }
@@ -84,11 +84,11 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
     // =========================================================
     // 3. CONSTRUCT INITIAL OBJECTS
     // =========================================================
-    
+
     let sidebarLabels: any = {};
     let sidebarIcons: any = {};
     let sidebarPath: any = {};
-  
+
     allowedKeys.forEach(key => {
         if (ORGANIZATION_LABELS[key] && path[key]) {
             sidebarLabels[key] = ORGANIZATION_LABELS[key];
@@ -102,9 +102,9 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
     // =========================================================
 
     if (lowerRole !== "owner") {
-        
+
         Object.keys(sidebarLabels).forEach((sidebarKey) => {
-            
+
             const backendKey = PERMISSION_MAPPING[sidebarKey];
 
             if (backendKey) {
@@ -129,6 +129,20 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
         return () => window.removeEventListener('resize', handleResize);
     }, [organizationId, setOrganizationId]);
 
+    // =========================================================
+    // 5. DATA STRUCTURE FOR SIDEBAR (Flat List / No Grouping)
+    // =========================================================
+
+    // Convert sidebarLabels to the menuStructure format
+    const organizationMenuStructure = Object?.entries(sidebarLabels).map(([key, value]) => ({
+        type: 'item',
+        key: key,
+        label: value as string
+    }));
+
+    // If you want them in alphabetical order (optional):
+    organizationMenuStructure.sort((a, b) => a.label.localeCompare(b.label));
+
     return (
         <div className="flex w-full h-full">
             {isMobile ? (
@@ -143,6 +157,7 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
                     path={sidebarPath}
                     labels={sidebarLabels}
                     icons={sidebarIcons}
+                    menuStructure={organizationMenuStructure} // Passing the flat structure
                 />
             )}
             <main className="!w-[100%] h-full">

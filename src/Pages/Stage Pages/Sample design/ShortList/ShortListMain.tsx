@@ -30,12 +30,30 @@ interface RoomShortlist {
 
 
 
-export const fetchSuggestions = (query: string) =>
-  axios
+export const fetchSuggestions = ({ query, organizationId }: { query: string, organizationId: string }) => {
+
+  // Add a safety check: if query or organizationId are missing, don't crash
+  const qValue = query || "";
+  const orgValue = organizationId || "";
+
+
+  return axios
     .get(
-      `${import.meta.env.VITE_API_URL}/api/shortlisteddesign/getsuggestedtags?q=${encodeURIComponent(
-        query
-      )}`
+      // `${import.meta.env.VITE_API_URL}/api/shortlisteddesign/getsuggestedtags?q=${encodeURIComponent(
+      //   query
+      // )}`
+
+      // Look at the end of the URL string:
+      // `${import.meta.env.VITE_API_URL}/api/shortlisteddesign/getsuggestedtags?q=${encodeURIComponent(query)}
+      // &organizationId=${encodeURIComponent(organizationId)}`
+
+      `${import.meta.env.VITE_API_URL}/api/shortlisteddesign/getsuggestedtags`, {
+      params: {
+        q: qValue,
+        organizationId: orgValue
+      }
+    }
+
     )
     .then((res) => {
       if (Array.isArray(res?.data?.tags)) {
@@ -43,6 +61,12 @@ export const fetchSuggestions = (query: string) =>
       }
       return [];
     })
+    .catch(err => {
+      console.error("Suggestion Error:", err);
+      return [];
+    });
+}
+
 
 
 
@@ -65,7 +89,6 @@ export default function ShortlistMain() {
   const [isReferencePopupOpen, setIsReferencePopupOpen] = useState(false);
 
   const [tags, setTags] = useState<string[]>([]); // by default show general images
-  // const [allSuggestions, setAllSuggestions] = useState<string[]>([]);
 
 
 
@@ -241,7 +264,7 @@ export default function ShortlistMain() {
           <SmartTagInput
             tags={tags}
             setState={setTags}
-            suggestionFetcher={fetchSuggestions}
+            suggestionFetcher={(q) => fetchSuggestions({ query: q, organizationId })}
           />
 
           {/* <SmartTagInput tags={tags} setState={setTags} disableSuggestion /> */}

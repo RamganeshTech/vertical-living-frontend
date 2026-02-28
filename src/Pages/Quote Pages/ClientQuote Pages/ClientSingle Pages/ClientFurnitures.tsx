@@ -389,6 +389,7 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
 
         furnitureName: data.furnitureName, // Original data (with ids etc)
 
+        dimention: data.dimention,
         plywoodBrand: "",
         laminateBrand: "",
 
@@ -420,9 +421,32 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
   const renderCoreMaterials = () => (
     <div className="mt-6">
       <h3 className="font-semibold text-md text-gray-800 mb-2">
-        {/* Core Materials (Total: ₹{coreTotal.toLocaleString("en-IN")}) */}
         Core Materials (Total: ₹{data?.totals?.core.toLocaleString("en-IN")})
       </h3>
+
+      {/* 🆕 NEAT BRAND SPECIFICATION SECTION */}
+      {/* <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 flex flex-wrap gap-6 items-center">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Plywood Brand</span>
+          <span className="text-sm font-semibold text-gray-800">{data?.plywoodBrand || "Standard Quality"}</span>
+        </div>
+
+        <div className="h-8 w-px bg-gray-300 hidden md:block" />
+
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Inner Laminate</span>
+          <span className="text-sm font-semibold text-gray-800">{data?.innerLaminateBrand || "Standard White"}</span>
+        </div>
+
+        <div className="h-8 w-px bg-gray-300 hidden md:block" />
+
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-orange-500 uppercase tracking-wider">Outer Laminate</span>
+          <span className="text-sm font-semibold text-gray-800">{data?.outerLaminateBrand || "Selected Finish"}</span>
+        </div>
+      </div> */}
+
+
       <div className="overflow-x-auto rounded-md">
         <table className="min-w-full text-sm bg-white shadow-sm">
           <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
@@ -434,8 +458,8 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
                   {templateType !== "type 2" && <>
                     <th colSpan={2} className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">Plywood</th>
                     <th colSpan={4} className="text-center px-6 py-1 text-xs font-medium text-gray-500 uppercase tracking-wider">Laminate</th>
-                    <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Carpenters / Day</th>
-                    <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Days</th>
+                    {/* <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Carpenters / Day</th>
+                    <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">No. of Days</th> */}
                     {/* <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Profit % Material</th>
               <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Profit % Labour</th>
               <th rowSpan={2} className="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Remarks</th> */}
@@ -528,7 +552,7 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
 
 
 
-                        {i === 0 && (<>
+                        {/* {i === 0 && (<>
 
                           <td rowSpan={data?.coreMaterials?.length} className="text-center border-r-1 p-2">
                             <span className={isBlurred ? "blur-sm select-none" : ""}>
@@ -543,7 +567,7 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
 
                           </td>
                         </>
-                        )}
+                        )} */}
                       </>}
                       <td className="text-center border-r-1 p-2 text-green-700 font-bold">
                         <span className={isBlurred ? "blur-sm select-none" : ""}>
@@ -608,7 +632,7 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
                 <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
                 <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
                 <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
-                <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th>
+                {/* <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th> */}
                 {/* <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Profit On Materials</th> */}
                 <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Total</th>
                 <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Actions</th>
@@ -637,12 +661,12 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
                     </span>
 
                   </td>
-                  <td className="text-center border p-2">
+                  {/* <td className="text-center border p-2">
                     <span className={isBlurred ? "blur-sm select-none" : ""}>
 
                       {item?.cost || 0}
                     </span>
-                  </td>
+                  </td> */}
 
                   <td className="text-center border p-2 text-green-700 font-bold">
                     <span className={isBlurred ? "blur-sm select-none" : ""}>
@@ -661,6 +685,82 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
     )
   }
 
+
+  // Inside your ClientFurnitures component, above the renderCoreMaterials() call
+
+  const renderBrandSpecificationTable = () => {
+    // 1. Group Fittings & Accessories into a single comma-separated string
+    const uniqueFittings = Array.from(new Set(
+      data.fittingsAndAccessories
+        ?.filter((item) => item.brandName)
+        .map((item) => item.brandName)
+    )).join(", ");
+
+    // 2. Group Glues/Adhesives into a single comma-separated string
+    const uniqueGlues = Array.from(new Set(
+      data.glues
+        ?.filter((item) => item.brandName)
+        .map((item) => item.brandName)
+    )).join(", ");
+
+    // 3. Prepare the final display list
+    const specs = [
+      { category: "Plywood", brand: data.plywoodBrand, desc: "" },
+      { category: "Inner Laminate", brand: data.innerLaminateBrand, desc: "" },
+      { category: "Outer Laminate", brand: data.outerLaminateBrand, desc: "" },
+      { category: "Fittings & Accessories", brand: uniqueFittings, desc: "" },
+      { category: "Adhesives/Glues", brand: uniqueGlues, desc: "" },
+    ].filter(s => s.brand); // Only show rows that have at least one brand
+
+    if (specs.length === 0) return null;
+
+    return (
+      <div className="mt-4 mb-8 overflow-hidden border border-gray-100 rounded-xl shadow-sm bg-white">
+        <div className="bg-gray-50 px-6 py-3 border-b border-gray-100">
+          <h4 className="text-sm font-bold text-blue-800 uppercase tracking-widest">
+            Brand Specifications
+          </h4>
+        </div>
+        <table className="w-full table-fixed divide-y divide-gray-100">
+          <thead>
+            <tr className="bg-white">
+              <th className="w-1/3 px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-tighter">Category</th>
+              <th className="w-1/3 px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-tighter">Brand Standard</th>
+              <th className="w-1/3 px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-tighter">Description</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {specs.map((spec, idx) => (
+              <tr key={idx} className="hover:bg-blue-50/20 transition-all duration-200">
+                {/* Category Column */}
+                <td className={`${isBlurred ? "" : ""} px-6 py-4 text-sm font-semibold text-gray-700`}>
+                  {spec.category}
+                </td>
+
+                {/* Brand Column - Comma separated for fittings */}
+                <td className="px-6 py-4">
+                  <div className="flex flex-wrap gap-2">
+                    {spec?.brand?.split(", ").map((b, bIdx) => (
+                      <span key={bIdx} className={`${isBlurred ? "blur-sm select-none" : ""} inline-block px-3 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase`}>
+                        {b}
+                      </span>
+                    ))}
+                  </div>
+                </td>
+
+                {/* Description Column - Empty for now */}
+                <td className={`${isBlurred ? "blur-sm select-none" : ""} px-6 py-4 text-sm text-gray-400`}>
+                  {spec.desc || "---"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+
   return (
     <div className="shadow-md p-4 my-4 border rounded-lg bg-white">
       <div className=" flex justify-between items-center">
@@ -678,13 +778,16 @@ const ClientFurnitures = forwardRef<FurnitureQuoteRef, Props>(({
 
       </div>
 
+
+      {(templateType === "type 2" || templateType === "type 3") && <section>
+        {/*  here the tbale like things should be shown to you  */}
+        {renderBrandSpecificationTable()}
+      </section>}
+
       {renderCoreMaterials()}
       {renderSimpleSection("Fittings & Accessories", data.fittingsAndAccessories)}
       {renderSimpleSection("Glues", data?.glues)}
       {renderSimpleSection("Non-Branded Materials", data?.nonBrandMaterials)}
-
-
-
     </div>
   );
 }

@@ -187,6 +187,8 @@ export const useGetSingleCutlist = (id: string) => {
             if (!api) throw new Error("API instance not found");
             return await getSingleCutlistApi({ id, api });
         },
+        refetchOnWindowFocus:false,
+        refetchOnMount: false,
         enabled: !!role && allowedRoles.includes(role) && !!id
     });
 };

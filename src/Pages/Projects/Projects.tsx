@@ -203,10 +203,14 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
 
   CUTLIST: "cutlist",
 
+  RATECONIGPRESALES: "presalesmaterialrateconfig", // Add this line!
   RATECONIG: "materialrateconfig",
   RATECONIGSTAFF: "labourratequote",
   RATECONIGMATERIALWITHSTAFF: "materialwithlabourratequote",
   WORKTEMPLATE: "materialquote",
+  CALCULATOR: "calculator",
+  PRESALESQUOTE: `presales`,
+
   INTERNALQUOTE: "internalquote",
   QUOTEVARIENT: "quotevariant",
   "QUOTES (CLIENT)": "clientquote",
@@ -246,10 +250,14 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     ACCOUNTING: `/organizations/${organizationId}/projects/accounting`,
     DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
     CUTLIST: `/organizations/${organizationId}/projects/cutlistmain`,
+    // MATERIAL_SHOP_DOCS: `/organizations/${organizationId}/projects/shopmaterialdoc`,
+    RATECONIGPRESALES: `/organizations/${organizationId}/projects/rateconfigpresales`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
     RATECONIGMATERIALWITHSTAFF: `/organizations/${organizationId}/projects/materialwithlabourrate`,
-    WORKTEMPLATE: `/organizations/${organizationId}/projects/worktemplates`,
+    // WORKTEMPLATE: `/organizations/${organizationId}/projects/worktemplates`,
+    CALCULATOR: `/organizations/${organizationId}/projects/calculator`,
+    PRESALESQUOTE: `/organizations/${organizationId}/projects/presalesquote`,
     INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
     QUOTEVARIENT: `/organizations/${organizationId}/projects/quotevariant`,
     "QUOTES (CLIENT)": `/organizations/${organizationId}/projects/clientquotes`,
@@ -345,6 +353,45 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
 
   // =========================================================
+  // 6. GROUPING & ALPHABETICAL SORTING
+  // =========================================================
+
+  // Define your groups
+  const SIDEBAR_GROUPS_CONFIG = [
+    {
+      id: "RATE_CONFIG",
+      label: "Rate Configuration",
+      keys: ["RATECONIGPRESALES", "RATECONIG", "RATECONIGSTAFF", "RATECONIGMATERIALWITHSTAFF"]
+    },
+    {
+      id: "QUOTE_ENGINE",
+      label: "Quote Engine",
+      keys: ["WORKTEMPLATE", "PRESALESQUOTE", "INTERNALQUOTE", "QUOTEVARIENT", "QUOTES (CLIENT)"]
+    }
+  ];
+
+  // 1. Identify which keys belong to groups
+  const groupedKeys = SIDEBAR_GROUPS_CONFIG.flatMap(group => group.keys);
+
+  // 2. Get Standalone items (not in groups) and sort them alphabetically by Label
+  const standaloneItems = Object.entries(finalLabels)
+    .filter(([key]) => !groupedKeys.includes(key))
+    .sort((a, b) => (a[1] as string).localeCompare(b[1] as string));
+
+  // 3. Filter groups (only keep groups that have at least one allowed item) 
+  // and sort groups by their own label (Quote Engine vs Rate Configuration)
+  const activeGroups = SIDEBAR_GROUPS_CONFIG
+    .filter(group => group.keys.some(key => finalLabels[key]))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  // 4. Combine them: Standalone items + Groups, sorted alphabetically as a whole
+  const allSidebarElements = [
+    ...standaloneItems.map(([key, value]) => ({ type: 'item', key, label: value })),
+    ...activeGroups.map(group => ({ type: 'group', ...group }))
+  ].sort((a: any, b) => a.label.localeCompare(b.label));
+
+
+  // =========================================================
   // 6. RESPONSIVE LOGIC
   // =========================================================
   useEffect(() => {
@@ -371,6 +418,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
             path={finalPaths}
             labels={finalLabels}
             icons={finalIcons}
+            menuStructure={allSidebarElements} // Pass the new sorted structure
           />
         )}
 

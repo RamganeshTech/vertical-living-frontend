@@ -23,25 +23,26 @@ export const useAuthCheck = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [authInfo, setAuthInfo] = useState<{ role: string | null; isauthenticated: boolean, _id: null | string, permission: Record<string, Record<string, boolean>>, isGuideRequired: boolean | undefined }>({
+  const [authInfo, setAuthInfo] = useState<{ role: string | null; ownerId: string | null; isauthenticated: boolean, _id: null | string, permission: Record<string, Record<string, boolean>>, isGuideRequired: boolean | undefined }>({
     role: null,
     isauthenticated: false,
     _id: null,
     permission: {},
     isGuideRequired: undefined,
+    ownerId: null
   });
 
 
   // This ensures that when Dispatch happens, this hook re-renders with new data immediately.
   const reduxGuidePref = useSelector((state: RootState) => {
-      switch (role) {
-          case "owner": return state.userProfileStore?.isGuideRequired;
-          case "CTO": return state.CTOProfileStore?.isGuideRequired;
-          case "staff": return state.staffProfileStore?.isGuideRequired;
-          case "worker": return state.workerProfileStore?.isGuideRequired;
-          case "client": return state.clientProfileStore?.isGuideRequired;
-          default: return false;
-      }
+    switch (role) {
+      case "owner": return state.userProfileStore?.isGuideRequired;
+      case "CTO": return state.CTOProfileStore?.isGuideRequired;
+      case "staff": return state.staffProfileStore?.isGuideRequired;
+      case "worker": return state.workerProfileStore?.isGuideRequired;
+      case "client": return state.clientProfileStore?.isGuideRequired;
+      default: return false;
+    }
   });
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export const useAuthCheck = () => {
               dispatch(setRole(info));
               dispatch(setOwnerProfileData(res.data.data));
               // setAuthInfo(info);
-              setAuthInfo({ ...info, _id: res.data.data.userId , });
+              setAuthInfo({ ...info, _id: res.data.data.userId, ownerId: res.data.data.userId });
               return setLoading(false);
             }
             break;
@@ -69,7 +70,11 @@ export const useAuthCheck = () => {
           case "staff":
             res = await staffApi.get("/auth/staff/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.staffId, userName: res.data.data.staffName, permission: res?.data?.data?.permission, isGuideRequired: res?.data?.data?.isGuideRequired };
+              const info = {
+                role, isauthenticated: true, _id: res.data.data.staffId,
+                userName: res.data.data.staffName, permission: res?.data?.data?.permission,
+                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data.data.ownerId
+              };
               dispatch(setRole(info));
               dispatch(setStaffProfileData(res.data.data));
               // setAuthInfo(info);
@@ -81,10 +86,14 @@ export const useAuthCheck = () => {
           case "worker":
             res = await workerApi.get("/auth/worker/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.workerId, userName: res.data.data.workerName, permission: res.data.data?.permission, isGuideRequired: res?.data?.data?.isGuideRequired };
+              const info = {
+                role, isauthenticated: true, _id: res.data.data.workerId,
+                userName: res.data.data.workerName, permission: res.data.data?.permission,
+                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data.data.ownerId
+              };
               dispatch(setRole(info));
               dispatch(setWorkerProfileData(res.data.data));
-              setAuthInfo({ ...info, _id: res.data.data.workerId });
+              setAuthInfo({ ...info, _id: res.data.data.workerId, });
               // setAuthInfo({ ...info, _id: res.data.data.workerId });
 
               return setLoading(false);
@@ -94,7 +103,11 @@ export const useAuthCheck = () => {
           case "CTO":
             res = await CTOApi.get("/auth/CTO/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.CTOId, userName: res.data.data.CTOName, permission: res.data.data?.permission, isGuideRequired: res?.data?.data?.isGuideRequired };
+              const info = {
+                role, isauthenticated: true, _id: res.data.data.CTOId,
+                userName: res.data.data.CTOName, permission: res.data.data?.permission,
+                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data?.data?.ownerId
+              };
               dispatch(setRole(info));
               dispatch(setCTOProfileData(res.data.data));
               // setAuthInfo(info);
@@ -107,7 +120,11 @@ export const useAuthCheck = () => {
           case "client":
             res = await clientApi.get("/auth/client/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.clientId, userName: res.data.data.clientName, permission: res.data.data?.permission, isGuideRequired: res?.data?.data?.isGuideRequired };
+              const info = {
+                role, isauthenticated: true, _id: res.data.data.clientId,
+                userName: res.data.data.clientName, permission: res.data.data?.permission,
+                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data?.data?.ownerId
+              };
               dispatch(setRole(info));
               dispatch(setClientProfileData(res.data.data));
               // setAuthInfo(info);
@@ -131,8 +148,12 @@ export const useAuthCheck = () => {
           ]);
 
           if (ownerRes.status === "fulfilled" && ownerRes.value.data.ok) {
-            const info = { role: "owner", isauthenticated: true, _id: ownerRes.value.data.data.userId, userName: ownerRes.value.data.data.userName, 
-              permission: ownerRes?.value?.data?.data?.permission, isGuideRequired: ownerRes?.value.data.data?.isGuideRequired };
+            const info = {
+              role: "owner", isauthenticated: true, _id: ownerRes.value.data.data.userId, userName: ownerRes.value.data.data.userName,
+              permission: ownerRes?.value?.data?.data?.permission,
+              isGuideRequired: ownerRes?.value.data.data?.isGuideRequired,
+              ownerId: ownerRes?.value?.data?.data?.ownerId
+            };
             // console.log("22222222", info)
             dispatch(setRole(info));
             dispatch(setOwnerProfileData(ownerRes.value.data.data))
@@ -141,8 +162,13 @@ export const useAuthCheck = () => {
           }
 
           if (staffRes.status === "fulfilled" && staffRes.value.data.ok) {
-            const info = { role: "staff", isauthenticated: true, _id: staffRes.value.data.data.staffId, userName: staffRes.value.data.data.staffName,
-               permission: staffRes?.value?.data?.data?.permission, isGuideRequired: staffRes?.value.data.data?.isGuideRequired };
+            const info = {
+              role: "staff", isauthenticated: true, _id: staffRes.value.data.data.staffId, userName: staffRes.value.data.data.staffName,
+              permission: staffRes?.value?.data?.data?.permission,
+              isGuideRequired: staffRes?.value.data.data?.isGuideRequired,
+              ownerId: staffRes?.value?.data?.data?.ownerId
+
+            };
             dispatch(setRole(info));
             dispatch(setStaffProfileData(staffRes.value.data.data))
             setAuthInfo({ ...info, _id: staffRes.value.data.data.staffId });
@@ -150,8 +176,13 @@ export const useAuthCheck = () => {
           }
 
           if (workerRes.status === "fulfilled" && workerRes.value.data.ok) {
-            const info = { role: "worker", isauthenticated: true, _id: workerRes.value.data.data.workerId, userName: workerRes.value.data.data.workerName,
-               permission: workerRes?.value?.data?.data?.permission, isGuideRequired: workerRes?.value.data.data?.isGuideRequired };
+            const info = {
+              role: "worker", isauthenticated: true, _id: workerRes.value.data.data.workerId, userName: workerRes.value.data.data.workerName,
+              permission: workerRes?.value?.data?.data?.permission,
+               isGuideRequired: workerRes?.value.data.data?.isGuideRequired,
+              ownerId: workerRes?.value?.data?.data?.ownerId
+
+            };
             dispatch(setRole(info));
             dispatch(setWorkerProfileData(workerRes.value.data.data))
             setAuthInfo({ ...info, _id: workerRes.value.data.data.workerId });
@@ -160,8 +191,13 @@ export const useAuthCheck = () => {
 
           if (CTORes.status === "fulfilled" && CTORes.value.data.ok) {
             console.log("cto data", CTORes)
-            const info = { role: "CTO", isauthenticated: true, _id: CTORes.value.data.data.CTOId, userName: CTORes.value.data.data.CTOName, 
-              permission: CTORes.value?.data?.data?.permission, isGuideRequired: CTORes?.value.data.data?.isGuideRequired };
+            const info = {
+              role: "CTO", isauthenticated: true, _id: CTORes.value.data.data.CTOId, userName: CTORes.value.data.data.CTOName,
+              permission: CTORes.value?.data?.data?.permission,
+               isGuideRequired: CTORes?.value.data.data?.isGuideRequired,
+              ownerId: CTORes?.value?.data?.data?.ownerId
+
+            };
             dispatch(setRole(info));
             dispatch(setCTOProfileData(CTORes.value.data.data))
             setAuthInfo({ ...info, _id: CTORes.value.data.data.CTOId });
@@ -169,16 +205,20 @@ export const useAuthCheck = () => {
           }
 
           if (clientRes.status === "fulfilled" && clientRes.value.data.ok) {
-            const info = { role: "client", isauthenticated: true, _id: clientRes.value.data.data.clientId, userName: clientRes.value.data.data.clientName, 
-              permission: clientRes.value?.data?.data?.permission, isGuideRequired: clientRes?.value.data.data?.isGuideRequired };
+            const info = {
+              role: "client", isauthenticated: true, _id: clientRes.value.data.data.clientId, userName: clientRes.value.data.data.clientName,
+              permission: clientRes.value?.data?.data?.permission,
+               isGuideRequired: clientRes?.value.data.data?.isGuideRequired,
+              ownerId: clientRes?.value?.data?.data?.ownerId
+            };
             dispatch(setRole(info));
             dispatch(setClientProfileData(clientRes.value.data.data))
             setAuthInfo({ ...info, _id: clientRes.value.data.data.clientId });
             return setLoading(false);
           }
         }
-        dispatch(setRole({ role: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined  }));
-        setAuthInfo({ role: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined });
+        dispatch(setRole({ role: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined }));
+        setAuthInfo({ role: null, ownerId:null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined });
 
         dispatch(resetOwnerProfile())
         dispatch(resetStaffProfile())
@@ -189,8 +229,8 @@ export const useAuthCheck = () => {
 
         setLoading(false);
       } catch (error) {
-        dispatch(setRole({ role: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined  }));
-        setAuthInfo({ role: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired:undefined });
+        dispatch(setRole({ role: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined }));
+        setAuthInfo({ role: null, isauthenticated: false, _id: null, ownerId:null, permission: {}, isGuideRequired: undefined });
         setError("Something went wrong while checking authentication.");
 
         // resetting every data 
@@ -209,5 +249,5 @@ export const useAuthCheck = () => {
     checkAllRoles();
   }, []);
 
-  return { loading, error, ...authInfo,  isGuideRequired: reduxGuidePref  }
+  return { loading, error, ...authInfo, isGuideRequired: reduxGuidePref }
 };

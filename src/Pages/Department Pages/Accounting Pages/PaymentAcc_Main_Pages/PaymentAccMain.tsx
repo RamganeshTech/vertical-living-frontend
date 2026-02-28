@@ -32,6 +32,8 @@ const PaymentAccMain = () => {
     // const canCreate = role === "owner" || permission?.payments?.create;
     // const canEdit = role === "owner" || permission?.payments?.create;
 
+    const showPublicTransaction  = organizationId === "684a57015e439b678e8f6918"
+
 
     // --- Breadcrumbs ---
     const paths: BreadcrumbItem[] = [
@@ -40,7 +42,7 @@ const PaymentAccMain = () => {
     ];
 
     // --- Check for Child Routes (Create / Single View) ---
-    const isDetailView = location.pathname.includes('/single') || location.pathname.includes('/create');
+    const isDetailView = location.pathname.includes('/single') || location.pathname.includes('/create') || location.pathname.includes('/publicpayment');
 
     // --- Local State for Filters ---
     const [filters, setFilters] = useState({
@@ -160,7 +162,11 @@ const PaymentAccMain = () => {
                     Create Payment
                 </Button> */}
 
-                <div className="w-full sm:w-auto flex justify-end sm:block">
+                <div className="w-full sm:w-auto !flex gap-3 justify-between sm:block">
+                   {showPublicTransaction && <Button onClick={()=> navigate('publicpayment')}>
+                        Client Payment
+                    </Button>}
+
                     <StageGuide
                         organizationId={organizationId!}
                         stageName="payments"

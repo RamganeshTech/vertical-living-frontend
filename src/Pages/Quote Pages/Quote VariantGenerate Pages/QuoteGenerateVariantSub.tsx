@@ -1030,7 +1030,7 @@
 
 import React, { createRef, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGenerateQuotePdf, useGetMaterialBrands, useGetMaterialQuoteSingleEntry } from "../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
+import {  useGenerateQuotePdf, useGetMaterialBrands, useGetMaterialQuoteSingleEntry } from "../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
 import { type FurnitureBlock, type SimpleItemRow } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
 import FurnitureQuoteVariantForm, { getRateForThickness, type FurnitureQuoteRef } from "./FurnitureQuoteVariantForm";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
@@ -1055,9 +1055,9 @@ const QuoteGenerateVariantSub = () => {
     let { data: innerLaminateBrands } = useGetMaterialBrands(organizationId!, "inner laminate"); // 🆕
     let { data: outerLaminateBrands } = useGetMaterialBrands(organizationId!, "outer laminate"); // 🆕
 
-    console.log("materialBrands", materialBrands)
-    console.log("innerLaminateBrands", innerLaminateBrands)
-    console.log("outerLaminateBrands", outerLaminateBrands)
+    // console.log("materialBrands", materialBrands)
+    // console.log("innerLaminateBrands", innerLaminateBrands)
+    // console.log("outerLaminateBrands", outerLaminateBrands)
 
     const [selectedLabourCategory, setSelectedLabourCategory] = useState({
         categoryId: "",
@@ -1105,14 +1105,6 @@ const QuoteGenerateVariantSub = () => {
     //     }
     // };
 
-    useEffect(() => {
-        if (quote) {
-            setGlobalTransportation(quote?.globalTransportation || 0);
-            setGlobalProfitPercent(quote?.globalProfitPercent || 0);
-            setCommonProfitOverride(quote?.commonProfitOverride || 0)
-
-        }
-    }, [quote]);
 
 
     // 3. Common Materials State
@@ -1120,10 +1112,40 @@ const QuoteGenerateVariantSub = () => {
 
     const [commonProfitOverride, setCommonProfitOverride] = useState<number>(0);
 
-    // Initialize Common Materials from Quote data
+
+
+    // old version
+    // useEffect(() => {
+    //     if (quote) {
+    //         setGlobalTransportation(quote?.globalTransportation || 0);
+    //         setGlobalProfitPercent(quote?.globalProfitPercent || 0);
+    //         setCommonProfitOverride(quote?.commonProfitOverride || 0)
+
+    //     }
+    // }, [quote]);
+
+
+    // // Initialize Common Materials from Quote data
+    // useEffect(() => {
+    //     if (quote?.commonMaterials) {
+    //         setCommonMaterials(quote.commonMaterials);
+    //     }
+    // }, [quote]);
+
+
+    // New version
+    // ✅ Unified Hydration: Initialize all quote-related state in one pass
     useEffect(() => {
-        if (quote?.commonMaterials) {
-            setCommonMaterials(quote.commonMaterials);
+        if (quote) {
+            // Initialize Global Overhead Settings
+            setGlobalTransportation(quote.globalTransportation || 0);
+            setGlobalProfitPercent(quote.globalProfitPercent || 0);
+            setCommonProfitOverride(quote.commonProfitOverride || 0);
+
+            // Initialize Common Materials List
+            if (quote.commonMaterials) {
+                setCommonMaterials(quote.commonMaterials);
+            }
         }
     }, [quote]);
 
@@ -1472,6 +1494,7 @@ const QuoteGenerateVariantSub = () => {
                         <th className="px-6 py-3">Total (incl. Global)</th> */}
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
+                        <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Brand</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Quantity</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Cost</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Profit %</th>
@@ -1487,6 +1510,9 @@ const QuoteGenerateVariantSub = () => {
                             </td>
                             <td className="p-3 border-r border-gray-100 text-center text-gray-500">
                                 {row.description || "—"}
+                            </td>
+                            <td className="p-3 border-r border-gray-100 text-center text-gray-500">
+                                {row.brandName || "—"}
                             </td>
                             <td className="p-3 border-r border-gray-100 text-center  text-gray-500">
                                 {row.quantity}
@@ -1657,7 +1683,7 @@ const QuoteGenerateVariantSub = () => {
                 data: {
                     quoteId, // Required for readable reference
                     organizationId,
-                    projectId: quote.projectId,
+                    projectId: quote?.projectId?._id,
                     brandName: selectedBrand,
                     innerLaminateBrand: selectedInnerBrand,
                     outerLaminateBrand: selectedOuterBrand,
@@ -1698,41 +1724,11 @@ const QuoteGenerateVariantSub = () => {
 
 
 
-    // useEffect(() => {
-    //     if (quote) {
-    //         setGlobalTransportation(quote?.globalTransportation || 0);
-    //         setGlobalProfitPercent(quote?.globalProfitPercent || 0);
-    //         setCommonProfitOverride(quote?.commonProfitOverride || 0);
-
-    //         // ✅ NEW: Initialize Global Brands from Saved IDs
-    //         if (quote?.plywoodBrandId && brandOptions.length > 0) {
-    //             const found = brandOptions.find(opt => opt.value === quote.plywoodBrandId);
-    //             if (found) {
-    //                 setSelectedBrand(found.label);
-    //                 setSelectedBrandId(found.value);
-    //             }
-    //         }
-
-    //         if (quote?.innerLaminateId && innerOptions.length > 0) {
-    //             const found = innerOptions.find(opt => opt.value === quote.innerLaminateId);
-    //             if (found) {
-    //                 setSelectedInnerBrand(found.label);
-    //                 setSelectedInnerBrandId(found.value);
-    //             }
-    //         }
-
-    //         if (quote?.outerLaminateId && outerOptions.length > 0) {
-    //             const found = outerOptions.find(opt => opt.value === quote.outerLaminateId);
-    //             if (found) {
-    //                 setSelectedOuterBrand(found.label);
-    //                 setSelectedOuterBrandId(found.value);
-    //             }
-    //         }
-    //     }
-    //     // Added options as dependencies to ensure lookup works once they are loaded
-    // }, [quote, brandOptions, innerOptions, outerOptions]);
+    
 
 
+
+    //  old versiion
 
     // useEffect(() => {
     //     if (!quote?.furnitures) return;
@@ -1768,7 +1764,8 @@ const QuoteGenerateVariantSub = () => {
     //     setFurnitures(transformed);
     // }, [quote]);
 
-    //  new versiion
+
+    //  second new versiion
     //     useEffect(() => {
     //     if (!quote?.furnitures || !brandOptions.length) return;
 
@@ -1811,7 +1808,7 @@ const QuoteGenerateVariantSub = () => {
 
     const isInitialMount = useRef(true);
 
-    
+
     useEffect(() => {
         // 1. Guard: Ensure data and options are loaded
         if (!quote || !brandOptions.length || !innerOptions.length || !outerOptions.length) return;
@@ -1962,10 +1959,20 @@ const QuoteGenerateVariantSub = () => {
                         </div>
                     </div>
 
+
+                    {/* <div className="flex gap-2 items-center"> */}
+
+
+                       
+
+                        {(canCreate || canEdit) && <Button onClick={handleGenerateQuote} isLoading={quotePending} className="flex-shrink-0">
+                            Generate Quote for Client
+                        </Button>}
+
+                    {/* </div> */}
+
                     {/* Right - Generate Button */}
-                    {(canCreate || canEdit) && <Button onClick={handleGenerateQuote} disabled={quotePending} className="flex-shrink-0">
-                        {quotePending ? "Generating..." : "Generate Quote for Client"}
-                    </Button>}
+
                 </div>
 
                 {/* Bottom Row - Brand Selection */}

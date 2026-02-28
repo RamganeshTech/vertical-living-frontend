@@ -7,6 +7,7 @@ import { toast } from '../../utils/toast';
 import { Button } from '../../components/ui/Button';
 import { useGetProjects } from '../../apiList/projectApi';
 import type { AvailableProjetType } from '../Department Pages/Logistics Pages/LogisticsShipmentForm';
+import { dateFormate } from '../../utils/dateFormator';
 
 const CutlistMain = () => {
     const navigate = useNavigate();
@@ -55,7 +56,7 @@ const CutlistMain = () => {
     } = useGetAllCutlists({
         organizationId: organizationId || '',
         projectId: filters.projectId || undefined,
-        limit: 20,
+        limit: 10,
         startDate: debouncedStartDate, // <--- Used here
         endDate: debouncedEndDate,
         search: debouncedSearch
@@ -87,7 +88,7 @@ const CutlistMain = () => {
         } catch (err: any) {
             toast({
                 title: "Error",
-                description: err?.message || "Failed to delete cutlist",
+                description:  err?.response?.data?.message || err?.message || "Failed to delete cutlist",
                 variant: "destructive"
             });
         }
@@ -142,7 +143,7 @@ const CutlistMain = () => {
                     <Button onClick={() => refetch()} className="mt-4">Retry</Button>
                 </div>
             ) : (
-                <main className="flex gap-4 h-[calc(100vh-150px)]">
+                <main className="flex gap-4 h-[calc(100vh-90px)]">
                     {/* Filters Sidebar */}
                     <aside className="w-80 flex-shrink-0 bg-white rounded-xl shadow-sm p-6 border border-gray-100 overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
@@ -234,15 +235,15 @@ const CutlistMain = () => {
                         ) : (
                             <div ref={scrollContainerRef} className="overflow-y-auto rounded-xl border border-gray-200 bg-white">
                                 {/* <div className="sticky top-0 z-20 bg-blue-50 grid grid-cols-12 gap-4 px-6 py-4 font-semibold text-gray-700 text-sm"> */}
-                                    <div className="sticky top-0 z-20 bg-blue-50 grid grid-cols-11 gap-4 px-6 py-4 font-semibold text-gray-700 text-sm border-b border-gray-200">
-                                        <div className="col-span-1">S.No</div>
-                                        <div className="col-span-2">Date</div> {/* Added Date Column */}
-                                        <div className="col-span-2">Cutlist No</div>
-                                        <div className="col-span-2">Project</div> {/* Added Project Column */}
-                                        <div className="col-span-2">Client Name</div>
-                                        {/* <div className="col-span-2 text-center">Status</div> */}
-                                        <div className="col-span-2 text-center">Actions</div>
-                                    </div>
+                                <div className="sticky top-0 z-20 bg-blue-50 grid grid-cols-11 gap-4 px-6 py-4 font-semibold text-gray-700 text-sm border-b border-gray-200">
+                                    <div className="col-span-1 text-center">S.No</div>
+                                    <div className="col-span-2 text-center">Cutlist No</div>
+                                    <div className="col-span-2 text-center">Date</div> {/* Added Date Column */}
+                                    <div className="col-span-2 text-center">Project</div> {/* Added Project Column */}
+                                    <div className="col-span-2 text-center">Client Name</div>
+                                    {/* <div className="col-span-2 text-center">Status</div> */}
+                                    <div className="col-span-2 text-center">Actions</div>
+                                </div>
 
                                 <div className="divide-y divide-gray-100">
                                     {cutlists.map((cl: any, index: number) => (
@@ -251,21 +252,22 @@ const CutlistMain = () => {
                                             onClick={() => handleView(cl._id!.toString())} // Whole list acts as view
                                             className="grid grid-cols-11 gap-4 px-6 py-4 items-center hover:bg-blue-50/50 cursor-pointer transition-colors text-sm"
                                         >
-                                            <div className="col-span-1 text-gray-500">{index + 1}</div>
+                                            <div className="col-span-1 text-gray-500 text-center">{index + 1}</div>
+
+                                            <div className="col-span-2 font-medium text-blue-600 text-center">{cl.cutlistNo}</div>
 
                                             {/* 1. Date Column (createdAt) */}
-                                            <div className="col-span-2 text-gray-600">
-                                                {cl.createdAt ? new Date(cl.createdAt).toLocaleDateString('en-GB') : '—'}
+                                            <div className="col-span-2 text-gray-600 text-center">
+                                                {cl.createdAt ? dateFormate(cl.createdAt) : '—'}
                                             </div>
 
-                                            <div className="col-span-2 font-medium text-blue-600">{cl.cutlistNo}</div>
 
                                             {/* 2. Project Name Column */}
-                                            <div className="col-span-2 text-gray-600 truncate" title={cl.projectId?.projectName}>
+                                            <div className="col-span-2 text-gray-600 truncate  text-center" title={cl.projectId?.projectName}>
                                                 {cl.projectId?.projectName || '—'}
                                             </div>
 
-                                            <div className="col-span-2 font-medium text-gray-800">{cl.clientName}</div>
+                                            <div className="col-span-2 font-medium text-gray-800 text-center">{cl.clientName || '—'}</div>
 
                                             {/* <div className="col-span-2 text-center">
                                                 <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${cl.isLocked ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
@@ -286,9 +288,15 @@ const CutlistMain = () => {
                                                             e.stopPropagation(); // Stops handleView from triggering
                                                             handleDelete(cl._id!.toString());
                                                         }}
-                                                        className="text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-50 transition-all"
+                                                        className="text-red-500 cursor-pointer text-center hover:text-red-700 p-1 rounded-md hover:bg-red-50 transition-all"
                                                     >
-                                                        <i className="fas fa-trash-alt" />
+                                                        {/* {deleteMutation.isPending && deleteMutation.variables. ? <i className="fas fa-spinner animate-spin" /> : <i className="fas fa-trash-alt" />} */}
+
+                                                        {deleteMutation.isPending && deleteMutation.variables === cl._id?.toString()
+                                                            ? <i className="fas fa-spinner animate-spin" />
+                                                            : <i className="fas fa-trash-alt" />
+                                                        }
+
                                                     </button>
                                                 )}
                                             </div>

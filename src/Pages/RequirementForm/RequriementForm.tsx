@@ -20,7 +20,7 @@ import ClientInfoCard from "./components/ClientInfoCard";
 import SectionCards from "./components/SectionCards";
 import AssignStageStaff from "../../shared/AssignStaff";
 import type { ProjectDetailsOutlet } from "../../types/types";
-import ShareDocumentWhatsapp from "../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../shared/ShareDocumentWhatsapp";
 import { useAuthCheck } from "../../Hooks/useAuthCheck";
 import StageGuide from "../../shared/StageGuide";
 
@@ -314,12 +314,12 @@ export default function RequirementForm() {
               className="sm:!max-w-[20%] w-full"
             />}
 
-            {(!error && (canCreate || canEdit)) && <ShareDocumentWhatsapp
+            {/* {(!error && (canCreate || canEdit)) && <ShareDocumentWhatsapp
               projectId={projectId}
               stageNumber="1"
               className="w-full sm:w-fit"
               isStageCompleted={formData?.status}
-            />}
+            />} */}
 
            {(canCreate || canEdit) && <AssignStageStaff
               stageName="RequirementFormModel"
@@ -379,7 +379,7 @@ export default function RequirementForm() {
 
           {/* Client Info & Uploads */}
           <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
-            <ClientInfoCard className="w-[100%] md:w-[50%]" client={formData?.clientData} />
+            <ClientInfoCard projectId={projectId} className="w-[100%] md:w-[50%]" client={formData?.clientData} />
 
            {canList && <Card className="p-4 w-[100%] md:w-[50%] shadow border-l-4 border-blue-500 bg-white">
               <RequirementFileUploader

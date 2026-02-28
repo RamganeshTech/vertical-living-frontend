@@ -181,7 +181,7 @@ const updateDriverLocation = async ({
     { latitude, longitude }
   );
   if (!response.data.ok) throw new Error(response.data.message);
-  return response.data.data;
+  return response.data;
 };
 
 
@@ -436,12 +436,16 @@ export const useUpdateDriverLocation = () => {
       latitude: number; 
       longitude: number;
     }) => {
+      console.log("latitude", latitude)
+      console.log("longitude", longitude)
       return await updateDriverLocation({ shipmentId, latitude, longitude });
     },
     onSuccess: (_data, variables) => {
       // Invalidate active shipments query to refresh dashboard
       queryClient.invalidateQueries({ queryKey: ['logistics', 'active-shipments'] });
-      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipment', variables.shipmentId] });
+      // queryClient.invalidateQueries({ queryKey: ['logistics', 'shipment', variables.shipmentId] });
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'driver-tracking-id', variables.shipmentId] });
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'single'] });
     }
   });
 };
@@ -540,4 +544,28 @@ export const useGetShipmentByToken = (token: string) => {
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
+};  
+
+
+
+// PUBLIC THE SHIPMENT BY ID (DRIVER TRACKING NO AUTH NEEDED)
+
+
+const getShipmentByIdPublic = async ({ id }: { id: string }) => {
+  const response = await axios.get(
+    `${import.meta.env.VITE_API_URL}/api/department/logistics/shipment/getpublicbyId/${id}`
+  );
+  if (!response.data.ok) throw new Error(response.data.message);
+  return response.data.data;
 };
+
+export const useGetShipmentByIdPublic = (id: string) => {
+  return useQuery({
+    queryKey: ['logistics', 'driver-tracking-id', id],
+    queryFn: () => getShipmentByIdPublic({ id }),
+    enabled: !!id, // Only fetch if token exists
+    // retry: 1, // Only retry once if failed
+    // refetchOnMount: true,
+    refetchOnWindowFocus: true,
+  });
+};  

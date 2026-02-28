@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 export interface SelectOption {
   value: string;
   label: string;
+
   email?: string;
   [key: string]: any; // Allow additional properties
 }
@@ -13,6 +14,7 @@ export interface SearchSelectProps {
   placeholder?: string;
   searchPlaceholder?: string;
   onValueChange: (value: string | null) => void;
+  onFocus?: () => void; // 👈 Add this optional line
   value?: string;
   className?: string;
   searchBy?: 'name' | 'email' | 'both' ; // Control what to search by
@@ -21,11 +23,11 @@ export interface SearchSelectProps {
 }
 // Helper function to normalize options
 const normalizeOptions = (options: SelectOption[] | string[]): SelectOption[] => {
-  if (options.length === 0) return [];
+  if (options?.length === 0) return [];
   
   // If options are strings, convert to SelectOption format
-  if (typeof options[0] === 'string') {
-    return (options as string[]).map(option => ({
+  if (typeof options?.[0] === 'string') {
+    return (options as string[])?.map(option => ({
       value: option,
       label: option
     }));
@@ -53,6 +55,7 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
   searchPlaceholder = "Search...",
   onValueChange,
   value,
+  onFocus,
   className = "",
   searchBy = 'name', // Default to search by name only
   displayFormat = 'detailed', // Default to detailed display
@@ -67,7 +70,7 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
   const normalizedOptions = normalizeOptions(options);
 
   // Filter options based on search term and searchBy preference
-  const filteredOptions = normalizedOptions.filter(option =>
+  const filteredOptions = normalizedOptions?.filter(option =>
     getSearchableText(option, searchBy)?.toLowerCase()?.includes(searchTerm.toLowerCase())
   );
 
@@ -87,7 +90,7 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
   // Set selected option when value changes
   useEffect(() => {
     if (value) {
-      const option = normalizedOptions.find(opt => opt.value === value);
+      const option = normalizedOptions?.find(opt => opt.value === value);
       setSelectedOption(option || null);
     } else {
       setSelectedOption(null);
@@ -105,6 +108,7 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
     if(enabled){
       setIsOpen(true);
       setSearchTerm("");
+      if (onFocus) onFocus();
     }
   };
 
@@ -175,8 +179,8 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
 
           {/* Options list */}
           <div className="py-1">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option) => (
+            {filteredOptions?.length > 0 ? (
+              filteredOptions?.map((option) => (
                 <div
                   key={option.value}
                   className={`px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 ${

@@ -7,10 +7,11 @@ import { Input } from "../../components/ui/Input"
 import { Label } from "../../components/ui/Label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/Card"
 import { toast } from "../../utils/toast"
-import { useRegisterCTO } from "../../apiList/CTOApi"
+// import { useRegisterCTO } from "../../apiList/CTOApi"
 import { useDispatch } from "react-redux"
 import { setRole } from "../../features/authSlice"
 import { setCTOProfileData } from "../../features/CTOSlice"
+import { useCreateCommonUser } from "../../apiList/commonAuthApi"
 
 export default function CTORegister() {
     const navigate = useNavigate()
@@ -28,7 +29,12 @@ export default function CTORegister() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [errors, setErrors] = useState<Record<string, string>>({})
 
-    const registerCTO = useRegisterCTO()
+    // const registerCTO = useRegisterCTO()
+
+      const { mutateAsync: registerCommonUser, isPending } = useCreateCommonUser();
+    
+
+
     const dispatch = useDispatch()
     useEffect(() => {
         if (!invite) {
@@ -96,7 +102,71 @@ export default function CTORegister() {
         }
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
+
+    // old version useddurig the seperate login form
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault()
+
+    //     if (!invite) {
+    //         toast({
+    //             title: "Error",
+    //             description: "Invalid invitation token",
+    //             variant: "destructive",
+    //         })
+    //         return
+    //     }
+
+    //     if (!validateForm()) {
+    //         return
+    //     }
+
+    //     try {
+    //         const data = await mutateAsync({
+    //             invite,
+    //             email: formData.email,
+    //             password: formData.password,
+    //             phoneNo: formData.phoneNo,
+    //             CTOName: formData.CTOName,
+    //         })
+
+    //         const CTOData = data.data
+
+    //         dispatch(setRole({
+    //             role: CTOData.role,
+    //             isauthenticated: true,
+    //             _id: CTOData._id
+    //         }));
+
+    //         dispatch(setCTOProfileData({
+    //             CTOId: CTOData._id,
+    //             CTOName: CTOData.CTOName,
+    //             email: CTOData.email,
+    //             phoneNo: CTOData.phoneNo,
+    //             role: CTOData.role,
+    //             isauthenticated: true
+    //         }));
+
+
+    //         toast({
+    //             title: "Success",
+    //             description: "Registration successful",
+    //         })
+
+    //         // Redirect to login page
+    //         setTimeout(() => {
+    //             navigate("/organizations")
+    //         }, 2000)
+    //     } catch (error: any) {
+    //         toast({
+    //             title: "Registration Failed",
+    //             description: error?.response?.data?.message  || "Failed to register. Please try again.",
+    //             variant: "destructive",
+    //         })
+    //     }
+    // }
+
+
+      const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if (!invite) {
@@ -113,12 +183,12 @@ export default function CTORegister() {
         }
 
         try {
-            const data = await registerCTO.mutateAsync({
+            const data = await registerCommonUser({
                 invite,
                 email: formData.email,
                 password: formData.password,
                 phoneNo: formData.phoneNo,
-                CTOName: formData.CTOName,
+                name: formData.CTOName,
             })
 
             const CTOData = data.data
@@ -126,11 +196,11 @@ export default function CTORegister() {
             dispatch(setRole({
                 role: CTOData.role,
                 isauthenticated: true,
-                _id: CTOData._id
+                _id: CTOData.CTOId
             }));
 
             dispatch(setCTOProfileData({
-                CTOId: CTOData._id,
+                CTOId: CTOData.CTOId,
                 CTOName: CTOData.CTOName,
                 email: CTOData.email,
                 phoneNo: CTOData.phoneNo,
@@ -156,6 +226,10 @@ export default function CTORegister() {
             })
         }
     }
+
+    
+
+
 
     if (!invite) {
         return (
@@ -359,9 +433,9 @@ export default function CTORegister() {
                             <Button
                                 type="submit"
                                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
-                                isLoading={registerCTO.isPending}
+                                isLoading={isPending}
                             >
-                                {registerCTO.isPending ? (
+                                {isPending ? (
                                     <>
                                         Registering...
                                     </>

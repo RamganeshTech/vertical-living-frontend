@@ -154,6 +154,7 @@ type SmartTagInputProps = {
     setState: React.Dispatch<React.SetStateAction<string[]>>;
 
     suggestions?: string[];
+    inputClassName?: string;
     suggestionFetcher?: (searchTerm: string) => Promise<string[]>;
     disableSuggestion?: boolean;
 };
@@ -163,6 +164,7 @@ const SmartTagInput: React.FC<SmartTagInputProps> = ({
     setState,
     suggestions = [],
     suggestionFetcher,
+    inputClassName,
     disableSuggestion = false,
 }) => {
     const [input, setInput] = useState("");
@@ -260,8 +262,8 @@ const SmartTagInput: React.FC<SmartTagInputProps> = ({
     };
 
     return (
-        <div className="relative w-full">
-            <div className="flex flex-wrap items-center border-b-1 border-[#565656] p-2 gap-2 rounded">
+        <div className={`${inputClassName} relative w-full`}>
+            <div className={`flex flex-wrap items-center border-b-1 border-[#565656] p-2 gap-2 rounded`}>
                 {tags.map((tag, index) => (
                     <div
                         key={index}

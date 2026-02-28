@@ -14,7 +14,7 @@ import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
 import type { ProjectDetailsOutlet } from "../../../types/types";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
 
@@ -175,12 +175,12 @@ const SampleDesignModule: React.FC = () => {
             />
             }
 
-            {(!getAllError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
+            {/* {(!getAllError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
               projectId={projectId}
               stageNumber="3"
               className="w-full sm:w-fit"
               isStageCompleted={sampleDesign?.status}
-            />}
+            />} */}
 
             <AssignStageStaff
               stageName="SampleDesignModel"

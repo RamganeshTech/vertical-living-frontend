@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import {   useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 // import { Input } from "../../../../components/ui/Input";
 // import { toast } from "../../../../utils/toast";
 // import { Button } from "../../../../components/ui/Button";
@@ -12,7 +12,8 @@ import StageGuide from "../../../../shared/StageGuide";
 // import { Card, CardContent } from "../../../../components/ui/Card";
 import {
     //  useCreateMaterialWithLabourRateConfigCategory, useDeleteMaterialWithLabourRateConfigCategory, 
-    useGetMaterialWithLabourRateConfigCategories } from "../../../../apiList/Quote Api/RateConfig Api/materialLabourRateConfigApi";
+    useGetMaterialWithLabourRateConfigCategories
+} from "../../../../apiList/Quote Api/RateConfig Api/rateConfigLabourwithMaterialApi";
 import MaterialWithLabourSingle from "./MaterialWithLabourConfigSingle";
 
 

@@ -22,6 +22,15 @@ const createPublicFromSubmission = async ({ projectId, payload, token }: { proje
 }
 
 
+
+// below api is used for submitting the form details form the form link submitted through whatsapp to the client 
+const updateClientInfo = async ({ projectId, payload, api }: { projectId: string, payload: any, api: AxiosInstance, }) => {
+    const { data } = await api.put(`/requirementform/update/clientinfo/${projectId}`, payload);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+}
+
+
 // const getRequrimentformDetails = async ({ projectId, api }: { projectId: string, api: AxiosInstance }) => {
 //     const { data } = await api.get(`/requirementform/getrequirementform/${projectId}`);
 //     if (!data.ok) throw new Error(data.message);
@@ -209,6 +218,29 @@ export const useCreateFormSubmission = () => {
             // if (!api) throw new Error("API instance not found for role");
 
             return await createPublicFromSubmission({ projectId, payload, token })
+        },
+        onSuccess: (_, {projectId}) => {
+            queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
+        },
+    })
+
+}
+
+
+
+export const useUpdateClientInfoRequirement = () => {
+ const { role } = useGetRole()
+
+    const api = getApiForRole(role!)
+
+    return useMutation({
+        mutationFn: async ({ projectId, payload, }: { projectId: string, payload: any,  }) => {
+
+            if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+
+            if (!api) throw new Error("API instance not found for role");
+
+            return await updateClientInfo({ projectId, payload, api })
         },
         onSuccess: (_, {projectId}) => {
             queryClient.invalidateQueries({ queryKey: ["requirementForm", projectId] });
@@ -415,6 +447,7 @@ export const useGetAllRequirementInfo = ({ projectId }: { projectId: string }) =
         },
         retry: false,
         // refetchOnWindowFocus: false,
+        enabled: !!projectId
     });
 };
 

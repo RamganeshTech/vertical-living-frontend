@@ -8,7 +8,7 @@ import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { Card } from "../../../components/ui/Card";
 import { useCompletePaymentConfirmation, useGetPaymentConfirmation, useSetPaymentConfirmationDeadline } from "../../../apiList/Stage Api/Payment Api/paymentConfirmationApi";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
 
@@ -136,12 +136,12 @@ const PaymentConfirmationStage: React.FC = () => {
             />}
 
 
-            {(!getAllError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
+            {/* {(!getAllError && (canCreate || canEdit)) && <ShareDocumentWhatsapp
               projectId={projectId!}
               stageNumber="7"
               className="w-full sm:w-fit"
               isStageCompleted={data?.status}
-            />}
+            />} */}
 
             {(canCreate || canEdit) && <AssignStageStaff
               stageName="PaymentConfirmationModel"

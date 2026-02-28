@@ -6,7 +6,7 @@ import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
 import { toast } from '../../../../utils/toast';
 import { useUpdateSqftInternalQuote } from '../../../../apiList/Quote Api/Internal_Quote_Api/internalquoteApi';
 import CreateQuoteModal from './InternalQuote_New_Version/CreateQuoteModal';
-import { useGetItemsByMaterialWithLabourRateConfigCategory, useGetMaterialWithLabourRateConfigCategories } from '../../../../apiList/Quote Api/RateConfig Api/materialLabourRateConfigApi';
+import { useGetItemsByMaterialWithLabourRateConfigCategory, useGetMaterialWithLabourRateConfigCategories } from '../../../../apiList/Quote Api/RateConfig Api/rateConfigLabourwithMaterialApi';
 import { useDebounce } from '../../../../Hooks/useDebounce';
 
 interface Props {

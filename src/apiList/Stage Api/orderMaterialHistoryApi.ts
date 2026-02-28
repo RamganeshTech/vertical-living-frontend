@@ -220,15 +220,17 @@ const sendToProcruementNewVersion = async ({
   projectId,
   orderItemId, organizationId,
   priority,
+  vendorId,
   api,
 }: {
   projectId: string;
   orderItemId: string,
   organizationId: string
-  priority: string
+  priority: string | null
+  vendorId: string
   api: AxiosInstance;
 }) => {
-  const { data } = await api.put(`/orderingmaterial/v1/${projectId}/${orderItemId}/${organizationId}/senttoprocurement`, { priority });
+  const { data } = await api.put(`/orderingmaterial/v2/${projectId}/${orderItemId}/${organizationId}/senttoprocurement`, { priority , vendorId});
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
@@ -317,10 +319,10 @@ export const useOrderHistorySendToProcurementNewVersion = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ projectId, orderItemId, organizationId, priority }: { projectId: string, orderItemId: string, organizationId: string, priority: string }) => {
+    mutationFn: async ({ projectId, orderItemId, organizationId, priority, vendorId }: { projectId: string, orderItemId: string, organizationId: string, priority: string | null, vendorId:string}) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
-      return await sendToProcruementNewVersion({ projectId, orderItemId, organizationId, api, priority });
+      return await sendToProcruementNewVersion({ projectId, orderItemId, organizationId, api, priority, vendorId });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
@@ -923,3 +925,165 @@ export const useDeleteOrderMaterialPdf = () => {
 };
 
 
+
+
+
+
+//  updating after submittig the items
+
+
+// ✅ Add SubItem to Specific Historical Order
+const addOrderingMaterialHistorySubItemApi = async ({
+  projectId,
+  orderItemId,
+  subItemName,
+  quantity,
+  unit,
+  index,
+  api,
+}: {
+  projectId: string;
+  orderItemId: string;
+  subItemName: string;
+  quantity: number;
+  unit: string;
+  index: number;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.post(
+    `/orderingmaterial/${projectId}/history/addsubitem/${orderItemId}`,
+    { subItemName, quantity, unit, index }
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+// ✅ Update SubItem in Specific Historical Order
+const updateOrderingMaterialHistorySubItemApi = async ({
+  projectId,
+  orderItemId,
+  subItemId,
+  subItemName,
+  quantity,
+  unit,
+  api,
+}: {
+  projectId: string;
+  orderItemId: string;
+  subItemId: string;
+  subItemName?: string;
+  quantity?: number;
+  unit?: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.put(
+    `/orderingmaterial/${projectId}/history/updatesubitem/${orderItemId}/${subItemId}`,
+    { subItemName, quantity, unit }
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+// ✅ Delete SubItem from Specific Historical Order
+const deleteOrderingMaterialHistorySubItemApi = async ({
+  projectId,
+  orderItemId,
+  subItemId,
+  api,
+}: {
+  projectId: string;
+  orderItemId: string;
+  subItemId: string;
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.delete(
+    `/orderingmaterial/${projectId}/history/deletesubitem/${orderItemId}/${subItemId}`
+  );
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
+
+
+// 🔹 Hook: Add SubItem
+export const useAddOrderingMaterialHistorySubItem = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+  const allowedRoles = ["owner", "staff", "CTO"];
+
+
+  return useMutation({
+    mutationFn: async (vars: {
+      projectId: string;
+      orderItemId: string;
+      subItemName: string;
+      quantity: number;
+      unit: string;
+      index: number;
+    }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+      if (!api) throw new Error("API instance missing");
+      return await addOrderingMaterialHistorySubItemApi({ ...vars, api });
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+      queryClient.invalidateQueries({ queryKey: ["inventory", vars.projectId], refetchType: 'active' });
+    },
+  });
+};
+
+// 🔹 Hook: Update SubItem
+export const useUpdateOrderingMaterialHistorySubItem = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+  const allowedRoles = ["owner", "staff", "CTO"];
+
+
+  return useMutation({
+    mutationFn: async (vars: {
+      projectId: string;
+      orderItemId: string;
+      subItemId: string;
+      subItemName?: string;
+      quantity?: number;
+      unit?: string;
+    }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+      if (!api) throw new Error("API instance missing");
+      return await updateOrderingMaterialHistorySubItemApi({ ...vars, api });
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+      queryClient.invalidateQueries({ queryKey: ["inventory", vars.projectId], refetchType: 'active' });
+    },
+  });
+};
+
+// 🔹 Hook: Delete SubItem
+export const useDeleteOrderingMaterialHistorySubItem = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+  const allowedRoles = ["owner", "staff", "CTO"];
+
+
+  return useMutation({
+    mutationFn: async (vars: {
+      projectId: string;
+      orderItemId: string;
+      subItemId: string;
+    }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+      if (!api) throw new Error("API instance missing");
+      return await deleteOrderingMaterialHistorySubItemApi({ ...vars, api });
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", vars.projectId] });
+      queryClient.invalidateQueries({ queryKey: ["inventory", vars.projectId], refetchType: 'active' });
+    },
+  });
+};

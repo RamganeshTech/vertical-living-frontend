@@ -213,11 +213,11 @@ const deleteProcurementPdf = async (
 };
 
 
-// const syncLogisticsDept = async ( id: string, api: AxiosInstance)=>{
-//   const { data } = await api.post(`/department/procurement/synclogistics/${id}`);
-//   if (!data.ok) throw new Error(data.message);
-//   return data.data;
-// }
+const syncLogisticsDept = async ( id: string, api: AxiosInstance)=>{
+  const { data } = await api.post(`/department/procurement/synclogistics/${id}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+}
 
 
 // const synAccountsFromProcurement = async ({
@@ -580,22 +580,22 @@ export const useDeleteProcurementPdf = () => {
 
 
 
-// export const useSyncLogistics = ()=>{
-//     const { role } = useGetRole();
-//   const api = getApiForRole(role!);
+export const useSyncLogistics = ()=>{
+    const { role } = useGetRole();
+  const api = getApiForRole(role!);
 
-//   return useMutation({
-//     mutationFn: async ({ id, }: {id:string,}) => {
-//       if (!role || !allowedRoles.includes(role)) throw new Error("Youre not allowed to delete pdf");
-//       if (!api) throw new Error("API instance not available");
-//       return await syncLogisticsDept(id, api);
-//     },
-//      onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
-//       queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] });
-//     },
-//   });
-// }
+  return useMutation({
+    mutationFn: async ({ id, }: {id:string,}) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Youre not allowed to delete pdf");
+      if (!api) throw new Error("API instance not available");
+      return await syncLogisticsDept(id, api);
+    },
+     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["procurement", "details"] });
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] });
+    },
+  });
+}
 
 
 

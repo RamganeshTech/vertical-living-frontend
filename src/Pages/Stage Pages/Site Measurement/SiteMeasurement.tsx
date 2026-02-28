@@ -27,7 +27,7 @@ import CommonSiteForm from './CommonSiteForm';
 import { ResetStageButton } from '../../../shared/ResetStageButton';
 import MaterialOverviewLoading from '../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading';
 import AssignStageStaff from '../../../shared/AssignStaff';
-import ShareDocumentWhatsapp from '../../../shared/ShareDocumentWhatsapp';
+// import ShareDocumentWhatsapp from '../../../shared/ShareDocumentWhatsapp';
 import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 import StageGuide from '../../../shared/StageGuide';
 
@@ -201,12 +201,12 @@ function HomeInteriorProject() {
             className="sm:!max-w-[20%] w-full"
           />}
 
-          {!getAllError && <ShareDocumentWhatsapp
+          {/* {!getAllError && <ShareDocumentWhatsapp
             projectId={projectId}
             stageNumber="2"
             className="w-full sm:w-fit"
             isStageCompleted={measurementData?.status}
-          />}
+          />} */}
 
           <AssignStageStaff
             stageName="SiteMeasurementModel"

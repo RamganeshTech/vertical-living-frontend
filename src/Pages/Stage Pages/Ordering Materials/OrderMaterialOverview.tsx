@@ -7,25 +7,29 @@ import { Card, CardContent } from "../../../components/ui/Card";
 import StageTimerInfo from "../../../shared/StagetimerInfo";
 import { ResetStageButton } from "../../../shared/ResetStageButton";
 import AssignStageStaff from "../../../shared/AssignStaff";
-import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
+// import ShareDocumentWhatsapp from "../../../shared/ShareDocumentWhatsapp";
 // import { useCompleteOrderingMaterialStage, useGetAllOrderingMaterial, useSetOrderingMaterialDeadline } from "../../../apiList/Stage Api/orderingMaterialApi";
 import MaterialOverviewLoading from "../MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 // import { useGetSelectedModularUnits } from "../../../apiList/Modular Unit Api/Selected Modular Api/selectedModularUnitApi";
 // import { NO_IMAGE } from "../../../constants/constants";
-import { useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialImage, useGetAllOrderingMaterialHistory, useOrderHistoryGneratePdf, 
+import {
+    useAddOrderingMaterialSubItem, useCompleteOrderingMaterialHistoryStage, useDeleteAllSubItems, useDeleteOrderingMaterialSubItem, useDeleteOrderMaterialImage, useGetAllOrderingMaterialHistory, useOrderHistoryGneratePdf,
     // useOrderHistorySendToProcurement, useOrderHistorySendToProcurementNewVersion,
-     useOrderHistorySubmitOrder, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdateShopDetails, useUploadOrderingMaterialImages } from "../../../apiList/Stage Api/orderMaterialHistoryApi";
+    useOrderHistorySubmitOrder, useSetOrderingMaterialHistoryDeadline, useUpdateDeliveryLocation, useUpdateOrderingMaterialSubItem, useUpdateShopDetails, useUploadOrderingMaterialImages
+} from "../../../apiList/Stage Api/orderMaterialHistoryApi";
 // import GenerateWhatsappLink from "../../../shared/GenerateWhatsappLink";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../components/ui/Select";
 import { Input } from "../../../components/ui/Input";
 import { downloadImage } from "../../../utils/downloadFile";
-import { useGetShopLib } from "../../../apiList/Stage Api/shopLibDetailApi";
+// import { useGetShopLib } from "../../../apiList/Stage Api/shopLibDetailApi";
 import SearchSelectNew from "../../../components/ui/SearchSelectNew";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
 import { ProcurementPriorityDropdown } from "./ProcurementPriorityDropdown";
+import { useGetVendorForDropDown } from "../../../apiList/Department Api/Accounting Api/vendorAccApi";
+import { dateFormate, formatTime } from "../../../utils/dateFormator";
 // import { dateFormate, formatTime } from "../../../utils/dateFormator";
 
 
@@ -100,7 +104,8 @@ const OrderMaterialOverview = () => {
     const { mutateAsync: updateDelivery } = useUpdateDeliveryLocation();
     const { mutateAsync: updateShop } = useUpdateShopDetails();
 
-    const { data: shops } = useGetShopLib(organizationId);
+    // const { data: shops } = useGetShopLib(organizationId);
+    const { data: vendors } = useGetVendorForDropDown(organizationId);
 
     const { mutateAsync: deleteAllSubItems, isPending: deleteAllPending } = useDeleteAllSubItems();
     // const { mutateAsync: deletePdf, isPending: deletePdfLoading } = useDeleteOrderMaterialPdf();
@@ -124,20 +129,48 @@ const OrderMaterialOverview = () => {
 
 
 
+    // useEffect(() => {
+    //     if (selectedShop.selectedId) {
+    //         const shop = shops?.find((shop: any) => shop._id === selectedShop.selectedId)
+    //         console.log("shop", shop)
+    //         if (shop) {
+    //             setShopForm(shop)
+    //         }
+    //     }
+    // }, [selectedShop.selectedId, shops])
+
+    // const shopLibOptions = (shops || [])?.map((shop: any) => ({
+    //     value: shop._id,
+    //     label: shop.shopName
+    // }))
+
+
+    // Inside your useEffect to update the form
     useEffect(() => {
-        if (selectedShop.selectedId) {
-            const shop = shops?.find((shop: any) => shop._id === selectedShop.selectedId)
-            console.log("shop", shop)
-            if (shop) {
-                setShopForm(shop)
+        if (selectedShop.selectedId && vendors.length > 0) {
+            const vendor = vendors.find((v: any) => v._id === selectedShop.selectedId);
+            if (vendor) {
+                setShopForm({
+                    shopName: vendor?.shopName,
+                    address: vendor?.address,
+                    contactPerson: vendor?.vendorName,
+                    phoneNumber: vendor?.phoneNo, // Matches 'phoneNo' from your backend map
+                    priority: vendor?.priority || []
+                });
             }
         }
-    }, [selectedShop.selectedId, shops])
+    }, [selectedShop.selectedId, vendors]);
 
-    const shopLibOptions = (shops || [])?.map((shop: any) => ({
-        value: shop._id,
-        label: shop.shopName
-    }))
+
+    // 2. Map the data specifically for SearchSelectNew options
+    const shopLibOptions = useMemo(() => {
+        return vendors?.map((vendor: any) => ({
+            value: vendor._id,
+            // Match the 'shopName' key you defined in your backend 'modifiedvendor'
+            label: vendor.shopName || vendor.vendorName,
+            subLabel: vendor.contactPerson
+        }));
+    }, [vendors]);
 
 
     // const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
@@ -513,12 +546,12 @@ const OrderMaterialOverview = () => {
                                 />
 
 
-                                {!getAllError && <ShareDocumentWhatsapp
+                                {/* {!getAllError && <ShareDocumentWhatsapp
                                     projectId={projectId!}
                                     stageNumber="8"
                                     className="w-full sm:w-fit"
                                     isStageCompleted={data?.status}
-                                />}
+                                />} */}
 
                                 <AssignStageStaff
                                     stageName="OrderMaterialHistoryModel"
@@ -603,6 +636,8 @@ const OrderMaterialOverview = () => {
                                                 </h2>
                                             </div>
 
+
+
                                             {!editShop ? <div className="gap-2 flex">
 
                                                 <Button onClick={() => navigate("shoplib")}>
@@ -621,18 +656,30 @@ const OrderMaterialOverview = () => {
                                             </div>
                                                 :
 
-                                                <div>
+                                                <div className="w-[60%] animate-in fade-in duration-300 mb-2">
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
                                                     <SearchSelectNew
                                                         options={shopLibOptions}
                                                         placeholder="Select Shop"
                                                         searchPlaceholder="Search by shop name..."
                                                         value={selectedShop.selectedId || ''}
+                                                        // onValueChange={(value) => {
+                                                        //     const shopFound = shops?.find((s: any) => s._id === value)
+                                                        //     // console.log("sop", shopFound)
+                                                        //     setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
+                                                        // }}
+
                                                         onValueChange={(value) => {
-                                                            const shopFound = shops?.find((s: any) => s._id === value)
-                                                            // console.log("sop", shopFound)
-                                                            setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
+                                                            // Search in the 'vendors' local variable we created above
+                                                            const vendorFound = vendors.find((v: any) => v._id === value);
+                                                            if (vendorFound) {
+                                                                setSelectedShop({
+                                                                    selectedId: vendorFound._id,
+                                                                    shopName: vendorFound.shopName
+                                                                });
+                                                            }
                                                         }}
+
                                                         searchBy="name"
                                                         displayFormat="detailed"
                                                         className="w-full"
@@ -1647,7 +1694,7 @@ const OrderMaterialOverview = () => {
                         <section>
 
 
-                            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                            <div className="flex flex-col px-6 sm:flex-row gap-4 items-start sm:items-center justify-between">
                                 <div className="flex-1">
                                     <h3 className="text-lg font-semibold text-gray-900 mb-1">
                                         Orders
@@ -1676,7 +1723,7 @@ const OrderMaterialOverview = () => {
 
                                     {data?.orderedItems?.sort((a: any, b: any) => new Date(b?.createdAt).getTime() - new Date(a.createdAt).getTime()).map((ele: any) => (
                                         <Card key={ele._id}
-                            
+
                                             className="border-green-200  !relative bg-green-50 shadow  border-0 rounded-2xl ">
                                             <CardContent className="p-6 ">
                                                 <div className="flex flex-col sm:flex-row items-start  sm:items-center gap-4">
@@ -1689,7 +1736,14 @@ const OrderMaterialOverview = () => {
                                                                 <span className="!text-sm text-gray-600">Order Id: </span> {ele.orderMaterialNumber}
                                                             </h4>
                                                             {/* <span className="text-sm text-gray-500">Created At:</span> <span>{dateFormate(ele.createdAt)} - {formatTime(ele.createdAt)}</span> */}
-                                                            <span className="text-sm text-gray-900">Order Material</span>
+                                                            {/* <span className="text-sm text-gray-900">Order Material</span> */}
+
+                                                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-md border border-blue-200 w-fit">
+                                                                <i className="far fa-calendar-alt text-[10px] text-blue-500"></i>
+                                                                <span className="text-[11px] font-bold text-blue-600 uppercase tracking-tight">
+                                                                    {dateFormate(ele.createdAt)} • {formatTime(ele.createdAt)}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
 
