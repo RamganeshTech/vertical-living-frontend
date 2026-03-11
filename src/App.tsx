@@ -8,7 +8,13 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
-import RateConfigDescription from './Pages/Quote Pages/RateConfig Pages/RateConfigDescription';
+const AccountingRecordMain= lazy(()=> import('./Pages/Department Pages/AccountingRecords/AccountingRecordMain')) ;
+const AccountingRecordSingle= lazy(()=> import('./Pages/Department Pages/AccountingRecords/AccountingRecordSingle')) ;
+const RateConfigDescription = lazy(()=> import('./Pages/Quote Pages/RateConfig Pages/RateConfigDescription'));
+const PublicCostCalculationMain = lazy(()=> import('./Pages/PublicCostCalculation_Pages/PublicCostCalculationMain'));
+const PublicCostCalculationSingle = lazy(()=> import('./Pages/PublicCostCalculation_Pages/PublicCostCalculationSingle'));
+const PublicLeadCollectionMain = lazy(()=> import('./Pages/PublicLeadCollection_pages/PublicLeadCollectionMain'));
+const PublicLeadCollectionSingle = lazy(()=> import('./Pages/PublicLeadCollection_pages/PublicLeadCollectionSingle'));
 const LogisticsPublicSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsPublicSingle'));
 const PublicPaymentTransactionMain = lazy(() => import('./Pages/publicPaymentTransaction/PublicPaymentTransactionMain'));
 const ShopMaterialDocumentMain = lazy(() => import('./Pages/ShopMaterialDocument_Pages/ShopMaterialDocumentMain'));
@@ -130,7 +136,7 @@ const LogisticsSingle = lazy(() => import('./Pages/Department Pages/Logistics Pa
 const ProcurementSub = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/ProcurementSub'));
 const ProcurementNewMain = lazy(() => import('./Pages/Department Pages/ProcurementNew Pages/ProcurementNewMain'));
 const AccountingMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/AccountingMain'));
-const AccountingSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/AccountingSingle'));
+// const AccountingSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/AccountingSingle'));
 // import LogisticsVehicle from './Pages/Department Pages/Logistics Pages/LogisticsVehicle';
 const InventoryMain = lazy(() => import('./Pages/Stage Pages/Inventory Main/InventoryMain'));
 // const ExternalMain = lazy(() => import('./Pages/External Units/ExternalMain'));
@@ -616,7 +622,7 @@ function App() {
 
             <Route path="accounting" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               // requiredDepartment={"accounts" || "billing"}
-              requiredDepartment={["accounts", "billing", "payments", "vendor", "customer", "invoice",
+              requiredDepartment={["accounts", "records", "billing", "payments", "vendor", "customer", "invoice",
                 "expense", "billtemplate", "purchaseorder",
                 "vendorpayment", "salesorder", "retailinvoice",]}
               // ⭐ Allow entry if they can do ANY of these things
@@ -625,12 +631,32 @@ function App() {
               <AccountingMain />
             </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              {/* <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
                 requiredDepartment="accounts"
                 // ⭐ Allow entry if they can do ANY of these things
                 requiredAction={["list"]}
               >
                 <AccountingSingle />
+              </ProtectedRoutes>} /> */}
+
+
+            </Route>
+
+            <Route path="accountingrecords" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              // requiredDepartment={"accounts" || "billing"}
+              requiredDepartment="records"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
+              <AccountingRecordMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="records"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["list"]}
+              >
+                <AccountingRecordSingle />
               </ProtectedRoutes>} />
 
 
@@ -1128,6 +1154,44 @@ function App() {
             </Route>
 
 
+            <Route path="publiccostcalculation" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="leadmodule"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <PublicCostCalculationMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="leadmodule"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <PublicCostCalculationSingle />
+              </ProtectedRoutes>} />
+
+            </Route>
+
+
+            <Route path="publicleadcollection" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="leadmodule"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <PublicLeadCollectionMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="leadmodule"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <PublicLeadCollectionSingle />
+              </ProtectedRoutes>} />
+
+            </Route>
+
+
             <Route path="rateconfigpresales" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="presalesmaterialrateconfig"
               // ⭐ Allow entry if they can do ANY of these things
@@ -1144,13 +1208,13 @@ function App() {
                 <RateConfigPreSalesSub />
               </ProtectedRoutes>} >
 
-              <Route path="description" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
-                requiredDepartment="materialrateconfig"
-                // ⭐ Allow entry if they can do ANY of these things
-                requiredAction={['list', 'edit', "create", "delete"]}
-              >
-                <RateConfigDescription />
-              </ProtectedRoutes>} />
+                <Route path="description" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="materialrateconfig"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'edit', "create", "delete"]}
+                >
+                  <RateConfigDescription />
+                </ProtectedRoutes>} />
 
               </Route>
 

@@ -16,6 +16,7 @@ import InfoTooltip from '../../../../components/ui/InfoToolTip';
 import { useGetProjects } from '../../../../apiList/projectApi';
 import type { AvailableProjetType } from '../../Logistics Pages/LogisticsShipmentForm';
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+import { Badge } from '../../../../components/ui/Badge';
 
 // Internal Form State (Images are strictly NEW FILES)
 export interface BillFormData {
@@ -35,6 +36,8 @@ export interface BillFormData {
     advancedAmount: number,
     notes: string;
     images: File[]; // Only for new uploads
+    paymentProof: File[]; // Only for new uploads
+    settlementSource: string | null
 }
 
 interface BillAccountFormProps {
@@ -42,19 +45,36 @@ interface BillAccountFormProps {
     initialData?: any;
     organizationId: string;
     isSubmitting: boolean;
+    // isUploadingPaymentProof?: boolean;
     // Parent handles how to send data. 
     // We pass: 1. The Text Payload, 2. The New Files
-    onSubmit: (data: Omit<CreateBillPayload, 'images'>, newFiles: File[]) => Promise<void>;
+    onSubmit: (data: Omit<CreateBillPayload, 'images'>, newFiles: File[], paymentProofFiles: File[]) => Promise<void>;
     refetch?: any
     onQuickUpload?: (files: File[]) => Promise<void>;
+    // onQuickPaymentProofUpload?: (files: File[]) => Promise<void>;
 }
+
+
+export const getSourceStatusLabel = (status?: string) => {
+        if (!status) return "";
+
+        const map: Record<string, string> = {
+            CREATED_WITHOUT_ORDER_MATERIAL: "Created Without Material Order",
+            CREATED_FROM_ORDER_MATERIAL: "Created From Ordered Material"
+        };
+
+        return map[status] || status.split("_").join(" ");
+    };
+
 
 const BillAccountForm: React.FC<BillAccountFormProps> = ({
     mode: initialMode,
     initialData,
     onSubmit,
     onQuickUpload,
+    // onQuickPaymentProofUpload,
     isSubmitting,
+    // isUploadingPaymentProof,
     organizationId,
     refetch
 }) => {
@@ -62,6 +82,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
     const [currentMode, setCurrentMode] = useState<'create' | 'view' | 'edit'>(initialMode);
     const { data: VendorData } = useGetVendorForDropDown(organizationId);
     const deleteImgMutation = useDeleteBillImage()
+    // const deletePaymentProofMutation = useDeleteBillPaymentProof()
 
 
 
@@ -95,6 +116,22 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
         }
     }
 
+    // const handlePaymentProofDelete = async (imageId: string) => {
+    //     try {
+    //         await deletePaymentProofMutation.mutateAsync({
+    //             billId: initialData._id!,
+    //             imageId,
+    //         })
+
+    //         // console.log("upladsImages", uploadedImages)
+    //         refetch?.()
+    //         toast({ title: "Success", description: "deleted successfully" })
+
+    //     } catch (error: any) {
+    //         toast({ title: "Error", description: error?.response?.data?.message || "failed to delete", variant: "destructive" })
+    //     }
+    // }
+
     // --- STATE ---
     const defaultFormData: BillFormData = {
         vendorId: null,
@@ -112,7 +149,9 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
         advancedAmount: 0,
         notes: '',
         paymentType: "cash on carry",
-        images: [] // Strictly for NEW files
+        settlementSource: null,
+        images: [], // Strictly for NEW files
+        paymentProof: [], // Strictly for NEW files
     };
 
     const [formData, setFormData] = useState<BillFormData>(defaultFormData);
@@ -148,7 +187,9 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 paymentType: initialData?.paymentType || "",
                 advancedAmount: initialData?.advancedAmount || 0,
                 notes: initialData?.notes || '',
-                images: [] // Always start empty. We do NOT load existing images here.
+                settlementSource: initialData.settlementSource || null,
+                images: [], // Always start empty. We do NOT load existing images here.
+                paymentProof: [], // Always start empty. We do NOT load existing images here.
             });
 
             // if (initialMode === "view") setEnableVendorInput(true);
@@ -179,10 +220,14 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 notes: initialData?.notes || '',
                 paymentType: initialData?.paymentType || "",
                 advancedAmount: initialData?.advancedAmount || 0,
-                images: [] // Always start empty. We do NOT load existing images here.
+                settlementSource: initialData?.settlementSource || null,
+
+                images: [], // Always start empty. We do NOT load existing images here.
+                paymentProof: [] // Always start empty. We do NOT load existing images here.
             });
         }
     }, [currentMode])
+
 
     // --- CALCULATIONS ---
     useEffect(() => {
@@ -190,6 +235,8 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
         const discountAmount = (totalAmount * formData.discountPercentage) / 100;
         const amountAfterDiscount = totalAmount - discountAmount;
         const taxAmount = (amountAfterDiscount * formData.taxPercentage) / 100;
+        // const advancedAmount = formData.advancedAmount
+
         const grandTotal = amountAfterDiscount + taxAmount;
 
         setCalculatedTotals({ totalAmount, discountAmount, taxAmount, grandTotal });
@@ -267,6 +314,30 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
         }
     };
 
+
+    
+
+
+    // --- FILE HANDLERS (NEW FILES ONLY) ---
+    // const handleFilePaymentProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     if (e.target.files) {
+    //         setFormData(p => ({ ...p, paymentProof: [...p.paymentProof, ...Array.from(e.target.files || [])] }));
+    //     }
+    // };
+
+    // const removePaymentProofFile = (index: number) => {
+    //     setFormData(prev => ({ ...prev, paymentProof: prev.paymentProof.filter((_, i) => i !== index) }));
+    // };
+
+
+    // // --- QUICK UPLOAD (View Mode) ---
+    // const handleQuickUploadPaymentProofClick = async () => {
+    //     if (formData.paymentProof.length > 0 && onQuickPaymentProofUpload) {
+    //         await onQuickPaymentProofUpload(formData.paymentProof);
+    //         setFormData(p => ({ ...p, images: [] })); // Clear after upload
+    //     }
+    // };
+
     // --- SUBMIT ---
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -277,6 +348,21 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 return;
             }
         }
+
+        // // 2. NEW Validation: Mandatory Payment Proof for Staff Payments
+        // if (formData.settlementSource === "STAFF_OUT_OF_POCKET") {
+        //     const hasExistingProof = initialData?.paymentProof && initialData?.paymentProof.length > 0;
+        //     const hasNewProof = formData.paymentProof && formData.paymentProof.length > 0;
+
+        //     if (!hasExistingProof && !hasNewProof) {
+        //         toast({
+        //             title: "Payment Proof Required",
+        //             description: "Since this was paid by staff, you must upload a receipt or payment proof images.",
+        //             variant: "destructive"
+        //         });
+        //         return;
+        //     }
+        // }
 
 
         const cleanedItems = formData.items.filter(item => item.itemName.trim() !== '');
@@ -293,7 +379,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
         };
 
         // Pass payload (text) and newFiles (images) separately
-        await onSubmit(payload, formData.images);
+        await onSubmit(payload, formData.images, formData?.paymentProof || []);
         if (currentMode === "edit") {
             setCurrentMode("view")
         }
@@ -349,9 +435,15 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         <i className="fas fa-arrow-left"></i>
                     </button>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                             <i className="fas fa-receipt mr-3 text-blue-600"></i>
                             {isCreateMode ? 'Create Bill' : isEditMode ? 'Update Bill' : 'View Bill'}
+
+                            {initialData?.sourceStatus && (
+                                <Badge variant="success">
+                                    {getSourceStatusLabel(initialData.sourceStatus)}
+                                </Badge>
+                            )}
                         </h1>
                         <p className="text-gray-600 mt-1">
                             {isCreateMode ? 'Fill in details' : isEditMode ? 'Update details' : 'Bill details'}
@@ -378,13 +470,13 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         />
                     </div>} */}
 
-                    {(isReadOnly && (canEdit || canCreate) ) && <div className="flex items-center space-y-1">
+                    {(isReadOnly && (canEdit || canCreate)) && <div className="flex items-center space-y-1">
                         <Button
                             variant="primary"
                             className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}
                             title={initialData?.isSyncWithPaymentsSection ? "already sent to payment" : ""}
                             isLoading={syncPaymentsLoading}
-                            disabled={initialData?.isSyncWithPaymentsSection}
+                            // disabled={initialData?.isSyncWithPaymentsSection}
                             onClick={handleSyncToPayments}
                         >
                             Send To Payments Section
@@ -490,6 +582,31 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                             </select>
                         </div>
 
+                        {/* <div className="flex items-center gap-2 px-1">
+                            <input
+                                type="checkbox"
+                                id="staffPaid"
+                                name="settlementSource"
+                                disabled={isReadOnly}
+                                checked={formData.settlementSource === "STAFF_OUT_OF_POCKET"}
+                                onChange={(e) => {
+                                    const value = e.target.checked ? "STAFF_OUT_OF_POCKET" : "DIRECT_COMPANY_PAY";
+                                    // Manually trigger change for settlementSource
+                                    setFormData(prev => ({ ...prev, settlementSource: value }));
+                                }}
+                                className=" text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed"
+                            />
+                            <label htmlFor="staffPaid" className="text-md font-medium text-gray-600 cursor-pointer select-none">
+                                Paid personally by staff
+                            </label>
+
+                            {formData.settlementSource === "STAFF_OUT_OF_POCKET" && (
+                                <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold animate-pulse">
+                                    STAFF PAID
+                                </span>
+                            )}
+                        </div> */}
+
                         <div>
                             <Label>Payment Type</Label>
                             <select
@@ -511,6 +628,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                             <input
                                 type="number"
                                 name="advancedAmount"
+                                title={formData.paymentType !== "pay advanced, balance later" ? "select pay advanced, balance later option in payment type to enable it" : ""}
                                 value={formData.advancedAmount}
                                 onChange={(e) => {
                                     if (Number(e.target.value) < 0) return
@@ -586,8 +704,8 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
 
                                     <div className="col-span-2 ">
                                         <input type="number"
-                                            value={item.rate}
-                                            onChange={e => handleItemChange(index, 'rate', e.target.value)}
+                                            value={item.rate || ""}
+                                            onChange={e => handleItemChange(index, 'rate', Math.max(0, Number(e.target.value)))}
                                             disabled={isReadOnly}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-100"
                                         /></div>
@@ -707,9 +825,44 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 {/* --- DISPLAY EXISTING DOCUMENTS (From InitialData ONLY) --- */}
                 {isReadOnly && initialData && initialData.images && initialData.images.length > 0 && (
                     <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                        <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center">
-                            <i className="fas fa-folder-open mr-2 text-blue-500"></i> Existing Documents
-                        </h3>
+
+                        <div className="flex justify-between items-center mb-4 border-b pb-2">
+                            <h3 className="text-lg font-semibold flex items-center">
+                                <i className="fas fa-folder-open mr-2 text-blue-500"></i> Existing Documents
+                            </h3>
+
+                            {/* ACTION GROUP: Upload Controls on the Right */}
+                            <div className="flex items-center gap-2">
+                                {/* 1. The Select Button (Icon Only or Small Text) */}
+                                <div className="relative">
+                                    <button className="text-xs cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-1.5 px-3 rounded flex items-center gap-2 border border-gray-300 transition-all">
+                                        <i className="fas fa-plus text-blue-500"></i>
+                                        {formData.images.length > 0 ? `${formData.images.length} Selected` : 'Select Files'}
+                                    </button>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*,.pdf"
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                    />
+                                </div>
+
+                                {/* 2. The Upload Button (Only shows after selection) */}
+                                {formData.images.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={handleQuickUploadClick}
+                                        disabled={isSubmitting}
+                                        className="text-xs cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow-sm transition-all flex items-center gap-2"
+                                    >
+                                        {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-cloud-upload-alt"></i>}
+                                        Upload Now
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
 
                         {/* Image Gallery */}
                         <div className="mb-6">
@@ -719,47 +872,142 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         </div>
 
 
+
                     </section>
                 )}
 
-                {/* --- NEW UPLOADS SECTION --- */}
-                {isReadOnly && <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h3 className="text-lg font-semibold mb-4 pb-2 border-b flex justify-between items-center">
-                        <span><i className="fas fa-cloud-upload-alt mr-2 text-blue-500"></i> {isCreateMode ? 'Upload Hot Copy of Bill' : 'Add Hot Copy of Bill'}</span>
-                        {isReadOnly && <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">View Mode Upload</span>}
-                    </h3>
+                {/* {isReadOnly && initialData && initialData?.paymentProof && initialData?.paymentProof.length > 0 && (
+                    <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div className="flex justify-between items-center mb-4 border-b pb-2">
+                            <h3 className="text-lg font-semibold flex items-center">
+                                <i className="fas fa-receipt mr-2 text-green-500"></i> Payment Proofs
+                            </h3>
 
-                    {/* Upload Area */}
-                    <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 bg-gray-50 flex flex-col items-center justify-center">
-                        <input type="file" multiple accept="image/*,.pdf" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
-                        <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                        <p className="text-sm text-gray-600">Click to upload files</p>
-                    </div>
-
-                    {/* Preview New Files */}
-                    {formData.images.length > 0 && (
-                        <div className="mt-4 space-y-2">
-                            {formData.images.map((file, index) => (
-                                <div key={index} className="flex items-center justify-between p-2 bg-white border rounded shadow-sm">
-                                    <div className="flex items-center gap-2">
-                                        <i className={`fas ${file.type.includes('pdf') ? 'fa-file-pdf text-red-500' : 'fa-file-image text-blue-500'}`}></i>
-                                        <span className="text-sm text-gray-700">{file.name}</span>
-                                    </div>
-                                    <button type="button" onClick={() => removeFile(index)} className="text-red-500 px-2"><i className="fas fa-times"></i></button>
+                            <div className="flex items-center gap-2">
+                                <div className="relative ">
+                                    <button className="text-xs bg-gray-100 !cursor-pointer hover:bg-gray-200 text-gray-700 font-bold py-1.5 px-3 rounded flex items-center gap-2 border border-gray-300 transition-all">
+                                        <i className="fas fa-camera text-green-500"></i>
+                                        {formData.paymentProof.length > 0 ? `${formData.paymentProof.length} Selected` : 'Select Proof'}
+                                    </button>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*,.pdf"
+                                        onChange={handleFilePaymentProofChange}
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                    />
                                 </div>
-                            ))}
 
-                            {/* Quick Upload Button (View Mode Only) */}
-                            {isReadOnly && (
-                                <div className="flex justify-end mt-2">
-                                    <Button type="button" onClick={handleQuickUploadClick} disabled={isSubmitting} className="">
-                                        {isSubmitting ? 'Uploading...' : 'Upload Files Now'}
-                                    </Button>
-                                </div>
-                            )}
+                                {formData.paymentProof.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={handleQuickUploadPaymentProofClick}
+                                        disabled={isUploadingPaymentProof}
+                                        className="text-xs cursor-pointer bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded shadow-sm transition-all flex items-center gap-2"
+                                    >
+                                        {isUploadingPaymentProof ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-check-double"></i>}
+                                        Save Proof
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                    )}
-                </section>}
+
+                        <div className="mb-6">
+                            <ImageGalleryExample
+                                handleDeleteFile={(imgId: string) => handlePaymentProofDelete(imgId)}
+                                imageFiles={initialData?.paymentProof} height={150} minWidth={150} maxWidth={200} />
+                        </div>
+
+
+                    </section>
+                )} */}
+
+
+                {/* --- NEW UPLOADS SECTION --- */}
+                {/* {isReadOnly && initialData && */}
+                {(currentMode === 'create' || currentMode === 'edit' || (currentMode === 'view' && initialData)) &&
+                    (<>
+                        {
+                            (currentMode === 'create' || currentMode === 'edit' || (currentMode === 'view' && initialData?.images?.length === 0)) &&
+                            <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                                <h3 className="text-lg font-semibold mb-4 pb-2 border-b flex justify-between items-center">
+                                    <span><i className="fas fa-cloud-upload-alt mr-2 text-blue-500"></i> {isCreateMode ? 'Upload Hot Copy of Bill' : 'Add Hot Copy of Bill'}</span>
+                                    {isReadOnly && <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">View Mode Upload</span>}
+                                </h3>
+
+                                {/* Upload Area */}
+                                <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 bg-gray-50 flex flex-col items-center justify-center">
+                                    <input type="file" multiple accept="image/*,.pdf" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+                                    <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p className="text-sm text-gray-600">Click to upload files</p>
+                                </div>
+
+                                {/* Preview New Files */}
+                                {formData.images.length > 0 && (
+                                    <div className="mt-4 space-y-2">
+                                        {formData.images.map((file, index) => (
+                                            <div key={index} className="flex items-center justify-between p-2 bg-white border rounded shadow-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <i className={`fas ${file.type.includes('pdf') ? 'fa-file-pdf text-red-500' : 'fa-file-image text-blue-500'}`}></i>
+                                                    <span className="text-sm text-gray-700">{file.name}</span>
+                                                </div>
+                                                <button type="button" onClick={() => removeFile(index)} className="text-red-500 px-2"><i className="fas fa-times"></i></button>
+                                            </div>
+                                        ))}
+
+                                        {/* Quick Upload Button (View Mode Only) */}
+                                        {isReadOnly && (
+                                            <div className="flex justify-end mt-2">
+                                                <Button type="button" onClick={handleQuickUploadClick} disabled={isSubmitting} className="">
+                                                    {isSubmitting ? 'Uploading...' : 'Upload Files Now'}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </section>
+                        }
+
+
+                        {/* {(currentMode === 'create' || currentMode === 'edit' || (currentMode === 'view' && initialData?.paymentProof?.length === 0)) &&
+                            <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                                <h3 className="text-lg font-semibold mb-4 pb-2 border-b flex justify-between items-center">
+                                    <span><i className="fas fa-cloud-upload-alt mr-2 text-blue-500"></i> {isCreateMode ? 'Upload Proof for Payment' : 'Add Proof for Payment'}</span>
+                                    {isReadOnly && <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">View Mode Upload</span>}
+                                </h3>
+
+                                <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 bg-gray-50 flex flex-col items-center justify-center">
+                                    <input type="file" multiple accept="image/*,.pdf" onChange={handleFilePaymentProofChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+                                    <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p className="text-sm text-gray-600">Click to upload files</p>
+                                </div>
+
+                                {formData?.paymentProof?.length > 0 && (
+                                    <div className="mt-4 space-y-2">
+                                        {formData.paymentProof.map((file, index) => (
+                                            <div key={index} className="flex items-center justify-between p-2 bg-white border rounded shadow-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <i className={`fas ${file.type.includes('pdf') ? 'fa-file-pdf text-red-500' : 'fa-file-image text-blue-500'}`}></i>
+                                                    <span className="text-sm text-gray-700">{file.name}</span>
+                                                </div>
+                                                <button type="button" onClick={() => removePaymentProofFile(index)} className="text-red-500 px-2"><i className="fas fa-times"></i></button>
+                                            </div>
+                                        ))}
+
+                                        {isReadOnly && (
+                                            <div className="flex justify-end mt-2">
+                                                <Button type="button" onClick={handleQuickUploadPaymentProofClick} disabled={isUploadingPaymentProof} className="">
+                                                    {isUploadingPaymentProof ? 'Uploading...' : 'Upload Proof images'}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </section>
+                        } */}
+                    </>
+                    )
+                }
 
                 {isReadOnly && initialData?.pdfData ? (
                     <>

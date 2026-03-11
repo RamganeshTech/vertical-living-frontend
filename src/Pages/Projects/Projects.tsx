@@ -203,6 +203,9 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
 
   CUTLIST: "cutlist",
 
+  LEADCOLLECTION: "leadmodule",
+  COSTCALCULATIONLEADFORM: "leadmodule",
+
   RATECONIGPRESALES: "presalesmaterialrateconfig", // Add this line!
   RATECONIG: "materialrateconfig",
   RATECONIGSTAFF: "labourratequote",
@@ -251,6 +254,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
     CUTLIST: `/organizations/${organizationId}/projects/cutlistmain`,
     // MATERIAL_SHOP_DOCS: `/organizations/${organizationId}/projects/shopmaterialdoc`,
+    LEADCOLLECTION: `/organizations/${organizationId}/projects/publicleadcollection`,
+    COSTCALCULATIONLEADFORM: `/organizations/${organizationId}/projects/publiccostcalculation`,
     RATECONIGPRESALES: `/organizations/${organizationId}/projects/rateconfigpresales`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
@@ -275,6 +280,10 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
   const allKeys = Object.keys(SIDEBAR_LABELS);
   let allowedKeys: string[] = [];
 
+  if (organizationId === "684a57015e439b678e8f6918") {
+    allowedKeys = allKeys.filter(key => key === "LEADCOLLECTION")
+  }
+
   if (lowerRole === "owner" || lowerRole === "cto") {
     // Owner/CTO: Everything EXCEPT SingleStaffTask
     allowedKeys = allKeys.filter(key => key !== "SINGLESTAFFTASK");
@@ -296,6 +305,11 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     allowedKeys = ["PROJECTS", "ORGANIZATION"];
   }
 
+
+  // If NOT the special org → remove LEADCOLLECTION
+  if (organizationId !== "684a57015e439b678e8f6918") {
+    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION");
+  }
   // =========================================================
   // 4. CONSTRUCT INITIAL SIDEBAR OBJECTS
   // =========================================================
@@ -367,6 +381,12 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
       id: "QUOTE_ENGINE",
       label: "Quote Engine",
       keys: ["WORKTEMPLATE", "PRESALESQUOTE", "INTERNALQUOTE", "QUOTEVARIENT", "QUOTES (CLIENT)"]
+    },
+    {
+      id: "LEAD_COLLECTION",
+      label: "Lead Collection",
+      keys: ["LEADCOLLECTION", "COSTCALCULATIONLEADFORM"]
+
     }
   ];
 

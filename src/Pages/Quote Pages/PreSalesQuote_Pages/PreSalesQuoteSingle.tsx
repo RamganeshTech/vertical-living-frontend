@@ -58,71 +58,91 @@ const ROOM_LIST = ["Living Room", "Kitchen", "Master Bedroom",
 
 const PRODUCT_CATALOG: Record<string, any[]> = {
     "Living Room": [
-        { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 8, w: 6 },
+        { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 6, w: 6 },
         { id: "wardrobe", label: "wardrobe", name: "Wardrobe", h: 7, w: 6 },
-        { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 7, w: 4 },
+        { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 3, w: 6 },
         { id: "bar_unit", label: "bar unit", name: "Bar Unit", h: 7, w: 3 },
-        { id: "book_shelf", label: "book shelf", name: "Book Shelf", h: 7, w: 3 },
+        { id: "book_shelf", label: "book shelf", name: "Book Shelf", h: 2.5, w: 3 },
+        { id: "study_cabin", label: "study cabin", name: "Study Cabin", h: 2.5, w: 3 },
+        { id: "dressing_unit", label: "dressing unit", name: "Dressing Unit", h: 7, w: 3 },
+        { id: "shoe_rack", label: "shoe rack", name: "Shoe Rack", h: 2, w: 2.5 },
+
+
         { id: "wallpaper", label: "wall paper", name: "Wall Paper", h: 10, w: 10 },
-        { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 5, w: 3 },
+        { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 4, w: 5 },
         { id: "sofa_panel", label: "sofa back wall panelling", name: "Sofa Back Wall Panelling", h: 4, w: 10 },
         { id: "dining_panel", label: "dining wall panelling", name: "Dining Wall Panelling", h: 8, w: 6 },
         { id: "diamond_mirror", label: "diamond mirror wall", name: "Diamond Mirror Wall", h: 8, w: 4 },
     ],
     "Master Bedroom": [
-        { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 8, w: 6 },
+        { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 6, w: 6 },
         { id: "wardrobe", label: "wardrobe", name: "Wardrobe", h: 7, w: 6 },
-        { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 7, w: 4 },
-        { id: "loft", label: "loft", name: "Loft", h: 2, w: 10 },
-        { id: "dressing", label: "dressing", name: "Dressing", h: 6, w: 2 },
-        { id: "book_shelf", label: "book shelf", name: "Book Shelf", h: 7, w: 3 },
+        { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 3, w: 6 },
+        { id: "loft", label: "loft", name: "Loft", h: 3, w: 7 },
+        // { id: "dressing", label: "dressing", name: "Dressing", h: 6, w: 2 },
+        { id: "book_shelf", label: "book shelf", name: "Book Shelf", h: 2.5, w: 3 },
+        { id: "study_cabin", label: "study cabin", name: "Study Cabin", h: 2.5, w: 3 },
+        { id: "dressing_unit", label: "dressing unit", name: "Dressing Unit", h: 7, w: 3 },
+
         { id: "bed", label: "bed", name: "Bed", h: 1.5, w: 6 },
         { id: "bed_back_fabric", label: "bed", name: "Bed Back Rest with Fabric", h: 3, w: 6 },
         { id: "wallpaper", label: "wall paper", name: "Wall Paper", h: 10, w: 10 },
         { id: "sofa_panel", label: "sofa back wall panelling", name: "Sofa Back Wall Panelling", h: 4, w: 10 },
+        { id: "shoe_rack", label: "shoe rack", name: "Shoe Rack", h: 2, w: 2.5 },
 
         { id: "dining_panel", label: "dining wall panelling", name: "Dining Wall Panelling", h: 8, w: 6 },
 
         { id: "side_table", label: "sideboard", name: "Side Table", h: 1.5, w: 1.5 },
         { id: "work_table", label: "study table", name: "Working Table", h: 2.5, w: 4 },
-        { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 5, w: 3 },
+        // { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 5, w: 3 },
         // { id: "mini_tv", label: "mini tv unit", name: "Mini TV Unit", h: 4, w: 4 },
+        { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 4, w: 5 },
+
         { id: "diamond_mirror", label: "diamond mirror wall", name: "Diamond Mirror Wall", h: 8, w: 4 },
 
         // { id: "wallpaper_bed", label: "wall paper bed", name: "Wall Paper", h: 10, w: 10 },
         // { id: "laminate_panel", label: "bed back wall laminate panelling", name: "Bed Back Wall Laminate Panelling", h: 8, w: 10 },
     ],
     "Washroom": [
-        { id: "vanity", label: "vanity unit", name: "Vanity Below Handwash Counter", h: 2, w: 3 },
+        { id: "vanity", label: "vanity storage", name: "Vanity Below Handwash Counter", h: 2, w: 3 },
         { id: "mirror_shelf", label: "mirror with shelfs behind", name: "Mirror with Shelfs Behind", h: 3, w: 2 },
         { id: "shower_partition", label: "shower glass partition", name: "Shower Glass Partition", h: 7, w: 3 },
-        { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 8, w: 6 },
+        { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 6, w: 6 },
+        { id: "dressing_unit", label: "dressing unit", name: "Dressing Unit", h: 7, w: 3 },
         { id: "wallpaper", label: "wall paper", name: "Wall Paper", h: 10, w: 10 },
-
-
-
         { id: "wardrobe", label: "wardrobe", name: "Wardrobe", h: 7, w: 6 },
-        { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 7, w: 4 },
-        { id: "loft", label: "loft", name: "Loft", h: 2, w: 8 },
+        { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 3, w: 6 },
+        { id: "shoe_rack", label: "shoe rack", name: "Shoe Rack", h: 2, w: 2.5 },
+
+        { id: "loft", label: "loft", name: "Loft", h: 3, w: 7  },
         { id: "dressing", label: "dressing", name: "Dressing", h: 6, w: 2 },
         { id: "book_shelf", label: "book shelf", name: "Book Shelf", h: 7, w: 3 },
-        { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 5, w: 3 },
+        // { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 5, w: 3 },
+        
+        { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 4, w: 5 },
     ],
+
     "Kitchen": [
-        { id: "base_cabinets", label: "kitchen", name: "Base Cabinets", h: 2.5, w: 12 },
-        { id: "wall_cabinets", label: "kitchen", name: "Wall Cabinets", h: 2, w: 12 },
-        { id: "tall_unit", label: "tall unit", name: "Tall Unit", h: 7, w: 2 },
+        { id: "base_cabinets", label: "kitchen base unit", name: "Base Cabinets", h: 2.5, w: 5 },
+        { id: "wall_cabinets", label: "kitchen wall unit", name: "Wall Cabinets", h: 2.5, w: 5 },
+        { id: "tall_cabinets", label: "kitchen tall unit", name: "Tall Cabinets", h: 7, w: 2 },
         { id: "breakfast_counter", label: "breakfast counter", name: "Breakfast Counter", h: 3, w: 5 },
-        { id: "loft", label: "loft", name: "Loft", h: 2, w: 8 },
-        { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 5, w: 3 },
+        { id: "loft", label: "loft", name: "Loft", h: 3, w: 7  },
+        { id: "study_cabin", label: "study cabin", name: "Study Cabin", h: 2.5, w: 3 },
+        { id: "dressing_unit", label: "dressing unit", name: "Dressing Unit", h: 7, w: 3 },
+
+        // { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 5, w: 3 },
         { id: "dining_panel", label: "dining wall panelling", name: "Dining Wall Panelling", h: 8, w: 6 },
+        { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 4, w: 5 },
+        { id: "shoe_rack", label: "shoe rack", name: "Shoe Rack", h: 2, w: 2.5 },
+
 
         { id: "mirror_shelf", label: "mirror with shelfs behind", name: "Mirror with Shelfs Behind", h: 3, w: 2 },
         { id: "shower_partition", label: "shower glass partition", name: "Shower Glass Partition", h: 7, w: 3 },
         { id: "wardrobe", label: "wardrobe", name: "Wardrobe", h: 7, w: 6 },
         { id: "wallpaper", label: "wall paper", name: "Wall Paper", h: 10, w: 10 },
-        { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 8, w: 6 },
-        { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 7, w: 4 },
+        { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 6, w: 6 },
+        { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 3, w: 6 },
         { id: "dressing", label: "dressing", name: "Dressing", h: 6, w: 2 },
         { id: "book_shelf", label: "book shelf", name: "Book Shelf", h: 7, w: 3 },
     ]

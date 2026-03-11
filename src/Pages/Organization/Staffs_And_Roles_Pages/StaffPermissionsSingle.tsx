@@ -19,10 +19,12 @@ const ORG_MODULES = [
     "vendor", "customer", "invoice",
     "expense", "billtemplate", "purchaseorder",
     "vendorpayment", "salesorder", "retailinvoice",
+    "records",
 
     "subcontract",
     "cutlist",
     // "materialquote",
+    "leadmodule",
     "materialrateconfig",
     "presalesmaterialrateconfig",
     "materialwithlabourratequote",
@@ -117,7 +119,6 @@ const StaffPermissionsSingle = () => {
             });
         };
         performUpdate();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedPermissions]);
 
 

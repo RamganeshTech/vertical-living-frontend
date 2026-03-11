@@ -19,6 +19,7 @@ export interface IPaymentFilters {
     startDate?: string;
     endDate?: string;
     fromSection?: string;
+    sourceStatus?: string;
 }
 
 interface PaymentResponse {
@@ -33,7 +34,16 @@ interface PaymentResponse {
     };
 }
 
-// --- API Functions ---
+
+// 3. UPLOAD payment FILES ONLY (Multipart)
+const uploadPaymentProofOnlyApi = async ({ paymentId, files, api }: { paymentId: string; files: File[]; api: AxiosInstance }) => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+
+    const { data } = await api.post(`/department/accounting/payments/section/updatepaymentproof/${paymentId}`, formData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
 
 
 // --- API Function ---
@@ -60,6 +70,26 @@ const getInfinitePaymentsApi = async ({
 };
 
 
+// --- API Function ---
+const getAllPaymentsForExportApi = async ({
+    api,
+    filters,
+}: {
+    api: AxiosInstance;
+    filters: IPaymentFilters;
+}) => {
+    // Merge filters with pagination params
+    const { data } = await api.get(`/department/accounting/payments/section/getallpayments-export`, {
+        params: {
+            ...filters,
+        }
+    });
+
+    if (!data.ok) throw new Error("Failed to fetch payments");
+    return data.data;
+};
+
+
 const getSinglePaymentApi = async ({
     api,
     id
@@ -80,16 +110,26 @@ const deletePaymentApi = async ({
     id: string;
 }) => {
     const { data } = await api.delete(`/department/accounting/payments/section/deletepayments/${id}`);
-    if (!data.success && !data.ok) throw new Error(data.message || "Failed to delete payment");
+    if (!data.ok) throw new Error(data.message || "Failed to delete payment");
     return data;
 };
 
 
-const syncPaymenttoAcc = async ({  id, api }: {  id: string; api: AxiosInstance }) => {
+const syncPaymenttoAcc = async ({ id, api }: { id: string; api: AxiosInstance }) => {
     // We send billData as JSON. 
     // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
     const { data } = await api.post(`/department/accounting/payments/section/syncpaymenttoaccounts/${id}`);
-    if (!data.success) throw new Error(data.message);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
+
+
+const verifyCashPayment = async ({ id, api, recipientName, phoneNo }: { id: string; recipientName: string, phoneNo: string, api: AxiosInstance }) => {
+    const { data } = await api.post(`/department/accounting/payments/section/verifycashpayment/${id}`, { recipientName, phoneNo });
+
+    if (!data.ok) throw new Error(data.message);
     return data.data;
 };
 
@@ -126,6 +166,29 @@ export const useInfinitePayments = (filters: IPaymentFilters = {}) => {
         enabled: !!role && !!api,
     });
 };
+
+
+
+export const useAllPaymentsForExport = (filters: IPaymentFilters = {}, enable:boolean=false) => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useQuery({
+        // Key includes filters, so if filters change, the list resets and refetches
+        queryKey: ["accounting", "payments", "export", filters],
+
+        queryFn: async () => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+            if (!api) throw new Error("API instance not found");
+
+            return await getAllPaymentsForExportApi({ api, filters });
+        },
+        enabled: !!role && !!api && enable,
+    });
+};
+
+
 
 /**
  * Hook to get a SINGLE payment by ID
@@ -179,13 +242,52 @@ export const useSyncPaymentToAccounts = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({  id }: {  id: string }) => {
+        mutationFn: async ({ id }: { id: string }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
             if (!api) throw new Error("API instance not found for role");
             return await syncPaymenttoAcc({ id, api });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["bills"] });
+            queryClient.invalidateQueries({ queryKey: ["accounting", "payments", "all"] });
+        },
+    });
+};
+
+
+export const useUploadPaymentAccProof = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ paymentId, files }: { paymentId: string, files: File[] }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+
+            return await uploadPaymentProofOnlyApi({ paymentId, files, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["accounting", "payments", "all"] });
+        },
+    });
+};
+
+
+
+
+export const useVerifyCashPayemtnAcc = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ id, recipientName, phoneNo }: { id: string, recipientName: string, phoneNo: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await verifyCashPayment({ id, api, recipientName, phoneNo });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["accounting", "payments", "single"] });
         },
     });
 };

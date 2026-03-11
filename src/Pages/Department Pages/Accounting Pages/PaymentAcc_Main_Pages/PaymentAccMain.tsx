@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css'; // Ensure you have installed rc-slider
+import * as XLSX from 'xlsx';
 
 // --- Custom Components & Hooks ---
 import { Button } from '../../../../components/ui/Button';
@@ -16,15 +17,17 @@ import { useDebounce } from '../../../../Hooks/useDebounce';
 // --- API Hooks ---
 // import { useDeletePayment, useInfinitePayments } from './hooks/payment.hooks'; // Adjust path
 import PaymentAccList from './PaymentAccList'; // We will create this next
-import { useDeletePayment, useInfinitePayments } from '../../../../apiList/Department Api/Accounting Api/paymentAccApi';
+import { useAllPaymentsForExport, useDeletePayment, useInfinitePayments } from '../../../../apiList/Department Api/Accounting Api/paymentAccApi';
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
 import StageGuide from '../../../../shared/StageGuide';
+import { dateFormate } from '../../../../utils/dateFormator';
 
 const PaymentAccMain = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { organizationId } = useParams();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [isExporting, setIsExporting] = useState<boolean>(false);
 
     const { role, permission } = useAuthCheck();
     // const canDelete = role === "owner" || permission?.payments?.delete;
@@ -32,7 +35,7 @@ const PaymentAccMain = () => {
     // const canCreate = role === "owner" || permission?.payments?.create;
     // const canEdit = role === "owner" || permission?.payments?.create;
 
-    const showPublicTransaction  = organizationId === "684a57015e439b678e8f6918"
+    const showPublicTransaction = organizationId === "684a57015e439b678e8f6918"
 
 
     // --- Breadcrumbs ---
@@ -52,6 +55,7 @@ const PaymentAccMain = () => {
         startDate: '', // Payment Date From
         endDate: '',   // Payment Date To
         fromSection: '', // bill, expense, etc.
+        sourceStatus: '',
     });
 
     // --- Debounce Values to prevent API spam ---
@@ -77,7 +81,21 @@ const PaymentAccMain = () => {
         startDate: filters.startDate || undefined,
         endDate: filters.endDate || undefined,
         fromSection: filters.fromSection || undefined,
+        sourceStatus: filters.sourceStatus || undefined
     });
+
+
+    // 2. Call the export hook (using existing filters and organizationId)
+    const { data: exportData, isFetching: isExportLoading } = useAllPaymentsForExport({
+        organizationId: organizationId || '',
+        personName: debouncedSearch || undefined,
+        minAmount: debouncedMinAmount,
+        maxAmount: debouncedMaxAmount,
+        startDate: filters.startDate || undefined,
+        endDate: filters.endDate || undefined,
+        fromSection: filters.fromSection || undefined,
+        sourceStatus: filters.sourceStatus || undefined,
+    }, isExporting); // Hook only runs when isExporting is true
 
     const deletePaymentMutation = useDeletePayment();
 
@@ -99,6 +117,65 @@ const PaymentAccMain = () => {
         return () => container.removeEventListener('scroll', handleScroll);
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+
+    useEffect(() => {
+        // Check if data has arrived and we are in export mode
+        if (isExporting && exportData && exportData.length > 0) {
+            try {
+                // const excelData = exportData.map((p: any, idx: number) => ({
+                //     "S.No": idx + 1,
+                //     "Payment Date": p.paymentDate ? new Date(p.paymentDate).toLocaleDateString() : "N/A",
+                //     "Project Name": p.projectId?.projectName || "N/A",
+                //     "Payee Name": p.paymentPersonName || "N/A",
+                //     "Payment Number": p.paymentNumber || "N/A",
+                //     "Grand Total (₹)": p.grandTotal || 0,
+                //     "Status": p.generalStatus || "pending"
+                // }));
+
+                const excelData = exportData.map((p: any, idx: number) => ({
+                    // 1. Column Order: Defined by the order of keys in this object
+                    "S.No": idx + 1,
+                    "Date": dateFormate(p.paymentDate), // Use fallback if paymentDate is null
+                    "Payment Number": p.paymentNumber || "N/A",
+                    "Project Name": p.projectId?.projectName || "N/A",
+                    "Payee Name": p.paymentPersonName || "N/A",
+                    "Grand Total (₹)": p.grandTotal || 0,
+                    "Status": p.generalStatus || "pending"
+                }));
+
+                const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+                // OPTIONAL: Auto-size columns for a professional look
+                const colWidths = [
+                    { wch: 5 },  // S.No
+                    { wch: 12 }, // Date
+                    { wch: 15 }, // Payment Number
+                    { wch: 25 }, // Project Name
+                    { wch: 25 }, // Payee Name
+                    { wch: 15 }, // Total
+                    { wch: 10 }, // Status
+                ];
+
+                worksheet['!cols'] = colWidths;
+
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Payments Report");
+
+                XLSX.writeFile(workbook, `Payments_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+                toast({ title: "Export Complete", description: "All filtered transactions exported." });
+            } catch (e: any) {
+                console.log("error in fetching", e)
+                toast({ title: "Error", variant: "destructive", description: "Export Failed" });
+            } finally {
+                setIsExporting(false); // Reset state so it doesn't refetch on every render
+            }
+        } else if (isExporting && exportData && exportData.length === 0) {
+            toast({ title: "No Data", description: "No records found for current filters." });
+            setIsExporting(false);
+        }
+    }, [exportData, isExporting]);
+
     // --- Handlers ---
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this payment record?")) return;
@@ -117,6 +194,42 @@ const PaymentAccMain = () => {
         }
     };
 
+
+    // --- Excel Export Handler ---
+    // const handleExportExcel = () => {
+    //     if (payments.length === 0) {
+    //         return toast({ title: "No data", description: "There are no records to export", variant: "destructive" });
+    //     }
+
+    //     try {
+    //         // 2. Map the data to your specific requirements
+    //         const excelData = payments.map((p: any) => ({
+    //             "Project Name": p.projectId?.projectName || "N/A",
+    //             "Payee Name": p.paymentPersonName || "N/A",
+    //             "Payment Number": p.paymentNumber || "N/A",
+    //             "Payment Date": p.paymentDate ? new Date(p.paymentDate).toLocaleDateString() : "N/A",
+    //             "Grand Total (₹)": p.grandTotal || 0,
+    //             "Status": p.generalStatus || "pending"
+    //         }));
+
+    //         // 3. Create the Worksheet
+    //         const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+    //         // 4. Create the Workbook
+    //         const workbook = XLSX.utils.book_new();
+    //         XLSX.utils.book_append_sheet(workbook, worksheet, "Payments Report");
+
+    //         // 5. Generate and Download
+    //         const fileName = `Payments_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+    //         XLSX.writeFile(workbook, fileName);
+
+    //         toast({ title: "Export Successful", description: "Excel file has been generated." });
+    //     } catch (error) {
+    //         console.error("Export Error:", error);
+    //         toast({ title: "Export Failed", variant: "destructive", description: "failed to export the transactions" });
+    //     }
+    // };
+
     const handleView = (id: string) => {
         navigate(`single/${id}`);
     };
@@ -128,7 +241,8 @@ const PaymentAccMain = () => {
             maxAmount: 10000000,
             startDate: '',
             endDate: '',
-            fromSection: ''
+            fromSection: '',
+            sourceStatus: ""
         });
     };
 
@@ -163,7 +277,30 @@ const PaymentAccMain = () => {
                 </Button> */}
 
                 <div className="w-full sm:w-auto !flex gap-3 justify-between sm:block">
-                   {showPublicTransaction && <Button onClick={()=> navigate('publicpayment')}>
+
+                    {/* ADDED EXCEL BUTTON HERE */}
+                    {/* <Button
+                        variant="secondary"
+                        // onClick={handleExportExcel}
+                        
+                        className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                    >
+                        <i className="fas fa-file-excel mr-2"></i>
+                        Export Excel
+                    </Button> */}
+
+
+                    <Button
+                        variant="secondary"
+                        onClick={() => setIsExporting(true)} // Triggers the useQuery enabled state
+                        isLoading={isExportLoading} // Shows loading state while fetching all pages
+                        className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                    >
+                        <i className="fas fa-file-excel mr-2"></i>
+                        Export to Excel
+                    </Button>
+
+                    {showPublicTransaction && <Button onClick={() => navigate('publicpayment')}>
                         Client Payment
                     </Button>}
 
@@ -186,11 +323,11 @@ const PaymentAccMain = () => {
                     <Button onClick={() => refetch()} className="bg-red-600 text-white px-4 py-2">Retry</Button>
                 </div>
             ) : (
-                <main className="flex gap-4 h-[calc(100%-80px)]">
+                <main className="flex gap-4 h-[calc(100%-90px)]">
 
-                    <div className="xl:w-80 lg:w-72 w-64 flex-shrink-0 h-full overflow-y-auto custom-scrollbar">
-                        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100 h-full">
-                            <div className="flex items-center justify-between mb-6">
+                    <section className="xl:w-60 lg:w-66 w-64 flex-shrink-0 h-full overflow-y-auto custom-scrollbar">
+                        <div className="bg-white rounded-xl  p-5 border border-gray-100 h-full">
+                            <div className="flex items-center justify-between mb-6 ">
                                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                                     <i className="fas fa-filter mr-2 text-blue-600"></i>
                                     Filters
@@ -205,7 +342,7 @@ const PaymentAccMain = () => {
                                 )}
                             </div>
 
-                            <div className="space-y-6">
+                            <section className="space-y-6  ">
                                 {/* 1. Search */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -314,7 +451,7 @@ const PaymentAccMain = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar-alt mr-2 text-gray-400"></i>
-                                        Due Date From
+                                        From
                                     </label>
                                     <input
                                         type="date"
@@ -327,7 +464,7 @@ const PaymentAccMain = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <i className="fas fa-calendar-alt mr-2 text-gray-400"></i>
-                                        Due Date To
+                                        To
                                     </label>
                                     <input
                                         type="date"
@@ -353,9 +490,27 @@ const PaymentAccMain = () => {
                                         <option value="Expense">Expense</option>
                                     </select>
                                 </div>
-                            </div>
+
+                                {/* --- Source Status Filter --- */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <i className="fas fa-sitemap mr-2 text-gray-400"></i>
+                                        Entry Origin
+                                    </label>
+                                    <select
+                                        value={filters.sourceStatus}
+                                        onChange={(e) => setFilters(f => ({ ...f, sourceStatus: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                    >
+                                        <option value="">All Origins</option>
+                                        <option value="CREATED_WITHOUT_ORDER_MATERIAL">Manual Entry</option>
+                                        <option value="CREATED_FROM_ORDER_MATERIAL">From Order Material</option>
+                                    </select>
+                                </div>
+
+                            </section>
                         </div>
-                    </div>
+                    </section>
 
                     {canList && <> {payments.length === 0 ? (
                         <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center p-8">
@@ -375,12 +530,13 @@ const PaymentAccMain = () => {
                             className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto custom-scrollbar flex flex-col"
                         >
                             <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
-                                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 font-semibold text-gray-700 text-sm uppercase tracking-wider">
+                                <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gray-50 font-semibold text-gray-700 text-sm uppercase tracking-wider">
                                     <div className="col-span-1 text-center">#</div>
-                                    <div className="col-span-3">Payee Name</div>
-                                    <div className="col-span-2">Payment No</div>
-                                    <div className="col-span-2">Due Date</div>
-                                    <div className="col-span-2 text-right">Amount</div>
+                                    <div className="col-span-3 ">Payee Name</div>
+                                    <div className="col-span-2 ">Payment No</div>
+                                    <div className="col-span-2 ">Created Date</div>
+                                    <div className="col-span-2 text-center">Source</div>
+                                    <div className="col-span-2 text-center">Amount</div>
                                     <div className="col-span-1 text-center">Status</div>
                                     <div className="col-span-1 text-center">Action</div>
                                 </div>

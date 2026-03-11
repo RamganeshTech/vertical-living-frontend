@@ -62,9 +62,9 @@ const getAllBills = async ({
 
 
 // 1. CREATE (Multipart)
-const createBillApi = async ({ billData, files, api }: { billData: any; files: File[]; api: AxiosInstance }) => {
+const createBillApi = async ({ billData, files, paymentProofFiles, api }: { billData: any; files: File[]; api: AxiosInstance, paymentProofFiles: File[]; }) => {
     const formData = new FormData();
-    const { images, items, ...rest } = billData;
+    const { items, ...rest } = billData;
 
     // Append standard fields
     Object.entries(rest).forEach(([key, value]) => {
@@ -77,7 +77,12 @@ const createBillApi = async ({ billData, files, api }: { billData: any; files: F
         files.forEach((file) => formData.append('files', file));
     }
 
-    const { data } = await api.post(`/department/accounting/bill/createbill`, formData);
+    // Append Payment Proof Files (Category 2)
+    if (paymentProofFiles && paymentProofFiles.length > 0) {
+        paymentProofFiles.forEach((file) => formData.append('paymentProof', file));
+    }
+
+    const { data } = await api.post(`/department/accounting/bill/v1/createbill`, formData);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
@@ -119,6 +124,18 @@ const uploadImagesOnlyApi = async ({ billId, files, api }: { billId: string; fil
     return data.data;
 };
 
+
+// 3. UPLOAD payment FILES ONLY (Multipart)
+const uploadPaymentProofOnlyApi = async ({ billId, files, api }: { billId: string; files: File[]; api: AxiosInstance }) => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+
+    const { data } = await api.post(`/department/accounting/bill/upload-payment-proof/${billId}`, formData);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
 const deleteBill = async ({
     billId,
     api
@@ -142,6 +159,20 @@ const deleteBillImage = async ({
     api: AxiosInstance
 }) => {
     const { data } = await api.delete(`/department/accounting/bill/deleteimage/${billId}/${imageId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+const deleteBillPaymentProof = async ({
+    billId,
+    imageId,
+    api
+}: {
+    billId: string;
+    imageId: string;
+    api: AxiosInstance
+}) => {
+    const { data } = await api.delete(`/department/accounting/bill/deletepaymentproof/${billId}/${imageId}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
@@ -247,11 +278,11 @@ export const useCreateBill = () => {
     const api = getApiForRole(role!);
 
     return useMutation({
-        mutationFn: async ({ billData, files }: { billData: any, files: File[] }) => {
+        mutationFn: async ({ billData, files, paymentProofFiles }: { billData: any, files: File[], paymentProofFiles: File[]; }) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
             if (!api) throw new Error("API instance not found for role");
 
-            return await createBillApi({ billData, files, api });
+            return await createBillApi({ billData, files, paymentProofFiles, api });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["bills"] });
@@ -337,6 +368,29 @@ export const useUploadBillImages = () => {
 
 
 
+export const useUploadBillPaymentProof = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ billId, files }: { billId: string, files: File[] }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+
+            return await uploadPaymentProofOnlyApi({ billId, files, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bills"] });
+        },
+    });
+};
+
+
+
+
+
+
 export const useDeleteBill = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
     const { role } = useGetRole();
@@ -368,6 +422,25 @@ export const useDeleteBillImage = () => {
             if (!api) throw new Error("API instance not found for role");
 
             return await deleteBillImage({ billId, api, imageId });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bills"] });
+        },
+    });
+};
+
+
+export const useDeleteBillPaymentProof = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ billId, imageId }: { billId: string, imageId: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+
+            return await deleteBillPaymentProof({ billId, api, imageId });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["bills"] });

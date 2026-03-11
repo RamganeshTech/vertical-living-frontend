@@ -39,16 +39,18 @@ const CreateBillAcc = () => {
     const { organizationId } = useParams() as { organizationId: string }
     const createBillMutation = useCreateBill();
 
-    const handleSubmit = async (data: Omit<CreateBillPayload, 'images'>, newFiles: File[]) => {
+    const handleSubmit = async (data: Omit<CreateBillPayload, 'images'>, newFiles: File[], paymentProofFiles: File[]) => {
         try {
             const payload: Omit<CreateBillPayload, 'images'> = {
                 ...data,
                 organizationId: organizationId!,
             };
 
-            const res = await createBillMutation.mutateAsync({ billData: payload, files: newFiles });
+            const res = await createBillMutation.mutateAsync({ billData: payload, files: newFiles,
+                paymentProofFiles: paymentProofFiles // Pass the new files here
+             });
 
-            await downloadImage({ src: res.pdfData.url, alt: res.pdfData.originalName })
+            await downloadImage({ src: res?.pdfData?.url, alt: res.pdfData.originalName })
 
             toast({ title: "Success", description: "Bill created successfully" });
         } catch (error: any) {

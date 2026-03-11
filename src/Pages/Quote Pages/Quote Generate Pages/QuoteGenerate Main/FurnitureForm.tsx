@@ -674,10 +674,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../../../../components/ui/Button";
 import SearchSelectNew from "../../../../components/ui/SearchSelectNew";
-import { getItemsBycategoryNameForAllCategories, getItemsBycategoryNameForFittings } from "../../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
+// import { getItemsBycategoryNameForAllCategories, getItemsBycategoryNameForFittings } from "../../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 import useGetRole from "../../../../Hooks/useGetRole";
 import { getApiForRole } from "../../../../utils/roleCheck";
 import { useParams } from "react-router-dom";
+import { getMaterialBrand } from "../../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
 
 // Types ----------------------------------------
 export type CoreMaterialRow = {
@@ -892,73 +893,120 @@ const FurnitureForm: React.FC<Props> = ({
   const api = getApiForRole(role!);
 
 
-  const fetchFittingsBrands = async (index: number, itemName: string) => {
-    if (!itemName) return;
-    try {
+  // const fetchFittingsBrands = async (index: number, itemName: string) => {
+  //   if (!itemName) return;
+  //   try {
 
-      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
-      if (!api) throw new Error("API instance not found for role");
-
-
-      const results = await getItemsBycategoryNameForFittings({
-        api,
-        organizationId,
-        categoryName: "Accessories/Hardware",
-        itemName: itemName
-      });
+  //     if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
+  //     if (!api) throw new Error("API instance not found for role");
 
 
-      // console.log("results", results)
+  //     const results = await getItemsBycategoryNameForFittings({
+  //       api,
+  //       organizationId,
+  //       categoryName: "Accessories/Hardware",
+  //       itemName: itemName
+  //     });
 
 
-
-      //  OLD VERSION
-      // const formatted = results.map((item: any) => ({
-      //   label: item.data?.Brand,
-
-      //   value: item?._id ? String(item._id) : "",
-
-      //   rate: item.data?.Rs
-      // }));
+  //     // console.log("results", results)
 
 
 
-      //  NEW VERSION
-      const formatted = results.map((item: any) => {
-        // Extract brand and image dynamically
-        const brand = item.data?.Brand || item.data?.brand || item.data.BrandName || "Unknown";
-        const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";
+  //     //  OLD VERSION
+  //     // const formatted = results.map((item: any) => ({
+  //     //   label: item.data?.Brand,
 
-        return {
-          label: brand,
-          value: item?._id ? String(item._id) : "",
-          rate: item.data?.Rs || item.data?.rs || 0,
-          imageUrl: img // 🆕 Extracted image
-        };
-      });
+  //     //   value: item?._id ? String(item._id) : "",
 
-      // console.log("formatted", formatted)
-
-      setFittingsOptionsMap(prev => ({ ...prev, [index]: formatted }));
-    } catch (error) {
-      console.error("Error fetching fitting brands:", error);
-    }
-  };
+  //     //   rate: item.data?.Rs
+  //     // }));
 
 
-  // 🆕 New fetch function for Non-Branded (Global Search)
-  const fetchAllCategoryItems = async (index: number, itemName: string) => {
+
+  //     //  NEW VERSION
+  //     const formatted = results.map((item: any) => {
+  //       // Extract brand and image dynamically
+  //       const brand = item.data?.Brand || item.data?.brand || item.data.BrandName || "Unknown";
+  //       const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";
+
+  //       return {
+  //         label: brand,
+  //         value: item?._id ? String(item._id) : "",
+  //         rate: item.data?.Rs || item.data?.rs || 0,
+  //         imageUrl: img // 🆕 Extracted image
+  //       };
+  //     });
+
+  //     // console.log("formatted", formatted)
+
+  //     setFittingsOptionsMap(prev => ({ ...prev, [index]: formatted }));
+  //   } catch (error) {
+  //     console.error("Error fetching fitting brands:", error);
+  //   }
+  // };
+
+
+  // // 🆕 New fetch function for Non-Branded (Global Search)
+  // const fetchAllCategoryItems = async (index: number, itemName: string) => {
+  //   if (!itemName) return;
+  //   try {
+  //     if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+  //     if (!api) throw new Error("API instance not found");
+
+  //     const results = await getItemsBycategoryNameForAllCategories({
+  //       api,
+  //       organizationId,
+  //       itemName: itemName
+  //     });
+
+  //     const formatted = results.map((item: any) => {
+  //       // ✅ FIX: Prioritize Brand so you see "Hettich" instead of "hinges"
+  //       // ✅ This is just the Brand name (e.g., "Hettich")
+  //       const brandOnly =
+  //         item.data?.Brand ||
+  //         item.data?.BrandName ||
+  //         item.data?.brand ||
+  //         item.data?.brandName ||
+  //         item.data?.["Brands light name"] ||
+  //         item.data?.["Brand "] ||
+  //         item.data?.["Brands "] ||
+  //         item.data?.["BRAND NAME"] ||
+  //         'Unknown';
+
+  //       const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";
+
+
+  //       return {
+  //         // This will now result in "Hettich (Accessories/Hardware)"
+  //         label: `${brandOnly} (${item.categoryName?.trim() || 'No Cat'})`,
+  //         value: item?._id ? String(item._id) : "",
+  //         rate: item.data?.Rs || item.data?.rs || item?.data?.RS || 0,
+  //         brandOnly: brandOnly,
+  //         imageUrl: img // 🆕 Extracted image
+  //       };
+  //     });
+
+  //     setNbmOptionsMap(prev => ({ ...prev, [index]: formatted }));
+  //   } catch (error) {
+  //     console.error("Error fetching all category items:", error);
+  //   }
+  // };
+
+  const fetchAllCategoryItems_v2 = async (index: number, itemName: string) => {
     if (!itemName) return;
     try {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
       if (!api) throw new Error("API instance not found");
 
-      const results = await getItemsBycategoryNameForAllCategories({
+      const results = await getMaterialBrand({
         api,
         organizationId,
-        itemName: itemName
+        categoryName: itemName
       });
 
+
+      console.log("results", results)
       const formatted = results.map((item: any) => {
         // ✅ FIX: Prioritize Brand so you see "Hettich" instead of "hinges"
         // ✅ This is just the Brand name (e.g., "Hettich")
@@ -970,6 +1018,8 @@ const FurnitureForm: React.FC<Props> = ({
           item.data?.["Brands light name"] ||
           item.data?.["Brand "] ||
           item.data?.["Brands "] ||
+          item.data?.["BRAND NAME"] ||
+
           'Unknown';
 
         const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";
@@ -992,28 +1042,9 @@ const FurnitureForm: React.FC<Props> = ({
   };
 
 
-  //  OLD VERSION OF USE EFFECT TO GET FITTING BRAND AUTOMATICALLY
-  // useEffect(() => {
-  //   // Prime the options map with already saved data so labels show up on load
-  //   const initialMap: Record<number, any[]> = {};
-
-  //   data.fittingsAndAccessories.forEach((row, i) => {
-  //     if (row.brandId && row.brandName) {
-  //       initialMap[i] = [{
-  //         label: row.brandName,
-  //         value: String(row.brandId),
-  //         rate: row.cost // Use existing cost as fallback
-  //       }];
-  //     }
-  //   });
-
-  //   setFittingsOptionsMap(prev => ({ ...prev, ...initialMap }));
-  // }, []); // Run once on mount
-
 
 
   //  NEW VERSION OF USE EFFECT TO GET FITTING BRAND AND ALL BRANDS AUTOMATICALLY
-
   useEffect(() => {
     // 1. Setup temporary maps to build the initial state
     const initialFittingsMap: Record<number, any[]> = {};
@@ -1031,17 +1062,6 @@ const FurnitureForm: React.FC<Props> = ({
       }
     });
 
-    // 3. Prime Non-Branded Materials (🆕 Added this part)
-    // We use brandId/brandName here as well since your table row uses those fields to store selection
-    // data.nonBrandMaterials?.forEach((row, i) => {
-    //   if (row.brandId && row.brandName) {
-    //     initialNbmMap[i] = [{
-    //       label: row.brandName,
-    //       value: String(row.brandId),
-    //       rate: row.cost
-    //     }];
-    //   }
-    // });
 
     // 2. Prime Non-Branded Materials & Trigger Silent Fetch
     data.nonBrandMaterials?.forEach((row, i) => {
@@ -1058,7 +1078,8 @@ const FurnitureForm: React.FC<Props> = ({
         // ✅ Trigger fetchAllCategoryItems immediately for existing rows
         // This will overwrite initialNbmMap[i] with the "Brand (Category)" label once finished
         if (row.itemName) {
-          fetchAllCategoryItems(i, row.itemName);
+          // fetchAllCategoryItems(i, row.itemName);
+          fetchAllCategoryItems_v2(i, row.itemName);
         }
       }
     });
@@ -1723,9 +1744,10 @@ const FurnitureForm: React.FC<Props> = ({
                           // fetchFittingsBrands(i, val);
                           // 🆕 Check 'kind' to decide which function to call
                           if (kind === "fittingsAndAccessories") {
-                            fetchFittingsBrands(i, val);
+                            fetchAllCategoryItems_v2(i, val);
                           } else if (kind === "nonBrandMaterials") {
-                            fetchAllCategoryItems(i, val);
+                            // fetchAllCategoryItems(i, val);
+                            fetchAllCategoryItems_v2(i, val);
                           }
                         }, 600);
                       }}
@@ -1770,10 +1792,11 @@ const FurnitureForm: React.FC<Props> = ({
                             const currentKind = kind as string;
 
                             if (currentKind === "fittingsAndAccessories" && (!fittingsOptionsMap[i] || fittingsOptionsMap[i]?.length <= 1)) {
-                              fetchFittingsBrands(i, row.itemName);
+                              fetchAllCategoryItems_v2(i, row.itemName);
                             }
                             else if (currentKind === "nonBrandMaterials" && (!nbmOptionsMap[i] || nbmOptionsMap[i]?.length <= 1)) {
-                              fetchAllCategoryItems(i, row.itemName);
+                              // fetchAllCategoryItems(i, row.itemName);
+                              fetchAllCategoryItems_v2(i, row.itemName);
                             }
                           }}
                           // This ensures the dropdown menu itself is forced to the front

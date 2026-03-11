@@ -151,6 +151,7 @@ const InternalQuoteEntrySingle = () => {
 
 
 
+    
     // 🆕 New fetch function for Non-Branded (Global Search)
     const fetchAllCategoryItems = async (index: number, itemName: string) => {
         if (!itemName) return;
@@ -164,6 +165,9 @@ const InternalQuoteEntrySingle = () => {
                 itemName: itemName
             });
 
+
+            console.log("results", results)
+
             const formatted = results.map((item: any) => {
                 // ✅ FIX: Prioritize Brand so you see "Hettich" instead of "hinges"
                 // ✅ This is just the Brand name (e.g., "Hettich")
@@ -175,6 +179,7 @@ const InternalQuoteEntrySingle = () => {
                     item.data?.["Brands light name"] ||
                     item.data?.["Brand "] ||
                     item.data?.["Brands "] ||
+                    item.data?.["BRAND NAME "] ||
                     'Unknown';
 
                 const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";

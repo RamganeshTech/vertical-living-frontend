@@ -593,7 +593,19 @@ const PreSalesQuoteType4: React.FC<PreSalesProps> = ({
     console.log("furnitures", furnitures)
 
     // --- 3. Handlers ---
-    const handlePrint = () => window.print();
+    // const handlePrint = () => window.print();
+
+    const handlePrint = () => {
+  // 1. Add a loading state if you have one (optional)
+//   console.log("Preparing document for PDF...");
+
+  // 2. Wait for a short moment to ensure all React state updates 
+  // and images are fully rendered in the DOM
+  setTimeout(() => {
+    // 3. Trigger the browser's built-in print dialog
+    window.print();
+  }, 800); // 800ms is usually perfect for a "stable" page
+};
 
     const { mutateAsync: updateQuote, isPending: isSaving } = useUpdatePreSalesQuote4Alone();
     const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>({});

@@ -93,6 +93,7 @@ const BillAccSingle = () => {
     // Mutations
     const updateBillMutation = useUpdateBill();
     const uploadImagesMutation = useUploadBillImages();
+    // const uploadPaymentProofMutation = useUploadBillPaymentProof();
 
     // Handle Full Update (Edit Mode)
     const handleUpdate = async (data: Omit<CreateBillPayload, 'images'>) => {
@@ -133,14 +134,32 @@ const BillAccSingle = () => {
             await uploadImagesMutation.mutateAsync({ billId: id, files });
             refetch()
             toast({ title: "Success", description: "Documents uploaded successfully" });
-        } catch (error: any) {
+        } catch(error:any) {
             toast({
                 title: "Error",
-                description: "Failed to upload documents",
+                description: error?.response?.data?.message  || "Failed to upload documents",
                 variant: "destructive"
             });
         }
     };
+
+
+    // const handleQuickUploadPaymentProof = async (files: File[]) => {
+    //     if (!id) return;
+    //     try {
+    //         await uploadPaymentProofMutation.mutateAsync({ billId: id, files });
+    //         refetch()
+    //         toast({ title: "Success", description: "Documents uploaded successfully" });
+    //     } catch (error: any) {
+    //         toast({
+    //             title: "Error",
+    //             description: "Failed to upload documents",
+    //             variant: "destructive"
+    //         });
+    //     }
+    // };
+
+
 
     if (isLoading) return <MaterialOverviewLoading />;
     if (isError) return <div className="p-10 text-center text-red-500">Error: {(error as any).message}</div>;
@@ -153,8 +172,10 @@ const BillAccSingle = () => {
                 initialData={bill}
                 onSubmit={handleUpdate}
                 onQuickUpload={handleQuickUpload}
+                // onQuickPaymentProofUpload={handleQuickUploadPaymentProof}
                 refetch={refetch}
                 isSubmitting={updateBillMutation.isPending || uploadImagesMutation.isPending}
+                // isUploadingPaymentProof={uploadPaymentProofMutation.isPending}
             />
         </main>
     );

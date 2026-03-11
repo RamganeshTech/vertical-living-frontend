@@ -44,8 +44,14 @@ const CategoryMaterialGroup: React.FC<CategoryMaterialGroupProps> = ({
 
     // 1. Cleaner: Extract only digits from a string part
     const getOnlyDigits = (str: string) => {
-        const match = str.match(/\d+/);
-        return match ? parseInt(match[0], 10) : null;
+        console.log("str", str)
+        // const match = str.match(/\d+/);
+        // Regex matches digits, optional dots, and more digits (e.g., 7, 7.5, .5)
+        // const match = str.match(/(\d*\.?\d+)/);
+        const match = str.match(/(\d*\.?\d+)/);
+        console.log("match", match)
+        // return match ? parseInt(match[0], 10) : null;
+        return match ? parseFloat(match[0]) : null;
     };
 
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { dateFormate } from '../../../../utils/dateFormator'; // Adjust path if needed
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
+// import { getSourceStatusLabel } from '../Bill Pages/BillAccForm';
 // You can import the interface from your model file or use 'any' if strict typing isn't ready
 // import { IPaymentMainAcc } from '../../path/to/model'; 
 
@@ -11,6 +12,21 @@ type Props = {
     handleDelete: (id: string) => any;
     deletePending: boolean;
 };
+
+
+export const SOURCE_STATUS_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
+    CREATED_WITHOUT_ORDER_MATERIAL: {
+        label: "Manual Entry", //
+        color: "bg-amber-50 text-amber-700 border-amber-200",
+        icon: "fa-file-invoice"
+    },
+    CREATED_FROM_ORDER_MATERIAL: {
+        label: "From Order Material",
+        color: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        icon: "fa-box-open"
+    }
+};
+
 
 const PaymentAccList: React.FC<Props> = ({ payment, index, handleView, handleDelete, deletePending }) => {
 
@@ -28,7 +44,7 @@ const PaymentAccList: React.FC<Props> = ({ payment, index, handleView, handleDel
 
     return (
         <div
-            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
+            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
             onClick={() => handleView(payment._id)}
         >
             {/* 1. S.No */}
@@ -53,20 +69,36 @@ const PaymentAccList: React.FC<Props> = ({ payment, index, handleView, handleDel
             </div>
 
             {/* 3. Payment Number */}
-            <div className="col-span-2">
+            <div className="col-span-2 ">
                 <span className="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-xs font-medium tracking-wide">
                     {payment.paymentNumber || 'N/A'}
                 </span>
             </div>
 
             {/* 4. Payment Date */}
-            <div className="col-span-2 text-gray-600 text-sm flex items-center">
+            <div className="col-span-2  text-gray-600 text-sm flex items-center">
                 <i className="far fa-calendar-alt text-gray-400 mr-2"></i>
-                {dateFormate(payment?.dueDate)}
+                {dateFormate(payment?.createdAt)}
+            </div>
+
+            {/* <div className="col-span-2  text-gray-600 text-[10px] flex items-center">
+                {getSourceStatusLabel(payment?.sourceStatus)}
+            </div> */}
+
+
+            <div className="col-span-2 flex items-center justify-center ">
+                {payment?.sourceStatus ? (
+                    <div className={`px-[8px] py-1 rounded-full text-[10px] font-bold border flex items-center gap-1 uppercase tracking-tight ${SOURCE_STATUS_CONFIG[payment.sourceStatus]?.color || 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                        <i className={`fas ${SOURCE_STATUS_CONFIG[payment.sourceStatus]?.icon || 'fa-info-circle'} text-[9px]`}></i>
+                        {SOURCE_STATUS_CONFIG[payment.sourceStatus]?.label || payment.sourceStatus}
+                    </div>
+                ) : (
+                    <span className="text-gray-400 text-xs italic">Not Specified</span>
+                )}
             </div>
 
             {/* 5. Amount (Right Aligned) */}
-            <div className="col-span-2 text-right font-bold text-gray-800">
+            <div className="col-span-2 text-center font-bold text-gray-800">
                 ₹{payment.grandTotal?.toLocaleString("en-IN") || '0.00'}
             </div>
 

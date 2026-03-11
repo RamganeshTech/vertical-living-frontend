@@ -16,6 +16,7 @@ import { ProcurementPriorityDropdown } from "./ProcurementPriorityDropdown";
 import { dateFormate, formatTime } from "../../../utils/dateFormator";
 import { useState } from "react";
 import { ORDERMATERIAL_UNIT_OPTIONS } from "./OrderMaterialOverview";
+import SendToBillSection from "./SendToBillSection";
 
 
 const SingleOrderViewPage = () => {
@@ -253,6 +254,13 @@ const SingleOrderViewPage = () => {
                         >
                             Send To Procurement
                         </Button>} */}
+
+
+                        <SendToBillSection 
+                        ele={orderData}
+                                projectId={projectId}
+                                organizationId={organizationId}
+                                refetch={refetch} />
 
 
                         {(canCreate || canEdit) && (

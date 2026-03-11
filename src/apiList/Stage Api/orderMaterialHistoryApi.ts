@@ -237,6 +237,24 @@ const sendToProcruementNewVersion = async ({
 
 
 
+const sendToBillModule = async ({
+  projectId,
+  orderItemId, 
+  organizationId,
+  api,
+}: {
+  projectId: string;
+  orderItemId: string,
+  organizationId: string
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.put(`/orderingmaterial/v2/${projectId}/${orderItemId}/${organizationId}/senttobills`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+
+
 
 const updatePdfStatus = async ({
   projectId,
@@ -323,6 +341,25 @@ export const useOrderHistorySendToProcurementNewVersion = () => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await sendToProcruementNewVersion({ projectId, orderItemId, organizationId, api, priority, vendorId });
+    },
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
+    },
+  });
+};
+
+
+
+export const useOrderHistorySendToBillModule = () => {
+  const allowedRoles = ["owner", "staff", "CTO", "worker"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ projectId, orderItemId, organizationId, }: { projectId: string, orderItemId: string, organizationId: string}) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
+      if (!api) throw new Error("API instance missing");
+      return await sendToBillModule({ projectId, orderItemId, organizationId, api, });
     },
     onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["ordering-material-history", projectId] });
