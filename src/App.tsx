@@ -8,13 +8,19 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
-const AccountingRecordMain= lazy(()=> import('./Pages/Department Pages/AccountingRecords/AccountingRecordMain')) ;
-const AccountingRecordSingle= lazy(()=> import('./Pages/Department Pages/AccountingRecords/AccountingRecordSingle')) ;
-const RateConfigDescription = lazy(()=> import('./Pages/Quote Pages/RateConfig Pages/RateConfigDescription'));
-const PublicCostCalculationMain = lazy(()=> import('./Pages/PublicCostCalculation_Pages/PublicCostCalculationMain'));
-const PublicCostCalculationSingle = lazy(()=> import('./Pages/PublicCostCalculation_Pages/PublicCostCalculationSingle'));
-const PublicLeadCollectionMain = lazy(()=> import('./Pages/PublicLeadCollection_pages/PublicLeadCollectionMain'));
-const PublicLeadCollectionSingle = lazy(()=> import('./Pages/PublicLeadCollection_pages/PublicLeadCollectionSingle'));
+import PinCodeMain from './Pages/Pincode_Pages/PincodeMaster/PinCodeMain';
+import PincodeSingle from './Pages/Pincode_Pages/PincodeMaster/PincodeSingle';
+import CreatePincode from './Pages/Pincode_Pages/PincodeMaster/CreatePincode';
+import PincodeVendorMappingMain from './Pages/Pincode_Pages/PincodeVendorMapping/PincodeVendorMappingMain';
+import PincodeVendorMappingSingle from './Pages/Pincode_Pages/PincodeVendorMapping/PincodeVendorMappingSingle';
+import CreatePincodeVendorMapping from './Pages/Pincode_Pages/PincodeVendorMapping/CreatePincodeVendorMapping';
+const AccountingRecordMain = lazy(() => import('./Pages/Department Pages/AccountingRecords/AccountingRecordMain'));
+const AccountingRecordSingle = lazy(() => import('./Pages/Department Pages/AccountingRecords/AccountingRecordSingle'));
+const RateConfigDescription = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigDescription'));
+const PublicCostCalculationMain = lazy(() => import('./Pages/PublicCostCalculation_Pages/PublicCostCalculationMain'));
+const PublicCostCalculationSingle = lazy(() => import('./Pages/PublicCostCalculation_Pages/PublicCostCalculationSingle'));
+const PublicLeadCollectionMain = lazy(() => import('./Pages/PublicLeadCollection_pages/PublicLeadCollectionMain'));
+const PublicLeadCollectionSingle = lazy(() => import('./Pages/PublicLeadCollection_pages/PublicLeadCollectionSingle'));
 const LogisticsPublicSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsPublicSingle'));
 const PublicPaymentTransactionMain = lazy(() => import('./Pages/publicPaymentTransaction/PublicPaymentTransactionMain'));
 const ShopMaterialDocumentMain = lazy(() => import('./Pages/ShopMaterialDocument_Pages/ShopMaterialDocumentMain'));
@@ -990,6 +996,65 @@ function App() {
               >
                 <CreateVendorPaymentAcc />
               </ProtectedRoutes>} />
+            </Route>
+
+
+            <Route path="pincodemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              // requiredDepartment={"accounts" || "billing"}
+              requiredDepartment="pincode"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
+              <PinCodeMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment={"pincode"}
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["list", "edit"]}
+              >
+                <PincodeSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="pincode"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["create"]}
+              >
+                <CreatePincode />
+              </ProtectedRoutes>} />
+
+
+            </Route>
+
+            <Route path="pincodemappingmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              // requiredDepartment={"accounts" || "billing"}
+              requiredDepartment="pincodeMapping"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
+              <PincodeVendorMappingMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment={"pincodeMapping"}
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["list", "edit"]}
+              >
+                <PincodeVendorMappingSingle />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="pincodeMapping"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["create"]}
+              >
+                <CreatePincodeVendorMapping />
+              </ProtectedRoutes>} />
+
+
             </Route>
 
 

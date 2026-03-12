@@ -202,6 +202,8 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
     "vendorpayment", "salesorder", "retailinvoice"],
 
   CUTLIST: "cutlist",
+  PINCODE:"pincode",
+  PINCODEMAPPING:"pincodemappingmain",
 
   LEADCOLLECTION: "leadmodule",
   COSTCALCULATIONLEADFORM: "leadmodule",
@@ -253,6 +255,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     ACCOUNTING: `/organizations/${organizationId}/projects/accounting`,
     DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
     CUTLIST: `/organizations/${organizationId}/projects/cutlistmain`,
+    PINCODE: `/organizations/${organizationId}/projects/pincodemain`,
+    PINCODEMAPPING: `/organizations/${organizationId}/projects/pincodemappingmain`,
     // MATERIAL_SHOP_DOCS: `/organizations/${organizationId}/projects/shopmaterialdoc`,
     LEADCOLLECTION: `/organizations/${organizationId}/projects/publicleadcollection`,
     COSTCALCULATIONLEADFORM: `/organizations/${organizationId}/projects/publiccostcalculation`,
@@ -386,6 +390,12 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
       id: "LEAD_COLLECTION",
       label: "Lead Collection",
       keys: ["LEADCOLLECTION", "COSTCALCULATIONLEADFORM"]
+
+    },
+    {
+      id: "PINCODE_MODULE",
+      label: "PinCode Module",
+      keys: ["PINCODE", "PINCODEMAPPING"]
 
     }
   ];

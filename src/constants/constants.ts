@@ -18,8 +18,11 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   // CUSTOMERACCOUNT: "Customer",
   // INVOICEACCOUNT: "Invoice",
   LEADCOLLECTION: "Lead Collections",
-  COSTCALCULATIONLEADFORM:" Cost Calculation Leads",
+  COSTCALCULATIONLEADFORM: " Cost Calculation Leads",
   CUTLIST: "Cutlist Generation",
+  PINCODE: `PinCode Module`,
+  PINCODEMAPPING: `PinCode and Vendor Mapping`,
+
   CALCULATOR: "Calculator",
   MATERIAL_SHOP_DOCS: "Shop Quotations",
   RATECONIGPRESALES: "Rate Config (Pre Sales)",
@@ -67,6 +70,9 @@ export const SIDEBAR_ICONS: Record<string, string> = {
   LEADCOLLECTION: "fas fa-file-alt text-2xl",
   COSTCALCULATIONLEADFORM: "fas fa-calculator text-2xl",
   CUTLIST: "fas fa-scissors text-2xl",
+  PINCODE: `fas fa-scissors text-2xl`,
+  PINCODEMAPPING: `fas fa-scissors text-2xl`,
+
   CALCULATOR: "fas fa-calculator text-2xl",
   MATERIAL_SHOP_DOCS: "fas fa-file-invoice text-2xl",
   RATECONIGPRESALES: "fas fa-box-archive text-2xl",

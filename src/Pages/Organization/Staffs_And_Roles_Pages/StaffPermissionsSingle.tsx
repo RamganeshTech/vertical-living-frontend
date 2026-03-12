@@ -21,6 +21,9 @@ const ORG_MODULES = [
     "vendorpayment", "salesorder", "retailinvoice",
     "records",
 
+    "pincode",
+    "pincodeMapping",
+
     "subcontract",
     "cutlist",
     // "materialquote",

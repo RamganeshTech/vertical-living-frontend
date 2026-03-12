@@ -189,89 +189,89 @@ const PRODUCT_CATALOG: Record<string, any[]> = {
 // };
 
 
-export const calculateMaterialSqft = (details: any, prodId: string) => {
-    const H = Number(details.h || 0);
-    const L = Number(details.w || 0); // L refers to width input
-    const D = Number(details.d || 0);
-    const P = Number(details.p || 0);
-    const S = Number(details.s || 0);
-    const DR = Number(details.dr || 0);
-    const t = 0.5; // Standard drawer height proxy
+// export const calculateMaterialSqft = (details: any, prodId: string) => {
+//     const H = Number(details.h || 0);
+//     const L = Number(details.w || 0); // L refers to width input
+//     const D = Number(details.d || 0);
+//     const P = Number(details.p || 0);
+//     const S = Number(details.s || 0);
+//     const DR = Number(details.dr || 0);
+//     const t = 0.5; // Standard drawer height proxy
 
-    // Base Carcass Area (Common to most box units)
-    const baseCarcass = 2 * (H * D) + 2 * (L * D) + (L * H);
+//     // Base Carcass Area (Common to most box units)
+//     const baseCarcass = 2 * (H * D) + 2 * (L * D) + (L * H);
 
-    // Internal Area Components
-    const partitionArea = P * (H * D);
-    const shelvesArea = S * (L * D);
-    const shuttersArea = 2 * (L * H);
-    const drawerAreaPer = (L * D) + (L * t) + (L * t) + 2 * (D * t);
-    const totalDrawerArea = DR * drawerAreaPer;
+//     // Internal Area Components
+//     const partitionArea = P * (H * D);
+//     const shelvesArea = S * (L * D);
+//     const shuttersArea = 2 * (L * H);
+//     const drawerAreaPer = (L * D) + (L * t) + (L * t) + 2 * (D * t);
+//     const totalDrawerArea = DR * drawerAreaPer;
 
-    switch (prodId) {
-        case "wardrobe":
-            // Formula: Carcass + Partitions + Shelves + Shutters + Drawers
-            return baseCarcass + partitionArea + shelvesArea + shuttersArea + totalDrawerArea;
+//     switch (prodId) {
+//         case "wardrobe":
+//             // Formula: Carcass + Partitions + Shelves + Shutters + Drawers
+//             return baseCarcass + partitionArea + shelvesArea + shuttersArea + totalDrawerArea;
 
-        case "grand_tv":
-        case "mini_tv":
-            // TV Unit Formula: Carcass + Shelves + Shutters (closed) + Drawers
-            return baseCarcass + shelvesArea + shuttersArea + totalDrawerArea;
+//         case "grand_tv":
+//         case "mini_tv":
+//             // TV Unit Formula: Carcass + Shelves + Shutters (closed) + Drawers
+//             return baseCarcass + shelvesArea + shuttersArea + totalDrawerArea;
 
-        case "crockery":
-        case "temple":
-            // Crockery/Pooja Unit Formula: Carcass + Partitions + Shelves + Shutters + Drawers
-            return baseCarcass + partitionArea + shelvesArea + shuttersArea + totalDrawerArea;
+//         case "crockery":
+//         case "temple":
+//             // Crockery/Pooja Unit Formula: Carcass + Partitions + Shelves + Shutters + Drawers
+//             return baseCarcass + partitionArea + shelvesArea + shuttersArea + totalDrawerArea;
 
-        case "shoe_rack":
-            // Shoe Rack Formula: Carcass + Shelves + Shutters + Drawers
-            return baseCarcass + shelvesArea + shuttersArea + totalDrawerArea;
+//         case "shoe_rack":
+//             // Shoe Rack Formula: Carcass + Shelves + Shutters + Drawers
+//             return baseCarcass + shelvesArea + shuttersArea + totalDrawerArea;
 
-        case "loft":
-            // Loft Formula: Carcass + Shelves + Shutters
-            return baseCarcass + shelvesArea + shuttersArea;
+//         case "loft":
+//             // Loft Formula: Carcass + Shelves + Shutters
+//             return baseCarcass + shelvesArea + shuttersArea;
 
-        case "base_cabinets":
-            // Kitchen Base Formula (uses RFT as L): Carcass + Partitions + Shelves + Shutters + Drawers
-            return baseCarcass + partitionArea + shelvesArea + shuttersArea + totalDrawerArea;
+//         case "base_cabinets":
+//             // Kitchen Base Formula (uses RFT as L): Carcass + Partitions + Shelves + Shutters + Drawers
+//             return baseCarcass + partitionArea + shelvesArea + shuttersArea + totalDrawerArea;
 
-        case "wall_cabinets":
-            // Kitchen Wall Formula: Carcass + Shelves + Shutters
-            return baseCarcass + shelvesArea + shuttersArea;
+//         case "wall_cabinets":
+//             // Kitchen Wall Formula: Carcass + Shelves + Shutters
+//             return baseCarcass + shelvesArea + shuttersArea;
 
-        case "vanity":
-            // Vanity Unit Formula: Carcass + Shelves + Shutters + Drawers
-            return baseCarcass + shelvesArea + shuttersArea + totalDrawerArea;
+//         case "vanity":
+//             // Vanity Unit Formula: Carcass + Shelves + Shutters + Drawers
+//             return baseCarcass + shelvesArea + shuttersArea + totalDrawerArea;
 
-        case "bar_unit":
-        case "sideboard":
-            // Sideboard/Buffet Formula: Carcass + Partitions + Shelves + Shutters + Drawers
-            return baseCarcass + partitionArea + shelvesArea + shuttersArea + totalDrawerArea;
+//         case "bar_unit":
+//         case "sideboard":
+//             // Sideboard/Buffet Formula: Carcass + Partitions + Shelves + Shutters + Drawers
+//             return baseCarcass + partitionArea + shelvesArea + shuttersArea + totalDrawerArea;
 
-        case "work_table":
-            // Study Table Formula: Carcass + Shelves
-            return baseCarcass + shelvesArea;
+//         case "work_table":
+//             // Study Table Formula: Carcass + Shelves
+//             return baseCarcass + shelvesArea;
 
-        case "bed":
-            // Bed with Storage Formula: Headboard + Box sides + bottom + partitions + Drawers
-            const headboard = (L * 3); // Proxy for headboard height
-            const bedBox = (L * D) + 2 * (6 * D) + 2 * (L * 1.5); // L x D is bottom
-            return headboard + bedBox + totalDrawerArea;
+//         case "bed":
+//             // Bed with Storage Formula: Headboard + Box sides + bottom + partitions + Drawers
+//             const headboard = (L * 3); // Proxy for headboard height
+//             const bedBox = (L * D) + 2 * (6 * D) + 2 * (L * 1.5); // L x D is bottom
+//             return headboard + bedBox + totalDrawerArea;
 
-        case "sofa_panel":
-        case "dining_panel":
-        case "laminate_panel":
-        case "wallpaper":
-        case "wallpaper_bed":
-        case "diamond_mirror":
-            // Flat Panel Logic: Simple front area
-            return (L * H);
+//         case "sofa_panel":
+//         case "dining_panel":
+//         case "laminate_panel":
+//         case "wallpaper":
+//         case "wallpaper_bed":
+//         case "diamond_mirror":
+//             // Flat Panel Logic: Simple front area
+//             return (L * H);
 
-        default:
-            // Standard fallback to simple front area for unidentified units
-            return (L * H);
-    }
-};
+//         default:
+//             // Standard fallback to simple front area for unidentified units
+//             return (L * H);
+//     }
+// };
 
 export default function PreSalesQuoteSingle() {
     const { organizationId, id } = useParams();
@@ -515,6 +515,7 @@ export default function PreSalesQuoteSingle() {
         let total = 0;
         Object.entries(config).forEach(([roomId, roomInsts]: any) => {
             Object.entries(roomInsts).forEach(([_rIdx, products]: any) => {
+
                 Object.entries(products).forEach(([prodId, instances]: any) => {
                     // Find group name to get specific margin
                     const productDef = PRODUCT_CATALOG[roomId]?.find((p: any) => p.id === prodId);
