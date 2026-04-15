@@ -5,6 +5,7 @@ import Sidebar from '../../shared/Sidebar'
 import { Outlet, useParams } from 'react-router-dom'
 import MobileSidebar from '../../shared/MobileSidebar'
 import { useAuthCheck } from '../../Hooks/useAuthCheck'
+import HeaderSidebar from '../../shared/HeaderSidebar'
 
 // 1. ⭐ MAPPING: Sidebar Keys -> Backend Permission Keys
 // (Ensure these keys exist in your DB permissions)
@@ -12,6 +13,7 @@ const PERMISSION_MAPPING: Record<string, string> = {
     INVITECTO: "invitecto",
     INVITESTAFFS: "invitestaff",
     MODULAR: "modularunit",
+    ALLORGS: "allorgs"
     // PLAN is owner only, so no mapping needed
     // PROJECTS, DETAILS, PROFILE are open to all
 };
@@ -23,11 +25,13 @@ export type OrganizationOutletTypeProps = {
     closeMobileSidebar: () => void;
 }
 
-interface OrganizationChildrenProps {
-    setOrganizationId: React.Dispatch<React.SetStateAction<string | null>>;
-}
+// interface OrganizationChildrenProps {
+//     setOrganizationId: React.Dispatch<React.SetStateAction<string | null>>;
+// }
 
-const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganizationId }) => {
+const OrganizationChildrens: React.FC = (
+    // { setOrganizationId }
+) => {
 
     const { organizationId } = useParams<{ organizationId: string }>()
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
@@ -40,6 +44,7 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
     const path: Record<string, string> = {
         PROJECTS: `/organizations/${organizationId}/projects`,
         DETAILS: `/organizations/${organizationId}`, // Organization Dashboard
+        ALLORGS: `/organizations/${organizationId}/all-organizations`, // Organization Dashboard
         INVITECTO: `/organizations/${organizationId}/invitecto`,
         INVITESTAFFS: `/organizations/${organizationId}/invitestaff`,
         ROLESPERMISSIONS: `/organizations/${organizationId}/dashboard`,
@@ -79,6 +84,10 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
             key !== "ROLESPERMISSIONS" &&
             key !== "PLAN"
         );
+    }
+
+    if (organizationId !== "684a57015e439b678e8f6918") {
+        allowedKeys = allowedKeys.filter(key => key !== "ALLORGS");
     }
 
     // =========================================================
@@ -125,9 +134,9 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 470);
         window.addEventListener('resize', handleResize);
-        if (organizationId) setOrganizationId(organizationId);
+        // if (organizationId) setOrganizationId(organizationId);
         return () => window.removeEventListener('resize', handleResize);
-    }, [organizationId, setOrganizationId]);
+    }, []);
 
     // =========================================================
     // 5. DATA STRUCTURE FOR SIDEBAR (Flat List / No Grouping)
@@ -160,14 +169,26 @@ const OrganizationChildrens: React.FC<OrganizationChildrenProps> = ({ setOrganiz
                     menuStructure={organizationMenuStructure} // Passing the flat structure
                 />
             )}
-            <main className="!w-[100%] h-full">
-                <Outlet context={{
-                    isMobile,
-                    isMobileSidebarOpen,
-                    openMobileSidebar: () => setIsMobileSidebarOpen(true),
-                    closeMobileSidebar: () => setIsMobileSidebarOpen(false),
-                }} />
-            </main>
+
+            {/* 3. RIGHT COLUMN: This holds both the Header and the Main content */}
+            <div className="flex-1 flex flex-col h-full min-w-0">
+                {/* TOP: The new Header Sidebar */}
+                <HeaderSidebar
+                    isMobile={isMobile}
+                    openMobileSidebar={() => setIsMobileSidebarOpen(true)}
+                />
+                {/* <main className="!w-[100%] / p-4"> */}
+                <main className="flex-1 overflow-y-auto p-4 bg-white/50">
+               
+                {/* <main className="!w-[100%] h-full"> */}
+                    <Outlet context={{
+                        isMobile,
+                        isMobileSidebarOpen,
+                        openMobileSidebar: () => setIsMobileSidebarOpen(true),
+                        closeMobileSidebar: () => setIsMobileSidebarOpen(false),
+                    }} />
+                </main>
+            </div>
         </div>
     )
 }

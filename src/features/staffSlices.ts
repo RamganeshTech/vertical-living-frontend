@@ -11,6 +11,7 @@ const initialState = {
     isGuideRequired: undefined,
     ownerId:"",
 
+    profileImage: null
 
 
 }
@@ -21,7 +22,8 @@ const staffSlice = createSlice({
     reducers: {
         setStaffProfileData: (state, action) => {
             const { staffId, staffName, email, phoneNo, isauthenticated, role, permission,
-                isGuideRequired, ownerId
+    profileImage,
+                isGuideRequired, ownerId, 
              } = action.payload
 
             return {
@@ -34,7 +36,9 @@ const staffSlice = createSlice({
                 isauthenticated,
                 permission,
                 isGuideRequired,
-                ownerId
+                ownerId,
+    profileImage
+
             };
         },
             updateStaffGuideStatus: (state, action) => {

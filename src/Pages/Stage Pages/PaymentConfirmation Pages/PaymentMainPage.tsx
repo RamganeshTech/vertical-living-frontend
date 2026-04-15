@@ -22,26 +22,30 @@ const sectionCards = [
   {
     title: "Consent Form",
     description: "Review and accept client consent agreements.",
-    icon: "📝",
+    // icon: "📝",
+    icon: "fa-solid fa-file-signature", // Replaces 📝
     path: "consent",
   },
   {
     title: "Schedule Approval",
     description: "Manage milestone approvals from client & MD.",
-    icon: "📅",
+    // icon: "📅",
+    icon: "fa-solid fa-calendar-check", // Replaces 📅
     path: "schedule",
   },
   {
     title: "Payment Transaction",
     description: "Track actual payment gateway transactions.",
-    icon: "💳",
+    // icon: "💳",
+    icon: "fa-solid fa-credit-card", // Replaces 💳 (or you can use "fa-solid fa-money-check-dollar")
     path: "transaction",
   },
 
   {
     title: "Client Quotes",
     description: "Get the Quotation that is approved by client",
-    icon: "📄",
+    // icon: "📄",
+    icon: "fa-solid fa-file-invoice-dollar", // Replaces 📄
     path: "quotes",
   },
 ];
@@ -99,20 +103,23 @@ const PaymentConfirmationStage: React.FC = () => {
   const { assignedTo, timer, totalAmount, _id: formId } = data || {};
 
   return (
-    <div className="container mx-auto max-w-full max-h-full overflow-y-auto">
+    <div className="container mx-auto max-w-full max-h-full overflow-y-auto bg-brand-surface ">
       {/* Header Section with Mobile Sidebar Toggle */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
+      {/* <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6"> */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 mb-8 pb-4 border-b border-ash-light">
+        {/* <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center"> */}
+        <h2 className="text-2xl sm:text-3xl font-bold text-text-main flex items-center">
           {isMobile && (
             <button
               onClick={openMobileSidebar}
-              className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100"
+              // className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100"
+              className="mr-3 p-2 rounded-lg border border-ash-medium hover:bg-brand-ash text-text-muted shadow-sm transition-colors"
               title="Open Menu"
             >
               <i className="fa-solid fa-bars"></i>
             </button>
           )}
-          <i className="fa-solid fa-sack-dollar mr-2" /> Payment Confirmation
+          <i className="fa-solid fa-sack-dollar mr-2 text-text-muted" /> Payment Confirmation
         </h2>
 
         <div className="!w-[100%] sm:!w-[80%] lg:w-[50%] flex flex-col sm:flex-row gap-3 justify-end">
@@ -120,9 +127,10 @@ const PaymentConfirmationStage: React.FC = () => {
             {(canCreate || canEdit) && <Button
               isLoading={completePending}
               onClick={handleCompletionStatus}
-              className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
+              // className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
+              variant="dark"
             >
-              <i className="fa-solid fa-circle-check mr-2" />
+              <i className="fa-solid fa-circle-check mr-2 text-action-success" />
               Mark Complete
             </Button>}
           </div>
@@ -133,6 +141,7 @@ const PaymentConfirmationStage: React.FC = () => {
               stagePath="paymentconfirmation"
               projectId={projectId!}
               className="flex-1 sm:flex-initial min-w-max"
+            // className="flex-1 sm:flex-initial min-w-max border-ash-medium text-text-main"
             />}
 
 
@@ -163,18 +172,39 @@ const PaymentConfirmationStage: React.FC = () => {
 
       {/* Error Display - Doesn't hide header buttons */}
       {getAllError && (
-        <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
-          <div className="text-red-600 font-semibold mb-2">
-            ⚠️ Error Occurred
+        // <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
+        //   <div className="text-red-600 font-semibold mb-2">
+        //     ⚠️ Error Occurred
+        //   </div>
+        //   <p className="text-red-500 text-sm mb-4">
+        //     {(error as any)?.response?.data?.message ||
+        //       (error as any)?.message ||
+        //       "Failed to load payment confirmation data"}
+        //   </p>
+        //   <Button
+        //     onClick={() => refetch()}
+        //     className="bg-red-600 text-white px-4 py-2"
+        //   >
+        //     Retry
+        //   </Button>
+        // </div>
+
+        <div className="max-w-xl mx-auto p-5 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mb-8">
+          <div className="text-action-danger text-2xl mb-3">
+            <i className="fa-solid fa-triangle-exclamation"></i>
           </div>
-          <p className="text-red-500 text-sm mb-4">
+          <div className="text-text-main font-bold mb-2">
+            Error Occurred
+          </div>
+          <p className="text-text-muted text-sm mb-5">
             {(error as any)?.response?.data?.message ||
               (error as any)?.message ||
               "Failed to load payment confirmation data"}
           </p>
           <Button
             onClick={() => refetch()}
-            className="bg-red-600 text-white px-4 py-2"
+            variant="outline"
+            className="hover:bg-brand-ash hover:text-action-danger hover:border-action-danger text-text-main border-ash-medium"
           >
             Retry
           </Button>
@@ -185,9 +215,16 @@ const PaymentConfirmationStage: React.FC = () => {
       {!getAllError && (
         <>
           {/* Timer Section */}
-          <Card className="p-4 mb-6 w-full shadow border-l-4 border-blue-600 bg-white">
+          {/* <Card className="p-4 mb-6 w-full shadow border-l-4 border-blue-600 bg-white">
             <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
               <i className="fa-solid fa-clock text-blue-500 text-lg" />
+              <span>Stage Timings</span>
+            </div> */}
+
+
+          <Card className="p-5 mb-2  lg:col-span-2 shadow-sm  border-2 border-ash-medium rounded-xl bg-brand-surface">
+            <div className="flex items-center gap-2 text-text-main text-sm font-bold mb-4 uppercase tracking-wide border-b border-ash-light pb-3">
+              <i className="fa-regular fa-clock text-ash-dark text-base" />
               <span>Stage Timings</span>
             </div>
 
@@ -205,7 +242,7 @@ const PaymentConfirmationStage: React.FC = () => {
           </Card>
 
           {/* Total Amount Display */}
-          <Card className="p-4 mb-6 bg-blue-50 border-l-4 border-blue-600 shadow-md">
+          {/* <Card className="p-4 mb-6 bg-blue-50 border-l-4 border-blue-600 shadow-md">
             <div className="text-lg font-semibold text-blue-800 flex items-center gap-2">
               <i className="fa-solid fa-wallet" />
               Total Payment Amount
@@ -213,27 +250,62 @@ const PaymentConfirmationStage: React.FC = () => {
             <p className="text-3xl text-blue-700 mt-2 font-bold">
               ₹ {totalAmount?.toLocaleString("en-in") || 0}
             </p>
+          </Card> */}
+
+          {/* <Card className="p-6 mb-3 bg-brand-surface border border-ash-medium rounded-xl shadow-sm flex flex-col justify-center"> */}
+          <Card className="bg-brand-surface border-2 border-ash-medium  hover:shadow-md transition-all p-5 rounded-xl h-full flex flex-col justify-between shadow-sm">
+            <div className="flex items-center gap-4 mb-2">
+              <div className="w-10 h-10 bg-brand-ash border border-ash-light rounded-lg flex items-center justify-center shrink-0">
+                <i className="fa-solid fa-wallet text-text-muted text-lg" />
+              </div>
+              <h3 className="text-md sm:text-lg  font-bold tracking-wide text-text-muted">Total Payment Amount</h3>
+            </div>
+            <p className="text-3xl sm:text-4xl font-bold text-text-main mt-2 tracking-tight">
+              <span className="text-text-muted text-2xl mr-1">₹</span>
+              {totalAmount?.toLocaleString("en-in") || 0}
+            </p>
           </Card>
 
+
           {/* Stage Sections Navigation */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
             {sectionCards.map((card) => (
               <div
                 key={card.path}
                 onClick={() => navigate(card.path)}
                 className="cursor-pointer"
               >
-                <Card className="hover:shadow-xl border-l-6 border-blue-600 transition bg-blue-100 p-4 sm:p-6 !rounded-xl h-full flex flex-col justify-between">
+                {/* <Card className="hover:shadow-xl border-l-6 border-blue-600 transition bg-blue-100 p-4 sm:p-6 !rounded-xl h-full flex flex-col justify-between"> */}
+                {/* <Card className="bg-brand-surface border border-ash-medium hover:border-text-muted hover:shadow-md transition-all p-5 rounded-xl h-full flex flex-col justify-between shadow-sm"> */}
+                <Card className="bg-brand-surface border-[2px] border-ash-medium hover:border-text-muted hover:shadow-md transition-all p-5 rounded-xl h-full flex flex-col justify-between shadow-sm">
                   <div>
-                    <div className="text-4xl">{card.icon}</div>
+                    {/* <div className="text-4xl">{card.icon}</div>
                     <h3 className="text-xl mt-3 font-bold text-blue-800">{card.title}</h3>
-                    <p className="text-sm text-blue-700 mt-2">{card.description}</p>
+                    <p className="text-sm text-blue-700 mt-2">{card.description}</p> */}
+
+                    <div className="w-10 h-10 rounded-lg bg-brand-ash border border-ash-light flex items-center justify-center shadow-sm mb-4">
+                      {/* This will now inject 'fa-solid fa-file-signature' etc. */}
+                      <i className={`${card.icon} text-text-muted text-lg`}></i>
+                    </div>
+                    <h3 className="text-lg font-bold text-text-main mb-2">{card.title}</h3>
+                    <p className="text-sm text-text-muted leading-relaxed">{card.description}</p>
+
                   </div>
-                  <div className="mt-4 text-right">
+                  {/* <div className="mt-4 text-right">
                     <span className="inline-block bg-blue-600 text-white text-xs px-3 py-1 rounded">
                       Go to {card.title}
                     </span>
+                  </div> */}
+
+                  <div className="mt-6 flex items-center justify-between border-t border-ash-light pt-4">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted group-hover:text-text-main transition-colors">
+                      Go to {card.title}
+                    </span>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-brand-ash group-hover:bg-action-primary transition-colors">
+                      <i className="fas fa-arrow-right text-ash-dark group-hover:text-text-main text-xs transition-colors"></i>
+                    </div>
                   </div>
+
                 </Card>
               </div>
             ))}

@@ -16,25 +16,48 @@ const QuotePaymentMain = () => {
     const { data: quotes, isLoading, isError, error, refetch } = usePaymentAllQuotes(projectId!);
 
     if (isLoading) return <MaterialOverviewLoading />;
+    // if (isError) return (
+    //     <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
+    //         <div className="text-red-600 font-semibold mb-2">
+    //             ⚠️ Error Occurred
+    //         </div>
+    //         <p className="text-red-500 text-sm mb-4">
+    //             {(error as any)?.response?.data?.message ||
+    //                 (error as any)?.message ||
+    //                 "Failed to load payment confirmation data"}
+    //         </p>
+    //         <Button
+    //             onClick={() => refetch()}
+    //             className="bg-red-600 text-white px-4 py-2"
+    //         >
+    //             Retry
+    //         </Button>
+    //     </div>
+    // );
+
+
     if (isError) return (
-        <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
-            <div className="text-red-600 font-semibold mb-2">
-                ⚠️ Error Occurred
+        <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-6">
+            <div className="text-action-danger text-2xl mb-3">
+                <i className="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <p className="text-red-500 text-sm mb-4">
+            <div className="text-text-main text-lg font-bold mb-2">
+                Error Occurred
+            </div>
+            <p className="text-text-muted text-sm mb-5">
                 {(error as any)?.response?.data?.message ||
                     (error as any)?.message ||
-                    "Failed to load payment confirmation data"}
+                    "Failed to load payment quote data"}
             </p>
             <Button
                 onClick={() => refetch()}
-                className="bg-red-600 text-white px-4 py-2"
+                variant="outline"
+                className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash"
             >
                 Retry
             </Button>
         </div>
     );
-
 
 
 
@@ -44,14 +67,21 @@ const QuotePaymentMain = () => {
 
 
     return (
-        <div className="p-2 max-h-full overflow-y-auto">
-            <div className="flex gap-2 items-center mb-4">
+        // <div className="p-2 max-h-full overflow-y-auto">
+        <div className="w-full max-h-full overflow-y-auto p-2 bg-brand-main">
+            <div className="flex gap-2 items-center mb-4 border-b border-ash-light">
 
                 <div onClick={() => navigate(-1)}
-                    className='bg-blue-50 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
+                    className='border border-ash-medium text-text-main flex items-center justify-between w-8 h-8  text-sm cursor-pointer rounded-md px-2 '>
                     <i className='fas fa-arrow-left'></i>
                 </div>
-                <h1 className="text-2xl font-bold text-blue-600">Payment Quotes</h1>
+                {/* <h1 className="text-2xl font-bold text-blue-600">Payment Quotes</h1> */}
+                <h1 className="text-xl sm:text-2xl font-bold text-text-main flex items-center gap-3">
+                    <div className="w-10 h-10 bg-brand-surface border border-ash-medium rounded-lg flex items-center justify-center shadow-sm">
+                        <i className="fa-solid fa-file-invoice text-text-muted text-lg" />
+                    </div>
+                    Payment Quotes
+                </h1>
             </div>
 
 
@@ -69,29 +99,7 @@ const QuotePaymentMain = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {(quotes || [])?.map((q: any) => (
-                    // <Card  key={q._id} className="border-l-4 border-blue-600 shadow-sm">
-                    //     <CardHeader className=" flex items-center justify-between">
-                    //         <CardTitle className="">{q.quoteNo || "Untitled Quote"}</CardTitle>
 
-                    //     </CardHeader>
-                    //     <CardContent className="space-y-1 text-sm text-blue-950">
-                    //         <p>
-                    //             <i className="fas fa-stream mr-1 text-gray-500" />
-                    //             <span className="font-medium text-gray-700">Status</span> {q.status || "—"}
-                    //         </p>
-
-                    //         <div className="mt-4 flex justify-end">
-                    //             <Button
-                    //                 size="sm"
-                    //                 variant="primary"
-                    //                 onClick={() => navigate(`single/${q._id}`)} // 👈 navigates to child
-                    //             >
-                    //                 <i className="fas fa-eye mr-1" />
-                    //                 View
-                    //             </Button>
-                    //         </div>
-                    //     </CardContent>
-                    // </Card>
 
                     <Card key={quotes._id} className="border-l-4 border-blue-600 shadow-sm">
                         <CardHeader className="flex items-center justify-between">

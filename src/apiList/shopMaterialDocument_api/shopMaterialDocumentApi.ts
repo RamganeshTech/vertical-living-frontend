@@ -176,7 +176,7 @@ export const useUploadMaterialShopFiles = () => {
 };
 
 
-// 🔹 1. Hook for Uploading Documents
+// 🔹 1. Hook for Uploading Documents (this is used currently now)
 export const useUploadMaterialShopFilesV1 = () => {
   const queryClient = useQueryClient();
   const { role } = useGetRole();
@@ -342,7 +342,7 @@ export const useDeleteMaterialShopDocument = () => {
 
 
 
-// 🔹 Hook for AI Extraction
+// 🔹 Hook for AI Extraction (not used currently)
 export const useExtractMaterialShopDocDetails = () => {
   const queryClient = useQueryClient();
   const { role } = useGetRole();

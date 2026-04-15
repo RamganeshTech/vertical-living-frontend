@@ -29,6 +29,7 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
+      "no-useless-catch": "off",
       // ✅ 2. Stop ESLint from suggesting 'const' over 'let'
       'prefer-const': 'off',
       'react-refresh/only-export-components': [

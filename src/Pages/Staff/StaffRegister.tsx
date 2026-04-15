@@ -201,7 +201,9 @@ export default function StaffRegister() {
         _id: staffData.staffId,
         role: staffData.role,
         isauthenticated: true,
-        userName: staffData?.staffName
+        userName: staffData?.staffName,
+                        organizationId: staffData?.organizationId || ""
+
       }));
 
       dispatch(setStaffProfileData({

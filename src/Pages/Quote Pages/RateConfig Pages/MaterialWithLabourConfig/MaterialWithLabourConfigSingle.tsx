@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import { Input } from "../../../../components/ui/Input";
 // import { useCreateItems, useDeleteItem, useGetCategories, useGetItemsByCategory } from "../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 import { Button } from "../../../../components/ui/Button";
@@ -205,6 +205,8 @@ export default function MaterialWithLabourSingle({
         }
     };
 
+
+
     return (
         <div className="space-y-4  ">
             {/* Sticky Header */}
@@ -225,7 +227,7 @@ export default function MaterialWithLabourSingle({
 
 
                 </div>}
-                <div className="flex gap-2 mt-3 sm:mt-0  absolute top-[-73px] right-[43px]  ">
+                <div className="flex gap-2 mt-3 sm:mt-0  absolute top-[-76px] right-[133px]  ">
 
                     <div className="relative w-full sm:w-64">
                         <Input
@@ -243,6 +245,8 @@ export default function MaterialWithLabourSingle({
                     {(canEdit || canCreate) && <Button onClick={handleSave} isLoading={createPending} className="bg-blue-600 hover:bg-blue-700 text-white">
                         <i className="fas fa-file mr-2"></i> Save Items
                     </Button>}
+
+                  
                 </div>
             </div>
 
@@ -332,7 +336,7 @@ export default function MaterialWithLabourSingle({
                                                     onChange={(e) =>
                                                         setEditValues({
                                                             ...editValues,
-                                                            [field.key]: field.type === "number" ? Math.max(0,Number(e.target.value)) : e.target.value,
+                                                            [field.key]: field.type === "number" ? Math.max(0, Number(e.target.value)) : e.target.value,
                                                         })
                                                     }
                                                 />

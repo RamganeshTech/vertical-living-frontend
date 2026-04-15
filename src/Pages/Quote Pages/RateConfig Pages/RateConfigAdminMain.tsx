@@ -19,6 +19,8 @@ export default function RateConfigAdminMain() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Add this near your other state variables
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
 
     const { role, permission } = useAuthCheck();
@@ -31,13 +33,15 @@ export default function RateConfigAdminMain() {
 
     const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
 
-    const isChildRoute = location.pathname.includes("single");
+    const isChildRoute = location.pathname.includes("single") || location.pathname.includes("backup");
 
     const [categoryName, setCategoryName] = useState("");
-    const [fields, setFields] = useState([{ key: "", type: "string", required: false, visibleIn: [] as string[] }]);
+    const [fields, setFields] = useState([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] as string[] }]);
     const [isProductSpecific, setIsProductSpecific] = useState<boolean>(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
 
     const { data: categories, isLoading, refetch } = useGetCategories(organizationId!);
@@ -45,6 +49,11 @@ export default function RateConfigAdminMain() {
     const { mutateAsync: deleteCategory, isPending } = useDeleteCategory();
     const { mutateAsync: updateCategory, isPending: updatePending } = useUpdateRateConfigCategory();
 
+
+    // Add this line to filter categories dynamically
+    const filteredCategories = categories?.filter((category: any) =>
+        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
 
     // Inside your component function:
     const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -67,7 +76,7 @@ export default function RateConfigAdminMain() {
 
 
     const handleAddField = () => {
-        setFields([...fields, { key: "", type: "string", required: false, visibleIn: [] }]);
+        setFields([...fields, { key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
     };
 
 
@@ -83,15 +92,15 @@ export default function RateConfigAdminMain() {
     };
 
 
-    const handleFieldChange = (
-        index: number,
-        field: keyof typeof fields[number],
-        value: any
-    ) => {
-        const updated: any = [...fields];
-        updated[index][field] = value;
-        setFields(updated);
-    };
+    // const handleFieldChange = (
+    //     index: number,
+    //     field: keyof typeof fields[number],
+    //     value: any
+    // ) => {
+    //     const updated: any = [...fields];
+    //     updated[index][field] = value;
+    //     setFields(updated);
+    // };
 
     const toggleVisibility = (index: number, module: string) => {
         const updated = [...fields];
@@ -119,6 +128,17 @@ export default function RateConfigAdminMain() {
         setFields(updated);
     };
 
+
+    // // Update your change handler
+    const handleFieldChange = (index: number, property: string, value: any) => {
+        const updatedFields = [...fields];
+
+        // If it's a brand new field being typed for the first time, 
+        // it won't have an oldKey, which is correct (it's an addition).
+        updatedFields[index] = { ...updatedFields[index], [property]: value };
+        setFields(updatedFields);
+    };
+
     const handleCreate = async () => {
         try {
             if (!editingCategoryId) {
@@ -139,7 +159,21 @@ export default function RateConfigAdminMain() {
                 }
             }
 
-            const validFields = fields.filter((f) => f.key.trim() !== "");
+            // const validFields = fields.filter((f) => f.key.trim() !== "");
+
+            // 1. Validate and Normalize Field Keys
+            const validFields = fields.filter((f) => f.key.trim() !== "").map(f => {
+                let sanitizedKey = f.key.trim();
+
+                // --- NORMALIZATION: Replace '×' (U+00D7) with 'x' (Standard) ---
+                if (isProductSpecific) {
+                    sanitizedKey = sanitizedKey.replace(/×/g, 'x');
+                }
+
+                return { ...f, key: sanitizedKey };
+            });
+
+
             if (validFields.length === 0) {
                 return toast({
                     title: "Error",
@@ -150,12 +184,23 @@ export default function RateConfigAdminMain() {
 
 
             if (editingCategoryId) {
+
+                // --- UPDATE FLOW ---
+                // We map the fields to include oldKey so the backend can sync
+                const updatePayload = validFields.map(f => ({
+                    key: f.key,
+                    type: f.type,
+                    required: f.required || false,
+                    visibleIn: f.visibleIn || [],
+                    oldKey: f.oldKey // Will be undefined for brand new fields added during edit
+                }));
+
                 // CALL UPDATE MUTATION
                 await updateCategory({
                     organizationId,
                     categoryId: editingCategoryId,
                     name: categoryName,
-                    fields: validFields,
+                    fields: updatePayload,
                     isProductSpecific: isProductSpecific,
                 });
                 toast({ title: "Success", description: "Category Updated Successfully" });
@@ -172,7 +217,7 @@ export default function RateConfigAdminMain() {
 
             setEditingCategoryId(null);
             setCategoryName("");
-            setFields([{ key: "", type: "string", required: false, visibleIn: [] }]);
+            setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
             setShowCreateForm(false);
             refetch()
 
@@ -222,9 +267,51 @@ export default function RateConfigAdminMain() {
                 </div>
 
                 <section className="flex  gap-3 items-center">
+
+                    {/* NEW: Search Bar */}
+                    <div className="relative hidden sm:block">
+                        <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <Input
+                            type="text"
+                            placeholder="Search categories..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9 pr-4 py-2 w-48 lg:w-64"
+                        />
+                    </div>
+
+                    <div className="hidden sm:flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
+                        <button
+                            onClick={() => setViewMode("grid")}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-white shadow-sm text-blue-600" : "text-slate-400 hover:text-slate-700"}`}
+                            title="Grid View"
+                        >
+                            <i className="fa-solid fa-border-all text-sm px-1" />
+                        </button>
+                        <button
+                            onClick={() => setViewMode("list")}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === "list" ? "bg-white shadow-sm text-blue-600" : "text-slate-400 hover:text-slate-700"}`}
+                            title="List View"
+                        >
+                            <i className="fa-solid fa-list text-sm px-1" />
+                        </button>
+                    </div>
+
                     {canCreate && <div>
                         <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button>
                     </div>}
+
+                    {/* SECONDARY ACTION: Changed to an outlined, lighter button with an archive/trash icon */}
+                    <div>
+                        <button
+                            onClick={() => navigate("backup")}
+                            className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-md hover:bg-slate-200 hover:text-blue-700 transition-all font-semibold text-sm shadow-sm group"
+                        >
+                            {/* The icon will turn blue when the whole button is hovered */}
+                            <i className="fa-solid fa-trash-can-arrow-up text-slate-500 group-hover:text-blue-600 transition-colors" />
+                            Recycle Bin
+                        </button>
+                    </div>
 
                     <div className="w-full sm:w-auto flex justify-end sm:block">
                         <StageGuide
@@ -237,15 +324,15 @@ export default function RateConfigAdminMain() {
 
             {/* Create Modal */}
             <Dialog open={showCreateForm}
-                //  onOpenChange={setShowCreateForm}
                 onOpenChange={(open) => {
                     setShowCreateForm(open);
                     if (!open) {
                         setEditingCategoryId(null);
                         setCategoryName("");
-                        setFields([{ key: "", type: "string", required: false, visibleIn: [] }]);
+                        setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
                     }
                 }}
+
             >
                 <DialogContent className="px-5 py-6 !overflow-visble ">
                     <DialogHeader className="px-0 py-0">
@@ -297,7 +384,7 @@ export default function RateConfigAdminMain() {
                                                 <p className="mt-1 font-bold opacity-80">
                                                     Valid Formats: <span className="underline">7 x 6</span> or <span className="underline">7ft h x 6ft w</span>, or <span className="underline">7h x 6w</span>
                                                 </p>
-                                                 <p className="mt-1 font-bold opacity-80">
+                                                <p className="mt-1 font-bold opacity-80">
                                                     Type: <span className="underline">Number</span>
                                                 </p>
                                             </div>
@@ -322,7 +409,8 @@ export default function RateConfigAdminMain() {
 
 
                             {fields.map((field, index) => {
-                                const isLockedField = field.key === "manufacturCostPerSqft";
+                                // const isLockedField = field.key === "manufacturCostPerSqft";
+                                const isLockedField = field.key === "manufacturCostPerSqft" || field.oldKey === "manufacturCostPerSqft";
 
 
                                 return (
@@ -471,138 +559,172 @@ export default function RateConfigAdminMain() {
             </Dialog>
 
             {/* Category Cards Section */}
-            {canList && <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4  overflow-y-auto max-h-[85vh]">
+            {canList &&
+                // <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4  overflow-y-auto max-h-[85vh]">
+                <div className={`mt-6 overflow-y-auto max-h-[85vh] ${viewMode === "grid"
+                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    : "flex flex-col gap-3" // List view uses flex column
+                    }`}>
 
-                {isLoading && <p>Loading categories...</p>}
-                {!isLoading && categories?.length === 0 && (
-                    <p className="text-gray-500">No categories found</p>
-                )}
+                    {isLoading && <p>Loading categories...</p>}
+                    {!isLoading && categories?.length === 0 && (
+                        <p className="text-gray-500">No categories found</p>
+                    )}
 
-                {categories?.map((category: any) => (
-                    // <Card
-                    //     key={category._id}
-                    //     className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg transition-all"
-                    // >
-                    //     <CardContent className="p-4 space-y-2">
-                    //         <h3 className="text-base font-bold text-blue-700 mb-2">
-                    //             {category.name}
-                    //         </h3>
+                    {/* {categories?.map((category: any) => (
 
-                    //         <p className="text-sm text-gray-600 capitalize">
-                    //             Fields:{" "}
-                    //             <strong>
-                    //                 {category.fields
-                    //                     .filter((f: any) => !f.visibleIn || f.visibleIn.length === 0 || f.visibleIn.includes("materials"))
-                    //                     .map((f: any) => f.key)
-                    //                     .join(", ") || <span className="italic text-gray-400">No fields enabled</span>
-                    //                 }
-                    //             </strong>
-                    //         </p>
+                        <Card
+                            key={category._id}
+                            className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg transition-all"
+                        >
+                            <CardContent className="p-4 space-y-2">
+                                <div className="flex justify-between items-start gap-4">
+                                    <h3 className="text-base font-bold text-blue-700 mb-2 truncate">
+                                        {category.name}
+                                    </h3>
 
-                    //         <div className="flex justify-end gap-2 pt-2">
-                    //             <Button
-                    //                 size="sm"
-                    //                 variant="primary"
-                    //                 onClick={() => {
-                    //                     setEditingCategoryId(category._id);
-                    //                     setCategoryName(category.name);
-                    //                     setFields(category.fields); // Pre-fill with existing fields
-                    //                     setShowCreateForm(true);
-                    //                 }}
-                    //             >
-                    //                 <i className="fas fa-edit mr-1" /> Edit
-                    //             </Button>
-                    //             <Button
-                    //                 size="sm"
-                    //                 variant="secondary"
-                    //                 onClick={() => navigate(`single/${category._id}`)}
-                    //             >
-                    //                 <i className="fas fa-eye mr-1" />
-                    //                 View
-                    //             </Button>
-                    //             {canDelete && <Button
-                    //                 size="sm"
-                    //                 isLoading={isPending}
-                    //                 variant="danger"
-                    //                 className="bg-red-600 text-white"
-                    //                 onClick={() =>
-                    //                     handleDelete(category._id)
-                    //                 }
-                    //             >
-                    //                 <i className="fas fa-trash mr-1" />
-                    //                 Delete
-                    //             </Button>}
-                    //         </div>
-                    //     </CardContent>
-                    // </Card>
+                                    {canDelete && (
+                                        <button
+                                            disabled={isPending}
+                                            className="group flex items-center cursor-pointer justify-center w-8 h-8 rounded-full text-red-500 bg-red-50 hover:bg-red-600 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={() => handleDelete(category._id)}
+                                            title="Delete Category"
+                                        >
+                                            {isPending ? (
+                                                <i className="fas fa-circle-notch fa-spin text-sm" />
+                                            ) : (
+                                                <i className="fas fa-trash-alt text-sm" />
+                                            )}
+                                        </button>
+                                    )}
+                                </div>
 
+                                <p className="text-sm text-gray-600 capitalize">
+                                    Fields:{" "}
+                                    <strong>
+                                        {category.fields
+                                            .filter((f: any) => !f.visibleIn || f.visibleIn.length === 0 || f.visibleIn.includes("materials"))
+                                            .map((f: any) => f.key)
+                                            .join(", ") || <span className="italic text-gray-400">No fields enabled</span>
+                                        }
+                                    </strong>
+                                </p>
 
-                    <Card
-                        key={category._id}
-                        className="w-full border-l-4 border-blue-600 shadow-md bg-white hover:shadow-lg transition-all"
-                    >
-                        <CardContent className="p-4 space-y-2">
-                            {/* Top Header Row */}
-                            <div className="flex justify-between items-start gap-4">
-                                <h3 className="text-base font-bold text-blue-700 mb-2 truncate">
-                                    {category.name}
-                                </h3>
+                                <div className="flex justify-end gap-2 pt-2 border-t border-gray-50">
+                                    <Button
+                                        size="sm"
+                                        variant="primary"
+                                        
+                                        onClick={() => {
+                                            setEditingCategoryId(category._id);
+                                            setCategoryName(category.name);
+                                            setIsProductSpecific(category.isProductSpecific);
 
-                                {/* Delete button placed at top right */}
-                                {canDelete && (
-                                    <button
-                                        disabled={isPending}
-                                        className="group flex items-center cursor-pointer justify-center w-8 h-8 rounded-full text-red-500 bg-red-50 hover:bg-red-600 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                                        onClick={() => handleDelete(category._id)}
-                                        title="Delete Category"
+                                            // MAP FIELDS HERE: This ensures the backend knows what the field was 
+                                            // before you started editing it.
+                                            const mappedFields = category.fields.map((f: any) => ({
+                                                ...f,
+                                                oldKey: f.key // Critical: bookmark the original name
+                                            }));
+
+                                            setFields(mappedFields);
+                                            setShowCreateForm(true);
+                                        }}
                                     >
-                                        {isPending ? (
-                                            <i className="fas fa-circle-notch fa-spin text-sm" />
-                                        ) : (
-                                            <i className="fas fa-trash-alt text-sm" />
+                                        <i className="fas fa-edit mr-1" /> Edit
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        onClick={() => navigate(`single/${category._id}`)}
+                                    >
+                                        <i className="fas fa-eye mr-1" />
+                                        View
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))} */}
+
+                    {filteredCategories?.map((category: any) => (
+                        <Card
+                            key={category._id}
+                            className="w-full border-l-4 border-blue-600 shadow-sm bg-white hover:shadow-md transition-all"
+                        >
+                            {/* Dynamically switch between vertical (grid) and horizontal (list) layouts */}
+                            <CardContent className={`p-4 ${viewMode === "list" ? "flex flex-col sm:flex-row sm:items-center justify-between gap-4" : "space-y-3"}`}>
+
+                                {/* Left Side: Title & Fields */}
+                                <div className={`${viewMode === "list" ? "flex-1 flex flex-col sm:flex-row sm:items-center gap-4" : ""}`}>
+                                    <div className="flex justify-between items-start">
+                                        <h3 className={`font-bold text-blue-700 truncate ${viewMode === "list" ? "text-lg w-48" : "text-base mb-2"}`}>
+                                            {category.name}
+                                        </h3>
+
+                                        {/* Mobile Delete Button (Only shows in grid mode or on small screens) */}
+                                        {(canDelete && viewMode === "grid") && (
+                                            <button
+                                                disabled={isPending}
+                                                className="group flex items-center justify-center w-8 h-8 rounded-full text-red-500 bg-red-50 hover:bg-red-600 hover:text-white transition-all"
+                                                onClick={() => handleDelete(category._id)}
+                                            >
+                                                {isPending ? <i className="fas fa-circle-notch fa-spin text-sm" /> : <i className="fas fa-trash-alt text-sm" />}
+                                            </button>
                                         )}
-                                    </button>
-                                )}
-                            </div>
+                                    </div>
 
-                            <p className="text-sm text-gray-600 capitalize">
-                                Fields:{" "}
-                                <strong>
-                                    {category.fields
-                                        .filter((f: any) => !f.visibleIn || f.visibleIn.length === 0 || f.visibleIn.includes("materials"))
-                                        .map((f: any) => f.key)
-                                        .join(", ") || <span className="italic text-gray-400">No fields enabled</span>
-                                    }
-                                </strong>
-                            </p>
+                                    <p className="text-sm text-gray-600 capitalize flex-1 line-clamp-1" title={category.fields.map((f: any) => f.key).join(", ")}>
+                                        <span className="text-gray-400 text-xs font-bold uppercase tracking-wider mr-2">Fields:</span>
+                                        <span className="font-medium">
+                                            {category.fields
+                                                .filter((f: any) => !f.visibleIn || f.visibleIn.length === 0 || f.visibleIn.includes("materials"))
+                                                .map((f: any) => f.key)
+                                                .join(", ") || <span className="italic text-gray-400">None</span>
+                                            }
+                                        </span>
+                                    </p>
+                                </div>
 
-                            {/* Footer Actions */}
-                            <div className="flex justify-end gap-2 pt-2 border-t border-gray-50">
-                                <Button
-                                    size="sm"
-                                    variant="primary"
-                                    onClick={() => {
-                                        setEditingCategoryId(category._id);
-                                        setCategoryName(category.name);
-                                        setFields(category.fields);
-                                        setShowCreateForm(true);
-                                    }}
-                                >
-                                    <i className="fas fa-edit mr-1" /> Edit
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    onClick={() => navigate(`single/${category._id}`)}
-                                >
-                                    <i className="fas fa-eye mr-1" />
-                                    View
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+                                {/* Right Side: Actions */}
+                                <div className={`flex items-center justify-end gap-2 ${viewMode === "list" ? "" : "pt-3 border-t border-gray-50"}`}>
+                                    <Button
+                                        size="sm"
+                                        variant="primary"
+                                        onClick={() => {
+                                            setEditingCategoryId(category._id);
+                                            setCategoryName(category.name);
+                                            setIsProductSpecific(category.isProductSpecific);
+                                            const mappedFields = category.fields.map((f: any) => ({ ...f, oldKey: f.key }));
+                                            setFields(mappedFields);
+                                            setShowCreateForm(true);
+                                        }}
+                                    >
+                                        <i className="fas fa-edit sm:mr-1" /> <span className={`${viewMode === 'list' ? 'hidden sm:inline' : ''}`}>Edit</span>
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        onClick={() => navigate(`single/${category._id}`)}
+                                    >
+                                        <i className="fas fa-eye sm:mr-1" /> <span className={`${viewMode === 'list' ? 'hidden sm:inline' : ''}`}>View</span>
+                                    </Button>
+
+                                    {/* Desktop Delete Button (List Mode) */}
+                                    {(canDelete && viewMode === "list") && (
+                                        <button
+                                            disabled={isPending}
+                                            className="flex items-center justify-center w-9 h-9 ml-1 rounded-md text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100"
+                                            onClick={() => handleDelete(category._id)}
+                                        >
+                                            {isPending ? <i className="fas fa-circle-notch fa-spin" /> : <i className="fas fa-trash-alt" />}
+                                        </button>
+                                    )}
+                                </div>
+
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
             }
         </div>
     );

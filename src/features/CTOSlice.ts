@@ -10,6 +10,7 @@ const initialState = {
     permission: {} as Record<string, Record<string, boolean>>,
     isGuideRequired: undefined,
     ownerId:"",
+    profileImage: null
 
     // <-- add this
 
@@ -20,7 +21,7 @@ const CTOSlice = createSlice({
     initialState,
     reducers: {
         setCTOProfileData: (state, action) => {
-            const { CTOId, CTOName, email, phoneNo, isauthenticated, role, permission, isGuideRequired, ownerId } = action.payload
+            const { CTOId, profileImage, CTOName, email, phoneNo, isauthenticated, role, permission, isGuideRequired, ownerId } = action.payload
 
             return {
                 ...state,
@@ -31,7 +32,9 @@ const CTOSlice = createSlice({
                 role,
                 isauthenticated,
                 permission, isGuideRequired,
-                ownerId
+                ownerId,
+    profileImage
+
             };
         },
         updateCTOGuideStatus: (state, action) => {

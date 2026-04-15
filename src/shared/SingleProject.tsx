@@ -126,7 +126,6 @@ const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizat
             </div>
 
 
-
             <div>
                 <label className="text-sm font-medium text-gray-600">
                     Progress

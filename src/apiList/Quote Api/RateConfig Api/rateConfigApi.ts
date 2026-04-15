@@ -256,7 +256,7 @@ export const getItemsBycategoryNameForAllCategories = async ({
 };
 
 
-
+//  not used
 export const useGetBrandsByCategoryForFittings = ({ categoryName, organizationId, itemName }: { categoryName: string, organizationId: string, itemName: string }) => {
   const { role } = useGetRole();
   const allowedRoles = ["owner", "CTO", "staff"];
@@ -277,6 +277,7 @@ export const useGetBrandsByCategoryForFittings = ({ categoryName, organizationId
   });
 };
 
+//  not used
 
 export const useGetBrandsByCategoryForallCategories = ({ organizationId, itemName }: { organizationId: string, itemName: string }) => {
   const { role } = useGetRole();

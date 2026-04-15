@@ -52,7 +52,7 @@ export default function WorkerRegister() {
     try {
       const decodedInvite = JSON.parse(atob(invite))
       setInviteData(decodedInvite)
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Invalid Invitation",
         description: "The invitation link is corrupted or invalid.",
@@ -209,12 +209,12 @@ export default function WorkerRegister() {
 
 
       const data = await registerCommonUser({
-          invite,
-          email: formData.email,
-          password: formData.password,
-          phoneNo: formData.phoneNo,
-          name: formData.workerName,
-        
+        invite,
+        email: formData.email,
+        password: formData.password,
+        phoneNo: formData.phoneNo,
+        name: formData.workerName,
+
       })
 
 
@@ -226,7 +226,8 @@ export default function WorkerRegister() {
         role: workerData?.role,
         isauthenticated: true,
         _id: workerData?.workerId,
-        userName: workerData?.workerName
+        userName: workerData?.workerName,
+        organizationId: workerData?.organizationId || ""
       }));
 
       dispatch(setWorkerProfileData({
@@ -259,7 +260,7 @@ export default function WorkerRegister() {
   }
 
 
-  
+
 
   if (!invite) {
     return (

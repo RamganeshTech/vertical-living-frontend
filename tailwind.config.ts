@@ -6,9 +6,32 @@ const config: Config = {
         './index.html',
         './src/**/*.{js,ts,jsx,tsx}'
     ],
+    darkMode: 'class', // Important for future light/dark switching
     theme: {
         extend: {
             colors: {
+                // New Professional Semantic Palette
+                brand: {
+                    main: 'var(--color-brand-main)',
+                    surface: 'var(--color-brand-surface)',
+                    ash: 'var(--color-brand-ash)',
+                },
+                ash: {
+                    light: 'var(--color-ash-light)',
+                    medium: 'var(--color-ash-medium)',
+                    dark: 'var(--color-ash-dark)',
+                },
+                text: {
+                    main: 'var(--color-text-main)',
+                    muted: 'var(--color-text-muted)',
+                },
+                action: {
+                    primary: 'var(--color-action-primary)',
+                    success: 'var(--color-action-success)',
+                    danger: 'var(--color-action-danger)',
+                },
+
+             // Legacy colors (keep these so existing code doesn't break)
                 selectedBg: '#494950',
                 blackBG: '#35353d',
                 "black-bg": "#444444",

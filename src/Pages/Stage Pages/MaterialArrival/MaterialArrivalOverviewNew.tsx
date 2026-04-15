@@ -56,7 +56,7 @@ const MaterialArrivalOverviewNew = () => {
 
   const { timer, generatedLink, materialArrivalList } = data || {};
 
-  console.log("materialArrivalList", materialArrivalList)
+  // console.log("materialArrivalList", materialArrivalList)
 
 
   // --- Handlers ---
@@ -82,36 +82,49 @@ const MaterialArrivalOverviewNew = () => {
   const verificationProgress = totalMaterials > 0 ? Math.round((verifiedMaterials / totalMaterials) * 100) : 0;
 
   return (
-    <div className="w-full h-full flex flex-col p-2">
+    // <div className="w-full h-full flex flex-col p-2">
+    <div className="w-full h-full flex flex-col bg-brand-surface p-2">
 
       {/* Header Section */}
       <div className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 pb-3">
-        <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
+        {/* <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center"> */}
+        <h2 className="text-xl sm:text-2xl font-bold text-text-main flex items-center">
           {isMobile && (
-            <button onClick={openMobileSidebar} className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100">
+            <button onClick={openMobileSidebar}
+              //  className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100"
+              className="mr-3 p-2 rounded-lg border border-ash-medium hover:bg-brand-ash text-text-muted shadow-sm transition-colors"
+              title="Open Menu"
+            >
               <i className="fa-solid fa-bars"></i>
             </button>
           )}
-          <i className="fa-solid fa-receipt mr-2"></i>
+          {/* <i className="fa-solid fa-receipt mr-2 text-text-muted text-lg"></i> */}
+          <div className="w-10 h-10 bg-brand-surface border border-ash-medium rounded-lg flex items-center justify-center shadow-sm mr-3">
+            <i className="fa-solid fa-receipt text-text-muted text-lg"></i>
+          </div>
           <span className="hidden sm:inline">Material Checking</span>
           <span className="sm:hidden">Material Check</span>
         </h2>
 
-        {(canCreate || canEdit) &&
+        <div className="flex gap-2 items-center">
+          {(canCreate || canEdit) &&
 
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button
-              isLoading={completePending}
-              onClick={handleCompletionStatus}
-              className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
-            >
-              <i className="fa-solid fa-circle-check mr-2"></i>
-              Mark as Complete
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button
+                isLoading={completePending}
+                onClick={handleCompletionStatus}
+                // className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
+                variant="dark"
+                className="flex-1 sm:flex-initial min-w-max px-5 shadow-sm"
+              >
+                {/* <i className="fa-solid fa-circle-check mr-2"></i> */}
+                <i className="fa-solid fa-circle-check mr-2 text-action-success"></i>
+                Mark as Complete
+              </Button>
 
-            <ResetStageButton projectId={projectId!} stageNumber={9} stagePath="materialarrivalcheck" />
+              <ResetStageButton projectId={projectId!} stageNumber={9} stagePath="materialarrivalcheck" />
 
-            {/* {!error && (
+              {/* {!error && (
               <ShareDocumentWhatsapp
                 projectId={projectId!}
                 stageNumber="9"
@@ -120,33 +133,54 @@ const MaterialArrivalOverviewNew = () => {
               />
             )} */}
 
-            <AssignStageStaff
-              stageName="MaterialArrivalModel"
-              projectId={projectId!}
-              organizationId={organizationId!}
-              currentAssignedStaff={data?.assignedTo || null}
-            />
-           
-
-          </div>}
-
-           <div className="w-full sm:w-auto flex justify-end sm:block">
-              <StageGuide
+              <AssignStageStaff
+                stageName="MaterialArrivalModel"
+                projectId={projectId!}
                 organizationId={organizationId!}
-                stageName="materialarrival"
+                currentAssignedStaff={data?.assignedTo || null}
               />
-            </div>
+
+
+            </div>}
+
+          <div className="w-full sm:w-auto flex justify-end sm:block">
+            <StageGuide
+              organizationId={organizationId!}
+              stageName="materialarrival"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Error Display */}
       {isError && (
+        // <div className="flex-1 flex items-center justify-center">
+        //   <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+        //     <div className="text-red-600 font-semibold mb-2">⚠️ Error Occurred</div>
+        //     <p className="text-red-500 text-sm mb-4">
+        //       {(error as any)?.response?.data?.message || "Failed to load data"}
+        //     </p>
+        //     <Button onClick={() => refetch()} className="bg-red-600 text-white hover:bg-red-700">Retry</Button>
+        //   </div>
+        // </div>
         <div className="flex-1 flex items-center justify-center">
-          <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-            <div className="text-red-600 font-semibold mb-2">⚠️ Error Occurred</div>
-            <p className="text-red-500 text-sm mb-4">
+          <div className="max-w-xl w-full p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center">
+            <div className="text-action-danger text-3xl mb-3">
+              <i className="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div className="text-text-main text-lg font-bold mb-2">
+              Error Occurred
+            </div>
+            <p className="text-text-muted text-sm mb-5">
               {(error as any)?.response?.data?.message || "Failed to load data"}
             </p>
-            <Button onClick={() => refetch()} className="bg-red-600 text-white hover:bg-red-700">Retry</Button>
+            <Button
+              onClick={() => refetch()}
+              variant="outline"
+              className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+            >
+              Retry
+            </Button>
           </div>
         </div>
       )}
@@ -156,9 +190,14 @@ const MaterialArrivalOverviewNew = () => {
         <div className="flex-1 min-h-0 overflow-y-auto space-y-4 sm:space-y-6">
 
           {/* Timer Card */}
-          <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
+          {/* <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
             <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
               <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+              <span>Stage Timings</span>
+            </div> */}
+          <Card className="p-5 w-full shadow-sm border-2 border-ash-medium rounded-xl bg-brand-surface">
+            <div className="flex items-center gap-2 text-text-main text-sm font-bold mb-4 uppercase tracking-wide border-b border-ash-light pb-3">
+              <i className="fa-regular fa-clock text-ash-dark text-base"></i>
               <span>Stage Timings</span>
             </div>
             <StageTimerInfo
@@ -175,9 +214,11 @@ const MaterialArrivalOverviewNew = () => {
           </Card>
 
           {/* Stats Header */}
-          <section className="w-full rounded-xl shadow-lg border border-gray-200 overflow-hidden bg-white">
-            <div className="bg-gradient-to-r from-slate-800 to-gray-900 p-6 text-white">
-              <div className="flex items-center justify-between">
+          {/* <section className="w-full rounded-xl shadow-lg border border-gray-200 overflow-hidden bg-white"> */}
+          <section className="w-full rounded-xl shadow-sm border border-ash-medium overflow-hidden bg-brand-surface">
+            {/* <div className="bg-gradient-to-r from-slate-800 to-gray-900 p-6 text-white"> */}
+            <div className="bg-brand-ash border-b border-ash-medium p-5 sm:p-6">
+              {/* <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-opacity-10 rounded-lg flex items-center justify-center">
                     <i className="fa-solid fa-boxes-stacked text-2xl text-white"></i>
@@ -191,12 +232,29 @@ const MaterialArrivalOverviewNew = () => {
                   <div className="text-2xl font-bold">{totalMaterials}</div>
                   <div className="text-gray-300 text-sm">Total Items</div>
                 </div>
+              </div> */}
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-brand-surface border border-ash-medium shadow-sm rounded-lg flex items-center justify-center shrink-0">
+                    <i className="fa-solid fa-boxes-stacked text-xl text-text-muted"></i>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-text-main">Material Verification Center</h3>
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-text-muted mt-1">Review arrival status per order</p>
+                  </div>
+                </div>
+                <div className="sm:text-right bg-brand-surface px-4 py-2 rounded-lg border border-ash-medium shadow-sm flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-text-muted sm:mb-0.5">Total Items</div>
+                  <div className="text-xl font-black text-text-main">{totalMaterials}</div>
+                </div>
               </div>
 
               {/* Progress Stats */}
               {totalMaterials > 0 && (
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-slate-700 bg-opacity-50 rounded-lg p-3 backdrop-blur-sm flex items-center gap-3">
+
+                  {/* <div className="bg-slate-700 bg-opacity-50 rounded-lg p-3 backdrop-blur-sm flex items-center gap-3">
                     <div className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400">
                       <i className="fa-solid fa-check"></i>
                     </div>
@@ -205,6 +263,7 @@ const MaterialArrivalOverviewNew = () => {
                       <div className="text-xs text-gray-300">Verified</div>
                     </div>
                   </div>
+
                   <div className="bg-slate-700 bg-opacity-50 rounded-lg p-3 backdrop-blur-sm flex items-center gap-3">
                     <div className="w-8 h-8 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-400">
                       <i className="fa-solid fa-clock"></i>
@@ -214,6 +273,7 @@ const MaterialArrivalOverviewNew = () => {
                       <div className="text-xs text-gray-300">Pending</div>
                     </div>
                   </div>
+
                   <div className="bg-slate-700 bg-opacity-50 rounded-lg p-3 backdrop-blur-sm flex items-center gap-3">
                     <div className="w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400">
                       <i className="fa-solid fa-chart-pie"></i>
@@ -223,12 +283,44 @@ const MaterialArrivalOverviewNew = () => {
                       <div className="text-xs text-gray-300">Complete</div>
                     </div>
                   </div>
+                   */}
+
+                  <div className="bg-brand-surface border border-ash-medium rounded-lg p-3.5 flex items-center gap-4 shadow-sm">
+                    <div className="w-10 h-10 bg-action-success/10 border border-action-success/20 rounded-full flex items-center justify-center text-action-success shrink-0">
+                      <i className="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-0.5">Verified</div>
+                      <div className="text-xl font-black text-text-main leading-none">{verifiedMaterials}</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-brand-surface border border-ash-medium rounded-lg p-3.5 flex items-center gap-4 shadow-sm">
+                    <div className="w-10 h-10 bg-brand-ash border border-ash-medium rounded-full flex items-center justify-center text-text-muted shrink-0">
+                      <i className="fa-regular fa-clock"></i>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-0.5">Pending</div>
+                      <div className="text-xl font-black text-text-main leading-none">{pendingMaterials}</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-brand-surface border border-ash-medium rounded-lg p-3.5 flex items-center gap-4 shadow-sm">
+                    <div className="w-10 h-10 bg-action-primary/10 border border-action-primary/20 rounded-full flex items-center justify-center text-action-primary shrink-0">
+                      <i className="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-0.5">Complete</div>
+                      <div className="text-xl font-black text-text-main leading-none">{verificationProgress}%</div>
+                    </div>
+                  </div>
+
                 </div>
               )}
             </div>
 
             {/* Accordion List */}
-            <div className="p-4 bg-gray-50">
+            <div className="p-4 bg-brand-surface">
               {materialArrivalList && materialArrivalList?.length > 0 ? (
                 <div className="space-y-4">
                   {materialArrivalList?.map((orderGroup: any, index: number) => (
@@ -240,9 +332,17 @@ const MaterialArrivalOverviewNew = () => {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                  <i className="fa-solid fa-box-open text-4xl mb-3 opacity-50"></i>
-                  <p>No material orders synced yet.</p>
+                // <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                //   <i className="fa-solid fa-box-open text-4xl mb-3 opacity-50"></i>
+                //   <p>No material orders synced yet.</p>
+                // </div>
+
+                <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-ash-medium rounded-xl bg-brand-ash/50">
+                  <div className="w-14 h-14 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mb-3 shadow-sm">
+                    <i className="fa-solid fa-box-open text-2xl text-ash-dark"></i>
+                  </div>
+                  <p className="text-sm font-bold text-text-main mb-1">No orders found</p>
+                  <p className="text-xs font-medium text-text-muted">No material orders have been synced yet.</p>
                 </div>
               )}
             </div>

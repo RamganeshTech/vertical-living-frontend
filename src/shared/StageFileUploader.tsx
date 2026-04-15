@@ -102,13 +102,16 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({enableUpload, fo
     const videoFiles = existingUploads.filter((file) => file.type === "video");
     return (
         <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-blue-700">Common Uploads</h3>
+            {/* <h3 className="text-xl font-semibold text-blue-700">Common Uploads</h3> */}
+            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide flex items-center pb-2 border-b border-gray-100">
+    <i className="fa-solid fa-cloud-arrow-up mr-2 text-gray-400 text-base" /> Common Uploads
+</h3>
 
             <div className="flex gap-4 items-center relative">
                 {enableUpload &&
                     <>
                         <Input type="file" multiple onChange={handleFileChange} accept="image/jpeg,image/png,application/pdf,video/*" />
-                        {!autoUpload && <Button onClick={handleUpload} isLoading={uploadPending} className="bg-blue-600 text-white">
+                        {!autoUpload && <Button onClick={handleUpload} isLoading={uploadPending} className="bg-gray-800 hover:bg-gray-900 text-white shadow-sm">
                             Upload
                         </Button>}
 
@@ -143,23 +146,37 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({enableUpload, fo
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
 
                 <div>
-                    <h4 className="font-semibold text-blue-800 mb-2">📄 PDF Files</h4>
-                    <ul className="space-y-2 max-h-[180px]  rounded-lg  border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto ">
-                        {pdfFiles.length === 0 && <div className="min-h-[145px]   flex items-center justify-center"><p className="text-sm text-gray-500">No PDFs uploaded.</p></div>}
+                    {/* <h4 className="font-semibold text-blue-800 mb-2">📄 PDF Files</h4> */}
+                    <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i className="fa-regular fa-file-pdf text-gray-400 text-sm"></i> PDF Files</h4>
+                    {/* <ul className="space-y-2 max-h-[180px]  rounded-lg  border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto "> */}
+<ul className="space-y-2.5 max-h-[180px] rounded-xl border border-gray-200 bg-gray-50/50 p-2 max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto">                        {pdfFiles.length === 0 && <div className="min-h-[145px]   flex items-center justify-center"><p className="text-sm text-gray-500">No PDFs uploaded.</p></div>}
                         {pdfFiles?.map((file, i) => (
 
-                            <li key={i} className="flex justify-between items-center  bg-blue-50 p-2 rounded-xl">
-                                <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span>
-                                <div className="flex gap-2 items-center">
-                                    {/* <a href={file.url} target="_blank" download className="text-blue-600 underline">
-                                        <i className="fa-solid fa-download"></i>
-                                    </a> */}
+                            // <li key={i} className="flex justify-between items-center  bg-blue-50 p-2 rounded-xl">
+                            <li key={i} className="flex justify-between items-center bg-white border border-gray-100 p-2.5 rounded-lg shadow-sm">
+                                {/* <span className="truncate whitespace-wrap max-w-[100%]">{file.originalName}</span> */}
+                                {/* <span className="truncate whitespace-wrap max-w-[100%] text-xs font-medium text-gray-700">{file.originalName}</span> */}
 
-                                    <Button onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })} size="sm" className="text-sm">
+                                <div className="flex items-center gap-3 truncate mr-2">
+        {/* The PDF Icon Container */}
+        <div className="w-8 h-8 flex-shrink-0 bg-gray-50 border border-gray-100 rounded flex items-center justify-center">
+            <i className="fa-regular fa-file-pdf text-red-500/80 text-sm"></i>
+        </div>
+        
+        {/* File Name */}
+        <span className="truncate text-xs font-medium text-gray-700 tracking-tight">
+            {file.originalName}
+        </span>
+    </div>
+                                <div className="flex gap-2 items-center">
+
+                                    <Button onClick={() => downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })} size="sm" 
+                                    className="text-sm bg-transparent !text-gray-500 !hover:text-gray-800 hover:bg-gray-50">
                                         <i className="fa-solid fa-download"></i>
                                     </Button>
 
-                                    {canDelete && <Button size="sm" isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)} className="text-green-600 text-sm">
+                                    {canDelete && <Button size="sm" isLoading={deleteFilePending} onClick={() => handleDeleteFile((file as any)?._id)}
+                                     className="text-sm !bg-red-50/10 !text-gray-500 hover:!text-red-600 hover:!bg-red-50">
                                         <i className="fa-solid fa-trash-can"></i>
                                     </Button>}
                                 </div>
@@ -172,7 +189,9 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({enableUpload, fo
                 {/* <Separator orientation="vertical" /> */}
 
                 <div className="overflow-y-auto">
-                    <h4 className="font-semibold text-blue-800 mb-2">🖼️ Image Files</h4>
+                    {/* <h4 className="font-semibold text-blue-800 mb-2">🖼️ Image Files</h4> */}
+
+                    <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i className="fa-regular fa-image text-gray-400 text-sm"></i> Image Files</h4>
                     <ul className="space-y-2  max-h-[180px] rounded-lg border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto custom-scrollbar">
                         {imageFiles.length === 0 && <div className="min-h-[145px]  flex items-center justify-center"><p className="text-sm text-gray-500">No Images uploaded.</p></div>}
 
@@ -214,7 +233,8 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({enableUpload, fo
 
 
                 <div className="overflow-y-auto">
-                    <h4 className="font-semibold text-blue-800 mb-2">🎥 Video Files</h4>
+                    {/* <h4 className="font-semibold text-blue-800 mb-2">🎥 Video Files</h4> */}
+                    <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i className="fa-solid fa-film text-gray-400 text-sm"></i> Video Files</h4>
                     <ul className="space-y-2 max-h-[180px] rounded-lg border-2 border-[#5e5f612a] max-w-[100%] overflow-x-hidden custom-scrollbar overflow-y-auto">
                         {videoFiles.length === 0 && <div className="min-h-[145px] flex items-center justify-center"><p className="text-sm text-gray-500">No Videos uploaded.</p></div>}
                         {/* {videoFiles.map((file, i) => (
@@ -281,3 +301,6 @@ const RequirementFileUploader: React.FC<UploadSectionProps> = ({enableUpload, fo
 };
 
 export default RequirementFileUploader;
+
+
+

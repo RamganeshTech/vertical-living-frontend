@@ -22,13 +22,7 @@ type Props = {
 }
 
 
-const QuoteGenerateList: React.FC<Props> = ({
-    // setFurnitures, 
-    // setEditQuoteNo,
-    //  setIsEditingId, 
-    //  setFiltersMain, 
-    //  setQuoteType 
-}) => {
+const QuoteGenerateList: React.FC<Props> = () => {
 
     const { organizationId } = useParams();
     const [filters, setFilters] = useState({

@@ -42,7 +42,7 @@ export default function RateConfigSub() {
     const [searchTerm, setSearchTerm] = useState("");
     // Default to the first field key if available, otherwise empty string
     const [searchKey, setSearchKey] = useState("");
-    const [materialType, setMaterialType] = useState<string>("All");
+    const [materialType, setMaterialType] = useState<string>("plywood");
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const currentCategory = categories?.find((cat: any) => cat._id === categoryId);
@@ -337,7 +337,7 @@ export default function RateConfigSub() {
 
 
 
-    const isChildRoute = location.pathname.includes("catalogue") || location.pathname.includes("description");
+    const isChildRoute = location.pathname.includes("catalogue") || location.pathname.includes("description") || location.pathname.includes("history"); 
 
     if (isChildRoute) return <Outlet />;
 
@@ -347,7 +347,7 @@ export default function RateConfigSub() {
             {/* Sticky Header */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center sticky top-0 bg-white z-10 py-4 border-b">
                 <div className='flex gap-2 items-center'>
-                    <div onClick={() => navigate(-1)}
+                    <div onClick={() => navigate("..")}
                         className='bg-slate-50 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
                         <i className='fas fa-arrow-left'></i></div>
                     <h2 className="text-2xl font-bold text-gray-800">{currentCategory.name}</h2>
@@ -492,6 +492,13 @@ export default function RateConfigSub() {
                         >
                             <i className="fas fa-book-open mr-2"></i> Catalogue
                         </Button>
+
+                         <Button
+                            onClick={() => navigate(`history`)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-xl text-[11px] font-bold shadow-sm px-4 shrink-0"
+                        >
+                            <i className="fas fa-book-open mr-2"></i> History
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -535,6 +542,13 @@ export default function RateConfigSub() {
                             }
                             )
                             }
+
+
+                            <th className="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Activity
+                            </th>
+
+
                             <th className="text-center px-6 py-1 sm:py-3  text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -543,6 +557,11 @@ export default function RateConfigSub() {
                     <tbody>
                         {filteredItems?.map((item: any, i: number) => {
                             const isEditing = isEditingId === item._id;
+
+                            // Date Formatting Helper
+                            // const createdDate = new Date(item.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                            const updatedDate = new Date(item.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                            const updatedTime = new Date(item.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                             return (
                                 <tr key={`existing-${item?._id}`} className={`group border-b border-gray-100 transition-all duration-200 ${isEditing ? "bg-blue-50/50" : "hover:bg-gray-50"}`}>
                                     <td className="p-4 font-medium text-center text-sm text-gray-700">{i + 1}</td>
@@ -616,6 +635,28 @@ export default function RateConfigSub() {
                                             }
                                         </td>
                                     ))}
+
+
+                                    {/* 🆕 New Timeline Data Cell */}
+                                    <td className="p-1 border border-gray-100 text-center whitespace-nowrap bg-gray-50/30">
+                                        <div className="flex flex-col items-center justify-center gap-0.5 max-w-[100px]">
+                                            {/* 1. The Primary Date (Bold Slate) */}
+                                            <span className="text-[11px] font-bold text-slate-700 tracking-tight">
+                                                {updatedDate}
+                                            </span>
+
+                                            {/* 2. The Time (Subtle Slate with icon) */}
+                                            <div className="flex items-center gap-1 text-[10px] text-slate-800 font-medium">
+                                                <i className="far fa-clock text-[9px]"></i>
+                                                <span>{updatedTime}</span>
+                                            </div>
+
+                                            {/* 3. The Label (Minimalist and clean) */}
+                                            <span className="text-[9px] text-slate-800 uppercase tracking-wide mt-0.5 border-t border-slate-100 pt-0.5 w-full">
+                                                {item.createdAt === item.updatedAt ? "Newly Created" : "Last Updated"}
+                                            </span>
+                                        </div>
+                                    </td>
 
                                     <td className="text-center p-4 border border-gray-100">
                                         <div className="flex justify-center gap-2">

@@ -174,59 +174,78 @@ const PublicCostCalculationMain = () => {
                         <div className="flex-1 flex items-center justify-center"><i className="fa fa-spinner fa-spin text-[#ffc000] text-2xl" /></div>
                     ) : (
                         <div className="flex-1 overflow-auto relative custom-scrollbar">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="sticky top-0 z-10 bg-gray-50">
-                                    <tr className="text-[10px] uppercase tracking-[2px] text-gray-400">
-                                        <th className="px-8 py-5 font-bold">S.No</th>
-                                        <th className="px-8 py-5 font-bold">Date</th>
-                                        <th className="px-8 py-5 font-bold">Client Details</th>
-                                        <th className="px-8 py-5 font-bold">Property</th>
-                                        <th className="px-8 py-5 font-bold text-center">Finish</th>
-                                        <th className="px-8 py-5 font-bold text-right">Estimate</th>
-                                        <th className="px-8 py-5 font-bold text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {records.map((item: any, idx:number) => (
-                                        <tr
-                                            key={item._id}
-                                            className="hover:bg-gray-50/50 transition-all cursor-pointer group"
-                                            onClick={() => navigate(`single/${item._id}`)} // Navigate to child detail route
-                                        >
-                                            <td className="px-8 py-5 text-xs font-bold text-gray-400">
-                                                {idx+1}
-                                            </td>
-                                            <td className="px-8 py-5 text-xs font-bold text-gray-400">
-                                                {/* {new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} */}
-                                                {dateFormate(item.createdAt)}
-                                            </td>
-                                            <td className="px-8 py-5">
-                                                <div className="font-bold text-gray-900 text-sm">{item.name}</div>
-                                                <div className="text-[11px] text-gray-400 font-medium">{item.phone}</div>
-                                            </td>
-                                            <td className="px-8 py-5">
-                                                <div className="text-xs font-bold text-gray-700">{item.homeType}</div>
-                                                <div className="text-[10px] text-gray-400 uppercase tracking-tighter">{item.location}</div>
-                                            </td>
-                                            <td className="px-8 py-5 text-center">
-                                                <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase ${item.finish === 'Luxury' ? 'bg-purple-50 text-purple-600' :
-                                                    item.finish === 'Premium' ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-600'
-                                                    }`}>
-                                                    {item.finish}
-                                                </span>
-                                            </td>
-                                            <td className="px-8 py-5 text-right font-bold text-[#1a1a1a]">
-                                                ₹{item.estimate.toLocaleString('en-IN')}
-                                            </td>
-                                            <td className="px-8 py-5 text-center">
-                                                <button className="w-8 h-8 rounded-xl bg-gray-100 cursor-pointer">
-                                                    <i className="fa fa-chevron-right text-[10px]" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                          <table className="w-full text-left border-collapse">
+    <thead className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200">
+        <tr className="text-[10px] uppercase tracking-[2px] text-slate-500">
+            <th className="px-8 py-5 font-extrabold">S.No</th>
+            <th className="px-8 py-5 font-extrabold">Date</th>
+            <th className="px-8 py-5 font-extrabold">Client Details</th>
+            <th className="px-8 py-5 font-extrabold">Property</th>
+            <th className="px-8 py-5 font-extrabold text-center">Finish</th>
+            <th className="px-8 py-5 font-extrabold text-right">Estimate</th>
+            <th className="px-8 py-5 font-extrabold text-center">Action</th>
+        </tr>
+    </thead>
+    <tbody className="divide-y divide-slate-100 bg-white">
+        {records.map((item: any, idx: number) => (
+            <tr
+                key={item._id}
+                className="hover:bg-blue-50/50 transition-all cursor-pointer group"
+                onClick={() => navigate(`single/${item._id}`)}
+            >
+                {/* 1. S.No with Blue accent */}
+                <td className="px-8 py-5 text-xs font-extrabold text-blue-600/40 group-hover:text-blue-600">
+                    {idx + 1}
+                </td>
+
+                {/* 2. Date with Slate color */}
+                <td className="px-8 py-5 text-xs font-bold text-slate-500">
+                    {dateFormate(item.createdAt)}
+                </td>
+
+                {/* 3. Client Details - Bold Name, Blue Phone */}
+                <td className="px-8 py-5">
+                    <div className="font-bold text-slate-900 text-sm tracking-tight">{item.name}</div>
+                    <div className="text-[11px] text-blue-500 font-bold opacity-80 group-hover:opacity-100">{item.phone}</div>
+                </td>
+
+                {/* 4. Property - Dark Type, Slate Location */}
+                <td className="px-8 py-5">
+                    <div className="text-xs font-bold text-slate-800">{item.homeType}</div>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">{item.location}</div>
+                </td>
+
+                {/* 5. Finish - Colorful Badges */}
+                <td className="px-8 py-5 text-center">
+                    <span className={`px-3 py-1.5 rounded-lg text-[9px] font-extrabold uppercase border ${
+                        item.finish === 'Basic' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                        item.finish === 'Core' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
+                        item.finish === 'Prime' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                        item.finish === 'Premium' ? 'bg-blue-50 text-violet-600 border-violet-100' :
+                        'bg-slate-100 text-slate-600 border-slate-200'
+                    }`}>
+                        {item.finish}
+                    </span>
+                </td>
+
+                {/* 6. Estimate - Vibrant Blue/Black */}
+                <td className="px-8 py-5 text-right">
+                    <span className="text-blue-600 font-bold text-[10px] mr-1">₹</span>
+                    <span className="font-bold text-slate-900 text-[15px]">
+                        {item.estimate.toLocaleString('en-IN')}
+                    </span>
+                </td>
+
+                {/* 7. Action Button - Colorful Hover */}
+                <td className="px-8 py-5 text-center">
+                    <button className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-200 transition-all flex items-center justify-center mx-auto cursor-pointer">
+                        <i className="fa fa-chevron-right text-[10px]" />
+                    </button>
+                </td>
+            </tr>
+        ))}
+    </tbody>
+</table>
                         </div>
                     )}
                 </div>

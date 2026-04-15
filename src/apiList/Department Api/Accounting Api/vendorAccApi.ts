@@ -292,6 +292,39 @@ export const createVendor = async ({
     return data.data;
 };
 
+
+export const quickCreateVendor = async ({
+    organizationId, firstName,
+    companyName,
+    shopDisplayName,
+    vendorCategory, email, phone, shopFullAddress,
+    api
+}: {
+    organizationId: string; firstName?: string | null;
+    companyName?: string | null;
+    shopDisplayName?: string | null;
+    vendorCategory?: string | null; email: string,
+    phone?: {
+        work?: string | null;
+        mobile?: string | null;
+    };
+    shopFullAddress: string
+    api: AxiosInstance;
+}) => {
+    // Always send as FormData
+
+
+    const { data } = await api.post('/department/accounting/vendor/quick/createvendor', {
+        organizationId, firstName,
+        companyName,
+        shopDisplayName,
+        vendorCategory, email, phone, shopFullAddress,
+    });
+
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
 export const updateVendorMainImage = async ({
     vendorId,
     file,
@@ -315,6 +348,7 @@ export const updateVendorMainImage = async ({
     if (!data.ok) throw new Error(data.message);
     return data.data; // Should return { mainImage: "url..." }
 };
+
 
 
 
@@ -359,7 +393,7 @@ export const getAllCustomeforDD = async ({
     api: AxiosInstance;
 }) => {
     const { data } = await api.get(`/department/accounting/vendor/getallvendorname/${organizationId}`, {
-        params: {priority}
+        params: { priority }
     });
     if (!data.ok) throw new Error(data.message);
 
@@ -462,6 +496,47 @@ export const useCreateVendor = () => {
 };
 
 
+
+
+export const useQuickCreateVendor = () => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({organizationId, email, firstName, companyName, shopFullAddress, shopDisplayName, vendorCategory, phone,}:{organizationId: string; firstName?: string | null;
+    companyName?: string | null;
+    shopDisplayName?: string | null;
+    vendorCategory?: string | null; 
+    email: string;
+    phone?: {
+        work?: string | null;
+        mobile?: string | null;
+    };
+    shopFullAddress: string
+    api: AxiosInstance;}) => {
+            if (!role || !ALLOWED_ROLES.includes(role)) {
+                throw new Error("Not allowed to make this API call");
+            }
+            if (!api) {
+                throw new Error("API instance not found for role");
+            }
+            return await quickCreateVendor({ organizationId, email, firstName, companyName, shopFullAddress, shopDisplayName, vendorCategory, phone, api });
+        },
+        onSuccess: (_, variables) => {
+            // Invalidate all Vendor queries for this organization
+            queryClient.invalidateQueries({
+                queryKey: ["vendors", "list", variables.organizationId],
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ["allvendorsname", variables.organizationId],
+            });
+        }
+    });
+};
+
+
+
 //  update the main image alone
 
 
@@ -555,7 +630,7 @@ export const useGetVendor = (VendorId: string, enabled: boolean = true) => {
 
 
 
-export const useGetVendorForDropDown = (organizationId: string, enabled: boolean = true, priority?:string) => {
+export const useGetVendorForDropDown = (organizationId: string, enabled: boolean = true, priority?: string) => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 

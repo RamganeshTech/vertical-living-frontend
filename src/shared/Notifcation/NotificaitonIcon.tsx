@@ -48,7 +48,7 @@ const NotificationIcon: React.FC<NotificationIconProps> = ({
   return (
     <div
       onClick={handleNotificationClick}
-      className={`cursor-pointer flex justify-center items-center py-4 px-4 ${isActive ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#3a3b45]'
+      className={`cursor-pointer flex justify-center items-center p-1 px-2 ${isActive ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#f7f7f7]'
         }`}
     >
       <div className="relative">

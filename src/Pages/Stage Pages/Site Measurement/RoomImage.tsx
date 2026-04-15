@@ -114,12 +114,25 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
                                 variant="secondary"
                                 size="sm"
                                 onClick={(e) => {
-                                    e.stopPropagation()
-                                    action === "eye"
-                                        ? setPreviewImage(file?.url)
-                                        : action === "trash"
-                                            ? handleDeleteFile(file._id)
-                                            : downloadImage({ src: file?.url, alt: file?.originalName || "image" })
+                                    // e.stopPropagation()
+                                    // action === "eye"
+                                    //     ? setPreviewImage(file?.url)
+                                    //     : action === "trash"
+                                    //         ? handleDeleteFile(file._id)
+                                    //         : downloadImage({ src: file?.url, alt: file?.originalName || "image" })
+
+                                    e.stopPropagation();
+
+                                    if (action === "eye") {
+                                        setPreviewImage(file?.url);
+                                    } else if (action === "trash") {
+                                        handleDeleteFile(file._id);
+                                    } else {
+                                        downloadImage({
+                                            src: file?.url,
+                                            alt: file?.originalName || "image",
+                                        });
+                                    }
                                 }}
                                 disabled={action === "trash" && isDeleting}
                                 className={`rounded-full bg-white hover:bg-gray-100 shadow-lg transition-all duration-200 ${action === "trash" ? "hover:bg-red-50" : ""
@@ -145,13 +158,28 @@ const RoomImage: React.FC<RoomImageProp> = ({ file, setPreviewImage, room }) => 
                             key={action}
                             variant="secondary"
                             size="sm"
+                            // onClick={(e) => {
+                            //     e.stopPropagation()
+                            //     action === "eye"
+                            //         ? setPreviewImage(file?.url)
+                            //         : action === "trash"
+                            //             ? handleDeleteFile(file._id)
+                            //             : downloadImage({ src: file?.url, alt: file?.originalName || "image" })
+                            // }}
+
                             onClick={(e) => {
-                                e.stopPropagation()
-                                action === "eye"
-                                    ? setPreviewImage(file?.url)
-                                    : action === "trash"
-                                        ? handleDeleteFile(file._id)
-                                        : downloadImage({ src: file?.url, alt: file?.originalName || "image" })
+                                e.stopPropagation();
+
+                                if (action === "eye") {
+                                    setPreviewImage(file?.url);
+                                } else if (action === "trash") {
+                                    handleDeleteFile(file._id);
+                                } else {
+                                    downloadImage({
+                                        src: file?.url,
+                                        alt: file?.originalName || "image",
+                                    });
+                                }
                             }}
                             disabled={action === "trash" && isDeleting}
                             className={`w-6 h-6 p-0 rounded-full bg-white/90 backdrop-blur-sm border shadow-sm transition-all duration-200 ${action === "trash"

@@ -166,8 +166,8 @@ const RequirementFormPublic: React.FC = () => {
     {
       label: "Client Info",
       content: (
-        <div className="bg-white rounded-2xl shadow p-6">
-          <h2 className="text-2xl font-semibold text-blue-800 mb-4">Client Information</h2>
+        <div className="bg-brand-surface rounded-2xl shadow p-6">
+          <h2 className="text-2xl font-semibold text-text-main mb-4">Client Information</h2>
           <div className="grid grid-cols-1 gap-4">
             <div>
               <Label>Client Name</Label>
@@ -177,6 +177,8 @@ const RequirementFormPublic: React.FC = () => {
                 onChange={handleClientChange}
                 required={true}
                 error={errors.clientName || ""}
+                className="bg-transparent border-0 border-b border-ash-light !rounded-none focus:ring-0 focus:border-ash-dark text-text-main px-0 transition-all "
+
               />
 
             </div>
@@ -189,6 +191,8 @@ const RequirementFormPublic: React.FC = () => {
                 onChange={handleClientChange}
                 required={true}
                 error={errors.email || ""}
+                className="bg-transparent border-0 border-b border-ash-light !rounded-none focus:ring-0 focus:border-ash-dark text-text-main px-0 transition-all "
+
               />
             </div>
             <div>
@@ -203,6 +207,8 @@ const RequirementFormPublic: React.FC = () => {
                 required={true}
                 error={errors.whatsapp || ""}
                 maxLength={10}
+                className="bg-transparent border-0 border-b border-ash-light !rounded-none focus:ring-0 focus:border-ash-dark text-text-main px-0 transition-all "
+
               />
             </div>
             <div>
@@ -211,6 +217,8 @@ const RequirementFormPublic: React.FC = () => {
                 name="location"
                 value={formData.clientData.location ?? ""}
                 onChange={handleClientChange}
+                className="bg-transparent border-0 border-b border-ash-light !rounded-none focus:ring-0 focus:border-ash-dark text-text-main px-0 transition-all "
+
               />
             </div>
           </div>
@@ -230,7 +238,7 @@ const RequirementFormPublic: React.FC = () => {
 
           <div className="mt-6 text-center">
             <Button
-              variant="primary"
+              variant="dark"
               size="lg"
               onClick={handleSubmit}
               isLoading={isPending}
@@ -239,14 +247,38 @@ const RequirementFormPublic: React.FC = () => {
             </Button>
           </div>
 
-          {isSuccess && <p className="text-green-600 mt-4">Form submitted successfully!</p>}
-          {isError && <p className="text-red-600 mt-4">{(error as any)?.response?.data?.message || (error as Error).message || "Form Submission Failed"}</p>}
+          {isSuccess && <p className="text-action-success mt-4">Form submitted successfully!</p>}
+          {isError && <p className="text-action-error mt-4">{(error as any)?.response?.data?.message || (error as Error).message || "Form Submission Failed"}</p>}
         </div>
       ),
     },
   ];
 
   return (
+    // <div className="space-y-8  max-h-[100vh] overflow-y-auto custom-scrollbar bg-gradient-to-br from-blue-50 via-white to-blue-100 !p-6 h-full w-full">
+    //   <div className="max-w-5xl max-h-full mx-auto space-y-5">
+    //     <h1 className="text-3xl font-bold text-center text-blue-800">Client Detail Form</h1>
+
+    //     <div className="max-w-5xl  mx-auto">{steps[step].content}</div>
+
+    //     <div className={`flex ${step > 0 ? "justify-between" : "justify-end"} mt-2`}>
+    //       {step > 0 && (
+    //         <Button variant="secondary" onClick={() => setStep((prev) => prev - 1)}>
+    //           Previous
+    //         </Button>
+    //       )}
+
+    //       {step < steps.length - 1 && (
+    //         <Button variant="primary" onClick={() => setStep((prev) => prev + 1)}>
+    //           Skip & Continue
+    //         </Button>
+    //       )}
+    //     </div>
+
+    //   </div>
+    // </div>
+
+
     <div className="space-y-8  max-h-[100vh] overflow-y-auto custom-scrollbar bg-gradient-to-br from-blue-50 via-white to-blue-100 !p-6 h-full w-full">
       <div className="max-w-5xl max-h-full mx-auto space-y-5">
         <h1 className="text-3xl font-bold text-center text-blue-800">Client Detail Form</h1>

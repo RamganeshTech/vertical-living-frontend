@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useStaffforgotPasswordUser } from '../../apiList/staffApi'
-import { useforgotPasswordUser } from '../../apiList/userApi'
+import { useForgotPasswordUser } from '../../apiList/userApi'
 import { useWorkerforgotPasswordUser } from '../../apiList/workerApi'
 import { useClientforgotPasswordUser } from '../../apiList/clientApi'
 import { useCTOforgotPasswordUser } from '../../apiList/CTOApi'
@@ -20,7 +20,7 @@ const ForgotPassword = () => {
     const { mutateAsync: CTOPassword, isPending: CTOPending } = useCTOforgotPasswordUser()
     const { mutateAsync: clientPassword, isPending: clientPending } = useClientforgotPasswordUser()
     const { mutateAsync: workerPassword, isPending: workerPending } = useWorkerforgotPasswordUser()
-    const { mutateAsync: userPassword, isPending: userPending } = useforgotPasswordUser() //"owner"
+    const { mutateAsync: userPassword, isPending: userPending } = useForgotPasswordUser() //"owner"
 
 
     const [emailInput, setEmailInput] = useState<string>("");

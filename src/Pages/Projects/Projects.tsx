@@ -178,6 +178,7 @@ import { SIDEBAR_ICONS, SIDEBAR_LABELS } from "../../constants/constants";
 import MobileSidebar from "../../shared/MobileSidebar";
 import { useEffect, useState } from "react";
 import { useAuthCheck } from "../../Hooks/useAuthCheck";
+import HeaderSidebar from "../../shared/HeaderSidebar";
 
 type ProjectType = {
   projectId: string | null,
@@ -199,11 +200,12 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
   // ACCOUNTING: "accounts" || "billing" || "payments",
   ACCOUNTING: ["accounts", "billing", "payments", "vendor", "customer", "invoice",
     "expense", "billtemplate", "purchaseorder",
-    "vendorpayment", "salesorder", "retailinvoice"],
+    "vendorpayment", "salesorder", "retailinvoice", "executionpartnermain"],
 
   CUTLIST: "cutlist",
-  PINCODE:"pincode",
-  PINCODEMAPPING:"pincodemappingmain",
+  PINCODE: "pincode",
+  PINCODEMAPPING: "pincodemappingmain",
+  PINCODEPROJECTSASSIGNMENT: "pincodeproject",
 
   LEADCOLLECTION: "leadmodule",
   COSTCALCULATIONLEADFORM: "leadmodule",
@@ -256,7 +258,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
     CUTLIST: `/organizations/${organizationId}/projects/cutlistmain`,
     PINCODE: `/organizations/${organizationId}/projects/pincodemain`,
-    PINCODEMAPPING: `/organizations/${organizationId}/projects/pincodemappingmain`,
+    // PINCODEMAPPING: `/organizations/${organizationId}/projects/pincodemappingmain`,
+    PINCODEPROJECTSASSIGNMENT: `/organizations/${organizationId}/projects/pincodeprojectmain`,
     // MATERIAL_SHOP_DOCS: `/organizations/${organizationId}/projects/shopmaterialdoc`,
     LEADCOLLECTION: `/organizations/${organizationId}/projects/publicleadcollection`,
     COSTCALCULATIONLEADFORM: `/organizations/${organizationId}/projects/publiccostcalculation`,
@@ -312,7 +315,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
   // If NOT the special org → remove LEADCOLLECTION
   if (organizationId !== "684a57015e439b678e8f6918") {
-    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION");
+    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION" && key !== "COSTCALCULATIONLEADFORM");
   }
   // =========================================================
   // 4. CONSTRUCT INITIAL SIDEBAR OBJECTS
@@ -394,8 +397,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     },
     {
       id: "PINCODE_MODULE",
-      label: "PinCode Module",
-      keys: ["PINCODE", "PINCODEMAPPING"]
+      label: "Pincode Module",
+      keys: ["PINCODE", "PINCODEPROJECTSASSIGNMENT"]
 
     }
   ];
@@ -452,15 +455,25 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
           />
         )}
 
-        <main className="!w-[100%] h-full p-4">
-          <Outlet context={{
-            projectId, setProjectId, organizationId,
-            isMobile,
-            isMobileSidebarOpen,
-            openMobileSidebar: () => setIsMobileSidebarOpen(true),
-            closeMobileSidebar: () => setIsMobileSidebarOpen(false),
-          }} />
-        </main>
+        {/* 3. RIGHT COLUMN: This holds both the Header and the Main content */}
+        <div className="flex-1 flex flex-col h-full min-w-0">
+
+          {/* TOP: The new Header Sidebar */}
+          <HeaderSidebar
+            isMobile={isMobile}
+            openMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          />
+          {/* <main className="!w-[100%] / p-4"> */}
+          <main className="flex-1 overflow-y-auto p-4 bg-white/50">
+            <Outlet context={{
+              projectId, setProjectId, organizationId,
+              isMobile,
+              isMobileSidebarOpen,
+              openMobileSidebar: () => setIsMobileSidebarOpen(true),
+              closeMobileSidebar: () => setIsMobileSidebarOpen(false),
+            }} />
+          </main>
+        </div>
       </div>
     </>
 

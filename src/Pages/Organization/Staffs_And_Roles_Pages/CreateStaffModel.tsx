@@ -6,7 +6,7 @@
 import { Button } from '../../../components/ui/Button';
 
 import { useState } from "react";
-import { useRegisterUser } from "../../../apiList/orgApi";
+import { useRegisterUser } from "../../../apiList/organization_api/orgApi";
 import { useGetProjects } from "../../../apiList/projectApi";
 import { toast } from "../../../utils/toast";
 // import { Dialog } from "../../../components/ui/Dialog";
@@ -239,88 +239,88 @@ export const CreateUserModal = ({ isOpen, onClose, organizationId }: { isOpen: b
         }
     };
 
-return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-xl p-0 overflow-hidden rounded-2xl bg-white shadow-2xl border border-gray-100">
-            {/* Header with Color Accent */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-                <DialogTitle className="text-white text-xl font-bold flex items-center gap-2">
-                    <i className="fas fa-user-plus bg-white/20 p-2 rounded-lg"></i>
-                    Create New User
-                </DialogTitle>
-                <p className="text-blue-100 text-xs mt-1">Add a new member to your organization</p>
-            </div>
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="max-w-xl p-0 overflow-hidden rounded-2xl bg-white shadow-2xl border border-gray-100">
+                {/* Header with Color Accent */}
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                    <DialogTitle className="text-white text-xl font-bold flex items-center gap-2">
+                        <i className="fas fa-user-plus bg-white/20 p-2 rounded-lg"></i>
+                        Create New User
+                    </DialogTitle>
+                    <p className="text-blue-100 text-xs mt-1">Add a new member to your organization</p>
+                </div>
 
-            <div className="p-6">
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="p-6">
+                    <form onSubmit={handleSubmit} className="space-y-5">
 
-                    {/* Role Selection - Visual Cards or Select */}
-                    <div>
-                        <Label className="mb-2 block text-xs uppercase tracking-wide text-gray-500">Assign Role</Label>
-                        <div className="relative">
-                            <i className="fas fa-briefcase absolute left-3 top-3 text-gray-400 z-10"></i>
-                            <select
-                                className="w-full pl-10 pr-4 py-2.5 border border-blue-200 rounded-xl bg-blue-50/30 focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all cursor-pointer font-medium text-gray-700"
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                            >
-                                <option value="staff">staff</option>
-                                <option value="worker">worker</option>
-                                <option value="client">client</option>
-                                <option value="CTO">CTO</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Name & Email Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Role Selection - Visual Cards or Select */}
                         <div>
-                            <Label className="mb-1.5 block">Full Name</Label>
-                            <Input
-                                required
-                                placeholder={`e.g. John Doe`}
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            />
+                            <Label className="mb-2 block text-xs uppercase tracking-wide text-gray-500">Assign Role</Label>
+                            <div className="relative">
+                                <i className="fas fa-briefcase absolute left-3 top-3 text-gray-400 z-10"></i>
+                                <select
+                                    className="w-full pl-10 pr-4 py-2.5 border border-blue-200 rounded-xl bg-blue-50/30 focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all cursor-pointer font-medium text-gray-700"
+                                    value={role}
+                                    onChange={(e) => setRole(e.target.value)}
+                                >
+                                    <option value="staff">staff</option>
+                                    <option value="worker">worker</option>
+                                    <option value="client">client</option>
+                                    <option value="CTO">CTO</option>
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <Label className="mb-1.5 block">Email Address</Label>
-                            <Input
-                                required
-                                type="email"
-                                placeholder="john@example.com"
-                                value={formData.email}
-                                onChange={e => setFormData({ ...formData, email: e.target.value })}
-                            />
-                        </div>
-                    </div>
 
-                    {/* Phone & Password Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <Label className="mb-1.5 block">Phone Number</Label>
-                            <Input
-                                maxLength={10}
-                                type="text"
-                                placeholder="+91 98765 43210"
-                                value={formData.phoneNo}
-                                onChange={e => setFormData({ ...formData, phoneNo: e.target.value })}
-                            />
+                        {/* Name & Email Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <Label className="mb-1.5 block">Full Name</Label>
+                                <Input
+                                    required
+                                    placeholder={`e.g. John Doe`}
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <Label className="mb-1.5 block">Email Address</Label>
+                                <Input
+                                    required
+                                    type="email"
+                                    placeholder="john@example.com"
+                                    value={formData.email}
+                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <Label className="mb-1.5 block">Set Password</Label>
-                            <Input
-                                required
-                                type="password"
-                                placeholder="••••••••"
-                                value={formData.password}
-                                onChange={e => setFormData({ ...formData, password: e.target.value })}
-                            />
-                        </div>
-                    </div>
 
-                    {/* Conditional Fields */}
-                    {/* <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-4">
+                        {/* Phone & Password Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <Label className="mb-1.5 block">Phone Number</Label>
+                                <Input
+                                    maxLength={10}
+                                    type="text"
+                                    placeholder="+91 98765 43210"
+                                    value={formData.phoneNo}
+                                    onChange={e => setFormData({ ...formData, phoneNo: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <Label className="mb-1.5 block">Set Password</Label>
+                                <Input
+                                    required
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={formData.password}
+                                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Conditional Fields */}
+                        {/* <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-4">
                             {role === 'client' && (
                                 <div>
                                     <Label className="mb-1.5 block">Location / Address</Label>
@@ -353,27 +353,27 @@ return (
                             )}
                         </div> */}
 
-                    {/* Actions */}
-                    <div className="flex justify-end gap-3 pt-2">
-                        <Button
-                            type="button"
-                            variant='secondary'
-                            onClick={onClose}
-                            className="  text-gray-700 border border-gray-300 shadow-sm"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            isLoading={isPending}
-                            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200"
-                        >
-                            <i className="fas fa-check mr-2"></i> Create User
-                        </Button>
-                    </div>
-                </form>
-            </div>
-        </DialogContent>
-    </Dialog>
-);
+                        {/* Actions */}
+                        <div className="flex justify-end gap-3 pt-2">
+                            <Button
+                                type="button"
+                                variant='secondary'
+                                onClick={onClose}
+                                className="  text-gray-700 border border-gray-300 shadow-sm"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                isLoading={isPending}
+                                className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200"
+                            >
+                                <i className="fas fa-check mr-2"></i> Create User
+                            </Button>
+                        </div>
+                    </form>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
 };

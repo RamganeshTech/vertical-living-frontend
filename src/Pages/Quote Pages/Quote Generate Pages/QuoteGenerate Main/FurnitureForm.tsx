@@ -993,7 +993,7 @@ const FurnitureForm: React.FC<Props> = ({
   //   }
   // };
 
-  const fetchAllCategoryItems_v2 = async (index: number, itemName: string) => {
+  const fetchAllCategoryItems_v2 = async (index: number, itemName: string, isFittings: boolean = false) => {
     if (!itemName) return;
     try {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
@@ -1019,6 +1019,7 @@ const FurnitureForm: React.FC<Props> = ({
           item.data?.["Brand "] ||
           item.data?.["Brands "] ||
           item.data?.["BRAND NAME"] ||
+          item.data?.["Brand Name"] ||
 
           'Unknown';
 
@@ -1035,7 +1036,15 @@ const FurnitureForm: React.FC<Props> = ({
         };
       });
 
-      setNbmOptionsMap(prev => ({ ...prev, [index]: formatted }));
+
+      // setNbmOptionsMap(prev => ({ ...prev, [index]: formatted }));
+
+      if (isFittings) {
+        setFittingsOptionsMap(prev => ({ ...prev, [index]: formatted }));
+      } else {
+        setNbmOptionsMap(prev => ({ ...prev, [index]: formatted }));
+      }
+
     } catch (error) {
       console.error("Error fetching all category items:", error);
     }
@@ -1059,6 +1068,11 @@ const FurnitureForm: React.FC<Props> = ({
           rate: row.cost,
           imageUrl: row.imageUrl
         }];
+
+        // ✅ ADD THIS: Trigger fetch for Fittings using the 'true' flag
+            if (row.itemName) {
+                fetchAllCategoryItems_v2(i, row.itemName, true); 
+            }
       }
     });
 
@@ -1396,7 +1410,10 @@ const FurnitureForm: React.FC<Props> = ({
       [kind]: section,
     };
     updatedFurniture.totals = computeTotals(updatedFurniture);
-    updateFurniture && updateFurniture(updatedFurniture);
+    // updateFurniture && updateFurniture(updatedFurniture);
+    if (updateFurniture) {
+      updateFurniture(updatedFurniture);
+    }
   };
 
   // Render core material table
@@ -1744,7 +1761,7 @@ const FurnitureForm: React.FC<Props> = ({
                           // fetchFittingsBrands(i, val);
                           // 🆕 Check 'kind' to decide which function to call
                           if (kind === "fittingsAndAccessories") {
-                            fetchAllCategoryItems_v2(i, val);
+                            fetchAllCategoryItems_v2(i, val, true);
                           } else if (kind === "nonBrandMaterials") {
                             // fetchAllCategoryItems(i, val);
                             fetchAllCategoryItems_v2(i, val);
@@ -1792,7 +1809,7 @@ const FurnitureForm: React.FC<Props> = ({
                             const currentKind = kind as string;
 
                             if (currentKind === "fittingsAndAccessories" && (!fittingsOptionsMap[i] || fittingsOptionsMap[i]?.length <= 1)) {
-                              fetchAllCategoryItems_v2(i, row.itemName);
+                              fetchAllCategoryItems_v2(i, row.itemName, true);
                             }
                             else if (currentKind === "nonBrandMaterials" && (!nbmOptionsMap[i] || nbmOptionsMap[i]?.length <= 1)) {
                               // fetchAllCategoryItems(i, row.itemName);
@@ -1897,7 +1914,10 @@ const FurnitureForm: React.FC<Props> = ({
                           [kind]: updated,
                         };
                         updatedFurniture.totals = computeTotals(updatedFurniture);
-                        updateFurniture && updateFurniture(updatedFurniture);
+                        // updateFurniture && updateFurniture(updatedFurniture);
+                        if (updateFurniture) {
+                          updateFurniture(updatedFurniture);
+                        }
                       }}
                       className="px-1 text-xs bg-red-600 text-white"
                     >
@@ -1918,7 +1938,10 @@ const FurnitureForm: React.FC<Props> = ({
                 [kind]: updated,
               };
               updatedFurniture.totals = computeTotals(updatedFurniture);
-              updateFurniture && updateFurniture(updatedFurniture);
+              // updateFurniture && updateFurniture(updatedFurniture);
+              if (updateFurniture) {
+                updateFurniture(updatedFurniture);
+              }
             }}
           >
             + Add {title} Item

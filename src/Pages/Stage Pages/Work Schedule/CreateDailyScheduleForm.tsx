@@ -811,7 +811,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             try {
                 const importedData = JSON.parse(e.target?.result as string)
                 setFormData(importedData)
-            } catch (error) {
+            } catch (_error) {
                 toast({ title: "Error", description: "Error importing JSON file", variant: "destructive" })
             }
         }

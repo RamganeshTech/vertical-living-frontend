@@ -109,7 +109,7 @@ export const useGetAllPincodes = ({
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
-        queryKey: ["pincodes", organizationId, limit, search],
+        queryKey: ["pincodes", organizationId, limit, search, serviceStatus],
         queryFn: async ({ pageParam = 1 }) => {
             // Mandatory Role and API Instance Check
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");

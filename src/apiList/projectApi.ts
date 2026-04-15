@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query"
 import { queryClient } from "../QueryClient/queryClient"
 import type { ProjectInput } from "../components/CreateProject"
 import { getApiForRole } from "../utils/roleCheck"
@@ -17,7 +17,6 @@ const createProject = async ({ api, projectData, orgsId }: { api: AxiosInstance,
     }
 }
 
-
 const getProjects = async ({ orgsId, api }: { orgsId: string, api: AxiosInstance, }) => {
     try {
 
@@ -32,6 +31,47 @@ const getProjects = async ({ orgsId, api }: { orgsId: string, api: AxiosInstance
     }
 }
 
+
+
+export const getAllProjectsApi = async ({
+    organizationId,
+    page = 1,
+    limit = 10,
+    projectName,
+    status,
+    priority,
+    startDate,
+    endDate,
+    isCompleted, // 1. Extract the new parameter
+    api
+}: {
+    organizationId: string;
+    page: number;
+    limit: number;
+    projectName?: string;
+    status?: string;
+    priority?: string;
+    startDate?: string;
+    endDate?: string;
+    isCompleted?: boolean; // Type here
+    api: any; // AxiosInstance
+}) => {
+    const { data } = await api.get(`/project/v1/getprojects/${organizationId}`, {
+        params: {
+            page,
+            limit,
+            projectName,
+            status,
+            priority,
+            startDate,
+            endDate,
+            isCompleted
+        }
+    });
+    if (!data.ok) throw new Error(data.message);
+    return data;
+};
+
 const deleteProject = async (projectId: string, api: AxiosInstance) => {
     try {
         let { data } = await api.delete(`/project/deleteproject/${projectId}`)
@@ -44,7 +84,7 @@ const deleteProject = async (projectId: string, api: AxiosInstance) => {
     }
 }
 
-const assignClientProject  = async ({ projectId, clientId, api }: { projectId: string, clientId: string, api: AxiosInstance, }) => {
+const assignClientProject = async ({ projectId, clientId, api }: { projectId: string, clientId: string, api: AxiosInstance, }) => {
     try {
         let { data } = await api.patch(`/project/assignprojectclient/${projectId}/${clientId}`)
         if (data.ok) {
@@ -87,6 +127,71 @@ export const useGetProjects = (orgsId: string) => {
         retry: false,
     })
 }
+
+
+const allowedProjectRoles = ["owner", "staff", "CTO", "client", "worker"];
+
+export const useGetAllProjects = ({
+    organizationId,
+    limit = 20,
+    projectName,
+    status,
+    priority,
+    startDate,
+    endDate,
+    isCompleted
+}: {
+    organizationId?: string;
+    limit?: number;
+    projectName?: string;
+    status?: string;
+    priority?: string;
+    startDate?: string;
+    endDate?: string;
+    isCompleted?: boolean; // Type here
+}) => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useInfiniteQuery({
+        // The queryKey must change whenever a filter changes to trigger a re-fetch
+        queryKey: ["projects", organizationId, projectName, status, priority, startDate, endDate, isCompleted],
+
+        queryFn: async ({ pageParam = 1 }) => {
+            if (!role || !allowedProjectRoles.includes(role)) {
+                throw new Error("Not allowed to access projects");
+            }
+            if (!api) throw new Error("API instance not found");
+
+            return await getAllProjectsApi({
+                organizationId: organizationId!,
+                page: pageParam as number,
+                limit,
+                projectName,
+                status,
+                priority,
+                startDate,
+                endDate,
+                isCompleted,
+                api
+            });
+        },
+
+        getNextPageParam: (lastPage) => {
+            // Mapping to your backend result: data.pagination.currentPage
+            const { currentPage, totalPages } = lastPage.data.pagination;
+            if (currentPage < totalPages) {
+                return currentPage + 1;
+            }
+            return undefined;
+        },
+
+        initialPageParam: 1,
+
+        // Only run the query if we have the necessary IDs and Permissions
+        enabled: !!role && allowedProjectRoles.includes(role) && !!organizationId
+    });
+};
 
 export const useCreateProject = () => {
     const { role } = useGetRole();
@@ -147,7 +252,7 @@ export const useAssignClientToProject = () => {
     const allowedRoles = ["owner", "staff", "CTO"];
 
     return useMutation({
-        mutationFn: async ({ projectId, clientId }: { projectId: string, clientId: string}) => {
+        mutationFn: async ({ projectId, clientId }: { projectId: string, clientId: string }) => {
             if (!role) throw new Error("Not Authrorized");
             if (!allowedRoles.includes(role)) throw new Error("Not Allowed to make api calls");
             if (!api) throw new Error("API not found");

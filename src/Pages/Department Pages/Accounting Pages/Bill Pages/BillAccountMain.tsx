@@ -25,6 +25,7 @@ const MENU_PERMISSION_MAPPING: Record<string, string> = {
     'Vendor Payments': 'vendorpayment',
     'Customer': 'customer',
     'Vendor': 'vendor',
+    'Execution partner': 'executionpartnermain',
 };
 
 const BillAccountsMain = () => {
@@ -144,6 +145,12 @@ const BillAccountsMain = () => {
                     path: `/organizations/${organizationId}/projects/vendormain`,
                     icon: 'fas fa-user text-blue-600',
                     onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
+                },
+                {
+                    label: 'Execution Partner',
+                    path: `/organizations/${organizationId}/projects/executionpartnermain`,
+                    icon: 'fas fa-digging text-blue-600',
+                    onClick: () => navigate(`/organizations/${organizationId}/projects/executionpartnermain`)
                 },
             ]
         }

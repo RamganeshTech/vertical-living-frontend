@@ -368,7 +368,7 @@
 
 
 import React, { useMemo, useState } from 'react';
-import { useGetSingleOrganization } from '../../../apiList/orgApi';
+import { useGetSingleOrganization } from '../../../apiList/organization_api/orgApi';
 import { COMPANY_DETAILS } from '../../../constants/constants';
 import QuoteType4 from '../ClientQuote Pages/ClientSingle Pages/QuoteType4';
 import { DEFAULT_QUOTE_TEXTS } from '../ClientQuote Pages/ClientSingle Pages/ClientQuoteType4';
@@ -596,16 +596,16 @@ const PreSalesQuoteType4: React.FC<PreSalesProps> = ({
     // const handlePrint = () => window.print();
 
     const handlePrint = () => {
-  // 1. Add a loading state if you have one (optional)
-//   console.log("Preparing document for PDF...");
+        // 1. Add a loading state if you have one (optional)
+        //   console.log("Preparing document for PDF...");
 
-  // 2. Wait for a short moment to ensure all React state updates 
-  // and images are fully rendered in the DOM
-  setTimeout(() => {
-    // 3. Trigger the browser's built-in print dialog
-    window.print();
-  }, 800); // 800ms is usually perfect for a "stable" page
-};
+        // 2. Wait for a short moment to ensure all React state updates 
+        // and images are fully rendered in the DOM
+        setTimeout(() => {
+            // 3. Trigger the browser's built-in print dialog
+            window.print();
+        }, 800); // 800ms is usually perfect for a "stable" page
+    };
 
     const { mutateAsync: updateQuote, isPending: isSaving } = useUpdatePreSalesQuote4Alone();
     const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File }>({});

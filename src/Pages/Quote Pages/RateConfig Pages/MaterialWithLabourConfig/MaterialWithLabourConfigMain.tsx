@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import { useParams } from "react-router-dom";
+import {  Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 // import { Input } from "../../../../components/ui/Input";
 // import { toast } from "../../../../utils/toast";
 // import { Button } from "../../../../components/ui/Button";
@@ -15,12 +15,15 @@ import {
     useGetMaterialWithLabourRateConfigCategories
 } from "../../../../apiList/Quote Api/RateConfig Api/rateConfigLabourwithMaterialApi";
 import MaterialWithLabourSingle from "./MaterialWithLabourConfigSingle";
+import { Button } from "../../../../components/ui/Button";
 
 
 export default function MaterialWithLabourRateMain() {
     const { organizationId } = useParams<{ organizationId: string }>();
-    // const navigate = useNavigate();
-    // const location = useLocation();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const isChildRoute = location.pathname.includes("description");
+
 
     // const isChildRoute = location.pathname.includes("single");
 
@@ -127,7 +130,7 @@ export default function MaterialWithLabourRateMain() {
     //     setShowCreateForm(val)
     // }
 
-    // if (isChildRoute) return <Outlet />;
+    if (isChildRoute) return <Outlet />;
 
     return (
         <div className="space-y-6 max-h-full overflow-y-auto ">
@@ -153,6 +156,13 @@ export default function MaterialWithLabourRateMain() {
                     {/* {canCreate && <div>
                         <Button onClick={() => setShowCreateForm(true)}>Create New Category</Button>
                     </div>} */}
+
+                      <Button
+                        onClick={() => navigate(`${firstCategory}/description`)}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white h-10 rounded-xl text-[11px] font-bold shadow-sm px-4 shrink-0"
+                    >
+                        <i className="fas fa-file-alt mr-2"></i> Scope
+                    </Button>
 
                     <div className="w-full sm:w-auto flex justify-end sm:block">
                         <StageGuide

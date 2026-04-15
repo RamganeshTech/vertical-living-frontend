@@ -6,13 +6,14 @@ import Sidebar from '../../shared/Sidebar';
 import { Outlet, useLocation } from 'react-router-dom';
 import MobileSidebar from '../../shared/MobileSidebar';
 import { useAuthCheck } from '../../Hooks/useAuthCheck';
+import HeaderSidebar from '../../shared/HeaderSidebar';
 
 
 type ProjectType = {
   projectId: string | null,
   organizationId: string | null,
   setProjectId: React.Dispatch<React.SetStateAction<string | null>>
-  setOrganizationId: React.Dispatch<React.SetStateAction<string | null>>
+  // setOrganizationId: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 // These values MUST match the 'PROJECT_STAGES' array in StaffPermissionsSingle.tsx
@@ -36,7 +37,7 @@ const PERMISSION_MAPPING: Record<string, string> = {
   PROJECTDELIVERY: "projectdelivery"
 };
 
-const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organizationId, setOrganizationId }) => {
+const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organizationId }) => {
 
   const location = useLocation()
   const { role, permission } = useAuthCheck();
@@ -51,7 +52,7 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
   useLayoutEffect(() => {
     const pathname = location.pathname.split('/')
     setProjectId(pathname[3])
-    setOrganizationId(pathname[1])
+    // setOrganizationId(pathname[1])
   }, [location.pathname])
 
   // useEffect(() => {
@@ -227,20 +228,30 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
           />
         )}
 
-        <main className="!w-[100%] h-full p-2 sm:p-4">
-          <Outlet context={{
-            projectId, setProjectId,
-            isMobile,
-            isMobileSidebarOpen,
-            openMobileSidebar: () => setIsMobileSidebarOpen(true),
-            closeMobileSidebar: () => setIsMobileSidebarOpen(false),
-            setProjectName,
-            projectName
-          }} />
-        </main>
-      </div>
-    </>
-  )
+        <div className="flex-1 flex flex-col h-full min-w-0">
+          {/* TOP: The new Header Sidebar */}
+          <HeaderSidebar
+            isMobile={isMobile}
+            openMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          />
+          {/* <main className="!w-[100%] / p-4"> */}
+          <main className="flex-1 overflow-y-auto p-4 bg-white/50">
+
+            {/* <main className="!w-[100%] h-full p-2 sm:p-4"> */}
+            <Outlet context={{
+              projectId, setProjectId,
+              isMobile,
+              isMobileSidebarOpen,
+              openMobileSidebar: () => setIsMobileSidebarOpen(true),
+              closeMobileSidebar: () => setIsMobileSidebarOpen(false),
+              setProjectName,
+              projectName
+            }} />
+          </main>
+        </div>
+        </div>
+      </>
+      )
 }
 
-export default ProjectDetails
+      export default ProjectDetails

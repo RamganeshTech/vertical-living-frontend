@@ -2,11 +2,11 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Button } from "./ui/Button" 
-import { Input } from "./ui/Input" 
-import { Label } from "./ui/Label" 
-import { useUpdateOrganizationName } from "../apiList/orgApi" 
-import { toast } from "../utils/toast" 
+import { Button } from "./ui/Button"
+import { Input } from "./ui/Input"
+import { Label } from "./ui/Label"
+import { useUpdateOrganizationName } from "../apiList/organization_api/orgApi"
+import { toast } from "../utils/toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/Dialog';
 
 interface EditOrganizationModalProps {
@@ -46,7 +46,7 @@ export default function EditOrganizationModal({ isOpen, onClose, organization }:
     }
 
     try {
-      await updateOrganization.mutateAsync({ orgsId:organization._id, updateField:organization })
+      await updateOrganization.mutateAsync({ orgsId: organization._id, updateField: organization })
       toast({
         title: "Success",
         description: "Organization updated successfully",

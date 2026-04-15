@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useGetProjects } from '../../../../apiList/projectApi';
 import { useUpdateClientQuote } from '../../../../apiList/Quote Api/ClientQuote/clientQuoteApi';
 import { toast } from '../../../../utils/toast';
-import { useGetSingleOrganization } from '../../../../apiList/orgApi';
+import { useGetSingleOrganization } from '../../../../apiList/organization_api/orgApi';
 import QuoteType4 from './QuoteType4';
 
 interface Props {

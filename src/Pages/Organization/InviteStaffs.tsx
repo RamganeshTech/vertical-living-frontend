@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Skeleton } from '../../components/ui/Skeleton';
 // import { Badge } from './../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { useGetStaffsByOrganization, useInviteStaffToOrganization, useRemoveStaffFromOrganization } from '../../apiList/orgApi';
+import { useGetStaffsByOrganization, useInviteStaffToOrganization, useRemoveStaffFromOrganization } from '../../apiList/organization_api/orgApi';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { toast } from '../../utils/toast';
 import { Label } from '../../components/ui/Label';

@@ -23,13 +23,15 @@ export const useAuthCheck = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [authInfo, setAuthInfo] = useState<{ role: string | null; ownerId: string | null; isauthenticated: boolean, _id: null | string, permission: Record<string, Record<string, boolean>>, isGuideRequired: boolean | undefined }>({
+  const [authInfo, setAuthInfo] = useState<{ profileImage: string | null, role: string | null; ownerId: string | null; isauthenticated: boolean, _id: null | string, permission: Record<string, Record<string, boolean>>, isGuideRequired: boolean | undefined }>({
     role: null,
+
     isauthenticated: false,
     _id: null,
     permission: {},
     isGuideRequired: undefined,
-    ownerId: null
+    ownerId: null,
+    profileImage: null
   });
 
 
@@ -56,11 +58,21 @@ export const useAuthCheck = () => {
           case "owner":
             res = await Api.get("/auth/isauthenticated");
             if (res.data.ok) {
-              const info = { role, isauthenticated: true, _id: res.data.data.userId, userName: res.data.data.userName, permission: res?.data?.data?.permission, isGuideRequired: res?.data?.data?.isGuideRequired };
+              const info = {
+                role, isauthenticated: true,
+                _id: res.data.data.userId, userName: res.data.data.userName,
+                permission: res?.data?.data?.permission, isGuideRequired: res?.data?.data?.isGuideRequired,
+                organizationId: res?.data?.data?.organizationId,
+                profileImage: res?.data?.data?.profileImage?.url,
+
+                email: res?.data?.data?.email,
+                phoneNo: res?.data?.data?.phoneNo
+              };
               // console.log("11111111", info)
 
               dispatch(setRole(info));
-              dispatch(setOwnerProfileData(res.data.data));
+              // dispatch(setOwnerProfileData(res.data.data));
+              dispatch(setOwnerProfileData({ ...info, _id: res.data.data.userId, ownerId: res.data.data.userId }));
               // setAuthInfo(info);
               setAuthInfo({ ...info, _id: res.data.data.userId, ownerId: res.data.data.userId });
               return setLoading(false);
@@ -73,10 +85,17 @@ export const useAuthCheck = () => {
               const info = {
                 role, isauthenticated: true, _id: res.data.data.staffId,
                 userName: res.data.data.staffName, permission: res?.data?.data?.permission,
-                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data.data.ownerId
+                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data.data.ownerId,
+                organizationId: res?.data?.data?.organizationId,
+                profileImage: res?.data?.data?.profileImage?.url,
+
+                email: res?.data?.data?.email,
+                phoneNo: res?.data?.data?.phoneNo
+
               };
               dispatch(setRole(info));
-              dispatch(setStaffProfileData(res.data.data));
+              dispatch(setStaffProfileData({ ...info, _id: res.data.data.staffId }));
+              // dispatch(setStaffProfileData(res.data.data));
               // setAuthInfo(info);
               setAuthInfo({ ...info, _id: res.data.data.staffId });
               return setLoading(false);
@@ -89,10 +108,17 @@ export const useAuthCheck = () => {
               const info = {
                 role, isauthenticated: true, _id: res.data.data.workerId,
                 userName: res.data.data.workerName, permission: res.data.data?.permission,
-                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data.data.ownerId
+                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data.data.ownerId,
+                organizationId: res?.data?.data?.organizationId,
+                profileImage: res?.data?.data?.profileImage?.url,
+
+                email: res?.data?.data?.email,
+                phoneNo: res?.data?.data?.phoneNo
+
               };
               dispatch(setRole(info));
-              dispatch(setWorkerProfileData(res.data.data));
+              // dispatch(setWorkerProfileData(res.data.data));
+              dispatch(setWorkerProfileData({ ...info, _id: res.data.data.workerId, }));
               setAuthInfo({ ...info, _id: res.data.data.workerId, });
               // setAuthInfo({ ...info, _id: res.data.data.workerId });
 
@@ -106,10 +132,17 @@ export const useAuthCheck = () => {
               const info = {
                 role, isauthenticated: true, _id: res.data.data.CTOId,
                 userName: res.data.data.CTOName, permission: res.data.data?.permission,
-                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data?.data?.ownerId
+                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data?.data?.ownerId,
+                organizationId: res?.data?.data?.organizationId,
+                profileImage: res?.data?.data?.profileImage?.url,
+
+                email: res?.data?.data?.email,
+                phoneNo: res?.data?.data?.phoneNo
+
               };
               dispatch(setRole(info));
-              dispatch(setCTOProfileData(res.data.data));
+              // dispatch(setCTOProfileData(res.data.data));
+              dispatch(setCTOProfileData({ ...info, _id: res.data.data.CTOId, }));
               // setAuthInfo(info);
               setAuthInfo({ ...info, _id: res.data.data.CTOId, });
 
@@ -123,10 +156,17 @@ export const useAuthCheck = () => {
               const info = {
                 role, isauthenticated: true, _id: res.data.data.clientId,
                 userName: res.data.data.clientName, permission: res.data.data?.permission,
-                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data?.data?.ownerId
+                isGuideRequired: res?.data?.data?.isGuideRequired, ownerId: res.data?.data?.ownerId,
+                organizationId: res?.data?.data?.organizationId,
+                profileImage: res?.data?.data?.profileImage?.url,
+
+                email: res?.data?.data?.email,
+                phoneNo: res?.data?.data?.phoneNo
+
               };
               dispatch(setRole(info));
-              dispatch(setClientProfileData(res.data.data));
+              // dispatch(setClientProfileData(res.data.data));
+              dispatch(setClientProfileData({ ...info, _id: res.data.data.clientId, }));
               // setAuthInfo(info);
               setAuthInfo({ ...info, _id: res.data.data.clientId, });
               return setLoading(false);
@@ -149,42 +189,56 @@ export const useAuthCheck = () => {
 
           if (ownerRes.status === "fulfilled" && ownerRes.value.data.ok) {
             const info = {
-              role: "owner", isauthenticated: true, _id: ownerRes.value.data.data.userId, userName: ownerRes.value.data.data.userName,
+              role: "owner", organizationId: ownerRes.value.data.data.organizationId, isauthenticated: true, _id: ownerRes.value.data.data.userId, userName: ownerRes.value.data.data.userName,
               permission: ownerRes?.value?.data?.data?.permission,
               isGuideRequired: ownerRes?.value.data.data?.isGuideRequired,
-              ownerId: ownerRes?.value?.data?.data?.ownerId
+              ownerId: ownerRes?.value?.data?.data?.ownerId,
+              profileImage: ownerRes?.value?.data?.data?.profileImage?.url,
+              email: ownerRes?.value?.data?.data?.email,
+              phoneNo: ownerRes?.value?.data?.data?.phoneNo
             };
             // console.log("22222222", info)
             dispatch(setRole(info));
-            dispatch(setOwnerProfileData(ownerRes.value.data.data))
+            // dispatch(setOwnerProfileData(ownerRes.value.data.data))
+            dispatch(setOwnerProfileData({ ...info, _id: ownerRes.value.data.data.userId, }))
             setAuthInfo({ ...info, _id: ownerRes.value.data.data.userId });
             return setLoading(false);;
           }
 
           if (staffRes.status === "fulfilled" && staffRes.value.data.ok) {
             const info = {
-              role: "staff", isauthenticated: true, _id: staffRes.value.data.data.staffId, userName: staffRes.value.data.data.staffName,
+              role: "staff", organizationId: staffRes.value.data.data.organizationId, isauthenticated: true, _id: staffRes.value.data.data.staffId, userName: staffRes.value.data.data.staffName,
               permission: staffRes?.value?.data?.data?.permission,
               isGuideRequired: staffRes?.value.data.data?.isGuideRequired,
-              ownerId: staffRes?.value?.data?.data?.ownerId
+              ownerId: staffRes?.value?.data?.data?.ownerId,
+              profileImage: staffRes?.value?.data?.data?.profileImage?.url,
+              email: staffRes?.value?.data?.data?.email,
+              phoneNo: staffRes?.value?.data?.data?.phoneNo
 
             };
             dispatch(setRole(info));
-            dispatch(setStaffProfileData(staffRes.value.data.data))
+            // dispatch(setStaffProfileData(staffRes.value.data.data))
+            dispatch(setStaffProfileData({ ...info, _id: staffRes.value.data.data.staffId }))
             setAuthInfo({ ...info, _id: staffRes.value.data.data.staffId });
             return setLoading(false);;
           }
 
           if (workerRes.status === "fulfilled" && workerRes.value.data.ok) {
             const info = {
-              role: "worker", isauthenticated: true, _id: workerRes.value.data.data.workerId, userName: workerRes.value.data.data.workerName,
+              role: "worker", organizationId: workerRes.value.data.data.organizationId, isauthenticated: true, _id: workerRes.value.data.data.workerId, userName: workerRes.value.data.data.workerName,
               permission: workerRes?.value?.data?.data?.permission,
-               isGuideRequired: workerRes?.value.data.data?.isGuideRequired,
-              ownerId: workerRes?.value?.data?.data?.ownerId
+              isGuideRequired: workerRes?.value.data.data?.isGuideRequired,
+              ownerId: workerRes?.value?.data?.data?.ownerId,
+              profileImage: workerRes?.value?.data?.data?.profileImage?.url,
+
+              email: workerRes?.value?.data?.data?.email,
+              phoneNo: workerRes?.value?.data?.data?.phoneNo
+
 
             };
             dispatch(setRole(info));
-            dispatch(setWorkerProfileData(workerRes.value.data.data))
+            // dispatch(setWorkerProfileData(workerRes.value.data.data))
+            dispatch(setWorkerProfileData({ ...info, _id: workerRes.value.data.data.workerId }))
             setAuthInfo({ ...info, _id: workerRes.value.data.data.workerId });
             return setLoading(false);
           }
@@ -192,33 +246,44 @@ export const useAuthCheck = () => {
           if (CTORes.status === "fulfilled" && CTORes.value.data.ok) {
             console.log("cto data", CTORes)
             const info = {
-              role: "CTO", isauthenticated: true, _id: CTORes.value.data.data.CTOId, userName: CTORes.value.data.data.CTOName,
+              role: "CTO", organizationId: CTORes.value.data.data.organizationId, isauthenticated: true, _id: CTORes.value.data.data.CTOId, userName: CTORes.value.data.data.CTOName,
               permission: CTORes.value?.data?.data?.permission,
-               isGuideRequired: CTORes?.value.data.data?.isGuideRequired,
-              ownerId: CTORes?.value?.data?.data?.ownerId
+              isGuideRequired: CTORes?.value.data.data?.isGuideRequired,
+              ownerId: CTORes?.value?.data?.data?.ownerId,
+              profileImage: CTORes?.value?.data?.data?.profileImage?.url,
+
+              email: CTORes?.value?.data?.data?.email,
+              phoneNo: CTORes?.value?.data?.data?.phoneNo
+
 
             };
             dispatch(setRole(info));
-            dispatch(setCTOProfileData(CTORes.value.data.data))
+            // dispatch(setCTOProfileData(CTORes.value.data.data))
+            dispatch(setCTOProfileData({ ...info, _id: CTORes.value.data.data.CTOId }))
             setAuthInfo({ ...info, _id: CTORes.value.data.data.CTOId });
             return setLoading(false);
           }
 
           if (clientRes.status === "fulfilled" && clientRes.value.data.ok) {
             const info = {
-              role: "client", isauthenticated: true, _id: clientRes.value.data.data.clientId, userName: clientRes.value.data.data.clientName,
+              role: "client", organizationId: clientRes.value.data.data.organizationId, isauthenticated: true, _id: clientRes.value.data.data.clientId, userName: clientRes.value.data.data.clientName,
               permission: clientRes.value?.data?.data?.permission,
-               isGuideRequired: clientRes?.value.data.data?.isGuideRequired,
-              ownerId: clientRes?.value?.data?.data?.ownerId
+              isGuideRequired: clientRes?.value.data.data?.isGuideRequired,
+              ownerId: clientRes?.value?.data?.data?.ownerId,
+              profileImage: clientRes?.value?.data?.data?.profileImage?.url,
+              email: clientRes?.value?.data?.data?.email,
+              phoneNo: clientRes?.value?.data?.data?.phoneNo
+
             };
             dispatch(setRole(info));
-            dispatch(setClientProfileData(clientRes.value.data.data))
+            // dispatch(setClientProfileData(clientRes.value.data.data))
+            dispatch(setClientProfileData({ ...info, _id: clientRes.value.data.data.clientId }))
             setAuthInfo({ ...info, _id: clientRes.value.data.data.clientId });
             return setLoading(false);
           }
         }
-        dispatch(setRole({ role: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined }));
-        setAuthInfo({ role: null, ownerId:null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined });
+        dispatch(setRole({ role: null, organizationId: "", isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined, profileImage: null }));
+        setAuthInfo({ role: null, ownerId: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined, profileImage: null });
 
         dispatch(resetOwnerProfile())
         dispatch(resetStaffProfile())
@@ -228,9 +293,9 @@ export const useAuthCheck = () => {
         dispatch(logout())
 
         setLoading(false);
-      } catch (error) {
-        dispatch(setRole({ role: null, isauthenticated: false, _id: null, permission: {}, isGuideRequired: undefined }));
-        setAuthInfo({ role: null, isauthenticated: false, _id: null, ownerId:null, permission: {}, isGuideRequired: undefined });
+      } catch (_error) {
+        dispatch(setRole({ role: null, isauthenticated: false, organizationId: "", _id: null, permission: {}, isGuideRequired: undefined }));
+        setAuthInfo({ profileImage: null, role: null, isauthenticated: false, _id: null, ownerId: null, permission: {}, isGuideRequired: undefined });
         setError("Something went wrong while checking authentication.");
 
         // resetting every data 

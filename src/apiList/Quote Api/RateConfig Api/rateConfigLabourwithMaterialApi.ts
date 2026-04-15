@@ -95,6 +95,51 @@ export const useDeleteMaterialWithLabourRateConfigCategory = () => {
   });
 };
 
+
+
+// 1. Create Category
+const updateCategoryDescription = async ({
+  api,
+  categoryId,
+  field, content
+}: {
+  api: AxiosInstance;
+  categoryId: string;
+  field: string,
+  content: any,
+}) => {
+  const { data } = await api.put(`/quote/materialwithlabour/rateconfig/categories/${categoryId}/description`, { field, content });
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useUpdateMaterialAndLabourCategoryDescription = () => {
+  const allowedRoles = ["owner", "CTO", "staff"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useMutation({
+    mutationFn: async ({ categoryId,
+      field, content }: {
+        categoryId: string;
+        field: string,
+        content: any,
+      }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+      if (!api) throw new Error("API instance not found for role");
+      return await updateCategoryDescription({
+        api, categoryId,
+        field, content
+      });
+    },
+    onSuccess: (_, { categoryId }) => {
+      // queryClient.invalidateQueries({ queryKey: ["rateconfig", "categories", organizationId] });
+      queryClient.invalidateQueries({ queryKey: ["rateconfig", "items", categoryId] });
+
+    },
+  });
+};
+
 /* --------------------------- salary API FUNCTIONS --------------------------- */
 
 

@@ -152,6 +152,9 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
 
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
+      const auth = useSelector((state: RootState) => state.authStore);
+    
+
     const toggleGroup = (groupId: string) => {
         setOpenGroups(prev => ({
             ...prev,
@@ -245,7 +248,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
         }
 
         if (isLoginNavBar) {
-            navigate(`/organizations`)
+            navigate(`/organizations/${auth.organizationId}`)
         }
     }
 
@@ -293,7 +296,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                 <aside onMouseLeave={() => setShowSideBar(false)} className="relative flex flex-col bg-[#2f303a] w-[17%] min-h-screen max-h-screen text-[#9ca3af] select-none transition-all duration-300">
 
                     <div onClick={handleNav} className={`flex ${isInStageNavBar ? "cursor-pointer" : ""} justify-between items-center border-b border-[#3a3b45] px-2 py-2 bg-[#2f303a] z-10`}>
-                        <span  className='text-xl cursor-pointer font-bold truncate pr-2'>
+                        <span className='text-xl cursor-pointer font-bold truncate pr-2'>
                             {isProjectDetailRoute ? (projectName || "Project") : COMPANY_DETAILS.COMPANY_NAME}
                         </span>
                         <div className='w-[30px] h-[30px] flex-shrink-0'>
@@ -416,15 +419,9 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                         </Button>
                         }
 
-                        {/* <button
-                            title="Ctrl+] to close"
-                            onClick={handleSideBarClose}
-                            className="mt-2 flex items-center justify-center outline-none border border-blue-600 text-blue-500 hover:bg-[#3a3b45] rounded-lg w-full py-2">
-                            <i className="fa-solid fa-chevron-left"></i>
-                        </button> */}
 
 
-                        <div className='mt-2 flex gap-2 w-full'>
+                        <div className='mt-2 flex gap-2 w-full justify-around'>
                             {showNotifications && (
                                 <NotificationIcon
                                     isExpanded={false}
@@ -438,6 +435,14 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                                     isActive={false}
                                 />
                             )}
+
+                            <button
+                                title="Ctrl+] to close"
+                                onClick={handleSideBarClose}
+                                className="mt-2 flex items-center justify-center outline-none border border-blue-600 text-blue-500 hover:bg-[#3a3b45] rounded-lg w-full py-2">
+                                <i className="fa-solid fa-chevron-left"></i>
+                            </button>
+
                         </div>
 
                     </div>
@@ -502,30 +507,18 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
 
 
                     <div className="flex flex-col items-center p-2 border-t border-[#3a3b45]">
-                        {pathArray[1] !== "login" &&
-                            <Button
-                                isLoading={
-                                    isCTOPending ||
-                                    isClientPending ||
-                                    isStaffPending ||
-                                    isUserPending ||
-                                    isWorkerPending
-                                }
-                                title='logout'
-                                onClick={handleLogout}
-                                className="w-[40px] h-[40px] flex items-center justify-center !bg-[#3a3b45] !text-[#9ca3af] hover:!text-red-500 transition">
-                                <i className="fa-solid fa-right-from-bracket"></i>
-                            </Button>
 
-
-                        }
-
-                        {/* <button
+                        <button
                             title="Ctrl+[ to open"
                             onClick={handleSideBarOpen}
                             className="mt-2 cursor-pointer outline-none border-[#9ca3af] h-[40px] w-[40px] flex items-center justify-center border rounded-lg">
                             <i className="fa-solid fa-chevron-right text-[#4a86f7]"></i>
-                        </button> */}
+                        </button>
+
+
+                      
+
+
 
 
                         <div className=''>
@@ -544,6 +537,22 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                                 />
                             )}
                         </div>
+
+                          {pathArray[1] !== "login" &&
+                            <Button
+                                isLoading={
+                                    isCTOPending ||
+                                    isClientPending ||
+                                    isStaffPending ||
+                                    isUserPending ||
+                                    isWorkerPending
+                                }
+                                title='logout'
+                                onClick={handleLogout}
+                                className="w-[40px] h-[40px] flex items-center justify-center !bg-[#3a3b45] !text-[#9ca3af] hover:!text-red-500 transition">
+                                <i className="fa-solid fa-right-from-bracket"></i>
+                            </Button>
+                        }
 
                     </div>
                 </aside>

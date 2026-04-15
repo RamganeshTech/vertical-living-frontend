@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useUpdateProfile } from "../../apiList/Stage Api/profile Edit Api/profileEditApi";
 import { Button } from "../../components/ui/Button";
 
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import type { OrganizationOutletTypeProps } from "../Organization/OrganizationChildren";
 import { toast } from "../../utils/toast";
 
@@ -55,22 +55,48 @@ export default function ProfileDetails() {
   const { openMobileSidebar, isMobile } =
     useOutletContext<OrganizationOutletTypeProps>();
 
+  const navigate = useNavigate()
+
+  // Inside ProfileDetails, above the selectors
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
   // Get role
   const { role, _id } = useSelector((state: RootState) => state.authStore);
   const dispatch = useDispatch()
   // Get correct slice by role
-  const profile =
-    role === "owner"
-      ? useSelector((state: RootState) => state.userProfileStore)
-      : role === "staff"
-        ? useSelector((state: RootState) => state.staffProfileStore)
-        : role === "CTO"
-          ? useSelector((state: RootState) => state.CTOProfileStore)
-          : role === "client"
-            ? useSelector((state: RootState) => state.clientProfileStore)
-            : role === "worker"
-              ? useSelector((state: RootState) => state.workerProfileStore)
-              : null;
+  // const profile =
+  //   role === "owner"
+  //     ? useSelector((state: RootState) => state.userProfileStore)
+  //     : role === "staff"
+  //       ? useSelector((state: RootState) => state.staffProfileStore)
+  //       : role === "CTO"
+  //         ? useSelector((state: RootState) => state.CTOProfileStore)
+  //         : role === "client"
+  //           ? useSelector((state: RootState) => state.clientProfileStore)
+  //           : role === "worker"
+  //             ? useSelector((state: RootState) => state.workerProfileStore)
+  //             : null;
+
+  // 1. Call all selectors at the top level (Rules of Hooks)
+  const userProfile = useSelector((state: RootState) => state.userProfileStore);
+  const staffProfile = useSelector((state: RootState) => state.staffProfileStore);
+  const ctoProfile = useSelector((state: RootState) => state.CTOProfileStore);
+  const clientProfile = useSelector((state: RootState) => state.clientProfileStore);
+  const workerProfile = useSelector((state: RootState) => state.workerProfileStore);
+
+  // 2. Use a standard object or switch to pick the data based on role
+  const profile = useMemo(() => {
+    switch (role) {
+      case "owner": return userProfile;
+      case "staff": return staffProfile;
+      case "CTO": return ctoProfile;
+      case "client": return clientProfile;
+      case "worker": return workerProfile;
+      default: return null;
+    }
+  }, [role, userProfile, staffProfile, ctoProfile, clientProfile, workerProfile]);
 
   const getProfileName = () => {
     if (!profile) return "-";
@@ -102,15 +128,18 @@ export default function ProfileDetails() {
         name: form.name,
         email: form.email,
         phoneNo: form.phoneNo,
+        file: selectedImage || undefined, // Pass the file here
       })
       toast({ title: "Success", description: "Completion status updated successfully" });
 
 
+      console.log("data", data)
       const payload = {
         email: form.email,
         phoneNo: form.phoneNo,
         role: role,
         isauthenticated: true,
+        profileImage: data?.data?.profileImage?.url || null
       };
 
       switch (role) {
@@ -164,6 +193,7 @@ export default function ProfileDetails() {
       }
 
       setIsEditing(false)
+      setSelectedImage(null); // Clear selection after success
     } catch (error: any) {
       toast({
         title: "Error",
@@ -180,12 +210,31 @@ export default function ProfileDetails() {
       email: "",
       phoneNo: "",
     })
+    setSelectedImage(null); // Clear the preview if user cancels
     setIsEditing(false)
   }
 
 
   const currentRole = roleConfig[role as keyof typeof roleConfig] || roleConfig.worker
-  const firstLetter = getProfileName().charAt(0).toUpperCase();
+  // const firstLetter = getProfileName().charAt(0).toUpperCase();
+
+  // Determine what image to show (Preview new selection OR existing DB image)
+  // const displayImageSrc = selectedImage && URL.createObjectURL(selectedImage)
+  const displayImageSrc = useMemo(() => {
+    // 1. If user just picked a new file, show that preview first
+    if (selectedImage) {
+      return URL.createObjectURL(selectedImage);
+    }
+
+    // 2. Otherwise, show the image from the profile (Redux/DB)
+    // Check if profileImage exists and has a url
+    return profile?.profileImage || null;
+  }, [selectedImage, profile]);
+
+  const getDisplayName = getProfileName();
+  const firstLetter = getDisplayName && getDisplayName !== "-"
+    ? getDisplayName.charAt(0).toUpperCase()
+    : "U"; // Default to 'U' for User if no name exists
 
   return (
     <div className="max-h-screen overflow-y-auto bg-gray-50">
@@ -203,7 +252,11 @@ export default function ProfileDetails() {
                   <i className="w-4 h-4 sm:w-5 sm:h-5 fas fa-bars !text-gray-600" />
                 </button>
               )}
+
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div onClick={() => navigate(-1)} className="p-1.5 cursor-pointer sm:p-2 bg-gray-100 rounded-lg">
+                  <i className="w-5 h-5 sm:w-6 sm:h-6 fas fa-arrow-left text-gray-600" />
+                </div>
                 <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg flex-shrink-0">
                   <i className="w-5 h-5 sm:w-6 sm:h-6 fas fa-user text-gray-600" />
                 </div>
@@ -232,14 +285,14 @@ export default function ProfileDetails() {
         <div className="max-w-4xl mx-auto">
           {/* Profile Card - Made Responsive */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            {/* Profile Header - Made Responsive */}
-            <div className="bg-gradient-to-r from-blue-500 to-blue-700 px-4 sm:px-6 py-6 sm:py-8 text-white">
+
+            {/* <div className="bg-gradient-to-r from-blue-500 to-blue-700 px-4 sm:px-6 py-6 sm:py-8 text-white">
               <div className="flex flex-col items-center gap-4 sm:gap-6 md:flex-row">
-                {/* Avatar - Responsive Size */}
+
                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold text-white border-2 sm:border-3 border-white/30 shadow-lg flex-shrink-0">
                   {firstLetter}
                 </div>
-                {/* Profile Info - Made Responsive */}
+
                 <div className="text-center md:text-left flex-1 min-w-0">
                   <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 break-words">{getProfileName()}</h2>
                   <div className="flex items-center justify-center md:justify-start gap-2 sm:gap-3 mb-2 flex-wrap">
@@ -247,13 +300,79 @@ export default function ProfileDetails() {
                     <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold bg-white/90 text-gray-800 border border-white/30">
                       {currentRole.label}
                     </span>
-                    {/* {currentRole.icon} 
-                    <Badge>{" "} {currentRole.label}</Badge> */}
+                    
                   </div>
                   <p className="text-white/80 text-xs sm:text-sm break-all">ID: {_id}</p>
                 </div>
               </div>
-            </div>
+            </div> */}
+
+
+            {/* Profile Card Wrapper */}
+
+            {/* FIX: This is the missing Blue Header Container */}
+            <div className="bg-gradient-to-r from-blue-500 to-blue-700 px-4 sm:px-6 py-6 sm:py-8 text-white">
+              <div className="flex flex-col items-center gap-4 sm:gap-6 md:flex-row">
+
+                {/* Avatar Section */}
+                <div className="relative w-fit group">
+                  {displayImageSrc ? (
+                    <img
+                      src={displayImageSrc}
+                      alt="Profile"
+                      onClick={() => !isEditing && setIsModalOpen(true)}
+                      className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-white/30 shadow-lg ${!isEditing ? "cursor-pointer" : ""}`}
+                    />
+                  ) : (
+                    <div
+                      className={`w-20 h-20 sm:w-24 sm:h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl sm:text-3xl font-bold text-white border-2 border-white/30 shadow-lg flex-shrink-0 ${!isEditing ? "cursor-pointer" : ""}`}
+                      onClick={() => !isEditing && setIsModalOpen(true)}
+                    >
+                      {firstLetter}
+                    </div>
+                  )}
+
+                  <input
+                    type="file"
+                    hidden
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setSelectedImage(e.target.files[0]);
+                      }
+                    }}
+                  />
+
+                  {/* Pencil Icon */}
+                  {isEditing && (
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute bottom-0 right-0 bg-white text-blue-600 w-8 h-8 flex items-center justify-center rounded-full shadow-xl hover:bg-gray-100 transition-all border border-gray-200 z-10"
+                    >
+                      <i className="fas fa-pencil-alt text-xs" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Profile Info */}
+                <div className="text-center md:text-left flex-1 min-w-0">
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-2 break-words">
+                    {getDisplayName}
+                  </h2>
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-2 flex-wrap">
+                    <span className="text-lg sm:text-xl">{currentRole.icon}</span>
+                    <span className="px-3 py-1 rounded-full text-xs sm:text-sm font-semibold bg-white/90 text-gray-800 border border-white/30">
+                      {currentRole.label}
+                    </span>
+                  </div>
+                  <p className="text-white/70 text-xs break-all font-mono">ID: {_id}</p>
+                </div>
+
+              </div>
+            </div> {/* End of Blue Header */}
+
+
 
             {/* Profile Form - Made Responsive */}
             <div className="p-4 sm:p-6 md:p-8">
@@ -284,8 +403,8 @@ export default function ProfileDetails() {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg transition-all duration-200 text-sm sm:text-base ${isEditing
-                        ? "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
-                        : "border-gray-200 bg-gray-50 text-gray-700"
+                      ? "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+                      : "border-gray-200 bg-gray-50 text-gray-700"
                       } disabled:cursor-not-allowed`}
                     placeholder="Enter your full name"
                   />
@@ -304,8 +423,8 @@ export default function ProfileDetails() {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg transition-all duration-200 text-sm sm:text-base ${isEditing
-                        ? "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
-                        : "border-gray-200 bg-gray-50 text-gray-700"
+                      ? "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+                      : "border-gray-200 bg-gray-50 text-gray-700"
                       } disabled:cursor-not-allowed`}
                     placeholder="Enter your email address"
                   />
@@ -324,8 +443,8 @@ export default function ProfileDetails() {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg transition-all duration-200 text-sm sm:text-base ${isEditing
-                        ? "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
-                        : "border-gray-200 bg-gray-50 text-gray-700"
+                      ? "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+                      : "border-gray-200 bg-gray-50 text-gray-700"
                       } disabled:cursor-not-allowed`}
                     placeholder="Enter your phone number"
                   />
@@ -383,7 +502,28 @@ export default function ProfileDetails() {
       </div>
 
 
-      {/* {role && ["owner"].includes(role) && <RazorpayConfig />} */}
+
+      {/* Full-Screen Image Modal */}
+      {isModalOpen && displayImageSrc && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={displayImageSrc}
+              alt="Profile Full Size"
+              className="max-w-full max-h-[85vh] rounded-xl object-contain shadow-2xl"
+            />
+            <button
+              className="absolute -top-12 right-0 text-white p-2"
+              onClick={() => setIsModalOpen(false)}
+            >
+              <i className="fas fa-times text-2xl" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

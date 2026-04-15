@@ -17,14 +17,20 @@ export interface SearchSelectProps {
   onFocus?: () => void; // 👈 Add this optional line
   value?: string;
   className?: string;
-  searchBy?: 'name' | 'email' | 'both' ; // Control what to search by
+  searchBy?: 'name' | 'email' | 'both'; // Control what to search by
   displayFormat?: 'simple' | 'detailed'; // Control display format
-  enabled?:boolean,
+  enabled?: boolean,
+  disabled?: boolean;      // 👈 New Prop
+  disabledTitle?: string;  // 👈 New Prop
+
+  showCreateButton?: boolean;
+  createButtonLabel?: string;
+  onCreateClick?: () => void;
 }
 // Helper function to normalize options
 const normalizeOptions = (options: SelectOption[] | string[]): SelectOption[] => {
   if (options?.length === 0) return [];
-  
+
   // If options are strings, convert to SelectOption format
   if (typeof options?.[0] === 'string') {
     return (options as string[])?.map(option => ({
@@ -32,7 +38,7 @@ const normalizeOptions = (options: SelectOption[] | string[]): SelectOption[] =>
       label: option
     }));
   }
-  
+
   return options as SelectOption[];
 };
 
@@ -59,7 +65,14 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
   className = "",
   searchBy = 'name', // Default to search by name only
   displayFormat = 'detailed', // Default to detailed display
-  enabled = true
+  enabled = true,
+  disabled = false,        // 👈 Add this
+  disabledTitle = "",       // 👈 Add this
+
+  showCreateButton = false,
+  createButtonLabel = "",
+  onCreateClick,
+
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -105,7 +118,7 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
   };
 
   const handleInputClick = () => {
-    if(enabled){
+    if (enabled) {
       setIsOpen(true);
       setSearchTerm("");
       if (onFocus) onFocus();
@@ -125,13 +138,20 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       {/* Selected value display */}
+
       <div
-        className="w-full p-3 border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-gray-400 transition-colors flex justify-between items-center"
-        onClick={handleInputClick}
+        // className="w-full p-3 border border-gray-300 rounded-lg bg-white cursor-pointer hover:border-gray-400 transition-colors flex justify-between items-center"
+        className={`w-full p-3 border border-gray-300 rounded-lg flex justify-between items-center transition-colors 
+    ${disabled
+            ? "bg-gray-50 cursor-not-allowed opacity-80" // Blocked state
+            : "bg-white cursor-pointer hover:border-gray-400" // Active state
+          } ${className}`}
+        // onClick={handleInputClick}
+        onClick={disabled ? undefined : handleInputClick}
       >
         <div className="flex-1 min-w-0">
           {selectedOption ? (
-            <div className="flex flex-col truncate">
+            <div className="flex flex-col truncate" title={disabled ? disabledTitle : ""}>
               <span className="text-gray-800 font-medium truncate">
                 {selectedOption.label}
               </span>
@@ -162,8 +182,9 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
         </div>
       </div>
 
+
       {/* Dropdown */}
-      {isOpen && (
+      {!disabled && isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
           {/* Search input */}
           <div className="p-2 border-b border-gray-200 sticky top-0 bg-white">
@@ -180,23 +201,50 @@ const SearchSelectNew: React.FC<SearchSelectProps> = ({
           {/* Options list */}
           <div className="py-1">
             {filteredOptions?.length > 0 ? (
-              filteredOptions?.map((option) => (
-                <div
-                  key={option.value}
-                  className={`px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 ${
-                    selectedOption?.value === option.value ? 'bg-blue-50 border-blue-200' : ''
-                  }`}
-                  onClick={() => handleSelect(option)}
-                >
-                  <div className="font-medium text-gray-900">{option.label}</div>
-                  {displayFormat === 'detailed' && option.email && (
-                    <div className="text-sm text-gray-500 mt-1">{option.email}</div>
-                  )}
-                </div>
-              ))
+              <>
+                {filteredOptions?.map((option) => (
+                  <div
+                    key={option.value}
+                    className={`px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 ${selectedOption?.value === option.value ? 'bg-blue-50 border-blue-200' : ''
+                      }`}
+                    onClick={() => handleSelect(option)}
+                  >
+                    <div className="font-medium text-gray-900">{option.label}</div>
+                    {displayFormat === 'detailed' && option.email && (
+                      <div className="text-sm text-gray-500 mt-1">{option.email}</div>
+                    )}
+                  </div>
+                ))
+                }
+
+                {/* 👈 ADD THIS: Quick Create Button at the end of the list */}
+                {showCreateButton && (
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onCreateClick) onCreateClick();
+                      setIsOpen(false); // Close dropdown after clicking
+                    }}
+                    className="sticky bottom-0 bg-gray-50 p-3 border-t border-gray-200 hover:bg-blue-600 hover:text-white transition-all cursor-pointer flex items-center justify-center gap-2 font-bold text-blue-600 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]"
+                  >
+                    <i className="fas fa-plus-circle"></i>
+                    {createButtonLabel || "Add New Item"}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="px-4 py-3 text-gray-500 text-center">
                 No options found
+
+                {/* 👈 Also show it here if search result is empty */}
+                {showCreateButton && (
+                  <button
+                    onClick={onCreateClick}
+                    className="block w-full mt-2 text-blue-600 font-bold hover:underline"
+                  >
+                    + {createButtonLabel}
+                  </button>
+                )}
               </div>
             )}
           </div>

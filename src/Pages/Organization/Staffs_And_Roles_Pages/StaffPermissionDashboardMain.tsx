@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { useDeleteUser, useGetAllUsers } from '../../../apiList/orgApi';
+import { useDeleteUser, useGetAllUsers } from '../../../apiList/organization_api/orgApi';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { CreateUserModal } from './CreateStaffModel';
@@ -35,13 +35,13 @@ const StaffPermissionDashboard = () => {
     //     });
     // }, [users, filters]);
 
-     const filteredUsers = useMemo(() => {
+    const filteredUsers = useMemo(() => {
         return users.filter((user: any) => {
-            
+
             // 1. General Search (Name)
             // Safe check: handle if user.name is null
-            const matchesSearch = filters.search 
-                ? user.name?.toLowerCase().includes(filters.search.toLowerCase()) 
+            const matchesSearch = filters.search
+                ? user.name?.toLowerCase().includes(filters.search.toLowerCase())
                 : true;
 
             // 2. Role Filter
@@ -49,13 +49,13 @@ const StaffPermissionDashboard = () => {
 
             // 3. Email Filter (FIXED)
             // Logic: If filter is empty, return true. Else, check match.
-            const matchesEmail = filters.email 
-                ? user.email?.toLowerCase().includes(filters.email.toLowerCase()) 
+            const matchesEmail = filters.email
+                ? user.email?.toLowerCase().includes(filters.email.toLowerCase())
                 : true;
 
             // 4. Phone Filter (FIXED)
-            const matchesPhone = filters.phone 
-                ? user.phoneNo?.includes(filters.phone) 
+            const matchesPhone = filters.phone
+                ? user.phoneNo?.includes(filters.phone)
                 : true;
 
             return matchesSearch && matchesRole && matchesEmail && matchesPhone;

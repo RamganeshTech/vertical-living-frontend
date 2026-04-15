@@ -94,9 +94,9 @@ const PincodeListRow: React.FC<Props> = ({
                     <span className="text-sm font-medium text-gray-700">
                         {pincodeItem.serviceMode}
                     </span>
-                    <span className="text-[10px] uppercase tracking-tighter text-gray-400">
-                        {pincodeItem.urbanClassification || 'Urban'} [cite: 87]
-                    </span>
+                    {/* <span className="text-[10px] uppercase tracking-tighter text-gray-400">
+                        {pincodeItem.urbanClassification || "slkjdfls;dkj"}
+                    </span> */}
                 </div>
             </div>
 

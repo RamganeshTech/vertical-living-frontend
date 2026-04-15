@@ -10,6 +10,7 @@ const initialState = {
     permission: {} as Record<string, Record<string, boolean>>,
     isGuideRequired: undefined,
     ownerId:"",
+    profileImage: null
 
 
 }
@@ -19,7 +20,7 @@ const workerSlice = createSlice({
     initialState,
     reducers: {
         setWorkerProfileData: (state, action) => {
-            const { workerId, workerName, email, phoneNo, isauthenticated, role, permission, isGuideRequired , ownerId} = action.payload
+            const { workerId, profileImage, workerName, email, phoneNo, isauthenticated, role, permission, isGuideRequired , ownerId} = action.payload
 
             return {
                 ...state,
@@ -31,7 +32,9 @@ const workerSlice = createSlice({
                 isauthenticated,
                 permission,
                 isGuideRequired,
-                ownerId
+                ownerId,
+    profileImage
+
 
             };
         },

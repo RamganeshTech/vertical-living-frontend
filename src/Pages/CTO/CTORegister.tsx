@@ -196,7 +196,8 @@ export default function CTORegister() {
             dispatch(setRole({
                 role: CTOData.role,
                 isauthenticated: true,
-                _id: CTOData.CTOId
+                _id: CTOData.CTOId,
+                organizationId: CTOData?.organizationId || ""
             }));
 
             dispatch(setCTOProfileData({

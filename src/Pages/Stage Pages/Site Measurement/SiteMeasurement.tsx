@@ -50,10 +50,10 @@ const initialRoomDetails: SiteRooms = {
 };
 
 function HomeInteriorProject() {
-  const { projectId, organizationId } = useParams()
+  const { projectId, organizationId } = useParams() as { projectId: string, organizationId: string }
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>()
 
-  if (!projectId) return
+  // if (!projectId) return
   const navigate = useNavigate()
 
   const [showSiteForm, setShowSiteForm] = useState<boolean>(false);
@@ -167,31 +167,41 @@ function HomeInteriorProject() {
   if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <div className="container mx-auto px-2 py-2 max-w-full h-full w-full overflow-y-auto custom-scrollbar">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+    <div className="container mx-auto px-2 py-2 bg-brand-surface max-w-full h-full w-full overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b border-ash-light">
         <div className="w-full sm:w-auto">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
+          {/* <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center"> */}
+          <h2 className="text-2xl sm:text-3xl font-bold text-text-main flex items-center">
             {isMobile && (
               <button
                 onClick={openMobileSidebar}
-                className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                // className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                className="mr-3 p-2 rounded-lg border border-ash-medium hover:bg-brand-ash text-text-muted shadow-sm transition-colors"
                 title="Open Menu"
               >
                 <i className="fa-solid fa-bars"></i>
               </button>
             )}
-            <i className="fa-solid fa-receipt mr-2"></i> Site Measurement
+            {/* <i className="fa-solid fa-receipt mr-2"></i> Site Measurement */}
+            <div className="w-10 h-10 bg-brand-surface border border-ash-medium rounded-lg flex items-center justify-center shadow-sm mr-3">
+              <i className="fa-solid fa-ruler-combined text-text-muted text-lg"></i>
+            </div>
+            <span className="leading-tight">Site Measurement</span>
           </h2>
-          <p className="text-gray-600 hidden sm:block text-sm sm:text-base">Plan your dream home</p>
+          {/* <p className="text-gray-600 hidden sm:block text-sm sm:text-base">Plan your dream home</p> */}
+          <p className="text-sm sm:text-base font-bold tracking-wider text-text-muted mt-2 hidden sm:block">Plan your dream home</p>
         </div>
 
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2  !w-[100%] sm:!w-[50%] lg:!w-[60%] justify-start lg:justify-end">
           {(canCreate || canEdit) && <Button
             isLoading={updateCompletionStatus.isPending}
             onClick={handleCompletionStatus}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2  w-full sm:w-auto"
+            variant='dark'
+          // className="bg-green-600 hover:bg-green-700 text-white px-4 py-2  w-full sm:w-auto"
           >
-            <i className="fa-solid fa-circle-check mr-2"></i> Mark Complete
+            {/* <i className="fa-solid fa-circle-check mr-2"></i>  */}
+            <i className="fa-solid fa-circle-check mr-2 text-action-success"></i>
+            Mark Complete
           </Button>}
 
           {(canCreate || canEdit) && <ResetStageButton
@@ -218,51 +228,78 @@ function HomeInteriorProject() {
           />
 
           <div className="w-full sm:w-auto flex justify-end sm:block">
-                <StageGuide 
-                    organizationId={organizationId!} 
-                    stageName="sitemeasurement" 
-                />
-            </div>
+            <StageGuide
+              organizationId={organizationId!}
+              stageName="sitemeasurement"
+            />
+          </div>
         </div>
       </div>
 
       {getAllError && (
-        <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-          <div className="text-red-600 font-semibold mb-2">
-            ⚠️ Error Occurred
+        // <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+        //   <div className="text-red-600 font-semibold mb-2">
+        //     ⚠️ Error Occurred
+        //   </div>
+        //   <p className="text-red-500 text-sm mb-4">
+        //     {(getAllError as any)?.response?.data?.message || "Failed to load data"}
+        //   </p>
+        //   <Button
+        //     onClick={() => refetch()}
+        //     className="bg-red-600 text-white px-4 py-2"
+        //   >
+        //     Retry
+        //   </Button>
+        // </div>
+
+        <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
+          <div className="text-action-danger text-3xl mb-3">
+            <i className="fa-solid fa-triangle-exclamation"></i>
           </div>
-          <p className="text-red-500 text-sm mb-4">
-            {(getAllError as any)?.response?.data?.message || "Failed to load data"}
+          <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
+          <p className="text-text-muted text-sm mb-5">
+            {(getAllError as any)?.response?.data?.message || "Failed to load site measurement data"}
           </p>
           <Button
+            isLoading={isLoading}
             onClick={() => refetch()}
-            className="bg-red-600 text-white px-4 py-2"
+            variant="outline"
+            className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
           >
             Retry
           </Button>
         </div>
       )}
 
-      {!getAllError && <Card className="p-4 mb-4 shadow border-l-4 border-blue-600 bg-white">
-        <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
-          <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
-          <span>Stage Timings</span>
-        </div>
-        <StageTimerInfo
-          completedAt={measurementData?.timer?.compltedAt}
-          stageName='sitemeasurement'
-          formId={(measurementData as any)?._id}
-          projectId={projectId}
-          deadLine={measurementData?.timer?.deadLine}
-          startedAt={measurementData?.timer?.startedAt}
-          refetchStageMutate={refetch}
-          deadLineMutate={deadLineAsync}
-          isPending={deadLinePending}
-        />
-      </Card>
+      {!getAllError &&
+        // <Card className="p-4 mb-4 shadow border-l-4 border-blue-600 bg-white">
+        //   <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
+        //     <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+        //     <span>Stage Timings</span>
+        //   </div>
+
+        <Card className="p-4 shadow-sm border-2 border-ash-medium rounded-xl bg-brand-surface w-full">
+          <div className="flex items-center gap-2 text-text-main text-sm font-bold mb-4 uppercase tracking-wide border-b border-ash-light pb-3">
+            <i className="fa-regular fa-clock text-ash-dark text-base"></i>
+            <span>Stage Timings</span>
+          </div>
+          <StageTimerInfo
+            completedAt={measurementData?.timer?.compltedAt}
+            stageName='sitemeasurement'
+            formId={(measurementData as any)?._id}
+            projectId={projectId}
+            deadLine={measurementData?.timer?.deadLine}
+            startedAt={measurementData?.timer?.startedAt}
+            refetchStageMutate={refetch}
+            deadLineMutate={deadLineAsync}
+            isPending={deadLinePending}
+          />
+        </Card>
       }
-      {!getAllError && <div className="mb-6">
-        <Card className="p-4 shadow border-l-4 border-blue-500 bg-white">
+      {!getAllError && <div className="my-6">
+        {/* <Card className="p-4 shadow border-l-4 border-blue-500 bg-white"> */}
+        {/* <Card className="p-5 w-full bg-white shadow-sm border border-gray-200 rounded-xl"> */}
+        <Card className="p-4 w-full bg-brand-surface shadow-sm border-2 border-ash-medium rounded-xl">
           <RequirementFileUploader
             enableUpload={canEdit || canCreate}
             autoUpload={true}
@@ -282,19 +319,29 @@ function HomeInteriorProject() {
       {!getAllError &&
         <>
           {!Object.values(measurementData?.siteDetails || {}).some((ele: any) => ele !== null) && !showSiteForm ? (
-            <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            // <div className="bg-white rounded-xl shadow-sm border border-dashed border-gray-200 p-10 text-center mb-6">
+            <div className="bg-brand-surface rounded-xl shadow-sm border-1 border-dashed border-ash-medium p-10 text-center">
+              {/* <div className="w-16 h-16 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
-              </div>
-              <p className="text-gray-600 mb-4">No Site Details Added</p>
-              {(canEdit || canCreate) && <button
-                onClick={() => setShowSiteForm(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              >
-                Add Site Details
-              </button>}
+              </div> */}
+
+              <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                        <i className="fa-solid fa-file-contract text-2xl text-ash-dark"></i>
+                    </div>
+              <h3 className="text-lg font-bold text-text-main mb-2">No Site Details Added</h3>
+              <p className="text-sm text-text-muted mb-6 max-w-sm mx-auto">Start by configuring the primary details and layout of the site.</p>
+
+              {(canEdit || canCreate) && (
+                <Button
+                  onClick={() => setShowSiteForm(true)}
+                  variant="dark"
+                  className="px-5 py-2.5"
+                >
+                  <i className="fa-solid fa-plus mr-2"></i> Add Site Details
+                </Button>
+              )}
             </div>
           ) : (
             <CommonSiteInfo   // this has teh room cards also 

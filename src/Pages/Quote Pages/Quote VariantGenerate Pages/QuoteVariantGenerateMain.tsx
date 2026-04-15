@@ -63,7 +63,12 @@ const QuoteGenerateVariantMain = () => {
 
 
 
-    const quotes = allQuotes?.filter((quote: any) => quote.mainQuote === null && quote?.sqftRateWork && quote?.sqftRateWork?.length === 0)
+    // const quotes = allQuotes?.filter((quote: any) => quote.mainQuote === null && quote?.sqftRateWork && quote?.sqftRateWork?.length === 0)
+    // NEW FILTER LOGIC
+    const quotes = allQuotes?.filter((quote: any) =>
+        quote?.mainQuote === null &&
+        (quote?.sqftRateWorkCount === 0 || quote?.sqftRateWork?.length === 0)
+    );
 
 
 
@@ -146,9 +151,9 @@ const QuoteGenerateVariantMain = () => {
 
 
 
-{/* kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaaaaaaaaaaaaaaaaaaaaa kkkkkkkkkkkkkkkkkkk */}
+            {/* kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaaaaaaaaaaaaaaaaaaaaa kkkkkkkkkkkkkkkkkkk */}
 
-{/* kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaaaaaaaaaaaaaaaaaaaaa kkkkkkkkkkkkkkkkkkk */}
+            {/* kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaaaaaaaaaaaaaaaaaaaaa kkkkkkkkkkkkkkkkkkk */}
 
             <main className="flex gap-4 w-full h-[calc(100vh-108px)] overflow-hidden">
 

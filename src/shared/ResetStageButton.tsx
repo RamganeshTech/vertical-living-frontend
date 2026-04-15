@@ -20,7 +20,9 @@ export const ResetStageButton: React.FC<ResetStageButtonProps> = ({
     projectId,
     stageNumber,
     stagePath,
-    buttonClass = "bg-red-600 text-white",
+    // buttonClass = "bg-red-600 text-white",
+    // buttonClass = "bg-white border border-gray-200 text-red-600 hover:bg-red-50 hover:border-red-200 shadow-sm transition-all",
+    buttonClass = "bg-white border border-gray-200 !text-red-600 hover:bg-red-50 hover:border-red-200 shadow-sm transition-all",
     iconClass = "fas fa-rotate-left",
     disabled = false,
     className = ""
@@ -39,24 +41,30 @@ export const ResetStageButton: React.FC<ResetStageButtonProps> = ({
     };
 
     return (
+        // <div className={`space-y-1 w-full ${className}`}>
+        //     <Button
+        //         onClick={handleReset}
+        //         variant="danger"
+        //         disabled={isPending || disabled}
+        //         className={`${buttonClass} flex items-center gap-2 !p-2 w-full`}
+        //     >
+        //         <i className={iconClass} />
+               
+        //         <span>{isPending ? "Resetting..." : "Reset Stage"}</span>
+        //     </Button>
+
+           
+        // </div>
+
         <div className={`space-y-1 w-full ${className}`}>
             <Button
                 onClick={handleReset}
-                variant="danger"
                 disabled={isPending || disabled}
-                className={`${buttonClass} flex items-center gap-2 !p-2 w-full`}
+                className={`${buttonClass} flex items-center justify-center gap-2 !py-2 !px-4 w-full`}
             >
-                <i className={iconClass} />
-                {/* <span className="hidden sm:block">{isPending ? "Resetting..." : "Reset Stage"}</span>
-                <span className="sm:hidden">Reset</span> */}
-                <span>{isPending ? "Resetting..." : "Reset Stage"}</span>
+                <i className={`${iconClass} ${isPending ? 'animate-spin' : ''}`} />
+                <span className="text-sm font-medium">{isPending ? "Resetting..." : "Reset Stage"}</span>
             </Button>
-
-            {/* {error && (
-                <p className="text-sm text-red-500">
-                    {(error as any)?.response?.data?.message || "failed to reset all stages"}
-                </p>
-            )} */}
         </div>
     );
 };

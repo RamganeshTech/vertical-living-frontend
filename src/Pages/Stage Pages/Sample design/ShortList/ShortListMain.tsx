@@ -210,14 +210,16 @@ export default function ShortlistMain() {
         <div className="flex gap-2 items-center">
           <div
             onClick={() => navigate(-1)}
-            className="flex bg-gray-200 h-fit rounded-full items-center gap-2 backdrop-blur-sm px-4 py-2 cursor-pointer"
+            // className="flex bg-gray-200 h-fit rounded-full items-center gap-2 backdrop-blur-sm px-4 py-2 cursor-pointer"
+            className="flex bg-brand-surface border border-ash-medium hover:bg-brand-ash h-fit rounded-lg items-center gap-2 px-3 py-2 cursor-pointer shadow-sm"
           >
             <i className="fas fa-arrow-left text-sm"></i>
             <span className="text-sm hidden sm:inline-block font-medium">Back</span>
           </div>
           <div>
             <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1">Shortlisting Reference Designs</h1>
-            <p className="text-gray-600 hidden sm:inline-block text-sm md:text-md">
+            {/* <p className="text-gray-600 hidden sm:inline-block text-sm md:text-md"> */}
+            <p className="text-text-muted hidden sm:inline-block text-sm">
               Select and organize your favorite design references for easy access
             </p>
           </div>
@@ -225,7 +227,8 @@ export default function ShortlistMain() {
 
 
         {(selectedSiteImage || tempReferenceImages.length > 0) && <button
-          className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg cursor-pointer"
+          // className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg cursor-pointer"
+          className="bg-action-primary hover:opacity-90 text-white px-6 py-2.5 rounded-lg text-sm font-semibold cursor-pointer shadow-sm transition-all whitespace-nowrap"
           onClick={() => {
             if (!selectedSiteImage || tempReferenceImages.length === 0) {
               toast({ title: "Error", description: "Select site image & at least 1 reference", variant: "destructive" });
@@ -254,11 +257,14 @@ export default function ShortlistMain() {
           Confirm Selection
         </button>}
       </header>
-      <hr className="my-3 bg-gray-500" />
+      <hr className="my-3 bg-ash-medium" />
 
-      <div className="mb-4 flex gap-4 w-full  items-end">
+      {/* <div className="mb-4 flex gap-4 w-full  items-end"> */}
+      <div className="mb-6 flex gap-4 w-full items-end bg-brand-surface p-4 rounded-xl border border-ash-medium shadow-sm">
+
         <div className="flex flex-1 flex-col">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Categories</label>
+          {/* <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Categories</label> */}
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-2">Filter by Categories</label>
           {/* <TagInput tags={tags} setState={setTags} /> */}
 
           <SmartTagInput
@@ -274,7 +280,8 @@ export default function ShortlistMain() {
           <Button
             variant="outline"
             onClick={() => setTags([])}
-            className="text-sm ml-2 flex"
+            // className="text-sm ml-2 flex"
+            className="text-sm ml-2 flex border-ash-medium text-text-main hover:bg-brand-ash bg-brand-surface shadow-sm"
           >
             Reset Filter
           </Button>
@@ -283,11 +290,20 @@ export default function ShortlistMain() {
 
 
 
-      <div className="grid md:grid-cols-2 gap-8 border-gray-300 border-2 rounded-2xl p-2">
+      {/* <div className="grid md:grid-cols-2 gap-8 border-gray-300 border-2 rounded-2xl p-2"> */}
+      <div className="grid md:grid-cols-2 gap-6 border border-ash-medium rounded-2xl bg-brand-surface shadow-sm p-2">
         {/* ➕ Reference Designs */}
-        <div className="border-r-1 border-gray-300 pr-8">
-          <h2 className="font-semibold text-lg mb-2">Reference Designs</h2>
-          <div className="my-3 w-full h-[1px] bg-gray-200" />
+        {/* <div className="border-r-1 border-gray-300 pr-8"> */}
+        <div className="md:border-r border-ash-medium p-5 sm:p-6 bg-brand-surface">
+          {/* <h2 className="font-semibold text-lg mb-2">Reference Designs</h2> */}
+
+          <h2 className="font-bold text-lg mb-4 text-text-main flex items-center gap-2">
+            <i className="fa-regular fa-image text-text-muted"></i>
+            Reference Designs
+          </h2>
+
+          {/* <div className="my-3 w-full h-[1px] bg-gray-200" /> */}
+          <div className="mb-3 w-full h-[1px] bg-ash-light" />
 
           {isLoadingRefs ? (
             <div><MaterialOverviewLoading /></div>
@@ -317,13 +333,24 @@ export default function ShortlistMain() {
                 />
 
                 :
-                <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white   text-center p-6">
-                  <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
-                  <h3 className="text-lg font-semibold text-blue-800 mb-1">No Reference Images Available</h3>
-                  <p className="text-sm text-gray-500">
-                    Upload the Images in the <span className="cursor-pointer font-semibold text-blue-600" onClick={() => navigate(`/organizations/${organizationId}/projects/shortlistdesign`)}>Reference Design</span> section<br />
-                    Select multiple Reference images<br />
-                    after selecting <strong>"Confirm Selection"</strong> to add images 🚀
+                // <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white   text-center p-6">
+                //   <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
+                //   <h3 className="text-lg font-semibold text-blue-800 mb-1">No Reference Images Available</h3>
+                //   <p className="text-sm text-gray-500">
+                //     Upload the Images in the <span className="cursor-pointer font-semibold text-blue-600" onClick={() => navigate(`/organizations/${organizationId}/projects/shortlistdesign`)}>Reference Design</span> section<br />
+                //     Select multiple Reference images<br />
+                //     after selecting <strong>"Confirm Selection"</strong> to add images 🚀
+                //   </p>
+                // </div>
+
+                <div className="flex flex-col items-center justify-center h-full w-full bg-brand-ash border border-dashed border-ash-medium rounded-xl text-center p-6">
+                  <div className="w-16 h-16 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mb-4 shadow-sm">
+                    <i className="fas fa-box-open text-2xl text-ash-dark" />
+                  </div>
+                  <h3 className="text-base font-bold text-text-main mb-1">No Reference Images</h3>
+                  <p className="text-sm text-text-muted leading-relaxed max-w-xs mx-auto">
+                    Upload images in the <span className="cursor-pointer font-bold text-text-main hover:underline" onClick={() => navigate(`/organizations/${organizationId}/projects/shortlistdesign`)}>Reference Design</span> section.<br />
+                    Select multiple references, then click <strong>"Confirm Selection"</strong> 🚀
                   </p>
                 </div>
               }
@@ -332,9 +359,15 @@ export default function ShortlistMain() {
         </div>
 
         {/* 🏠 Site Images */}
-        <div>
-          <h2 className="font-semibold text-lg mb-2">Site Images</h2>
-          <div className="my-3 w-full h-[1px] bg-gray-200" />
+        <div className="p-5 sm:p-6 bg-brand-surface">
+          {/* <h2 className="font-semibold text-lg mb-2">Site Images</h2>
+          <div className="my-3 w-full h-[1px] bg-gray-200" /> */}
+
+          <h2 className="font-bold text-lg mb-4 text-text-main flex items-center gap-2">
+            <i className="fa-solid fa-camera text-text-muted"></i>
+            Site Images
+          </h2>
+          <div className="mb-4 w-full h-[1px] bg-ash-light" />
           {isLoadingSite ? (
             <div><MaterialOverviewLoading /></div>
           ) : (
@@ -363,13 +396,24 @@ export default function ShortlistMain() {
 
               />
                 :
-                <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white   text-center p-6">
-                  <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
-                  <h3 className="text-lg font-semibold text-blue-800 mb-1">No Site Images Available</h3>
-                  <p className="text-sm text-gray-500">
-                    Upload the Images in the Site Measurement Stage<br />
-                    Select multiple Reference images for single Site Image <br />
-                    after selection <strong>"Confirm Selection"</strong> to add images 🚀
+                // <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white   text-center p-6">
+                //   <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
+                //   <h3 className="text-lg font-semibold text-blue-800 mb-1">No Site Images Available</h3>
+                //   <p className="text-sm text-gray-500">
+                //     Upload the Images in the Site Measurement Stage<br />
+                //     Select multiple Reference images for single Site Image <br />
+                //     after selection <strong>"Confirm Selection"</strong> to add images 🚀
+                //   </p>
+                // </div>
+
+                <div className="flex flex-col items-center justify-center h-full w-full bg-brand-ash border border-dashed border-ash-medium rounded-xl text-center p-6">
+                  <div className="w-16 h-16 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mb-4 shadow-sm">
+                    <i className="fas fa-box-open text-2xl text-ash-dark" />
+                  </div>
+                  <h3 className="text-base font-bold text-text-main mb-1">No Reference Images</h3>
+                  <p className="text-sm text-text-muted leading-relaxed max-w-xs mx-auto">
+                    Upload images in the <span className="cursor-pointer font-bold text-text-main hover:underline" onClick={() => navigate(`/organizations/${organizationId}/projects/shortlistdesign`)}>Reference Design</span> section.<br />
+                    Select multiple references, then click <strong>"Confirm Selection"</strong> 🚀
                   </p>
                 </div>
               }
@@ -382,15 +426,23 @@ export default function ShortlistMain() {
       {selections.length > 0 ?
         (
           <div className="mt-10 space-y-8">
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
 
-              <h3 className="font-bold text-xl mb-4">Selected Designs</h3>
+              <h3 className="font-bold text-xl mb-4">Selected Designs</h3> */}
+
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2 border-b border-ash-medium">
+              <h3 className="font-bold text-xl text-text-main flex items-center gap-2">
+                <i className="fa-solid fa-layer-group text-text-muted"></i>
+                Selected Designs Summary
+              </h3>
 
               <div className="flex gap-2">
                 {(canCreate || canEdit) && <Button
                   isLoading={isGenerating}
                   onClick={handleGenerate}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow disabled:opacity-50"
+                  // className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow disabled:opacity-50"
+                  variant="dark"
+                  className="bg-action-primary hover:opacity-90 text-white px-6 py-2 rounded-lg shadow-sm text-sm font-semibold disabled:opacity-50 transition-all"
                 >
                   {isGenerating ? "Generating..." : "Generate Pdf"}
                 </Button>}
@@ -399,8 +451,11 @@ export default function ShortlistMain() {
                   onClick={() => {
                     setSelections([])
                   }}
-                  variant="danger"
-                  className="bg-red-600  text-white px-6 py-2 rounded shadow disabled:opacity-50"
+                  // variant="danger"
+                  // className="bg-red-600  text-white px-6 py-2 rounded shadow disabled:opacity-50"
+
+                  variant="ghost"
+                  className="bg-brand-surface border border-ash-light text-action-danger px-5 py-2 rounded-lg shadow-sm text-sm font-semibold transition-all"
                 >
                   Clear List
                 </Button>
@@ -410,10 +465,11 @@ export default function ShortlistMain() {
             {selections.map(({ siteImage, referenceImages }, index) => (
               <div
                 key={siteImage._id}
-                className="p-4 py-6 border border-gray-300 rounded-lg bg-white shadow-md"
+                className="p-4 py-6 border border-ash-medium rounded-lg bg-brand-surface shadow-md"
               >
                 {/* Site Image with Index */}
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-4 lg:border-r border-ash-light">
+                {/* <div className="flex lg:w-1/3 shrink-0 lg:border-r border-ash-light lg:pr-6"> */}
                   <div className="">
                     <h2 className="text-base font-semibold text-gray-700 min-w-[110px]">Site Image {index + 1}</h2>
                     <br />
@@ -424,11 +480,27 @@ export default function ShortlistMain() {
                     />
                   </div>
 
-                  <Button
-                    variant="danger"
+                  {/* <div className="flex justify-between items-center mb-3">
+                      <h2 className="text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                        Site Image {index + 1}
+                      </h2>
+                    </div>
+                    <div className="bg-brand-ash border border-ash-medium p-2 rounded-lg shadow-sm mb-4">
+                      <img
+                        src={siteImage?.url}
+                        alt={siteImage.originalName || `Site ${index + 1}`}
+                        className="h-32 sm:h-40 w-full object-contain rounded-md bg-brand-surface"
+                      />
+                    </div> */}
 
+                  <Button
+                    // variant="danger"
+                    variant="ghost"
                     onClick={() => handleRemoveSite(siteImage._id)}
-                    className="text-white bg-red-600 text-sm whitespace-nowrap"
+                    // className="text-white bg-red-600 text-sm whitespace-nowrap"
+                    // className="text-action-danger bg-red-50/50 hover:bg-action-danger hover:text-white border border-red-100 text-sm font-semibold transition-all w-full justify-center"
+                    className="flex-1 sm:flex-none text-action-danger bg-brand-surface border  border-ash-dark hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all px-4"
+
                   >
 
                     <i className="fas fa-trash !mr-2 " ></i>
@@ -437,8 +509,11 @@ export default function ShortlistMain() {
                 </div>
 
                 {/* Reference Images Row */}
-                <div className="flex flex-wrap gap-4 flex-col">
-                  <h2 className="text-base font-semibold text-gray-700 min-w-[110px]">Referece Images</h2>
+                <div className="flex flex-wrap gap-2 flex-col">
+                  {/* <h2 className="text-base font-semibold text-gray-700 min-w-[110px]">Referece Images</h2> */}
+                  <h2 className="text-[11px] font-bold uppercase tracking-wider text-text-muted mb-2">
+                      Reference Images 
+                    </h2>
                   <div className="flex flex-wrap gap-4 ">
                     {referenceImages.map((ref) => (
                       <div key={ref._id} className="relative  w-[120px] h-[120px] ">
@@ -449,9 +524,10 @@ export default function ShortlistMain() {
                         />
                         <button
                           onClick={() => handleRemoveReference(siteImage._id, ref._id)}
-                          className="absolute top-1 right-1 bg-red-600 text-white p-1 px-2 text-xs rounded-full"
+                          // className="absolute top-1 right-1 bg-red-600 text-white p-1 px-2 text-xs rounded-full"
+                          className="absolute -top-1 -right-1 bg-brand-surface border border-ash-medium text-text-muted hover:text-action-danger hover:border-action-danger w-7 h-7 flex items-center justify-center text-xs rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all"
                         >
-                          ✕
+                          <i className="fas fa-xmark"></i>
                         </button>
                         <p className="text-xs mt-1 text-center max-w-[120px] truncate">{ref.originalName}</p>
                       </div>
@@ -464,7 +540,7 @@ export default function ShortlistMain() {
         )
         :
         <>
-          <h3 className="text-xl font-semibold text-black-800 my-3">Youre Selections will appear below</h3>
+          {/* <h3 className="text-xl font-semibold text-black-800 my-3">Youre Selections will appear below</h3>
 
           <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl shadow-xl border border-gray-100  text-center p-6">
             <i className="fas fa-box-open text-5xl text-blue-300 mb-4" />
@@ -474,13 +550,28 @@ export default function ShortlistMain() {
               Select multiple Reference images for single Site Image <br />
               after selection <strong>"Confirm Selection"</strong> to add images 🚀
             </p>
+          </div> */}
+
+          <div className="mt-8 border-t border-ash-medium pt-8">
+          <h3 className="text-lg font-bold text-text-main mb-4">Your Selections</h3>
+          <div className="flex flex-col items-center justify-center min-h-[250px] w-full bg-brand-surface rounded-xl shadow-sm border border-ash-medium text-center p-6">
+            <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-4 shadow-sm">
+              <i className="fa-solid fa-layer-group text-2xl text-ash-dark" />
+            </div>
+            <h3 className="text-base font-bold text-text-main mb-1">No Selections Created</h3>
+            <p className="text-sm text-text-muted leading-relaxed max-w-lg mx-auto">
+              Your generated pairs will appear here.<br />
+              Select a Site Image and multiple References, then click <strong>"Confirm Selection"</strong>.
+            </p>
           </div>
+        </div>
         </>
       }
 
 
 
-      <section className="mt-6">
+      {/* <section className="mt-6"> */}
+      <section className="mt-10 border-t border-ash-medium pt-8">
         <ShortListPdfList projectId={projectId} />
       </section>
     </div>

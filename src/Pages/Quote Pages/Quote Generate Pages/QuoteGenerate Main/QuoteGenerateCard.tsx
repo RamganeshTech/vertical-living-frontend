@@ -53,7 +53,7 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
 
             toast({
                 title: "Success",
-                description: "Items deleted successfully",
+                description: "Quote deleted successfully",
             });
 
             // refetch()
@@ -128,7 +128,7 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
                     (quote?.sqftRateWork?.length > 0 ? <p className="text-sm text-gray-500 italic">
                         <strong>Works: </strong> {quote?.sqftRateWork?.length || 0}
                     </p>
-                        : <div className='h-6'></div>
+                        : <div ></div>
                     )
 
                 }

@@ -23,7 +23,7 @@ export function toast(options: ToastOptions) {
   // Create toast container
   const toastContainer = document.createElement("div")
   toastContainer.id = "toast-container"
-  toastContainer.className = "fixed bottom-4 right-4 z-50 max-w-xs"
+  toastContainer.className = "fixed bottom-4 right-4 z-[9999] max-w-xs"
 
   // Create toast element
   const toastElement = document.createElement("div")

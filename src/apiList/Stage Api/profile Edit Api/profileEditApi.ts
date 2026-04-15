@@ -13,10 +13,23 @@ export const updateProfile = async ({
     name?: string;
     email?: string;
     phoneNo?: string;
+    file?: File
   };
 }) => {
+
+
   try {
-    const { data } = await api.put("/profile/update-profile", profileData);
+
+
+    const formData = new FormData();
+    if (profileData.name) formData.append("name", profileData.name);
+    if (profileData.email) formData.append("email", profileData.email);
+    if (profileData.phoneNo) formData.append("phoneNo", profileData.phoneNo);
+
+    // Append the file (Make sure "profileImage" matches your backend Multer key!)
+    if (profileData.file) formData.append("profileImage", profileData.file);
+
+    const { data } = await api.put("/profile/update-profile", formData);
     if (data.ok) {
       return data;
     } else {
@@ -42,16 +55,18 @@ export const useUpdateProfile = () => {
       name,
       email,
       phoneNo,
+      file
     }: {
       name?: string;
       email?: string;
       phoneNo?: string;
+      file?: File
     }) => {
       if (!role) throw new Error("Not authorized.");
       if (!allowedRoles.includes(role)) throw new Error("Role not allowed.");
       if (!api) throw new Error("API not found.");
 
-      return await updateProfile({ api, profileData: { name, email, phoneNo } });
+      return await updateProfile({ api, profileData: { name, email, phoneNo, file} });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });

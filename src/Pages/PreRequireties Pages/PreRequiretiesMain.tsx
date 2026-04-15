@@ -121,12 +121,14 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
                             <div className="flex items-center space-x-2 mt-1">
                                 <span className="text-sm text-gray-500">Status:</span>
                                 {isRequired ? (
-                                    <span className="flex items-center text-green-600 text-sm">
-                                        <i className="fas fa-check-circle mr-1"></i>
+                                    // <span className="flex items-center text-green-600 text-sm">
+                                    <span className="flex items-center  text-xs font-semibold">
+                                        <i className="fas fa-check-circle text-emerald-500 mr-1"></i>
                                         Required
                                     </span>
                                 ) : (
-                                    <span className="flex items-center text-gray-500 text-sm">
+                                    // <span className="flex items-center text-gray-500 text-sm">
+                                    <span className="flex items-center text-gray-400 text-xs font-semibold">
                                         <i className="fas fa-exclamation-circle mr-1"></i>
                                         Not Required
                                     </span>
@@ -147,11 +149,13 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
                                 className="sr-only"
                             />
                             <div
-                                className={`w-11 h-6 rounded-full transition-colors ${isRequired ? "bg-blue-600" : "bg-gray-200"
+                                // className={`w-11 h-6 rounded-full transition-colors ${isRequired ? "bg-blue-600" : "bg-gray-200"
+                                className={`w-10 h-5 rounded-full transition-colors ${isRequired ? "bg-gray-800" : "bg-gray-200"
                                     } ${updateBooleanMutation.isPending ? "opacity-50" : ""}`}
                             >
                                 <div
-                                    className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${isRequired ? "translate-x-5" : "translate-x-0"
+                                    // className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${isRequired ? "translate-x-5" : "translate-x-0"
+                                    className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${isRequired ? "translate-x-5" : "translate-x-0.5"
                                         } mt-0.5 ml-0.5`}
                                 ></div>
                             </div>
@@ -163,9 +167,11 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
 
             {/* Collapsible Content */}
             {isOpen && (
-                <div className="p-4">
+                // <div className="p-4">
+                <div className="p-4 sm:p-5 bg-gray-50/30">
                     <div className="space-y-4">
-                        {(canCreate || canEdit) && <div className="flex items-center space-x-2">
+                        {/* {(canCreate || canEdit) && <div className="flex items-center space-x-2"> */}
+                        {(canCreate || canEdit) && <div className="flex items-center space-x-3 bg-white p-3 rounded-lg border border-gray-200 shadow-sm w-fit">
                             <label className="relative inline-flex items-center cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -175,20 +181,23 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
                                     className="sr-only"
                                 />
                                 <div
-                                    className={`w-11 h-6 rounded-full transition-colors ${isRequired ? "bg-blue-600" : "bg-gray-200"
+                                    // className={`w-11 h-6 rounded-full transition-colors ${isRequired ? "bg-blue-600" : "bg-gray-200"
+                                    className={`w-10 h-5 rounded-full transition-colors ${isRequired ? "bg-gray-800" : "bg-gray-200"
                                         } ${updateBooleanMutation.isPending ? "opacity-50" : ""}`}
                                 >
                                     <div
-                                        className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${isRequired ? "translate-x-5" : "translate-x-0"
+                                        // className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${isRequired ? "translate-x-5" : "translate-x-0"
+                                        className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${isRequired ? "translate-x-5" : "translate-x-0.5"
                                             } mt-0.5 ml-0.5`}
                                     ></div>
                                 </div>
                             </label>
-                            <label className="text-sm font-medium text-gray-700">This work is required for the project</label>
+                            <label className="text-sm font-medium text-gray-700 cursor-pointer">This work is required for the project</label>
                         </div>}
 
                         {(canCreate || canEdit) && <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Notes & Additional Details</label>
+                            {/* <label className="text-sm font-medium text-gray-700">Notes & Additional Details</label> */}
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500 block">Notes & Additional Details</label>
                             <div className="relative">
                                 <textarea
                                     placeholder={`Add notes about ${title.toLowerCase()}...`}
@@ -196,12 +205,16 @@ const PrerequisitesSection: React.FC<PrerequisitesSectionProps> = ({
                                     onChange={(e) => setLocalNotes(e.target.value)}
                                     onBlur={handleNotesBlur}
                                     onKeyDown={handleNotesKeyDown}
-                                    className="w-full min-h-[100px] p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    // className="w-full min-h-[100px] p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    className="w-full min-h-[100px] p-3 bg-gray-50 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-gray-200 focus:border-gray-400 focus:bg-white outline-none transition-all text-sm text-gray-800 shadow-sm"
                                     disabled={isUpdatingNotes}
                                 />
                                 {isUpdatingNotes && (
-                                    <div className="absolute top-2 right-2">
-                                        <i className="fas fa-spinner fa-spin text-gray-400"></i>
+                                    // <div className="absolute top-2 right-2">
+                                    //     <i className="fas fa-spinner fa-spin text-gray-400"></i>
+                                    // </div>
+                                    <div className="absolute top-3 right-3 bg-white/80 rounded-full w-6 h-6 flex items-center justify-center">
+                                        <i className="fas fa-circle-notch fa-spin text-gray-400 text-sm"></i>
                                     </div>
                                 )}
                             </div>
@@ -253,7 +266,8 @@ const PrerequisitesPage: React.FC = () => {
         return (
             <div className="container mx-auto px-4 py-8 max-w-4xl">
                 <div className="text-center space-y-4">
-                    <i className="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
+                    {/* <i className="fas fa-spinner fa-spin text-4xl text-blue-600"></i> */}
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-800 mx-auto"></div>
                     <p className="text-gray-600">Loading project prerequisites...</p>
                 </div>
             </div>
@@ -261,21 +275,37 @@ const PrerequisitesPage: React.FC = () => {
     }
 
     if (error) {
+        // return (
+        //     <div className="container mx-auto px-4 py-8 max-w-4xl">
+        //         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        //             <div className="flex items-center">
+        //                 <i className="fas fa-exclamation-circle text-red-600 mr-2"></i>
+        //                 <p className="text-red-800">{error instanceof Error ? error.message : "Failed to load prerequisites"}</p>
+        //             </div>
+        //         </div>
+        //         <div className="mt-4 text-center">
+        //             <button
+        //                 onClick={() => refetch()}
+        //                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+        //             >
+        //                 Try Again
+        //             </button>
+        //         </div>
+        //     </div>
+        // )
+
+
         return (
             <div className="container mx-auto px-4 py-8 max-w-4xl">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <div className="flex items-center">
-                        <i className="fas fa-exclamation-circle text-red-600 mr-2"></i>
-                        <p className="text-red-800">{error instanceof Error ? error.message : "Failed to load prerequisites"}</p>
+                <div className="bg-white border border-red-200 rounded-xl p-6 text-center shadow-sm">
+                    <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i className="fas fa-exclamation-triangle text-red-500 text-lg"></i>
                     </div>
-                </div>
-                <div className="mt-4 text-center">
-                    <button
-                        onClick={() => refetch()}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
+                    <h3 className="text-gray-800 font-bold mb-2">Failed to load data</h3>
+                    <p className="text-gray-500 text-sm mb-5">{error instanceof Error ? error.message : "Failed to load prerequisites"}</p>
+                    <Button variant="outline" onClick={() => refetch()} className="bg-white border-gray-200 hover:bg-gray-50">
                         Try Again
-                    </button>
+                    </Button>
                 </div>
             </div>
         )
@@ -283,22 +313,37 @@ const PrerequisitesPage: React.FC = () => {
 
     if (!data?.data) {
         return (
+            // <div className="container mx-auto px-4 py-8 max-w-4xl">
+            //     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            //         <div className="flex items-center">
+            //             <i className="fas fa-exclamation-circle text-yellow-600 mr-2"></i>
+            //             <p className="text-yellow-800">
+            //                 No prerequisites data found for this project. Please ensure the project exists and try again.
+            //             </p>
+            //         </div>
+            //     </div>
+            //     <div className="mt-4 text-center">
+            //         <button
+            //             onClick={() => refetch()}
+            //             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            //         >
+            //             Refresh
+            //         </button>
+            //     </div>
+            // </div>
+
             <div className="container mx-auto px-4 py-8 max-w-4xl">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <div className="flex items-center">
-                        <i className="fas fa-exclamation-circle text-yellow-600 mr-2"></i>
-                        <p className="text-yellow-800">
-                            No prerequisites data found for this project. Please ensure the project exists and try again.
-                        </p>
+                <div className="bg-white border border-yellow-200 rounded-xl p-6 text-center shadow-sm">
+                    <div className="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i className="fas fa-exclamation-circle text-yellow-600 text-lg"></i>
                     </div>
-                </div>
-                <div className="mt-4 text-center">
-                    <button
-                        onClick={() => refetch()}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
+                    <h3 className="text-gray-800 font-bold mb-2">No Data Found</h3>
+                    <p className="text-gray-500 text-sm mb-5">
+                        No prerequisites data found for this project. Please ensure the project exists and try again.
+                    </p>
+                    <Button variant="outline" onClick={() => refetch()} className="bg-white border-gray-200 hover:bg-gray-50">
                         Refresh
-                    </button>
+                    </Button>
                 </div>
             </div>
         )
@@ -308,40 +353,10 @@ const PrerequisitesPage: React.FC = () => {
 
     return (
         <>
-            <div className="max-h-full overflow-y-auto mx-auto px-4  custom-scrollbar">
+            {/* <div className="max-h-full overflow-y-auto mx-auto px-4  custom-scrollbar"> */}
+            <div className="max-h-full overflow-y-auto mx-auto px-4 sm:px-6 py-6 custom-scrollbar ">
                 <div className="space-y-6">
-                    {/* Header */}
-                    {/* <header className="flex justify-between items-center">
-
-                     <div className="text-left hidden sm:block space-y-2">
-                        <h1 className="text-3xl font-bold text-blue-700">Project Prerequisites</h1>
-                        <p className="text-gray-600 max-w-full mx-auto">
-                            Configure the required work types for your project. <br />  These prerequisites must be completed before
-                            proceeding to the 14-step process.
-                        </p>
-                    </div>
-
-                    <div className="w-full sm:w-auto flex justify-end sm:block">
-                        <StageGuide
-                            organizationId={organizationId!}
-                            stageName="prerequisites"
-                        />
-                    </div>
-                   </header>
-
-                    <header className="block sm:hidden space-y-2">
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            {isMobile && (
-                                <button
-                                    onClick={openMobileSidebar}
-                                    className="mr-3 p-2 rounded-md border border-gray-300 hover:bg-gray-100"
-                                    title="Open Menu"
-                                >
-                                    <i className="fa-solid fa-bars"></i>
-                                </button>
-                            )}
-                            Project Prerequisites</h1>
-                    </header> */}
+                   
 
 
                     <header className="flex justify-between items-center mb-2 pb-2  border-b border-gray-100 gap-4">
@@ -360,14 +375,23 @@ const PrerequisitesPage: React.FC = () => {
                                         <i className="fa-solid fa-bars text-lg"></i>
                                     </button>
                                 )}
-                                <h1 className="text-xl font-bold text-gray-800 leading-tight">
+                                {/* <h1 className="text-xl font-bold text-gray-800 leading-tight">
+                                    Project Prerequisites
+                                </h1> */}
+
+                               <h1 className="text-xl font-bold text-gray-800 leading-tight">
                                     Project Prerequisites
                                 </h1>
                             </div>
 
                             {/* Desktop View: Title + Description */}
                             <div className="hidden sm:block space-y-2">
-                                <h1 className="text-3xl font-bold text-blue-700 tracking-tight">
+                                {/* <h1 className="text-3xl font-bold text-blue-700 tracking-tight">
+                                    Project Prerequisites
+                                </h1> */}
+
+                                <h1 className="text-3xl font-bold text-gray-700 tracking-tight flex items-center">
+                                    <i className="fa-solid fa-list-check mr-3 text-gray-400"></i>
                                     Project Prerequisites
                                 </h1>
                                 <p className="text-gray-500 text-sm md:text-base max-w-2xl leading-relaxed">
@@ -407,8 +431,10 @@ const PrerequisitesPage: React.FC = () => {
                     </div>
 
                     {/* Summary */}
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Prerequisites Summary</h3>
+                    {/* <div className="bg-gray-50 border border-gray-200 rounded-lg p-6"> */}
+                    <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 mt-8">
+                        {/* <h3 className="text-lg font-semibold text-gray-900 mb-4">Prerequisites Summary</h3> */}
+                        <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-5 border-b border-gray-100 pb-3">Prerequisites Summary</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                             {workTypes.map((workType) => {
                                 const sectionData = prerequisites[workType.key as keyof typeof prerequisites]
@@ -416,12 +442,19 @@ const PrerequisitesPage: React.FC = () => {
 
                                 return (
                                     <div key={workType.key} className="flex items-center space-x-2">
-                                        {isRequired ? (
+                                        {/* {isRequired ? (
                                             <i className="fas fa-check-circle text-green-600"></i>
                                         ) : (
                                             <i className="fas fa-exclamation-circle text-gray-400"></i>
+                                        )} */}
+
+                                        {isRequired ? (
+                                            <i className="fa-solid fa-circle-check text-emerald-500 text-lg"></i>
+                                        ) : (
+                                            <i className="fa-solid fa-circle-minus text-gray-300 text-lg"></i>
                                         )}
-                                        <span className={`text-sm ${isRequired ? "text-green-600 font-medium" : "text-gray-500"}`}>
+                                        {/* <span className={`text-sm ${isRequired ? "text-green-600 font-medium" : "text-gray-500"}`}> */}
+                                        <span className={`text-sm ${isRequired ? "text-gray-800 font-bold" : "text-gray-500 font-medium"}`}>
                                             {workType.title}
                                         </span>
                                     </div>
@@ -431,7 +464,7 @@ const PrerequisitesPage: React.FC = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    {/* <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Button
                             variant="ghost"
                             onClick={() => refetch()}
@@ -451,6 +484,32 @@ const PrerequisitesPage: React.FC = () => {
                         >
                             Continue to Next Steps
                         </Button>}
+                    </div> */}
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4">
+                        <Button
+                            variant="white"
+                            onClick={() => refetch()}
+                            className="px-6"
+                        >
+                            Refresh Data
+                        </Button>
+                        {(canCreate || canEdit) && (
+                            <Button
+                                variant="dark"
+                                onClick={() => {
+                                    navigate(`../requirementform`)
+                                    toast({
+                                        title: "Success",
+                                        description: "Prerequisites configured successfully. You can now proceed to the next steps.",
+                                    })
+                                }}
+                                className="px-6"
+                            >
+                                Continue to Next Steps <i className="fa-solid fa-arrow-right ml-2 text-xs"></i>
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

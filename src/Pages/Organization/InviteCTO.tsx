@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
-import { useGetCTOByOrganization, useInviteCTOToOrganization, useRemoveCTOFromOrganization } from '../../apiList/orgApi'
+import { useGetCTOByOrganization, useInviteCTOToOrganization, useRemoveCTOFromOrganization } from '../../apiList/organization_api/orgApi'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { toast } from '../../utils/toast'
 import { Label } from '../../components/ui/Label'
@@ -64,7 +64,7 @@ const InviteCTO: React.FC = () => {
       setCopied(true)
       toast({ title: "Success", description: "Link copied to clipboard" })
       setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to copy link", variant: "destructive" })
     }
   }

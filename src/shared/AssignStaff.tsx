@@ -80,11 +80,17 @@ export default function AssignStageStaff({
 
 
   return (
-    <div className={`relative inline-flex items-center px-2 py-2 sm:py-1 rounded-lg text-sm shadow-sm border-[#92abc4] sm:border-none ${className} `}>
+    // <div className={`relative inline-flex items-center px-/2 py-2 sm:py-1 rounded-lg text-sm shadow-sm border-[#92abc4] sm:border-none ${className} `}>
+    <div className={`relative inline-flex items-center px-2 py-2 sm:py-1 rounded-lg text-sm border border-transparent sm:border-none ${className} `}>
+
+      
       <div className="flex items-center gap-2">
         <span className="text-gray-700 whitespace-nowrap">
-          <span className="font-medium hidden sm:inline text-blue-800">Staff:</span>{" "}
-          <span className="font-medium inline sm:hidden text-blue-800">Staff Member:</span>{" "}
+          {/* <span className="font-medium hidden sm:inline text-blue-800">Staff:</span>{" "}
+          <span className="font-medium inline sm:hidden text-blue-800">Staff Member:</span>{" "} */}
+
+          <span className="font-bold hidden sm:inline text-gray-500 uppercase tracking-wider text-[11px] mr-1">Staff:</span>{" "}
+          <span className="font-bold inline sm:hidden text-gray-500 uppercase tracking-wider text-[11px] mr-1">Staff Member:</span>{" "}
           {assigned ? (
             <span className="text-gray-800 font-semibold">{assigned?.staffName}</span>
           ) : (
@@ -95,36 +101,46 @@ export default function AssignStageStaff({
         <Button
           size="sm"
           variant="ghost"
-          className="text-blue-600 hover:bg-blue-50 px-2 py-1 text-xs"
+          // className="text-blue-600 hover:bg-blue-50 px-2 py-1 text-xs"
+          className="text-gray-400 hover:text-gray-800 hover:bg-gray-100 px-2 py-1 text-xs h-7 rounded"
           onClick={() => setIsEditing(!isEditing)}
         >
-          {isEditing ? <i className="fas fa-xmark text-red-600"></i> : <i className="fas fa-pencil text-blue-600"></i>}
+          {/* {isEditing ? <i className="fas fa-xmark text-red-600"></i> : <i className="fas fa-pencil text-blue-600"></i>} */}
+          {isEditing ? <i className="fas fa-xmark text-red-500"></i> : <i className="fa-regular fa-pen-to-square"></i>}
         </Button>
       </div>
 
       {/* Dropdown */}
       {isEditing && (
-        <div className="absolute z-10 top-full left-[0%] sm:left-[-20%] mt-2 w-[200px] bg-white border border-blue-200 rounded-md shadow-lg max-h-48 overflow-auto text-sm">
+        // <div className="absolute z-10 top-full left-[0%] sm:left-[-20%] mt-2 w-[200px] bg-white border border-blue-200 rounded-md shadow-lg max-h-48 overflow-auto text-sm">
+        <div className="absolute z-10 top-full left-[0%] sm:left-[-25%] mt-2 w-[220px] bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-auto text-sm">
           {isLoading ? (
             <div className="p-3 text-gray-500 text-center">Loading...</div>
           ) : staffList.length === 0 ? (
             <div className="p-3 text-gray-400 text-center">No staff available</div>
           ) : (
-            <ul className="divide-y divide-blue-100 max-h-40 overflow-y-auto custom-scrollbar">
+            // <ul className="divide-y divide-blue-100 max-h-40 overflow-y-auto custom-scrollbar">
+            <ul className="divide-y divide-gray-100 max-h-40 overflow-y-auto custom-scrollbar">
               <li onClick={() => handleAssign(null)}
-                className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                // className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                className="px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors"
               >
-                <span className="font-medium text-blue-700 block truncate text-center py-1">Select Staff</span>
+                {/* <span className="font-medium text-blue-700 block truncate text-center py-1">Select Staff</span> */}
+                <span className="font-semibold text-gray-500 block truncate text-center text-xs uppercase tracking-wider">Unassign Staff</span>
 
               </li>
               {staffList?.map((staff: any) => (
                 <li
                   key={staff?._id}
                   onClick={() => handleAssign(staff)}
-                  className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                  // className="px-3 py-2 hover:bg-blue-50 cursor-pointer"
+                  className="px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors"
                 >
-                  <span className="font-medium text-blue-700 block truncate">{staff?.staffName || staff?.name}</span>
-                  <span className="text-xs text-gray-500 truncate">{staff?.email}</span>
+                  {/* <span className="font-medium text-blue-700 block truncate">{staff?.staffName || staff?.name}</span>
+                  <span className="text-xs text-gray-500 truncate">{staff?.email}</span> */}
+
+                  <span className="font-semibold text-gray-800 block truncate">{staff?.staffName || staff?.name}</span>
+                  <span className="text-[11px] text-gray-500 truncate block mt-0.5">{staff?.email}</span>
                 </li>
               ))}
             </ul>

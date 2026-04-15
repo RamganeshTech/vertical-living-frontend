@@ -121,11 +121,18 @@ export default function ShortListReferenceDesignMain() {
 
 
     return (
-        <div className="w-full max-h-full mx-auto p-2 overflow-y-auto">
+        <div className="w-full max-h-full mx-auto p-2 overflow-y-auto bg-brand-main">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                <h1 className="text-2xl font-semibold text-gray-800">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 border-b border-ash-light">
+                {/* <h1 className="text-2xl font-semibold text-gray-800">
                     <i className="fa-solid fa-object-group text-2xl text-blue-600 mr-2"></i>
+                    Reference Designs
+                </h1> */}
+
+                <h1 className="text-xl sm:text-2xl font-bold text-text-main flex items-center gap-3">
+                    <div className="w-10 h-10 bg-brand-surface border border-ash-medium rounded-lg flex items-center justify-center shadow-sm">
+                        <i className="fa-regular fa-object-group text-text-muted text-lg"></i>
+                    </div>
                     Reference Designs
                 </h1>
 
@@ -140,8 +147,11 @@ export default function ShortListReferenceDesignMain() {
             </div>
 
 
-            <div className="mb-5">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Enter Categories</label>
+            <div className="mb-5 bg-brand-surface p-4 rounded-xl border border-ash-medium shadow-sm">
+                {/* <label className="block text-sm font-medium text-gray-700 mb-1"> */}
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-2">
+
+                    Enter Categories</label>
                 {/* <TagInput
                     tags={tags}
                     setState={setTags}
@@ -158,53 +168,105 @@ export default function ShortListReferenceDesignMain() {
             </div>
 
 
-            {(canCreate || canEdit) && <Card className="">
-                <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                        {isDragging
-                            ? "Drop files here..."
-                            : "Drag and drop image files here or "}
-                        <Button variant="outline" size="sm" className="text-blue-600 bg-transparent">
-                            {uploadPending ? <>Loading <i className="fas fa-spinner ml-2 animate-spin"></i></> : "Upload reference images, and can be used to compare in the projects"}
-                        </Button>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div
-                        // className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
-                            }`}
-                        onClick={() => fileInputRef.current?.click()}
-                        onDragLeave={handleDragLeave}
-                        onDragOver={handleDragOver}
-                        onDrop={handleDrop}
-                    >
-                        <div className="space-y-2">
+            {(canCreate || canEdit) &&
+                // <Card className="">
+                //     <CardHeader>
+                //         <CardTitle className="flex items-center justify-between">
+                //             {isDragging
+                //                 ? "Drop files here..."
+                //                 : "Drag and drop image files here or "}
+                //             <Button variant="outline" size="sm" className="text-blue-600 bg-transparent">
+                //                 {uploadPending ? <>Loading <i className="fas fa-spinner ml-2 animate-spin"></i></> : "Upload reference images, and can be used to compare in the projects"}
+                //             </Button>
+                //         </CardTitle>
+                //     </CardHeader>
+
+                <Card className="mb-8 border-ash-medium shadow-sm bg-brand-surface overflow-hidden rounded-xl">
+                    <CardHeader className="border-b border-ash-light bg-brand-ash/50 px-5 py-4">
+                        <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 m-0">
+                            <span className="text-base font-bold text-text-main flex items-center gap-2">
+                                <i className="fa-solid fa-cloud-arrow-up text-text-muted"></i>
+                                {isDragging ? "Drop files here..." : "Upload Reference Images"}
+                            </span>
+                            <div className="text-sm font-medium text-text-muted flex items-center gap-2 bg-brand-surface px-3 py-1.5 rounded-md border border-ash-medium shadow-sm">
+                                {uploadPending ? (
+                                    <>
+                                        Loading <i className="fas fa-spinner animate-spin text-action-primary"></i>
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="fa-solid fa-circle-info"></i> Used for project comparison
+                                    </>
+                                )}
+                            </div>
+                        </CardTitle>
+                    </CardHeader>
+
+                    <CardContent>
+                        <div
+                            // className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
+                            //     }`}
+
+                            className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200 ${isDragging
+                                    ? "border-action-primary bg-brand-ash/80 scale-[0.99]"
+                                    : "border-ash-medium bg-brand-surface hover:bg-brand-ash hover:border-text-muted"
+                                }`}
+                            onClick={() => fileInputRef.current?.click()}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                        >
+                            {/* <div className="space-y-2">
                             <p className="text-lg font-medium">Drag & drop plan/reference images here or</p>
                             <Button variant="outline">Browse</Button>
                             <p className="text-sm text-gray-500">Accepted: JPG/PNG/WebP • Images auto-saved locally</p>
+                        </div> */}
+
+                            <div className="space-y-3 flex flex-col items-center">
+                                <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-2 shadow-sm">
+                                    <i className={`fa-solid fa-images text-2xl ${isDragging ? 'text-action-primary' : 'text-ash-dark'}`}></i>
+                                </div>
+                                <p className="text-lg font-bold text-text-main">
+                                    Drag & drop reference images here
+                                </p>
+                                <p className="text-sm text-text-muted font-medium mb-4">or</p>
+                                <Button variant="dark" className="px-6 shadow-sm">
+                                    Browse Files
+                                </Button>
+                                <p className="text-xs font-bold uppercase tracking-wider text-text-muted mt-4">
+                                    Accepted: JPG, PNG, WebP • Auto-saved locally
+                                </p>
+                            </div>
+
                         </div>
-                    </div>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}
-                    />
-                </CardContent>
-            </Card>}
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageChange}
+                        />
+                    </CardContent>
+                </Card>}
 
             {/* Image Gallery */}
             {canList && <div className="mt-5">
 
                 {/* <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images</h1> */}
 
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+                {/* <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4"> */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 bg-brand-surface p-4 rounded-xl border border-ash-medium shadow-sm">
                     <div className="flex-1">
-                        <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images Gallery</h1>
-                        <label className="block text-sm font-medium text-gray-600 mb-1">Filter gallery by tags</label>
+                        {/* <h1 className="text-2xl font-semibold text-gray-700 mb-3">Images Gallery</h1> */}
+                        <h1 className="text-2xl font-bold text-text-main mb-4 flex items-center gap-2">
+                                <i className="fa-regular fa-images text-text-muted"></i>
+                                Images Gallery
+                            </h1>
+                        {/* <label className="block text-sm font-medium text-gray-600 mb-1">Filter gallery by tags</label> */}
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-2">
+                                Filter gallery by tags
+                            </label>
                         <div className="max-w-md">
                             <SmartTagInput
                                 tags={searchTags}
@@ -229,11 +291,13 @@ export default function ShortListReferenceDesignMain() {
                 </div>
 
                 {isFetching ? (
-                    <div className="text-center text-gray-600">
+                    // <div className="text-center text-gray-600">
+                    <div className="py-8 bg-brand-surface rounded-xl border border-ash-medium shadow-sm">
                         <MaterialOverviewLoading />
                     </div>
                 ) : (
                     imageData?.referenceImages.length ?
+                    <div className="bg-brand-surface p-4 rounded-xl border border-ash-medium shadow-sm">
                         <ImageGalleryExample
                             imageFiles={imageData?.referenceImages || []}
                             refetch={refetch}
@@ -246,13 +310,25 @@ export default function ShortListReferenceDesignMain() {
 
                         // handleDeleteFile={handleDelete}
                         />
-                        : <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
-                            <i className="fas fa-image text-5xl text-blue-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Images Found</h3>
-                            <p className="text-sm text-gray-500">
-                                Please upload images
-                            </p>
                         </div>
+                        : 
+                        // <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl   text-center p-6">
+                        //     <i className="fas fa-image text-5xl text-blue-300 mb-4" />
+                        //     <h3 className="text-lg font-semibold text-blue-800 mb-1">No Images Found</h3>
+                        //     <p className="text-sm text-gray-500">
+                        //         Please upload images
+                        //     </p>
+                        // </div>
+
+                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-brand-surface rounded-xl shadow-sm border border-ash-medium text-center p-6">
+                                <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-4 shadow-sm">
+                                    <i className="fa-regular fa-image text-2xl text-ash-dark" />
+                                </div>
+                                <h3 className="text-base font-bold text-text-main mb-1">No Images Found</h3>
+                                <p className="text-sm text-text-muted max-w-sm mx-auto">
+                                    Please upload reference images above to populate the gallery.
+                                </p>
+                            </div>
 
                 )}
             </div>}

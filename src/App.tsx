@@ -8,12 +8,27 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
-import PinCodeMain from './Pages/Pincode_Pages/PincodeMaster/PinCodeMain';
-import PincodeSingle from './Pages/Pincode_Pages/PincodeMaster/PincodeSingle';
-import CreatePincode from './Pages/Pincode_Pages/PincodeMaster/CreatePincode';
-import PincodeVendorMappingMain from './Pages/Pincode_Pages/PincodeVendorMapping/PincodeVendorMappingMain';
-import PincodeVendorMappingSingle from './Pages/Pincode_Pages/PincodeVendorMapping/PincodeVendorMappingSingle';
-import CreatePincodeVendorMapping from './Pages/Pincode_Pages/PincodeVendorMapping/CreatePincodeVendorMapping';
+const RateConfigBackupMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigBackupMain'));
+const RateConfigBackupSingle = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigBackupSingle'));
+const RateConfigVersionMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigVersionMain'));
+const AllOrganizationMain = lazy(() => import('./Pages/Organization/AllOrganization_pages/AllOrganizationMain'));
+const OrganizationDetailsMain = lazy(() => import('./Pages/Organization/OrganizationDetailsMain'));
+const OrganizaitonOtherDashBoard = lazy(() => import('./Pages/Organization/AllOrganization_pages/OrganizaitonOtherDashBoard'));
+const OrganizationAndUserRegistrationMain = lazy(() => import('./Pages/Organization/OrganizationRegistration_Page/OrganizationAndUserRegistrationMain'));
+const ExpensePartnerAccSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Execution_Partner_Pages/ExecutionPartnerAccSingle'));
+const CreateExpensePartnerAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Execution_Partner_Pages/CreateExecutionPartnerAcc'));
+const ExecutionPartnerAccountsMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Execution_Partner_Pages/ExecutionPartnerMain'));
+const MaterialAndLabourConfigDescription = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/MaterialWithLabourConfig/MaterialWithLabourConfigDescription'));
+const PinCodeMain = lazy(() => import('./Pages/Pincode_Pages/PincodeMaster/PinCodeMain'));
+const PincodeSingle = lazy(() => import('./Pages/Pincode_Pages/PincodeMaster/PincodeSingle'));
+const CreatePincode = lazy(() => import('./Pages/Pincode_Pages/PincodeMaster/CreatePincode'));
+// const PincodeVendorMappingMain = lazy(() => import('./Pages/Pincode_Pages/PincodeVendorMapping/PincodeVendorMappingMain'));
+// const PincodeVendorMappingSingle = lazy(() => import('./Pages/Pincode_Pages/PincodeVendorMapping/PincodeVendorMappingSingle'));
+// const CreatePincodeVendorMapping = lazy(() => import('./Pages/Pincode_Pages/PincodeVendorMapping/CreatePincodeVendorMapping'));
+const PincodeVendorProjectAssignMain = lazy(() => import('./Pages/Pincode_Pages/PincodeVendor_ProjectAssign_pages/PincodeVendorProjectAssignMain'));
+const SinglePincodeVendorProjectAssign = lazy(() => import('./Pages/Pincode_Pages/PincodeVendor_ProjectAssign_pages/SinglePincodeVendorProjectAssign'));
+const CreatePincodeVendorProjectAssign = lazy(() => import('./Pages/Pincode_Pages/PincodeVendor_ProjectAssign_pages/CreatePincodeVendorProjectAssign'));
+const PincodeVendorPublicAcknowledgement = lazy(() => import('./Pages/Pincode_Pages/PincodeVendor_ProjectAssign_pages/PincodeVendorPublicAcknowledgement'));
 const AccountingRecordMain = lazy(() => import('./Pages/Department Pages/AccountingRecords/AccountingRecordMain'));
 const AccountingRecordSingle = lazy(() => import('./Pages/Department Pages/AccountingRecords/AccountingRecordSingle'));
 const RateConfigDescription = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigDescription'));
@@ -171,7 +186,7 @@ const ProjectDetails = lazy(() => import("./Pages/Projects/ProjectDetails"));
 const ProjectLists = lazy(() => import("./Pages/Projects/ProjectLists"));
 const NotFound = lazy(() => import("./Pages/Not Found/NotFound"));
 const Organization = lazy(() => import("./Pages/Organization/Organization"));
-const OrganizationDetails = lazy(() => import("./Pages/Organization/OrganizationDetails"));
+// const OrganizationDetails = lazy(() => import("./Pages/Organization/OrganizationDetails"));
 const StaffRegister = lazy(() => import("./Pages/Staff/StaffRegister"));
 // const StaffLogin = lazy(() => import("./Pages/Staff/StaffLogin"));
 const Workers = lazy(() => import("./Pages/Workers/Workers"));
@@ -260,8 +275,8 @@ const LazyWrapper = ({ children }: { children: React.ReactNode }) => (
 function App() {
 
   const [projectId, setProjectId] = useState<string | null>(null)
-  const [organizationId, setOrganizationId] = useState<string | null>(null)
-  const { isauthenticated } = useSelector((state: RootState) => state.authStore)
+  // const [organizationId, setOrganizationId] = useState<string | null>(null)
+  const { isauthenticated, organizationId } = useSelector((state: RootState) => state.authStore)
 
   //it is used to check whether which user is now currently using the application
   const { loading } = useAuthCheck();
@@ -330,7 +345,7 @@ function App() {
         <Routes>
 
           {/* <Route path="/" element={<Navigate to="/organizations" replace />} /> */}
-          <Route path="/" element={isauthenticated ? (<Navigate to="/organizations" replace />) : (<Home />)} />
+          <Route path="/" element={isauthenticated ? (<Navigate to={`/organizations/${organizationId}`} replace />) : (<Home />)} />
 
 
           <Route path="/login" element={<LoginGroup />}>
@@ -374,21 +389,43 @@ function App() {
             </ProtectedRoutes>
           } />
 
+          <Route path="/organizations-registration" element={
+            <OrganizationAndUserRegistrationMain />
+          } />
+
           <Route path="/organizations/:organizationId" element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
-            <OrganizationChildrens setOrganizationId={setOrganizationId} />
+            <OrganizationChildrens
+            //  setOrganizationId={setOrganizationId}
+            />
           </ProtectedRoutes>} >
 
 
 
             <Route index
               element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO", "worker", "client"]}>
-                <OrganizationDetails />
+                <OrganizationDetailsMain />
               </ProtectedRoutes>} />
+
+
 
             <Route path='settings'
               element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
                 <OrganizationSettings />
               </ProtectedRoutes>} />
+
+
+            <Route path='all-organizations'
+              element={<ProtectedRoutes allowedRoles={["CTO", "owner", "staff"]}
+                requiredAction={["create", "delete", "edit", "list"]} requiredDepartment="allorgs"
+              >
+                <AllOrganizationMain />
+              </ProtectedRoutes>} >
+
+              <Route path='organization-dashboard/:organizationId'
+                element={<ProtectedRoutes allowedRoles={["owner", "staff", "CTO"]}>
+                  <OrganizaitonOtherDashBoard />
+                </ProtectedRoutes>} />
+            </Route>
 
 
             <Route path='invitestaff'
@@ -803,6 +840,31 @@ function App() {
               </ProtectedRoutes>} />
             </Route>
 
+            <Route path="executionpartnermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="executionpartner"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
+              <ExecutionPartnerAccountsMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="executionpartner"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit", "delete"]}
+              >
+                <ExpensePartnerAccSingle />
+              </ProtectedRoutes>} />
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="executionpartner"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create']}
+              >
+                <CreateExpensePartnerAcc />
+              </ProtectedRoutes>} />
+            </Route>
+
             <Route path="expensemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="expense"
               // ⭐ Allow entry if they can do ANY of these things
@@ -1028,7 +1090,7 @@ function App() {
 
             </Route>
 
-            <Route path="pincodemappingmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+            {/* <Route path="pincodemappingmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               // requiredDepartment={"accounts" || "billing"}
               requiredDepartment="pincodeMapping"
               // ⭐ Allow entry if they can do ANY of these things
@@ -1055,6 +1117,33 @@ function App() {
               </ProtectedRoutes>} />
 
 
+            </Route> */}
+
+            <Route path="pincodeprojectmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              // requiredDepartment={"accounts" || "billing"}
+              requiredDepartment="pincodeproject"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
+              <PincodeVendorProjectAssignMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment={"pincodeproject"}
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["list", "edit"]}
+              >
+                <SinglePincodeVendorProjectAssign />
+              </ProtectedRoutes>} />
+
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="pincodeproject"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={["create"]}
+              >
+                <CreatePincodeVendorProjectAssign />
+              </ProtectedRoutes>} />
             </Route>
 
 
@@ -1320,8 +1409,40 @@ function App() {
                 </ProtectedRoutes>} ></Route>
 
 
+
+                <Route path="history" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="materialrateconfig"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'edit', "create", "delete"]}
+                >
+                  <RateConfigVersionMain />
+                </ProtectedRoutes>} ></Route>
+
+
+              </Route>
+
+
+              <Route path="backup" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="materialrateconfig"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <RateConfigBackupMain />
+              </ProtectedRoutes>} >
+
+                <Route path="single/:backupId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="materialrateconfig"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'edit', "create", "delete"]}
+                >
+                  <RateConfigBackupSingle />
+                </ProtectedRoutes>} ></Route>
+
+
               </Route>
             </Route>
+
+
 
             <Route path="labourrateconfig" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="labourratequote"
@@ -1354,7 +1475,17 @@ function App() {
                 requiredAction={['list', 'edit', "create", "delete"]}
               >
                 <MaterialWithLabourSingle />
+              </ProtectedRoutes>} >
+              </Route>
+
+              <Route path=":id/description" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="materialwithlabourratequote"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <MaterialAndLabourConfigDescription />
               </ProtectedRoutes>} />
+
             </Route>
 
             <Route path="worktemplates" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
@@ -1781,7 +1912,9 @@ function App() {
           </Route>
 
           <Route path='/:organizationId/projectdetails/:projectId' element={<ProtectedRoutes allowedRoles={["owner", "client", "CTO", "worker", "staff"]}>
-            <ProjectDetails projectId={projectId} setProjectId={setProjectId} setOrganizationId={setOrganizationId} organizationId={organizationId} />
+            <ProjectDetails projectId={projectId} setProjectId={setProjectId}
+              //  setOrganizationId={setOrganizationId} 
+              organizationId={organizationId} />
           </ProtectedRoutes>}>
 
 
@@ -2440,6 +2573,7 @@ function App() {
           <Route path='/:organizationId/ordermaterial' element={<PublicOrderMaterialMain />} />
           <Route path='/:organizationId/procurement/public' element={<PublicProcurementRatePage />} />
           <Route path='/:organizationId/logistics/public/:id' element={<LogisticsPublicSingle />} />
+          <Route path='/:organizationId/pincode/acknowledgement/public/:id' element={<PincodeVendorPublicAcknowledgement />} />
 
           <Route path='/subcontract/share/:subContractId' element={<PublicSubContract />} />
           <Route path='/privacy-policy' element={<PrivacyPolicy />} />

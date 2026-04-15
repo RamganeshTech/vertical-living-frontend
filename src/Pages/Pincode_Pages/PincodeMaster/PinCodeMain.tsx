@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
 import { useAuthCheck } from '../../../Hooks/useAuthCheck';
 import { useDebounce } from '../../../Hooks/useDebounce';
@@ -33,13 +33,15 @@ export interface PincodeFormData {
     complexityFactor: number;
     riskLevel: "Low" | "Medium" | "High";
     notes: string;
+    partners: []
 }
 
 const PinCodeMain = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { organizationId } = useParams();
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    // const scrollContainerRef = useRef<HTMLDivElement>(null);
+    // const observerTarget = useRef(null);
 
     const { role, permission } = useAuthCheck();
     const canList = role === "owner" || permission?.pincode?.list;
@@ -51,7 +53,7 @@ const PinCodeMain = () => {
     // ];
 
     // --- Local State ---
-    const isDetailView = location.pathname.includes('/single/') || location.pathname.includes('/create');
+    const isDetailView = location.pathname.includes('/single') || location.pathname.includes('/create');
 
     // Filter states based on PincodeMasterModel fields [cite: 79-96]
     const [filters, setFilters] = useState({
@@ -88,21 +90,64 @@ const PinCodeMain = () => {
 
     const deletePincodeMutation = useDeletePincode();
 
-    // Infinite scroll observer
-    useEffect(() => {
-        const container = scrollContainerRef.current;
-        if (!container) return;
-
-        const handleScroll = () => {
-            const { scrollTop, scrollHeight, clientHeight } = container;
-            if (scrollHeight - scrollTop - clientHeight < 100 && hasNextPage && !isFetchingNextPage) {
+    const setScrollRef = (node: HTMLDivElement | null) => {
+    if (node) {
+        node.onscroll = () => {
+            const { scrollTop, scrollHeight, clientHeight } = node;
+            console.log("Scrolling:", scrollHeight - scrollTop - clientHeight);
+            
+            if (scrollHeight - scrollTop - clientHeight < 300 && hasNextPage && !isFetchingNextPage) {
+                console.log("FETCHING NEXT PAGE");
                 fetchNextPage();
             }
         };
+    }
+};
 
-        container.addEventListener('scroll', handleScroll);
-        return () => container.removeEventListener('scroll', handleScroll);
-    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    // // Infinite scroll observer
+    // useEffect(() => {
+    //     const container = scrollContainerRef.current;
+
+    //     // DEBUG: This should log "true" after the spinner disappears
+    //     console.log("Is container ready?", !!container);
+
+    //     if (!container) return;
+
+    //     const handleScroll = () => {
+    //         const { scrollTop, scrollHeight, clientHeight } = container;
+    //         // DEBUG: This MUST log when you move your mouse wheel
+    //     console.log("Scroll Stats:", { scrollTop, scrollHeight, clientHeight });
+
+
+    //         if (scrollHeight - scrollTop - clientHeight < 300 && hasNextPage && !isFetchingNextPage) {
+    //             console.log("API CALL TRIGGERED");
+    //             fetchNextPage();
+    //         }
+    //     };
+
+    //     container.addEventListener('scroll', handleScroll);
+    //     return () => container.removeEventListener('scroll', handleScroll);
+    // }, [hasNextPage, isFetchingNextPage, fetchNextPage,isLoading]);
+
+
+    // useEffect(() => {
+    //     if (!hasNextPage || isFetchingNextPage) return;
+
+    //     const observer = new IntersectionObserver(
+    //         (entries) => {
+    //             if (entries[0].isIntersecting) {
+    //                 fetchNextPage();
+    //             }
+    //         },
+    //         { threshold: 0.1 }
+    //     );
+
+    //     if (observerTarget.current) {
+    //         observer.observe(observerTarget.current);
+    //     }
+
+    //     return () => observer.disconnect();
+    // }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const handleDelete = async (id: string) => {
         try {
@@ -171,9 +216,9 @@ const PinCodeMain = () => {
                     <Button onClick={() => refetch()}>Retry</Button>
                 </div>
             ) : (
-                <main className="flex gap-2 !max-h-[93%] h-[93%]">
-                    {/* Filters Sidebar [cite: 362] */}
-                    <div className="xl:w-80 flex-shrink-0 !max-h-[90%] overflow-y-auto">
+                <main className="flex gap-2 h-[90vh] min-h-0 overflow-hidden">
+                    {/* Filters Sidebar */}
+                    <div className="xl:w-80 flex-shrink-0 !max-h-[90%] overflow-y-auto min-h-0">
                         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -229,68 +274,74 @@ const PinCodeMain = () => {
                         </div>
                     </div>
 
-                   
+
 
                     {/* 2. Modern Grid List View */}
-                    {canList && <div className="flex-1 flex flex-col min-w-0 bg-white rounded-xl border border-gray-200 overflow-hidden">
-                        {/* Table Header - Sticky */}
-                        <div className="flex-shrink-0 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200 sticky top-0 z-10">
-                            <div className="grid grid-cols-13 gap-4 px-6 py-4 font-bold text-gray-700 text-sm">
-                                <div className="col-span-1 text-center">S.No</div>
-                                <div className="col-span-2 text-center">Pincode</div>
-                                <div className="col-span-3 text-center">Area Name</div>
-                                <div className="col-span-2 text-center">City</div>
-                                <div className="col-span-2 text-center">Service Mode</div>
-                                <div className="col-span-2 text-center">Status</div>
-                                <div className="col-span-1 text-center">Actions</div>
+                    {canList &&
+                        <div className="flex-1 flex flex-col min-w-0 bg-white rounded-xl border border-gray-200 h-full min-h-0 overflow-hidden">
+                            {/* Table Header - Sticky */}
+                            <div className="flex-shrink-0 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200 sticky top-0 z-10">
+                                <div className="grid grid-cols-13 gap-4 px-6 py-4 font-bold text-gray-700 text-sm">
+                                    <div className="col-span-1 text-center">S.No</div>
+                                    <div className="col-span-2 text-center">Pincode</div>
+                                    <div className="col-span-3 text-center">Area Name</div>
+                                    <div className="col-span-2 text-center">City</div>
+                                    <div className="col-span-2 text-center">Service Mode</div>
+                                    <div className="col-span-2 text-center">Status</div>
+                                    <div className="col-span-1 text-center">Actions</div>
+                                </div>
+                            </div>
+
+                            {/* Scrollable Body */}
+                            <div
+                                // ref={scrollContainerRef}
+                                ref={setScrollRef} // Use the function name here, not the ref object
+                                className="flex-1 overflow-y-auto divide-y divide-gray-100"
+                                style={{ maxHeight: 'calc(100% - 53px)' }}
+
+                            >
+                                {pincodes.length === 0 && !isLoading ? (
+                                    <div className="flex flex-col items-center justify-center h-64 text-center p-6">
+                                        <i className="fas fa-map-marked-alt text-5xl text-blue-200 mb-4" />
+                                        <h3 className="text-lg font-semibold text-blue-800">No Pincodes Found</h3>
+                                        <p className="text-sm text-gray-500">Try adjusting your filters.</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {pincodes.map((item, idx) => (
+                                            <PincodeListRow
+                                                key={item._id}
+                                                pincodeItem={item}
+                                                index={idx}
+                                                handleView={handleView}
+                                                handleDelete={handleDelete}
+                                                deletePending={deletePincodeMutation.isPending && deletePincodeMutation.variables === item._id}
+                                            />
+                                        ))}
+
+
+                                        {/* <div ref={observerTarget} className="h-4 w-full" /> */}
+                                        {/* Infinite Loading Indicator */}
+                                        {isFetchingNextPage && (
+                                            <div className="p-8 flex justify-center border-t border-gray-50">
+                                                <div className="flex items-center gap-3 text-blue-600 font-semibold">
+                                                    <i className="fas fa-circle-notch fa-spin text-xl"></i>
+                                                    <span>Loading more areas...</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* End of List */}
+                                        {!hasNextPage && pincodes.length > 0 && (
+                                            <div className="p-8 text-center text-gray-400 text-sm font-medium border-t border-gray-50 bg-gray-50/30">
+                                                <i className="fas fa-check-circle mr-2"></i>
+                                                All  pincodes loaded
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
                         </div>
-
-                        {/* Scrollable Body */}
-                        <div
-                            ref={scrollContainerRef}
-                            className="flex-1 overflow-y-auto divide-y divide-gray-100"
-                        >
-                            {pincodes.length === 0 && !isLoading ? (
-                                <div className="flex flex-col items-center justify-center h-64 text-center p-6">
-                                    <i className="fas fa-map-marked-alt text-5xl text-blue-200 mb-4" />
-                                    <h3 className="text-lg font-semibold text-blue-800">No Pincodes Found</h3>
-                                    <p className="text-sm text-gray-500">Try adjusting your filters.</p>
-                                </div>
-                            ) : (
-                                <>
-                                    {pincodes.map((item, idx) => (
-                                        <PincodeListRow
-                                            key={item._id}
-                                            pincodeItem={item}
-                                            index={idx}
-                                            handleView={handleView}
-                                            handleDelete={handleDelete}
-                                            deletePending={deletePincodeMutation.isPending && deletePincodeMutation.variables === item._id}
-                                        />
-                                    ))}
-
-                                    {/* Infinite Loading Indicator */}
-                                    {isFetchingNextPage && (
-                                        <div className="p-8 flex justify-center border-t border-gray-50">
-                                            <div className="flex items-center gap-3 text-blue-600 font-semibold">
-                                                <i className="fas fa-circle-notch fa-spin text-xl"></i>
-                                                <span>Loading more areas...</span>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* End of List */}
-                                    {!hasNextPage && pincodes.length > 0 && (
-                                        <div className="p-8 text-center text-gray-400 text-sm font-medium border-t border-gray-50 bg-gray-50/30">
-                                            <i className="fas fa-check-circle mr-2"></i>
-                                            All Tamil Nadu pincodes loaded
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    </div>
                     }
                 </main>
             )}
@@ -299,3 +350,6 @@ const PinCodeMain = () => {
 };
 
 export default PinCodeMain;
+
+
+

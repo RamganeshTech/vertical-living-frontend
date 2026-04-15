@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-html, body, #root {
+html,
+body,
+#root {
   width: 100vw;
   height: 100vh;
   margin: 0;
@@ -11,4 +13,93 @@ html, body, #root {
 
 html {
   scroll-behavior: smooth !important;
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
+
+
+
+@theme {
+  /* Surface & Backgrounds */
+  --color-brand-main: var(--bg-main);
+  --color-brand-surface: var(--bg-surface);
+  --color-brand-ash: var(--bg-ash);
+
+  /* Grays/Ash */
+  --color-ash-light: var(--border-ash-light);
+  --color-ash-medium: var(--border-ash-medium);
+  --color-ash-dark: var(--text-ash-dark);
+  /* --color-ash-dark: var(--border-ash-medium); */
+
+  /* Text */
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+
+  /* Actions */
+  --color-action-primary: var(--action-primary);
+  --color-action-success: var(--action-success);
+  --color-action-danger: var(--action-danger);
+}
+
+:root {
+  /* LIGHT MODE (Default) */
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-ash: #f5f5f5;
+
+  --border-ash-light: #f5f5f5;
+  --border-ash-medium: #e5e5e5;
+  /* --border-ash-dark: #060617; */
+
+
+  /* --text-main: #1e293b; */
+  --text-main: #343d49;
+  /* Was #1e293b - much softer on the eyes */
+  --text-muted: #64748b;
+  --text-ash-dark: #94a3b8;
+
+  --action-primary: #1e293b;
+  --action-success: #10b981;
+  --action-danger: #ef4444;
+}
+
+/* FUTURE PROOFING: Dark mode hook */
+.dark {
+  /* When you add 'dark' class to html, these take over */
+  --bg-main: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-ash: #334155;
+
+  --border-ash-light: #1e293b;
+  --border-ash-medium: #334155;
+  /* --border-ash-dark: #475569; */
+
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+
+  --action-primary: #ffffff;
+  /* White buttons in dark mode */
 }

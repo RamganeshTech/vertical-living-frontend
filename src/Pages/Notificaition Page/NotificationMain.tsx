@@ -7,13 +7,13 @@ import { queryClient } from '../../QueryClient/queryClient';
 import { useNavigate } from 'react-router-dom';
 // import { Badge } from '../../components/ui/Badge';
 import { useCurrentSupervisor } from '../../Hooks/useCurrentSupervisor';
-import { useSelector } from 'react-redux';
-import type { RootState } from '../../store/store';
+// import { useSelector } from 'react-redux';
+// import type { RootState } from '../../store/store';
 
 const NotificationMain = () => {
     const navigate = useNavigate()
     const currentUser = useCurrentSupervisor()
-    const user = useSelector((state:RootState) => state.authStore )
+    // const user = useSelector((state:RootState) => state.authStore )
 
     const {
         data,
@@ -167,11 +167,9 @@ const NotificationMain = () => {
                         </div>
                         <div>
                             <h1 className="text-xl md:text-2xl font-bold text-slate-900">
-                                Notifications {user?.userName ? `for (${user?.userName})` : ""}
-                                {/* <Badge className='ml-2'>
-                                    <i className="fa-solid fa-flask mr-2"></i>
-                                    In Development
-                                </Badge> */}
+                                Notifications 
+                                {/* {user?.userName ? `for (${user?.userName})` : ""} */}
+                               
                             </h1>
                         </div>
                     </div>

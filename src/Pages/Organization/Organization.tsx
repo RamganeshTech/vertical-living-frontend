@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button } from "../../components/ui/Button"
-import { useGetMyOrganizations } from "../../apiList/orgApi"
+import { useGetMyOrganizations } from "../../apiList/organization_api/orgApi"
 import OrganizationCard from "../../components/OrganizationCard"
 import CreateOrganizationModal from "../../components/CreateOrganizationModal"
 import { Skeleton } from "../../components/ui/Skeleton"
@@ -70,12 +70,12 @@ export default function Organization() {
 
   // (with alphetical order)
   const loginMenuStructure = Object.entries(LOGIN_LABELS)
-  .map(([key, value]) => ({
-    type: 'item',
-    key: key,
-    label: value as string
-  }))
-  .sort((a, b) => a.label.localeCompare(b.label)); // Alphabetical Sort
+    .map(([key, value]) => ({
+      type: 'item',
+      key: key,
+      label: value as string
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label)); // Alphabetical Sort
 
 
   if (isLoading) {

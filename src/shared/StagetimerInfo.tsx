@@ -86,17 +86,26 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
     const handleSetDeadline = async () => {
         try {
             if (!formId || !newDeadline) return;
-            const safeDeadline = newDeadline.length === 10 ? `${newDeadline}T00:00:00` : newDeadline;
-
-            const selectedDate = new Date(safeDeadline);
+            // const safeDeadline = newDeadline.length === 10 ? `${newDeadline}T00:00:00` : newDeadline;
+            const selectedDate = new Date(newDeadline);
 
             if (isNaN(selectedDate.getTime())) {
                 return toast({
                     title: "Invalid Date",
                     description: "Please pick a valid date & time",
-                    variant: "destructive",
+                    variant: "destructive"
                 });
             }
+
+            // const selectedDate = new Date(safeDeadline);
+
+            // if (isNaN(selectedDate.getTime())) {
+            //     return toast({
+            //         title: "Invalid Date",
+            //         description: "Please pick a valid date & time",
+            //         variant: "destructive",
+            //     });
+            // }
 
             const now = new Date();
             if (selectedDate < now) {
@@ -107,7 +116,11 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
                 });
             }
 
-            await deadLineMutate({ formId, projectId, deadLine: safeDeadline });
+            // 2. CONVERT TO ISO STRING (This is the key change)
+            // This converts 9:00 AM IST to 3:30 AM UTC automatically
+            const isoDeadline = selectedDate.toISOString();
+
+            await deadLineMutate({ formId, projectId, deadLine: isoDeadline });
             refetchStageMutate()
             setEditMode(false);
 
@@ -166,24 +179,36 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
 
     return (
 
-        <div className="text-sm w-full text-blue-900 space-y-3">
+        // <div className="text-sm w-full text-blue-900 space-y-3">
+        <div className="text-sm w-full  text-gray-700 space-y-3">
             <div className="flex w-full justify-between flex-wrap gap-x-6 gap-y-2 items-center">
                 {/* ✅ STARTED ON */}
                 <div className="flex items-center gap-2">
-                    <i className="fa-solid fa-play text-blue-500" />
-                    <strong>Started On:</strong> {formatDisplayDate(startedDate)}
+                    {/* <i className="fa-solid fa-play text-blue-500" /> */}
+                    <i className="fa-regular fa-circle-play text-gray-400 w-4 text-center" />
+                    {/* <strong>Started On:</strong> {formatDisplayDate(startedDate)} */}
+                    <strong className="text-gray-800 font-medium">Started On:</strong>
+                    <span className="text-gray-600">{formatDisplayDate(startedDate)}</span>
                     {!editStartMode && (
-                        <Button variant="outline" size="sm" onClick={() => setEditStartMode(true)}>
+                        <Button variant="ghost" size="sm" onClick={() => setEditStartMode(true)}>
                             <i className="fa-solid fa-pen mr-1" /> Edit
+                            {/* <i className="fa-regular fa-pen-to-square mr-1.5" /> Edit */}
                         </Button>
                     )}
                 </div>
-                <div className="flex items-center gap-2">
+                {/* <div className="flex items-center gap-2">
                     <i className="fa-solid fa-flag-checkered text-green-500" />
                     <strong>Completed On:</strong> {formatDisplayDate(completedDate)}
+                </div> */}
+
+                {/* ✅ COMPLETED ON */}
+                <div className="flex items-center gap-2 text-sm">
+                    <i className="fa-regular fa-circle-check text-gray-400 w-4 text-center" />
+                    <strong className="text-gray-800 font-medium">Completed On:</strong>
+                    <span className="text-gray-600">{formatDisplayDate(completedDate)}</span>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* <div className="flex items-center gap-2">
                     <i className="fa-solid fa-calendar text-purple-600" />
                     <strong>Deadline:</strong> {formatDisplayDate(deadlineDate)}
                     {!editMode && (
@@ -191,10 +216,24 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
                             <i className="fa-solid fa-pen mr-1" /> Edit
                         </Button>
                     )}
+                </div> */}
+
+                <div className="flex items-center gap-2 text-sm">
+                    <i className="fa-regular fa-calendar text-gray-400 w-4 text-center" />
+                    <strong className="text-gray-800 font-medium">Deadline:</strong>
+                    <span className="text-gray-600">{formatDisplayDate(deadlineDate)}</span>
+                    {!editMode && (
+                        <Button variant="ghost" size="sm" onClick={() => setEditMode(true)} className="h-6 px-2 text-xs text-gray-400 hover:text-gray-800 hover:bg-gray-50">
+                            <i className="fa-regular fa-pen-to-square mr-1.5" /> Edit
+                        </Button>
+                    )}
                 </div>
             </div>
 
-            <div className="font-semibold text-blue-700">{showTimer()}</div>
+            {/* <div className="font-semibold text-blue-700">{showTimer()}</div> */}
+            <div className="inline-block bg-gray-50 border border-gray-100 rounded-lg px-4 py-2 mt-2 shadow-sm">
+                <span className="font-semibold text-gray-700">{showTimer()}</span>
+            </div>
 
             {editStartMode && (
                 <div className="flex w-full flex-wrap gap-3 pt-2 items-center">
@@ -203,12 +242,14 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
                         value={newStartDate} // reuse same state
                         // min={new Date().toISOString().slice(0, 16)}    ///used to restrict selecting the past
                         onChange={(e) => setNewStartDate(e.target.value)}
-                        className="max-w-xs"
+                        // className="max-w-xs"
+                        className="max-w-xs bg-white border-gray-200 focus:ring-gray-200 focus:border-gray-300 text-gray-800 shadow-sm"
                     />
                     <Button
                         onClick={handleSetStartDateTime}
                         isLoading={isStarting}
-                       variant="primary"
+                        variant="ghost"
+                        className="bg-gray-800 hover:bg-gray-900 text-white shadow-sm"
                     >
                         Update StartedAt
                     </Button>
@@ -219,18 +260,25 @@ const StageTimerInfo: React.FC<TimerProps> = ({ startedAt, stageName, projectId,
             )}
 
             {editMode && (
-                <div className="flex w-full flex-wrap gap-3 pt-2 items-center">
+                // <div className="flex w-full flex-wrap gap-3 pt-2 items-center">
+                <div className="flex w-full flex-wrap gap-3 pt-3 items-center border-t border-gray-100">
                     <Input
                         type="datetime-local"
                         value={newDeadline}
                         min={new Date().toISOString().slice(0, 16)}
                         onChange={(e) => setNewDeadline(e.target.value)}
-                        className="max-w-xs"
+                        // className="max-w-xs"
+                        className="max-w-xs bg-white border-gray-200 focus:ring-gray-200 focus:border-gray-300 text-gray-800 shadow-sm"
                     />
-                    <Button onClick={handleSetDeadline} isLoading={isPending} className="bg-blue-600 text-white">
+                    <Button onClick={handleSetDeadline} isLoading={isPending}
+                        // className="bg-blue-600 text-white"
+                        className="bg-gray-800 hover:bg-gray-900 text-white shadow-sm"
+                    >
                         Update Deadline
                     </Button>
-                    <Button onClick={() => setEditMode(false)} variant="ghost">
+                    <Button onClick={() => setEditMode(false)} variant="ghost"
+                        className="text-gray-500 hover:text-gray-800 hover:bg-gray-50"
+                    >
                         Cancel
                     </Button>
                 </div>

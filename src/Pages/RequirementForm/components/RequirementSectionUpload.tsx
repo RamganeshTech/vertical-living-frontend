@@ -84,7 +84,7 @@ const RequirementSectionUpload: React.FC<RequirementSectionUploadProps> = ({
   const pdfFiles = existingUploads?.filter(file => file.type === "pdf")
   const videoFiles = existingUploads?.filter(file => file.type === "video")
 
-const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
+  const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
 
 
   return (
@@ -98,24 +98,28 @@ const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
           // className="h-10"
           onChange={handleUpload}
           disabled={isUploading}
-          className={isUploading ? "pr-10 opacity-70 cursor-not-allowed w-full" : ""}
+          // className={isUploading ? "pr-10 opacity-70 cursor-not-allowed w-full" : ""}
+          className={`w-full  border border-ash-medium text-text-main file:bg-brand-surface file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm ${isUploading ? "pr-10 opacity-70 cursor-not-allowed" : ""}`}
         />}
 
         {isUploading && (
           <div className="absolute inset-y-0 right-2 flex items-center">
-            <div className="animate-spin h-5 w-5 border-t-transparent rounded-full border-2 border-gray-500"></div>
+            <i className="fas fa-circle-notch fa-spin text-text-muted text-lg"></i>
           </div>
         )}
       </div>
 
 
       {/* File Previews */}
-      <h3 className="text-lg font-semibold mb-4 text-gray-800">PDFs</h3>
+      {/* <h3 className="text-lg font-semibold mb-4 text-gray-800">PDFs</h3> */}
+      <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
+        <i className="fas fa-file-pdf"></i> PDF Documents
+      </h3>
 
 
       {pdfFiles.length === 0 && (
-        <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
-          No Pdfs uploaded yet.
+        <div className="text-center py-6 border border-dashed border-ash-medium rounded-xl bg-brand-ash/30">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">No PDFs uploaded yet.</p>
         </div>
       )
       }
@@ -128,21 +132,25 @@ const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
             <div
 
 
-              className={`relative space-y-4 group flex justify-between items-center px-4 py-3 border rounded-lg shadow-sm bg-white`}
+              className={`relative space-y-4 group flex justify-between items-center px-4 py-3 rounded-lg shadow-sm bg-brand-surface border border-ash-medium`}
 
             >
 
               <div className="flex items-center space-x-3 w-[190px] sm:w-3/2 lg:w-full">
-                <div className="w-10 h-10 bg-red-100 flex items-center justify-center rounded-lg text-red-600">
-                  <i className="fas fa-file-pdf text-xl" />
+                {/* <div className="w-10 h-10 bg-red-100 flex items-center justify-center rounded-lg text-red-600"> */}
+                <div className="w-10 h-10 bg-brand-ash border border-ash-light flex items-center justify-center rounded-lg shrink-0 shadow-sm">
+                  <i className="fas fa-file-pdf text-action-danger text-xl" />
                 </div>
-                <span className="text-sm font-medium !truncate max-w-[100%] whitespace-wrap">{type.originalName}</span>
+                {/* <span className="text-sm font-medium !truncate max-w-[100%] whitespace-wrap">{type.originalName}</span> */}
+                <span className="text-sm font-bold text-text-main truncate max-w-[200px] sm:max-w-[300px]">
+                  {type.originalName}
+                </span>
               </div>
               <div className="flex ">
                 {pdfActions.map((action) => (
                   <Button
                     key={action}
-                    variant="ghost"
+                    variant="white"
                     size="sm"
                     onClick={() =>
                       action === "eye"
@@ -152,15 +160,23 @@ const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
                           : downloadImage({ src: type?.url, alt: type?.originalName || "file.pdf" })
                     }
                     disabled={action === "trash" && isDeleting}
-                    className="hover:bg-gray-100 shadow-sm"
+                    // className="hover:bg-gray-100 shadow-sm"
+                    className="border-ash-medium text-text-main shadow-sm hover:text-action-primary"
                   >
-                    <i
-                      className={` fas fa-${action} ${action === "trash"
+                    {/* <i
+                      className={` fas fa-${action} 
+                      ${action === "trash"
                         ? "text-red-500"
                         : action === "download"
                           ? "text-blue-500"
                           : "text-gray-600"
                         }`}
+                    /> */}
+
+                    <i
+                      className={` fas fa-${action} 
+                     text-text-main
+                        `}
                     />
                   </Button>
                 ))}
@@ -173,16 +189,19 @@ const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
       })}
 
       <div className="mt-6 w-full ">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800"> Images </h3>
+        {/* <h3 className="text-lg font-semibold mb-4 text-gray-800"> Images </h3> */}
+        <h3 className="text-[11px] font-bold text-text-muted mb-3 flex items-center gap-2">
+            <i className="fas fa-image"></i> Images
+        </h3>
         {imageFiles?.length === 0 ? (
-          <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
-            No Images uploaded yet.
+         <div className="text-center py-6 border border-dashed border-ash-medium rounded-xl bg-brand-ash/30">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">No Images uploaded yet.</p>
           </div>
         ) : <>
           <div className="">
             <ImageGalleryExample
               imageFiles={imageFiles}
-              
+
               refetch={refetch}
               //  handleDeleteFile={handleDelete}
               height={190}
@@ -198,10 +217,13 @@ const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
       </div>
 
       <div className="mt-6 w-full ">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800"> Videos </h3>
+        {/* <h3 className="text-lg font-semibold mb-4 text-gray-800"> Videos </h3> */}
+        <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
+            <i className="fas fa-video"></i> Videos
+        </h3>
         {videoFiles?.length === 0 ? (
-          <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
-            No Videos uploaded yet.
+          <div className="text-center py-6 border border-dashed border-ash-medium rounded-xl bg-brand-ash/30">
+             <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">No Videos uploaded yet.</p>
           </div>
         ) : <>
           <div className="">
@@ -219,8 +241,8 @@ const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
               refetch={refetch}
               // handleDeleteFile={handleDelete}
               // /                            {...(canDelete ? { handleDeleteFile:  } : {})}
-              
-              
+
+
               isDeleting={isDeleting}
               height={190}
               minWidth={156}
@@ -234,8 +256,8 @@ const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
       </div>
 
       {previewImage && (
-        <div onClick={() => setPreviewImage(null)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div onClick={(e) => e.stopPropagation()} className="relative bg-black/70 rounded-lg shadow-lg max-w-[80%] max-h-[80%] p-2">
+        <div onClick={() => setPreviewImage(null)} className="fixed inset-0 z-50 flex items-center justify-center bg-brand-main/90">
+          <div onClick={(e) => e.stopPropagation()} className="relative bg-brand-surface rounded-lg shadow-lg max-w-[80%] max-h-[80%] p-2">
 
             <img
               src={previewImage}
@@ -248,6 +270,161 @@ const pdfActions = ["eye", "download", ...(canDelete ? ["trash"] : [])];
 
     </div>
   );
+
+// return (
+// <div className="space-y-6 w-full">
+//       {/* Upload Button */}
+//       <div className="flex relative items-center justify-between w-full">
+//         {(canCreate || canEdit) && (
+//           <Input
+//             type="file"
+//             multiple
+//             placeholder="select files"
+//             onChange={handleUpload}
+//             disabled={isUploading}
+//             className={`w-full bg-brand-ash border border-ash-medium text-text-main file:bg-brand-surface file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm ${isUploading ? "pr-10 opacity-70 cursor-not-allowed" : ""}`}
+//           />
+//         )}
+
+//         {isUploading && (
+//           <div className="absolute inset-y-0 right-3 flex items-center">
+//             <i className="fas fa-circle-notch fa-spin text-text-muted text-lg"></i>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* File Previews: PDFs */}
+//       <div className="w-full">
+//         <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
+//           <i className="fas fa-file-pdf"></i> PDF Documents
+//         </h3>
+
+//         {pdfFiles.length === 0 ? (
+//           <div className="text-center py-6 border border-dashed border-ash-medium rounded-xl bg-brand-ash/30">
+//             <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">No PDFs uploaded yet.</p>
+//           </div>
+//         ) : (
+//           <div className="space-y-3">
+//             {pdfFiles?.map((file) => (
+//               <div
+//                 key={file.url}
+//                 className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 py-3 rounded-xl shadow-sm bg-brand-surface border border-ash-medium hover:bg-brand-ash/50 transition-colors gap-3"
+//               >
+//                 <div className="flex items-center space-x-3 w-full sm:w-auto overflow-hidden">
+//                   <div className="w-10 h-10 bg-brand-ash border border-ash-light flex items-center justify-center rounded-lg shrink-0 shadow-sm">
+//                     <i className="fas fa-file-pdf text-action-danger text-xl" />
+//                   </div>
+//                   <span className="text-sm font-bold text-text-main truncate max-w-[200px] sm:max-w-[300px]">
+//                     {file.originalName}
+//                   </span>
+//                 </div>
+                
+//                 <div className="flex gap-2 w-full sm:w-auto justify-end shrink-0">
+//                   {pdfActions.map((action) => (
+//                     <Button
+//                       key={action}
+//                       variant={action === "trash" ? "ghost" : "white"}
+//                       size="sm"
+//                       onClick={() =>
+//                         action === "eye"
+//                           ? window.open(file.url, "_blank")
+//                           : action === "trash"
+//                             ? handleDelete(file._id)
+//                             : downloadImage({ src: file?.url, alt: file?.originalName || "file.pdf" })
+//                       }
+//                       disabled={action === "trash" && isDeleting}
+//                       className={
+//                         action === "trash" 
+//                           ? "text-action-danger hover:bg-red-50 border border-transparent hover:border-red-200 shadow-sm transition-all" 
+//                           : "border-ash-medium text-text-main shadow-sm hover:text-action-primary transition-colors"
+//                       }
+//                       title={action === "trash" ? "Delete" : action === "eye" ? "View" : "Download"}
+//                     >
+//                       <i className={`fas fa-${action === "trash" ? "trash-can" : action}`} />
+//                     </Button>
+//                   ))}
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+
+//       {/* File Previews: Images */}
+//       <div className="w-full">
+//         <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
+//           <i className="fas fa-image"></i> Images
+//         </h3>
+        
+//         {imageFiles?.length === 0 ? (
+//           <div className="text-center py-6 border border-dashed border-ash-medium rounded-xl bg-brand-ash/30">
+//             <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">No Images uploaded yet.</p>
+//           </div>
+//         ) : (
+//           <div className="bg-brand-ash/30 border border-ash-light p-4 rounded-xl">
+//             <ImageGalleryExample
+//               imageFiles={imageFiles}
+//               refetch={refetch}
+//               height={120}
+//               minWidth={110}
+//               maxWidth={140}
+//               {...(canDelete ? { handleDeleteFile: handleDelete } : {})}
+//             />
+//           </div>
+//         )}
+//       </div>
+
+//       {/* File Previews: Videos */}
+//       <div className="w-full">
+//         <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
+//           <i className="fas fa-video"></i> Videos
+//         </h3>
+        
+//         {videoFiles?.length === 0 ? (
+//           <div className="text-center py-6 border border-dashed border-ash-medium rounded-xl bg-brand-ash/30">
+//              <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">No Videos uploaded yet.</p>
+//           </div>
+//         ) : (
+//           <div className="bg-brand-ash/30 border border-ash-light p-4 rounded-xl">
+//             <VideoGalleryMain
+//               videoFiles={videoFiles}
+//               refetch={refetch}
+//               isDeleting={isDeleting}
+//               height={140}
+//               minWidth={160}
+//               maxWidth={200}
+//               {...(canDelete ? { handleDeleteFile: handleDelete } : {})}
+//             />
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Image Preview Modal */}
+//       {previewImage && (
+//         <div 
+//           onClick={() => setPreviewImage(null)} 
+//           className="fixed inset-0 z-[9999] flex items-center justify-center bg-brand-main/90 backdrop-blur-md p-4"
+//         >
+//           <div 
+//             onClick={(e) => e.stopPropagation()} 
+//             className="relative bg-brand-surface rounded-xl shadow-2xl border border-ash-medium p-2 max-w-[90vw] max-h-[90vh] animate-in fade-in zoom-in duration-200"
+//           >
+//             <button
+//               onClick={() => setPreviewImage(null)}
+//               className="absolute -top-4 -right-4 bg-brand-surface border border-ash-medium text-text-main hover:bg-brand-ash rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all z-10"
+//             >
+//               <i className="fas fa-times text-lg"></i>
+//             </button>
+//             <img
+//               src={previewImage}
+//               alt="preview image"
+//               className="max-h-[85vh] w-auto object-contain mx-auto rounded-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//     )
 };
 
 export default RequirementSectionUpload;

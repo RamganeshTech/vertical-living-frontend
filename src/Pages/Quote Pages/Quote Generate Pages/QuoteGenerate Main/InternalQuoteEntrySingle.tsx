@@ -17,10 +17,11 @@ import CreateQuoteModal from './InternalQuote_New_Version/CreateQuoteModal';
 import { useGetProjects } from '../../../../apiList/projectApi';
 import SqftRateInternalWork from './SqftRateInternalwork';
 import { useDebounce } from '../../../../Hooks/useDebounce';
-import { getItemsBycategoryNameForAllCategories } from '../../../../apiList/Quote Api/RateConfig Api/rateConfigApi';
+// import { getItemsBycategoryNameForAllCategories } from '../../../../apiList/Quote Api/RateConfig Api/rateConfigApi';
 // import useGetRole from '../../../../Hooks/useGetRole';
 import { getApiForRole } from '../../../../utils/roleCheck';
 import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
+import { getMaterialBrand } from '../../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi';
 
 const InternalQuoteEntrySingle = () => {
     const navigate = useNavigate()
@@ -159,10 +160,11 @@ const InternalQuoteEntrySingle = () => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
             if (!api) throw new Error("API instance not found");
 
-            const results = await getItemsBycategoryNameForAllCategories({
+            // const results = await getItemsBycategoryNameForAllCategories({
+            const results = await getMaterialBrand({
                 api,
                 organizationId,
-                itemName: itemName
+                categoryName: itemName
             });
 
 
@@ -180,6 +182,7 @@ const InternalQuoteEntrySingle = () => {
                     item.data?.["Brand "] ||
                     item.data?.["Brands "] ||
                     item.data?.["BRAND NAME "] ||
+                    item.data?.["Brand Name"] ||
                     'Unknown';
 
                 const img = item.data?.image || item.data?.Image || item.data?.img || item.data?.images || item.data?.Images || "";
@@ -818,7 +821,7 @@ const InternalQuoteEntrySingle = () => {
             // Prepare furnitures payload & attach new image files
             const furnituresPayload = furnitures.map((f, fIndex) => {
                 const coreMaterials = f.coreMaterials.map((cm, cmIndex) => {
-                    const { previewUrl, newImageFile, ...rest } = cm as any;
+                    const {  newImageFile, ...rest } = cm as any;
 
                     // Attach new image file if present
                     if (newImageFile) {
@@ -1107,9 +1110,9 @@ const InternalQuoteEntrySingle = () => {
 
 
                         {isModalOpen && (
-                            <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
+                            <div className="fixed inset-0 z-120 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
                                 <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md relative animate-scaleIn">
-                                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Quote</h3>
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Product</h3>
 
                                     <input
                                         className="w-full border border-gray-300 rounded px-3 py-2 mb-4 outline-none focus:ring-2 focus:ring-blue-400"

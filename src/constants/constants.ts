@@ -20,8 +20,9 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   LEADCOLLECTION: "Lead Collections",
   COSTCALCULATIONLEADFORM: " Cost Calculation Leads",
   CUTLIST: "Cutlist Generation",
-  PINCODE: `PinCode Module`,
-  PINCODEMAPPING: `PinCode and Vendor Mapping`,
+  PINCODE: `Pincode Master`,
+  PINCODEMAPPING: `Pincode and Vendor Mapping`,
+  PINCODEPROJECTSASSIGNMENT:"Partner Project Allocation",
 
   CALCULATOR: "Calculator",
   MATERIAL_SHOP_DOCS: "Shop Quotations",
@@ -70,8 +71,10 @@ export const SIDEBAR_ICONS: Record<string, string> = {
   LEADCOLLECTION: "fas fa-file-alt text-2xl",
   COSTCALCULATIONLEADFORM: "fas fa-calculator text-2xl",
   CUTLIST: "fas fa-scissors text-2xl",
-  PINCODE: `fas fa-scissors text-2xl`,
-  PINCODEMAPPING: `fas fa-scissors text-2xl`,
+  PINCODE: `fas fa-map-marker-alt text-2xl`,
+  PINCODEMAPPING: `fas fa-map text-2xl`,
+  PINCODEPROJECTSASSIGNMENT:"fas fa-diagram-project text-2xl",
+
 
   CALCULATOR: "fas fa-calculator text-2xl",
   MATERIAL_SHOP_DOCS: "fas fa-file-invoice text-2xl",
@@ -123,6 +126,7 @@ export const ORGANIZATION_ICONS: Record<string, string> = {
   INVITESTAFFS: "fa-solid fa-user text-2xl",
   ROLESPERMISSIONS: "fa-solid fa-dashboard text-2xl",
   DETAILS: "fa-solid fa-building text-2xl",
+  ALLORGS: "fa-solid fa-buildings text-2xl",
   PROJECTS: "fa-solid fa-diagram-project  text-2xl",
   PLAN: "fa-solid fa-wallet  text-2xl",
   PROFILE: "fa-solid fa-user-gear  text-2xl",
@@ -136,6 +140,7 @@ export const ORGANIZATION_LABELS: Record<string, string> = {
   INVITESTAFFS: "Invite Staffs",
   ROLESPERMISSIONS: "Roles And Permission",
   DETAILS: "Org Details",
+  ALLORGS: "All Organizations",
   PROJECTS: "Projects",
   PLAN: "Upgrade Plan",
   PROFILE: "User Profile",
@@ -262,7 +267,7 @@ export const MAIN_PATH_ICON: Record<any, string> = {
 export const NO_IMAGE = noimg
 
 export const COMPANY_DETAILS = {
-  COMPANY_NAME: "Vertical living",
+  COMPANY_NAME: "Vertical Living",
   COMPANY_LOGO: "https://th.bing.com/th/id/OIP.Uparc9uI63RDb82OupdPvwAAAA?w=80&h=80&c=1&bgcl=c77779&r=0&o=6&dpr=1.3&pid=ImgRC"
 }
 

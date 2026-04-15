@@ -2,16 +2,16 @@ import { Button } from "./ui/Button"
 import { Card, CardContent, CardHeader } from "./ui/Card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/DropdownMenu"
 import { Badge } from "./ui/Badge"
-import { useDeleteOrganization } from './../apiList/orgApi';
+import { useDeleteOrganization } from '../apiList/organization_api/orgApi';
 import { toast } from './../utils/toast';
 
 // Import icons
 import {
   FiUsers as Users,
   FiMoreVertical as MoreVertical,
- 
+
   FiTrash2 as Trash2,
-  
+
   FiMapPin as MapPin,
   FiPhone as Phone,
 } from "react-icons/fi"
@@ -103,10 +103,10 @@ export default function OrganizationCard({ organization }: OrganizationCardProps
       </CardHeader>
       <CardContent className="p-6">
         <div className="space-y-2">
-            <p className="text-sm text-gray-600 flex items-start">
-              <MapPin className="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0" />
-              {organization?.address || "N/A"}
-            </p>
+          <p className="text-sm text-gray-600 flex items-start">
+            <MapPin className="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0" />
+            {organization?.address || "N/A"}
+          </p>
           {organization?.organizationPhoneNo && (
             <p className="text-sm text-gray-600 flex items-center">
               <Phone className="w-4 h-4 mr-2 text-blue-500" />

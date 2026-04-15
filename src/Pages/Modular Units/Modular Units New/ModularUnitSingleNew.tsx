@@ -15,6 +15,7 @@ import type { ModularFormValues } from "./ModularUnitFormNew";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import { downloadImage } from "../../../utils/downloadFile";
+import Modular3DViewer from "./Modular3DViewer";
 
 const ModularUnitSingleNew = () => {
     const navigate = useNavigate();
@@ -562,7 +563,7 @@ const ModularUnitSingleNew = () => {
                             <Card>
                                 <CardContent className="!p-2">
                                     <div className="aspect-video bg-gray-100 relative rounded-lg">
-                                        {currentImages.length > 0 ? (
+                                        {/* {currentImages.length > 0 ? (
                                             <img
                                                 src={currentImages[selectedImageIndex]?.url}
                                                 alt={`${selectedImageType} image ${selectedImageIndex + 1}`}
@@ -575,6 +576,35 @@ const ModularUnitSingleNew = () => {
                                                     <p>No {selectedImageType} images available</p>
                                                 </div>
                                             </div>
+                                        )} */}
+
+                                        {selectedImageType === "3d" ? (
+                                            // --- SHOW 3D VIEWER ---
+                                            unit["3dImages"]?.[selectedImageIndex]?.url ? (
+                                                <Modular3DViewer modelUrl={unit["3dImages"][selectedImageIndex]?.url} />
+                                                // <Modular3DViewer modelUrl={"https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Box/glTF-Binary/Box.glb"} />
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center h-full bg-gray-50 border-2 border-dashed rounded-lg">
+                                                    <i className="fas fa-cube text-4xl text-gray-300 mb-2" />
+                                                    <p className="text-gray-400 text-sm font-medium">No 3D Model file (.glb) uploaded</p>
+                                                </div>
+                                            )
+                                        ) : (
+                                            // --- SHOW STATIC IMAGES (Product/2D) ---
+                                            currentImages.length > 0 ? (
+                                                <img
+                                                    src={currentImages[selectedImageIndex]?.url}
+                                                    alt={`${selectedImageType} image`}
+                                                    className="w-full h-full object-contain rounded-lg"
+                                                />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full">
+                                                    <div className="text-center text-gray-400">
+                                                        <i className="fas fa-image text-6xl mb-4" />
+                                                        <p>No {selectedImageType} images available</p>
+                                                    </div>
+                                                </div>
+                                            )
                                         )}
                                     </div>
 
@@ -626,22 +656,68 @@ const ModularUnitSingleNew = () => {
                                         <div className="p-4 border-t">
                                             <div className="grid grid-cols-3 gap-1 h-full max-h-[150px] overflow-y-auto ">
                                                 {currentImages.map((image: any, index: number) => (
-                                                    // <>
+                                                    // <button
+                                                    //     key={index}
+                                                    //     onClick={() => setSelectedImageIndex(index)}
+                                                    //     className={`aspect-square h-full w-full rounded-lg overflow-hidden border-2 transition-all ${selectedImageIndex === index
+                                                    //         ? "border-blue-500 ring-2 ring-blue-200"
+                                                    //         : "border-gray-200 hover:border-gray-300"
+                                                    //         }`}
+                                                    // >
+                                                    //     <img
+                                                    //         src={image.url}
+                                                    //         alt={`Thumbnail ${index + 1}`}
+                                                    //         className="w-full h-full object-cover"
+                                                    //     />
+                                                    // </button>
+
                                                     <button
                                                         key={index}
                                                         onClick={() => setSelectedImageIndex(index)}
-                                                        className={`aspect-square h-full w-full rounded-lg overflow-hidden border-2 transition-all ${selectedImageIndex === index
-                                                            ? "border-blue-500 ring-2 ring-blue-200"
-                                                            : "border-gray-200 hover:border-gray-300"
+                                                        className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedImageIndex === index ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200"
                                                             }`}
                                                     >
-                                                        <img
-                                                            src={image.url}
-                                                            alt={`Thumbnail ${index + 1}`}
-                                                            className="w-full h-full object-cover"
-                                                        />
+                                                        {selectedImageType === "3d" ? (
+                                                            // Render a Placeholder/Icon for the 3D Model in the list
+                                                            // <div className="w-full h-full flex flex-col items-center justify-center bg-indigo-50 text-indigo-400">
+                                                            //     <i className="fas fa-box-open text-xl mb-1" />
+                                                            //     <span className="text-[8px] font-black uppercase">Model {index + 1}</span>
+                                                            // </div>
+
+                                                            // <div className="w-full h-full pointer-events-none">
+                                                            //     <Modular3DViewer key={`thumb-${index}-${image.url}`} modelUrl={image.url} isThumbnail={true} />
+
+                                                            //     <div className="absolute top-1 right-1 bg-blue-600 text-white text-[7px] px-1 rounded font-bold">
+                                                            //         3D VIEW
+                                                            //     </div>
+                                                            // </div>
+
+                                                            <div className="w-full h-full pointer-events-none">
+                                                                {/* FIX: If this thumbnail is the one currently being viewed in the BIG viewer,
+       don't start a second 3D engine. Show a static "Active" state instead.
+    */}
+                                                                {selectedImageIndex === index ? (
+                                                                    <div className="w-full h-full flex flex-col items-center justify-center bg-blue-50">
+                                                                        <i className="fas fa-video text-blue-500 text-xl animate-pulse" />
+                                                                        <span className="text-[7px] font-bold text-blue-500 mt-1 uppercase">Live View</span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <Modular3DViewer
+                                                                        key={`thumb-${index}-${image.url}`}
+                                                                        modelUrl={image.url}
+                                                                        isThumbnail={true}
+                                                                    />
+                                                                )}
+
+                                                                <div className="absolute top-1 right-1 bg-blue-600 text-white text-[7px] px-1 rounded font-bold">
+                                                                    3D VIEW
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            // Standard Image for Product/2D
+                                                            <img src={image.url} className="w-full h-full object-cover" />
+                                                        )}
                                                     </button>
-                                                    // </>
                                                 ))}
                                             </div>
                                         </div>

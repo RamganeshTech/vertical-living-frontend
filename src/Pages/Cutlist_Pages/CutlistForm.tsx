@@ -808,7 +808,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
         // (In Edit Mode, initialData should take priority)
         const hasProjectChanged = header.projectId !== prevProjectIdRef.current;
         if (requirementData?.clientData && hasProjectChanged) {
-            const { clientName, location } = requirementData?.clientData;
+            const { clientName, location } = requirementData?.clientData || {};
 
             setHeader(prev => ({
                 ...prev,

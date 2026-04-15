@@ -69,8 +69,9 @@ const LoginPage = () => {
                         _id: userData?.userId,
                         role: userData?.role,
                         isauthenticated: true,
-                        userName: userData?.userName
-                        
+                        userName: userData?.userName,
+                    organizationId: userData?.organizationId
+
                     }));
 
                     // 2️⃣ Update userSlice
@@ -116,7 +117,8 @@ const LoginPage = () => {
                     dispatch(setRole({
                         _id: userData?.userId,
                         role: userData.role,
-                        isauthenticated: true
+                        isauthenticated: true,
+                        organizationId:userData?.organizationId || ""
                     }));
 
                     dispatch(setOwnerProfileData({

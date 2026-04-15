@@ -18,7 +18,7 @@ export type ForgotPasswordParams = {
     email: string;
 };
 
-export  type ResetPasswordParams = {
+export type ResetPasswordParams = {
     token: string;
     password: string;
 };
@@ -31,7 +31,7 @@ const createUser = async ({ email, password, userName, phoneNo }: CreateUserPara
             password,
             username: userName, // 👈 here we rename it for backend
             phoneNo,
-            role:"owner"
+            role: "owner"
         };
         let { data } = await Api.post(`/auth/registeruser`, payload)
 
@@ -98,21 +98,21 @@ const resetPasswordUser = async ({ token, password }: ResetPasswordParams) => {
 
 
 const inviteWorkerByOwner = async (payload: { projectId: string; specifiedRole: string }) => {
-  const { data } = await Api.post("/owner/inviteworker", payload);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
+    const { data } = await Api.post("/owner/inviteworker", payload);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
 };
 
 const getWorkersByProjectAsOwner = async (projectId: string) => {
-  const { data } = await Api.get(`/owner/getworker/${projectId}`);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
+    const { data } = await Api.get(`/owner/getworker/${projectId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
 };
 
 const removeWorkerAsOwner = async ({ workerId, projectId }: { workerId: string; projectId: string }) => {
-  const { data } = await Api.put(`/owner/removeworker/${workerId}/${projectId}`);
-  if (!data.ok) throw new Error(data.message);
-  return data.data;
+    const { data } = await Api.put(`/owner/removeworker/${workerId}/${projectId}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
 };
 
 
@@ -138,34 +138,81 @@ export const useLogoutUser = () => {
 }
 
 
-    export const useforgotPasswordUser = () => {
-        return useMutation({
-            mutationFn: forgotPassworduser
-        })
-    }
+export const useForgotPasswordUser = () => {
+    return useMutation({
+        mutationFn: forgotPassworduser
+    })
+}
 
 
 
-    export const useResetPasswordUser = () => {
-        return useMutation({
-            mutationFn: resetPasswordUser
-        })
-    }
+export const useResetPasswordUser = () => {
+    return useMutation({
+        mutationFn: resetPasswordUser
+    })
+}
 
 
 
 export const useInviteWorkerByOwner = () => useMutation({ mutationFn: inviteWorkerByOwner });
 
 export const useGetWorkersAsOwner = (projectId: string) =>
-  useQuery({
-    queryKey: ["workers", projectId],
-    queryFn: () => getWorkersByProjectAsOwner(projectId),
-    enabled: !!projectId,
-    refetchOnWindowFocus: false,
-  });
+    useQuery({
+        queryKey: ["workers", projectId],
+        queryFn: () => getWorkersByProjectAsOwner(projectId),
+        enabled: !!projectId,
+        refetchOnWindowFocus: false,
+    });
 
 export const useRemoveWorkerAsOwner = () =>
-  useMutation({
-    mutationFn: removeWorkerAsOwner,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workers"] }),
-  });
+    useMutation({
+        mutationFn: removeWorkerAsOwner,
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workers"] }),
+    });
+
+
+
+//  CREATING THE OWNER AND ORGANIZATION TOGETHER
+
+
+// Define the interface for the registration data
+interface RegisterOrgAndOwnerParams {
+    // User details
+    email: string;
+    password: string;
+    username: string;
+    phoneNo?: string;
+
+    // Organization details
+    organizationName: string;
+    type?: string;
+    address?: string;
+    logoUrl?: string;
+    organizationPhoneNo?: string;
+    registeredEntity?: string;
+    secondaryPhoneNo?: string;
+    website?: string;
+    gstin?: string;
+}
+
+const registerOrgAndOwner = async (payload: RegisterOrgAndOwnerParams) => {
+    const { data } = await Api.post(`/auth/v1/register/org-and-owner`, payload);
+    if (!data.ok) {
+        throw new Error(data.message || "Registration failed");
+    }
+    return data;
+};
+
+
+export const useRegisterOrgAndOwner = () => {
+    return useMutation({
+        mutationFn: registerOrgAndOwner,
+        // onSuccess: (data) => {
+        //     console.log("Registration successful:", data);
+        //     // You can add logic here to redirect or show a success message
+        // },
+        // onError: (error: any) => {
+        //     console.error("Registration failed:", error.message || "Something went wrong");
+        // }
+    });
+};

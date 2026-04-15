@@ -8,7 +8,8 @@ interface AuthState {
   permission: Record<string, Record<string, boolean>>, // <-- add this
   isGuideRequired: boolean | undefined
   ownerId: string,
-
+  organizationId: string,
+  profileImage: string | null
 
 }
 
@@ -19,7 +20,9 @@ const initialState: AuthState = {
   userName: null,
   permission: {} as Record<string, Record<string, boolean>>,
   isGuideRequired: undefined, // <-- add this
-    ownerId: "",
+  ownerId: "",
+  organizationId: "",
+  profileImage: null
 
 };
 
@@ -37,8 +40,10 @@ const authSlice = createSlice({
       state.role = null;
       state.isauthenticated = false
       state._id = null
-      state.userName = null,
-        state.permission = {}
+      state.userName = null
+      state.permission = {}
+      state.organizationId = ""
+      state.profileImage = null
     },
   },
 });

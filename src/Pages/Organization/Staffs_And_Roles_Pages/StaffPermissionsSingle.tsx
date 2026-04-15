@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetSingleUserForRoles, useUpdateUserPermissions } from '../../../apiList/orgApi';
+import { useGetSingleUserForRoles, useUpdateUserPermissions } from '../../../apiList/organization_api/orgApi';
 import { useDebounce } from '../../../Hooks/useDebounce';
 
 // --- CONSTANTS ---
@@ -16,13 +16,14 @@ const ORG_MODULES = [
     "billing",
     "cad",
     "toolhardware",
-    "vendor", "customer", "invoice",
+    "vendor", "customer", "executionpartnermain", "invoice",
     "expense", "billtemplate", "purchaseorder",
     "vendorpayment", "salesorder", "retailinvoice",
     "records",
 
     "pincode",
     "pincodeMapping",
+
 
     "subcontract",
     "cutlist",

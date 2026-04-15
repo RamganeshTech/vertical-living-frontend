@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { useGetSingleOrganization, useUpdateOrganizationName } from "../../apiList/orgApi";
+import { useGetSingleOrganization, useUpdateOrganizationLogo, useUpdateOrganizationName } from "../../apiList/organization_api/orgApi";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Skeleton } from "../../components/ui/Skeleton";
@@ -63,7 +63,7 @@ export default function OrganizationSettings() {
             console.log("111111111111")
 
 
-           const res =  await updateMutation.mutateAsync({
+            const res = await updateMutation.mutateAsync({
                 orgsId: organizationId!,
                 updateField: { [field]: tempValue },
             });
@@ -80,6 +80,17 @@ export default function OrganizationSettings() {
         }
     };
 
+    // Inside OrganizationSettings component
+    const { mutate: uploadLogo, isPending: logoUpdating } = useUpdateOrganizationLogo();
+    const [showLogoPreview, setShowLogoPreview] = useState(false);
+
+    const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && organizationId) {
+            uploadLogo({ file, orgId: organizationId });
+        }
+    };
+
     const handleModeToggle = async (newMode: "manual" | "automation") => {
         if (organization?.mode === newMode) return;
         try {
@@ -88,7 +99,7 @@ export default function OrganizationSettings() {
                 updateField: { mode: newMode },
             });
             toast({ title: "Success", description: `Switched to ${newMode} mode` });
-        } catch (error: any) {
+        } catch (_error: any) {
             toast({ title: "Error", description: "Failed to update mode", variant: "destructive" });
         }
     };
@@ -115,7 +126,7 @@ export default function OrganizationSettings() {
             <div className="p-6 space-y-8 w-full">
 
                 {/* HYBRID MODE TOGGLE CARD - Enterprise Style */}
-                <div className="w-full bg-white border border-blue-200 rounded-2xl shadow-sm p-8 overflow-hidden relative">
+                {/* <div className="w-full bg-white border border-blue-200 rounded-2xl shadow-sm p-8 overflow-hidden relative">
                     <div className="absolute top-0 left-0 w-1 h-full bg-blue-600"></div>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="flex items-start gap-4">
@@ -146,6 +157,73 @@ export default function OrganizationSettings() {
                                     ? "bg-blue-600 text-white shadow-lg scale-105"
                                     : "text-gray-400 hover:text-gray-600"
                                     }`}
+                            >
+                                <i className="fas fa-bolt"></i> Automation
+                            </button>
+                        </div>
+                    </div>
+                </div> */}
+
+
+                {/* HYBRID MODE & LOGO SECTION */}
+                <div className="w-full bg-white border border-blue-200 rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row min-h-[180px]">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-600"></div>
+
+                    {/* 30% LEFT: LOGO SECTION */}
+                    <div className="w-full md:w-[30%] bg-blue-50/30 flex items-center justify-center p-8 border-b md:border-b-0 md:border-r border-blue-100">
+                        <div className="relative group">
+                            {/* Logo Circle */}
+                            <div
+                                onClick={() => setShowLogoPreview(true)}
+                                className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-white flex items-center justify-center overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+                            >
+                                <img
+                                    src={organization?.logoUrl || "/default-org-icon.png"}
+                                    alt="Logo"
+                                    className={`w-full h-full object-cover ${logoUpdating ? 'opacity-30' : ''}`}
+                                />
+                                {logoUpdating && <i className="fas fa-circle-notch fa-spin absolute text-blue-600 text-2xl" />}
+                            </div>
+
+                            {/* Pencil Icon / Upload Trigger */}
+                            <label className="absolute bottom-1 right-1 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white cursor-pointer shadow-lg hover:bg-blue-700 transition-colors border-2 border-white">
+                                <i className="fas fa-pencil-alt text-sm"></i>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleLogoChange}
+                                    disabled={logoUpdating}
+                                />
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* 70% RIGHT: PROCESS AUTOMATION MODE */}
+                    <div className="w-full md:w-[70%] p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
+                                <i className="fas fa-microchip text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900">Process Automation Mode</h3>
+                                <p className="text-gray-500 mt-1 max-w-xl text-sm leading-relaxed">
+                                    Choose between manual verification or automated 30-minute auto-transfer.
+                                    Affects procurement and billing workflows globally.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center p-1.5 bg-gray-100 rounded-2xl border border-gray-200 w-fit h-fit">
+                            <button
+                                onClick={() => handleModeToggle("manual")}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${organization?.mode === "manual" ? "bg-white text-blue-600 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+                            >
+                                <i className="fas fa-hand-pointer"></i> Manual
+                            </button>
+                            <button
+                                onClick={() => handleModeToggle("automation")}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${organization?.mode === "automation" ? "bg-blue-600 text-white shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
                             >
                                 <i className="fas fa-bolt"></i> Automation
                             </button>
@@ -281,6 +359,32 @@ export default function OrganizationSettings() {
 
                 </div>
             </div>
+
+
+            {/* LOGO PREVIEW MODAL */}
+            {showLogoPreview && (
+                <div
+                    className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+                    onClick={() => setShowLogoPreview(false)}
+                >
+                    <div className="relative max-w-3xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                        <button
+                            className="absolute top-4 right-4 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-colors"
+                            onClick={() => setShowLogoPreview(false)}
+                        >
+                            <i className="fas fa-times"></i>
+                        </button>
+                        <img
+                            src={organization?.logoUrl || "/default-org-icon.png"}
+                            alt="Logo Full View"
+                            className="w-full h-auto max-h-[80vh] object-contain"
+                        />
+                        <div className="p-4 bg-white border-t border-gray-100 text-center">
+                            <p className="font-bold text-gray-800">{organization?.organizationName} Official Logo</p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

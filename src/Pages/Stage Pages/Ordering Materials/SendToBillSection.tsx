@@ -18,7 +18,8 @@ const SendToBillSection = ({ ele, projectId, organizationId, refetch }: any) => 
 
     return (
         <Button
-            variant="secondary"
+            // variant="secondary"
+            variant="white"
             onClick={() => handleSendToProcurement(ele._id)}
             disabled={ele?.isSyncWithBill}
             title={ele?.isSyncWithBill ? "bill already created" : ""}
@@ -26,6 +27,7 @@ const SendToBillSection = ({ ele, projectId, organizationId, refetch }: any) => 
             isLoading={isCreating}
             // className="border-green-300 text-blue-700 disabled:cursor-not-allowed hover:bg-blue-100 hover:border-blue-400"
             // className={`${ele.isSyncWithBill ? " text-gray-400 !cursor-not-allowed": ""}`}
+            className="border-ash-medium text-text-main shadow-sm hover:bg-brand-ash disabled:bg-brand-ash disabled:text-text-muted disabled:border-ash-light disabled:opacity-60 disabled:shadow-none disabled:cursor-not-allowed transition-all px-4"
         >
             Create Bill
         </Button>

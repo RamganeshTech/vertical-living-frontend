@@ -25,7 +25,8 @@ const ProtectedSingleShopQuote = () => {
             await navigator.clipboard.writeText(link);
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
-        } catch (err) {
+        } catch (e) {
+            console.log("error",e)
             toast({ title: "Error", description: "Failed to copy link", variant: "destructive" });
         }
     };

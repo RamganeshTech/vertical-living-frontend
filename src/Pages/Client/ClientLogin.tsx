@@ -79,6 +79,7 @@ export default function ClientLogin() {
         userName: clientData?.clientName,
         permission: clientData?.permission || {},
         isGuideRequired: clientData.isGuideRequired
+        
       }));
 
       dispatch(setClientProfileData({

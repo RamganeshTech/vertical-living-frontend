@@ -379,67 +379,106 @@ export const ProcurementPriorityDropdown = ({ ele, projectId, organizationId, re
                 type="button"
                 disabled={ele?.isSyncWithProcurement || isSending}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-2 px-4 py-2 border-2 rounded-lg font-medium transition-all duration-200 
-                    ${ele?.isSyncWithProcurement
-                        ? "bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed"
-                        : "border-green-400 text-green-700 hover:bg-green-50 active:scale-95 shadow-sm"}`}
+            //     className={`flex items-center gap-2 px-4 py-2 border-2 rounded-lg font-medium transition-all duration-200 
+            //         ${ele?.isSyncWithProcurement
+            //             ? "bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed"
+            //             : "border-green-400 text-green-700 hover:bg-green-50 active:scale-95 shadow-sm"}`}
+            // >
+
+            className={`flex items-center gap-2 px-4 py-2 border rounded-lg font-bold text-sm transition-all duration-200 shadow-sm
+                    ${ele?.isSyncWithProcurement || isSending
+                        ? "bg-brand-ash border-ash-light text-text-muted cursor-not-allowed opacity-80"
+                        : "bg-brand-surface border-ash-medium text-text-main hover:bg-brand-ash hover:border-text-muted active:scale-95"}`}
             >
                 {isSending ? (
-                    <i className="fas fa-spinner fa-spin"></i>
+                    // <i className="fas fa-spinner fa-spin"></i>
+                    <i className="fas fa-circle-notch fa-spin text-text-muted"></i>
                 ) : ele?.isSyncWithProcurement ? (
-                    <i className="fas fa-check-circle"></i>
+                    // <i className="fas fa-check-circle"></i>
+                    <i className="fas fa-check-circle text-action-success"></i>
                 ) : (
-                    <i className="fas fa-paper-plane"></i>
+                    // <i className="fas fa-paper-plane"></i>
+                    <i className="fas fa-paper-plane text-text-muted"></i>
                 )}
                 <span>{ele?.isSyncWithProcurement ? "Sent to Procurement" : "Send To Procurement"}</span>
-                {!ele?.isSyncWithProcurement && <i className={`fas fa-chevron-down text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}></i>}
+                {!ele?.isSyncWithProcurement && 
+                // <i className={`fas fa-chevron-down text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`}></i>
+                <i className={`fas fa-chevron-down text-[10px] text-text-muted transition-transform ml-1 ${isOpen ? 'rotate-180' : ''}`}></i>
+                }
             </button>
 
            {isOpen && (
-                <div className={`absolute right-0 w-[600px] rounded-2xl bg-slate-50 shadow-2xl border border-blue-100 z-[9999] flex p-3 gap-3 overflow-hidden animate-in fade-in zoom-in duration-200
+                // <div className={`absolute right-0 w-[600px] rounded-2xl bg-slate-50 shadow-2xl border border-blue-100 z-[9999] flex p-3 gap-3 overflow-hidden animate-in fade-in zoom-in duration-200
+                //     ${dropUp ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
+                <div className={`absolute right-0 w-full sm:w-[600px] rounded-2xl bg-brand-surface shadow-2xl border border-ash-medium z-[9999] flex flex-col sm:flex-row p-3 gap-3 overflow-hidden animate-in fade-in zoom-in duration-200
                     ${dropUp ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
 
                     {/* LEFT COLUMN: PRIORITY WORKFLOW */}
-                    <div className="w-1/2 flex flex-col bg-white rounded-xl border border-blue-50 shadow-sm overflow-hidden">
+                    {/* <div className="w-1/2 flex flex-col bg-white rounded-xl border border-blue-50 shadow-sm overflow-hidden"> */}
+                    <div className="w-full sm:w-1/2 flex flex-col bg-brand-surface rounded-xl border border-ash-medium shadow-sm overflow-hidden">
                         {view === 'priorities' ? (
                             <div className="flex flex-col h-full">
-                                <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
+                                {/* <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
                                     <span className="text-[10px] font-black text-white uppercase tracking-widest">1. Priority Tag</span>
                                     <i className="fas fa-tags text-blue-200 text-xs"></i>
+                                </div> */}
+
+                                <div className="bg-brand-ash border-b border-ash-medium px-4 py-3 flex items-center justify-between rounded-t-xl">
+                                    <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">1. Priority Tag</span>
+                                    <i className="fas fa-tags text-text-muted text-xs"></i>
                                 </div>
                                 <div className="p-2 space-y-1">
                                     {priorities.map((item) => (
                                         <button
                                             key={item.value}
                                             onClick={() => { setSelectedPriority(item.value); setView('vendors'); }}
-                                            className={`w-full flex items-center justify-between px-4 py-3 text-sm rounded-lg transition-all group
-                                                ${selectedPriority === item.value ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-slate-50"}`}
+                                            // className={`w-full flex items-center justify-between px-4 py-3 text-sm rounded-lg transition-all group
+                                            //     ${selectedPriority === item.value ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-slate-50"}`}
+                                            className={`w-full flex items-center justify-between px-4 py-3 text-sm rounded-lg transition-all group border
+                                                ${selectedPriority === item.value 
+                                                    ? "bg-brand-surface border-ash-medium text-text-main shadow-sm" 
+                                                    : "border-transparent text-text-muted hover:bg-brand-ash hover:text-text-main"}`}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <span className={`w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm ${item.color}`}></span>
+                                                {/* <span className={`w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm ${item.color}`}></span> */}
+                                                <span className={`w-2.5 h-2.5 rounded-full border border-brand-surface shadow-sm ${item.color}`}></span>
                                                 <span className="font-bold">{item.label}</span>
                                             </div>
-                                            <i className="fas fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i>
+                                            {/* <i className="fas fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i> */}
+                                            <i className="fas fa-chevron-right text-[10px] text-ash-dark group-hover:translate-x-1 group-hover:text-text-main transition-all"></i>
                                         </button>
                                     ))}
                                 </div>
                             </div>
                         ) : (
+                            // <div className="flex flex-col h-full animate-in slide-in-from-right-2 duration-200">
                             <div className="flex flex-col h-full animate-in slide-in-from-right-2 duration-200">
-                                <div className="bg-blue-700 px-4 py-3 flex items-center gap-3">
-                                    <button onClick={() => setView('priorities')} className="bg-white/20 hover:bg-white/40 text-white w-7 h-7 rounded-full flex items-center justify-center transition-all">
+                                {/* <div className="bg-blue-700 px-4 py-3 flex items-center gap-3"> */}
+                                <div className="bg-brand-ash border-b border-ash-medium px-4 py-3 flex items-center gap-3 rounded-t-xl">
+                                    <button onClick={() => setView('priorities')} 
+                                    
+                                    // className="bg-white/20 hover:bg-white/40 text-white w-7 h-7 rounded-full flex items-center justify-center transition-all"
+                                    className="bg-brand-surface border border-ash-medium hover:border-text-muted text-text-muted hover:text-text-main w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm shrink-0"
+                                    >
                                         <i className="fas fa-arrow-left text-xs"></i>
                                     </button>
-                                    <div>
+                                    {/* <div>
                                         <div className="text-[9px] font-black text-blue-200 uppercase tracking-tighter">Priority: {selectedPriority}</div>
                                         <div className="text-sm text-white font-bold leading-none">Choose Vendor</div>
+                                    </div> */}
+                                    <div>
+                                        <div className="text-[9px] font-bold text-text-muted uppercase tracking-wider">Priority: {selectedPriority}</div>
+                                        <div className="text-sm text-text-main font-bold leading-tight mt-0.5">Choose Vendor</div>
                                     </div>
                                 </div>
 
-                                <div className="relative flex-1 min-h-[300px] max-h-[380px] overflow-y-auto custom-scrollbar bg-white p-1">
+                                {/* <div className="relative flex-1 min-h-[300px] max-h-[380px] overflow-y-auto custom-scrollbar bg-white p-1"> */}
+                                <div className="relative flex-1 min-h-[300px] max-h-[380px] overflow-y-auto custom-scrollbar bg-brand-surface p-1">
                                     {isLoadingPriority && (
-                                        <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
-                                            <i className="fas fa-circle-notch fa-spin text-blue-600 text-xl"></i>
+                                        // <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-brand-surface/80 z-10 flex items-center justify-center backdrop-blur-sm">
+                                            {/* <i className="fas fa-circle-notch fa-spin text-blue-600 text-xl"></i> */}
+                                            <i className="fas fa-circle-notch fa-spin text-text-muted text-xl"></i>
                                         </div>
                                     )}
                                     {priorityVendors?.length > 0 ? (
@@ -447,9 +486,15 @@ export const ProcurementPriorityDropdown = ({ ele, projectId, organizationId, re
                                             <VendorRow key={vendor._id} vendor={vendor} onClick={() => handleVendorSelect(selectedPriority, vendor._id)} />
                                         ))
                                     ) : !isLoadingPriority && (
+                                        // <div className="p-10 text-center flex flex-col items-center">
+                                        //     <i className="fas fa-store-slash text-slate-200 text-2xl mb-2"></i>
+                                        //     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">No vendors found</p>
+                                        // </div>
                                         <div className="p-10 text-center flex flex-col items-center">
-                                            <i className="fas fa-store-slash text-slate-200 text-2xl mb-2"></i>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">No vendors found</p>
+                                            <div className="w-12 h-12 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-3">
+                                                <i className="fas fa-store-slash text-ash-dark text-lg"></i>
+                                            </div>
+                                            <p className="text-[10px] font-bold text-text-muted uppercase tracking-tight">No vendors found</p>
                                         </div>
                                     )}
                                 </div>
@@ -458,18 +503,31 @@ export const ProcurementPriorityDropdown = ({ ele, projectId, organizationId, re
                     </div>
 
                     {/* RIGHT COLUMN: DIRECT SELECTION (Blue-Themed for Consistency) */}
-                    <div className="w-1/2 flex flex-col bg-white rounded-xl border border-blue-50 shadow-sm overflow-hidden">
-                        <div className="bg-blue-800 px-4 py-3 flex items-center justify-between">
+                    {/* <div className="w-1/2 flex flex-col bg-white rounded-xl border border-blue-50 shadow-sm overflow-hidden"> */}
+                    <div className="w-full sm:w-1/2 flex flex-col bg-brand-surface rounded-xl border border-ash-medium shadow-sm overflow-hidden mt-3 sm:mt-0">
+                        {/* <div className="bg-blue-800 px-4 py-3 flex items-center justify-between">
                             <div>
                                 <span className="text-[10px] font-black text-blue-300 uppercase tracking-widest block">Direct Select</span>
                                 <div className="text-sm text-white font-bold leading-none">All Shops</div>
                             </div>
                             <i className="fas fa-store text-blue-400 text-xs"></i>
+                        </div> */}
+                        <div className="bg-brand-ash border-b border-ash-medium px-4 py-3 flex items-center justify-between rounded-t-xl">
+                            <div>
+                                <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest block mb-0.5">Direct Select</span>
+                                <div className="text-sm text-text-main font-bold leading-tight">All Shops</div>
+                            </div>
+                            <div className="w-8 h-8 rounded-lg bg-brand-surface border border-ash-medium shadow-sm flex items-center justify-center">
+                                <i className="fas fa-store text-text-muted text-xs"></i>
+                            </div>
                         </div>
                         <div className="relative flex-1 min-h-[300px] max-h-[440px] overflow-y-auto custom-scrollbar p-1">
                             {isLoadingAll && (
-                                <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
-                                    <i className="fas fa-circle-notch fa-spin text-blue-400 text-xl"></i>
+                                // <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center">
+                                //     <i className="fas fa-circle-notch fa-spin text-blue-400 text-xl"></i>
+                                // </div>
+                                <div className="absolute inset-0 bg-brand-surface/80 z-10 flex items-center justify-center backdrop-blur-sm">
+                                    <i className="fas fa-circle-notch fa-spin text-text-muted text-xl"></i>
                                 </div>
                             )}
                             {allVendors?.length > 0 ? (
@@ -477,9 +535,15 @@ export const ProcurementPriorityDropdown = ({ ele, projectId, organizationId, re
                                     <VendorRow key={vendor._id} vendor={vendor} onClick={() => handleVendorSelect(null, vendor._id)} />
                                 ))
                             ) : !isLoadingAll && (
+                                // <div className="p-10 text-center flex flex-col items-center">
+                                //      <i className="fas fa-search text-slate-200 text-2xl mb-2"></i>
+                                //      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">No Shops Available</p>
+                                // </div>
                                 <div className="p-10 text-center flex flex-col items-center">
-                                     <i className="fas fa-search text-slate-200 text-2xl mb-2"></i>
-                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">No Shops Available</p>
+                                    <div className="w-12 h-12 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-3">
+                                        <i className="fas fa-search text-ash-dark text-lg"></i>
+                                    </div>
+                                    <p className="text-[10px] font-bold text-text-muted uppercase tracking-tight">No Shops Available</p>
                                 </div>
                             )}
                         </div>
@@ -495,18 +559,25 @@ export const ProcurementPriorityDropdown = ({ ele, projectId, organizationId, re
 const VendorRow = ({ vendor, onClick }: any) => (
     <button
         onClick={onClick}
-        className="w-full text-left px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors group"
+        // className="w-full text-left px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 last:border-0 transition-colors group"
+        className="w-full text-left px-4 py-3.5 hover:bg-brand-ash border-b border-ash-light last:border-0 transition-all group rounded-lg"
     >
-        <div className="text-sm font-black text-slate-800 truncate uppercase" title={vendor.vendorName}>{vendor.vendorName}</div>
-        <div className="text-[10px] font-medium text-slate-500 flex items-center gap-1.5 mt-0.5 italic">
+        {/* <div className="text-sm font-black text-slate-800 truncate uppercase" title={vendor.vendorName}>{vendor.vendorName}</div> */}
+        <div className="text-sm font-bold text-text-main truncate uppercase tracking-tight" title={vendor.vendorName}>
+            {vendor.vendorName}
+        </div>
+        {/* <div className="text-[10px] font-medium text-slate-500 flex items-center gap-1.5 mt-0.5 italic"> */}
+        <div className="text-[10px] font-bold text-text-muted flex items-center gap-1.5 mt-1">
             <i className="fas fa-store text-blue-400"></i>
             <span className="truncate w-full">{vendor.shopName || "Untitled Shop"}</span>
         </div>
         <div className="flex items-center justify-between mt-2">
-            <span className="text-[9px] font-bold px-2 py-0.5 bg-slate-100 rounded text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors uppercase tracking-tighter">
+            {/* <span className="text-[9px] font-bold px-2 py-0.5 bg-slate-100 rounded text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors uppercase tracking-tighter"> */}
+            <span className="text-[9px] font-bold px-2 py-1 bg-brand-surface border border-ash-medium rounded text-text-muted group-hover:text-text-main group-hover:border-text-muted transition-all uppercase tracking-wider shadow-sm">
                 {vendor.phoneNo || "No Contact"}
             </span>
-            <i className="fas fa-chevron-right text-[10px] text-blue-500 opacity-0 group-hover:opacity-100 transition-all"></i>
+            {/* <i className="fas fa-chevron-right text-[10px] text-blue-500 opacity-0 group-hover:opacity-100 transition-all"></i> */}
+            <i className="fas fa-chevron-right text-[10px] text-text-muted opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:text-text-main transition-all"></i>
         </div>
     </button>
 );

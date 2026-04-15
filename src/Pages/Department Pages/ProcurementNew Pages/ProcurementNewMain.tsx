@@ -16,18 +16,18 @@ import StageGuide from "../../../shared/StageGuide";
 
 
 export interface OrderMaterialSiteDetail {
-    siteName: String,
-    address: String,
-    siteSupervisor: String,
-    phoneNumber: String,
+    siteName: string,
+    address: string,
+    siteSupervisor: string,
+    phoneNumber: string,
 }
 
 export interface OrderMaterialShopDetails {
-    shopName: String,
-    address: String,
+    shopName: string,
+    address: string,
     upiId: string
-    contactPerson: String,
-    phoneNumber: String,
+    contactPerson: string,
+    phoneNumber: string,
 }
 
 

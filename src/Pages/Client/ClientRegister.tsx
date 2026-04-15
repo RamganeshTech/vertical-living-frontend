@@ -200,7 +200,8 @@ export default function ClientRegister() {
             dispatch(setRole({
                 role: clientData.role,
                 isauthenticated: true,
-                _id: clientData.clientId
+                _id: clientData.clientId,
+                organizationId: clientData?.organizationId || ""
             }));
 
             dispatch(setClientProfileData({

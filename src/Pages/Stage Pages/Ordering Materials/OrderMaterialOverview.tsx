@@ -57,7 +57,8 @@ export const ORDERMATERIAL_UNIT_OPTIONS = [
     "sheet",
     "set",
     "coil",
-    "pair"
+    "pair",
+    "gram"
 ];
 
 
@@ -507,21 +508,21 @@ const OrderMaterialOverview = () => {
 
     // console.log("ordering matieral ", data)
     return (
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col bg-brand-surface">
 
             {/* Header Section - Always visible */}
-            <header className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-blue-600 flex items-center">
+            <header className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-ash-light">
+                <h2 className="text-2xl sm:text-2xl lg:text-2xl xl:text-3xl font-semibold text-text-main flex items-center">
                     {isMobile && (
                         <button
                             onClick={openMobileSidebar}
-                            className="mr-3 p-2 rounded-md border-gray-300 hover:bg-gray-100"
+                            className="mr-3 p-2 rounded-md border border-ash-medium hover:bg-brand-ash text-text-muted"
                             title="Open Menu"
                         >
-                            <i className="fa-solid fa-bars"></i>
+                            <i className="fa-solid fa-bars "></i>
                         </button>
                     )}
-                    <i className="fa-solid fa-cart-shopping mr-2"></i>
+                    <i className="fa-solid fa-cart-shopping mr-2 text-text-muted"></i>
                     <span className="hidden sm:inline">Ordering Material</span>
                     <span className="sm:hidden">Order Material</span>
                 </h2>
@@ -533,9 +534,11 @@ const OrderMaterialOverview = () => {
                                 <Button
                                     isLoading={completePending}
                                     onClick={handleCompletionStatus}
-                                    className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
+                                    // className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
+                                    variant="dark"
+                                    className="flex-1 sm:flex-initial min-w-max px-5 shadow-sm"
                                 >
-                                    <i className="fa-solid fa-circle-check mr-2"></i>
+                                    <i className="fa-solid fa-circle-check mr-2 text-action-success"></i>
                                     Mark as Complete
                                 </Button>
 
@@ -543,6 +546,7 @@ const OrderMaterialOverview = () => {
                                     projectId={projectId!}
                                     stageNumber={8}
                                     stagePath="orderingmaterial"
+                                    className="flex-1 sm:flex-initial min-w-max border-ash-medium text-text-main shadow-sm"
                                 />
 
 
@@ -575,7 +579,7 @@ const OrderMaterialOverview = () => {
             </header >
 
             {/* Error Display */}
-            {
+            {/* {
                 (isError) && (
                     <div className="flex-1 flex items-center justify-center">
                         <div className="max-w-xl p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
@@ -595,16 +599,46 @@ const OrderMaterialOverview = () => {
                         </div>
                     </div>
                 )
-            }
+            } */}
+
+            {isError && (
+                <div className="flex-1 flex items-center justify-center">
+                    <div className="max-w-xl w-full p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center">
+                        <div className="text-action-danger text-3xl mb-3">
+                            <i className="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div className="text-text-main text-lg font-bold mb-2">
+                            Error Occurred
+                        </div>
+                        <p className="text-text-muted text-sm mb-5">
+                            {(getAllError as any)?.response?.data?.message || "Failed to load ordering material"}
+                        </p>
+                        <Button
+                            isLoading={isLoading}
+                            onClick={() => refetch()}
+                            variant="outline"
+                            className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+                        >
+                            Retry
+                        </Button>
+                    </div>
+                </div>
+            )}
 
             {/* Main Content - Only show if no error */}
             {
                 !isError && (
                     <div className="flex-1 min-h-0 overflow-y-auto space-y-4 sm:space-y-6 ">
                         {/* Timer Card */}
-                        <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
+                        {/* <Card className="p-4 w-full shadow border-l-4 border-blue-600 bg-white">
                             <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
                                 <i className="fa-solid fa-clock text-blue-500 text-lg"></i>
+                                <span>Stage Timings</span>
+                            </div> */}
+
+                        <Card className="p-4 w-full shadow-sm border-2 mr-[-10px] border-ash-medium rounded-xl bg-brand-surface">
+                            <div className="flex items-center gap-2 text-text-main text-sm font-bold mb-4 uppercase tracking-wide border-b border-ash-light pb-3">
+                                <i className="fa-regular fa-clock text-ash-dark text-base"></i>
                                 <span>Stage Timings</span>
                             </div>
                             <StageTimerInfo
@@ -621,56 +655,56 @@ const OrderMaterialOverview = () => {
                         </Card>
 
                         {!isError && (
-                            <section className="bg-white rounded-3xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
+                            <section className="bg-brand-main rounded-3xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
 
 
                                 {/* Shop Details */}
                                 <div className="flex flex-col md:flex-row gap-4 w-full mb-3">
 
-                                    <section className="border-l-4 flex-1 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                                        <div className="flex justify-between items-center w-full">
-                                            <div>
-                                                <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
-                                                    <i className="fa-solid fa-store"></i>
-                                                    Shop Details
-                                                </h2>
-                                            </div>
+                                    {/* <section className="border flex-1 border-ash-dark rounded-lg p-4 shadow-brand-surface relative bg-brand-main"> */}
+                                    {/* Shop Details */}
+                                    <section className="flex-1 border-2 border-ash-medium rounded-xl p-5 sm:p-6 shadow-sm relative bg-brand-surface flex flex-col">
+                                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full mb-5 pb-4 border-b border-ash-light gap-4">
+                                            <h2 className="text-lg font-bold text-text-main flex items-center gap-3 m-0">
+                                                <div className="w-8 h-8 rounded-lg bg-brand-ash border border-ash-light flex items-center justify-center">
+                                                    <i className="fa-solid fa-store text-text-muted text-sm"></i>
+                                                </div>
+                                                Shop Details
+                                            </h2>
 
+                                            {!editShop ? (
+                                                <div className="gap-2 flex w-full sm:w-auto">
+                                                    <Button
+                                                        variant="white"
+                                                        size="sm"
+                                                        onClick={() => navigate("shoplib")}
+                                                        className="border-ash-medium text-text-main shadow-sm flex-1 sm:flex-none"
+                                                    >
+                                                        <i className="fas fa-shop sm:mr-2 text-text-muted"></i>
+                                                        <span className="hidden sm:inline">Shop Library</span>
+                                                    </Button>
 
-
-                                            {!editShop ? <div className="gap-2 flex">
-
-                                                <Button onClick={() => navigate("shoplib")}>
-                                                    <i className="fas fa-shop mr-2"></i>
-                                                    Shop Library
-                                                </Button>
-
-                                                {(canEdit || canCreate) && <button
-                                                    onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
-                                                    // className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-                                                    className=" text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
-
-                                                >
-                                                    <i className="fa-solid fa-edit mr-1"></i>Edit
-                                                </button>}
-                                            </div>
-                                                :
-
-                                                <div className="w-[60%] animate-in fade-in duration-300 mb-2">
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
+                                                    {(canEdit || canCreate) && (
+                                                        <Button
+                                                            variant="white"
+                                                            size="sm"
+                                                            onClick={() => { setShopForm(data?.shopDetails); setEditShop(true); }}
+                                                            className="border-ash-medium text-text-main shadow-sm flex-1 sm:flex-none"
+                                                        >
+                                                            <i className="fa-solid fa-edit sm:mr-2 text-text-muted"></i>
+                                                            <span className="hidden sm:inline">Edit</span>
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="w-full sm:w-[60%] animate-in fade-in duration-300">
+                                                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">Assignee</label>
                                                     <SearchSelectNew
                                                         options={shopLibOptions}
                                                         placeholder="Select Shop"
                                                         searchPlaceholder="Search by shop name..."
                                                         value={selectedShop.selectedId || ''}
-                                                        // onValueChange={(value) => {
-                                                        //     const shopFound = shops?.find((s: any) => s._id === value)
-                                                        //     // console.log("sop", shopFound)
-                                                        //     setSelectedShop(({ selectedId: shopFound._id, shopName: shopFound.shopName }))
-                                                        // }}
-
                                                         onValueChange={(value) => {
-                                                            // Search in the 'vendors' local variable we created above
                                                             const vendorFound = vendors.find((v: any) => v._id === value);
                                                             if (vendorFound) {
                                                                 setSelectedShop({
@@ -679,27 +713,27 @@ const OrderMaterialOverview = () => {
                                                                 });
                                                             }
                                                         }}
-
                                                         searchBy="name"
                                                         displayFormat="detailed"
                                                         className="w-full"
                                                     />
                                                 </div>
-                                            }
+                                            )}
                                         </div>
+
                                         {editShop ? (
-                                            <div className="space-y-3">
+                                            <div className="space-y-3 bg-brand-ash p-4 rounded-xl border border-ash-light">
                                                 <Input
                                                     placeholder="Shop Name"
                                                     value={shopForm?.shopName || ""}
                                                     onChange={(e) => setShopForm({ ...shopForm, shopName: e.target.value })}
-                                                    className="w-full"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main placeholder:text-text-muted"
                                                 />
                                                 <Input
                                                     placeholder="Contact Person"
                                                     value={shopForm?.contactPerson || ""}
                                                     onChange={(e) => setShopForm({ ...shopForm, contactPerson: e.target.value })}
-                                                    className="w-full"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main placeholder:text-text-muted"
                                                 />
                                                 <Input
                                                     placeholder="Phone Number"
@@ -707,58 +741,95 @@ const OrderMaterialOverview = () => {
                                                     type="tel"
                                                     maxLength={10}
                                                     onChange={(e) => setShopForm({ ...shopForm, phoneNumber: e.target.value })}
-                                                    className="w-full"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main placeholder:text-text-muted"
                                                 />
                                                 <Input
                                                     placeholder="Address"
                                                     value={shopForm?.address || ""}
                                                     onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
-                                                    className="w-full"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main placeholder:text-text-muted"
                                                 />
-                                                <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
-                                                    <Button onClick={handleUpdateShop} className="w-full sm:w-auto">
-                                                        <i className="fa-solid fa-save mr-2"></i>Save
-                                                    </Button>
+                                                <div className="flex flex-col sm:flex-row gap-3 mt-5 justify-end">
                                                     <Button
                                                         variant="outline"
                                                         onClick={() => setEditShop(false)}
-                                                        className="w-full sm:w-auto"
+                                                        className="w-full sm:w-auto border-ash-medium text-text-main hover:bg-brand-surface shadow-sm"
                                                     >
-                                                        <i className="fa-solid fa-times mr-2"></i>Cancel
+                                                        <i className="fa-solid fa-times mr-2 text-text-muted"></i>Cancel
+                                                    </Button>
+                                                    <Button onClick={handleUpdateShop} variant="dark" className="w-full sm:w-auto px-6 shadow-sm">
+                                                        <i className="fa-solid fa-save mr-2"></i>Save
                                                     </Button>
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="space-y-2 text-sm sm:text-base">
-                                                <p><strong>Shop Name:</strong> {data?.shopDetails?.shopName || "-"}</p>
-                                                <p><strong>Contact Person:</strong> {data?.shopDetails?.contactPerson || "-"}</p>
-                                                <p><strong>Phone:</strong> {data?.shopDetails?.phoneNumber || "-"}</p>
-                                                <p><strong>Address:</strong> {data?.shopDetails?.address || "-"}</p>
-
-
-
+                                            <div className="space-y-3.5 text-sm text-text-main mt-2">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted font-bold">Shop Name:</span>
+                                                    <span className="font-bold">{data?.shopDetails?.shopName || "-"}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted font-bold">Contact Person:</span>
+                                                    <span className="font-medium">{data?.shopDetails?.contactPerson || "-"}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-text-muted font-bold">Phone:</span>
+                                                    <span className="font-medium ">{data?.shopDetails?.phoneNumber || "-"}</span>
+                                                </div>
+                                                <div className="flex justify-between items-start">
+                                                    <span className="text-text-muted font-bold mt-0.5">Address:</span>
+                                                    <span className="text-right max-w-[200px] leading-snug">{data?.shopDetails?.address || "-"}</span>
+                                                </div>
                                             </div>
                                         )}
                                     </section>
 
-                                    <div className="border-l-4 flex-1 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white">
-                                        <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
+
+
+                                    {/* <div className="border-l-4 flex-1 mt-4 border-blue-600 rounded-lg p-4 shadow-sm relative bg-white"> */}
+                                    {/* <h2 className="text-base sm:text-lg font-bold mb-3 text-blue-700 flex items-center gap-2">
                                             <i className="fa-solid fa-truck"></i>
                                             Delivery Location
-                                        </h2>
+                                        </h2> */}
+                                    <section className="flex-1 border-2 border-ash-medium rounded-xl p-5 sm:p-6 shadow-sm relative bg-brand-surface flex flex-col">
+
+                                        <div className="flex justify-between items-start sm:items-center w-full mb-5 pb-4 border-b border-ash-light gap-4">
+                                            <h2 className="text-lg font-bold text-text-main flex items-center gap-3 m-0">
+                                                <div className="w-8 h-8 rounded-lg bg-brand-ash border border-ash-light flex items-center justify-center">
+                                                    <i className="fa-solid fa-truck text-text-muted text-sm"></i>
+                                                </div>
+                                                Delivery Location
+                                            </h2>
+
+                                            {(canEdit || canCreate) && !editDelivery && (
+                                                <Button
+                                                    variant="white"
+                                                    size="sm"
+                                                    onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
+                                                    className="border-ash-medium text-text-main shadow-sm shrink-0"
+                                                >
+                                                    <i className="fa-solid fa-edit sm:mr-2 text-text-muted"></i>
+                                                    <span className="hidden sm:inline">Edit</span>
+                                                </Button>
+                                            )}
+                                        </div>
+
                                         {editDelivery ? (
-                                            <div className="space-y-3">
+                                            // <div className="space-y-3">
+                                            <div className="space-y-3 bg-brand-ash p-4 rounded-xl border border-ash-light">
                                                 <Input
                                                     placeholder="Site Name"
                                                     value={deliveryForm?.siteName || ""}
                                                     onChange={(e) => setDeliveryForm({ ...deliveryForm, siteName: e.target.value })}
-                                                    className="w-full"
+                                                    // className="w-full"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main placeholder:text-text-muted"
                                                 />
                                                 <Input
                                                     placeholder="Site Supervisor"
                                                     value={deliveryForm?.siteSupervisor || ""}
                                                     onChange={(e) => setDeliveryForm({ ...deliveryForm, siteSupervisor: e.target.value })}
-                                                    className="w-full"
+                                                    // className="w-full"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main placeholder:text-text-muted"
                                                 />
                                                 <Input
                                                     placeholder="Phone Number"
@@ -766,49 +837,65 @@ const OrderMaterialOverview = () => {
                                                     maxLength={10}
                                                     value={deliveryForm?.phoneNumber || ""}
                                                     onChange={(e) => setDeliveryForm({ ...deliveryForm, phoneNumber: e.target.value })}
-                                                    className="w-full"
+                                                    // className="w-full"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main placeholder:text-text-muted"
                                                 />
                                                 <Input
                                                     placeholder="Address"
                                                     value={deliveryForm?.address || ""}
                                                     onChange={(e) => setDeliveryForm({ ...deliveryForm, address: e.target.value })}
-                                                    className="w-full"
+                                                    // className="w-full"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main placeholder:text-text-muted"
                                                 />
                                                 <div className="flex flex-col sm:flex-row gap-2 mt-3  justify-end ">
-                                                    <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
+                                                    {/* <Button onClick={handleUpdateDelivery} className="w-full sm:w-auto">
+                                                        <i className="fa-solid fa-save mr-2"></i>Save
+                                                    </Button> */}
+                                                    <Button onClick={handleUpdateDelivery} variant="dark" className="w-full sm:w-auto px-6 shadow-sm">
                                                         <i className="fa-solid fa-save mr-2"></i>Save
                                                     </Button>
                                                     <Button
                                                         variant="outline"
                                                         onClick={() => setEditDelivery(false)}
-                                                        className="w-full sm:w-auto"
+                                                        // className="w-full sm:w-auto"
+                                                        className="w-full sm:w-auto border-ash-medium text-text-main hover:bg-brand-surface shadow-sm"
                                                     >
                                                         <i className="fa-solid fa-times mr-2"></i>Cancel
                                                     </Button>
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="space-y-2 text-sm sm:text-base">
+                                            <div className="space-y-2 text-sm sm:text-base text-text-main mt-2">
                                                 <p><strong>Site Name:</strong> {data?.deliveryLocationDetails?.siteName || "-"}</p>
                                                 <p><strong>Supervisor:</strong> {data?.deliveryLocationDetails?.siteSupervisor || "-"}</p>
                                                 <p><strong>Phone:</strong> {data?.deliveryLocationDetails?.phoneNumber || "-"}</p>
                                                 <p><strong>Address:</strong> {data?.deliveryLocationDetails?.address || "-"}</p>
-                                                {(canEdit || canCreate) && <button
+                                                {/* {(canEdit || canCreate) && <button
                                                     onClick={() => { setDeliveryForm(data?.deliveryLocationDetails); setEditDelivery(true); }}
                                                     className="absolute top-3 right-4 text-blue-600 text-xs sm:text-sm underline hover:text-blue-800"
                                                 >
                                                     <i className="fa-solid fa-edit mr-1"></i>Edit
-                                                </button>}
+                                                </button>} */}
+
+                                                {/* <div className="flex justify-between items-center"><span className="text-text-muted font-bold">Site Name:</span> <span className="font-bold">{data?.deliveryLocationDetails?.siteName || "-"}</span></div>
+                                        <div className="flex justify-between items-center"><span className="text-text-muted font-bold">Supervisor:</span> <span className="font-medium">{data?.deliveryLocationDetails?.siteSupervisor || "-"}</span></div>
+                                        <div className="flex justify-between items-center"><span className="text-text-muted font-bold">Phone:</span> <span className="font-mono font-medium bg-brand-ash px-2 py-0.5 rounded border border-ash-light">{data?.deliveryLocationDetails?.phoneNumber || "-"}</span></div>
+                                        <div className="flex justify-between items-start"><span className="text-text-muted font-bold mt-0.5">Address:</span> <span className="text-right max-w-[200px] leading-snug">{data?.deliveryLocationDetails?.address || "-"}</span></div> */}
                                             </div>
                                         )}
-                                    </div>
+                                    </section>
                                 </div>
 
 
                                 <section className="w-full">
-                                    <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                                    {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                                         <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center">
                                             <i className="fas fa-folder-open mr-2 text-blue-500"></i> Images
+                                        </h3> */}
+
+                                    <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-medium">
+                                        <h3 className="text-lg font-bold text-text-main mb-5 border-b border-ash-light pb-3 flex items-center gap-2">
+                                            <i className="fas fa-folder-open text-text-muted"></i> Images
                                         </h3>
 
 
@@ -823,10 +910,11 @@ const OrderMaterialOverview = () => {
                                                 // className="h-10"
                                                 onChange={handleFileChange}
                                                 disabled={imagePending}
-                                                className={imagePending ? "pr-10 opacity-70 cursor-not-allowed w-full mb-4" : "mb-4"}
+                                                // className={imagePending ? "pr-10 opacity-70 cursor-not-allowed w-full mb-4" : "mb-4"}
+                                                className={`w-full bg-brand-ash border-ash-medium text-text-main file:bg-brand-surface file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 ${imagePending ? "pr-10 opacity-60 cursor-not-allowed" : ""}`}
                                             />}
 
-                                            {imagePending && (
+                                            {/* {imagePending && (
                                                 <div className="absolute inset-y-0 right-2 flex items-center">
                                                     <svg
                                                         className="animate-spin h-5 w-5 text-gray-500"
@@ -842,11 +930,17 @@ const OrderMaterialOverview = () => {
                                                         />
                                                     </svg>
                                                 </div>
+                                            )} */}
+
+                                            {imagePending && (
+                                                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                                    <i className="fas fa-circle-notch fa-spin text-text-muted"></i>
+                                                </div>
                                             )}
                                         </div>
 
                                         {/* Image Gallery */}
-                                        <div className="mb-6">
+                                        <div className="mb-1 mt-3">
                                             {data?.images?.length > 0 ? <ImageGalleryExample
                                                 {...(canDelete ? { handleDeleteFile: (imgId: string) => handleImageDelete(imgId) } : {})}
 
@@ -855,7 +949,16 @@ const OrderMaterialOverview = () => {
                                                 minWidth={150}
                                                 maxWidth={200} />
                                                 :
-                                                <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
+                                                // <div className="text-gray-500 text-sm italic bg-gray-50 p-8 rounded-lg text-center border-2 border-dashed border-gray-200">
+
+
+                                                //     No Images uploaded yet.
+                                                // </div>
+
+                                                <div className="text-text-muted text-sm font-medium bg-brand-ash py-10 rounded-xl text-center border border-dashed border-ash-medium">
+                                                    <div className="w-12 h-12 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                                                        <i className="fas fa-image text-ash-dark text-lg"></i>
+                                                    </div>
                                                     No Images uploaded yet.
                                                 </div>
                                             }
@@ -865,9 +968,7 @@ const OrderMaterialOverview = () => {
 
 
 
-                                    </section>
-
-
+                                    </div>
                                 </section>
 
                                 {/* Modern header with subtle accent */}
@@ -902,13 +1003,8 @@ const OrderMaterialOverview = () => {
 
 
 
-                                {/* Newer version */}
 
-                                <div
-                                    className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
-
-                                >
-                                    {/* <div className="mb-3 ">
+                                {/* <div className="mb-3 ">
 
                             <div className="flex items-center gap-2">
                                 <i className="fa-solid fa-list text-blue-600"></i>
@@ -922,27 +1018,36 @@ const OrderMaterialOverview = () => {
                                 </span>
                             </p>
                         </div> */}
+                                {/* Newer version */}
 
-                                    <div className="flex flex-col md:flex-row md:items-end justify-between pb-4 border-b-2 border-blue-600">
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50">
-                                                    <i className="fa-solid fa-list text-blue-600"></i>
-                                                </div>
-                                                <h4 className="font-bold text-gray-900 text-2xl tracking-tight">
+                                {/* <div
+                                    className="mt-6 pt-4 border-t-2 border-blue-200 bg-gradient-to-r from-white to-white rounded-lg p-4"
+                                > */}
+                                <div className="mt-6 pt-4 border-t-2  bg-brand-surface rounded-xl p-6 shadow-sm border border-ash-medium">
+                                    {/* <div className="flex flex-col md:flex-row md:items-end justify-between pb-4 border-b-2 border-blue-600"> */}
+                                    <div className="flex flex-col md:flex-row md:items-end justify-between pb-5 border-b-2 border-ash-medium mb-6">
+                                        <div className="flex items-center gap-3 sm:gap-4">
+                                            {/* Left Column: Shared Icon */}
+                                            <div className="flex items-center justify-center w-11 h-11 rounded-lg bg-brand-ash border border-ash-light shadow-sm shrink-0">
+                                                <i className="fa-solid fa-list-check text-text-muted text-lg"></i>
+                                            </div>
+
+                                            {/* Right Column: Title and Instructions */}
+                                            <div className="flex flex-col gap-1.5">
+                                                <h4 className="font-bold text-text-main text-xl sm:text-2xl tracking-tight leading-none">
                                                     Create Material Order
                                                 </h4>
-                                            </div>
-                                            <div className="flex items-center gap-2 ml-10">
-                                                <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                                                    Instruction
-                                                </span>
-                                                <p className="text-xs text-gray-500 italic">
-                                                    Click cells to edit • Press <span className="font-bold text-gray-700">Enter</span> to save
-                                                </p>
+
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-text-main bg-brand-ash px-2 py-0.5 rounded border border-ash-light shadow-sm">
+                                                        Instruction
+                                                    </span>
+                                                    <p className="text-xs text-text-muted font-medium">
+                                                        Click cells to edit • Press <span className="font-bold text-text-main bg-brand-ash px-1 py-0.5 rounded border border-ash-light">Enter</span> to save
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
-
                                         {/* <div className="flex gap-2 items-center">
 
                                 <div className="mt-4 md:mt-0 flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
@@ -967,10 +1072,17 @@ const OrderMaterialOverview = () => {
 
                                         <div className="flex flex-wrap items-center gap-2">
                                             {/* Compact Order Identifier */}
-                                            <div className="flex items-center self-stretch bg-white rounded-lg border border-gray-200 px-3 py-1 shadow-sm">
-                                                <div className="flex flex-col leading-none border-r border-gray-200 pr-3 mr-3">
-                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Order ID</span>
+                                            {/* <div className="flex items-center self-stretch bg-white rounded-lg border border-gray-200 px-3 py-1 shadow-sm"> */}
+                                            <div className="flex items-center self-stretch bg-brand-surface rounded-lg border border-ash-medium px-3.5 py-1.5 shadow-sm">
+                                                {/* <div className="flex flex-col leading-none border-r border-gray-200 pr-3 mr-3"> */}
+                                                <div className="flex flex-col leading-none border-r border-ash-light pr-3 mr-3">
+                                                    {/* <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Order ID</span>
                                                     <span className="text-sm font-mono font-black text-blue-700 mt-0.5">
+                                                        {nextOrderMaterialNumber}
+                                                    </span> */}
+
+                                                    <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-1">Order ID</span>
+                                                    <span className="text-sm font-mono font-black text-text-main">
                                                         {nextOrderMaterialNumber}
                                                     </span>
                                                 </div>
@@ -978,20 +1090,24 @@ const OrderMaterialOverview = () => {
                                                 {/* Action Buttons Container */}
                                                 <div className="flex items-center gap-1.5">
                                                     <Button
-                                                        variant="primary"
+                                                        // variant="primary"
+                                                        variant="white"
                                                         size="sm"
-                                                        className="h-8 text-xs px-3 shadow-none"
+                                                        // className="h-8 text-xs px-3 shadow-none"
+                                                        className="h-8 text-xs px-3 border-ash-medium text-text-main shadow-sm"
                                                         onClick={() => navigate('siteorders')}
                                                     >
-                                                        <i className="fas fa-box-archive mr-2"></i>
+                                                        {/* <i className="fas fa-box-archive mr-2"></i> */}
+                                                        <i className="fas fa-box-archive mr-2 text-text-muted"></i>
                                                         View Public Orders
                                                     </Button>
 
                                                     {canDelete && (
                                                         <Button
-                                                            variant="danger"
+                                                            variant="ghost"
                                                             size="sm"
-                                                            className="h-8 text-xs px-3 bg-red-600 text-white shadow-none"
+                                                            // className="h-8 text-xs px-3 bg-red-600 text-white shadow-none"
+                                                            className="h-8 text-xs px-3 text-action-danger  bg-red-50 border border-red-100  shadow-sm transition-all"
                                                             isLoading={deleteAllPending}
                                                             onClick={handleDeleteAllSubItems}
                                                         >
@@ -1008,11 +1124,12 @@ const OrderMaterialOverview = () => {
 
 
 
-                                    <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
-                                        <div
-                                            className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
-                                        >
-                                            <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
+                                    {/* <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden"> */}
+                                    <div className="bg-brand-surface rounded-xl border border-ash-medium overflow-hidden shadow-sm">
+                                        {/* <div className="grid grid-cols-17 gap-0 bg-gradient-to-r from-blue-100 to-blue-100 border-b-2 border-blue-200"
+                                        > */}
+                                        <div className="grid grid-cols-17 bg-brand-ash border-b border-ash-medium text-[10px] font-bold text-text-muted">
+                                            {/* <div className="col-span-3 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
                                                 Ref ID
                                             </div>
                                             <div className="col-span-8 px-4 py-3 text-sm font-medium text-gray-700 border-r border-gray-200">
@@ -1026,27 +1143,41 @@ const OrderMaterialOverview = () => {
                                             </div>
                                             <div className="col-span-1 px-4 py-3 text-sm font-medium text-gray-700">
                                                 Action
-                                            </div>
+                                            </div> */}
+                                            <div className="col-span-3 px-4 py-3 border-r border-ash-light text-center">Ref ID</div>
+                                            <div className="col-span-8 px-4 py-3 border-r border-ash-light">Material Name</div>
+                                            <div className="col-span-2 px-4 py-3 border-r border-ash-light text-center">Qty</div>
+                                            <div className="col-span-3 px-4 py-3 border-r border-ash-light text-center">Unit</div>
+                                            <div className="col-span-1 px-4 py-3 text-center">Action</div>
                                         </div>
 
 
                                         {data.currentOrder.subItems && data.currentOrder?.subItems.length > 0 && data.currentOrder.subItems.map((sub: SubItem) => (
-                                            <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-gray-100 hover:bg-gray-50">
+                                            // <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-gray-100 hover:bg-gray-50">
+                                            <div key={sub._id} className="grid grid-cols-17 gap-0 border-b border-ash-light hover:bg-brand-ash/50 transition-colors group">
 
-                                                <div className="col-span-3 border-r border-blue-200">
+                                                {/* <div className="col-span-3 border-r border-blue-200">
 
                                                     <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
                                                         {sub?.refId || "N/A"}
                                                     </div>
+                                                </div> */}
+
+                                                <div className="col-span-3  border-r border-ash-light flex items-center justify-center">
+                                                    <div className="w-full px-2 py-3 text-center text-xs font-mono font-bold text-text-muted">
+                                                        {sub?.refId || "N/A"}
+                                                    </div>
                                                 </div>
 
-                                                <div className="col-span-8 border-r border-blue-200">
+                                                {/* <div className="col-span-8 border-r border-blue-200"> */}
+                                                <div className="col-span-8 border-r border-ash-light p-1">
                                                     {editingCell?.subItemId === sub._id && editingCell?.field === 'name' ? (
                                                         <input
                                                             ref={inputRef}
                                                             type="text"
                                                             defaultValue={sub.subItemName}
-                                                            className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                                            // className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                                            className="w-full px-4 py-3 bg-brand-surface border border-ash-medium rounded-md outline-none text-sm font-medium text-text-main shadow-sm focus:ring-2 focus:ring-ash-medium"
                                                             onBlur={(e) => {
                                                                 handleSaveEdit(sub._id, 'name', e.target.value);
                                                                 setEditingCell(null);
@@ -1064,7 +1195,8 @@ const OrderMaterialOverview = () => {
                                                         />
                                                     ) : (
                                                         <div
-                                                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            // className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            className="px-3 py-2 cursor-pointer rounded-md hover:bg-brand-surface border border-transparent hover:border-ash-medium transition-colors text-sm font-medium text-text-main flex items-center h-full"
                                                             onClick={() => {
                                                                 if (canCreate || canEdit) {
                                                                     setEditingCell({ subItemId: sub._id, field: 'name' })
@@ -1078,14 +1210,16 @@ const OrderMaterialOverview = () => {
                                                     )}
                                                 </div>
 
-                                                <div className="col-span-2 border-r border-blue-200">
+                                                {/* <div className="col-span-2 border-r border-blue-200"> */}
+                                                <div className="col-span-2 border-r border-ash-light p-1">
                                                     {editingCell?.subItemId === sub._id && editingCell?.field === 'quantity' ? (
                                                         <input
                                                             ref={inputRef}
                                                             type="number"
                                                             defaultValue={sub.quantity}
                                                             min="0"
-                                                            className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                                            // className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50"
+                                                            className="w-full px-2 py-2 text-center bg-brand-surface border border-ash-medium rounded-md outline-none text-sm font-mono font-bold text-text-main shadow-sm focus:ring-2 focus:ring-ash-medium"
                                                             onBlur={(e) => {
                                                                 handleSaveEdit(sub._id, 'quantity', e.target.value);
                                                                 setEditingCell(null);
@@ -1102,7 +1236,8 @@ const OrderMaterialOverview = () => {
                                                         />
                                                     ) : (
                                                         <div
-                                                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            // className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            className="px-2 py-2 text-center cursor-pointer rounded-md hover:bg-brand-surface border border-transparent hover:border-ash-medium transition-colors text-sm font-mono font-bold text-text-main flex items-center justify-center h-full"
                                                             onClick={() => {
                                                                 if (canCreate || canEdit) {
                                                                     setEditingCell({ subItemId: sub._id, field: 'quantity' })
@@ -1117,7 +1252,8 @@ const OrderMaterialOverview = () => {
                                                 </div>
 
 
-                                                <div className="col-span-3 border-r border-blue-200">
+                                                {/* <div className="col-span-3 border-r border-blue-200"> */}
+                                                <div className="col-span-3 border-r border-ash-light p-1">
                                                     {editingCell?.subItemId === sub._id && editingCell?.field === 'unit' ? (
                                                         <div className="p-2 relative z-50">
                                                             <select
@@ -1126,7 +1262,8 @@ const OrderMaterialOverview = () => {
                                                                     handleSaveEdit(sub._id, 'unit', e.target.value);
                                                                     setEditingCell(null);
                                                                 }}
-                                                                className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                                                // className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                                                className="w-full relative z-[50] px-2 py-1.5 border border-ash-medium rounded-md focus:outline-none focus:border-text-muted bg-brand-surface text-xs font-bold text-text-main cursor-pointer shadow-sm"
                                                             >
                                                                 <option value="" disabled>Selected unit</option>
                                                                 {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
@@ -1138,7 +1275,8 @@ const OrderMaterialOverview = () => {
                                                         </div>
                                                     ) : (
                                                         <div
-                                                            className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            // className="px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors"
+                                                            className="px-2 py-2 text-center cursor-pointer rounded-md hover:bg-brand-surface border border-transparent hover:border-ash-medium transition-colors text-xs font-bold text-text-main flex items-center justify-center h-full"
                                                             onClick={() => {
 
                                                                 if (canCreate || canEdit) {
@@ -1154,33 +1292,41 @@ const OrderMaterialOverview = () => {
                                                 </div>
 
 
-                                                {canDelete && <div className="col-span-1 flex items-center justify-center">
-                                                    <Button
-                                                        variant="danger"
-                                                        onClick={() => handleDelete(sub._id)}
-                                                        disabled={deleteItemLoading}
-                                                        isLoading={deleteItemLoading}
-                                                        className="p-2 bg-red-600 text-white  hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                                                        title="Delete item"
-                                                    >
-                                                        <i className="fa fa-trash text-sm"></i>
-                                                    </Button>
-                                                </div>}
+                                                {canDelete &&
+                                                    //  <div className="col-span-1 flex items-center justify-center">
+                                                    <div className="col-span-1 flex items-center justify-center p-1 relative">
+                                                        <Button
+                                                            variant="ghost"
+                                                            onClick={() => handleDelete(sub._id)}
+                                                            disabled={deleteItemLoading}
+                                                            isLoading={deleteItemLoading}
+                                                            // className="p-2 bg-red-600 text-white  hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                                                            className="w-8 h-8 p-0 text-text-muted hover:text-action-danger hover:bg-red-50 border border-transparent hover:border-red-200 transition-all rounded-md opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                                            title="Delete item"
+                                                        >
+                                                            <i className="fa fa-trash text-sm"></i>
+                                                        </Button>
+                                                    </div>}
                                             </div>
                                         ))}
 
-                                        <div className="grid grid-cols-17 gap-0 bg-green-50 border-b border-gray-100">
+                                        {/* <div className="grid grid-cols-17 gap-0 bg-green-50 border-b border-gray-100"> */}
+                                        <div className="grid grid-cols-17 bg-brand-surface border-b border-ash-light hover:bg-brand-ash/30 transition-colors">
 
 
-                                            <div className="col-span-3 border-r border-gray-200">
+                                            {/* <div className="col-span-3 border-r border-gray-200">
 
                                                 <div className="w-full px-4 py-3 border-none outline-none focus:bg-blue-50">
                                                     Ref Id
                                                 </div>
+                                            </div> */}
+                                            <div className="col-span-3 border-r border-ash-light flex items-center justify-center bg-brand-ash/50">
+                                                <span className="text-xs font-mono font-bold text-text-muted">Auto</span>
                                             </div>
 
 
-                                            <div className="col-span-8 border-r border-gray-200">
+                                            {/* <div className="col-span-8 border-r border-gray-200"> */}
+                                            <div className="col-span-8  border-r border-ash-light p-1">
                                                 <input
                                                     type="text"
                                                     placeholder="Enter matterial name..."
@@ -1203,11 +1349,13 @@ const OrderMaterialOverview = () => {
                                                             handleNewRowSave(newRowData);
                                                         }
                                                     }}
-                                                    className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
+                                                    // className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
+                                                    className="w-full px-3 py-2 bg-transparent border border-transparent rounded-md outline-none focus:border-ash-medium focus:bg-brand-ash text-sm font-medium text-text-main placeholder-text-muted transition-all"
                                                 />
                                             </div>
 
-                                            <div className="col-span-2 border-r border-gray-200">
+                                            {/* <div className="col-span-2 border-r border-gray-200"> */}
+                                            <div className="col-span-2 border-r border-ash-light p-1">
                                                 <input
                                                     type="number"
                                                     placeholder="Qty"
@@ -1221,11 +1369,13 @@ const OrderMaterialOverview = () => {
 
                                                         }));
                                                     }}
-                                                    className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
+                                                    // className="w-full px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400"
+                                                    className="w-full px-2 py-2 bg-transparent border border-transparent rounded-md text-center outline-none focus:border-ash-medium focus:bg-brand-ash text-sm font-mono font-bold text-text-main placeholder-text-muted transition-all"
                                                 />
                                             </div>
 
-                                            <div className="col-span-3 border-r border-gray-200">
+                                            {/* <div className="col-span-3 border-r border-gray-200"> */}
+                                            <div className="col-span-3 border-r border-ash-light p-1 flex items-center justify-center">
                                                 <div className="p-2">
 
 
@@ -1256,7 +1406,8 @@ const OrderMaterialOverview = () => {
                                                             await handleNewRowSave(updatedRow);
 
                                                         }}
-                                                        className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                                        // className="w-full relative z-[50] px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                                        className="w-full relative z-[50] px-2 py-1.5 border border-ash-medium rounded-md focus:outline-none focus:border-text-muted bg-brand-surface text-xs font-bold text-text-main cursor-pointer shadow-sm"
                                                     >
                                                         <option value="">Selected unit</option>
                                                         {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
@@ -1271,10 +1422,20 @@ const OrderMaterialOverview = () => {
 
                                         </div>
 
-                                        {(!data.currentOrder.subItems || data.currentOrder?.subItems?.length === 0) && (
+                                        {/* {(!data.currentOrder.subItems || data.currentOrder?.subItems?.length === 0) && (
                                             <div className="text-center py-8 text-gray-500">
                                                 <i className="fa-solid fa-inbox text-2xl mb-2"></i>
                                                 <p className="text-sm">No sub-items yet. Start typing in the row above to add items.</p>
+                                            </div>
+                                        )} */}
+
+                                        {(!data.currentOrder.subItems || data.currentOrder?.subItems?.length === 0) && (
+                                            <div className="text-center py-12 bg-brand-surface">
+                                                <div className="w-12 h-12 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                                                    <i className="fa-solid fa-inbox text-text-muted text-lg"></i>
+                                                </div>
+                                                <p className="text-sm font-bold text-text-main mb-1">No items yet</p>
+                                                <p className="text-xs text-text-muted">Start typing in the row above to add materials.</p>
                                             </div>
                                         )}
                                     </div>
@@ -1696,19 +1857,29 @@ const OrderMaterialOverview = () => {
 
                             <div className="flex flex-col px-6 sm:flex-row gap-4 items-start sm:items-center justify-between">
                                 <div className="flex-1">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                    {/* <h3 className="text-lg font-semibold text-gray-900 mb-1">
                                         Orders
                                     </h3>
                                     <p className="text-sm text-gray-600">
                                         view your orders
+                                    </p> */}
+
+                                    <h3 className="text-lg font-bold text-text-main mb-1 flex items-center gap-2">
+                                        <i className="fa-solid fa-boxes-stacked text-text-muted"></i>
+                                        Orders
+                                    </h3>
+                                    <p className="text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                                        View and manage your orders
                                     </p>
                                 </div>
 
                                 {canCreate && <Button
                                     onClick={handleSubmitOrder}
                                     isLoading={isSubmitting}
-                                    className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                                    // className="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-medium"
                                     size="lg"
+                                    variant="dark"
+                                    className="min-w-[140px] shadow-sm px-6 py-2.5"
                                 >
                                     Submit Order
                                 </Button>}
@@ -1724,24 +1895,42 @@ const OrderMaterialOverview = () => {
                                     {data?.orderedItems?.sort((a: any, b: any) => new Date(b?.createdAt).getTime() - new Date(a.createdAt).getTime()).map((ele: any) => (
                                         <Card key={ele._id}
 
-                                            className="border-green-200  !relative bg-green-50 shadow  border-0 rounded-2xl ">
+                                            // className="border-green-200  !relative bg-green-50 shadow  border-0 rounded-2xl ">
+                                            className="border-ash-medium bg-brand-surface shadow-sm hover:shadow-md transition-shadow rounded-xl font-poppins"
+                                        >
                                             <CardContent className="p-6 ">
                                                 <div className="flex flex-col sm:flex-row items-start  sm:items-center gap-4">
                                                     <div className="flex items-center gap-3 flex-1">
-                                                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                                        {/* <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                                                             <i className="fas fa-check-circle text-green-600"></i>
+                                                        </div> */}
+                                                        <div className="w-12 h-12 bg-brand-ash border border-ash-light rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+                                                            <i className="fas fa-box text-text-muted text-xl"></i>
                                                         </div>
                                                         <div>
-                                                            <h4 className="font-semibold text-blue-700 ">
+                                                            {/* <h4 className="font-semibold text-blue-700 ">
                                                                 <span className="!text-sm text-gray-600">Order Id: </span> {ele.orderMaterialNumber}
+                                                            </h4> */}
+
+                                                            <h4 className="font-bold text-text-main mb-2 truncate">
+                                                                <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted mr-1.5">Order Id:</span>
+                                                                <span className="font-mono text-sm">{ele.orderMaterialNumber}</span>
                                                             </h4>
+
                                                             {/* <span className="text-sm text-gray-500">Created At:</span> <span>{dateFormate(ele.createdAt)} - {formatTime(ele.createdAt)}</span> */}
                                                             {/* <span className="text-sm text-gray-900">Order Material</span> */}
 
-                                                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-md border border-blue-200 w-fit">
+                                                            {/* <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-100/50 rounded-md border border-blue-200 w-fit">
                                                                 <i className="far fa-calendar-alt text-[10px] text-blue-500"></i>
                                                                 <span className="text-[11px] font-bold text-blue-600 uppercase tracking-tight">
                                                                     {dateFormate(ele.createdAt)} • {formatTime(ele.createdAt)}
+                                                                </span>
+                                                            </div> */}
+
+                                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-brand-ash rounded-md border border-ash-light w-fit shadow-sm">
+                                                                <i className="far fa-calendar-alt text-[10px] text-text-muted"></i>
+                                                                <span className="text-[10px] font-bold text-text-main uppercase tracking-tight">
+                                                                    {dateFormate(ele.createdAt)} <span className="mx-1 text-text-muted opacity-50">•</span> {formatTime(ele.createdAt)}
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -1751,7 +1940,8 @@ const OrderMaterialOverview = () => {
                                                         <Button
                                                             variant="outline"
                                                             onClick={() => navigate(`singleorder/${ele._id}`)}
-                                                            className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                            // className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                            className="flex-1 sm:flex-none border-ash-medium text-text-main shadow-sm px-4"
                                                         >
                                                             <i className="fas mr-2 fa-external-link-alt"></i>
                                                             View
@@ -1761,18 +1951,21 @@ const OrderMaterialOverview = () => {
 
 
                                                         {(canCreate || canEdit) && <Button
-                                                            variant="outline"
+                                                            variant="white"
                                                             onClick={() => handleGenerate(ele._id)}
                                                             isLoading={generatePending}
-                                                            className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                            // className="border-green-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                            className="flex-1 sm:flex-none border-ash-medium text-text-main shadow-sm px-4"
                                                         >
+                                                            <i className="fas fa-file-pdf sm:mr-2 text-text-muted"></i>
                                                             Generate Pdf
                                                         </Button>}
 
                                                         <Button
-                                                            variant="secondary"
+                                                            variant="dark"
                                                             onClick={() => handleDownloadPdf(ele)}
-                                                            className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                            // className="border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400"
+                                                            className="flex-1 sm:flex-none shadow-sm px-5"
                                                         >
                                                             Download PDF
                                                         </Button>
@@ -1810,11 +2003,20 @@ const OrderMaterialOverview = () => {
 
                                 :
                                 <>
-                                    <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+                                    {/* <div className="flex flex-col items-center  justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
                                         <i className="fa-solid fa-box text-5xl text-blue-300 mb-4" />
                                         <h3 className="text-lg font-semibold text-blue-800 mb-1">No Orders Found</h3>
-                                        {/* <p className="text-sm text-gray-500">
-                                        No PDF Generated</p> */}
+                                        
+                                    </div> */}
+
+                                    <div className="flex flex-col items-center justify-center min-h-[250px] w-full bg-brand-surface rounded-xl border border-ash-medium shadow-sm text-center p-6">
+                                        <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-4 shadow-sm">
+                                            <i className="fa-solid fa-box-open text-2xl text-ash-dark" />
+                                        </div>
+                                        <h3 className="text-base font-bold text-text-main mb-1">No Orders Found</h3>
+                                        <p className="text-sm text-text-muted max-w-sm mx-auto">
+                                            There are currently no orders submitted for this project.
+                                        </p>
                                     </div>
                                 </>
                             }

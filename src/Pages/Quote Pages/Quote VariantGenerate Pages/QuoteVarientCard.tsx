@@ -82,9 +82,9 @@ const QuoteVarientCard: React.FC<Props> = ({ quote, organizationId }) => {
                                     <strong>Grand Total:</strong> ₹{quote.grandTotal.toLocaleString("en-IN")}
                                 </p> */}
 
-                <p className="text-sm text-gray-500 italic">
+               {/* <p className="text-sm text-gray-500 italic">
                     <strong>Furnitures: </strong> {quote.furnitures?.length || 0}
-                </p>
+                </p> */}
 
                 <div className="flex justify-end gap-2 pt-2">
                   {(canList || canEdit ) &&   <Button

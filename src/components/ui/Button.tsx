@@ -1,7 +1,7 @@
   import type React from "react"
 
   interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: "primary" | "secondary" | "outline" | "danger" | "ghost" | "link"
+    variant?: "primary" | "secondary" | "outline" | "danger" | "ghost" | "link" | "dark" | "white"
     size?: "sm" | "md" | "lg" | "icon"
     children: React.ReactNode
     isLoading?: boolean
@@ -25,6 +25,8 @@
       danger: "border border-red-200 bg-red-600 text-white",
       ghost: "hover:bg-gray-100 text-gray-700",
       link: "text-blue-600 hover:underline p-0 h-auto",
+      dark: "bg-gray-800 hover:bg-gray-900 text-white shadow-sm", // Added dark variant
+      white: "bg-white border border-gray-200 text-gray-800 shadow-sm hover:border-gray-300 hover:bg-gray-50 hover:shadow-md",
     }
 
     const sizeStyles = {
