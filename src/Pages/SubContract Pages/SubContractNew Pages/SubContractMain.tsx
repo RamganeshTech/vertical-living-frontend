@@ -60,6 +60,8 @@ export interface SubContractSingleData {
   status: string
 }
 
+
+
 const SubContractMain = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -278,12 +280,14 @@ const SubContractMain = () => {
   }
 
   return (
-    <div className="space-y-0 h-full">
+    <div className="space-y-0 h-full bg-brand-surface">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 border-b border-ash-light">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-            <i className="fas fa-hard-hat mr-3 text-blue-600"></i>
+          <h1 className="text-xl sm:text-2xl font-bold text-text-main flex items-center gap-2">
+            <div className="w-10 h-10 bg-brand-surface border border-ash-medium rounded-lg flex items-center justify-center shadow-sm shrink-0">
+              <i className="fas fa-hard-hat text-text-muted text-lg"></i>
+            </div>
             Sub Contracts
           </h1>
           {/* <Breadcrumb paths={paths} /> */}
@@ -291,7 +295,11 @@ const SubContractMain = () => {
 
         <div className='flex gap-3 items-center'>
 
-          {canCreate && <Button onClick={() => navigate('create')}>
+          {canCreate && <Button
+            variant="dark"
+            onClick={() => navigate('create')}
+            className="w-full sm:w-auto px-3 shadow-sm"
+          >
             <i className="fas fa-plus mr-2" />
             Create Sub Contract
           </Button>}
@@ -308,35 +316,41 @@ const SubContractMain = () => {
 
       {/* Loading State */}
       {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+        <div className="flex flex-col flex-1 items-center justify-center py-12">
+          <i className="fas fa-circle-notch fa-spin text-text-muted text-4xl mb-4"></i>
+          <span className="text-sm font-bold uppercase tracking-wider text-text-muted">Loading Sub Contracts...</span>
         </div>
       ) : isError ? (
-        <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-          <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
-            ⚠️ Error Occurred
+        <div className="max-w-xl mx-auto mt-8 p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center">
+          <div className="text-action-danger text-4xl mb-4">
+            <i className="fa-solid fa-triangle-exclamation"></i>
           </div>
-          <p className="text-red-500 mb-4 text-lg sm:text-xl">
-            {(error as any)?.message || "Failed to load sub contracts"}
+          <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
+          <p className="text-text-muted text-sm mb-5">
+            {(error as any)?.message || "Failed to load sub contracts. Please try again."}
           </p>
-          <Button onClick={() => refetch()} className="bg-red-600 text-white px-4 py-2">
-            Retry
+          <Button
+            variant="outline"
+            onClick={() => refetch()}
+            className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+          >
+            <i className="fas fa-rotate-right mr-2"></i> Retry
           </Button>
         </div>
       ) : (
         <main className="flex gap-2 !max-h-[90%]">
           {/* Filters Sidebar */}
-          <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto bg-brand-surface">
+            <div className="border-b border-ash-light rounded-xl shadow-sm p-3">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <i className="fas fa-filter mr-2 text-blue-600"></i>
+                <h3 className="text-sm font-bold  tracking-wider text-text-main flex items-center">
+                  <i className="fas fa-filter mr-2 text-text-muted"></i>
                   Filters
                 </h3>
                 {activeFiltersCount > 0 && (
                   <button
                     onClick={clearFilters}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    className="text-xs font-bold text-action-primary hover:text-text-main transition-colors"
                   >
                     Clear All ({activeFiltersCount})
                   </button>
@@ -346,8 +360,8 @@ const SubContractMain = () => {
               <div className="space-y-6">
                 {/* Search */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <i className="fas fa-search mr-2"></i>
+                  <label className="block text-sm font-medium text-text-muted mb-2">
+                    <i className="fas fa-search mr-2 text-ash-dark"></i>
                     Search
                   </label>
                   <input
@@ -356,20 +370,24 @@ const SubContractMain = () => {
                     placeholder="Work name, worker name..."
                     value={filters.search}
                     onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-brand-ash border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-ash-medium outline-none transition-all shadow-sm text-sm placeholder:text-text-muted"
                   />
                 </div>
 
                 {/* Status Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <i className="fas fa-flag mr-2"></i>
+                  {/* <label className="block text-sm font-medium text-gray-700 mb-2"> */}
+                  <label className="block text-sm font-medium text-text-muted mb-2">
+
+                    <i className="fas fa-flag mr-2 text-ash-dark"></i>
                     Status
                   </label>
                   <select
                     value={filters.status}
                     onChange={(e) => setFilters(f => ({ ...f, status: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-brand-ash border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-ash-medium outline-none transition-all shadow-sm text-sm appearance-none cursor-pointer"
                   >
                     <option value="">All Status</option>
                     <option value="pending">Pending</option>
@@ -380,8 +398,10 @@ const SubContractMain = () => {
 
                 {/* Worker Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <i className="fas fa-user mr-2"></i>
+                  {/* <label className="block text-sm font-medium text-gray-700 mb-2"> */}
+                  <label className="block text-sm font-medium text-text-muted mb-2">
+
+                    <i className="fas fa-user mr-2 text-ash-dark"></i>
                     Worker Name
                   </label>
                   <input
@@ -389,34 +409,41 @@ const SubContractMain = () => {
                     placeholder="Filter by worker name..."
                     value={filters.workerName}
                     onChange={(e) => setFilters(f => ({ ...f, workerName: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 bg-brand-ash border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-ash-medium outline-none transition-all shadow-sm text-sm placeholder:text-text-muted"
                   />
                 </div>
 
                 {/* Commencement Date Range */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <i className="fas fa-calendar-check mr-2"></i>
+                  {/* <label className="block text-sm font-medium text-gray-700 mb-2"> */}
+                  <label className="block text-sm font-medium text-text-muted mb-2">
+
+                    <i className="fas fa-calendar-check mr-2 text-ash-dark"></i>
                     Commencement From
                   </label>
                   <input
                     type="date"
                     value={filters.dateOfCommencementFrom}
                     onChange={(e) => setFilters(f => ({ ...f, dateOfCommencementFrom: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 py-2 bg-brand-ash border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-ash-medium outline-none transition-all shadow-sm text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <i className="fas fa-calendar-check mr-2"></i>
+                  {/* <label className="block text-sm font-medium text-gray-700 mb-2"> */}
+                  <label className="block text-sm font-medium text-text-muted mb-2">
+
+                    <i className="fas fa-calendar-check mr-2 text-ash-dark"></i>
                     Commencement To
                   </label>
                   <input
                     type="date"
                     value={filters.dateOfCommencementTo}
                     onChange={(e) => setFilters(f => ({ ...f, dateOfCommencementTo: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 py-2 bg-brand-ash border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-ash-medium outline-none transition-all shadow-sm text-xs"
                   />
                 </div>
 
@@ -497,14 +524,16 @@ const SubContractMain = () => {
                   const debouncedMax = debounced[maxKey];
 
                   return (
-                    <div key={minKey} className="mb-6">
+                    <div key={minKey} className="mt-6 pt-4 border-t border-ash-light">
 
                       {/* Title */}
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {/* <label className="block text-sm font-medium text-gray-700 mb-2"> */}
+                      <label className=" text-sm font-bold uppercase tracking-wider text-text-muted mb-3 flex items-center">
+                        <i className="fas fa-rupee-sign text-ash-dark mr-1.5"></i>
                         {title} Range
                         {(minValue !== Number(debouncedMin) || maxValue !== Number(debouncedMax)) && (
-                          <span className="ml-2 text-xs text-amber-600">
-                            <i className="fas fa-circle animate-pulse"></i>
+                          <span className="ml-2 text-action-primary">
+                            <i className="fas fa-circle text-[8px] animate-pulse"></i>
                           </span>
                         )}
                       </label>
@@ -527,9 +556,12 @@ const SubContractMain = () => {
                           }}
                           trackStyle={[{ backgroundColor: '#3b82f6', height: 6 }]}
                           railStyle={{ backgroundColor: '#e5e7eb', height: 6 }}
+                          //  use the belwo one if the above is not suitable
+                          //   trackStyle={[{ backgroundColor: '#2563eb', height: 4 }]} // Using Tailwind blue-600 conceptually for track
+                          // railStyle={{ backgroundColor: '#e2e8f0', height: 4 }} // Using Tailwind slate-200
                           handleStyle={[
                             {
-                              borderColor: '#3b82f6',
+                              borderColor: '#3b82f6', //2563eb
                               backgroundColor: '#fff',
                               boxShadow: '0 2px 6px rgba(59, 130, 246, 0.4)',
                               width: 18,
@@ -537,7 +569,7 @@ const SubContractMain = () => {
                               marginTop: -6
                             },
                             {
-                              borderColor: '#3b82f6',
+                              borderColor: '#3b82f6',  //2563eb
                               backgroundColor: '#fff',
                               boxShadow: '0 2px 6px rgba(59, 130, 246, 0.4)',
                               width: 18,
@@ -550,20 +582,26 @@ const SubContractMain = () => {
 
                       {/* Min/Max Display */}
                       <div className="flex justify-between items-center gap-2 text-sm">
-                        <div className="flex-1">
-                          <span className="text-xs text-gray-500 block mb-1">Min</span>
-                          <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+                        {/* <div className="flex-1"> */}
+                        <div className="flex-1 bg-brand-ash border border-ash-light px-3 py-1.5 rounded-lg text-center shadow-sm">
+                          <span className="text-xs mb-1 text-text-muted block">Min</span>
+                          {/* <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
                             ₹{Number(minValue).toLocaleString("en-IN")}
-                          </div>
+                          </div> */}
+                          <span className="font-bold text-text-main text-xs">₹{Number(minValue).toLocaleString("en-IN")}</span>
                         </div>
 
-                        <div className="text-gray-400 mt-5">—</div>
+                        <div className="text-text-muted mt-5">—</div>
 
-                        <div className="flex-1">
-                          <span className="text-xs text-gray-500 block mb-1">Max</span>
-                          <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+                        {/* <div className="flex-1"> */}
+                        <div className="flex-1 bg-brand-ash border border-ash-light px-3 py-1.5 rounded-lg text-center shadow-sm">
+
+                          <span className="text-xs mb-1 text-text-muted block">Max</span>
+                          {/* <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
                             ₹{Number(maxValue).toLocaleString("en-IN")}
-                          </div>
+                          </div> */}
+                          <span className="font-bold text-text-main text-xs">₹{Number(minValue).toLocaleString("en-IN")}</span>
+
                         </div>
                       </div>
 
@@ -575,6 +613,7 @@ const SubContractMain = () => {
                           onChange={(e) =>
                             setFilters((p) => ({ ...p, [minKey]: e.target.value }))
                           }
+                          className="w-full pl-6 pr-2 py-1.5 bg-brand-surface border border-ash-medium text-text-main rounded-md focus:ring-1 focus:ring-ash-medium outline-none shadow-sm text-xs"
                         />
                         <Input
                           type="number"
@@ -582,6 +621,7 @@ const SubContractMain = () => {
                           onChange={(e) =>
                             setFilters((p) => ({ ...p, [maxKey]: e.target.value }))
                           }
+                          className="w-full pl-6 pr-2 py-1.5 bg-brand-surface border border-ash-medium text-text-main rounded-md focus:ring-1 focus:ring-ash-medium outline-none shadow-sm text-xs"
                         />
                       </div>
                     </div>
@@ -627,15 +667,19 @@ const SubContractMain = () => {
           </div>
 
           {canList && <>{allSubContracts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-              <i className="fas fa-hard-hat text-5xl text-blue-300 mb-4" />
-              <h3 className="text-lg font-semibold text-blue-800 mb-1">No Sub Contracts Found</h3>
-              <p className="text-sm text-gray-500">
+            <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-brand-surface border border-ash-medium rounded-xl text-center p-6">
+              {/* <i className="fas fa-hard-hat text-5xl text-blue-300 mb-4" /> */}
+              <div className="w-20 h-20 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-5 shadow-sm">
+                <i className="fas fa-file-contract text-4xl text-ash-dark" />
+              </div>
+              {/* <h3 className="text-lg font-semibold text-blue-800 mb-1">No Sub Contracts Found</h3> */}
+              <h3 className="text-xl font-bold text-text-main mb-2">No Sub Contracts Found</h3>
+              <p className="text-sm font-medium text-text-muted max-w-md mx-auto leading-relaxed">
                 {filters.search || activeFiltersCount > 0
                   ? 'Try adjusting your filters to find sub contracts.'
                   : 'Looks like there are no sub contracts yet.'}
-                <br />
-                Click on <strong>"Create Sub Contract"</strong> to get started 🚀
+                <br /><br />
+                Click <span className="font-bold text-text-main">"Create Sub Contract"</span> to get started.
               </p>
             </div>
           ) : (
@@ -655,17 +699,17 @@ const SubContractMain = () => {
 
               {isFetchingNextPage && (
                 <div className="flex justify-center py-8">
-                  <div className="flex items-center gap-2 text-blue-600">
-                    <i className="fas fa-spinner fa-spin text-2xl"></i>
-                    <span className="text-sm font-medium">Loading more...</span>
+                  <div className="flex items-center gap-3 bg-brand-surface border border-ash-medium px-4 py-2 rounded-full shadow-sm">
+                    <i className="fas fa-circle-notch fa-spin text-text-muted text-lg"></i>
+                    <span className="text-xs font-bold uppercase tracking-wider text-text-main">Loading more...</span>
                   </div>
                 </div>
               )}
 
               {!hasNextPage && allSubContracts.length > 0 && (
-                <div className="flex justify-center py-6">
-                  <p className="text-gray-400 text-sm font-medium">
-                    <i className="fas fa-check-circle mr-2"></i>
+                <div className="flex justify-center py-8">
+                  <p className="text-text-muted text-[11px] font-bold uppercase tracking-wider flex items-center bg-brand-ash px-4 py-1.5 rounded-full border border-ash-medium shadow-sm">
+                    <i className="fas fa-check-circle mr-2 text-action-success"></i>
                     You've reached the end of the list
                   </p>
                 </div>

@@ -1,5 +1,5 @@
 // ✅ your role + api utility is assumed:
-import { getApiForRole } from "../../utils/roleCheck"; 
+import { getApiForRole } from "../../utils/roleCheck";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import useGetRole from './../../Hooks/useGetRole';
 import type { AxiosInstance } from "axios";
@@ -9,7 +9,7 @@ import { queryClient } from "../../QueryClient/queryClient";
 import axios from "axios";
 
 // 🗂️ GET APIs
-export const getWorkMainStageApi = async (projectId: string, api: AxiosInstance)=> {
+export const getWorkMainStageApi = async (projectId: string, api: AxiosInstance) => {
   const res = await api.get(`/worktasks/getworktaskmain/${projectId}`);
   return res.data.data;
 };
@@ -74,7 +74,7 @@ const uploadDailyScheduleImagesApi = async (
   scheduleId: string,
   taskId: string,
   date: string,
-  api:AxiosInstance,
+  api: AxiosInstance,
   files: File[]
 ) => {
   const formData = new FormData();
@@ -107,7 +107,7 @@ export const deleteDailyScheduleImageApi = async ({
   scheduleId: string;
   taskId: string;
   date: string;
-  api:AxiosInstance,
+  api: AxiosInstance,
   imageId: string;
 }) => {
 
@@ -133,7 +133,7 @@ const generateWorkPdfLink = async ({
 }: {
   projectId: string;
   scheduleId: string | null
-  formData:any
+  formData: any
   api: AxiosInstance;
 }) => {
   const { data } = await api.post(`/worktasks/generatePdf/work/${projectId}/${scheduleId}`, formData);
@@ -168,7 +168,7 @@ const createCorrection = async ({
 
 
 const uploadSelectImageManually = async ({
-  scheduleId ,
+  scheduleId,
   comparisonId,
   formData,
   api,
@@ -213,12 +213,12 @@ const updateSelectedImageComment = async ({
   selectedImageId,
   formData,
   api,
-}: {  
+}: {
   projectId: string;
   scheduleId: string;
   comparisonId: string;
   selectedImageId: string;
-  formData: {comment: string};
+  formData: { comment: string };
   api: AxiosInstance;
 }) => {
   const { data } = await api.put(
@@ -231,7 +231,7 @@ const updateSelectedImageComment = async ({
 
 
 const deleteSelectImage = async ({
- 
+
   scheduleId,
   comparisonId,
   selectId,
@@ -251,7 +251,7 @@ const deleteSelectImage = async ({
 };
 
 const deleteCorrectedImage = async ({
- 
+
   scheduleId,
   comparisonId,
   imageId,
@@ -364,8 +364,8 @@ export const useGetWorkMainStage = (projectId: string) => {
       return getWorkMainStageApi(projectId, api);
     },
     enabled: !!projectId,
-        retry:false,
-    refetchOnMount:false
+    retry: false,
+    refetchOnMount: false
   });
 };
 
@@ -398,8 +398,8 @@ export const useGetDailySchedule = (projectId: string) => {
       return getDailyScheduleApi(projectId, api);
     },
     enabled: !!projectId,
-        retry:false,
-    refetchOnMount:false
+    retry: false,
+    refetchOnMount: false
   });
 };
 
@@ -415,8 +415,8 @@ export const useGetProjectWorkers = (organizationId: string) => {
       return getProjectWorkersApi(organizationId, api);
     },
     enabled: !!organizationId,
-    retry:false,
-    refetchOnMount:false
+    retry: false,
+    refetchOnMount: false
   });
 };
 
@@ -437,8 +437,8 @@ export const useCreateWork = () => {
       if (!api) throw new Error("API not found");
       return createWorkApi(projectId, formData, api);
     },
-    onSuccess:(_, {projectId})=>{
-      queryClient.invalidateQueries({queryKey: ["daily-schedule", projectId]})
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["daily-schedule", projectId] })
     }
   });
 };
@@ -454,8 +454,8 @@ export const useUpdateWork = () => {
       if (!api) throw new Error("API not found");
       return updateWorkApi(projectId, scheduleId, formData, api);
     },
-    onSuccess:(_, {projectId})=>{
-      queryClient.invalidateQueries({queryKey: ["daily-schedule", projectId]})
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["daily-schedule", projectId] })
     }
   });
 };
@@ -466,7 +466,7 @@ export const useDeleteWork = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ scheduleId, taskId }: { scheduleId: string; taskId: string, projectId:string }) => {
+    mutationFn: async ({ scheduleId, taskId }: { scheduleId: string; taskId: string, projectId: string }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
       if (!api) throw new Error("API not found");
       return deleteWorkApi(scheduleId, taskId, api);
@@ -482,12 +482,10 @@ export const useDeleteWork = () => {
 
 export const useUploadDailyScheduleImages = () => {
 
-
-  
-    const { role } = useGetRole();
+  const { role } = useGetRole();
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO", "worker", "client"];
-  
+
 
 
   return useMutation({
@@ -499,17 +497,17 @@ export const useUploadDailyScheduleImages = () => {
     }: {
       scheduleId: string;
       taskId: string;
-      projectId:string;
+      projectId: string;
       date: string;
       files: File[];
-    }) =>{
-       if (!role || !allowedRoles.includes(role))
+    }) => {
+      if (!role || !allowedRoles.includes(role))
         throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
 
       return await uploadDailyScheduleImagesApi(scheduleId, taskId, date, api, files)
     },
-     onSuccess: (_, { projectId }) => {
+    onSuccess: (_, { projectId }) => {
       if (projectId) {
         queryClient.invalidateQueries({ queryKey: ["work-schedule", projectId] });
       }
@@ -521,23 +519,23 @@ export const useUploadDailyScheduleImages = () => {
 // newly created dlete ai for contrllers 
 export const useDeleteDailyScheduleImage = () => {
 
-    const { role } = useGetRole();
+  const { role } = useGetRole();
   const api = getApiForRole(role!);
   const allowedRoles = ["owner", "staff", "CTO", "worker", "client"];
-  
+
 
 
   return useMutation({
-    mutationFn: async ({scheduleId,taskId,date,imageId,}: 
-      {scheduleId: string;taskId: string; projectId: string;date: string;imageId: string;})=> {
-         if (!role || !allowedRoles.includes(role))
+    mutationFn: async ({ scheduleId, taskId, date, imageId, }:
+      { scheduleId: string; taskId: string; projectId: string; date: string; imageId: string; }) => {
+      if (!role || !allowedRoles.includes(role))
         throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
 
-      return await deleteDailyScheduleImageApi({scheduleId, taskId, date, api, imageId})
+      return await deleteDailyScheduleImageApi({ scheduleId, taskId, date, api, imageId })
     },
-    onSuccess:(_, {projectId})=>{
-      queryClient.invalidateQueries({queryKey: ["daily-schedule", projectId]})
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ["daily-schedule", projectId] })
     }
   });
 };
@@ -551,7 +549,7 @@ export const useGeneratePdfWorkSchedule = () => {
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ projectId , formData, scheduleId= null}: { projectId: string, formData:any, scheduleId?:string | null }) => {
+    mutationFn: async ({ projectId, formData, scheduleId = null }: { projectId: string, formData: any, scheduleId?: string | null }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await generateWorkPdfLink({ projectId, formData, scheduleId, api });
@@ -576,8 +574,8 @@ export const useGetProjectAssigneDetail = (projectId: string) => {
       return getProjectAssigneDetails(projectId, api);
     },
     enabled: !!projectId,
-        retry:false,
-    refetchOnMount:false
+    retry: false,
+    refetchOnMount: false
   });
 };
 
@@ -696,7 +694,7 @@ export const useUpdateSelectedImageComment = () => {
       scheduleId: string;
       comparisonId: string;
       selectedImageId: string;
-      data: {comment: string};
+      data: { comment: string };
     }) => {
       if (!role || !allowedRoles.includes(role))
         throw new Error("not allowed to make this api call");
@@ -912,21 +910,22 @@ export const useDeleteSelectedImage = () => {
 
 
 // ✅ 10. Set Deadline
- const setWorkScheduleDeadlineApi = async ({
+const setWorkScheduleDeadlineApi = async ({
   formId,
- projectId,  deadLine, api }: 
- {  projectId: string,
-  formId: string;
-  deadLine: string;
-  api: AxiosInstance;
-}) => {
+  projectId, deadLine, api }:
+  {
+    projectId: string,
+    formId: string;
+    deadLine: string;
+    api: AxiosInstance;
+  }) => {
   const { data } = await api.put(`/worktasks/deadline/${projectId}/${formId}`, { deadLine });
   if (!data.ok) throw new Error(data.message);
   return data.data;
 };
 
 // ✅ 11. Complete Stage
- const completeWorkScheduleStageApi = async ({
+const completeWorkScheduleStageApi = async ({
   projectId,
   // api,
 }: {
@@ -951,16 +950,17 @@ export const useSetWorkScheduleDeadline = () => {
   return useMutation({
     mutationFn: async ({
       formId,
-     projectId,  deadLine }: 
-     {  projectId: string,
-      formId: string;
-      deadLine: string;
-    }) => {
+      projectId, deadLine }:
+      {
+        projectId: string,
+        formId: string;
+        deadLine: string;
+      }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("not allowed to make this api call");
       if (!api) throw new Error("API instance missing");
       return await setWorkScheduleDeadlineApi({ formId, projectId, deadLine, api });
     },
-    onSuccess: (_, {projectId}) => {
+    onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: ["work-main-stage", projectId] });
     },
   });
@@ -978,8 +978,8 @@ export const useCompleteWorkSchedule = () => {
       return await completeWorkScheduleStageApi({ projectId });
     },
     onSuccess: (_, { projectId }) => {
-      queryClient.invalidateQueries({  queryKey: ["work-main-stage", projectId] });
-         
+      queryClient.invalidateQueries({ queryKey: ["work-main-stage", projectId] });
+
 
     },
   });

@@ -22,9 +22,11 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   CUTLIST: "Cutlist Generation",
   PINCODE: `Pincode Master`,
   PINCODEMAPPING: `Pincode and Vendor Mapping`,
-  PINCODEPROJECTSASSIGNMENT:"Partner Project Allocation",
+  PINCODEPROJECTSASSIGNMENT: "Partner Project Allocation",
 
   CALCULATOR: "Calculator",
+  INSTANTCOSTCALCULATION: "Instant Cost Calculation",
+
   MATERIAL_SHOP_DOCS: "Shop Quotations",
   RATECONIGPRESALES: "Rate Config (Pre Sales)",
   RATECONIG: "Rate Config (Material)",
@@ -49,7 +51,7 @@ export const SIDEBAR_LABELS: Record<string, string> = {
 };
 
 export const SIDEBAR_ICONS: Record<string, string> = {
-  PROJECTS: "fa-solid fa-diagram-project text-2xl",
+  PROJECTS: "fa-solid fa-city text-2xl",
   SHORTLIST: "fa-solid fa-object-group text-2xl",
   // SHORTLISTMICA: "fa-solid fa-object-group text-2xl",
   ORGANIZATION: "fa-solid fa-building text-2xl",
@@ -73,10 +75,11 @@ export const SIDEBAR_ICONS: Record<string, string> = {
   CUTLIST: "fas fa-scissors text-2xl",
   PINCODE: `fas fa-map-marker-alt text-2xl`,
   PINCODEMAPPING: `fas fa-map text-2xl`,
-  PINCODEPROJECTSASSIGNMENT:"fas fa-diagram-project text-2xl",
+  PINCODEPROJECTSASSIGNMENT: "fas fa-diagram-project text-2xl",
 
 
   CALCULATOR: "fas fa-calculator text-2xl",
+  INSTANTCOSTCALCULATION: "fas fa-calculator text-2xl",
   MATERIAL_SHOP_DOCS: "fas fa-file-invoice text-2xl",
   RATECONIGPRESALES: "fas fa-box-archive text-2xl",
   RATECONIG: "fas fa-box-archive text-2xl",
@@ -127,7 +130,7 @@ export const ORGANIZATION_ICONS: Record<string, string> = {
   ROLESPERMISSIONS: "fa-solid fa-dashboard text-2xl",
   DETAILS: "fa-solid fa-building text-2xl",
   ALLORGS: "fa-solid fa-buildings text-2xl",
-  PROJECTS: "fa-solid fa-diagram-project  text-2xl",
+  PROJECTS: "fa-solid fa-city  text-2xl",
   PLAN: "fa-solid fa-wallet  text-2xl",
   PROFILE: "fa-solid fa-user-gear  text-2xl",
   MODULAR: "fa-solid fa-box  text-2xl",

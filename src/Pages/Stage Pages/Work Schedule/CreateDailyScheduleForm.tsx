@@ -14,7 +14,7 @@ import { useCurrentSupervisor } from "../../../Hooks/useCurrentSupervisor"
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 import { useParams } from "react-router-dom"
 import { socket } from "../../../lib/socket"
-import { NO_IMAGE } from "../../../constants/constants"
+import { COMPANY_DETAILS, NO_IMAGE } from "../../../constants/constants"
 // import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain"
 // import { NO_IMAGE } from "../../../constants/constants"
 
@@ -1127,44 +1127,64 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
 
     return (
-        <div onClick={onClose} className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
-            <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg max-w-[90%] max-h-[90vh] overflow-y-auto w-full mx-4">
-                <div className=" bg-blue-600 text-white p-4 rounded-t-lg sticky top-0 z-10">
+        // <div onClick={onClose} className="fixed inset-0 bg-black/70  border border-ash-medium bg-opacity-50 flex items-center justify-center z-50">
+        <div onClick={onClose} className="fixed inset-0 bg-brand-main/90 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
+            <div onClick={(e) => e.stopPropagation()} className="bg-brand-surface border border-ash-medium rounded-lg max-w-[90%] max-h-[90vh] overflow-y-auto w-full mx-4">
+                <div className=" bg-brand-ash border-b border-ash-medium text-text-main p-4 rounded-t-lg sticky top-0 z-10">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h2 className="text-xl font-bold">Vertical Living — Carpenter Work Schedule & Visual Approval</h2>
-                            <p className="text-sm opacity-90">
+                            {/* <h2 className="text-xl font-bold">{COMPANY_DETAILS.COMPANY_NAME} — Carpenter Work Schedule & Visual Approval</h2> */}
+                            <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+                                <i className="fa-solid fa-clipboard-list text-text-muted"></i>
+                                {COMPANY_DETAILS.COMPANY_NAME} — Carpenter Work Schedule
+                            </h2>
+                            {/* <p className="text-sm opacity-90">
                                 RAMS TECH CIRCLE OPC Pvt. Ltd. • No. 22, 13th Main Road, Anna Nagar West, Chennai - 600040 • WhatsApp:
                                 +91 93639 93814
-                            </p>
+                            </p> */}
                         </div>
                         <div className="flex gap-2">
-                            <Button isLoading={updateWorkMutation.isPending || createWorkMutation.isPending} variant="secondary" size="sm" onClick={handleSave}>
+                            <Button isLoading={updateWorkMutation.isPending || createWorkMutation.isPending}
+                                variant="dark"
+                                size="sm"
+                                className="shadow-sm"
+
+                                onClick={handleSave}>
                                 Save
                             </Button>
                             {/* <Button variant="secondary" size="sm" onClick={() => document.getElementById("json-import")?.click()}>
                 Load
               </Button> */}
-                            <Button variant="secondary" size="sm" onClick={exportToJSON}>
+                            <Button variant="white" className="border-ash-medium shadow-sm" size="sm" onClick={exportToJSON}>
                                 Export JSON
                             </Button>
                             <input id="json-import" type="file" accept=".json" className="hidden" onChange={importFromJSON} />
-                            <Button variant="secondary" size="sm" onClick={() => document.getElementById("json-import")?.click()}>
+                            <Button variant="white"
+                                className="border-ash-medium shadow-sm"
+                                size="sm" onClick={() => document.getElementById("json-import")?.click()}>
                                 Import JSON
                             </Button>
-                            <Button variant="secondary" isLoading={pdfPending} onClick={handleGeneratePdf} size="sm">
+                            <Button variant="white"
+                                className="border-ash-medium shadow-sm text-text-main"
+                                isLoading={pdfPending} onClick={handleGeneratePdf} size="sm">
                                 Print / PDF
                             </Button>
-                            <Button variant="secondary" size="sm" onClick={onClose}>
+                            {/* <Button variant="secondary" size="sm" onClick={onClose}>
                                 <i className="fas fa-times"></i>
-                            </Button>
+                            </Button> */}
+                            <button
+                                onClick={onClose}
+                                className="w-9 h-9 flex items-center justify-center rounded-lg bg-brand-surface border border-ash-medium text-text-muted hover:text-action-danger hover:bg-red-50 hover:border-red-200 transition-all shadow-sm"
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <div className="p-6 space-y-6">
                     {/* Project & Assignee Section */}
-                    <Card>
+                    {/* <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <i className="fas fa-file-text"></i>
@@ -1173,64 +1193,64 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                     Single sheet for multiple days
                                 </Button>
                             </CardTitle>
+                        </CardHeader> */}
+
+                    <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden">
+                        <CardHeader className="bg-brand-ash/50 border-b border-ash-light pb-4">
+                            <CardTitle className="flex items-center gap-2 text-text-main text-base font-bold">
+                                <div className="w-8 h-8 rounded bg-brand-ash border border-ash-medium flex items-center justify-center shrink-0 shadow-sm">
+                                    <i className="fas fa-file-text text-text-muted text-sm"></i>
+                                </div>
+                                Project & Assignee
+                                <Button variant="link" size="sm" className="ml-auto !text-action-primary text-xs uppercase tracking-wider font-bold">
+                                    Single sheet for multiple days
+                                </Button>
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <Label htmlFor="projectName">Project Name</Label>
+                                    <Label htmlFor="projectName"
+                                        className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5"
+                                    >Project Name</Label>
                                     <Input
                                         id="projectName"
                                         placeholder="e.g., Shankar Residence — Wardrobe & TV Unit"
                                         value={formData.projectAssignee.projectName}
                                         onChange={(e) => handleProjectAssigneeChange("projectName", e.target.value)}
+                                        className="bg-brand-surface border !border-ash-medium text-text-main focus:ring-2 focus:ring-ash-medium shadow-sm transition-all w-full"
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="siteAddress">Site Address</Label>
+                                    {/* <Label htmlFor="siteAddress">Site Address</Label> */}
+                                    <Label htmlFor="siteAddress" className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">Site Address</Label>
                                     <Input
                                         id="siteAddress"
                                         placeholder="Full address"
                                         value={formData.projectAssignee.siteAddress}
                                         onChange={(e) => handleProjectAssigneeChange("siteAddress", e.target.value)}
+                                        className="bg-brand-surface border !border-ash-medium text-text-main focus:ring-2 focus:ring-ash-medium shadow-sm transition-all w-full"
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="designReferenceId">Design Reference ID</Label>
+                                    {/* <Label htmlFor="designReferenceId">Design Reference ID</Label> */}
+                                    <Label htmlFor="designReferenceId" className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">Design Reference ID</Label>
                                     <Input
                                         id="designReferenceId"
                                         placeholder="e.g., VL-KTN-2025-001"
                                         value={formData.projectAssignee.designReferenceId}
                                         onChange={(e) => handleProjectAssigneeChange("designReferenceId", e.target.value)}
+                                        className="bg-brand-surface border !border-ash-medium text-text-main focus:ring-2 focus:ring-ash-medium shadow-sm transition-all w-full"
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="carpenterName">Carpenter Name</Label>
-                                    {/* <Input
-                                         id="carpenterName"
-                                         placeholder="Assigned carpenter"
-                                         value={formData.projectAssignee.carpenterName}
-                                         onChange={(e) => handleProjectAssigneeChange("carpenterName", e.target.value)}
-                                     />
-                                    */}
-
-
-                                    {/* <select
-                                        className="border-b px-2 py-1 text-sm"
-                                        value={formData.projectAssignee.carpenterName}
-                                         onChange={(e) => handleProjectAssigneeChange("carpenterName", e.target.value)}
-                                    >
-                                        <option value="">Select</option>
-                                        {workers?.map((w: { _id: string, workerName: string, email: string }) => (
-                                            <option key={w?._id} value={w?._id}>
-                                                {w.workerName}
-                                            </option>
-                                        ))}
-                                    </select> */}
-
+                                    {/* <Label htmlFor="carpenterName">Carpenter Name</Label> */}
+                                    <Label htmlFor="carpenterName" className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">Carpenter Name</Label>
 
 
                                     <select
-                                        className="border-b px-2 py-1 text-sm w-[100%]"
+                                        // className="border-b px-2 py-1 text-sm w-[100%]"
+                                        className="w-full bg-brand-surface border !border-ash-medium text-text-main rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium shadow-sm transition-all appearance-none cursor-pointer"
                                         value={formData.projectAssignee.carpenterUIName}
                                         onChange={(e) => {
                                             const selectedId = e.target.value;
@@ -1268,24 +1288,31 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                             </>
                                         )}
                                     </select>
+                                    {/* <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                        <i className="fa-solid fa-chevron-down text-text-muted text-xs"></i>
+                                    </div> */}
 
                                 </div>
                                 <div>
-                                    <Label htmlFor="supervisorName">Supervisor Name</Label>
+                                    {/* <Label htmlFor="supervisorName">Supervisor Name</Label> */}
+                                    <Label htmlFor="supervisorName" className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">Supervisor Name</Label>
                                     <Input
                                         id="supervisorName"
                                         placeholder="Site supervisor"
                                         value={formData.projectAssignee.supervisorName}
                                         onChange={(e) => handleProjectAssigneeChange("supervisorName", e.target.value)}
+                                        className="bg-brand-surface border !border-ash-medium text-text-main focus:ring-2 focus:ring-ash-medium shadow-sm transition-all w-full"
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="plannedStartDate">Planned Start Date</Label>
+                                    {/* <Label htmlFor="plannedStartDate">Planned Start Date</Label> */}
+                                    <Label htmlFor="plannedStartDate" className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">Planned Start Date</Label>
                                     <Input
                                         id="plannedStartDate"
                                         type="date"
                                         value={formData.projectAssignee.plannedStartDate}
                                         onChange={(e) => handleProjectAssigneeChange("plannedStartDate", e.target.value)}
+                                        className="bg-brand-surface border !border-ash-medium text-text-main focus:ring-2 focus:ring-ash-medium shadow-sm transition-all w-full"
                                     />
                                 </div>
                             </div>
@@ -1293,7 +1320,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                     </Card>
 
                     {/* Daily Work Schedule Section */}
-                    <Card>
+                    {/* <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
@@ -1310,99 +1337,155 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                     </Button>
                                 </div>
                             </CardTitle>
+                        </CardHeader> */}
+
+                    <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden">
+                        <CardHeader className="bg-brand-ash/50 border-b border-ash-light pb-4">
+                            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-2 text-text-main text-base font-bold">
+                                    <div className="w-8 h-8 rounded bg-brand-ash border border-ash-medium flex items-center justify-center shrink-0 shadow-sm">
+                                        <i className="fas fa-calendar-days text-text-muted text-sm"></i>
+                                    </div>
+                                    Daily Work Schedule
+                                </div>
+                                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                                    <Button
+                                        variant="white"
+                                        size="sm"
+                                        onClick={allClearTask}
+                                        className="flex-1 sm:flex-none border-ash-medium text-text-main shadow-sm"
+                                    >
+                                        <i className="fa-solid fa-eraser mr-1"></i> Clear
+                                    </Button>
+                                    <Button
+                                        variant="dark"
+                                        size="sm"
+                                        onClick={addTask}
+                                        className="flex-1 sm:flex-none shadow-sm"
+                                    >
+                                        <i className="fas fa-plus mr-1"></i> Add Task
+                                    </Button>
+                                </div>
+                            </CardTitle>
                         </CardHeader>
+
                         <CardContent>
-                            <div className="h-fit border overflow-y-auto">
+                            {/* <div className="h-fit border overflow-y-auto"> */}
+                            <div className=" h-fit border-x sm:border-2 border-ash-medium sm:rounded-xl overflow-x-auto overflow-y-auto">
                                 <table className="w-full border-collapse">
                                     <thead>
-                                        <tr className="bg-gray-100">
-                                            <th className="border p-2 text-center">DATE</th>
-                                            <th className="border p-2 text-center">ROOM / UNIT</th>
-                                            <th className="border p-2 text-center">WORK DESCRIPTION</th>
-                                            <th className="border p-2 text-center">START</th>
-                                            <th className="border p-2 text-center">END</th>
-                                            <th className="border p-2 text-center">MATERIALS NEEDED</th>
-                                            <th className="border p-2 text-center">MANPOWER</th>
-                                            <th className="border p-2 text-center">STATUS</th>
-                                            <th className="border p-2 text-center">ACTIONS</th>
+                                        {/* <tr className="bg-gray-100"> */}
+                                        <tr className="bg-brand-ash border-b border-ash-medium text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                                            <th className="border-r border-ash-medium p-2 text-center">DATE</th>
+                                            <th className="border-r border-ash-medium p-2 text-center">ROOM / UNIT</th>
+                                            <th className="border-r border-ash-medium p-2 text-center">WORK DESCRIPTION</th>
+                                            <th className="border-r border-ash-medium p-2 text-center">START</th>
+                                            <th className="border-r border-ash-medium p-2 text-center">END</th>
+                                            <th className="border-r border-ash-medium p-2 text-center">MATERIALS NEEDED</th>
+                                            <th className="border-r border-ash-medium p-2 text-center">MANPOWER</th>
+                                            <th className="border-r border-ash-medium p-2 text-center">STATUS</th>
+                                            <th className="border-l border-ash-medium p-2 text-center">ACTIONS</th>
                                         </tr>
                                     </thead>
                                     <tbody className="">
                                         {formData.dailyTasks.map((task, index) => (
-                                            <tr key={index}>
-                                                <td className="border p-2">
+                                            <tr key={index} className="bg-brand-surface border-b border-ash-medium last:border-0 hover:bg-brand-ash/30 transition-colors">
+                                                {/* <td className="border p-2"> */}
+
+                                                <td className="p-2 border-r border-ash-light">
                                                     <Input
                                                         type="date"
                                                         value={formatDateForInput(task.datePlanned)}
                                                         // value={task.datePlanned}
                                                         onChange={(e) => handleTaskChange(index, "datePlanned", e.target.value)}
+                                                        className="bg-transparent  border !border-ash-dark focus:ring-0 text-xs text-text-main font-mono px-1 w-full"
                                                     />
                                                 </td>
-                                                <td className="border p-2">
+                                                <td className="p-2 border-r border-ash-light">
                                                     <Input
                                                         placeholder="Kitchen"
                                                         value={task.room}
                                                         onChange={(e) => handleTaskChange(index, "room", e.target.value)}
+                                                        className="bg-transparent  border !border-ash-dark focus:ring-0 text-xs text-text-main font-mono px-1 w-full"
                                                     />
                                                 </td>
-                                                <td className="border p-2">
+                                                <td className="p-2 border-r border-ash-light">
                                                     <Textarea
                                                         placeholder="Base unit carcass fixing & levelling"
                                                         value={task.workDescription}
                                                         onChange={(e) => handleTaskChange(index, "workDescription", e.target.value)}
                                                         rows={2}
+                                                        className="bg-transparent border !border-ash-dark focus:ring-0 text-xs text-text-main px-1 py-1 w-full resize-none"
                                                     />
                                                 </td>
-                                                <td className="border p-2">
+                                                <td className="p-2 border-r border-ash-light">
                                                     <Input
                                                         type="time"
                                                         value={task.startTime}
                                                         onChange={(e) => handleTaskChange(index, "startTime", e.target.value)}
+                                                        className="bg-transparent border !border-ash-dark focus:ring-0 text-xs text-text-main font-mono text-center px-1 w-full"
                                                     />
                                                 </td>
-                                                <td className="border p-2">
+                                                <td className="p-2 border-r border-ash-light">
                                                     <Input
                                                         type="time"
                                                         value={task.endTime}
                                                         onChange={(e) => handleTaskChange(index, "endTime", e.target.value)}
+                                                        className="bg-transparent border !border-ash-dark focus:ring-0 text-xs text-text-main font-mono text-center px-1 w-full"
+
                                                     />
                                                 </td>
-                                                <td className="border p-2">
+                                                <td className="p-2 border-r border-ash-light">
                                                     <Input
                                                         placeholder="Plywood, laminate, screws"
                                                         value={rawMaterialInputs[index] ?? ""}
                                                         onChange={(e) => handleMaterialsChange(index, e.target.value)}
+                                                        className="bg-transparent border !border-ash-dark focus:ring-0 text-xs text-text-main font-mono text-center px-1 w-full"
+
                                                     />
                                                 </td>
-                                                <td className="border p-2">
+                                                <td className="p-2 border-r border-ash-light">
                                                     <Input
                                                         type="number"
                                                         placeholder="No of workers"
                                                         value={task.manpower}
                                                         onChange={(e) => handleTaskChange(index, "manpower", Number.parseInt(e.target.value) || 0)}
+                                                        className="bg-transparent border !border-ash-dark focus:ring-0 text-xs text-text-main font-mono text-center px-1 w-full"
+
                                                     />
                                                 </td>
-                                                <td className="border p-2">
+                                                <td className="p-2 border-r border-ash-light">
                                                     <Select
                                                         value={task.status}
                                                         onValueChange={(value) => handleTaskChange(index, "status", value)}
                                                     >
-                                                        <SelectTrigger>
+                                                        {/* <SelectTrigger> */}
+                                                        <SelectTrigger className="bg-transparent border !border-ash-dark focus:ring-0 text-xs text-text-main h-8">
                                                             <SelectValue selectedValue={findSingleDailyStatus(index)} />
                                                         </SelectTrigger>
-                                                        <SelectContent>
+                                                        {/* <SelectContent> */}
+                                                        <SelectContent className="bg-brand-surface border-ash-medium text-xs">
                                                             <SelectItem value="planned">Planned</SelectItem>
                                                             <SelectItem value="in-progress">In Progress</SelectItem>
                                                             <SelectItem value="completed">Completed</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </td>
-                                                <td className="border p-2">
-                                                    <div className="flex gap-1">
-                                                        <Button variant="danger" size="sm" onClick={() => removeTask(index)}>
+                                                <td className="p-2 border-r border-ash-light text-center">
+                                                    {/* <div className="flex gap-1"> */}
+                                                    {/* <Button variant="danger" size="sm" onClick={() => removeTask(index)}>
                                                             <i className="fas fa-trash"></i>
-                                                        </Button>
-                                                    </div>
+                                                        </Button> */}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => removeTask(index)}
+                                                        className="w-8 h-8 p-0 text-text-muted transition-colors shadow-sm border-2 border-ash-dark "
+                                                        title="Delete Task"
+                                                    >
+                                                        <i className="fas fa-trash-can text-xs"></i>
+                                                    </Button>
+                                                    {/* </div> */}
                                                 </td>
                                             </tr>
                                         ))}
@@ -1413,7 +1496,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                     </Card>
 
                     {/* Design Plan Images Section */}
-                    <Card className="">
+                    {/* <Card className="">
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
                                 <span>Laminate/Design/Plan Images — for Explanation</span>
@@ -1421,21 +1504,54 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                     Upload reference plans, markups, sketches
                                 </Button>
                             </CardTitle>
+                        </CardHeader> */}
+
+                    <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden mt-6">
+                        <CardHeader className="bg-brand-ash/50 border-b border-ash-light pb-4">
+                            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-2 text-text-main text-base font-bold">
+                                    <div className="w-8 h-8 rounded bg-brand-ash border border-ash-medium flex items-center justify-center shrink-0 shadow-sm">
+                                        <i className="fas fa-compass-drafting text-text-muted text-sm"></i>
+                                    </div>
+                                    Reference & Plan Images
+                                </div>
+                                <Button variant="link" size="sm" className="ml-auto !text-action-primary text-xs uppercase tracking-wider font-bold">
+                                    <i className="fa-solid fa-cloud-arrow-up mr-2"></i>
+                                    Upload references
+                                </Button>
+                                {/* <Button variant="white" size="sm" className="text-[10px] uppercase font-bold tracking-wider text-text-muted hover:text-action-primary border-ash-medium shadow-none">
+                                    
+                                </Button> */}
+                            </CardTitle>
                         </CardHeader>
+
                         <CardContent>
                             <div
                                 // className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isImageDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
+                                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors 
+                                    ${isImageDragging ? "border-action-primary bg-action-primary/5"
+                                        : "border-ash-medium bg-brand-ash/30 hover:bg-brand-ash/50 hover:border-text-muted"
                                     }`}
                                 onClick={() => fileInputRef.current?.click()}
                                 onDragOver={(e) => { e.preventDefault(); setIsImageDragging(true); }}
                                 onDragLeave={() => setIsImageDragging(false)}
                                 onDrop={(e) => handleDrop(e, "design")}
                             >
-                                <div className="space-y-2">
+                                {/* <div className="space-y-2">
                                     <p className="text-lg font-medium">Drag & drop plan/reference images here or</p>
                                     <Button variant="outline">Browse</Button>
                                     <p className="text-sm text-gray-500">Accepted: JPG/PNG/WebP • Images auto-saved locally</p>
+                                </div> */}
+                                <div className="flex flex-col items-center justify-center space-y-3 pointer-events-none">
+                                    <div className="w-16 h-16 rounded-full bg-brand-surface border border-ash-light shadow-sm flex items-center justify-center mb-2">
+                                        <i className="fa-regular fa-image text-3xl text-ash-dark"></i>
+                                    </div>
+                                    <p className="text-sm font-bold text-text-main">
+                                        Drag & drop images here, or <span className="text-action-primary underline">browse</span>
+                                    </p>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                                        Accepted: JPG, PNG, WebP
+                                    </p>
                                 </div>
                             </div>
                             <input
@@ -1447,7 +1563,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                 onChange={(e) => handleFileUpload(e.target.files, "design")}
                             />
                             {formData.designPlanImages.length > 0 && (
-                                <div className="mt-4">
+                                <div className="mt-4 border-t border-ash-light">
                                     {/* <ImageGalleryExample
                                         imageFiles={formData.designPlanImages}
                                         handleDeleteFile={(id) => handleDeleteImage(id, "design")}
@@ -1457,20 +1573,22 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                     /> */}
 
                                     <div className="flex flex-wrap gap-4 mt-4">
+                                        <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted mb-4">Uploaded References</h4>
                                         {formData.designPlanImages.map((image, idx) => (
                                             <div key={idx} className="relative group w-32 h-32">
                                                 {/* Image preview */}
                                                 <img
                                                     src={image.url || ""}
                                                     alt={image.originalName || `Image ${idx + 1}`}
-                                                    className="w-full h-full object-cover rounded-lg border shadow-sm"
+                                                    className="w-full h-full object-cover rounded-lg border border-ash-medium shadow-sm"
                                                 />
 
                                                 {/* Delete button */}
                                                 {!image._id && <button
                                                     type="button"
                                                     onClick={() => handleDeleteImage(idx, "design")}
-                                                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-700 transition-opacity"
+                                                    // className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-700 transition-opacity"
+                                                    className="absolute  top-1 -right-1 bg-brand-surface border border-ash-medium text-text-muted  rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md z-10"
                                                 >
                                                     &times;
                                                 </button>}
@@ -1484,7 +1602,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                     </Card>
 
                     {/* Site Images Section */}
-                    <Card>
+                    {/* <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
                                 <span>Site / Actual Images — for Visual Confirmation</span>
@@ -1492,11 +1610,37 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                     Upload daily progress photos
                                 </Button>
                             </CardTitle>
+                        </CardHeader> */}
+
+                    <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden mt-6">
+                        <CardHeader className="bg-brand-ash/50 border-b border-ash-light pb-4">
+                            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-text-main text-base font-bold">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded bg-brand-ash border border-ash-medium flex items-center justify-center shrink-0 shadow-sm">
+                                        <i className="fas fa-camera text-text-muted text-sm"></i>
+                                    </div>
+                                    Site / Actual Images — Visual Confirmation
+                                </div>
+                                {/* <Button variant="white" size="sm" className="text-[10px] uppercase font-bold tracking-wider text-text-muted hover:text-action-primary border-ash-medium shadow-sm">
+                                    <i className="fa-solid fa-cloud-arrow-up mr-2"></i>
+                                    Upload progress photos
+                                </Button> */}
+                                <Button variant="link" size="sm" className="ml-auto !text-action-primary text-xs uppercase tracking-wider font-bold">
+                                    <i className="fa-solid fa-cloud-arrow-up mr-2"></i>
+                                    Upload progress photos
+                                </Button>
+                            </CardTitle>
                         </CardHeader>
+
                         <CardContent>
                             <div
                                 // className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isImageDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
+                                // className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${isImageDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
+                                //     }`}
+
+                                className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors 
+                                    ${isImageDragging ? "border-action-primary bg-action-primary/5"
+                                        : "border-ash-medium bg-brand-ash/30 hover:bg-brand-ash/50 hover:border-text-muted"
                                     }`}
                                 onClick={() => siteFileInputRef.current?.click()}
                                 onDragOver={(e) => { e.preventDefault(); setIsImageDragging(true); }}
@@ -1504,11 +1648,24 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                 onDragLeave={() => setIsImageDragging(false)}
                                 onDrop={(e) => handleDrop(e, "site")} // "site" section
                             >
-                                <div className="space-y-2">
+                                {/* <div className="space-y-2">
                                     <p className="text-lg font-medium">Drag & drop site/progress images here or</p>
                                     <Button variant="outline">Browse</Button>
                                     <p className="text-sm text-gray-500">Tip: Upload clear, well-lit photos with unit labels in frame</p>
+                                </div> */}
+
+                                <div className="flex flex-col items-center justify-center space-y-3 pointer-events-none">
+                                    <div className="w-16 h-16 rounded-full bg-brand-surface border border-ash-light shadow-sm flex items-center justify-center mb-2">
+                                        <i className="fa-solid fa-camera-retro text-3xl text-ash-dark"></i>
+                                    </div>
+                                    <p className="text-sm font-bold text-text-main">
+                                        Drag & drop site/progress images here, or <span className="text-action-primary underline">browse</span>
+                                    </p>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                                        Tip: Upload clear, well-lit photos with unit labels in frame
+                                    </p>
                                 </div>
+
                             </div>
                             <input
                                 ref={siteFileInputRef}
@@ -1520,30 +1677,35 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                             />
 
                             <div>
-                                {editData && <div className="flex items-center gap-3 mb-4">
-                                    <input
-                                        type="checkbox"
-                                        id="correctionMode"
-                                        checked={correctionMode}
-                                        onChange={(e) => {
-                                            setCorrectionMode(e.target.checked);
-                                            if (!e.target.checked) setSelectedImages([]);
-                                        }}
-                                    />
-                                    <label htmlFor="correctionMode" className="text-sm font-medium">
-                                        Select images for correction
-                                    </label>
-                                    {correctionMode && (
-                                        <Button
-                                            size="sm"
-                                            className="bg-green-600 text-white"
-                                            disabled={selectedImages.length === 0 || isPending}
-                                            onClick={handleUploadCorrection}
-                                        >
-                                            {isPending ? "Uploading..." : "Upload Selected"}
-                                        </Button>
-                                    )}
-                                </div>}
+                                {editData &&
+                                    // <div className="flex items-center gap-3 mb-4">
+                                    <div className="flex items-center gap-3 mb-4 bg-brand-ash/30 rounded-lg border border-ash-light">
+                                        <input
+                                            type="checkbox"
+                                            id="correctionMode"
+                                            checked={correctionMode}
+                                            onChange={(e) => {
+                                                setCorrectionMode(e.target.checked);
+                                                if (!e.target.checked) setSelectedImages([]);
+                                            }}
+                                        // className="w-4 h-4 rounded border-ash-medium text-action-primary focus:ring-action-primary cursor-pointer transition-colors"
+                                        />
+                                        <label htmlFor="correctionMode" className="text-sm font-medium">
+                                            Select images for correction
+                                        </label>
+                                        {correctionMode && (
+                                            <Button
+                                                size="sm"
+                                                // className="bg-green-600 text-white"
+                                                variant="dark"
+                                                className="shadow-sm px-4"
+                                                disabled={selectedImages.length === 0 || isPending}
+                                                onClick={handleUploadCorrection}
+                                            >
+                                                {isPending ? "Uploading..." : "Upload Selected"}
+                                            </Button>
+                                        )}
+                                    </div>}
 
                             </div>
                             {formData.siteImages.length > 0 && (
@@ -1568,19 +1730,25 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                                         onClick={() => toggleImageSelection(image)}
                                                         src={image.url || ""}
                                                         alt={image.originalName || `Image ${idx + 1}`}
-                                                        className="w-full h-full object-cover rounded-lg border shadow-sm"
+                                                        // className="w-full h-full object-cover rounded-lg border shadow-sm"
+                                                        className={`w-full h-full object-cover rounded-xl border shadow-sm transition-all ${correctionMode ? "cursor-pointer hover:opacity-80" : ""
+                                                            } ${isSelected ? "border-action-success ring-2 ring-action-success/50" : "border-ash-medium"}`}
                                                     />
 
                                                     {/* Tick Mark */}
                                                     {isSelected && (
-                                                        <i className="fa fa-check absolute top-1 right-1 text-green-600 bg-white rounded-full p-1 shadow-md"></i>
+                                                        // <i className="fa fa-check absolute top-1 right-1 text-green-600 bg-white rounded-full p-1 shadow-md"></i>
+                                                        <div className="absolute top-2 right-2 bg-action-success text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md animate-in zoom-in">
+                                                            <i className="fa fa-check text-xs"></i>
+                                                        </div>
                                                     )}
 
                                                     {/* Delete button */}
                                                     {!correctionMode && <button
                                                         type="button"
                                                         onClick={() => handleDeleteImage(idx, "site")}
-                                                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-700 transition-opacity"
+                                                        // className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-700 transition-opacity"
+                                                        className="absolute -top-2 -right-2 bg-brand-surface border border-ash-medium text-text-muted  rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md z-10"
                                                     >
                                                         &times;
                                                     </button>}
@@ -1595,340 +1763,277 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                         </CardContent>
                     </Card>
 
-                    {editData && <Card>
-                        <CardHeader>
-                            <CardTitle className="">Correction Section</CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                    {editData &&
+                        // <Card>
+                        //     <CardHeader>
+                        //         <CardTitle className="">Correction Section</CardTitle>
+                        //     </CardHeader>
+
+                        <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden mt-6">
+                            <CardHeader className="bg-brand-ash/50 border-b border-ash-light pb-4">
+                                <CardTitle className="flex items-center gap-2 text-text-main text-base font-bold">
+                                    <div className="w-8 h-8 rounded bg-brand-ash border border-ash-medium flex items-center justify-center shrink-0 shadow-sm">
+                                        <i className="fas fa-wrench text-text-muted text-sm"></i>
+                                    </div>
+                                    Correction Section
+                                </CardTitle>
+                            </CardHeader>
+
+                            <CardContent>
 
 
 
-                            {workComparion && workComparion.length > 0 ? (
-                                <>
-                                    {workComparion.map((comp: IWorkComparison, compIdx: number) => (
-                                        <Fragment key={comp._id || compIdx}>
-                                            <div className=" border-b pb-6 last:border-b-0">
-                                                <div className="flex flex-col md:flex-row gap-6">
-                                                    {/* Left: Selected Images */}
-                                                    <div className="md:w-1/2 w-full">
+                                {workComparion && workComparion.length > 0 ? (
+                                    <>
+                                        {workComparion.map((comp: IWorkComparison, compIdx: number) => (
+                                            <Fragment key={comp._id || compIdx}>
+                                                {/* <div className=" border-b pb-6 last:border-b-0"> */}
+                                                <div className="border-b border-ash-medium pb-6 last:border-b-0 last:pb-0">
+                                                    <div className="flex flex-col md:flex-row gap-6">
+                                                        {/* Left: Selected Images */}
+                                                        {/* <div className="md:w-1/2 w-full"> */}
+                                                        <div className="xl:w-1/2 w-full bg-brand-ash/30 p-4 sm:p-5 rounded-xl border border-ash-light">
 
-                                                        <div className="mb-4">
-                                                            <label className="text-sm font-medium block mb-2">
-                                                                Upload Select Images (Stage {compIdx + 1})
-                                                            </label>
-
-                                                            <input
-                                                                type="file"
-                                                                multiple
-                                                                accept="image/*"
-                                                                className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
-                                                                onChange={(e) =>
-                                                                    handleUploadSelectImgManually(e.target.files, comp._id!)
-                                                                }
-                                                            />
-                                                            {crctImgPending && (
-                                                                <span className="ml-2 text-gray-600 animate-spin">
-                                                                    <i className="fas fa-spinner animate-spin" />
-                                                                </span>
-                                                            )}
-                                                        </div>
-
-                                                        <h3 className="text-md font-semibold mb-2">
-                                                            Stage {compIdx + 1}: Selected Images for Correction
-                                                        </h3>
-                                                        {comp.selectImage && comp.selectImage.length > 0 ? (
-                                                            <div className="flex flex-wrap gap-4">
-                                                                {/* {comp.selectImage.map((img: ISelectedImgForCorrection, idx: number) => (
-                                                                    <div
-                                                                        key={(img as any)._id || idx}
-                                                                        className="w-32 sm:w-36 flex-shrink-0"
-                                                                    >
-                                                                        <div className="w-full h-32 sm:h-36 border rounded-lg overflow-hidden shadow-sm mb-2">
-                                                                            <img
-                                                                                src={img?.plannedImage?.url || ""}
-                                                                                alt={`Selected ${idx + 1}`}
-                                                                                className="w-full h-full object-cover rounded-lg"
-                                                                            />
-                                                                        </div>
-
-                                                                        <div
-                                                                            className="text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 max-h-40 overflow-y-auto custom-scrollbar"
-                                                                            onMouseEnter={() => setHoveredCommentId((img as any)._id)}
-                                                                            onMouseLeave={() => setHoveredCommentId(null)}
-                                                                        >
-                                                                            {editingId === (img as any)._id ? (
-                                                                                <Input
-                                                                                    autoFocus
-                                                                                    value={tempComment[(img as any)._id] || ""}
-                                                                                    onChange={(e) =>
-                                                                                        handleChangeComment((img as any)._id, e.target.value)
-                                                                                    }
-                                                                                    onBlur={() =>
-                                                                                        handleUpdateComment(
-                                                                                            comp._id!,
-                                                                                            (img as any)._id,
-                                                                                            tempComment[(img as any)._id] || ""
-                                                                                        )
-                                                                                    }
-                                                                                    onKeyDown={(e) => {
-                                                                                        if (e.key === "Enter") {
-                                                                                            e.preventDefault();
-                                                                                            handleUpdateComment(
-                                                                                                comp._id!,
-                                                                                                (img as any)._id,
-                                                                                                tempComment[(img as any)._id] || ""
-                                                                                            );
-                                                                                        }
-                                                                                    }}
-                                                                                    className="text-sm w-full border p-1 rounded resize-none"
-                                                                                />
-                                                                            ) : (
-                                                                                <div
-                                                                                    onClick={() => {
-                                                                                        setEditingId((img as any)._id);
-                                                                                        setTempComment((prev) => ({
-                                                                                            ...prev,
-                                                                                            [(img as any)._id]: img.comment,
-                                                                                        }));
-                                                                                    }}
-                                                                                    className="cursor-pointer break-words hover:bg-gray-100 p-1 rounded"
-                                                                                >
-                                                                                    <div className="flex items-start gap-2">
-                                                                                        <i className="fas fa-comment text-gray-500 mt-1" />
-                                                                                        <p className="whitespace-pre-wrap break-words text-gray-800 text-sm">
-                                                                                            {img.comment || (
-                                                                                                <span className="italic text-gray-500">Add a comment</span>
-                                                                                            )}
-                                                                                        </p>
-                                                                                        {hoveredCommentId === (img as any)._id && (
-                                                                                            <i className="fas fa-pen ml-auto text-gray-400 text-xs mt-1" />
-                                                                                        )}
-                                                                                    </div>
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                ))} */}
-
-
-                                                                <ImageGalleryExample
-                                                                    imageFiles={comp?.selectImage.map((s) => {
-                                                                        const { _id, ...plannedImageWithoutId } = s.plannedImage || {}; // remove _id from plannedImage
-                                                                        return {
-                                                                            _id: (s as any)._id,                // keep parent s _id
-                                                                            ...plannedImageWithoutId,  // spread plannedImage without its _id
-                                                                            comment: s.comment,
-                                                                            createdBy: s.createdBy,
-                                                                            createModel: s.createModel,
-                                                                            createdAt: s.createdAt
-                                                                        };
-                                                                    })}
-                                                                    handleDeleteFile={(id) => {
-                                                                        handleDeleteSelectImage(comp._id!, id)
-                                                                    }}
-
-                                                                    height={120}
-                                                                    minWidth={120}
-                                                                    maxWidth={140}
-                                                                    isComments={true}
-                                                                    editingId={editingId}
-                                                                    tempComment={tempComment}
-                                                                    setEditingId={setEditingId}
-                                                                    setTempComment={setTempComment}
-                                                                    onUpdateComment={(imgId, comment) =>
-                                                                        handleUpdateComment(comp._id!, imgId, comment)
-                                                                    }
-                                                                />
-
-                                                            </div>
-                                                        ) : (
-                                                            <div className="text-sm text-gray-500">
-                                                                No selected images available for this comparison.
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Right: Refactored Images + Upload first */}
-                                                    <div className="md:w-1/2 w-full flex flex-col justify-between">
-                                                        <div>
-                                                            {/* Upload input comes first */}
                                                             <div className="mb-4">
-                                                                <label className="text-sm font-medium block mb-2">
-                                                                    Upload Refactored Images (Stage {compIdx + 1})
+                                                                <label className="text-sm font-medium text-text-muted block mb-2">
+                                                                    Upload Select Images (Stage {compIdx + 1})
                                                                 </label>
 
                                                                 <input
                                                                     type="file"
                                                                     multiple
                                                                     accept="image/*"
-                                                                    className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                                    // className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                                    className="w-full bg-brand-surface border-ash-medium text-text-main file:bg-brand-ash file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
                                                                     onChange={(e) =>
-                                                                        handleUploadCorrected(e.target.files, comp._id!)
+                                                                        handleUploadSelectImgManually(e.target.files, comp._id!)
                                                                     }
                                                                 />
-                                                                {uploadcorrectPending && (
-                                                                    <span className="ml-2 text-gray-600 animate-spin">
-                                                                        <i className="fas fa-spinner animate-spin" />
-                                                                    </span>
+                                                                {crctImgPending && (
+                                                                    <i className="fas fa-circle-notch fa-spin text-text-muted text-lg shrink-0" />
                                                                 )}
                                                             </div>
 
-                                                            {/* Refactored images */}
+                                                            {/* <h3 className="text-md font-semibold mb-2"> */}
+                                                            <h3 className="text-sm font-bold text-text-main mb-2 border-b border-ash-medium/50 pb-2">
+                                                                Stage {compIdx + 1}: Selected Images for Correction
+                                                            </h3>
+                                                            {comp.selectImage && comp.selectImage.length > 0 ? (
+                                                                <div className="flex flex-wrap gap-4">
+
+                                                                    <ImageGalleryExample
+                                                                        imageFiles={comp?.selectImage.map((s) => {
+                                                                            const { _id, ...plannedImageWithoutId } = s.plannedImage || {}; // remove _id from plannedImage
+                                                                            return {
+                                                                                _id: (s as any)._id,                // keep parent s _id
+                                                                                ...plannedImageWithoutId,  // spread plannedImage without its _id
+                                                                                comment: s.comment,
+                                                                                createdBy: s.createdBy,
+                                                                                createModel: s.createModel,
+                                                                                createdAt: s.createdAt
+                                                                            };
+                                                                        })}
+                                                                        handleDeleteFile={(id) => {
+                                                                            handleDeleteSelectImage(comp._id!, id)
+                                                                        }}
+
+                                                                        height={120}
+                                                                        minWidth={120}
+                                                                        maxWidth={140}
+                                                                        isComments={true}
+                                                                        editingId={editingId}
+                                                                        tempComment={tempComment}
+                                                                        setEditingId={setEditingId}
+                                                                        setTempComment={setTempComment}
+                                                                        onUpdateComment={(imgId, comment) =>
+                                                                            handleUpdateComment(comp._id!, imgId, comment)
+                                                                        }
+                                                                    />
+
+                                                                </div>
+                                                            ) : (
+                                                                // <div className="text-sm text-gray-500">
+                                                                //     No selected images available for this comparison.
+                                                                // </div>
+                                                                <div className="text-center py-6 border border-dashed border-ash-medium rounded-xl bg-brand-surface text-text-muted text-sm font-bold">
+                                                                    No selected images available for this comparison.
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Right: Refactored Images + Upload first */}
+                                                        {/* <div className="md:w-1/2 w-full flex flex-col justify-between"> */}
+                                                        <div className="xl:w-1/2 w-full flex flex-col justify-between bg-brand-ash/30  rounded-xl border border-ash-light">
                                                             <div>
-                                                                <h3 className="text-md font-semibold mb-2">
-                                                                    Stage {compIdx + 1}: Refactored Outputs
-                                                                </h3>
+                                                                {/* Upload input comes first */}
+                                                                <div className="mb-4">
+                                                                    {/* <label className="text-sm font-medium block mb-2"> */}
+                                                                    <label className="text-[10px] font-medium text-text-muted block mb-2">
+                                                                        Upload Refactored Images (Stage {compIdx + 1})
+                                                                    </label>
 
-                                                                {comp.correctedImages && comp.correctedImages.length > 0 ? (
-                                                                    <div className="flex flex-wrap gap-4">
-                                                                        {/* {comp.correctedImages.map((img: IImage, idx: number) => (
-                                                                            <div
-                                                                                key={img._id}
-                                                                                className="relative group w-32 h-32 sm:w-36 sm:h-36 border rounded-lg shadow-sm overflow-hidden"
-                                                                            >
-                                                                                <img
-                                                                                    src={img.url}
-                                                                                    alt={`Refactored ${idx + 1}`}
-                                                                                    className="w-full h-full object-cover rounded-lg"
-                                                                                />
-                                                                                <Button
-                                                                                    variant="danger"
-                                                                                    size="sm"
-                                                                                    isLoading={deleteCorrectPending}
-                                                                                    className="absolute bg-red-600 text-white top-1 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-1 rounded-full"
-                                                                                    onClick={() =>
-                                                                                        handleDeleteCorrected(comp._id!, img._id!)
-                                                                                    }
-                                                                                >
-                                                                                    <i className="w-4 h-4 fas fa-trash" />
-                                                                                </Button>
-                                                                            </div>
-                                                                        ))} */}
+                                                                    <input
+                                                                        type="file"
+                                                                        multiple
+                                                                        accept="image/*"
+                                                                        // className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                                        className="w-full bg-brand-surface border-2 border-ash-medium text-text-main file:bg-brand-ash file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
+                                                                        onChange={(e) =>
+                                                                            handleUploadCorrected(e.target.files, comp._id!)
+                                                                        }
+                                                                    />
+                                                                    {uploadcorrectPending && (
+                                                                        <i className="fas fa-circle-notch fa-spin text-text-muted text-lg shrink-0" />
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Refactored images */}
+                                                                <div>
+                                                                    {/* <h3 className="text-md font-semibold mb-2"> */}
+                                                                    <h3 className="text-sm font-bold text-text-main mb-3 border-b border-ash-medium/50 pb-2">
+                                                                        Stage {compIdx + 1}: Refactored Outputs
+                                                                    </h3>
+
+                                                                    {comp.correctedImages && comp.correctedImages.length > 0 ? (
+                                                                        <div className="flex flex-wrap gap-4">
+                                                                            {/* <div className="bg-brand-surface border border-ash-medium p-3 rounded-xl shadow-sm"> */}
 
 
-                                                                        <ImageGalleryExample
-                                                                            imageFiles={comp?.correctedImages}
-                                                                            handleDeleteFile={(imgId: string) =>
-                                                                                handleDeleteCorrected(comp._id!, imgId!)
-                                                                            }
-                                                                            refetch={refetch}
-                                                                            // className="grid grid-cols-3"
-                                                                            // height={80}
-                                                                            // minWidth={98}
-                                                                            // maxWidth={100}
-                                                                            height={120}
-                                                                            minWidth={120}
-                                                                            maxWidth={140}
-                                                                        />
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="text-sm text-gray-500">
-                                                                        No refactored images uploaded yet.
-                                                                    </div>
-                                                                )}
+                                                                            <ImageGalleryExample
+                                                                                imageFiles={comp?.correctedImages}
+                                                                                handleDeleteFile={(imgId: string) =>
+                                                                                    handleDeleteCorrected(comp._id!, imgId!)
+                                                                                }
+                                                                                refetch={refetch}
+                                                                                // className="grid grid-cols-3"
+                                                                                // height={80}
+                                                                                // minWidth={98}
+                                                                                // maxWidth={100}
+                                                                                height={120}
+                                                                                minWidth={120}
+                                                                                maxWidth={140}
+                                                                            />
+                                                                        </div>
+                                                                    ) : (
+                                                                        // <div className="text-sm text-gray-500">
+                                                                        <div className="text-center py-6 border border-dashed border-ash-medium rounded-xl bg-brand-surface text-text-muted text-sm font-bold">
+                                                                            No refactored images uploaded yet.
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </Fragment>
-                                    ))}
+                                            </Fragment>
+                                        ))}
 
+
+                                        <div className="md:w-1/2 w-full flex flex-col justify-between">
+                                            <div>
+                                                <div className="mb-4">
+                                                    <label className="text-sm font-medium block mb-2">
+                                                        Upload Select Images (Stage {workComparion?.length + 1 || 1})
+                                                    </label>
+
+                                                    <input
+                                                        type="file"
+                                                        multiple
+                                                        accept="image/*"
+                                                        // className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                        className="w-full bg-brand-surface border-ash-medium text-text-main file:bg-brand-ash file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
+                                                        onChange={(e) =>
+                                                            handleUploadSelectImgManually(e.target.files, null)
+                                                        }
+                                                    />
+                                                    {crctImgPending && (
+                                                        // <span className="ml-2 text-gray-600 animate-spin">
+                                                        //     <i className="fas fa-spinner animate-spin" />
+                                                        // </span>
+                                                        <i className="fas fa-circle-notch fa-spin text-text-muted text-lg shrink-0" />
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                {/* <h3 className="text-md font-semibold mb-2"> */}
+                                                <h3 className="text-sm font-bold text-text-main mt-4">
+                                                    Stage  {workComparion.length + 1 || 1}: Select Outputs
+                                                </h3>
+
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    // <div className="w-full px-6 py-8 flex justify-center">
+                                    //     <div className="bg-gray-100 border border-gray-200 rounded-lg p-6 max-w-full w-full text-sm text-gray-800 shadow-sm mx-auto flex justify-center">
+                                    //         <div className="">
+                                    //             <div className="flex items-start gap-2 mb-3">
+                                    //                 <i className="fas fa-info-circle mt-1 text-gray-500" />
+                                    //                 <p className="font-semibold">No corrections have been assigned.</p>
+                                    //             </div>
+
+                                    //             <p className="mb-2">To upload images for correction:</p>
+                                    //             <ul className="list-disc list-inside space-y-1 pl-4 text-sm">
+                                    //                 <li>Select checkbox in the <strong>Site/Actual Images</strong></li>
+                                    //                 <li>Click on the images that you need to upload for correction</li>
+                                    //                 <li>Click the <strong>"Upload Selected"</strong> button to upload</li>
+                                    //             </ul>
+                                    //         </div>
+
+                                    //     </div>
+                                    // </div>
 
                                     <div className="md:w-1/2 w-full flex flex-col justify-between">
                                         <div>
                                             <div className="mb-4">
-                                                <label className="text-sm font-medium block mb-2">
-                                                    Upload Select Images (Stage {workComparion?.length + 1 || 1})
+                                                <label className="text-sm font-medium text-text-muted block mb-2">
+                                                    Upload Select Images (Stage 1)
                                                 </label>
 
                                                 <input
                                                     type="file"
                                                     multiple
                                                     accept="image/*"
-                                                    className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                    // className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
+                                                    className="w-full bg-brand-surface border-ash-medium text-text-main file:bg-brand-ash file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
                                                     onChange={(e) =>
                                                         handleUploadSelectImgManually(e.target.files, null)
                                                     }
                                                 />
                                                 {crctImgPending && (
-                                                    <span className="ml-2 text-gray-600 animate-spin">
-                                                        <i className="fas fa-spinner animate-spin" />
-                                                    </span>
+                                                    // <span className="ml-2 text-gray-600 animate-spin">
+                                                    //     <i className="fas fa-spinner animate-spin" />
+                                                    // </span>
+                                                    <i className="fas fa-circle-notch fa-spin text-text-muted text-lg shrink-0" />
                                                 )}
                                             </div>
                                         </div>
 
                                         <div>
-                                            <h3 className="text-md font-semibold mb-2">
-                                                Stage  {workComparion.length + 1 || 1}: Select Outputs
-                                            </h3>
+                                            {/* <h3 className="text-md font-semibold mb-2"> */}
+                                            <h3 className="text-sm font-bold text-text-main mb-2">Stage 1: Select Outputs</h3>
+
 
                                         </div>
                                     </div>
-                                </>
-                            ) : (
-                                // <div className="w-full px-6 py-8 flex justify-center">
-                                //     <div className="bg-gray-100 border border-gray-200 rounded-lg p-6 max-w-full w-full text-sm text-gray-800 shadow-sm mx-auto flex justify-center">
-                                //         <div className="">
-                                //             <div className="flex items-start gap-2 mb-3">
-                                //                 <i className="fas fa-info-circle mt-1 text-gray-500" />
-                                //                 <p className="font-semibold">No corrections have been assigned.</p>
-                                //             </div>
-
-                                //             <p className="mb-2">To upload images for correction:</p>
-                                //             <ul className="list-disc list-inside space-y-1 pl-4 text-sm">
-                                //                 <li>Select checkbox in the <strong>Site/Actual Images</strong></li>
-                                //                 <li>Click on the images that you need to upload for correction</li>
-                                //                 <li>Click the <strong>"Upload Selected"</strong> button to upload</li>
-                                //             </ul>
-                                //         </div>
-
-                                //     </div>
-                                // </div>
-
-                                <div className="md:w-1/2 w-full flex flex-col justify-between">
-                                    <div>
-                                        <div className="mb-4">
-                                            <label className="text-sm font-medium block mb-2">
-                                                Upload Select Images (Stage 1)
-                                            </label>
-
-                                            <input
-                                                type="file"
-                                                multiple
-                                                accept="image/*"
-                                                className="border-2 border-dashed rounded-md p-2 w-full text-sm text-gray-600"
-                                                onChange={(e) =>
-                                                    handleUploadSelectImgManually(e.target.files, null)
-                                                }
-                                            />
-                                            {crctImgPending && (
-                                                <span className="ml-2 text-gray-600 animate-spin">
-                                                    <i className="fas fa-spinner animate-spin" />
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h3 className="text-md font-semibold mb-2">
-                                            Stage 1: Select Outputs
-                                        </h3>
-
-                                    </div>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                                )}
+                            </CardContent>
+                        </Card>
                     }
 
 
-                    <div className="border rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold">Planned vs Actual — Slider Comparison</h3>
+                    <div className="border border-ash-medium rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-4 border-b border-ash-light">
+                            {/* <h3 className="text-lg font-semibold">Planned vs Actual — Slider Comparison</h3> */}
+                            <h3 className="text-sm font-bold text-text-main flex items-center gap-2">
+                                <div className="w-8 h-8 rounded bg-brand-ash border border-ash-medium flex items-center justify-center shrink-0 shadow-sm">
+                                    <i className="fas fa-sliders-h text-text-muted text-sm"></i>
+                                </div>
+                                Planned vs Actual Comparison
+                            </h3>
                             <div className="flex gap-2">
-                                <button
+                                {/* <button
                                     onClick={() => document.getElementById("planned-image")?.click()}
                                     className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
                                 >
@@ -1942,12 +2047,36 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                 </button>
                                 <button onClick={resetSlider} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                                     Reset
-                                </button>
+                                </button> */}
+                                <Button
+                                    variant="white"
+                                    size="sm"
+                                    onClick={() => document.getElementById("planned-image")?.click()}
+                                    className="flex-1 sm:flex-none border-ash-medium text-text-main shadow-sm"
+                                >
+                                    <i className="fas fa-upload mr-2 text-text-muted"></i> Pick Planned
+                                </Button>
+                                <Button
+                                    variant="white"
+                                    size="sm"
+                                    onClick={() => document.getElementById("actual-image")?.click()}
+                                    className="flex-1 sm:flex-none border-ash-medium text-text-main shadow-sm"
+                                >
+                                    <i className="fas fa-upload mr-2 text-text-muted"></i> Pick Actual
+                                </Button>
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={resetSlider} 
+                                    className="flex-1 sm:flex-none text-text-muted hover:text-text-main hover:bg-brand-ash transition-colors"
+                                >
+                                    <i className="fas fa-rotate-right mr-2"></i> Reset
+                                </Button>
                             </div>
                         </div>
 
                         {/* Image Comparison Container */}
-                        <div className="relative w-[100%] h-96 bg-gray-100 rounded-lg overflow-hidden border">
+                        <div className="relative w-[100%] h-96 bg-brand-ash/30 rounded-lg overflow-hidden border border-ash-medium">
                             {plannedImage.url || actualImage.url ? (
                                 <div
                                     className="relative w-full h-full cursor-col-resize"
@@ -1982,12 +2111,13 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                                 style={{ clipPath: "inset(0px 0% 0px 0px)" }}
                                             />
 
-                                            <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm">
+                                            <div className="absolute bottom-2 left-2 bg-brand-surface/90 border border-ash-medium shadow-sm text-text-main px-2 py-1 rounded text-sm">
                                                 Planned
                                             </div>
                                             <button
                                                 onClick={removePlannedImage}
-                                                className="absolute top-2 left-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-700"
+                                                // className="absolute top-2 left-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-700"
+                                                className="absolute top-2 left-2 bg-brand-surface/90 backdrop-blur-sm border border-ash-medium text-text-muted rounded-full w-8 h-8 flex items-center justify-center text-xs transition-all shadow-sm opacity-0 group-hover:opacity-100"
                                             >
                                                 <i className="fas fa-times"></i>
                                             </button>
@@ -2011,21 +2141,16 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                             />
 
 
-                                            {/* <img
-                                                src={actualImage.url}
-                                                alt="actualimage"
-                                                className="absolute top-0 left-0 w-full h-full object-cover"
-                                                style={{
-                                                    clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` // reveal left portion only
-                                                }}
-                                            /> */}
+                                           
 
-                                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm">
+                                            {/* <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm"> */}
+                                            <div className="absolute bottom-2 right-2 bg-brand-surface/90 backdrop-blur-sm border border-ash-medium shadow-sm text-text-main px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider pointer-events-none">
                                                 Actual
                                             </div>
                                             <button
                                                 onClick={removeActualImage}
-                                                className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-700"
+                                                // className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-700"
+                                                className="absolute top-2 right-2 bg-brand-surface/90 backdrop-blur-sm border border-ash-medium text-text-muted rounded-full w-8 h-8 flex items-center justify-center text-xs transition-all shadow-sm opacity-0 group-hover:opacity-100"
                                             >
                                                 <i className="fas fa-times"></i>
                                             </button>
@@ -2034,29 +2159,35 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
                                     {/* Slider Handle */}
                                     <div
-                                        className="absolute top-0 h-full w-1 bg-white shadow-lg cursor-col-resize z-10"
+                                        className="absolute top-0 h-full w-1 bg-brand-surface shadow-lg cursor-col-resize z-10"
                                         style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
                                     >
                                         <div
-                                            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg border-2 border-gray-300 cursor-col-resize flex items-center justify-center"
+                                            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-brand-surface rounded-full shadow-lg border-2 border-ash-medium cursor-col-resize flex items-center justify-center"
                                             onMouseDown={handleSliderMouseDown}
                                         >
-                                            <i className="fas fa-arrows-alt-h text-gray-600 text-xs"></i>
+                                            <i className="fas fa-arrows-alt-h text-text-muted text-xs"></i>
                                         </div>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex items-center justify-center h-full text-gray-500">
-                                    <div className="text-center">
-                                        <i className="fas fa-images text-4xl mb-4"></i>
-                                        <p className="text-lg">Upload planned and actual images to compare</p>
-                                        <p className="text-sm">Use the buttons above to select images</p>
+                                <div className="flex items-center justify-center h-full text-text-muted border-2 border-dashed border-ash-medium bg-brand-surface">
+                                    <div className="text-center pointer-events-none">
+                                        <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                            <i className="fas fa-images text-3xl text-ash-dark"></i>
+                                        </div>
+                                        <p className="text-sm font-bold text-text-main mb-1">Upload images to compare</p>
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">Use the buttons above to select Planned and Actual images</p>
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        <p className="text-sm text-gray-600 mt-2 text-center">Drag the circle to reveal differences</p>
+                        {/* <p className="text-sm text-gray-600 mt-2 text-center">Drag the circle to reveal differences</p> */}
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted mt-3 text-center flex items-center justify-center gap-2">
+                            <i className="fas fa-info-circle"></i> Drag the center circle to reveal differences
+                        </p>a
+
 
                         {/* Hidden file inputs */}
                         <input
@@ -2076,7 +2207,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                     </div>
 
                     {/* Supervisor Visual Check Section */}
-                    <Card>
+                    {/* <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
                                 <span>Supervisor Visual Check & Approval</span>
@@ -2085,55 +2216,54 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                     <span className="text-sm">{formatSupervisorStatus()}</span>
                                 </div>
                             </CardTitle>
+                        </CardHeader> */}
+
+                    <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden mt-6">
+                        <CardHeader className="bg-brand-ash/50 border-b border-ash-light pb-4">
+                            <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-2 text-text-main text-base font-bold">
+                                    <div className="w-8 h-8 rounded bg-brand-ash border border-ash-medium flex items-center justify-center shrink-0 shadow-sm">
+                                        <i className="fas fa-clipboard-check text-text-muted text-sm"></i>
+                                    </div>
+                                    Supervisor Visual Check & Approval
+                                </div>
+                                <div className="flex items-center gap-2 bg-brand-surface px-3 py-1.5 rounded-full border border-ash-light shadow-sm">
+                                    <div className={`w-2.5 h-2.5 rounded-full ${formData.supervisorCheck.status === 'approved' ? 'bg-action-success' :
+                                            formData.supervisorCheck.status === 'needs_changes' ? 'bg-orange-500' :
+                                                'bg-text-muted'
+                                        }`}></div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-text-main">{formatSupervisorStatus()}</span>
+                                </div>
+                            </CardTitle>
                         </CardHeader>
+
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <Label htmlFor="reviewerName">Reviewer Name</Label>
+                                    {/* <Label htmlFor="reviewerName">Reviewer Name</Label> */}
+                                    <Label htmlFor="reviewerName" className=" font-bold tracking-wider text-text-muted block mb-1.5">Reviewer Name</Label>
                                     <Input
                                         id="reviewerName"
                                         placeholder="Staff doing the check"
                                         value={formData.supervisorCheck.reviewerName}
                                         onChange={(e) => handleSupervisorCheckChange("reviewerName", e.target.value)}
+                                        className=" font-bold tracking-wider text-text-muted block mb-1.5"
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="reviewDateTime">Review Date & Time</Label>
+                                    <Label htmlFor="reviewDateTime" className=" font-bold tracking-wider text-text-muted block mb-1.5">Review Date & Time</Label>
                                     <Input
                                         id="reviewDateTime"
                                         type="datetime-local"
                                         value={formData.supervisorCheck.reviewDateTime}
                                         onChange={(e) => handleSupervisorCheckChange("reviewDateTime", e.target.value)}
+                                        className="bg-brand-surface border border-ash-medium text-text-main focus:ring-2 focus:ring-ash-medium shadow-sm transition-all w-full"
                                     />
                                 </div>
                             </div>
 
                             <div className="flex gap-4 mb-4">
-                                {/* <div className="flex items-center space-x-2">
-                                    <input
-                                        type="radio"
-                                        id="pending"
-                                        name="status"
-                                        value=""
-                                        checked={formData.supervisorCheck.status === ""}
-                                        onChange={(e) => handleSupervisorCheckChange("status", e.target.value)}
-                                    />
-                                    <Label htmlFor="pending">Pending</Label>
-                                </div>
-                                <Button
-                                    variant={formData.supervisorCheck.status === "approved" ? "primary" : "outline"}
-                                    className="bg-green-500 hover:bg-green-600 text-white"
-                                    onClick={() => handleSupervisorCheckChange("status", "approved")}
-                                >
-                                    Approve
-                                </Button>
-                                <Button
-                                    variant={formData.supervisorCheck.status === "needs_changes" ? "primary" : "outline"}
-                                    className="bg-orange-500 hover:bg-orange-600 text-white"
-                                    onClick={() => handleSupervisorCheckChange("status", "needs_changes")}
-                                >
-                                    Changes Required
-                                </Button> */}
+
 
 
                                 <div className="flex gap-6">
@@ -2150,10 +2280,15 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                         />
                                         <Label
                                             htmlFor="pending"
-                                            className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
-        ${formData.supervisorCheck.status === "pending"
-                                                    ? "border-gray-500 bg-gray-100 text-gray-900 font-semibold"
-                                                    : "border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50"}`}
+                                            //                                     className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
+                                            // ${formData.supervisorCheck.status === "pending"
+                                            //                                             ? "border-gray-500 bg-gray-100 text-gray-900 font-semibold"
+                                            //                                             : "border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50"}`}
+
+                                            className={`px-4 py-2 rounded-lg cursor-pointer border transition-all text-xs font-bold uppercase tracking-wider shadow-sm flex-1 text-center sm:flex-none
+                                            ${formData.supervisorCheck.status === "pending"
+                                                    ? "border-text-muted bg-brand-ash text-text-main"
+                                                    : "border-ash-medium bg-brand-surface text-text-muted hover:border-text-muted hover:bg-brand-ash/50"}`}
                                         >
                                             Pending
                                         </Label>
@@ -2172,10 +2307,16 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                         />
                                         <Label
                                             htmlFor="approved"
-                                            className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
-        ${formData.supervisorCheck.status === "approved"
-                                                    ? "border-green-600 bg-green-100 text-green-800 font-semibold"
-                                                    : "border-gray-300 text-green-700 hover:border-green-400 hover:bg-green-50"}`}
+        //                                     className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
+        // ${formData.supervisorCheck.status === "approved"
+        //                                             ? "border-green-600 bg-green-100 text-green-800 font-semibold"
+        //                                             : "border-gray-300 text-green-700 hover:border-green-400 hover:bg-green-50"}`}
+
+        className={`px-4 py-2 rounded-lg cursor-pointer border transition-all text-xs font-bold uppercase tracking-wider shadow-sm flex-1 text-center sm:flex-none
+                                            ${formData.supervisorCheck.status === "approved"
+                                                ? "border-action-success bg-action-success/10 text-action-success"
+                                                : "border-ash-medium bg-brand-surface text-text-muted hover:border-action-success/50 hover:bg-action-success/5 hover:text-action-success"}`}
+
                                         >
                                             Approve
                                         </Label>
@@ -2194,10 +2335,15 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                         />
                                         <Label
                                             htmlFor="needs_changes"
-                                            className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
-        ${formData.supervisorCheck.status === "needs_changes"
-                                                    ? "border-orange-600 bg-orange-100 text-orange-800 font-semibold"
-                                                    : "border-gray-300 text-orange-700 hover:border-orange-400 hover:bg-orange-50"}`}
+        //                                     className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
+        // ${formData.supervisorCheck.status === "needs_changes"
+        //                                             ? "border-orange-600 bg-orange-100 text-orange-800 font-semibold"
+        //                                             : "border-gray-300 text-orange-700 hover:border-orange-400 hover:bg-orange-50"}`}
+
+        className={`px-4 py-2 rounded-lg cursor-pointer border transition-all text-xs font-bold uppercase tracking-wider shadow-sm flex-1 text-center sm:flex-none
+                                            ${formData.supervisorCheck.status === "needs_changes"
+                                                ? "border-orange-500 bg-orange-500/10 text-orange-600"
+                                                : "border-ash-medium bg-brand-surface text-text-muted hover:border-orange-500/50 hover:bg-orange-500/5 hover:text-orange-500"}`}
                                         >
                                             Changes Required
                                         </Label>
@@ -2208,17 +2354,18 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="remarks">Remarks / Observations</Label>
+                                    <Label htmlFor="remarks" className=" font-bold tracking-wider text-text-muted block mb-1.5">Remarks / Observations</Label>
                                     <Textarea
                                         id="remarks"
                                         placeholder="Note deviations, rework needed, or greenlight to proceed"
                                         value={formData.supervisorCheck.remarks}
                                         onChange={(e) => handleSupervisorCheckChange("remarks", e.target.value)}
                                         rows={3}
+                                        className="w-full bg-brand-surface border border-ash-medium text-text-main focus:ring-2 focus:ring-ash-medium rounded-lg px-3 py-2 outline-none transition-all shadow-sm resize-none custom-scrollbar text-sm placeholder:text-text-muted"
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="gatekeeping">Gatekeeping (Workflow Interlock)</Label>
+                                    <Label htmlFor="gatekeeping" className=" font-bold tracking-wider text-text-muted block mb-1.5">Gatekeeping (Workflow Interlock)</Label>
                                     <Select
                                         value={formData.supervisorCheck.gatekeeping}
                                         onValueChange={(value) => handleSupervisorCheckChange("gatekeeping", value)}
@@ -2236,7 +2383,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                             <SelectItem value="allow_with_watch">ALLOW work to start with Supervisor Watch</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs text-text-muted mt-1">
                                         Matches CRM philosophy used in Material Arrival stage — prevent next step until approval.
                                     </p>
                                 </div>

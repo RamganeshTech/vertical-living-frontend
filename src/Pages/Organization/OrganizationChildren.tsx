@@ -29,6 +29,22 @@ export type OrganizationOutletTypeProps = {
 //     setOrganizationId: React.Dispatch<React.SetStateAction<string | null>>;
 // }
 
+
+export const getOrganizationPaths = (organizationId: string | undefined): Record<string, string> => {
+    if (!organizationId) return {};
+    return {
+        PROJECTS: `/organizations/${organizationId}/projects`,
+        DETAILS: `/organizations/${organizationId}`, // Organization Dashboard
+        ALLORGS: `/organizations/${organizationId}/all-organizations`, // Organization Dashboard
+        INVITECTO: `/organizations/${organizationId}/invitecto`,
+        INVITESTAFFS: `/organizations/${organizationId}/invitestaff`,
+        ROLESPERMISSIONS: `/organizations/${organizationId}/dashboard`,
+        PLAN: `/organizations/${organizationId}/subscriptionplan`,
+        PROFILE: `/organizations/${organizationId}/userprofile`,
+        MODULAR: `/organizations/${organizationId}/modularunits`,
+    };
+};
+
 const OrganizationChildrens: React.FC = (
     // { setOrganizationId }
 ) => {
@@ -41,18 +57,20 @@ const OrganizationChildrens: React.FC = (
     const { role, permission } = useAuthCheck();
     const lowerRole = role?.toLowerCase() || "";
 
-    const path: Record<string, string> = {
-        PROJECTS: `/organizations/${organizationId}/projects`,
-        DETAILS: `/organizations/${organizationId}`, // Organization Dashboard
-        ALLORGS: `/organizations/${organizationId}/all-organizations`, // Organization Dashboard
-        INVITECTO: `/organizations/${organizationId}/invitecto`,
-        INVITESTAFFS: `/organizations/${organizationId}/invitestaff`,
-        ROLESPERMISSIONS: `/organizations/${organizationId}/dashboard`,
-        PLAN: `/organizations/${organizationId}/subscriptionplan`,
-        PROFILE: `/organizations/${organizationId}/userprofile`,
-        MODULAR: `/organizations/${organizationId}/modularunits`,
-        // SETTINGS: `/organizations/${organizationId}/settings`,
-    }
+    // const organizationPath: Record<string, string> = {
+    //     PROJECTS: `/organizations/${organizationId}/projects`,
+    //     DETAILS: `/organizations/${organizationId}`, // Organization Dashboard
+    //     ALLORGS: `/organizations/${organizationId}/all-organizations`, // Organization Dashboard
+    //     INVITECTO: `/organizations/${organizationId}/invitecto`,
+    //     INVITESTAFFS: `/organizations/${organizationId}/invitestaff`,
+    //     ROLESPERMISSIONS: `/organizations/${organizationId}/dashboard`,
+    //     PLAN: `/organizations/${organizationId}/subscriptionplan`,
+    //     PROFILE: `/organizations/${organizationId}/userprofile`,
+    //     MODULAR: `/organizations/${organizationId}/modularunits`,
+    //     // SETTINGS: `/organizations/${organizationId}/settings`,
+    // }
+
+    const organizationPath = getOrganizationPaths(organizationId);
 
     // =========================================================
     // 2. ROLE-BASED WHITELIST
@@ -99,10 +117,10 @@ const OrganizationChildrens: React.FC = (
     let sidebarPath: any = {};
 
     allowedKeys.forEach(key => {
-        if (ORGANIZATION_LABELS[key] && path[key]) {
+        if (ORGANIZATION_LABELS[key] && organizationPath[key]) {
             sidebarLabels[key] = ORGANIZATION_LABELS[key];
             sidebarIcons[key] = ORGANIZATION_ICONS[key];
-            sidebarPath[key] = path[key];
+            sidebarPath[key] = organizationPath[key];
         }
     });
 

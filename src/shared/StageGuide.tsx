@@ -12,12 +12,9 @@ const StageGuide: React.FC<StageGuideProps> = ({ organizationId, stageName }) =>
     // 1. Auth & Roles
     const { role, isGuideRequired  , loading:authLoading} = useAuthCheck();
 
-    // If client, render absolutely nothing
-    if (role === 'client') return null;
-
     const isAdmin = role === 'owner' || role === 'CTO';
 
-    // 2. State
+      // 2. State
     const [isOpen, setIsOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [newTipText, setNewTipText] = useState("");
@@ -33,9 +30,7 @@ const StageGuide: React.FC<StageGuideProps> = ({ organizationId, stageName }) =>
 
        const wrapperRef = useRef<HTMLDivElement>(null);
 
-
-
-    // 5. Logic: Auto Open
+        // 5. Logic: Auto Open
     useEffect(() => {
         // If data is loading or missing, do nothing
         // if (!stageData || isLoading || loading) return;
@@ -53,7 +48,7 @@ const StageGuide: React.FC<StageGuideProps> = ({ organizationId, stageName }) =>
             setIsOpen(true);
         }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stageData, isGuideRequired, isAdmin, authLoading, tipsLoading]);
 
      // ✅ 6. Logic: Click Outside to Close
@@ -78,6 +73,15 @@ const StageGuide: React.FC<StageGuideProps> = ({ organizationId, stageName }) =>
     }, [isOpen]); // Only re-run if isOpen changes
 
 
+
+    // If client, render absolutely nothing
+    if (role === 'client') return null;
+
+
+  
+
+
+   
     // 6. Handlers
     const handleSaveTip = () => {
         if (!newTipText.trim()) return;
@@ -137,7 +141,7 @@ const StageGuide: React.FC<StageGuideProps> = ({ organizationId, stageName }) =>
     };
 
     return (
-        <div ref={wrapperRef} className="relative  z-50 font-sans">
+        <div ref={wrapperRef} className="relative  z-40 font-sans">
             {/* --- The Trigger Icon (Pulse effect to draw attention if closed) --- */}
             <button
                 onClick={() => setIsOpen(!isOpen)}

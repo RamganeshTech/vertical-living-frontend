@@ -85,6 +85,7 @@ const TicketOperationIcon: React.FC<TicketOperationIconProps> = ({
       onClick={handleNotificationClick}
       className={`cursor-pointer flex justify-center items-center p-1 px-2 ${isActive ? 'bg-[#3a3b45] rounded-xl text-white' : 'rounded-xl hover:bg-[#f7f7f7]'
         }`}
+        title='tickets'
     >
       <div className="relative">
         {/* <i className={`fa-solid fa-bell ${isActive ? 'text-[#4a86f7]' : 'text-[#9ca3af]'}`}></i> */}

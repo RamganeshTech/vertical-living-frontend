@@ -6,8 +6,8 @@ import { Input } from "../../../components/ui/Input";
 import { useGetProjects } from "../../../apiList/projectApi";
 import type { AvailableProjetType } from "../../Department Pages/Logistics Pages/LogisticsShipmentForm";
 import SearchSelectNew from "../../../components/ui/SearchSelectNew";
-import type { SubContractSingleData } from "../SubContractMain";
-import type { SubContractFile } from "./SubContractMain";
+// import type { SubContractSingleData } from "../SubContractMain";
+import type { SubContractFile, SubContractSingleData } from "./SubContractMain";
 import ImageGalleryExample from "../../../shared/ImageGallery/ImageGalleryMain";
 import { toast } from "../../../utils/toast";
 import { useUpdateSubContract, useUploadAfterWorkFiles, useUploadBeforeWorkFiles } from "../../../apiList/SubContract Api/subContractNewApi";
@@ -62,11 +62,11 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
     // });
 
 
-    
-        const { role, permission } = useAuthCheck();
-        const canEdit = role === "owner" || permission?.subcontract?.edit;
-    
-    
+
+    const { role, permission } = useAuthCheck();
+    const canEdit = role === "owner" || permission?.subcontract?.edit;
+
+
 
 
     const [errors, setErrors] = useState<any>({});
@@ -201,7 +201,7 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
     };
 
 
-    
+
 
 
 
@@ -248,10 +248,11 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit?.(formData);
-        setFormData({projectId: "", projectName: "", workerName: "", workName: "", dateOfCommencement: "",
-                dateOfCompletion: "", labourCost: 0, materialCost: 0, totalCost: 0,
-                filesBeforeWork: [], filesAfterWork: [],
-            })
+        setFormData({
+            projectId: "", projectName: "", workerName: "", workName: "", dateOfCommencement: "",
+            dateOfCompletion: "", labourCost: 0, materialCost: 0, totalCost: 0,
+            filesBeforeWork: [], filesAfterWork: [],
+        })
         // After submission in 'view' mode, we switch back to not editing
         if (mode === 'view') setIsEditing(false);
     };
@@ -276,7 +277,7 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
     ];
 
     return (
-        <Card className="w-full max-w-full !shadow-none">
+        <Card className="w-full max-w-full !shadow-none bg-brand-surface border-0">
             <CardContent className="p-6">
                 <form onSubmit={
                     mode === "create" ?
@@ -285,9 +286,13 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                 }>
                     <div>
                         {(mode === 'view' && !isEditing && canEdit) && (
-                            <div className="flex justify-between items-center mb-6 pb-4 border-b">
-                                <h2 className="text-xl font-semibold text-gray-800">Contract Details</h2>
-                                <Button type="button" variant="outline" onClick={() => setIsEditing(true)}>
+                            <div className="flex justify-between items-center mb-6 pb-4 border-b border-ash-light">
+                                <h2 className="text-lg font-bold text-text-main flex items-center gap-2">
+                                    <i className="fas fa-file-signature text-text-muted"></i>
+                                    Contract Details
+                                </h2>
+                                <Button type="button" variant="white" onClick={() => setIsEditing(true)}
+                                    className="border-ash-medium shadow-sm text-text-main hover:text-action-primary">
                                     <i className="fas fa-edit mr-2" />
                                     Edit Details
                                 </Button>
@@ -296,13 +301,17 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
 
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:col-span-2 gap-x-8 gap-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:col-span-2 gap-x-8 gap-y-6 bg-brand-surface">
                         <div className="space-y-2">
-                            <Label>Project</Label>
+                            {/* <Label>Project</Label> */}
+                            <Label className=" font-bold text-text-muted">Project</Label>
                             {isEditing ? (
                                 <SearchSelectNew options={projectOptions} value={formData.projectId || undefined} onValueChange={handleProjectChange} placeholder="Select a project..." />
                             ) : (
-                                <p className="text-gray-800 font-medium p-2 bg-gray-50 rounded-md min-h-[40px] flex items-center">{formData.projectName || "N/A"}</p>
+                                // <p className="text-gray-800 font-medium p-2 bg-gray-50 rounded-md min-h-[40px] flex items-center">{formData.projectName || "N/A"}</p>
+                                <p className="text-text-main text-sm font-bold p-2 bg-brand-ash border border-ash-medium rounded-lg min-h-[40px] flex items-center shadow-sm">
+                                    {formData.projectName || "N/A"}
+                                </p>
                             )}
                         </div>
 
@@ -317,8 +326,11 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                                     {isEditing ? (
                                         isTotal ? (
                                             // 👉 READ-ONLY DISPLAY FOR TOTAL COST
-                                            <p className="p-2 bg-gray-100 text-gray-900 rounded-md font-semibold">
-                                                {formData?.totalCost ?? 0}
+                                            // <p className="p-2 bg-gray-100 text-gray-900 rounded-md font-semibold">
+                                            //     {formData?.totalCost ?? 0}
+                                            // </p>
+                                            <p className="p-2 bg-brand-ash/50 border border-ash-light text-text-main text-sm rounded-lg font-bold flex items-center">
+                                                <i className="fas fa-rupee-sign mr-1 text-text-muted text-[10px]"></i> {formData?.totalCost ?? 0}
                                             </p>
                                         ) : (
                                             // 👉 NORMAL INPUT FOR ALL OTHER FIELDS
@@ -332,12 +344,13 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                                                         e.target.value
                                                     )
                                                 }
-                                                className={errors[name] ? "border-red-500" : ""}
+                                                // className={errors[name] ? "border-red-500" : ""}
+                                                className={`bg-brand-surface border-ash-medium text-text-main focus:ring-2 focus:ring-ash-medium shadow-sm transition-all  ${errors[name] ? "border-action-danger ring-1 ring-action-danger" : ""}`}
                                             />
                                         )
                                     ) : (
                                         // 👉 VIEW MODE
-                                        <p className="text-gray-800 font-medium p-2 bg-gray-50 rounded-md min-h-[40px] flex items-center">
+                                        <p className="text-text-main font-medium p-2 bg-brand-ash border border-ash-medium rounded-md min-h-[40px] flex items-center">
                                             {(() => {
                                                 const value = formData[key];
 
@@ -357,45 +370,62 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                             )
                         })}
 
-                        {mode === "create" && <div className="space-y-2 md:col-span-2 lg:col-span-3 pt-4">
-                            <Label htmlFor="filesBeforeWork">Files Before Work</Label>
+                        {mode === "create" && <div className="space-y-2 md:col-span-2 lg:col-span-3 pt-4 border-t border-ash-light">
+                            <Label htmlFor="filesBeforeWork" className="text-[10px] font-bold  text-text-muted">Files Before Work</Label>
 
                             {isEditing && (
-                                <Input id="filesBeforeWork" type="file" multiple onChange={(e) => handleFileChange('filesBeforeWork', Array.from(e.target.files || []))} />
+                                <Input id="filesBeforeWork" type="file" multiple onChange={(e) => handleFileChange('filesBeforeWork', Array.from(e.target.files || []))}
+                                    className="w-full bg-brand-ash border border-ash-medium text-text-main file:bg-brand-surface file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1.5 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
+                                />
                             )}
 
                         </div>}
 
 
-                         {isEditing && mode === "view" && (
-                        <div className="flex justify-end gap-4 pt-8 mt-4">
-  <Button type="button" variant="outline" onClick={handleCancel}>
-                                <i className="fas fa-times mr-2"></i>
-                                Cancel
-                            </Button>
-                            <Button type="submit" isLoading={isLoading || updatePending}>
-                                {isLoading ? (
-                                    <><i className="fas fa-spinner fa-spin mr-2"></i>Saving...</>
-                                ) : (
-                                    <><i className={`fas fa-save mr-2`}></i>Save Changes</>
-                                )}
-                            </Button>
-                        </div>
-                    )}
+                        {isEditing && mode === "view" && (
+                            // <div className="flex justify-end gap-4 pt-8 mt-4">
+                            //     <Button type="button" variant="outline" onClick={handleCancel}>
+                            //         <i className="fas fa-times mr-2"></i>
+                            //         Cancel
+                            //     </Button>
+                            //     <Button type="submit" isLoading={isLoading || updatePending}>
+                            //         {isLoading ? (
+                            //             <><i className="fas fa-spinner fa-spin mr-2"></i>Saving...</>
+                            //         ) : (
+                            //             <><i className={`fas fa-save mr-2`}></i>Save Changes</>
+                            //         )}
+                            //     </Button>
+                            // </div>
+
+                            <div className="flex justify-end gap-3 pt-6 mt-4 border-t border-ash-light">
+                                <Button type="button" variant="white" onClick={handleCancel} className="border-ash-medium text-text-main shadow-sm">
+                                    <i className="fas fa-times mr-2"></i> Cancel
+                                </Button>
+                                <Button type="submit" variant="dark" isLoading={isLoading || updatePending} className="shadow-sm px-4">
+                                    {isLoading ? (
+                                        <><i className="fas fa-circle-notch fa-spin mr-2"></i>Saving...</>
+                                    ) : (
+                                        <><i className={`fas fa-save mr-2`}></i>Save Changes</>
+                                    )}
+                                </Button>
+                            </div>
+                        )}
 
 
                         {mode !== "create" &&
                             <>
-                                <Card className="col-span-3 !shadow-xs">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center text-lg">
-                                            <i className="fas fa-camera-retro mr-3 text-purple-600"></i>
-                                            Upload Before-Work Pictures
+                                <Card className="col-span-3 !shadow-xs bg-brand-surface border border-ash-medium">
+                                    <CardHeader className="bg-brand-ash/50 border-b border-ash-light pb-4">
+                                        <CardTitle className="flex items-center text-base font-bold text-text-main">
+                                            <div className="w-8 h-8 rounded bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 shadow-sm mr-3">
+                                                <i className="fas fa-camera-retro text-indigo-500 text-sm"></i>
+                                            </div>
+                                            Before-Work Progress Pictures
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        <p className="text-sm text-gray-600">
-                                            Before the work is getting started, upload pictures here.
+                                        <p className="text-xs font-medium text-text-muted">
+                                            Document the initial site condition before starting work.
                                         </p>
                                         <div className="space-y-2">
                                             <Label htmlFor="afterWorkUpload">Select Files</Label>
@@ -404,6 +434,7 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                                                 type="file"
                                                 multiple
                                                 onChange={(e) => setBeforeWorkFiles(Array.from(e.target.files || []))}
+                                                className="w-full bg-brand-surface border-ash-medium text-text-main file:bg-brand-ash file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
                                             />
                                         </div>
 
@@ -424,11 +455,16 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
 
 
                                         {initialData?.filesBeforeWork.some((file: SubContractFile) => file.type === "image") && (
-                                            <div className="mb-6">
+                                            <div className="mb-6 border-t border-ash-light">
                                                 <div className="flex items-center gap-2 mb-3">
-                                                    <i className="fas fa-images text-purple-600"></i>
-                                                    <h4 className="font-semibold text-gray-800 text-sm">Images</h4>
-                                                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                                                    {/* <i className="fas fa-images text-purple-600"></i>
+                                                    <h4 className="font-semibold text-gray-800 text-sm">Images</h4> */}
+
+                                                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+                                                        <i className="fas fa-images text-text-main"></i> Uploaded Images
+                                                    </h4>
+
+                                                    <span className="text-[10px] font-bold bg-indigo-100 text-text-main px-2 py-0.5 rounded-full border border-ash-light">
                                                         {initialData?.filesBeforeWork.filter((f: any) => f.type === "image").length}
                                                     </span>
                                                 </div>
@@ -442,7 +478,12 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                                         )}
 
                                         <div className="flex justify-end">
-                                            <Button onClick={handleBeforeUploads} isLoading={uploadBeforeMutation.isPending} disabled={uploadBeforeMutation.isPending || beforeWorkFiles.length === 0}>
+                                            <Button onClick={handleBeforeUploads}
+                                                isLoading={uploadBeforeMutation.isPending}
+                                                disabled={uploadBeforeMutation.isPending || beforeWorkFiles.length === 0}
+                                                variant="dark"
+                                                className="w-full sm:w-auto shadow-sm shrink-0"
+                                            >
                                                 {uploadBeforeMutation.isPending ? (
                                                     <><i className="fas fa-spinner fa-spin mr-2"></i>Uploading...</>
                                                 ) : (
@@ -456,13 +497,24 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
 
 
                                 {/* --- Separate Component for After Work Upload --- */}
-                                <Card className="col-span-3 !shadow-xs">
+                                {/* <Card className="col-span-3 !shadow-xs">
                                     <CardHeader>
                                         <CardTitle className="flex items-center text-lg">
                                             <i className="fas fa-camera-retro mr-3 text-purple-600"></i>
                                             Upload After-Work Pictures
                                         </CardTitle>
+                                    </CardHeader> */}
+
+                                <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden">
+                                    <CardHeader className="bg-brand-ash/50 border-b border-ash-light pb-4">
+                                        <CardTitle className="flex items-center text-base font-bold text-text-main">
+                                            <div className="w-8 h-8 rounded bg-brand-main/50 border border-ash-light flex items-center justify-center shrink-0 shadow-sm mr-3">
+                                                <i className="fas fa-camera text-text-muted text-sm"></i>
+                                            </div>
+                                            After-Work Completion Pictures
+                                        </CardTitle>
                                     </CardHeader>
+
                                     <CardContent className="space-y-4">
                                         <p className="text-sm text-gray-600">
                                             Once the work is completed, upload pictures here for verification.
@@ -474,6 +526,7 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                                                 type="file"
                                                 multiple
                                                 onChange={(e) => setAfterWorkFiles(Array.from(e.target.files || []))}
+                                                className="w-full bg-brand-surface border-ash-medium text-text-main file:bg-brand-ash file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
                                             />
                                         </div>
 
@@ -494,12 +547,17 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
 
 
                                         {initialData?.filesAfterWork.some((file: SubContractFile) => file.type === "image") && (
-                                            <div className="mb-6">
+                                            <div className="mb-6 border-t border-ash-light">
                                                 <div className="flex items-center gap-2 mb-3">
-                                                    <i className="fas fa-images text-purple-600"></i>
-                                                    <h4 className="font-semibold text-gray-800 text-sm">Images</h4>
-                                                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                                                        {initialData?.filesAfterWork.filter((f: any) => f.type === "image").length}
+                                                    {/* <i className="fas fa-images text-purple-600"></i>
+                                                    <h4 className="font-semibold text-gray-800 text-sm">Images</h4> */}
+
+                                                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+                                                        <i className="fas fa-images text-text-main"></i> Uploaded Images
+                                                    </h4>
+
+                                                    <span className="text-[10px] font-bold bg-indigo-100 text-text-main px-2 py-0.5 rounded-full border border-ash-light">
+                                                        {initialData?.filesBeforeWork.filter((f: any) => f.type === "image").length}
                                                     </span>
                                                 </div>
                                                 <ImageGalleryExample
@@ -512,7 +570,12 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                                         )}
 
                                         <div className="flex justify-end">
-                                            <Button onClick={handleAfterUploads} isLoading={uploadAfterMutation.isPending} disabled={uploadAfterMutation.isPending || afterWorkFiles.length === 0}>
+                                            <Button onClick={handleAfterUploads}
+                                                isLoading={uploadAfterMutation.isPending}
+                                                disabled={uploadAfterMutation.isPending || afterWorkFiles.length === 0}
+                                                variant="dark"
+                                                className="w-full sm:w-auto shadow-sm shrink-0"
+                                            >
                                                 {uploadAfterMutation.isPending ? (
                                                     <><i className="fas fa-spinner fa-spin mr-2"></i>Uploading...</>
                                                 ) : (
@@ -529,17 +592,27 @@ const SubContractForm = ({ organizationId, mode, initialData, onSubmit, isLoadin
                     </div>
 
                     {isEditing && mode === "create" && (
-                        <div className="flex justify-end gap-4 pt-8 mt-4">
-                            {mode !== "create" && <Button type="button" variant="outline" onClick={handleCancel}>
-                                <i className="fas fa-times mr-2"></i>
-                                Cancel
-                            </Button>}
-                            <Button type="submit" isLoading={isLoading || updatePending}>
-                                {isLoading ? (
-                                    <><i className="fas fa-spinner fa-spin mr-2"></i>{mode === 'create' ? 'Creating...' : 'Saving...'}</>
-                                ) : (
-                                    <><i className={`fas ${mode === 'create' ? 'fa-check' : 'fa-save'} mr-2`}></i>{mode === 'create' ? 'Create Contract' : 'Save Changes'}</>
-                                )}
+                        // <div className="flex justify-end gap-4 pt-8 mt-4 ">
+                        //     {mode !== "create" && 
+                        //     <Button type="button" variant="outline" onClick={handleCancel}>
+                        //         <i className="fas fa-times mr-2"></i>
+                        //         Cancel
+                        //     </Button>}
+                        //     <Button type="submit" isLoading={isLoading || updatePending}>
+                        //         {isLoading ? (
+                        //             <><i className="fas fa-spinner fa-spin mr-2"></i>{mode === 'create' ? 'Creating...' : 'Saving...'}</>
+                        //         ) : (
+                        //             <><i className={`fas ${mode === 'create' ? 'fa-check' : 'fa-save'} mr-2`}></i>{mode === 'create' ? 'Create Contract' : 'Save Changes'}</>
+                        //         )}
+                        //     </Button>
+                        // </div>
+
+                        <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-ash-light">
+                            <Button type="button" variant="white" onClick={handleCancel} className="border-ash-medium text-text-main shadow-sm">
+                                <i className="fas fa-times mr-2"></i> Cancel
+                            </Button>
+                            <Button type="submit" variant="dark" isLoading={isLoading || updatePending} className="shadow-sm px-8">
+                                <i className={`fas fa-check mr-2`}></i>Create Contract
                             </Button>
                         </div>
                     )}

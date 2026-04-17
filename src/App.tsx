@@ -8,6 +8,7 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
+import InstantCostCalculation from './Pages/InstantCostCalculator/InstantCostCalculator';
 const RateConfigBackupMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigBackupMain'));
 const RateConfigBackupSingle = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigBackupSingle'));
 const RateConfigVersionMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigVersionMain'));
@@ -586,6 +587,16 @@ function App() {
 
 
             </Route>
+
+            <Route path="instantcostcalculation" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="instant_cost_calculation"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+            >
+              <InstantCostCalculation />
+            </ProtectedRoutes>} />
+
+
 
 
             <Route path="logistics" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}

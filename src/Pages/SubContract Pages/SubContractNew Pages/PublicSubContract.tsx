@@ -15,11 +15,6 @@ const PublicSubContract = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token"); // ✅ get ?token=value
 
-  if (!token) {
-    return <div>
-      <p>Check the link is correct, Token is missing</p>
-    </div>
-  }
 
   const submitMutation = useSubmitWorkerInfo();
 
@@ -74,6 +69,13 @@ const PublicSubContract = () => {
     }
   }, [submission]);
 
+  
+  if (!token) {
+    return <div>
+      <p>Check the link is correct, Token is missing</p>
+    </div>
+  }
+
   const validateBeforeWork = () => {
     const newErrors: any = {};
 
@@ -90,6 +92,7 @@ const PublicSubContract = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
 
   const handleBeforeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

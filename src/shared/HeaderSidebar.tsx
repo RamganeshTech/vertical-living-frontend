@@ -6,6 +6,8 @@ import { useCurrentSupervisor } from '../Hooks/useCurrentSupervisor';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
+import GlobalSearch from './GlobalSearch';
+// import { useAuthCheck } from '../Hooks/useAuthCheck';
 // import { useAuthCheck } from '../../Hooks/useAuthCheck'; // Adjust path
 // Import your custom icons here:
 // import NotificationIcon from '../../shared/NotificationIcon'; // Adjust path
@@ -32,7 +34,8 @@ const HeaderSidebar: React.FC<HeaderSidebarProps> = ({
 
     const { organizationId } = useParams();
     // If your hook returns the user's name/email, you can extract it here
-    // const { role, user } = useAuthCheck(); 
+    // const { permission } = useAuthCheck(); 
+
 
 
     // Inside HeaderSidebar component
@@ -108,6 +111,11 @@ const HeaderSidebar: React.FC<HeaderSidebarProps> = ({
 
                 {/* Global Search Placeholder (Optional) */}
 
+                {/* CALL IT HERE */}
+                {organizationId && (
+                    <GlobalSearch organizationId={organizationId} />
+                )}
+
             </div>
 
             {/* MIDDLE: Page Specific Content (Optional) */}
@@ -118,9 +126,22 @@ const HeaderSidebar: React.FC<HeaderSidebarProps> = ({
             {/* RIGHT SIDE: Tickets, Notifications & User Profile */}
             <div className="flex items-center gap-1">
 
+
+                {/* {permission?.["instant_cost_calculation"].view && ( */}
+                    <div 
+                    onClick={()=> navigate(`/organizations/${organizationId}/projects/instantcostcalculation`)}
+                    title='instant calculator'
+                    className="text-[#9ca3af] py-2 px-2  rounded-xl hover:!bg-[#f7f7f7] transition-colors flex items-center cursor-pointer">
+                        <i className='fas fa-calculator' 
+                           
+                        />
+                    </div>
+                {/* )} */}
+
+
                 {/* 1. Ticket Operations System */}
                 {showTickets && (
-                    <div className="text-gray-400 hover:text-gray-700 transition-colors flex items-center cursor-pointer">
+                    <div className="text-gray-400  hover:text-gray-700 transition-colors flex items-center cursor-pointer">
                         <TicketOperationIcon
                             isExpanded={false}
                             isActive={false}

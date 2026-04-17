@@ -20,8 +20,8 @@ import type { RootState } from '../store/store'
 import { toast } from '../utils/toast'
 // import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
 import { useGetProjectDetails } from '../apiList/currentActiveStage api/currentActiveStageApi'
-import NotificationIcon from './Notifcation/NotificaitonIcon'
-import TicketOperationIcon from './Ticket Operation Icon/TicketOperationIcon'
+// import NotificationIcon from './Notifcation/NotificaitonIcon'
+// import TicketOperationIcon from './Ticket Operation Icon/TicketOperationIcon'
 // import { useGetStageSelection } from '../apiList/Modular Unit Api/Stage Selection Api/stageSelectionApi'
 
 
@@ -252,8 +252,8 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
         }
     }
 
-    const showNotifications = role && ['owner', 'CTO', 'staff', "worker"].includes(role);
-    const showTickets = role && ['owner', 'CTO', 'staff'].includes(role) && organizationId;
+    // const showNotifications = role && ['owner', 'CTO', 'staff', "worker"].includes(role);
+    // const showTickets = role && ['owner', 'CTO', 'staff'].includes(role) && organizationId;
     // const isNotificationActive = pathArray[pathArray.length - 1] === 'notification';
 
     const handleLogout = async () => {
@@ -422,7 +422,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
 
 
                         <div className='mt-2 flex gap-2 w-full justify-around'>
-                            {showNotifications && (
+                            {/* {showNotifications && (
                                 <NotificationIcon
                                     isExpanded={false}
                                     isActive={false}
@@ -434,7 +434,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                                     isExpanded={false}
                                     isActive={false}
                                 />
-                            )}
+                            )} */}
 
                             <button
                                 title="Ctrl+] to close"
@@ -506,7 +506,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                     </button> */}
 
 
-                    <div className="flex flex-col items-center p-2 border-t border-[#3a3b45]">
+                    <div className="flex flex-col items-center  gap-2 p-2 border-t border-[#3a3b45]">
 
                         <button
                             title="Ctrl+[ to open"
@@ -521,7 +521,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
 
 
 
-                        <div className=''>
+                        {/* <div className=''>
                             {showNotifications && (
                                 <NotificationIcon
                                     isExpanded={false}
@@ -536,7 +536,7 @@ const Sidebar: React.FC<SidebarProp> = ({ labels, icons, path, setProjectName, p
                                     isActive={false}
                                 />
                             )}
-                        </div>
+                        </div> */}
 
                           {pathArray[1] !== "login" &&
                             <Button

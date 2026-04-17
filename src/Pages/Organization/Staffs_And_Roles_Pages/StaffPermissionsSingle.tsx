@@ -23,8 +23,8 @@ const ORG_MODULES = [
 
     "pincode",
     "pincodeMapping",
-
-
+    
+    
     "subcontract",
     "cutlist",
     // "materialquote",
@@ -33,6 +33,7 @@ const ORG_MODULES = [
     "presalesmaterialrateconfig",
     "materialwithlabourratequote",
     "calculator",
+    "instant_cost_calculation",
     // "shopmaterialdoc",
     "labourratequote",
     "presales",

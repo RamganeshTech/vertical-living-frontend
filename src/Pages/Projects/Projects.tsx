@@ -224,6 +224,8 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
 
   SUBCONTRACT: "subcontract",
 
+  INSTANTCOSTCALCULATION: "instant_cost_calculation",
+
 
   STAFFTASK: "stafftask",
   SINGLESTAFFTASK: "stafftask",
@@ -233,17 +235,12 @@ const PERMISSION_MAPPING: Record<string, string | string[]> = {
   // Add "payments" if it exists in constants
 };
 
-const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
-  const { organizationId } = useParams()
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
+// Add this to your constants/constants.ts file
 
-  const { role, permission } = useAuthCheck();
-  const lowerRole = role?.toLowerCase() || "";
-
-  // 2. Define All Paths
-  const path: Record<string, string> = {
+export const getProjectPaths = (organizationId: string | undefined): Record<string, string> => {
+  if (!organizationId) return {};
+  return {
     PROJECTS: `/organizations/${organizationId}/projects`,
     ORGANIZATION: `/organizations/${organizationId}`,
     SHORTLIST: `/organizations/${organizationId}/projects/shortlistdesign`,
@@ -258,16 +255,14 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
     CUTLIST: `/organizations/${organizationId}/projects/cutlistmain`,
     PINCODE: `/organizations/${organizationId}/projects/pincodemain`,
-    // PINCODEMAPPING: `/organizations/${organizationId}/projects/pincodemappingmain`,
     PINCODEPROJECTSASSIGNMENT: `/organizations/${organizationId}/projects/pincodeprojectmain`,
-    // MATERIAL_SHOP_DOCS: `/organizations/${organizationId}/projects/shopmaterialdoc`,
     LEADCOLLECTION: `/organizations/${organizationId}/projects/publicleadcollection`,
     COSTCALCULATIONLEADFORM: `/organizations/${organizationId}/projects/publiccostcalculation`,
     RATECONIGPRESALES: `/organizations/${organizationId}/projects/rateconfigpresales`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
     RATECONIGMATERIALWITHSTAFF: `/organizations/${organizationId}/projects/materialwithlabourrate`,
-    // WORKTEMPLATE: `/organizations/${organizationId}/projects/worktemplates`,
+    INSTANTCOSTCALCULATION: `/organizations/${organizationId}/projects/instantcostcalculation`,
     CALCULATOR: `/organizations/${organizationId}/projects/calculator`,
     PRESALESQUOTE: `/organizations/${organizationId}/projects/presalesquote`,
     INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
@@ -277,7 +272,57 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     STAFFTASK: `/organizations/${organizationId}/projects/stafftask`,
     SINGLESTAFFTASK: `/organizations/${organizationId}/projects/associatedstafftask`,
     MATERIALINVENTORY: `/organizations/${organizationId}/projects/materialinventory`,
-  }
+  };
+};
+
+
+const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
+
+  const { organizationId } = useParams()
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 470);
+
+  const { role, permission } = useAuthCheck();
+  const lowerRole = role?.toLowerCase() || "";
+
+  // 2. Define All Paths
+  // const projectPath: Record<string, string> = {
+  //   PROJECTS: `/organizations/${organizationId}/projects`,
+  //   ORGANIZATION: `/organizations/${organizationId}`,
+  //   SHORTLIST: `/organizations/${organizationId}/projects/shortlistdesign`,
+  //   COMMONORDER: `/organizations/${organizationId}/projects/commonorder`,
+  //   SUBCONTRACT: `/organizations/${organizationId}/projects/subcontractmain`,
+  //   TOOLMANAGEMENT: `/organizations/${organizationId}/projects/toolhub`,
+  //   CAD: `/organizations/${organizationId}/projects/cadmain`,
+  //   HR: `/organizations/${organizationId}/projects/hr`,
+  //   LOGISTICS: `/organizations/${organizationId}/projects/logistics`,
+  //   PROCUREMENT: `/organizations/${organizationId}/projects/procurement`,
+  //   ACCOUNTING: `/organizations/${organizationId}/projects/accounting`,
+  //   DESIGNLAB: `/organizations/${organizationId}/projects/designlabmain`,
+  //   CUTLIST: `/organizations/${organizationId}/projects/cutlistmain`,
+  //   PINCODE: `/organizations/${organizationId}/projects/pincodemain`,
+  //   // PINCODEMAPPING: `/organizations/${organizationId}/projects/pincodemappingmain`,
+  //   PINCODEPROJECTSASSIGNMENT: `/organizations/${organizationId}/projects/pincodeprojectmain`,
+  //   // MATERIAL_SHOP_DOCS: `/organizations/${organizationId}/projects/shopmaterialdoc`,
+  //   LEADCOLLECTION: `/organizations/${organizationId}/projects/publicleadcollection`,
+  //   COSTCALCULATIONLEADFORM: `/organizations/${organizationId}/projects/publiccostcalculation`,
+  //   RATECONIGPRESALES: `/organizations/${organizationId}/projects/rateconfigpresales`,
+  //   RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
+  //   RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
+  //   RATECONIGMATERIALWITHSTAFF: `/organizations/${organizationId}/projects/materialwithlabourrate`,
+  //   // WORKTEMPLATE: `/organizations/${organizationId}/projects/worktemplates`,
+  //   CALCULATOR: `/organizations/${organizationId}/projects/calculator`,
+  //   PRESALESQUOTE: `/organizations/${organizationId}/projects/presalesquote`,
+  //   INTERNALQUOTE: `/organizations/${organizationId}/projects/internalquote`,
+  //   QUOTEVARIENT: `/organizations/${organizationId}/projects/quotevariant`,
+  //   "QUOTES (CLIENT)": `/organizations/${organizationId}/projects/clientquotes`,
+  //   WORKLIBRARY: `/organizations/${organizationId}/projects/worklibrary`,
+  //   STAFFTASK: `/organizations/${organizationId}/projects/stafftask`,
+  //   SINGLESTAFFTASK: `/organizations/${organizationId}/projects/associatedstafftask`,
+  //   MATERIALINVENTORY: `/organizations/${organizationId}/projects/materialinventory`,
+  // }
+
+  const projectPath = getProjectPaths(organizationId);
 
   // =========================================================
   // 3. ROLE-BASED FILTERING (The Whitelist Logic)
@@ -326,10 +371,10 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
   let finalPaths: any = {};
 
   allowedKeys.forEach(key => {
-    if (SIDEBAR_LABELS[key] && path[key]) {
+    if (SIDEBAR_LABELS[key] && projectPath[key]) {
       finalLabels[key] = SIDEBAR_LABELS[key];
       finalIcons[key] = SIDEBAR_ICONS[key];
-      finalPaths[key] = path[key];
+      finalPaths[key] = projectPath[key];
     }
   });
 

@@ -1106,8 +1106,7 @@ const OrderMaterialOverview = () => {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            // className="h-8 text-xs px-3 bg-red-600 text-white shadow-none"
-                                                            className="h-8 text-xs px-3 text-action-danger  bg-red-50 border border-red-100  shadow-sm transition-all"
+                                                            className="h-8 text-xs px-3 text-text-muted bg-transparent border border-transparent hover:bg-brand-ash hover:border-ash-medium hover:text-text-main shadow-sm transition-all"
                                                             isLoading={deleteAllPending}
                                                             onClick={handleDeleteAllSubItems}
                                                         >

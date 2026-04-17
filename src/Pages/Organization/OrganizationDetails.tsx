@@ -602,7 +602,7 @@ import { ArrivalDistributionPie, ArrivalEfficiencyBar } from "./Organization_das
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 const OrganizationHeader = ({ organization, showSettings, isMobile, openMobileSidebar, navigate }: any) => (
-  <header className="bg-white border-b border-slate-100 px-2 flex items-center justify-between sticky top-0 z-50">
+  <header className="bg-white border-b border-slate-100 px-2 flex items-center justify-between ">
     <div className="flex items-center gap-3">
       {isMobile && (
         <button onClick={openMobileSidebar} className="p-2 text-slate-500 hover:bg-slate-50 rounded-lg transition">

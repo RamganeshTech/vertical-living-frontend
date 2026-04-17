@@ -104,30 +104,41 @@ const WorkMainOverview = () => {
   if (isLoading) return <MaterialOverviewLoading />;
 
   return (
-    <main className="w-full h-full">
+    <main className="w-full h-full bg-brand-surface">
       {/* Header Always Visible */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-        <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 border-b border-ash-light">
+        <h2 className="text-2xl sm:text-3xl font-semibold text-text-main flex items-center">
           {isMobile && (
             <button
               onClick={openMobileSidebar}
-              className="mr-3 p-2 rounded-md border border-gray-200 hover:bg-gray-100"
+              // className="mr-3 p-2 rounded-md border border-gray-200 hover:bg-gray-100"
+              className="mr-3 p-2 rounded-lg border border-ash-medium hover:bg-brand-ash text-text-muted shadow-sm transition-colors"
               title="Open menu"
             >
               <i className="fa-solid fa-bars" />
             </button>
           )}
-          <i className="fas fa-digging mr-2"></i> Work Schedule Overview
+          {/* <i className="fas fa-digging mr-2"></i> Work Schedule Overview */}
+          <div className="w-10 h-10 bg-brand-surface border border-ash-medium rounded-lg flex items-center justify-center shadow-sm mr-3">
+             <i className="fas fa-digging text-text-muted text-lg"></i>
+          </div>
+          <span className="leading-tight">Work Schedule Overview</span>
         </h2>
 
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           {(canCreate || canEdit) && <Button
             isLoading={completePending}
             onClick={handleCompletionStatus}
-            className="bg-green-600 h-10 hover:bg-green-700 text-white w-full sm:w-auto"
+            // className="bg-green-600 h-10 hover:bg-green-700 text-white w-full sm:w-auto"
+            variant="dark"
+                className="flex-1 sm:flex-none px-6 shadow-sm min-w-max"
           >
-            <i className="fa-solid fa-circle-check mr-2" />
-            Mark as Complete
+            {/* <i className="fa-solid fa-circle-check mr-2" />
+            Mark as Complete */}
+
+            <i className="fa-solid fa-circle-check mr-2 text-action-success" />
+                <span className="hidden sm:inline">Mark Complete</span>
+                <span className="inline sm:hidden">Complete</span>
           </Button>}
 
           {/* <ResetStageButton
@@ -158,29 +169,56 @@ const WorkMainOverview = () => {
 
       {/* ❌ Error Message - Hide other content */}
       {getAllError ? (
-        <div className="max-w-xl mx-auto p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-          <div className="text-red-600 text-xl font-semibold mb-2">
-            ⚠️ An Error Occurred
-          </div>
-          <p className="text-red-500 text-sm mb-4">
-            {(getAllError as any)?.response?.data?.message ||
-              (getAllError as any)?.message ||
-              "Couldn't load data."}
-          </p>
-          <Button
-            isLoading={isLoading}
-            onClick={() => refetch()}
-            className="bg-red-600 text-white hover:bg-red-700 px-4 py-2"
-          >
-            Retry
-          </Button>
+        // <div className="max-w-xl mx-auto p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+        //   <div className="text-red-600 text-xl font-semibold mb-2">
+        //     ⚠️ An Error Occurred
+        //   </div>
+        //   <p className="text-red-500 text-sm mb-4">
+        //     {(getAllError as any)?.response?.data?.message ||
+        //       (getAllError as any)?.message ||
+        //       "Couldn't load data."}
+        //   </p>
+        //   <Button
+        //     isLoading={isLoading}
+        //     onClick={() => refetch()}
+        //     className="bg-red-600 text-white hover:bg-red-700 px-4 py-2"
+        //   >
+        //     Retry
+        //   </Button>
+        // </div>
+
+        <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
+            <div className="text-action-danger text-3xl mb-3">
+                <i className="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
+            <p className="text-text-muted text-sm mb-5">
+              {(getAllError as any)?.response?.data?.message ||
+                (getAllError as any)?.message ||
+                "Couldn't load data."}
+            </p>
+            <Button
+              isLoading={isLoading}
+              onClick={() => refetch()}
+              variant="outline"
+              className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+            >
+              Retry
+            </Button>
         </div>
+
       ) : (
         // ✅ Main Stage Content
         <>
-          <Card className="p-4 mb-6 w-full border-l-4 border-blue-600 shadow bg-white">
+          {/* <Card className="p-4 mb-6 w-full border-l-4 border-blue-600 shadow bg-white">
             <div className="flex items-center gap-3 text-blue-700 text-sm font-medium mb-2">
               <i className="fa-solid fa-clock text-blue-500 text-lg" />
+              <span>Stage Timings</span>
+            </div> */}
+
+            <Card className="p-5 shadow-sm border-2 border-ash-medium rounded-xl bg-brand-surface w-full">
+            <div className="flex items-center gap-2 text-text-main text-sm font-bold mb-4 uppercase tracking-wide border-b border-ash-light pb-3">
+              <i className="fa-regular fa-clock text-ash-dark text-base" />
               <span>Stage Timings</span>
             </div>
             <StageTimerInfo
@@ -294,45 +332,43 @@ const WorkMainOverview = () => {
           <div className="w-full mb-8">
             <Link
               to={`dailyschedule/${data?.dailyScheduleId}`}
-              className="w-full block bg-gradient-to-r from-slate-50 to-gray-50 hover:from-slate-100 hover:to-gray-100 border border-gray-200 hover:border-gray-300 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group"
+              // className="w-full block bg-gradient-to-r from-slate-50 to-gray-50 hover:from-slate-100 hover:to-gray-100 border border-gray-200 hover:border-gray-300 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group"
+              className="my-4 w-full block bg-brand-surface  border-2 border-ash-medium  rounded-xl transition-all duration-200 shadow-sm hover:shadow-md group"
             >
               <div className="flex items-center justify-between p-6 md:p-8">
                 <div className="flex items-center gap-6">
                   {/*  Updated icon styling to match page theme */}
-                  <div className="flex-shrink-0 w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-700 transition-colors">
-                    <i className="fas fa-calendar-check text-white text-2xl" />
+                <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 bg-brand-ash border border-ash-light rounded-xl flex items-center justify-center shadow-sm group-hover:border-ash-medium transition-colors">
+                    <i className="fas fa-calendar-check text-action-primary text-2xl" />
                   </div>
 
                   <div className="flex-1">
                     {/*  Updated typography and colors for better integration */}
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-text-main mb-1.5 group-hover:text-action-primary transition-colors leading-tight">
                       Daily Task Planner
                     </h3>
-                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                    <p className="text-text-muted text-xs sm:text-sm md:text-base font-medium leading-relaxed max-w-2xl">
                       Organize and track your daily activities with comprehensive progress reports and task management.
                     </p>
 
                     {/*  Added feature badges for better visual hierarchy */}
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                        <i className="fas fa-tasks text-xs" />
-                        Task Tracking
+                   <div className="flex flex-wrap gap-2 mt-4">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-surface border border-ash-medium text-text-main text-[10px] font-bold uppercase tracking-wider rounded shadow-sm">
+                        <i className="fas fa-tasks text-action-primary" /> Task Tracking
                       </span>
-                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                        <i className="fas fa-chart-line text-xs" />
-                        Progress Reports
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-surface border border-ash-medium text-text-main text-[10px] font-bold uppercase tracking-wider rounded shadow-sm">
+                        <i className="fas fa-chart-line text-action-success" /> Progress Reports
                       </span>
-                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                        <i className="fas fa-calendar-alt text-xs" />
-                        Date Planning
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-surface border border-ash-medium text-text-main text-[10px] font-bold uppercase tracking-wider rounded shadow-sm">
+                        <i className="fas fa-calendar-alt text-purple-500" /> Date Planning
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/*  Added arrow indicator for better UX */}
-                <div className="flex-shrink-0 ml-4">
-                  <i className="fas fa-arrow-right text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all text-xl" />
+               <div className="flex-shrink-0 self-end sm:self-auto w-10 h-10 rounded-full bg-brand-ash border border-ash-light flex items-center justify-center group-hover:bg-brand-surface group-hover:border-ash-medium transition-all shadow-sm">
+                  <i className="fas fa-arrow-right text-text-muted group-hover:text-action-primary group-hover:translate-x-0.5 transition-all text-sm" />
                 </div>
               </div>
             </Link>

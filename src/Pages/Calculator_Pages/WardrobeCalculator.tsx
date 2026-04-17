@@ -114,21 +114,21 @@ const WardrobeCalculator = () => {
                             ].map(m => (
                                 <div key={m.k} className="flex flex-col gap-1">
                                     <label className={`text-[9px] font-black uppercase text-${m.c}-600`}>{m.l}</label>
-                                    <SearchSelectNew
-                                        options={m.o}
-                                        value={values[`${m.k}Id` as keyof typeof values] as string}
-                                        onValueChange={(val) => {
-                                            const opt = m.o.find(x => x.value === val);
-                                            setValues(prev => ({
-                                                ...prev,
-                                                [`${m.k}Id`]: val,
-                                                [`${m.k}Cost`]: opt?.cost || 0
-                                            }));
-                                        }}
-                                        placeholder={`Select ${m.k}`}
-                                        className="w-full"
-                                        displayFormat="simple"
-                                    />
+                                        <SearchSelectNew
+                                            options={m.o}
+                                            value={values[`${m.k}Id` as keyof typeof values] as string}
+                                            onValueChange={(val) => {
+                                                const opt = m.o.find(x => x.value === val);
+                                                setValues(prev => ({
+                                                    ...prev,
+                                                    [`${m.k}Id`]: val,
+                                                    [`${m.k}Cost`]: opt?.cost || 0
+                                                }));
+                                            }}
+                                            placeholder={`Select ${m.k}`}
+                                            className="w-full"
+                                            displayFormat="simple"
+                                        />
                                     {(values[`${m.k}Cost` as keyof typeof values] as number) > 0 && (
                                         <div className={`text-[10px] font-bold text-${m.c}-700 mt-1`}>
                                             ₹{values[`${m.k}Cost` as keyof typeof values]}/sqft

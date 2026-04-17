@@ -575,10 +575,10 @@ const DailySchedulePage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <i className="fas fa-exclamation-triangle text-4xl text-red-600 mb-4"></i>
-          <p className="text-red-600">Error loading schedule data</p>
+      <div className="min-h-screen bg-brand-surface flex items-center justify-center">
+        <div className="text-center bg-brand-main border border-ash-medium shadow-sm w-full">
+          <i className="fas fa-exclamation-triangle text-4xl text-action-danger mb-4"></i>
+          <p className="text-text-main">Oops Something went Wrong...</p>
         </div>
       </div>
     )
@@ -591,53 +591,67 @@ const DailySchedulePage: React.FC = () => {
   }
 
   return (
-    <div className="max-h-full overflow-y-auto bg-gray-50">
+    <div className="max-h-full overflow-y-auto bg-brand-surface">
       <div className=" mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-brand-surface rounded-lg shadow-lg p-6">
           <header className="flex justify-between items-center mb-6">
-            <button className="bg-gray-100 rounded-lg px-2 py-1 cursor-pointer" onClick={() => {
-              navigate(-1)
-            }}>
-              <i className="fas fa-arrow-left mr-1 "></i>
-              back
-            </button>
-            <h1 className="text-3xl font-bold text-gray-800">Work Schedule Calendar</h1>
-            <div className="flex gap-2">
-             {canCreate && <button
-                onClick={() => setShowTaskForm(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2"
-              >
-                <i className="fas fa-plus"></i>
-                Add Events
-              </button>}
-
-
-              <button className="bg-gray-100 rounded-lg px-2 py-1 cursor-pointer" onClick={() => {
-                navigate(`workreport`)
-              }}>
-                <i className="fas fas-file-lines mr-1 "></i>
-                Work Report Lists
+            <div className="flex items-center gap-4">
+              <button
+                // className="bg-gray-100 rounded-lg px-2 py-1 cursor-pointer" 
+                className="bg-brand-surface border border-ash-medium hover:bg-brand-ash text-text-muted hover:text-text-main rounded-lg w-10 h-10 flex items-center justify-center transition-colors shadow-sm shrink-0"
+                onClick={() => {
+                  navigate(-1)
+                }}>
+                <i className="fas fa-arrow-left mr-1 "></i>
               </button>
+              {/* <h1 className="text-3xl font-bold text-gray-800">Work Schedule Calendar</h1> */}
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-text-main flex items-center gap-2">
+                  <i className="fas fa-calendar-alt text-text-muted hidden sm:inline-block"></i>
+                  Work Schedule Calendar
+                </h1>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted mt-1">Manage project timeline and tasks</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {canCreate && <Button
+                variant="dark"
+                onClick={() => setShowTaskForm(true)}
+                className="flex-1 sm:flex-none shadow-sm px-6"
+              >
+                <i className="fas fa-plus mr-2"></i> Add Events
+              </Button>}
+
+
+              <Button
+                variant="white"
+                className="flex-1 sm:flex-none border-ash-medium text-text-main shadow-sm transition-colors"
+                onClick={() => navigate(`workreport`)}
+              >
+                <i className="fas fa-file-lines mr-2"></i> Work Reports
+              </Button>
 
             </div>
           </header>
 
-          <section className="flex justify-between items-center mb-4">
-            <button onClick={() => navigateMonth(-1)} className="p-2 hover:bg-gray-100 rounded">
+          {/* <section className="flex justify-between items-center mb-4"> */}
+          <section className="flex justify-between items-center mb-4 bg-brand-ash border border-ash-light rounded-xl p-2 shadow-sm">
+           <button onClick={() => navigateMonth(-1)} className="w-10 h-10 flex items-center justify-center hover:bg-brand-surface border border-transparent hover:border-ash-medium text-text-muted hover:text-text-main rounded-lg transition-colors shadow-sm">
               <i className="fas fa-chevron-left"></i>
             </button>
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-base sm:text-lg font-bold text-text-main tracking-wide">
               {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
             </h2>
-            <button onClick={() => navigateMonth(1)} className="p-2 hover:bg-gray-100 rounded">
+            <button onClick={() => navigateMonth(1)} className="w-10 h-10 flex items-center justify-center hover:bg-brand-surface border border-transparent hover:border-ash-medium text-text-muted hover:text-text-main rounded-lg transition-colors shadow-sm">
               <i className="fas fa-chevron-right"></i>
             </button>
           </section>
 
           {/* Calendar Grid */}
-          <section className="grid grid-cols-7 gap-1 mb-4">
+          <section className="grid grid-cols-7 gap-1 mb-4 bg-ash-light border border-ash-medium">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div key={day} className="p-3 text-center font-semibold text-gray-600 bg-gray-100">
+              // <div key={day} className="p-3 text-center font-semibold text-gray-600 bg-gray-100">
+              <div key={day} className="p-3 text-center font-bold text-[10px] sm:text-xs uppercase tracking-wider text-text-muted bg-brand-ash">
                 {day}
               </div>
             ))}
@@ -647,22 +661,32 @@ const DailySchedulePage: React.FC = () => {
               return (
                 <div
                   key={index}
-                  className={`min-h-[120px] p-2 border border-gray-200 cursor-pointer hover:bg-gray-50 ${day.isCurrentMonth ? "bg-white" : "bg-gray-50"
-                    }`}
+                  // className={`min-h-[120px] p-2 border border-gray-200 cursor-pointer hover:bg-gray-50 ${day.isCurrentMonth ? "bg-white" : "bg-gray-50"
+                  //   }`}
+                  className={`min-h-[100px] sm:min-h-[120px] p-1.5 sm:p-2 transition-colors cursor-pointer ${
+                    day.isCurrentMonth ? "bg-brand-surface hover:bg-brand-ash/50" : "bg-brand-ash/30 opacity-60"
+                  }`}
                   onClick={() => handleDateClick(day.date)}
                 >
-                  <div className="font-medium text-sm mb-1">{day.date.getDate()}</div>
+                  {/* <div className="font-medium text-sm mb-1">{day.date.getDate()}</div> */}
+                  <div className={`font-bold text-xs sm:text-sm mb-1.5 ml-1 ${day.isCurrentMonth ? "text-text-main" : "text-text-muted"}`}>
+                    {day.date.getDate()}
+                  </div>
                   {tasksForDay.length === 0 ? (
-                    <div className="text-xs text-gray-400 italic">No tasks assigned</div>
+                    // <div className="text-xs text-gray-400 italic">No tasks assigned</div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-text-muted/40 hidden sm:block ml-1">No tasks</div>
                   ) : (
                     <div className="space-y-1">
                       {tasksForDay.slice(0, 2).map((task: any, idx: number) => (
-                        <div key={idx} className={`text-xs p-1 rounded truncate ${getStatusColor(task.status)}`}>
+                        <div key={idx} className={`text-[9px] sm:text-[10px] font-bold p-1.5 rounded shadow-sm truncate border border-black/5 ${getStatusColor(task.status)}`}>
                           {task.workDescription || task.room}
                         </div>
                       ))}
                       {tasksForDay.length > 2 && (
-                        <div className="text-xs text-blue-600 font-medium">+{tasksForDay.length - 2} more</div>
+                        // <div className="text-xs text-blue-600 font-medium">+{tasksForDay.length - 2} more</div>
+                        <div className="text-[9px] sm:text-[10px] font-bold text-action-primary bg-action-primary/10 border border-action-primary/20 px-1.5 py-0.5 rounded w-max">
+                          +{tasksForDay.length - 2} more
+                        </div>
                       )}
                     </div>
                   )}
@@ -678,21 +702,37 @@ const DailySchedulePage: React.FC = () => {
               setSelectedDate(null)
               setSelectedTask(null)
               setShowTaskList(false)
-            }} className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-around z-50">
+            }} 
+            // className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-around z-50"
+            className="fixed inset-0 z-[50] bg-brand-main/90 backdrop-blur-sm flex items-center justify-between sm:justify-center p-2 sm:p-4 gap-2"
+            >
 
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // 🛑 prevent background click
                   goToPreviousDate();
                 }}
-                className="p-2 text-gray-600 bg-gray-50 hover:text-gray-900"
+                // className="p-2 text-gray-600 bg-gray-50 hover:text-gray-900"
+                className="w-10 h-10 shrink-0 bg-brand-surface border border-ash-medium text-text-muted hover:text-text-main hover:bg-brand-ash rounded-full items-center justify-center transition-colors shadow-lg hidden sm:flex"
               >
                 <i className="fas fa-chevron-left"></i>
 
               </button>
-              <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold">Tasks for {selectedDate.toLocaleDateString()}</h3>
+              <div onClick={(e) => e.stopPropagation()} 
+              // className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+              className="bg-brand-surface border border-ash-medium rounded-xl shadow-2xl p-5 sm:p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in duration-200 flex-1 sm:flex-none relative"
+              >
+                <div className="flex justify-between items-center mb-6 pb-4 border-b border-ash-light">
+                  {/* <h3 className="text-xl font-bold">Tasks for {selectedDate.toLocaleDateString()}</h3> */}
+                  <h3 className="text-lg sm:text-xl font-bold text-text-main flex items-center gap-2">
+                    <i className="fa-regular fa-calendar-check text-text-muted"></i>
+                    Tasks for {selectedDate.toLocaleDateString()}
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <div className="flex sm:hidden gap-1 mr-2 border-r border-ash-light pr-3">
+                        <button onClick={goToPreviousDate} className="w-8 h-8 flex items-center justify-center text-text-muted hover:text-text-main bg-brand-ash rounded border border-ash-light"><i className="fas fa-chevron-left"></i></button>
+                        <button onClick={goToNextDate} className="w-8 h-8 flex items-center justify-center text-text-muted hover:text-text-main bg-brand-ash rounded border border-ash-light"><i className="fas fa-chevron-right"></i></button>
+                    </div>
                   <button
                     onClick={() => {
                       setEditingTask(null)
@@ -700,40 +740,45 @@ const DailySchedulePage: React.FC = () => {
                       setSelectedTask(null)
                       setShowTaskList(false)
                     }}
-                    className="text-gray-500 hover:text-gray-700"
+                    // className="text-gray-500 hover:text-gray-700"
+                    className="w-8 h-8 flex items-center justify-center bg-brand-surface border border-ash-medium text-text-muted hover:text-action-danger hover:bg-red-50 hover:border-red-200 rounded-full transition-colors shadow-sm"
                   >
                     <i className="fas fa-times text-xl"></i>
                   </button>
+                    </div>
                 </div>
 
                 {tasksForSelectedDate.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <i className="fas fa-calendar-times text-4xl mb-4"></i>
-                    <p className="text-lg">No tasks assigned for this date</p>
+                  <div className="text-center py-12 border border-dashed border-ash-medium rounded-xl bg-brand-ash/30">
+                    <i className="fas fa-calendar-times text-4xl text-ash-dark mb-4"></i>
+                    <p className="text-text-main font-bold">No tasks assigned for this date</p>
                   </div>
                 ) : showTaskList && tasksForSelectedDate.length > 1 ? (
                   <div className="space-y-3">
-                    <h4 className="text-lg font-semibold mb-4">Select a task to view details:</h4>
+                    {/* <h4 className="text-lg font-semibold mb-4">Select a task to view details:</h4> */}
+                    <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted">Select a task to view details</h4>
                     {tasksForSelectedDate.map((task, index) => (
                       <div
                         key={index}
-                        className="border rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                        // className="border rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                        className="bg-brand-ash/30 border border-ash-medium rounded-xl p-4 cursor-pointer hover:bg-brand-surface hover:shadow-md hover:border-text-muted transition-all group"
                         onClick={() => {
                           setSelectedTask(task)
                           setShowTaskList(false)
                         }}
                       >
-                        <div className="flex justify-between items-center">
+                        {/* <div className="flex justify-between items-center"> */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                           <div>
-                            <h5 className="font-semibold text-lg">{task.workDescription}</h5>
-                            <p className="text-gray-600">Room: {task.room}</p>
-                            <p className="text-gray-600">
-                              Time: {task.startTime} - {task.endTime}
-                            </p>
+                           <h5 className="font-bold text-text-main text-base group-hover:text-action-primary transition-colors mb-1.5">{task.workDescription}</h5>
+                              <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-bold text-text-muted uppercase tracking-wider">
+                                <span><i className="fas fa-door-open mr-1"></i> {task.room}</span>
+                                <span><i className="fa-regular fa-clock mr-1"></i> {task.startTime} - {task.endTime}</span>
+                              </div>
                           </div>
-                          <span className={`px-3 py-1 rounded text-sm ${getStatusColor(task.status)}`}>
-                            {task.status}
-                          </span>
+                          <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider shadow-sm border border-black/5 ${getStatusColor(task.status)}`}>
+                              {task.status}
+                            </span>
                           {/* <Button onClick={() => {
                             setEditingTask(task)
 
@@ -753,63 +798,85 @@ const DailySchedulePage: React.FC = () => {
                           setShowTaskList(true)
                           setSelectedTask(null)
                         }}
-                        className="text-blue-600 hover:text-blue-800 mb-4"
+                        // className="text-blue-600 hover:text-blue-800 mb-4"
+                        className="text-[11px] font-bold uppercase tracking-wider text-text-muted hover:text-action-primary flex items-center transition-colors mb-2"
                       >
                         <i className="fas fa-arrow-left mr-2"></i>
                         Back to task list
                       </button>
                     )}
 
-                    <div className="border rounded-lg p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-xl font-bold">{selectedTask.workDescription}</h4>
-                        <span className={`px-3 py-1 rounded text-sm ${getStatusColor(selectedTask.status)}`}>
+                    {/* <div className="border rounded-lg p-6"> */}
+                    <div className="bg-brand-surface border border-ash-medium rounded-xl overflow-hidden shadow-sm">
+                      {/* <div className="flex justify-between items-start mb-4"> */}
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 bg-brand-ash border-b border-ash-medium gap-3">
+                        <h4 className="text-lg font-bold text-text-main">{selectedTask.workDescription}</h4>
+                        <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider shadow-sm border border-black/5 ${getStatusColor(selectedTask.status)}`}>
                           {selectedTask.status}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-6 text-gray-700 mb-6">
-                        <div>
-                          <p className="mb-2">
-                            <strong>Room/Unit:</strong> {selectedTask.room}
-                          </p>
-                          <p className="mb-2">
-                            <strong>Time:</strong> {selectedTask.startTime} - {selectedTask.endTime}
-                          </p>
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-5 text-sm">
+                      <div className="space-y-4">
+                          <div className="flex items-start gap-3">
+                            <i className="fas fa-door-open text-text-muted mt-1 w-4 text-center"></i>
+                            <div>
+                              <span className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-0.5">Room/Unit</span>
+                              <span className="font-bold text-text-main">{selectedTask.room}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <i className="fa-regular fa-clock text-text-muted mt-1 w-4 text-center"></i>
+                            <div>
+                              <span className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-0.5">Time</span>
+                              <span className="font-bold text-text-main">{selectedTask.startTime} - {selectedTask.endTime}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <p className="mb-2">
-                            <strong>Materials:</strong> {selectedTask.materialsNeeded?.join(", ") || "None"}
-                          </p>
-                          <p className="mb-2">
-                            <strong>Manpower:</strong> {selectedTask.manpower}
-                          </p>
+                        <div className="space-y-4">
+                          <div className="flex items-start gap-3">
+                            <i className="fas fa-boxes-stacked text-text-muted mt-1 w-4 text-center"></i>
+                            <div>
+                              <span className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-0.5">Materials</span>
+                              <span className="font-bold text-text-main">{selectedTask.materialsNeeded?.join(", ") || "None"}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <i className="fas fa-users-gear text-text-muted mt-1 w-4 text-center"></i>
+                            <div>
+                              <span className="block text-[10px] font-bold uppercase tracking-wider text-text-muted mb-0.5">Manpower</span>
+                              <span className="font-bold text-text-main">{selectedTask.manpower}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="border-t pt-6">
+                      <div className="p-5 border-t border-ash-light">
                         <div className="flex justify-between items-center mb-4">
-                          <h5 className="text-lg font-semibold">Task Images</h5>
-                          {(canCreate || canEdit) && <label className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded cursor-pointer transition-colors">
-                            {uploadImagesMutation.isPending && <span className="animate-spin fas fa-spinner mr-1"></span>}
-                            <i className="fas fa-upload mr-2"></i>
-                            Upload Images
-                            <input
-                              type="file"
-                              multiple
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => {
-                                if (e.target.files) {
-                                  handleImageUpload(Array.from(e.target.files), selectedTask)
-                                }
-                              }}
-                            />
-                          </label>}
+                          <h5 className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
+                            <i className="fas fa-images"></i> Task Images
+                          </h5>
+                          {(canCreate || canEdit) && (
+                            <label className="bg-brand-surface border border-ash-medium text-text-main hover:bg-brand-ash px-4 py-2 rounded-lg cursor-pointer transition-colors shadow-sm text-[11px] uppercase tracking-wider font-bold flex items-center gap-2">
+                              {uploadImagesMutation.isPending ? <i className="fas fa-circle-notch fa-spin"></i> : <i className="fas fa-cloud-arrow-up"></i>}
+                              Upload
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  if (e.target.files) {
+                                    handleImageUpload(Array.from(e.target.files), selectedTask)
+                                  }
+                                }}
+                              />
+                            </label>
+                          )}
                         </div>
 
                         {selectedTask?.uploadedImages && selectedTask?.uploadedImages.length > 0 ? (
-                          <div className="">
+                          <div >
                             {(() => {
                               const groups = (selectedTask?.uploadedImages || []).reduce(
                                 (acc: Record<string, any[]>, imgGroup: any) => {
@@ -832,9 +899,9 @@ const DailySchedulePage: React.FC = () => {
                               const dateKeys = Object.keys(groups);
                               if (dateKeys.length === 0) {
                                 return (
-                                  <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
-                                    <i className="fas fa-images text-3xl mb-2" />
-                                    <p>No images uploaded for this task</p>
+                                 <div className="text-center py-6 border border-dashed border-ash-medium bg-brand-ash/30 rounded-xl">
+                                    <i className="fas fa-images text-2xl text-ash-dark mb-2" />
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">No images uploaded for this task</p>
                                   </div>
                                 );
                               }
@@ -849,7 +916,8 @@ const DailySchedulePage: React.FC = () => {
                               // });
 
                               return dateKeys.map((dateKey) => (
-                                <div key={dateKey} className="mb-4">
+                                // <div key={dateKey} className="mb-4">
+                                <div key={dateKey} className="mb-4 bg-brand-ash/30 border border-ash-light p-3 rounded-xl">
                                   {/* <h3 className="text-sm font-semibold text-gray-600 mb-2">{dateKey}</h3> */}
                                   <ImageGalleryExample
                                     imageFiles={groups[dateKey]}
@@ -866,31 +934,41 @@ const DailySchedulePage: React.FC = () => {
                             })()}
                           </div>
                         ) : (
-                          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
-                            <i className="fas fa-images text-3xl mb-2"></i>
-                            <p>No images uploaded for this task</p>
+                         <div className="text-center py-6 border border-dashed border-ash-medium bg-brand-ash/30 rounded-xl">
+                            <i className="fas fa-image text-2xl text-ash-dark mb-2"></i>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">No images uploaded for this task</p>
                           </div>
                         )}
                       </div>
 
-                      <div className="mt-6 flex gap-3 pt-4 border-t">
-                        {/* <button
-                          onClick={() => handleEditTask(selectedTask)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors"
-                        >
-                          <i className="fas fa-edit mr-2"></i>Edit Task
-                        </button> */}
-                        {canDelete && <button
-                          onClick={() => handleDeleteTask(selectedTask)}
-                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors"
-                        >
-                          <i className="fas fa-trash mr-2"></i>Delete Task
-                        </button>}
-
-
-
-                       {(canEdit || canCreate) && <> <Button onClick={() => handleEnableEditTask((selectedTask as any).scheduleId)}>Edit Task</Button>
-                        <Button onClick={() => handleCreateReport((selectedTask as any).scheduleId)}>Create Report</Button></>}
+                     <div className="p-5 border-t border-ash-light flex flex-wrap gap-2 justify-end bg-brand-ash/50">
+                        {canDelete && (
+  <Button
+    variant="ghost"
+    onClick={() => handleDeleteTask(selectedTask)}
+    className="text-text-muted hover:text-text-main hover:bg-brand-ash border border-transparent hover:border-ash-medium transition-colors shadow-sm"
+  >
+    <i className="fas fa-trash-can mr-2"></i>Delete
+  </Button>
+)}
+                        {(canEdit || canCreate) && (
+                          <> 
+                            <Button 
+                              variant="white" 
+                              className="border-ash-medium shadow-sm text-text-main" 
+                              onClick={() => handleEnableEditTask((selectedTask as any).scheduleId)}
+                            >
+                              <i className="fas fa-pen-to-square mr-2"></i>Edit Task
+                            </Button>
+                            <Button 
+                              variant="dark" 
+                              className="shadow-sm" 
+                              onClick={() => handleCreateReport((selectedTask as any).scheduleId)}
+                            >
+                              <i className="fas fa-file-invoice mr-2"></i>Create Report
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -907,7 +985,8 @@ const DailySchedulePage: React.FC = () => {
                   e.stopPropagation(); // 🛑 prevent background click
                   goToNextDate();
                 }}
-                className="p-2 text-gray-600  bg-gray-50 hover:text-gray-900"
+                // className="p-2 text-gray-600  bg-gray-50 hover:text-gray-900"
+                className="w-10 h-10 shrink-0 bg-brand-surface border border-ash-medium text-text-muted hover:text-text-main hover:bg-brand-ash rounded-full flex items-center justify-center transition-colors shadow-lg  sm:flex"
               >
                 <i className="fas fa-chevron-right"></i>
               </button>
@@ -917,7 +996,8 @@ const DailySchedulePage: React.FC = () => {
 
 
           {showWorkReport && selectedScheduleIdForWr && (
-            <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+            // <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+            <div className="fixed inset-0 z-[9999] bg-brand-main/90 backdrop-blur-sm flex items-center justify-center p-4">
               <div
                 onClick={() => {
                   setShowWorkReport(false);
@@ -928,12 +1008,16 @@ const DailySchedulePage: React.FC = () => {
 
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="relative z-10 bg-white rounded-lg shadow-lg max-w-4xl w-full mx-auto max-h-[90vh] overflow-y-auto p-6"
+                // className="relative z-10 bg-white rounded-lg shadow-lg max-w-4xl w-full mx-auto max-h-[90vh] overflow-y-auto p-6"
+                className="relative z-10 bg-brand-surface rounded-xl shadow-2xl border border-ash-medium max-w-4xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6"
               >
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-blue-700">Create Work Report</h2>
+                <div className="flex justify-between items-center mb-6 pb-4 border-b border-ash-light">
+                  <h2 className="text-xl font-bold text-text-main flex items-center gap-2">
+                     <i className="fas fa-file-invoice text-text-muted"></i> Create Work Report
+                  </h2>
                   <button
-                    className="text-gray-500 hover:text-red-600 text-xl"
+                    // className="text-gray-500 hover:text-red-600 text-xl"
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-brand-surface border border-ash-medium text-text-muted hover:text-action-danger hover:bg-red-50 hover:border-red-200 transition-colors shadow-sm"
                     onClick={() => {
                       setShowWorkReport(false);
                       setSelectedScheduleIdForWr(null);
