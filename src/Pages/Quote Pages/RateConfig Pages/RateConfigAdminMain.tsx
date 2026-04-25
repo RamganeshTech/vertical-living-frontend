@@ -345,9 +345,9 @@ export default function RateConfigAdminMain() {
                             placeholder="Category name (e.g. Plywood)"
                             value={categoryName}
                             onChange={(e) => setCategoryName(e.target.value)}
-                            disabled={!!editingCategoryId}
-                            className={editingCategoryId ? "cursor-not-allowed" : ""}
-                            title={`${editingCategoryId ? "not allowed to edit title" : ""}`}
+                            // disabled={!!editingCategoryId}
+                            // className={editingCategoryId ? "cursor-not-allowed" : ""}
+                            // title={`${editingCategoryId ? "not allowed to edit title" : ""}`}
                         />
 
                         {/* <h4 className="text-base font-semibold">Define Fields</h4> */}

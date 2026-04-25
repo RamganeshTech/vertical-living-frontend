@@ -17,14 +17,16 @@ type ProjectType = {
 }
 
 // These values MUST match the 'PROJECT_STAGES' array in StaffPermissionsSingle.tsx
-const PERMISSION_MAPPING: Record<string, string> = {
+export const PERMISSION_MAPPING: Record<string, string> = {
   INVENTORY: "inventory",
   WORKERS: "inviteworker",         // Changed from 'projectworkers' to match Admin
   INVITECLIENT: "inviteclient",
+  ONBOARDING: "onboarding",
   PREREQUISTIES: "prerequisites",
   REQUIREMENTFORM: "clientrequirement", // Changed from 'requirementform' to match Admin
   SITEMEASUREMENT: "sitemeasurement",
   SAMPLEDESIGN: "sampledesign",
+  DESIGNAPPROVAL: "designapproval",
   WORKSCHEDULE: "workschedule",
   TECHNICALCONSULTANT: "technicalconsultant",
   PAYMENTCONFIRMATION: "paymentconfirmation",
@@ -82,10 +84,12 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     INVENTORY: projectId ? `/${organizationId}/projectdetails/${projectId}/inventory` : "",
     WORKERS: projectId ? `/${organizationId}/projectdetails/${projectId}/workers` : "",
     INVITECLIENT: projectId ? `/${organizationId}/projectdetails/${projectId}/inviteclient` : "",
+    ONBOARDING: projectId ? `/${organizationId}/projectdetails/${projectId}/onboarding` : "",
     PREREQUISTIES: projectId ? `/${organizationId}/projectdetails/${projectId}/prerequisites` : "",
     REQUIREMENTFORM: projectId ? `/${organizationId}/projectdetails/${projectId}/requirementform` : "",
     SITEMEASUREMENT: projectId ? `/${organizationId}/projectdetails/${projectId}/sitemeasurement` : "",
     SAMPLEDESIGN: projectId ? `/${organizationId}/projectdetails/${projectId}/sampledesign` : "",
+    DESIGNAPPROVAL: projectId ? `/${organizationId}/projectdetails/${projectId}/designapproval` : "",
     WORKSCHEDULE: projectId ? `/${organizationId}/projectdetails/${projectId}/workmainschedule` : "",
     TECHNICALCONSULTANT: projectId ? `/${organizationId}/projectdetails/${projectId}/technicalconsultant` : "",
     // SELECTSTAGE: projectId ? `/${organizationId}/projectdetails/${projectId}/selectstage` : "",
@@ -164,9 +168,10 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
     label: "Core Operations",
     // keys: ["INVENTORY", "MODULARUNIT"]
     isOpenByDefault: true,
-    keys: ["WORKERS", "INVITECLIENT", "PREREQUISTIES", "REQUIREMENTFORM",
+    keys: ["WORKERS", "INVITECLIENT", "ONBOARDING", "PREREQUISTIES", "REQUIREMENTFORM",
       "SITEMEASUREMENT",
       "SAMPLEDESIGN",
+      "DESIGNAPPROVAL",
       "WORKSCHEDULE",
       "TECHNICALCONSULTANT",
       "PAYMENTCONFIRMATION",
@@ -249,9 +254,9 @@ const ProjectDetails: React.FC<ProjectType> = ({ projectId, setProjectId, organi
             }} />
           </main>
         </div>
-        </div>
-      </>
-      )
+      </div>
+    </>
+  )
 }
 
-      export default ProjectDetails
+export default ProjectDetails

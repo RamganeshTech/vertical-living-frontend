@@ -7,7 +7,7 @@ import { useStartStageTimer } from "../apiList/Stage Api/timerStage Api/timerSta
 interface TimerProps {
     startedAt: string | null;
     completedAt: string | null;
-    stageName: "requirementform" | "sitemeasurement" | "sampledesign" |
+    stageName: "requirementform" | "sitemeasurement" | "sampledesign" | "designapproval" | 
     "technicalconsultation" | "materialconfirmation" | "costestimation" | "paymentconfirmation" | "orderingmaterial" |
     "materialarrivalcheck" | "worktasks" | "installation" | "qualitycheck" | "cleaning" | "projectdelivery";
     deadLine: string | null;

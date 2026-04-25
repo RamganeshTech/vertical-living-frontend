@@ -14,21 +14,30 @@ const config: Config = {
                 brand: {
                     main: 'var(--color-brand-main)',
                     surface: 'var(--color-brand-surface)',
+                    'surface-hover': 'var(--color-brand-surface-hover)', // 🆕
                     ash: 'var(--color-brand-ash)',
+                    'ash-dark': 'var(--color-brand-ash-dark)', // 🆕
                 },
                 ash: {
+                    lighter: 'var(--color-ash-lighter)', // 🆕
                     light: 'var(--color-ash-light)',
                     medium: 'var(--color-ash-medium)',
                     dark: 'var(--color-ash-dark)',
                 },
                 text: {
+                    strong: 'var(--color-text-strong)', // 🆕 For h1, h2, h3
                     main: 'var(--color-text-main)',
                     muted: 'var(--color-text-muted)',
+                    soft: 'var(--color-text-soft)', // 🆕 For placeholders/icons
                 },
                 action: {
                     primary: 'var(--color-action-primary)',
+                    'primary-hover': 'var(--color-action-primary-hover)', // 🆕
+                    secondary: 'var(--color-action-secondary)', // 🆕 For outline/ghost buttons
+                    'secondary-hover': 'var(--color-action-secondary-hover)', // 🆕
                     success: 'var(--color-action-success)',
                     danger: 'var(--color-action-danger)',
+                    warning: 'var(--color-action-warning)', // 🆕 Good for "Pending" statuses
                 },
 
              // Legacy colors (keep these so existing code doesn't break)

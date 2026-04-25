@@ -57,22 +57,22 @@
 
 //     return (
 //         <div className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden border border-slate-200 border-l-4 ${getStatusBorder(projectInformation?.status)}`}>
-            
+
 //             <div className="p-4 flex-1 flex flex-col">
-                
+
 //                 {/* --- HEADER: Title & Badges --- */}
 //                 <div className="flex justify-between items-start gap-2 mb-3">
 //                     <h3 className="font-bold text-[15px] text-[#1f2d3d] leading-tight line-clamp-2 flex-1">
 //                         <i className="fa-solid fa-compass-drafting text-indigo-500 mr-1.5"></i>
 //                         {projectName}
 //                     </h3>
-                    
+
 //                     {/* Compact Badges */}
 //                     <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
 //                         <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${getPriorityColor(projectInformation?.priority)}`}>
 //                             {projectInformation?.priority || 'None'} 
 //                         </span>
-                        
+
 //                         {/* Status Badge (Using your requested statusColors logic) */}
 //                         {/* <div className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${statusColors[projectInformation?.status] || 'bg-slate-100 text-slate-600'}`}>
 //                             <span className="!bg-transparent">{projectInformation?.status || 'Unknown'}</span>
@@ -172,18 +172,23 @@ type ProjectsOutletContextType = {
 };
 
 interface ProjectCardProps {
-    project: any; 
+    project: any;
     organizationId: string;
     onEdit: () => void;
     onDelete: () => void;
+    onToggleArchive: () => void; // ✅ ADD
+
     isDeleting: boolean;
+    isArchived?: boolean
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, organizationId, onEdit, onDelete, isDeleting }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, organizationId, onEdit, onDelete, isDeleting, isArchived = false, onToggleArchive }) => {
     const { projectName, projectInformation, completionPercentage } = project;
 
     const { setProjectId } = useOutletContext<ProjectsOutletContextType>();
     const { data: currentStagePath, isLoading: isStageLoading } = useGetCurrentActiveStage(project?._id!);
+
+    const [menuOpen, setMenuOpen] = React.useState(false);  
 
     const handleSetProjectId = () => setProjectId(project._id);
 
@@ -204,22 +209,63 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, organizationId, onEd
 
     return (
         <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col overflow-hidden border border-slate-200">
-            
+
             <div className="p-4 flex-1 flex flex-col">
-                
+
                 {/* --- HEADER: Title & Badges --- */}
                 <div className="flex justify-between items-start gap-3 mb-4">
                     <h3 className="font-semibold text-[15px] text-slate-800 leading-snug line-clamp-2 flex-1">
- <i className="fa-solid fa-compass-drafting text-blue-500 mr-1.5"></i>
+                        <i className="fa-solid fa-compass-drafting text-blue-500 mr-1.5"></i>
 
                         {projectName}
                     </h3>
-                    
+
                     {/* Compact Badge */}
-                    <div className="flex flex-col items-end gap-1.5 flex-shrink-0 mt-0.5">
+                    {/* <div className="flex flex-col items-end gap-1.5 flex-shrink-0 mt-0.5">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide border ${getPriorityColor(projectInformation?.priority)}`}>
-                            {projectInformation?.priority || 'None'} 
+                            {projectInformation?.priority || 'None'}
                         </span>
+                    </div> */}
+
+                    <div className="flex items-start gap-2">
+
+                        {/* Priority Badge */}
+                        <span className={`px-2 py-1 rounded text-[10px] font-medium uppercase tracking-wide border ${getPriorityColor(projectInformation?.priority)}`}>
+                            {projectInformation?.priority || 'None'}
+                        </span>
+
+                        {/* 3 DOT MENU */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setMenuOpen(prev => !prev)}
+
+                                className="px-1 rounded hover:bg-slate-100 cursor-pointer"
+                            >
+                                <i className="fa-solid fa-ellipsis-vertical text-slate-500 text-xs"></i>
+                            </button>
+
+                            {menuOpen && (
+                                <div className="absolute right-0 mt-1 w-36 bg-white border border-slate-200 rounded-md shadow-md z-10">
+
+                                    <button
+                                        // onClick={handleToggleArchive}
+                                        onClick={() => {
+                                            onToggleArchive();   // 🔥 CALL PARENT
+                                            setMenuOpen(false);
+                                        }}
+                                        // disabled={archiveLoading}
+
+                                        // className="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 cursor-pointer"
+                                        className="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 cursor-pointer disabled:opacity-50"
+
+                                    >
+                                        {project.isArchived ? "Unarchive" : "Archive"}
+                                    </button>
+
+                                </div>
+                            )}
+                        </div>
+
                     </div>
                 </div>
 
@@ -254,7 +300,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, organizationId, onEd
                         <span className="text-[11px] font-semibold text-slate-700">{completionPercentage || 0}%</span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div 
+                        <div
                             className={`h-full transition-all duration-1000 ease-out ${completionPercentage === 100 ? 'bg-emerald-400' : 'bg-blue-500'}`}
                             style={{ width: `${completionPercentage || 0}%` }}
                         ></div>
@@ -263,32 +309,32 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, organizationId, onEd
             </div>
 
             {/* --- FULL BLEED ACTION BAR (Ash/White minimal theme) --- */}
-            <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 bg-white">
-    <Link 
-        to={`/${organizationId}/projectdetails/${project._id}/${currentStagePath}`} 
-        onClick={handleSetProjectId}
-        className={`flex items-center justify-center gap-1.5 py-3 text-[11px] font-semibold text-blue-600 hover:bg-blue-50 transition-colors ${isStageLoading ? "pointer-events-none opacity-50" : ""}`}
-    >
-        {isStageLoading ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-regular fa-eye opacity-80"></i>}
-        View
-    </Link>
+            {!isArchived && <div className="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 bg-white">
+                <Link
+                    to={currentStagePath?.percentage === 0 ? `/${organizationId}/projectdetails/${project._id}/onboarding` :  `/${organizationId}/projectdetails/${project._id}/${currentStagePath?.redirectTo}`}
+                    onClick={handleSetProjectId}
+                    className={`flex items-center justify-center gap-1.5 py-3 text-[11px] font-semibold text-blue-600 hover:bg-blue-50 transition-colors ${isStageLoading ? "pointer-events-none opacity-50" : ""}`}
+                >
+                    {isStageLoading ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-regular fa-eye opacity-80"></i>}
+                    View
+                </Link>
 
-    <button 
-        onClick={onEdit}
-        className="flex cursor-pointer items-center justify-center gap-1.5 py-3 text-[11px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
-    >
-        <i className="fa-regular fa-pen-to-square opacity-70"></i> Edit
-    </button>
+                <button
+                    onClick={onEdit}
+                    className="flex cursor-pointer items-center justify-center gap-1.5 py-3 text-[11px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                    <i className="fa-regular fa-pen-to-square opacity-70"></i> Edit
+                </button>
 
-    <button 
-        onClick={onDelete}
-        disabled={isDeleting}
-        className="flex cursor-pointer items-center justify-center gap-1.5 py-3 text-[11px] font-semibold text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors disabled:opacity-50"
-    >
-        {isDeleting ? <i className="fas fa-spinner fa-spin"></i> : <i className="fa-regular fa-trash-can opacity-80"></i>}
-        Delete
-    </button>
-</div>
+                <button
+                    onClick={onDelete}
+                    disabled={isDeleting}
+                    className="flex cursor-pointer items-center justify-center gap-1.5 py-3 text-[11px] font-semibold text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-colors disabled:opacity-50"
+                >
+                    {isDeleting ? <i className="fas fa-spinner fa-spin"></i> : <i className="fa-regular fa-trash-can opacity-80"></i>}
+                    Delete
+                </button>
+            </div>}
         </div>
     );
 };

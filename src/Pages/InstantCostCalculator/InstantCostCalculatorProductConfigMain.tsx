@@ -1,0 +1,256 @@
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useGetProductSpecificCategories } from '../../apiList/Quote Api/RateConfig Api/instantCostCalculatorApi';
+import { Button } from '../../components/ui/Button';
+// import { useGetProductSpecificCategories } from '../../Hooks/useInstantCostHooks'; // Adjust path to where you saved the hooks
+// import { Button } from '../ui/Button'; // Adjust path
+
+export const InstantCostCalculatorProductConfigMain: React.FC = () => {
+    const navigate = useNavigate();
+    const { organizationId } = useParams();
+
+    // Fetch only categories where isProductSpecific is true
+    const { 
+        data: categories, 
+        isLoading, 
+        isError, 
+        error, 
+        refetch 
+    } = useGetProductSpecificCategories(organizationId || "", true);
+
+    return (
+        // <div className="w-full h-full bg-brand-surface custom-scrollbar overflow-y-auto flex flex-col">
+            
+        //     {/* Header Section */}
+        //     <header className="sticky top-0 z-10 bg-brand-surface/90 backdrop-blur-md border-b border-ash-light px-6 py-5 shrink-0">
+        //         <div className="max-w-full mx-auto flex items-center justify-between">
+        //             <div className="flex items-center gap-4">
+        //                 <button 
+        //                     type="button" 
+        //                     onClick={() => navigate(-1)} 
+        //                     className='w-10 h-10 flex items-center justify-center rounded-xl bg-brand-ash border border-ash-medium text-text-muted hover:text-text-main hover:bg-brand-ash-dark transition-all shadow-sm shrink-0'
+        //                 >
+        //                     <i className="fas fa-arrow-left text-sm"></i>
+        //                 </button>
+        //                 <div className="flex items-center gap-3">
+        //                     <div className="w-12 h-12 bg-ash-dark text-brand-surface rounded-xl flex items-center justify-center shadow-md shrink-0">
+        //                         <i className="fas fa-calculator text-xl"></i>
+        //                     </div>
+        //                     <div className="flex flex-col justify-center">
+        //                         <h1 className="text-xl sm:text-2xl font-extrabold text-text-main leading-tight tracking-tight">
+        //                             Instant Cost Calculator Setup
+        //                         </h1>
+        //                         <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-text-muted mt-1">
+        //                             Configure dimensions and pricing models
+        //                         </p>
+        //                     </div>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     </header>
+
+        //     {/* Main Content Area */}
+        //     <main className="flex-1 w-full max-w-full mx-auto px-6 py-4">
+                
+        //         <div className="mb-4">
+        //             <h2 className="text-sm font-bold text-text-main uppercase  border-l-4 border-action-primary pl-3">
+        //                 Select a Product Category
+        //             </h2>
+        //             <p className="text-xs font-medium text-text-soft  pl-4">
+        //                 Choose a product category below to configure its specific dimension matrices, material requirements, and labour costs.
+        //             </p>
+        //         </div>
+
+        //         {/* State Handling: Loading */}
+        //         {isLoading && (
+        //             <div className="w-full h-64 flex flex-col items-center justify-center bg-brand-ash/20 rounded-2xl border border-ash-light border-dashed">
+        //                 <i className="fas fa-circle-notch fa-spin text-4xl text-action-primary mb-4"></i>
+        //                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted animate-pulse">Loading Categories...</p>
+        //             </div>
+        //         )}
+
+        //         {/* State Handling: Error */}
+        //         {!isLoading && isError && (
+        //             <div className="w-full max-w-lg mx-auto p-8 bg-brand-surface border border-action-danger/30 rounded-2xl shadow-sm text-center">
+        //                 <div className="w-16 h-16 bg-action-danger/10 text-action-danger rounded-full flex items-center justify-center mx-auto mb-4">
+        //                     <i className="fas fa-exclamation-triangle text-2xl"></i>
+        //                 </div>
+        //                 <h3 className="text-lg font-bold text-text-strong mb-2">Connection Failed</h3>
+        //                 <p className="text-text-muted text-xs font-medium mb-6">
+        //                     {(error as any)?.message || "Unable to retrieve product categories at this time."}
+        //                 </p>
+        //                 <Button onClick={() => refetch()} variant="outline" className="border-ash-dark text-text-main hover:bg-brand-ash px-8 h-10 font-bold uppercase tracking-wider text-[10px]">
+        //                     Retry Connection
+        //                 </Button>
+        //             </div>
+        //         )}
+
+        //         {/* State Handling: Empty */}
+        //         {!isLoading && !isError && categories?.length === 0 && (
+        //             <div className="w-full h-64 flex flex-col items-center justify-center bg-brand-ash/20 rounded-2xl border border-ash-light border-dashed text-center p-6">
+        //                 <div className="w-16 h-16 bg-brand-surface border border-ash-medium rounded-full flex items-center justify-center mb-4 shadow-sm">
+        //                     <i className="fas fa-box-open text-2xl text-text-soft"></i>
+        //                 </div>
+        //                 <h3 className="text-base font-bold text-text-strong mb-1">No Product Categories Found</h3>
+        //                 <p className="text-xs text-text-muted max-w-sm font-medium">
+        //                     There are currently no categories marked as "Product Specific". Please update your Category configurations first.
+        //                 </p>
+        //             </div>
+        //         )}
+
+        //         {/* State Handling: Success Grid */}
+        //         {!isLoading && !isError && categories?.length > 0 && (
+        //             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        //                 {categories.map((category: any) => (
+        //                     <div 
+        //                         key={category._id}
+        //                         onClick={() => navigate(`../instant-cost-calculator/dimention/${category._id}`)}
+        //                         className="group bg-brand-surface border-2 border-ash-medium rounded-2xl p-6 cursor-pointer hover:border-action-primary hover:shadow-lg transition-all duration-300 flex flex-col h-full relative overflow-hidden"
+        //                     >
+        //                         {/* Decorative background accent on hover */}
+        //                         <div className="absolute -right-6 -top-6 w-24 h-24 bg-action-primary/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+        //                         <div className="flex items-start justify-between mb-6">
+        //                             <div className="w-14 h-14 rounded-xl bg-brand-ash border border-ash-medium flex items-center justify-center text-action-primary group-hover:scale-110 group-hover:bg-action-primary/90 group-hover:text-brand-surface transition-all duration-300 shadow-sm">
+        //                                 <i className="fas fa-cubes text-2xl"></i>
+        //                             </div>
+        //                             <div className="w-8 h-8 rounded-full bg-brand-surface border border-ash-light flex items-center justify-center text-text-soft group-hover:text-action-primary group-hover:border-action-primary/30 transition-colors shadow-sm">
+        //                                 <i className="fas fa-arrow-right text-[10px]"></i>
+        //                             </div>
+        //                         </div>
+                                
+        //                         <div className="mt-auto">
+        //                             <h3 className="text-lg font-bold text-text-strong group-hover:text-action-primary transition-colors line-clamp-2">
+        //                                 {category.name}
+        //                             </h3>
+        //                             <div className="mt-3 flex items-center gap-2">
+        //                                 <span className="px-2.5 py-1 rounded bg-action-success/10 border border-action-success/20 text-action-success text-[9px] font-bold uppercase tracking-widest">
+        //                                     Product Specific
+        //                                 </span>
+        //                             </div>
+        //                         </div>
+        //                     </div>
+        //                 ))}
+        //             </div>
+        //         )}
+        //     </main>
+        // </div>
+
+      <div className="w-full h-full bg-brand-surface custom-scrollbar overflow-y-auto flex flex-col">
+
+            {/* Header Section (Solid White) */}
+            <header className="sticky top-0 z-10 bg-brand-surface border-b border-ash-light px-6 py-2 shrink-0 shadow-sm">
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <button
+                            type="button"
+                            onClick={() => navigate(-1)}
+                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-brand-surface border border-ash-medium text-text-muted hover:text-text-main hover:bg-brand-ash transition-all shadow-sm shrink-0 cursor-pointer"
+                        >
+                            <i className="fas fa-arrow-left text-sm"></i>
+                        </button>
+                        
+                        <div className="flex items-center gap-3.5">
+                            <div className="w-10 h-10 bg-brand-ash border border-ash-medium rounded-lg flex items-center justify-center shadow-sm shrink-0">
+                                <i className="fas fa-calculator text-lg text-text-main"></i>
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <h1 className="text-lg sm:text-xl font-semibold text-text-main leading-tight">
+                                    Instant Cost Calculator
+                                </h1>
+                                <p className="text-xs text-text-muted mt-0.5">
+                                    Configure dimensions and pricing models
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content Area */}
+            <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-8">
+
+                <div className="mb-6">
+                    <h2 className="text-lg font-semibold text-text-main">
+                        Select a Product Category
+                    </h2>
+                    <p className="text-sm text-text-soft mt-1.5 max-w-2xl">
+                        Choose a product category below to configure its specific dimension matrices, material requirements, and labour costs.
+                    </p>
+                </div>
+
+                {/* State Handling: Loading */}
+                {isLoading && (
+                    <div className="w-full h-64 flex flex-col items-center justify-center bg-brand-surface rounded-xl border border-ash-light shadow-sm">
+                        <i className="fas fa-circle-notch fa-spin text-2xl text-action-primary mb-3"></i>
+                        <p className="text-xs font-medium text-text-muted">Loading Categories...</p>
+                    </div>
+                )}
+
+                {/* State Handling: Error */}
+                {!isLoading && isError && (
+                    <div className="w-full max-w-lg mx-auto p-6 bg-brand-surface border border-action-danger/20 rounded-xl shadow-sm text-center mt-10">
+                        <div className="w-12 h-12 bg-action-danger/10 text-action-danger rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i className="fas fa-exclamation-triangle text-lg"></i>
+                        </div>
+                        <h3 className="text-base font-semibold text-text-main mb-1.5">Connection Failed</h3>
+                        <p className="text-text-muted text-sm mb-5">
+                            {(error as any)?.message || "Unable to retrieve product categories at this time."}
+                        </p>
+                        <Button onClick={() => refetch()} variant="outline" className="border-ash-medium text-text-main hover:bg-brand-ash px-6 h-9 text-xs font-medium shadow-sm">
+                            Retry Connection
+                        </Button>
+                    </div>
+                )}
+
+                {/* State Handling: Empty */}
+                {!isLoading && !isError && categories?.length === 0 && (
+                    <div className="w-full h-64 flex flex-col items-center justify-center bg-brand-surface rounded-xl border border-ash-light shadow-sm text-center p-6">
+                        <div className="w-12 h-12 bg-brand-ash border border-ash-medium rounded-full flex items-center justify-center mb-3 shadow-sm">
+                            <i className="fas fa-box-open text-lg text-text-muted"></i>
+                        </div>
+                        <h3 className="text-base font-semibold text-text-main mb-1">No Categories Found</h3>
+                        <p className="text-sm text-text-muted max-w-sm">
+                            There are currently no categories marked as "Product Specific".
+                        </p>
+                    </div>
+                )}
+
+                {/* State Handling: Success Grid */}
+                {!isLoading && !isError && categories?.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                        {categories.map((category: any) => (
+                            <div 
+                                key={category._id}
+                                onClick={() => navigate(`../instant-cost-calculator/dimention/${category._id}`)}
+                                className="group bg-brand-surface border border-ash-light hover:border-ash-medium rounded-xl p-5 cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col h-36"
+                            >
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className="w-10 h-10 rounded-lg bg-brand-ash/50 border border-ash-light flex items-center justify-center text-text-muted group-hover:text-action-primary group-hover:bg-action-primary/5 transition-colors">
+                                        <i className="fas fa-cubes text-lg"></i>
+                                    </div>
+                                    <div className="text-ash-dark group-hover:text-text-main transition-colors mt-1">
+                                        <i className="fas fa-arrow-right text-xs"></i>
+                                    </div>
+                                </div>
+                                
+                                <div className="mt-auto">
+                                    <h3 className="text-base font-semibold text-text-main line-clamp-1">
+                                        {category.name}
+                                    </h3>
+                                    <div className="mt-1.5">
+                                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-action-success/10 text-action-success border border-action-success/20 inline-block">
+                                            Product Specific
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </main>
+        </div>
+    );
+};
+
+export default InstantCostCalculatorProductConfigMain;

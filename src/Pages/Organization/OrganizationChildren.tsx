@@ -9,7 +9,7 @@ import HeaderSidebar from '../../shared/HeaderSidebar'
 
 // 1. ⭐ MAPPING: Sidebar Keys -> Backend Permission Keys
 // (Ensure these keys exist in your DB permissions)
-const PERMISSION_MAPPING: Record<string, string> = {
+export const PERMISSION_MAPPING: Record<string, string> = {
     INVITECTO: "invitecto",
     INVITESTAFFS: "invitestaff",
     MODULAR: "modularunit",

@@ -9,7 +9,7 @@ import { getApiForRole } from "../../utils/roleCheck";
 const getFirstPendingStageForProject = async ({projectId,}: { projectId: string;}) => {
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/currentactivestage/${projectId}/pendingstage`);
     // if (!response.data.ok) return ""
-    return response.data.redirectTo;
+    return response.data;
 };
 
 

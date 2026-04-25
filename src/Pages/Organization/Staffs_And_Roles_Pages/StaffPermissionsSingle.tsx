@@ -7,9 +7,11 @@ import { useDebounce } from '../../../Hooks/useDebounce';
 
 // 1. Organization Level Departments
 const ORG_MODULES = [
+    "project_configuration",
     'hr',
     'logistics',
     'procurement',
+    "archive_projects",
     // "commonorder",
     'accounts',
     'payments',
@@ -56,10 +58,12 @@ const PROJECT_STAGES = [
     "inventory",
     "inviteclient",
     "inviteworker",
+    "onboarding",
     "prerequisites",
     "clientrequirement", // clientrequirement
     "sitemeasurement",
     "sampledesign",
+    "designapproval",
     "workschedule",
     "technicalconsultant",
     "paymentconfirmation",

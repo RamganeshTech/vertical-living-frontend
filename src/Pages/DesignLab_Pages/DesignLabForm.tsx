@@ -21,11 +21,11 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ className = "", children, onClick }) => (
-    <div onClick={onClick} className={`bg-white border border-gray-300 rounded-xl shadow-sm mb-6 overflow-hidden ${className}`}>{children}</div>
+    <div onClick={onClick} className={`bg-brand-surface border border-ash-medium rounded-xl shadow-sm mb-6 overflow-hidden ${className}`}>{children}</div>
 );
 
 const CardHeader: React.FC<CardProps> = ({ className = "", children }) => (
-    <div className={`px-6 py-3 bg-gray-100 border-b border-gray-300 ${className}`}>{children}</div>
+    <div className={`px-6 py-3 bg-brand-ash/40 border-b border-ash-light ${className}`}>{children}</div>
 );
 
 const CardContent: React.FC<CardProps> = ({ className = "", children }) => (
@@ -33,7 +33,7 @@ const CardContent: React.FC<CardProps> = ({ className = "", children }) => (
 );
 
 const CardTitle: React.FC<CardProps> = ({ className = "", children }) => (
-    <h3 className={`text-base font-extrabold text-gray-800 flex items-center gap-2 uppercase tracking-wide ${className}`}>{children}</h3>
+    <h3 className={`text-base font-extrabold text-text-strong flex items-center gap-2 uppercase tracking-wide ${className}`}>{children}</h3>
 );
 
 // --- TYPES ---
@@ -568,27 +568,31 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
     }
 
     return (
-        <div className="max-h-full overflow-y-auto bg-gray-100 text-gray-800 font-sans">
+        <div className="max-h-full overflow-y-auto bg-brand-surface text-text-main font-sans">
 
             {/* HEADER */}
-            <header className="bg-white border-b border-gray-300 px-8 py-3 sticky top-0 z-50 shadow-sm flex justify-between items-center">
+            <header className="bg-brand-surface border-b border-ash-light px-8 py-3 sticky top-0 z-50 shadow-sm flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                    <button type="button" onClick={() => navigate(-1)} className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2'>
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className='bg-brand-ash border border-ash-medium flex items-center justify-between w-8 h-8  text-sm cursor-pointer rounded-md px-2'>
                         <i className="fas fa-arrow-left"></i>
                     </button>
-                    <div className="bg-blue-600 p-2 rounded text-white">
+                    <div className="bg-action-primary p-2 rounded text-brand-surface">
                         <i className="fas fa-drafting-compass text-lg"></i>
                     </div>
                     <div>
-                        <h2 className="text-lg font-bold text-gray-900 leading-none">
+                        <h2 className="text-lg font-bold text-text-strong leading-none">
                             {mode === 'create' ? 'New Specification' : 'Edit Specification'}
                         </h2>
-                        <p className="text-xs text-gray-500 font-medium">Design Lab Control • {formData.designCode}</p>
+                        <p className="text-xs text-text-muted font-medium">Design Lab Control • {formData.designCode}</p>
                     </div>
                 </div>
                 <div className="flex gap-3">
                     {onReset && (
-                        <Button variant="outline" onClick={onReset} disabled={isLoading} className="h-9 text-sm border-gray-300 text-gray-600 hover:bg-gray-50">
+                        <Button variant="outline" onClick={onReset} disabled={isLoading}
+                            className="h-9 text-sm border-ash-dark text-text-main hover:bg-brand-ash">
                             <i className="fas fa-undo mr-2"></i> Reset
                         </Button>
                     )}
@@ -596,7 +600,8 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                         <Button
                             onClick={() => onSubmit(formData)}
                             isLoading={isLoading}
-                            className="h-9 text-sm bg-blue-700 hover:bg-blue-800 text-white shadow-md"
+                            variant="dark"
+                            className="h-9 text-sm shadow-md"
                         >
                             <i className="fas fa-save mr-2"></i> {mode === 'create' ? 'Create Design' : 'Save Changes'}
                         </Button>)}
@@ -606,31 +611,38 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
             <div className="max-w-full mx-auto p-6 space-y-6">
 
                 {/* 1. BASIC DETAILS */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-300">
+                <div className="bg-brand-surface p-6 rounded-xl shadow-sm border border-ash-medium">
                     <div className="flex justify-between items-start">
-                        <h3 className="text-sm font-bold text-gray-500 uppercase mb-4 tracking-wider">Basic Details</h3>
-                        {!isCreateMode && <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-1">
-                                {/* {formData.designCode} */}
-                                Design Code: {" "}
-                                <span className='text-blue-700 text-sm'>{formData?.designCode}</span>
-                            </label>
-                        </div>}
+                        <h3 className="text-sm font-bold text-text-muted uppercase mb-4 tracking-wider">Basic Details</h3>
+                        {!isCreateMode &&
+                            // <div>
+                            //     <label className="block text-xs font-bold text-gray-500  mb-1">
+                            //         Design Code: {" "}
+                            //         <span className='text-blue-700 text-sm'>{formData?.designCode}</span>
+                            //     </label>
+                            // </div>
+
+                            <div className="bg-brand-ash px-3 py-1 rounded border border-ash-medium">
+                                <span className="text-[10px] font-bold text-text-muted uppercase mr-2">Design Code:</span>
+                                <span className='text-action-primary font-mono font-bold text-sm'>#{formData?.designCode}</span>
+                            </div>
+
+                        }
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-13 gap-6 items-end">
 
                         {/* Read-Only Fields (Styled as Disabled Inputs) */}
                         <div className="md:col-span-3">
-                            <label className="block text-xs font-bold text-gray-500 mb-1">Designer Name</label>
-                            <input className="w-full p-2.5 border border-gray-300 rounded text-sm font-bold text-gray-700" value={formData.designerName} />
+                            <label className="block text-xs font-bold text-text-muted  mb-1">Designer Name</label>
+                            <input className="w-full p-2.5 bg-brand-ash/50 border border-ash-medium rounded text-sm font-bold text-text-main" value={formData.designerName} />
                         </div>
 
 
                         <div className={`${!isCreateMode ? "md:col-span-2" : "md:col-span-2"}`}>
-                            <label className="block text-xs font-bold text-gray-500 mb-1">Design Date</label>
+                            <label className="block text-xs font-bold text-text-muted mb-1">Design Date</label>
                             <input
                                 type="date"
-                                className="w-full p-2.5 bg-white border border-gray-300 rounded text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full p-2.5 bg-brand-surface border border-ash-medium rounded text-sm text-text-main font-medium focus:border-2 focus:border-action-primary outline-none"
                                 value={formData.designDate.split('T')[0]}
                                 name='designDate'
                                 onChange={(e) => handleChange('designDate', e.target.value)}
@@ -641,9 +653,11 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                         {/* <div className="md:col-span-3"> */}
                         <div className={`${!isCreateMode ? "md:col-span-3" : "md:col-span-4"}`}>
 
-                            <label className="block text-xs font-bold text-blue-700 mb-1">Product / Design Name</label>
+                            <label className="block text-xs font-bold text-text-muted mb-1">Product / Design Name</label>
                             <input
-                                className="w-full p-2.5 bg-white border border-gray-300 rounded text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
+                                // className="w-full p-2.5 bg-brand-surface border-2 border-ash-medium rounded text-sm font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full p-2.5 bg-brand-surface border border-ash-medium rounded text-sm text-text-main font-medium focus:border-2 focus:border-action-primary outline-none"
+
                                 placeholder="Enter Name..."
                                 name='productName'
                                 value={formData.productName}
@@ -653,9 +667,11 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                         {/* <div className="md:col-span-1.5"> */}
                         <div className={`${!isCreateMode ? "md:col-span-2" : "md:col-span-2"}`}>
 
-                            <label className="block text-xs font-bold text-blue-700 mb-1">Space Type</label>
+                            <label className="block text-xs font-bold text-text-muted mb-1">Space Type</label>
                             <select
-                                className="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                // className="w-full p-2.5 bg-brand-surface border border-ash-medium rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full p-2.5 bg-brand-surface border border-ash-medium rounded text-sm text-text-main font-medium focus:border-2 focus:border-action-primary outline-none"
+
                                 value={formData.spaceType}
                                 name='productName'
                                 onChange={(e) => handleChange('spaceType', e.target.value)}
@@ -667,9 +683,11 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                         {/* <div className="md:col-span-1.5"> */}
                         <div className={`${!isCreateMode ? "md:col-span-3" : "md:col-span-2"}`}>
 
-                            <label className="block text-xs font-bold text-blue-700 mb-1">Difficulty</label>
+                            <label className="block text-xs font-bold text-text-muted mb-1">Difficulty</label>
                             <select
-                                className="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                // className="w-full p-2.5 bg-brand-surface border border-ash-medium rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full p-2.5 bg-brand-surface border border-ash-medium rounded text-sm text-text-main font-medium focus:border-2 focus:border-action-primary outline-none"
+
                                 value={formData.difficultyLevel}
                                 name='difficultyLevel'
                                 onChange={(e) => handleChange('difficultyLevel', e.target.value)}
@@ -683,21 +701,24 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                 {/* 2. REFERENCE IMAGES */}
                 <Card>
                     <CardHeader className="flex justify-between items-center">
-                        <CardTitle><i className="fas fa-images text-blue-600"></i> Reference Images</CardTitle>
-                        <label className="cursor-pointer bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded font-bold text-xs uppercase transition-colors flex items-center gap-2">
-                            {/* {!uploadingReferenceImg ?  */}
+                        {/* <CardTitle><i className="fas fa-images text-blue-600"></i> Reference Images</CardTitle> */}
+                        <CardTitle><i className="fas fa-images text-action-primary"></i> Reference Media</CardTitle>
+                        {/* <label className="cursor-pointer bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded font-bold text-xs uppercase transition-colors flex items-center gap-2">
                             <i className="fas fa-upload"></i>
-                            {/* : 
-                             <i className="fas fa-spinner animate-spin text-[10px]"></i> */}
-                            {/* }  */}
+                          
                             Upload Images
+                            <input type="file" multiple accept="image/*" className="hidden" onChange={handleRefImageUpload} />
+                        </label> */}
+
+                        <label className="cursor-pointer bg-brand-surface border-2 border-ash-dark text-text-main hover:bg-brand-ash px-4 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all shadow-sm flex items-center gap-2">
+                            <i className="fas fa-cloud-upload-alt"></i> Upload Reference
                             <input type="file" multiple accept="image/*" className="hidden" onChange={handleRefImageUpload} />
                         </label>
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-col items-center gap-4">
                             {/* Main Image Area */}
-                            <div className="relative w-full h-[400px] bg-gray-300 rounded-lg overflow-hidden flex items-center justify-center group">
+                            <div className="relative w-full h-[400px] bg-brand-ash/30 rounded-lg border border-ash-medium overflow-hidden flex items-center justify-center group">
                                 {formData.referenceImages.length > 0 ? (
                                     <>
                                         <img
@@ -705,37 +726,42 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                             className="h-full max-w-full object-contain"
                                             onClick={() => { setLightboxImage(formData.referenceImages[currentRefIndex].url); setIsLightboxOpen(true); }}
                                         />
-                                        <button onClick={(e) => { e.stopPropagation(); slideImage('prev'); }} className="absolute left-4 bg-black/50 text-white p-3 rounded-full hover:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity"><i className="fas fa-chevron-left"></i></button>
-                                        <button onClick={(e) => { e.stopPropagation(); slideImage('next'); }} className="absolute right-4 bg-black/50 text-white p-3 rounded-full hover:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity"><i className="fas fa-chevron-right"></i></button>
-                                        <span className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded text-xs font-bold">{currentRefIndex + 1} / {formData.referenceImages.length}</span>
+                                        {/* <button onClick={(e) => { e.stopPropagation(); slideImage('prev'); }} className="absolute left-4 bg-brand-surface/90 border border-ash-medium text-text-strong p-3 rounded-full hover:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity"><i className="fas fa-chevron-left"></i></button> */}
+                                        <button onClick={(e) => { e.stopPropagation(); slideImage('prev'); }} className=" cursor-pointer absolute left-4 bg-brand-surface/90 border border-ash-medium text-text-strong w-10 h-10 rounded-full hover:bg-brand-surface shadow-lg opacity-0 group-hover:opacity-100 transition-all"><i className="fas fa-chevron-left"></i></button>
+                                        {/* <button onClick={(e) => { e.stopPropagation(); slideImage('next'); }} className="absolute right-4 bg-black/50 text-white p-3 rounded-full hover:bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity"><i className="fas fa-chevron-right"></i></button> */}
+                                        <button onClick={(e) => { e.stopPropagation(); slideImage('next'); }} className=" cursor-pointer absolute right-4 bg-brand-surface/90 border border-ash-medium text-text-strong w-10 h-10 rounded-full hover:bg-brand-surface shadow-lg opacity-0 group-hover:opacity-100 transition-all"><i className="fas fa-chevron-right"></i></button>
+                                        {/* <span className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded text-xs font-bold">{currentRefIndex + 1} / {formData.referenceImages.length}</span> */}
+                                        <span className="absolute bottom-4 right-4 bg-action-primary text-brand-surface px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg border border-white/20">
+                                            {currentRefIndex + 1} / {formData.referenceImages.length}
+                                        </span>
                                     </>
                                 ) : (
-                                    // <div className="text-center text-gray-500">
-                                    //     <i className="fas fa-image text-5xl mb-3 opacity-30"></i>
-                                    //     <p className="text-sm">No images uploaded yet.</p>
-                                    //     <p className="text-xs opacity-70">(Upload 2-5 images for best results)</p>
-                                    // </div>
 
                                     // --- CLICKABLE UPLOAD ZONE ---
-                                    <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-gray-400 ">
-                                        <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
-                                            {/* {!uploadingReferenceImg ? ( */}
-                                            <i className="fas fa-cloud-upload-alt text-3xl"></i>
-                                            {/* ) : (
-                                                <i className="fas fa-spinner animate-spin text-3xl text-blue-500"></i>
-                                            )} */}
-                                        </div>
-                                        <p className="text-lg font-semibold text-gray-600 ">Click to Upload Images</p>
-                                        <p className="text-xs text-gray-400 mt-1">(Upload 2-5 images for best results)</p>
+                                    // <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-gray-400 ">
+                                    //     <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                                    //         <i className="fas fa-cloud-upload-alt text-3xl"></i>
 
-                                        {/* Hidden Input triggered by label click */}
-                                        <input
-                                            type="file"
-                                            multiple
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={handleRefImageUpload}
-                                        />
+                                    //     </div>
+                                    //     <p className="text-lg font-semibold text-gray-600 ">Click to Upload Images</p>
+                                    //     <p className="text-xs text-gray-400 mt-1">(Upload 2-5 images for best results)</p>
+
+                                    //     <input
+                                    //         type="file"
+                                    //         multiple
+                                    //         accept="image/*"
+                                    //         className="hidden"
+                                    //         onChange={handleRefImageUpload}
+                                    //     />
+                                    // </label>
+
+                                    <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-text-soft hover:bg-brand-ash/50 transition-all border-2 border-dashed border-ash-medium rounded-xl">
+                                        <div className="w-20 h-20 rounded-full bg-brand-surface border border-ash-medium flex items-center justify-center mb-4 group-hover:scale-105 transition-transform shadow-sm">
+                                            <i className="fas fa-image text-3xl"></i>
+                                        </div>
+                                        <p className="text-sm font-bold uppercase tracking-widest text-text-main">Click to Add Images</p>
+                                        <p className="text-[10px] text-text-muted mt-2">(Supported: PNG, JPG, WebP)</p>
+                                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleRefImageUpload} />
                                     </label>
                                 )}
                             </div>
@@ -751,19 +777,15 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                                 <img
                                                     src={img.url}
                                                     onClick={() => setCurrentRefIndex(idx)}
-                                                    className={`h-[80px] w-[120px] object-cover rounded border-2 cursor-pointer transition-all ${currentRefIndex === idx ? 'border-blue-600 opacity-100 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                                    className={`h-[80px] w-[120px] object-cover rounded border-2 cursor-pointer transition-all ${currentRefIndex === idx ? 'border-action-primary opacity-100 shadow-md' : 'border-ash-medium opacity-60 hover:opacity-100'}`}
                                                 />
                                                 {/* Delete Button (Top Right) */}
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); removeRefImage(idx); }}
-                                                    className="absolute !cursor-pointer -top-1 -right-2 bg-white text-red-500 rounded-full w-5 h-5 flex items-center justify-center shadow-md opacity-0 group-hover/thumb:opacity-100 transition-opacity border border-gray-200 z-10"
+                                                    className="absolute !cursor-pointer -top-1 -right-2 bg-brand-surface text-action-danger rounded-full w-5 h-5 flex items-center justify-center shadow-md opacity-0 group-hover/thumb:opacity-100 transition-opacity border border-ash-medium z-10 hover:bg-action-danger hover:text-brand-surface"
                                                     title="Delete Image"
                                                 >
-                                                    {/* {!deletingReferenceImg ?  */}
                                                     <i className="fas fa-trash text-[10px]"></i>
-                                                    {/* :
-                                                     <i className="fas fa-spinner animate-spin text-[10px]"></i>
-                                                     } */}
                                                 </button>
                                             </div>
                                         ))}
@@ -777,35 +799,39 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                 {/* 3. DESIGN COMPONENTS & MATERIALS */}
                 <Card>
                     <CardHeader className="flex justify-between items-center">
-                        {/* <CardTitle><i className="fas fa-images text-blue-600"></i> Reference Images</CardTitle> */}
 
-                        <CardTitle><i className="fas fa-cubes text-blue-400"></i> Design Components</CardTitle>
+                        {/* <CardTitle><i className="fas fa-cubes text-blue-400"></i> Design Components</CardTitle> */}
+                        <CardTitle><i className="fas fa-cubes text-action-primary"></i> Design Components</CardTitle>
 
-                        <Button onClick={addComponent} className="bg-blue-600 hover:bg-blue-500 border-none text-white text-xs h-8">
+                        {/* <Button onClick={addComponent} className="bg-blue-600 hover:bg-blue-500 border-none text-white text-xs h-8">
                             <i className="fas fa-plus mr-2"></i> Add Component
+                        </Button> */}
+
+                        <Button onClick={addComponent} variant="dark" className="h-8 px-4 text-[10px] font-bold uppercase tracking-[0.15em] shadow-sm">
+                            <i className="fas fa-plus mr-2"></i> New Component
                         </Button>
                     </CardHeader>
-                    <div className="p-6 bg-gray-50 space-y-8">
+                    <div className="p-6 bg-brand-ash/20 space-y-8">
                         {formData.components.map((comp, compIdx) => (
-                            <div key={compIdx} className="bg-white border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                            <div key={compIdx} className="bg-brand-surface border border-ash-medium rounded-xl overflow-hidden shadow-sm">
                                 {/* Component Header */}
-                                <div className="px-6 py-3 border-b border-gray-200 bg-gray-100 flex justify-between items-center">
+                                <div className="px-6 py-3 border-b border-ash-light bg-brand-ash/30 flex justify-between items-center">
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className="w-8 h-8 rounded bg-blue-600 text-white flex items-center justify-center text-sm font-bold">{compIdx + 1}</div>
+                                        <div className="w-8 h-8 rounded bg-action-primary text-brand-surface flex items-center justify-center text-sm font-bold">{compIdx + 1}</div>
                                         <input
-                                            className="bg-transparent text-lg font-bold text-gray-800 border-b-2 border-transparent hover:border-gray-300 focus:border-blue-600 outline-none px-1 w-1/2 transition-all placeholder-gray-400"
+                                            className="bg-transparent text-lg font-bold text-text-strong border-b-2 border-transparent hover:border-ash-medium focus:border-action-primary outline-none px-1 w-1/2 transition-all placeholder:text-text-soft"
                                             placeholder="Component Name..."
                                             value={comp.componentName}
                                             onChange={e => updateCompName(compIdx, e.target.value)}
                                         />
                                     </div>
-                                    <button onClick={() => removeComponent(compIdx)} className="text-gray-400 hover:text-red-600 p-2"><i className="fas fa-trash-alt text-lg"></i></button>
+                                    <button onClick={() => removeComponent(compIdx)} className="text-text-soft hover:text-action-danger p-2"><i className="fas fa-trash-alt text-lg"></i></button>
                                 </div>
 
                                 {/* Materials Table */}
                                 <div className="p-2">
                                     {/* Header Row */}
-                                    <div className="flex gap-3 px-4 py-2 text-xs font-bold text-gray-500 uppercase border-b border-gray-100">
+                                    <div className="flex gap-3 px-4 py-2 text-xs font-bold text-text-muted uppercase border-b border-ash-light">
                                         <div className="w-[90px] text-center">Img</div>
                                         <div className="flex-[2] text-center">Material Name</div>
                                         <div className="flex-[2] text-center ">Vendor</div>
@@ -817,9 +843,9 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                     </div>
 
                                     {/* Rows */}
-                                    <div className="divide-y divide-gray-50">
+                                    <div className="divide-y divide-ash-lighter">
                                         {comp.materials.map((mat, matIdx) => (
-                                            <div key={matIdx} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors group">
+                                            <div key={matIdx} className="flex items-center gap-3 px-4 py-3 hover:bg-brand-ash/20 transition-colors group">
 
                                                 {/* Image */}
                                                 {/* <div className="w-[60px] h-[60px] shrink-0 relative bg-gray-100 border border-gray-200 rounded overflow-hidden group/img">
@@ -838,18 +864,19 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
 
                                                 {/* Material Image Cell */}
                                                 <div className="flex flex-col items-center gap-2">
-                                                    <div className="w-[90px] h-[90px] shrink-0 relative rounded-lg overflow-hidden group/img">
+                                                    <div className="w-[90px] h-[90px] shrink-0 relative border border-ash-medium bg-brand-surface rounded-lg overflow-hidden group/img">
                                                         {mat.image?.url ? (
                                                             <>
                                                                 {/* The Image */}
                                                                 <img
                                                                     src={mat.image.url}
                                                                     alt="Material"
-                                                                    className="w-full h-full object-cover bg-gray-100"
+                                                                    className="w-full h-full object-cover"
                                                                 />
 
                                                                 {/* Hover Overlay with Actions */}
-                                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-all duration-200 flex items-center justify-center gap-2 backdrop-blur-[1px]">
+                                                                <div className="absolute inset-0 bg-action-primary/40 opacity-0 group-hover/img:opacity-100 transition-all duration-200 flex items-center justify-center gap-2 backdrop-blur-[1px]">
+
 
                                                                     {/* View Image (Invisible click area for Lightbox) */}
                                                                     <div
@@ -859,7 +886,7 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
 
                                                                     {/* Change/Upload Button */}
                                                                     <label
-                                                                        className="relative z-10 w-8 h-8 flex items-center justify-center bg-white text-gray-600 rounded-full shadow-lg cursor-pointer hover:text-blue-600 hover:scale-110 transition-transform"
+                                                                        className="relative z-10 w-8 h-8 flex items-center justify-center bg-brand-surface text-text-muted rounded-full shadow-lg cursor-pointer hover:text-text-strong hover:scale-110 transition-transform"
                                                                         title="Change Image"
                                                                     >
                                                                         <i className="fas fa-sync-alt text-xs"></i>
@@ -877,21 +904,17 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                                                             e.stopPropagation(); // Prevent opening lightbox
                                                                             removeMaterialImage(compIdx, matIdx);
                                                                         }}
-                                                                        className="relative z-10 w-8 h-8 flex items-center justify-center bg-white text-red-500 rounded-full shadow-lg cursor-pointer hover:bg-red-50 hover:scale-110 transition-transform"
+                                                                        className="relative z-10 w-8 h-8 flex items-center justify-center bg-brand-surface text-action-danger rounded-full shadow-lg cursor-pointer hover:bg-brand-surface hover:scale-110 transition-transform"
                                                                         title="Remove Image"
                                                                     >
-                                                                        {/* {!deletingMatImg ? ( */}
                                                                         <i className="fas fa-trash text-xs"></i>
-                                                                        {/* ) : (
-                                                                            <i className="fas fa-spinner animate-spin text-xs"></i>
-                                                                        )} */}
                                                                     </button>
                                                                 </div>
                                                             </>
                                                         ) : (
                                                             /* Empty State (Upload Placeholder) */
-                                                            <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50/50 text-gray-400 hover:text-blue-500 transition-all group/upload">
-                                                                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm mb-1 group-hover/upload:scale-110 transition-transform">
+                                                            <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-text-soft hover:text-action-primary bg-brand-ash/10 hover:bg-brand-ash/30 rounded-lg transition-all group/upload">
+                                                                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-bradn-surface shadow-sm mb-1 group-hover/upload:scale-110 transition-transform">
                                                                     {/* {!uploadingMatImg ? ( */}
                                                                     <i className="fas fa-plus text-xs"></i>
                                                                     {/* ) : (
@@ -911,32 +934,23 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                                                 </div>
 
                                                 {/* Inputs (Single Row) */}
-                                                <div className="flex-[2]"><input className="w-full p-2 text-sm border border-gray-300 rounded focus:border-blue-500 outline-none" placeholder="Name" value={mat.materialName} onChange={e => updateMaterial(compIdx, matIdx, 'materialName', e.target.value)} /></div>
+                                                <div className="flex-[2]"><input className="w-full p-2 text-sm border border-ash-medium rounded focus:border-action-primary outline-none" placeholder="Name" value={mat.materialName} onChange={e => updateMaterial(compIdx, matIdx, 'materialName', e.target.value)} /></div>
 
                                                 <div className="flex-[2] relative group/vendor">
                                                     {/* {mat.vendorId === null ? ( */}
-                                                    <input className="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded outline-none" placeholder="Vendor" value={mat.vendorName || ''} onChange={e => updateMaterial(compIdx, matIdx, 'vendorName', e.target.value)} />
-                                                    {/* ) : ( */}
-                                                    {/* <div className="h-[38px]"> */}
-                                                    {/* <SearchSelectNew options={VendorOptions} value={mat.vendorId || ""}
-                                                                onValueChange={(val: string | null) => updateMaterial(compIdx, matIdx, 'vendorId', val)}
-                                                                className="w-full h-full text-sm"
-                                                                placeholder="Select Vendor" /> */}
-                                                    {/* </div>
-                                                    )} */}
-                                                    {/* <div className="absolute -top-2 -right-2 bg-white rounded-full shadow border p-0.5 opacity-0 group-hover/vendor:opacity-100 transition-opacity z-10"><input type="checkbox" className="w-4 h-4 cursor-pointer" checked={mat.vendorId === null} onChange={() => toggleVendorMode(compIdx, matIdx)} title="Manual?" /></div> */}
+                                                    <input className="w-full p-2 text-sm bg-brand-ash/30 border border-ash-medium rounded focus:border-action-primary outline-none" placeholder="Vendor" value={mat.vendorName || ''} onChange={e => updateMaterial(compIdx, matIdx, 'vendorName', e.target.value)} />
                                                 </div>
 
                                                 <div className="w-[80px]">
-                                                    <input type="number" className="w-full p-2 text-sm text-right border border-gray-300 rounded outline-none" placeholder="0" value={mat.rate} onChange={e => updateMaterial(compIdx, matIdx, 'rate', e.target.value)} />
+                                                    <input type="number" className="w-full p-2 text-sm text-right border border-ash-medium rounded focus:border-action-primary outline-none" placeholder="0" value={mat.rate} onChange={e => updateMaterial(compIdx, matIdx, 'rate', e.target.value)} />
                                                 </div>
-                                                <div className="w-[80px]"><select className="w-full p-2 text-sm border border-gray-300 rounded outline-none bg-white" value={mat.unit} onChange={e => updateMaterial(compIdx, matIdx, 'unit', e.target.value)}>{UNITS.map(u => <option key={u} value={u}>{u}</option>)}</select></div>
-                                                <div className="w-[80px]"><input type="number" className="w-full p-2 text-sm text-right border border-gray-300 rounded outline-none" placeholder="0" value={mat.labourCost} onChange={e => updateMaterial(compIdx, matIdx, 'labourCost', e.target.value)} /></div>
-                                                <div className="flex-[3]"><input className="w-full p-2 text-sm border border-gray-300 rounded outline-none" placeholder="Specs..." value={mat.specsNotes} onChange={e => updateMaterial(compIdx, matIdx, 'specsNotes', e.target.value)} /></div>
+                                                <div className="w-[80px]"><select className="w-full p-2 text-sm border border-ash-medium rounded outline-none bg-white" value={mat.unit} onChange={e => updateMaterial(compIdx, matIdx, 'unit', e.target.value)}>{UNITS.map(u => <option key={u} value={u}>{u}</option>)}</select></div>
+                                                <div className="w-[80px]"><input type="number" className="w-full p-2 text-sm text-right border border-ash-medium rounded outline-none" placeholder="0" value={mat.labourCost} onChange={e => updateMaterial(compIdx, matIdx, 'labourCost', e.target.value)} /></div>
+                                                <div className="flex-[3]"><input className="w-full p-2 text-sm border border-ash-medium focus:border-action-primary rounded outline-none" placeholder="Specs..." value={mat.specsNotes} onChange={e => updateMaterial(compIdx, matIdx, 'specsNotes', e.target.value)} /></div>
 
                                                 <div className="w-[40px] text-center">
                                                     {matIdx !== comp.materials.length - 1 && (
-                                                        <button onClick={() => removeMaterial(compIdx, matIdx)} className="text-gray-300 hover:text-red-500"><i className="fas fa-times-circle text-xl"></i></button>
+                                                        <button onClick={() => removeMaterial(compIdx, matIdx)} className="text-text-soft hover:text-action-danger"><i className="fas fa-times-circle text-xl"></i></button>
                                                     )}
                                                 </div>
                                             </div>
@@ -950,27 +964,27 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
 
                 {/* 4. LOGIC & NOTES */}
                 <Card>
-                    <CardHeader><CardTitle><i className="fas fa-brain text-purple-600"></i> Logic, Pros & Cons</CardTitle></CardHeader>
+                    <CardHeader><CardTitle><i className="fas fa-brain text-action-primary"></i> Logic, Pros & Cons</CardTitle></CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-xs font-bold text-gray-700 uppercase mb-1 block">Pros</label>
-                                    <textarea className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 outline-none text-sm" rows={3} value={formData.pros} name='pros' onChange={e => handleChange('pros', e.target.value)} />
+                                    <label className="text-xs font-bold text-text-muted uppercase mb-1 block">Pros</label>
+                                    <textarea className="w-full p-3 bg-brand-ash/10 border border-ash-medium rounded-lg focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 outline-none text-sm" rows={3} value={formData.pros} name='pros' onChange={e => handleChange('pros', e.target.value)} />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-gray-700 uppercase mb-1 block">Cons</label>
-                                    <textarea className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 outline-none text-sm" rows={3} value={formData.cons} name='cons' onChange={e => handleChange('cons', e.target.value)} />
+                                    <label className="text-xs font-bold text-text-muted uppercase mb-1 block">Cons</label>
+                                    <textarea className="w-full p-3 bg-brand-ash/10 border border-ash-medium rounded-lg focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 outline-none text-sm" rows={3} value={formData.cons} name='cons' onChange={e => handleChange('cons', e.target.value)} />
                                 </div>
                             </div>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-xs font-bold text-gray-700 uppercase mb-1 block">Mistakes to Avoid</label>
-                                    <textarea className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 outline-none text-sm" rows={3} value={formData.mistakes} name='mistakes' onChange={e => handleChange('mistakes', e.target.value)} />
+                                    <label className="text-xs font-bold text-text-muted uppercase mb-1 block">Mistakes to Avoid</label>
+                                    <textarea className="w-full p-3 bg-brand-ash/10 border border-ash-medium rounded-lg focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 outline-none text-sm" rows={3} value={formData.mistakes} name='mistakes' onChange={e => handleChange('mistakes', e.target.value)} />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-gray-700 uppercase mb-1 block">Visual Logic</label>
-                                    <textarea className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 outline-none text-sm" rows={3} value={formData.visualLogic} name='visualLogic' onChange={e => handleChange('visualLogic', e.target.value)} />
+                                    <label className="text-xs font-bold text-text-muted uppercase mb-1 block">Visual Logic</label>
+                                    <textarea className="w-full p-3 bg-brand-ash/10 border border-ash-medium rounded-lg focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 outline-none text-sm" rows={3} value={formData.visualLogic} name='visualLogic' onChange={e => handleChange('visualLogic', e.target.value)} />
                                 </div>
                             </div>
                         </div>
@@ -980,9 +994,12 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                 {/* 5. SEQUENCE OF OPERATIONS */}
                 <Card>
                     <CardHeader className='flex justify-between'>
-                        <CardTitle><i className="fas fa-list-ol text-teal-600"></i> Sequence of Operations</CardTitle>
+                        <CardTitle><i className="fas fa-list-ol text-action-primary"></i> Sequence of Operations</CardTitle>
 
-                        <Button onClick={handleAddRow}>
+                        <Button onClick={handleAddRow}
+                        variant="dark"
+                        className="text-text-main h-8 font-bold text-[10px] uppercase"
+                        >
                             Add Row
                         </Button>
                     </CardHeader>
@@ -990,12 +1007,12 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
                         <div className="space-y-3">
                             {formData.sequenceOfOperations.map((step, idx) => (
                                 <div key={idx} className="flex items-start gap-4 group">
-                                    <div className="mt-2 w-8 h-8 rounded-full bg-teal-100 text-teal-700 font-bold flex items-center justify-center shrink-0 border border-teal-200 shadow-sm">
+                                    <div className="mt-2 w-8 h-8 rounded-full bg-brand-ash border border-ash-medium text-text-strong font-bold flex items-center justify-center shrink-0 group-hover/step:text-action-primary shadow-sm">
                                         {idx + 1}
                                     </div>
                                     <div className="flex-1">
                                         <textarea
-                                            className="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm shadow-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-200 outline-none  overflow-hidden min-h-[46px]"
+                                            className="w-full bg-brand-surface border border-ash-medium rounded-lg p-3 text-sm shadow-sm focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 outline-none placeholder:text-text-soft overflow-hidden min-h-[46px]"
                                             rows={3}
                                             placeholder="Describe step..."
                                             value={step.description}
@@ -1013,9 +1030,9 @@ export const DesignLabForm: React.FC<Props> = ({ initialData, mode, onSubmit, is
 
             {/* Lightbox */}
             {isLightboxOpen && (
-                <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setIsLightboxOpen(false)}>
-                    <button className="absolute top-5 right-5 text-white/70 hover:text-white text-3xl transition-colors"><i className="fas fa-times"></i></button>
-                    <img src={lightboxImage} className="max-h-[90vh] max-w-[90vw] object-contain rounded shadow-2xl border border-white/20" onClick={e => e.stopPropagation()} />
+                <div className="fixed inset-0 z-[9999] bg-action-primary/95 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setIsLightboxOpen(false)}>
+                    <button className="absolute top-5 right-5 text-brand-surface/70 hover:text-brand-surface text-3xl transition-colors"><i className="fas fa-times"></i></button>
+                    <img src={lightboxImage} className="max-h-[90vh] max-w-[90vw] object-contain rounded shadow-2xl border border-white/10" onClick={e => e.stopPropagation()} />
                 </div>
             )}
         </div>

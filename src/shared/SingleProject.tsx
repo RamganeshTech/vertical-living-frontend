@@ -146,7 +146,7 @@ const SingleProject: React.FC<SingleProjectProp> = ({ project, onEdit, organizat
                     <i className="fa-solid fa-eye" />
                     View
                 </Link>  */}
-                <Link to={`/${organizationId}/projectdetails/${(project as any)._id}/${currentStagePath}`} onClick={() => handleSetProejctId((project as any)._id)} className={`hover:underline ${isLoading ? "cursor-block" : "cursor-pointer"}  flex items-center gap-1`}>
+                <Link to={currentStagePath?.percentage === 0 ? `/${organizationId}/projectdetails/${project._id}/onboarding` : `/${organizationId}/projectdetails/${(project as any)._id}/${currentStagePath.redirectTo}`} onClick={() => handleSetProejctId((project as any)._id)} className={`hover:underline ${isLoading ? "cursor-block" : "cursor-pointer"}  flex items-center gap-1`}>
                     
                     {isLoading ? <i className='fa fa-spinner animate-spin text-blue-600'></i> : <><i className="fa-solid fa-eye" /> View</>}
                 </Link>

@@ -341,10 +341,10 @@ export default function RateConfigPreSalesMain() {
                         <Input
                             placeholder="Category name (e.g. Plywood)"
                             value={categoryName}
-                            disabled={!!editingCategoryId}
-                            onChange={(e) => setCategoryName(e.target.value)}
-                            className={editingCategoryId ? "cursor-not-allowed" : ""}
-                            title={`${editingCategoryId ? "not allowed to edit title" : ""}`}
+                            // disabled={!!editingCategoryId}
+                            // onChange={(e) => setCategoryName(e.target.value)}
+                            // className={editingCategoryId ? "cursor-not-allowed" : ""}
+                            // title={`${editingCategoryId ? "not allowed to edit title" : ""}`}
                         />
 
                         <div>

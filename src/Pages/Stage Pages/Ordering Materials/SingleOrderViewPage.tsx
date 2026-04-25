@@ -50,8 +50,8 @@ const SingleOrderViewPage = () => {
     // --- Handlers ---
     const handleGeneratePdf = async () => {
         try {
-            if (!projectId || !orderItemId) return;
-            const res = await generateLink({ projectId, organizationId: orderData?.organizationId, orderItemId });
+            if (!projectId || !orderItemId || !organizationId) return;
+            const res = await generateLink({ projectId, organizationId: organizationId, orderItemId });
             // console.log("res", res)
             await downloadImage({ src: res?.pdfUrl, alt: "Order Material" })
             toast({ title: "Success", description: "PDF Generated successfully" });

@@ -13,6 +13,7 @@ import SubContractForm from "./SubContractForm";
 import { Label } from "../../../components/ui/Label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/Select";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card";
 
 const SingleSubContract = () => {
     const navigate = useNavigate();
@@ -136,47 +137,58 @@ const SingleSubContract = () => {
         return
     }
     return (
-        <div className="space-y-6 max-h-full overflow-y-auto">
-            <div className="flex justify-between gap-2 items-center">
-                <div className="flex gap-2 items-center">
-                    <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
-                        <i className='fas fa-arrow-left'></i>
-                    </Button>
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        Sub Contract Details
-                    </h1>
+        <div className="space-y-6 max-h-full overflow-y-auto bg-brand-surface">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-3 pb-4 border-b border-ash-light">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center justify-center w-9 h-9 rounded-lg border border-ash-medium bg-brand-surface text-text-muted hover:text-text-main hover:bg-brand-ash transition-all shadow-sm shrink-0"
+                        title="Go Back"
+                    >
+                        <i className="fas fa-arrow-left text-sm"></i>
+                    </button>
+                    <div>
+                        <h1 className="text-xl sm:text-2xl font-bold text-text-main flex items-center gap-3">
+                            <div className="w-10 h-10 bg-brand-ash border border-ash-medium rounded-lg items-center justify-center shadow-sm hidden sm:flex">
+                                <i className="fas fa-file-contract text-action-primary"></i>
+                            </div>
+                            Sub Contract Details
+                        </h1>
+                        <p className="text-[10px] font-bold tracking-wider text-text-muted mt-1.5">View and manage contract status</p>
+                    </div>
                 </div>
 
-                <Select
-                    value={status}
-                    onValueChange={(val: string) => {
-                        handleUpdateStatus(val as "pending" | "accepted" | "rejected")
-                    }}
-                >
-                    <SelectTrigger className={`w-full ${statusConfig[status].triggerClass}`}>
-                        <SelectValue
-                            placeholder="Select Status"
-                            selectedValue={status.toString()}
-                            className={statusConfig[status].valueClass}
-                        />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {(["pending", "accepted", "rejected"] as const).map((statusOption) => (
-                            <SelectItem
-                                key={statusOption}
-                                value={statusOption}
-                                className={statusConfig[statusOption].itemClass}
-                            >
-                                <span className="flex items-center gap-2">
-                                    <span className={`w-2 h-2 rounded-full ${statusConfig[statusOption].dotColor}`}></span>
-                                    {statusConfig[statusOption].label}
-                                </span>
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
-
+                {/* Status Dropdown */}
+                <div className="w-full sm:w-48 shrink-0">
+                    <Label className="text-[9px] font-bold tracking-wider text-text-muted mb-1 block">Contract Status</Label>
+                    <Select
+                        value={status}
+                        onValueChange={(val: string) => handleUpdateStatus(val as "pending" | "accepted" | "rejected")}
+                    >
+                        <SelectTrigger className={`w-full h-10 shadow-sm ${statusConfig[status].triggerClass}`}>
+                            <SelectValue
+                                placeholder="Select Status"
+                                selectedValue={status.toString()}
+                                className={statusConfig[status].valueClass}
+                            />
+                        </SelectTrigger>
+                        <SelectContent className="bg-brand-surface border-ash-medium shadow-md">
+                            {(["pending", "accepted", "rejected"] as const).map((statusOption) => (
+                                <SelectItem
+                                    key={statusOption}
+                                    value={statusOption}
+                                    className={`cursor-pointer hover:bg-brand-ash ${statusConfig[statusOption].itemClass}`}
+                                >
+                                    <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider">
+                                        <span className={`w-2 h-2 rounded-full ${statusConfig[statusOption].dotColor}`}></span>
+                                        {statusConfig[statusOption].label}
+                                    </span>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             <div className="max-w-full mx-auto space-y-8">
@@ -189,22 +201,57 @@ const SingleSubContract = () => {
                 />
 
 
-                {shareableLink && <div className="space-y-4">
-                    <Label>Form Link</Label>
-                    <div className="flex flex-col sm:flex-row items-center gap-2">
-                        <Input
-                            value={shareableLink}
-                            readOnly
-                            className="bg-blue-50 text-blue-800 flex-1"
-                        />
-                        <Button
-                            onClick={handleCopyLink}
-                            className="w-full sm:w-auto"
-                        >
-                            <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
-                        </Button>
-                    </div>
-                </div>}
+                {shareableLink &&
+                    // <div className="space-y-4">
+                    //     <Label>Form Link</Label>
+                    //     <div className="flex flex-col sm:flex-row items-center gap-2">
+                    //         <Input
+                    //             value={shareableLink}
+                    //             readOnly
+                    //             className="bg-blue-50 text-blue-800 flex-1"
+                    //         />
+                    //         <Button
+                    //             onClick={handleCopyLink}
+                    //             className="w-full sm:w-auto"
+                    //         >
+                    //             <i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`} />
+                    //         </Button>
+                    //     </div>
+                    // </div>
+
+                    <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden mt-6 animate-in fade-in duration-300">
+                        <CardHeader className="bg-brand-ash/50 border-b border-ash-light py-4 px-5">
+                            <CardTitle className="text-sm font-bold text-text-main flex items-center gap-2">
+                                <i className="fas fa-link text-action-primary"></i> Sub Contract Form Link
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-5">
+                            <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3">
+                                Share this link with workers to submit their information.
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                                <div className="relative flex-1">
+                                    <Input
+                                        value={shareableLink}
+                                        readOnly
+                                        className="w-full bg-brand-surface border-ash-medium text-text-main h-10 px-4 font-mono text-sm focus:ring-1 focus:ring-action-primary/20 transition-all"
+                                    />
+                                </div>
+                                <Button
+                                    onClick={handleCopyLink}
+                                    variant={copied ? "white" : "dark"}
+                                    className={`h-10 px-6 shadow-sm transition-all shrink-0 ${copied ? 'border-action-primary text-action-primary' : ''}`}
+                                >
+                                    {copied ? (
+                                        <><i className="fas fa-check mr-2"></i> Copied!</>
+                                    ) : (
+                                        <><i className="fas fa-copy mr-2"></i> Copy Link</>
+                                    )}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                }
             </div>
         </div>
     );

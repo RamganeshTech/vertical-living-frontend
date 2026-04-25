@@ -46,16 +46,19 @@ html {
   --color-brand-main: var(--bg-main);
   --color-brand-surface: var(--bg-surface);
   --color-brand-ash: var(--bg-ash);
+  --color-brand-ash-dark: var(--bg-ash-dark);
 
   /* Grays/Ash */
+  --color-ash-lighter: var(--border-ash-lighter);
   --color-ash-light: var(--border-ash-light);
   --color-ash-medium: var(--border-ash-medium);
   --color-ash-dark: var(--text-ash-dark);
-  /* --color-ash-dark: var(--border-ash-medium); */
 
   /* Text */
   --color-text-main: var(--text-main);
   --color-text-muted: var(--text-muted);
+  --color-text-soft: var(--text-soft);
+  --color-text-strong: var(--text-strong);
 
   /* Actions */
   --color-action-primary: var(--action-primary);
@@ -67,21 +70,31 @@ html {
   /* LIGHT MODE (Default) */
   --bg-main: #f8fafc;
   --bg-surface: #ffffff;
+  --bg-surface-hover: #f8fafc;  /* Subtle hover for white cards */
   --bg-ash: #f5f5f5;
+  --bg-ash-dark: #cbd5e1;       /* Deeper fills, selected states */
 
+  --border-ash-lighter: #f8fafc;/* Extremely subtle dividers */
   --border-ash-light: #f5f5f5;
   --border-ash-medium: #e5e5e5;
   /* --border-ash-dark: #060617; */
+  --border-ash-dark: #94a3b8;   /* Icons, heavy outlines */
 
 
   /* --text-main: #1e293b; */
+  --text-strong: #0f172a;       /* Headings, Titles */
   --text-main: #343d49;
   /* Was #1e293b - much softer on the eyes */
   --text-muted: #64748b;
+  --text-soft: #94a3b8;         /* Placeholders, disabled text */
   --text-ash-dark: #94a3b8;
 
   --action-primary: #1e293b;
+  --action-primary-hover: #334155;    /* Hover for dark buttons */
+  --action-secondary: #e2e8f0;        /* Gray/Ghost buttons */
+  --action-secondary-hover: #cbd5e1;  /* Hover for gray/ghost buttons */
   --action-success: #10b981;
+  --action-warning: #f59e0b;
   --action-danger: #ef4444;
 }
 
@@ -90,16 +103,26 @@ html {
   /* When you add 'dark' class to html, these take over */
   --bg-main: #0f172a;
   --bg-surface: #1e293b;
+  --bg-surface-hover: #1e293b;  /* Hover for cards */
   --bg-ash: #334155;
+  --bg-ash-dark: #334155;       /* Selected states */
 
+  --border-ash-lighter: #0f172a;
   --border-ash-light: #1e293b;
   --border-ash-medium: #334155;
   /* --border-ash-dark: #475569; */
+  --border-ash-dark: #475569;   /* Hover borders */
 
-
+--text-strong: #f8fafc;       /* Brightest text for headings */
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
+  --text-soft: #64748b;         /* Placeholders */
 
-  --action-primary: #ffffff;
+  /* --action-primary: #ffffff; */
+  /* Actions */
+  --action-primary: #f8fafc;          /* White buttons in dark mode */
+  --action-primary-hover: #e2e8f0;
+  --action-secondary: #1e293b;        /* Dark gray buttons */
+  --action-secondary-hover: #334155;
   /* White buttons in dark mode */
 }

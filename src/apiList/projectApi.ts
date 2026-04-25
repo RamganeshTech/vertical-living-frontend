@@ -43,7 +43,8 @@ export const getAllProjectsApi = async ({
     startDate,
     endDate,
     isCompleted, // 1. Extract the new parameter
-    api
+    api,
+    isArchived
 }: {
     organizationId: string;
     page: number;
@@ -55,6 +56,7 @@ export const getAllProjectsApi = async ({
     endDate?: string;
     isCompleted?: boolean; // Type here
     api: any; // AxiosInstance
+    isArchived?: boolean
 }) => {
     const { data } = await api.get(`/project/v1/getprojects/${organizationId}`, {
         params: {
@@ -65,7 +67,8 @@ export const getAllProjectsApi = async ({
             priority,
             startDate,
             endDate,
-            isCompleted
+            isCompleted,
+            isArchived
         }
     });
     if (!data.ok) throw new Error(data.message);
@@ -109,6 +112,23 @@ const updateProject = async ({ projectId, formData, api }: { projectId: string, 
 }
 
 
+const toggleProjectArchiveApi = async ({
+    projectId,
+    isArchived,
+    api
+}: {
+    projectId: string;
+    isArchived: boolean;
+    api: AxiosInstance;
+}) => {
+    const { data } = await api.put(`/project/archive/${projectId}`, { isArchived });
+
+    if (!data.ok) throw new Error(data.message);
+
+    return data.data;
+};
+
+
 export const useGetProjects = (orgsId: string) => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
@@ -139,7 +159,8 @@ export const useGetAllProjects = ({
     priority,
     startDate,
     endDate,
-    isCompleted
+    isCompleted,
+    isArchived
 }: {
     organizationId?: string;
     limit?: number;
@@ -149,13 +170,14 @@ export const useGetAllProjects = ({
     startDate?: string;
     endDate?: string;
     isCompleted?: boolean; // Type here
+    isArchived?: boolean
 }) => {
     const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useInfiniteQuery({
         // The queryKey must change whenever a filter changes to trigger a re-fetch
-        queryKey: ["projects", organizationId, projectName, status, priority, startDate, endDate, isCompleted],
+        queryKey: ["projects", organizationId, projectName, status, priority, startDate, endDate, isCompleted, isArchived],
 
         queryFn: async ({ pageParam = 1 }) => {
             if (!role || !allowedProjectRoles.includes(role)) {
@@ -173,6 +195,7 @@ export const useGetAllProjects = ({
                 startDate,
                 endDate,
                 isCompleted,
+                isArchived,
                 api
             });
         },
@@ -262,4 +285,38 @@ export const useAssignClientToProject = () => {
             queryClient.invalidateQueries({ queryKey: ['project'] })
         }
     })
-} 
+}
+
+
+
+export const useToggleProjectArchive = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({
+            projectId,
+            isArchived
+        }: {
+            projectId: string;
+            isArchived: boolean;
+        }) => {
+            if (!role || !allowedRoles.includes(role)) {
+                throw new Error("Not allowed to perform this action");
+            }
+
+            if (!api) {
+                throw new Error("API instance not found for role");
+            }
+
+            return await toggleProjectArchiveApi({ projectId, isArchived, api });
+        },
+
+        onSuccess: () => {
+            // 🔄 refresh project list + single project if needed
+            queryClient.invalidateQueries({ queryKey: ["projects"] });
+            queryClient.invalidateQueries({ queryKey: ["project"] });
+        }
+    });
+};

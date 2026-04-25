@@ -12,7 +12,7 @@ export type currentAssignedStaffType = {
 }
 
 interface AssignStageStaffProps {
-  stageName: "RequirementFormModel" | "SiteMeasurementModel" | "SampleDesignModel" | "TechnicalConsultationModel" |
+  stageName: "RequirementFormModel" | "SiteMeasurementModel" | "SampleDesignModel" | "DesignApprovalModel" |  "TechnicalConsultationModel" |
   "MaterialRoomConfirmationModel" | "CostEstimation" | "PaymentConfirmationModel" | "OrderMaterialHistoryModel" |
   "MaterialArrivalModel" | "WorkMainStageScheduleModel" | "InstallationModel" |
   "QualityCheckupModel" | "CleaningAndSanitationModel" | "ProjectDeliveryModel"

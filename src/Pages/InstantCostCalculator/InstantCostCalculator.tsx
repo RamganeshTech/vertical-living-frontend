@@ -1,7 +1,7 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import useGetRole from "../../Hooks/useGetRole";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Label } from "../../components/ui/Label";
@@ -20,6 +20,7 @@ interface MaterialState {
     brandName: string;
     rate: number | string;
     quantity: number | string;
+    thickness?: string; // 🆕 Added thickness
     dimension: number | string;
     imageUrl?: string;
 }
@@ -39,6 +40,8 @@ interface EssentialState {
 
 const InstantCostCalculation: React.FC = () => {
     const { organizationId } = useParams<{ organizationId: string }>();
+    const location = useLocation()
+    const navigate = useNavigate()
     const { role } = useGetRole();
     const api = getApiForRole(role!);
     const allowedRoles = ["owner", "staff", "CTO"];
@@ -54,15 +57,22 @@ const InstantCostCalculation: React.FC = () => {
 
     // --- 1. CORE MATERIALS STATE ---
     const [productDim, setProductDim] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
-    const [plywood, setPlywood] = useState<MaterialState>({ categoryName: "Plywood", brandId: "", brandName: "", rate: 0, quantity: 1, dimension: 32 });
-    const [innerLaminate, setInnerLaminate] = useState<MaterialState>({ categoryName: "Inner Laminate", brandId: "", brandName: "", rate: 0, quantity: 1, dimension: 32 });
-    const [outerLaminate, setOuterLaminate] = useState<MaterialState>({ categoryName: "Outer Laminate", brandId: "", brandName: "", rate: 0, quantity: 1, dimension: 32 });
+    // --- 1. CORE MATERIALS STATE (Now Arrays for Multiple Items) ---
+    const defaultMaterial = { brandId: "", brandName: "", thickness: "", rate: 0, quantity: 1, dimension: 32 };
 
-    const [otherFinish, setOtherFinish] = useState({ rate: 0, quantity: 1, dimension: 32 }); // For PU/DUCO/Paint/Varnish
+    const [plywoods, setPlywoods] = useState<MaterialState[]>([{ ...defaultMaterial, categoryName: "Plywood" }]);
+    const [innerLaminates, setInnerLaminates] = useState<MaterialState[]>([{ ...defaultMaterial, categoryName: "Inner Laminate" }]);
+    const [outerLaminates, setOuterLaminates] = useState<MaterialState[]>([{ ...defaultMaterial, categoryName: "Outer Laminate" }]);
+    const [otherFinishes, setOtherFinishes] = useState<MaterialState[]>([{ ...defaultMaterial, categoryName: "Finish" }]);
 
     const [plywoodBrands, setPlywoodBrands] = useState<any[]>([]);
     const [innerLaminateBrands, setInnerLaminateBrands] = useState<any[]>([]);
     const [outerLaminateBrands, setOuterLaminateBrands] = useState<any[]>([]);
+
+    // 🆕 Grouped Rates Maps (Stores BrandName -> Array of { thickness, rs, id })
+    const [plywoodRatesMap, setPlywoodRatesMap] = useState<Record<string, any[]>>({});
+    const [innerLamRatesMap, setInnerLamRatesMap] = useState<Record<string, any[]>>({});
+    const [outerLamRatesMap, setOuterLamRatesMap] = useState<Record<string, any[]>>({});
 
     // --- 2. FITTINGS STATE ---
     // const [fittings, setFittings] = useState<MaterialState[]>([]);
@@ -91,34 +101,6 @@ const InstantCostCalculation: React.FC = () => {
     const [showSqftModal, setShowSqftModal] = useState(false);
     const [dimensions, setDimensions] = useState<DimensionRow[]>([{ name: "Main Unit", width: "", height: "", unit: "mm" }]);
 
-    // --- DATA FETCHING LOGIC ---
-
-    // Generic fetcher for static dropdowns (Plywood, Laminates)
-    const fetchStaticBrands = async (categoryName: string, setter: React.Dispatch<React.SetStateAction<any[]>>) => {
-        if (!api || !organizationId || !categoryName) return;
-        try {
-            const results = await getMaterialBrand({ api, organizationId, categoryName });
-            const formatted = results.map((item: any) => {
-                const brandOnly = item.data?.Brand || item.data?.BrandName || item.data?.brand || item.data?.brandName || item.data?.["Brands light name"] || item.data?.["Brand "] || item.data?.["Brands "] || item.data?.["BRAND NAME "] || item.data?.["Brand Name"] || 'Unknown';
-                return {
-                    label: `${brandOnly} (${item.categoryName?.trim() || 'No Cat'})`,
-                    value: item?._id ? String(item._id) : "",
-                    rate: item.data?.Rs || item.data?.rs || item?.data?.RS || 0,
-                    brandOnly: brandOnly
-                };
-            });
-            setter(formatted);
-        } catch (error) {
-            console.error(`Error fetching ${categoryName}:`, error);
-        }
-    };
-
-    // Load static categories on mount
-    useEffect(() => {
-        fetchStaticBrands("Plywood", setPlywoodBrands);
-        fetchStaticBrands("Inner Laminate", setInnerLaminateBrands);
-        fetchStaticBrands("Outer Laminate", setOuterLaminateBrands);
-    }, [api, organizationId]);
 
     // Auto-select Labour Category & Sync Cost
     useEffect(() => {
@@ -173,6 +155,95 @@ const InstantCostCalculation: React.FC = () => {
         }
     };
 
+
+
+    // --- DATA FETCHING LOGIC ---
+
+    // Generic fetcher for static dropdowns (Groups by Brand and Thickness)
+    const fetchStaticBrands = async (categoryName: string, setBrands: React.Dispatch<React.SetStateAction<any[]>>, setRatesMap: React.Dispatch<React.SetStateAction<any>>) => {
+        if (!api || !organizationId || !categoryName) return;
+        try {
+            const results = await getMaterialBrand({ api, organizationId, categoryName });
+
+            // This is where we group the thicknesses and rates by Brand Name!
+            const brandMap: Record<string, { thickness: string; rs: number, id: string }[]> = {};
+
+            results.forEach((item: any) => {
+                const d = item?.data || {};
+                const name = (d.Brand ?? d.BrandName ?? d.brand ?? d.brandName ?? d["Brand "] ?? d["Brands "] ?? d["BRAND NAME "] ?? d["Brand Name"] ?? d["Brands name"])?.trim();
+                const thickness = String(d["thickness (mm)"] || d.thickness || d.Thickness || d["Thickness (mm)"])?.trim();
+                const rs = parseFloat(d.Rs || d.rs || d.rS || d.RS || 0);
+
+                if (name) {
+                    if (!brandMap[name]) brandMap[name] = [];
+                    brandMap[name].push({ thickness, rs, id: item._id ? String(item._id) : "" });
+                }
+            });
+
+            // 1. Save the detailed map (Brand -> Thicknesses/Rates) into the missing state variable
+            setRatesMap(brandMap);
+
+            // 2. Save just the unique brand names for the main dropdown
+            const uniqueBrands = Object.keys(brandMap).map(name => ({ label: name, value: name }));
+            setBrands(uniqueBrands);
+
+        } catch (error) {
+            console.error(`Error fetching ${categoryName}:`, error);
+        }
+    };
+
+    // Load static categories on mount and pass BOTH setters
+    useEffect(() => {
+        fetchStaticBrands("Plywood", setPlywoodBrands, setPlywoodRatesMap);
+        fetchStaticBrands("Inner Laminate", setInnerLaminateBrands, setInnerLamRatesMap);
+        fetchStaticBrands("Outer Laminate", setOuterLaminateBrands, setOuterLamRatesMap);
+    }, [api, organizationId]);
+
+
+
+    // --- CORE MATERIAL HANDLERS ---
+    const handleAddCoreMaterialRow = () => {
+        setPlywoods(prev => [...prev, { ...defaultMaterial, categoryName: "Plywood" }]);
+        setInnerLaminates(prev => [...prev, { ...defaultMaterial, categoryName: "Inner Laminate" }]);
+        setOuterLaminates(prev => [...prev, { ...defaultMaterial, categoryName: "Outer Laminate" }]);
+        setOtherFinishes(prev => [...prev, { ...defaultMaterial, categoryName: "Finish" }]);
+    };
+
+    const handleRemoveCoreMaterialRow = (index: number) => {
+        if (plywoods.length === 1) {
+            setPlywoods([{ ...defaultMaterial, categoryName: "Plywood" }]);
+            setInnerLaminates([{ ...defaultMaterial, categoryName: "Inner Laminate" }]);
+            setOuterLaminates([{ ...defaultMaterial, categoryName: "Outer Laminate" }]);
+            setOtherFinishes([{ ...defaultMaterial, categoryName: "Finish" }]);
+            return;
+        }
+        setPlywoods(prev => prev.filter((_, i) => i !== index));
+        setInnerLaminates(prev => prev.filter((_, i) => i !== index));
+        setOuterLaminates(prev => prev.filter((_, i) => i !== index));
+        setOtherFinishes(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const updateMaterial = (index: number, field: string, value: any, getter: any[], setter: any, ratesMap?: any) => {
+        const newArr = [...getter];
+        newArr[index] = { ...newArr[index], [field]: value };
+
+        // Auto-reset dependent fields if brand changes
+        if (field === 'brandName') {
+            newArr[index].brandId = "";
+            newArr[index].thickness = "";
+            newArr[index].rate = 0;
+        }
+
+        // Auto-fetch rate if thickness changes
+        if (field === 'thickness' && ratesMap) {
+            const brandName = newArr[index].brandName;
+            const item = ratesMap[brandName]?.find((t: any) => t.thickness === value);
+            newArr[index].rate = item?.rs || 0;
+            newArr[index].brandId = item?.id || "";
+        }
+
+        setter(newArr);
+    };
 
 
     // --- HANDLERS ---
@@ -320,56 +391,16 @@ const InstantCostCalculation: React.FC = () => {
         setShowSqftModal(false);
     };
 
-
-
-    const isFormDirty = 
-        Number(productDim.width) > 0 || 
-        Number(productDim.height) > 0 ||
-        Number(plywood.rate) > 0 || plywood.brandId !== "" ||
-        Number(innerLaminate.rate) > 0 || innerLaminate.brandId !== "" ||
-        Number(outerLaminate.rate) > 0 || outerLaminate.brandId !== "" ||
-        Number(otherFinish.rate) > 0 ||
-        fittings.length > 1 || fittings[0].categoryName !== "" ||
-        essentials.length > 1 || essentials[0].name !== "" ||
-        Number(factory.ratePerSqft) > 0 || Number(factory.totalSqft) > 0 ||
-        Number(labour.noOfDays) > 1 || Number(labour.noOfLabours) > 1 || dimensions.length > 1;
-
-    // 2. Function to clear everything back to defaults
-    const handleReset = () => {
-        if (window.confirm("Are you sure you want to clear all calculator values? This cannot be undone.")) {
-            setProductDim({ width: 0, height: 0 });
-            setPlywood({ categoryName: "Plywood", brandId: "", brandName: "", rate: 0, quantity: 1, dimension: 32 });
-            setInnerLaminate({ categoryName: "Inner Laminate", brandId: "", brandName: "", rate: 0, quantity: 1, dimension: 32 });
-            setOuterLaminate({ categoryName: "Outer Laminate", brandId: "", brandName: "", rate: 0, quantity: 1, dimension: 32 });
-            setOtherFinish({ rate: 0, quantity: 1, dimension: 32 });
-            setFittings([{ categoryName: "", brandId: "", brandName: "", rate: 0, quantity: 1, dimension: 1 }]);
-            setEssentials([{ name: "", rate: 0, quantity: 1 }]);
-            setFactory({ ratePerSqft: 0, totalSqft: 0 });
-            setDimensions([{ name: "Main Unit", width: "", height: "", unit: "mm" }]);
-            
-            // For labour, just reset the multipliers but keep the fetched category/rate
-            setLabour(prev => ({ ...prev, noOfLabours: 1, noOfDays: 1 }));
-            
-            // Optional: reset finish type back to default
-            setActiveFinish("Laminate");
-        }
-    };
-
-    
     // --- CALCULATIONS ---
     const safeNum = (val: any) => Number(val) || 0;
+    const calcTotal = (arr: MaterialState[]) => arr.reduce((acc, curr) => acc + (safeNum(curr.rate) * safeNum(curr.dimension) * safeNum(curr.quantity)), 0);
 
     const productSqft = safeNum(productDim.width) * safeNum(productDim.height);
-    const plywoodTotal = safeNum(plywood.rate) * safeNum(plywood.dimension) * safeNum(plywood.quantity);
-    // const innerLamTotal = safeNum(innerLaminate.rate) * safeNum(innerLaminate.dimension) * safeNum(innerLaminate.quantity);
-    // const outerLamTotal = safeNum(outerLaminate.rate) * safeNum(outerLaminate.dimension) * safeNum(outerLaminate.quantity);
 
-    const innerLamTotal = activeFinish === 'Laminate' ? 
-    safeNum(innerLaminate.rate) * safeNum(innerLaminate.dimension) * safeNum(innerLaminate.quantity) : 0;
-    const outerLamTotal = activeFinish === 'Laminate' ? 
-    safeNum(outerLaminate.rate) * safeNum(outerLaminate.dimension) * safeNum(outerLaminate.quantity) : 0;
-    const otherFinishTotal = activeFinish !== 'Laminate' ? 
-    safeNum(otherFinish.rate) * safeNum(otherFinish.dimension) * safeNum(otherFinish.quantity) : 0;
+    const plywoodTotal = calcTotal(plywoods);
+    const innerLamTotal = activeFinish === 'Laminate' ? calcTotal(innerLaminates) : 0;
+    const outerLamTotal = activeFinish === 'Laminate' ? calcTotal(outerLaminates) : 0;
+    const otherFinishTotal = activeFinish !== 'Laminate' ? calcTotal(otherFinishes) : 0;
 
     const fittingsTotal = fittings.reduce((acc, curr) => acc + (safeNum(curr.rate) * safeNum(curr.quantity)), 0);
     const essentialsTotal = essentials.reduce((acc, curr) => acc + (safeNum(curr.rate) * safeNum(curr.quantity)), 0);
@@ -377,10 +408,35 @@ const InstantCostCalculation: React.FC = () => {
     const labourTotal = safeNum(labour.ratePerDay) * safeNum(labour.noOfLabours) * safeNum(labour.noOfDays);
     const factoryTotal = safeNum(factory.ratePerSqft) * safeNum(factory.totalSqft);
 
-    // const grandTotal = plywoodTotal + innerLamTotal + outerLamTotal + fittingsTotal + essentialsTotal + labourTotal + factoryTotal;
     const grandTotal = plywoodTotal + innerLamTotal + outerLamTotal + otherFinishTotal + fittingsTotal + essentialsTotal + labourTotal + factoryTotal;
-    // const finalSqftRate = factory.totalSqft > 0 ? (grandTotal / factory.totalSqft) : 0;
     const finalSqftRate = productSqft > 0 ? (grandTotal / productSqft) : 0;
+
+
+    const activeFinishLabel = finishOptions.find(o => o.value === activeFinish)?.label || "Finish";
+
+    // --- RESET LOGIC (Update to clear the arrays) ---
+    const isFormDirty = true; // Kept simple to always show clear button if needed, or implement your complex check
+
+
+
+    const handleReset = () => {
+        if (window.confirm("Are you sure you want to clear all calculator values? This cannot be undone.")) {
+            setProductDim({ width: 0, height: 0 });
+            setPlywoods([{ ...defaultMaterial, categoryName: "Plywood" }]);
+            setInnerLaminates([{ ...defaultMaterial, categoryName: "Inner Laminate" }]);
+            setOuterLaminates([{ ...defaultMaterial, categoryName: "Outer Laminate" }]);
+            setOtherFinishes([{ ...defaultMaterial, categoryName: "Finish" }]);
+            setFittings([{ categoryName: "", brandId: "", brandName: "", rate: 0, quantity: 1, dimension: 1 }]);
+            setEssentials([{ name: "", rate: 0, quantity: 1 }]);
+            setFactory({ ratePerSqft: 0, totalSqft: 0 });
+            setDimensions([{ name: "Main Unit", width: "", height: "", unit: "mm" }]);
+            setLabour(prev => ({ ...prev, noOfLabours: 1, noOfDays: 1 }));
+            setActiveFinish("Laminate");
+        }
+    };
+
+    const isDetailView = location.pathname.includes('/products');
+    if (isDetailView) return <Outlet />;
 
 
     return (
@@ -402,11 +458,32 @@ const InstantCostCalculation: React.FC = () => {
 
                 {/* Right Side: Reset Button & Finish Dropdown */}
                 <div className="flex items-end gap-3 w-full sm:w-auto">
-                    
+
+                    {/* <Button
+                        variant="ghost"
+                        size="lg"
+                        onClick={() => navigate('products')}
+                        className="py-3 px-4 font-bold text-text-muted hover:text-text-main hover:bg-brand-ash
+                         hover:border-ash-medium transition-all border border-transparent shadow-sm shrink-0"
+                        title="Products"
+                    >
+                        <i className="fas fa-box mr-1.5"></i> Products
+                    </Button> */}
+
+                    {/* Products Button (Outline style) */}
+                        <Button
+                            variant="outline"
+                            onClick={() => navigate('products')}
+                            className="h-10 px-4 border-ash-medium text-text-main hover:bg-brand-ash shadow-sm shrink-0 font-medium text-sm transition-all"
+                            title="View Products"
+                        >
+                            <i className="fas fa-box mr-1.5 text-text-muted"></i> Products
+                        </Button>
+
                     {/* Conditionally Rendered Clear Button */}
                     {isFormDirty && (
-                       <Button 
-                            variant="ghost" 
+                        <Button
+                            variant="ghost"
                             onClick={handleReset}
                             className="h-10 px-4  font-bold text-text-muted hover:text-text-main hover:bg-brand-ash hover:border-ash-medium transition-all border border-transparent shadow-sm shrink-0"
                             title="Clear all fields"
@@ -416,7 +493,7 @@ const InstantCostCalculation: React.FC = () => {
                     )}
 
                     {/* Finish Dropdown */}
-                    <div className="w-full sm:w-64 shrink-0 relative z-[120]">
+                    <div className="w-full sm:w-64 shrink-0 relative">
                         <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Finish Type</Label>
                         <SearchSelectNew
                             options={finishOptions}
@@ -472,180 +549,267 @@ const InstantCostCalculation: React.FC = () => {
                     </CardContent>
                 </Card>
 
-                {/* 1. Core Materials (Plywood, Inner Lam, Outer Lam) - ULTRA COMPACT ROW */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
 
-                    {/* Plywood Card */}
-                    <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-visible flex flex-col">
-                        <CardHeader className="bg-brand-ash border-b border-ash-light py-2.5 px-4">
-                            <CardTitle className="text-xs font-bold text-text-main flex items-center justify-between">
-                                <span><i className="fas fa-layer-group mr-2 text-text-muted"></i> Plywood</span>
-                                <span className="text-action-primary text-[11px] font-bold">₹ {plywoodTotal.toLocaleString('en-IN')}</span>
+
+                {/* 1. Core Materials */}
+                {/* <div className={`grid grid-cols-1 md:grid-cols-${activeFinish === 'Laminate' ? '3' : '2'} gap-4 lg:gap-6`}> */}
+
+                {/* 1. Core Materials (Unified Horizontal Rows) */}
+                <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-visible flex flex-col group">
+
+                    <CardHeader className="bg-brand-ash/30 border-b border-ash-light py-3 px-4 transition-colors group-hover:bg-brand-ash/50">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <CardTitle className="text-sm font-bold text-text-main flex items-center">
+                                <i className="fas fa-layer-group mr-2 text-action-primary"></i> Core Materials
                             </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-4 flex flex-col gap-3 flex-1">
-                            <div className="w-full relative">
-                                <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Brand Select</Label>
-                                <div className="h-8">
-                                    <SearchSelectNew
-                                        options={plywoodBrands}
-                                        value={plywood.brandId}
-                                        placeholder="Search Plywood..."
-                                        className="!overflow-visible relative  text-xs h-8"
-                                        onValueChange={(val) => {
-                                            const selected = plywoodBrands.find(opt => String(opt.value) === String(val));
-                                            if (selected) setPlywood({ ...plywood, brandId: selected.value, brandName: selected.brandOnly, rate: selected.rate });
-                                        }}
-                                    />
+
+                            {/* Top Totals Summary Badges */}
+                            <div className="flex flex-wrap items-center gap-2">
+
+                                {/* Plywood Total Badge */}
+                                <div className="flex items-center gap-2 bg-brand-surface border border-ash-medium/60 px-2.5 py-1.5 rounded-md shadow-sm">
+                                    <span className="text-[11px] font-bold tracking-wide text-text-muted">Plywood Total</span>
+                                    <span className="text-[11px] font-bold text-action-primary">₹ {plywoodTotal.toLocaleString('en-IN')}</span>
                                 </div>
+
+                                {activeFinish === 'Laminate' ? (
+                                    <>
+                                        {/* Inner Lam Total Badge */}
+                                        <div className="flex items-center gap-2 bg-brand-surface border border-ash-medium/60 px-2.5 py-1.5 rounded-md shadow-sm">
+                                            <span className="text-[11px] font-bold tracking-wide text-text-muted">Inner Lam Total</span>
+                                            <span className="text-[11px] font-bold text-action-primary">₹ {innerLamTotal.toLocaleString('en-IN')}</span>
+                                        </div>
+
+                                        {/* Outer Lam Total Badge */}
+                                        <div className="flex items-center gap-2 bg-brand-surface border border-ash-medium/60 px-2.5 py-1.5 rounded-md shadow-sm">
+                                            <span className="text-[11px] font-bold tracking-wide text-text-muted">Outer Lam Total</span>
+                                            <span className="text-[11px] font-bold text-action-primary">₹ {outerLamTotal.toLocaleString('en-IN')}</span>
+                                        </div>
+                                    </>
+                                ) : (
+                                    /* Finish Total Badge */
+                                    <div className="flex items-center gap-2 bg-brand-surface border border-ash-medium/60 px-2.5 py-1.5 rounded-md shadow-sm">
+                                        <span className="text-[11px] font-bold tracking-wide text-text-muted">Finish Total</span>
+                                        <span className="text-[11px] font-bold text-action-primary">₹ {otherFinishTotal.toLocaleString('en-IN')}</span>
+                                    </div>
+                                )}
+
+                                <Button variant="dark" size="sm" onClick={handleAddCoreMaterialRow} className="h-7 text-xs px-3 shadow-sm">
+                                    <i className="fas fa-plus mr-1"></i> Add Row
+                                </Button>
                             </div>
-                            <div className="grid grid-cols-3 gap-3">
-                                <div>
-                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Rate (₹)</Label>
-                                    <div className="relative">
-                                        <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-text-muted text-[10px]">₹</span>
-                                        <Input type="number" value={plywood.rate} onChange={(e) => setPlywood({ ...plywood, rate: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium pl-6 text-text-main h-8 text-xs" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Qty</Label>
-                                    <Input type="number" value={plywood.quantity} onChange={(e) => setPlywood({ ...plywood, quantity: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium text-text-main h-8 text-xs px-2 text-center" />
-                                </div>
-                                <div>
-                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block truncate" title="Dimension SqFt">Dim SqFt</Label>
-                                    <Input type="number" value={plywood.dimension} onChange={(e) => setPlywood({ ...plywood, dimension: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium text-text-muted h-8 text-xs px-2 text-center" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </CardHeader>
 
-                    {activeFinish === 'Laminate' ? (
-                        <>
-                            {/* Inner Laminate Card */}
-                            <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-visible flex flex-col">
-                                <CardHeader className="bg-brand-ash border-b border-ash-light py-2.5 px-4">
-                                    <CardTitle className="text-xs font-bold text-text-main flex items-center justify-between">
-                                        <span><i className="fas fa-scroll mr-2 text-text-muted"></i> Inner Lam.</span>
-                                        <span className="text-action-primary text-[11px] font-bold">₹ {innerLamTotal.toLocaleString('en-IN')}</span>
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-4 flex flex-col gap-3 flex-1">
-                                    <div className="w-full relative">
-                                        <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Brand Select</Label>
-                                        <div className="h-8">
-                                            <SearchSelectNew
-                                                options={innerLaminateBrands}
-                                                value={innerLaminate.brandId}
-                                                placeholder="Search Inner Lam..."
-                                                className="!overflow-visible relative  text-xs h-8"
-                                                onValueChange={(val) => {
-                                                    const selected = innerLaminateBrands.find(opt => String(opt.value) === String(val));
-                                                    if (selected) setInnerLaminate({ ...innerLaminate, brandId: selected.value, brandName: selected.brandOnly, rate: selected.rate });
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Rate (₹)</Label>
-                                            <div className="relative">
-                                                <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-text-muted text-[10px]">₹</span>
-                                                <Input type="number" value={innerLaminate.rate} onChange={(e) => setInnerLaminate({ ...innerLaminate, rate: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium pl-6 text-text-main h-8 text-xs" />
+                    <CardContent className="p-4 flex flex-col gap-5 flex-1">
+                        {plywoods.map((ply, i) => {
+                            // Map corresponding items for this row index
+                            const innerLam = innerLaminates[i] || defaultMaterial;
+                            const outerLam = outerLaminates[i] || defaultMaterial;
+                            const otherFin = otherFinishes[i] || defaultMaterial;
+
+                            return (
+                                // <div key={i} className="relative border border-ash-light bg-brand-ash/30 p-4 rounded-xl shadow-sm group/row hover:border-ash-medium transition-colors" style={{ zIndex: 50 - i }}>
+                                <div key={i} className="relative border border-ash-medium/30 bg-brand-ash/30 p-4 rounded-xl shadow-sm group/row"
+                                // style={{ zIndex: 40 - i }}
+
+                                >
+
+                                    {/* Delete Row Button */}
+                                    {!(plywoods.length === 1 && !ply.brandName && !innerLam.brandName) && (
+                                        <button onClick={() => handleRemoveCoreMaterialRow(i)}
+                                            className="absolute -top-2.5 -right-2.5 bg-brand-surface text-text-muted hover:text-action-danger border border-ash-medium rounded-full h-6 w-6 flex items-center justify-center transition-colors  cursor-pointer shadow-md">
+                                            <i className="fas fa-times text-[10px]"></i>
+                                        </button>
+                                    )}
+
+                                    {/* HORIZONTAL GRID ROW */}
+                                    <div className={`grid grid-cols-1 md:grid-cols-${activeFinish === 'Laminate' ? '3' : '2'} gap-4 md:gap-6`}>
+
+                                        {/* ================= COL 1: PLYWOOD ================= */}
+                                        <div className="flex flex-col bg-brand-surface border border-ash-light rounded-lg relative focus-within:z-[60]">
+
+                                            <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-text-main bg-brand-ash/80 px-3 py-2 border-b border-ash-light">
+                                                <i className="fas fa-layer-group mr-1.5 text-action-primary"></i> Plywood {i + 1}
+                                            </h4>
+
+
+                                            <div className="p-3 flex flex-col gap-3">
+                                                <div className="flex gap-2 relative">
+                                                    <div className="flex-1 relative focus-within:z-[70]">
+                                                        <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Brand</Label>
+                                                        <div className="h-8">
+                                                            <SearchSelectNew options={plywoodBrands} value={ply.brandName}
+                                                                placeholder="Search..." className="!overflow-visible relative text-xs h-8 w-full "
+                                                                onValueChange={(val) => updateMaterial(i, 'brandName', val, plywoods, setPlywoods)} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-[70px] shrink-0">
+                                                        <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Thick.</Label>
+                                                        <div className="relative">
+                                                            <select value={ply.thickness} onChange={(e) => updateMaterial(i, 'thickness', e.target.value, plywoods, setPlywoods, plywoodRatesMap)}
+                                                                disabled={!ply.brandName}
+                                                                className="w-full h-8 text-[11px] font-bold bg-brand-surface border border-ash-medium rounded-md px-1 outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 transition-all appearance-none disabled:opacity-50 text-text-main">
+                                                                <option value="">Select</option>
+                                                                {plywoodRatesMap[ply.brandName]?.map((t, idx) => (<option key={idx} value={t.thickness}>{t.thickness} mm</option>))}
+                                                            </select>
+                                                            <div className="absolute inset-y-0 right-1.5 flex items-center pointer-events-none"><i className="fa-solid fa-chevron-down text-text-muted text-[8px]"></i></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    <div>
+                                                        <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Rate (₹)</Label>
+                                                        <Input type="number" value={ply.rate} onChange={(e) => updateMaterial(i, 'rate', Math.max(Number(e.target.value), 0), plywoods, setPlywoods)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 transition-all w-full" />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block text-center">Qty</Label>
+                                                        <Input type="number" value={ply.quantity} onChange={(e) => updateMaterial(i, 'quantity', Math.max(Number(e.target.value), 0), plywoods, setPlywoods)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 text-center transition-all w-full" />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block text-center truncate">Dim SqFt</Label>
+                                                        <Input type="number" value={ply.dimension} onChange={(e) => updateMaterial(i, 'dimension', Math.max(Number(e.target.value), 0), plywoods, setPlywoods)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 text-center transition-all w-full" />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Qty</Label>
-                                            <Input type="number" value={innerLaminate.quantity} onChange={(e) => setInnerLaminate({ ...innerLaminate, quantity: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium text-text-main h-8 text-xs px-2 text-center" />
-                                        </div>
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block truncate" title="Dimension SqFt">Dim SqFt</Label>
-                                            <Input type="number" value={innerLaminate.dimension} onChange={(e) => setInnerLaminate({ ...innerLaminate, dimension: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium text-text-muted h-8 text-xs px-2 text-center" />
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
 
-                            {/* Outer Laminate Card */}
-                            <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-visible flex flex-col">
-                                <CardHeader className="bg-brand-ash border-b border-ash-light py-2.5 px-4">
-                                    <CardTitle className="text-xs font-bold text-text-main flex items-center justify-between">
-                                        <span><i className="fas fa-scroll mr-2 text-text-muted"></i> Outer Lam.</span>
-                                        <span className="text-action-primary text-[11px] font-bold">₹ {outerLamTotal.toLocaleString('en-IN')}</span>
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-4 flex flex-col gap-3 flex-1">
-                                    <div className="w-full relative">
-                                        <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Brand Select</Label>
-                                        <div className="h-8">
-                                            <SearchSelectNew
-                                                options={outerLaminateBrands}
-                                                value={outerLaminate.brandId}
-                                                placeholder="Search Outer Lam..."
-                                                className="!overflow-visible relative text-xs h-8"
-                                                onValueChange={(val) => {
-                                                    const selected = outerLaminateBrands.find(opt => String(opt.value) === String(val));
-                                                    if (selected) setOuterLaminate({ ...outerLaminate, brandId: selected.value, brandName: selected.brandOnly, rate: selected.rate });
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Rate (₹)</Label>
-                                            <div className="relative">
-                                                <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-text-muted text-[10px]">₹</span>
-                                                <Input type="number" value={outerLaminate.rate} onChange={(e) => setOuterLaminate({ ...outerLaminate, rate: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium pl-6 text-text-main h-8 text-xs" />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Qty</Label>
-                                            <Input type="number" value={outerLaminate.quantity} onChange={(e) => setOuterLaminate({ ...outerLaminate, quantity: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium text-text-main h-8 text-xs px-2 text-center" />
-                                        </div>
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block truncate" title="Dimension SqFt">Dim SqFt</Label>
-                                            <Input type="number" value={outerLaminate.dimension} onChange={(e) => setOuterLaminate({ ...outerLaminate, dimension: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium text-text-muted h-8 text-xs px-2 text-center" />
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </>
-                    )
-                        : (
-                            /* Alternative Finish Card (PU, DUCO, Varnish, Paint) */
-                            <Card className="bg-brand-surface border border-ash-medium hover:border-action-primary/40 transition-all shadow-sm hover:shadow-md rounded-xl overflow-visible flex flex-col group">
-                                <CardHeader className="bg-brand-ash border-b border-ash-light py-2.5 px-4 transition-colors group-hover:bg-brand-ash/50">
-                                    <CardTitle className="text-xs font-bold text-text-main flex items-center justify-between">
-                                        <span className="flex items-center"><i className="fas fa-paint-roller mr-2 text-action-primary"></i> {finishOptions.find(o => o.value === activeFinish)?.label}</span>
-                                        <span className="text-action-primary text-[11px] font-bold bg-action-primary/10 px-2 py-0.5 rounded-full border border-action-primary/20">₹ {otherFinishTotal.toLocaleString('en-IN')}</span>
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-4 flex flex-col gap-4 flex-1 justify-center">
-                                    {/* Only Manual Inputs, NO Brand Dropdown */}
-                                    <div className="grid grid-cols-3 gap-3 w-full">
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Rate (₹)</Label>
-                                            <div className="relative">
-                                                <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-text-muted text-[10px]">₹</span>
-                                                <Input type="number" value={otherFinish.rate} onChange={(e) => setOtherFinish({ ...otherFinish, rate: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 pl-6 text-text-main h-8 text-xs transition-all" />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block">Qty</Label>
-                                            <Input type="number" value={otherFinish.quantity} onChange={(e) => setOtherFinish({ ...otherFinish, quantity: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-xs px-2 text-center transition-all" />
-                                        </div>
-                                        <div>
-                                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 block truncate" title="Dimension SqFt">Dim SqFt</Label>
-                                            <Input type="number" value={otherFinish.dimension} onChange={(e) => setOtherFinish({ ...otherFinish, dimension: Math.max(Number(e.target.value), 0) })} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-xs px-2 text-center transition-all" />
-                                        </div>
-                                    </div>
-                                    <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted text-center bg-brand-ash/50 p-2 rounded-lg border border-ash-light border-dashed">
-                                        Enter manual parameters above.
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        )}
+                                        {/* ================= COL 2: INNER LAMINATE (Conditional) ================= */}
+                                        {activeFinish === 'Laminate' && (
+                                            // <div className="flex flex-col gap-3 border-t md:border-t-0 md:border-l border-ash-medium/50 md:pl-6 pt-3 md:pt-0">
+                                            <div className="flex flex-col bg-brand-surface border border-ash-light rounded-lg relative focus-within:z-[60]">
 
-                </div>
+
+
+                                                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-text-main bg-brand-ash/80 px-3 py-2 border-b border-ash-light">
+                                                    <i className="fas fa-scroll mr-1.5 text-action-primary"></i> Inner Lam {i + 1}
+
+                                                </h4>
+
+
+                                                <div className="p-3 flex flex-col gap-3">
+
+                                                    <div className="flex gap-2 relative">
+                                                        <div className="flex-1 relative focus-within:z-[70]">
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Brand</Label>
+                                                            <div className="h-8">
+                                                                <SearchSelectNew options={innerLaminateBrands} value={innerLam.brandName} placeholder="Search..." className="!overflow-visible relative text-xs h-8 w-full" onValueChange={(val) => updateMaterial(i, 'brandName', val, innerLaminates, setInnerLaminates)} />
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-[70px] shrink-0">
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Thick.</Label>
+                                                            <div className="relative">
+                                                                <select value={innerLam.thickness} onChange={(e) => updateMaterial(i, 'thickness', e.target.value, innerLaminates, setInnerLaminates, innerLamRatesMap)} disabled={!innerLam.brandName} className="w-full h-8 text-[11px] font-bold bg-brand-surface border border-ash-medium rounded-md px-1 outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 transition-all appearance-none disabled:opacity-50 text-text-main">
+                                                                    <option value="">Select</option>
+                                                                    {innerLamRatesMap[innerLam.brandName]?.map((t, idx) => (<option key={idx} value={t.thickness}>{t.thickness} mm</option>))}
+                                                                </select>
+                                                                <div className="absolute inset-y-0 right-1.5 flex items-center pointer-events-none"><i className="fa-solid fa-chevron-down text-text-muted text-[8px]"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        <div>
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Rate (₹)</Label>
+                                                            <Input type="number" value={innerLam.rate} onChange={(e) => updateMaterial(i, 'rate', Math.max(Number(e.target.value), 0), innerLaminates, setInnerLaminates)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 transition-all w-full" />
+                                                        </div>
+                                                        <div>
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block text-center">Qty</Label>
+                                                            <Input type="number" value={innerLam.quantity} onChange={(e) => updateMaterial(i, 'quantity', Math.max(Number(e.target.value), 0), innerLaminates, setInnerLaminates)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 text-center transition-all w-full" />
+                                                        </div>
+                                                        <div>
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block text-center truncate">Dim SqFt</Label>
+                                                            <Input type="number" value={innerLam.dimension} onChange={(e) => updateMaterial(i, 'dimension', Math.max(Number(e.target.value), 0), innerLaminates, setInnerLaminates)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 text-center transition-all w-full" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* ================= COL 3: OUTER LAM OR OTHER FINISH ================= */}
+                                        {activeFinish === 'Laminate' ? (
+                                            // <div className="flex flex-col gap-3 border-t md:border-t-0 md:border-l border-ash-medium/50 md:pl-6 pt-3 md:pt-0">
+                                            <div className="flex flex-col bg-brand-surface border border-ash-light rounded-lg relative focus-within:z-[60]">
+
+                                                {/* <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-text-muted border-b border-ash-medium/50 pb-1 mb-1">
+                                                    <i className="fas fa-scroll mr-1.5 text-ash-dark"></i> Outer Lam {i + 1}
+                                                </h4> */}
+
+                                                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-text-main bg-brand-ash/80 px-3 py-2 border-b border-ash-light">
+                                                    <i className="fas fa-scroll mr-1.5 text-action-primary"></i> Outer Lam {i + 1}
+
+                                                </h4>
+
+
+                                                <div className="p-3 flex flex-col gap-3">
+
+                                                    <div className="flex gap-2 relative">
+                                                        <div className="flex-1 relative focus-within:z-[70]">
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Brand</Label>
+                                                            <div className="h-8">
+                                                                <SearchSelectNew options={outerLaminateBrands} value={outerLam.brandName} placeholder="Search..."
+                                                                    className="!overflow-visible relative text-xs h-8 w-full"
+                                                                    onValueChange={(val) => updateMaterial(i, 'brandName', val, outerLaminates, setOuterLaminates)} />
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-[70px] shrink-0">
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Thick.</Label>
+                                                            <div className="relative">
+                                                                <select value={outerLam.thickness} onChange={(e) => updateMaterial(i, 'thickness', e.target.value, outerLaminates, setOuterLaminates, outerLamRatesMap)} disabled={!outerLam.brandName} className="w-full h-8 text-[11px] font-bold bg-brand-surface border border-ash-medium rounded-md px-1 outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 transition-all appearance-none disabled:opacity-50 text-text-main">
+                                                                    <option value="">Select</option>
+                                                                    {outerLamRatesMap[outerLam.brandName]?.map((t, idx) => (<option key={idx} value={t.thickness}>{t.thickness} mm</option>))}
+                                                                </select>
+                                                                <div className="absolute inset-y-0 right-1.5 flex items-center pointer-events-none"><i className="fa-solid fa-chevron-down text-text-muted text-[8px]"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        <div>
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Rate (₹)</Label>
+                                                            <Input type="number" value={outerLam.rate} onChange={(e) => updateMaterial(i, 'rate', Math.max(Number(e.target.value), 0), outerLaminates, setOuterLaminates)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 transition-all w-full" />
+                                                        </div>
+                                                        <div>
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block text-center">Qty</Label>
+                                                            <Input type="number" value={outerLam.quantity} onChange={(e) => updateMaterial(i, 'quantity', Math.max(Number(e.target.value), 0), outerLaminates, setOuterLaminates)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 text-center transition-all w-full" />
+                                                        </div>
+                                                        <div>
+                                                            <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block text-center truncate">Dim SqFt</Label>
+                                                            <Input type="number" value={outerLam.dimension} onChange={(e) => updateMaterial(i, 'dimension', Math.max(Number(e.target.value), 0), outerLaminates, setOuterLaminates)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 text-center transition-all w-full" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            // <div className="flex flex-col gap-3 border-t md:border-t-0 md:border-l border-ash-medium/50 md:pl-6 pt-3 md:pt-0">
+                                            <div className="flex flex-col bg-brand-surface border border-ash-light rounded-lg overflow-hidden">
+
+                                                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-text-main bg-brand-ash/80 px-3 py-2 border-b border-ash-light">
+                                                    <i className="fas fa-paint-roller mr-1.5 text-action-primary"></i> {activeFinishLabel} {i + 1}
+
+                                                </h4>
+                                                <div className="grid grid-cols-3 gap-2 mt-auto">
+                                                    <div>
+                                                        <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block">Rate (₹)</Label>
+                                                        <Input type="number" value={otherFin.rate} onChange={(e) => updateMaterial(i, 'rate', Math.max(Number(e.target.value), 0), otherFinishes, setOtherFinishes)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 transition-all w-full" />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block text-center">Qty</Label>
+                                                        <Input type="number" value={otherFin.quantity} onChange={(e) => updateMaterial(i, 'quantity', Math.max(Number(e.target.value), 0), otherFinishes, setOtherFinishes)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 text-center transition-all w-full" />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-[9px] font-bold uppercase tracking-wider text-text-muted mb-0.5 block text-center truncate">Dim SqFt</Label>
+                                                        <Input type="number" value={otherFin.dimension} onChange={(e) => updateMaterial(i, 'dimension', Math.max(Number(e.target.value), 0), otherFinishes, setOtherFinishes)} className="bg-brand-surface border-ash-medium focus:border-action-primary focus:ring-1 focus:ring-action-primary/20 text-text-main h-8 text-[11px] px-2 text-center transition-all w-full" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </CardContent>
+                </Card>
+                {/* </div> */}
 
                 {/* 2. Fittings & Accessories */}
                 <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-visible">
@@ -872,7 +1036,7 @@ const InstantCostCalculation: React.FC = () => {
                                     </div>
                                 </div>
 
-                               
+
 
                             </CardContent>
                         </Card>
@@ -921,14 +1085,7 @@ const InstantCostCalculation: React.FC = () => {
                                         <span className="font-poppins text-md text-text-main">Plywood</span>
                                         <span className="text-md">₹ {plywoodTotal.toLocaleString('en-IN')}</span>
                                     </div>
-                                    {/* <div className="flex justify-between items-center">
-                                        <span className="font-poppins text-md text-text-main">Inner Laminate</span>
-                                        <span className="text-md">₹ {innerLamTotal.toLocaleString('en-IN')}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-poppins text-md text-text-main">Outer Laminate</span>
-                                        <span className="text-md">₹ {outerLamTotal.toLocaleString('en-IN')}</span>
-                                    </div> */}
+
 
                                     {activeFinish === 'Laminate' ? (
                                         <>

@@ -386,14 +386,14 @@
 //                             <div className="flex gap-4 items-center">
 //                                 <span className="bg-blue-600 text-white w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold">{rIdx + 1}</span>
 //                                 <div className="flex items-center gap-2">
-//                                     <label className="text-[10px] font-black text-slate-400 uppercase">Room:</label>
+//                                     <label className="text-[10px] font-bold text-slate-400 uppercase">Room:</label>
 //                                     <input
 //                                         className="bg-transparent border-b border-blue-200 font-bold text-slate-800 text-sm focus:border-blue-500 outline-none w-32"
 //                                         value={room.roomName}
 //                                         onChange={(e) => { const n = [...rooms]; n[rIdx].roomName = e.target.value; setRooms(n); }} />
 //                                 </div>
 //                                 <div className="flex items-center gap-2">
-//                                     <label className="text-[10px] font-black text-slate-400 uppercase">Product:</label>
+//                                     <label className="text-[10px] font-bold text-slate-400 uppercase">Product:</label>
 //                                     <input
 //                                         className="bg-transparent border-b border-blue-200 font-bold text-slate-800 text-sm focus:border-blue-500 outline-none w-32"
 //                                         value={room.productName}
@@ -408,7 +408,7 @@
 //                                         { label: 'Front', key: 'frontSideLaminateImage' }
 //                                     ].map((side) => (
 //                                         <div key={side.label} className="flex flex-col items-center">
-//                                             <label className="text-[9px] font-black text-slate-500 uppercase mb-1">{side.label} Side Laminate Image</label>
+//                                             <label className="text-[9px] font-bold text-slate-500 uppercase mb-1">{side.label} Side Laminate Image</label>
 //                                             <div className="flex gap-1 items-center">
 //                                                 {room[side.key] ? (
 //                                                     <div className="flex flex-col gap-1 items-center group">
@@ -459,7 +459,7 @@
 //                             <table className="w-full text-xs text-left border-collapse">
 //                                 <thead className="bg-[#e3f2fd] text-slate-700">
 //                                     <tr className="text-center font-bold">
-//                                         <th className="border border-slate-300 p-3 w-12 text-center font-black">S No</th>
+//                                         <th className="border border-slate-300 p-3 w-12 text-center font-bold">S No</th>
 //                                         <th className="border border-slate-300 p-3 w-40">
 //                                             {/* Measurement */}
 //                                             <div className="flex flex-col items-center gap-0.5">
@@ -485,7 +485,7 @@
 //                                             <tr className="bg-white">
 //                                                 <td rowSpan={2} className="border border-slate-300 p-3 text-center font-bold text-slate-400">{item.sNo}</td>
 //                                                 <td rowSpan={2} className="border border-slate-300 p-3">
-//                                                     <input className="w-full p-2 bg-[#fffde7] border border-[#fbc02d] rounded-md font-bold text-slate-700 outline-none" value={item.measurement}
+//                                                     <input className="w-full p-2 bg-brand-surface border border-ash-medium rounded-md font-bold text-slate-700 outline-none" value={item.measurement}
 //                                                         onChange={(e) => {
 //                                                             // const n = [...rooms]; n[rIdx].items[iIdx].measurement = e.target.value; setRooms(n);
 
@@ -523,7 +523,7 @@
 
 //                                                     />
 //                                                 </td>
-//                                                 <td className="border border-slate-300 p-3 font-black text-[#2e7d32] bg-[#f1f8e9]/50 text-center uppercase">Inner</td>
+//                                                 <td className="border border-slate-300 p-3 font-bold text-[#2e7d32] bg-[#f1f8e9]/50 text-center uppercase">Inner</td>
 //                                                 <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.innerFace.laminateThickness} onChange={(e) => {
 //                                                     const n = [...rooms]; n[rIdx].items[iIdx].innerFace.laminateThickness = e.target.value; setRooms(n);
 //                                                 }} /></td>
@@ -545,7 +545,7 @@
 //                                                 </td>
 //                                             </tr>
 //                                             <tr className="bg-[#fcfcfc]">
-//                                                 <td className="border border-slate-300 p-3 font-black text-[#1565c0] bg-[#e3f2fd]/50 text-center uppercase">Outer</td>
+//                                                 <td className="border border-slate-300 p-3 font-bold text-[#1565c0] bg-[#e3f2fd]/50 text-center uppercase">Outer</td>
 //                                                 <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.outerFace.laminateThickness} onChange={(e) => {
 //                                                     const n = [...rooms]; n[rIdx].items[iIdx].outerFace.laminateThickness = e.target.value; setRooms(n);
 //                                                 }} /></td>
@@ -595,7 +595,7 @@
 
 //                 {/* 3. Fabrication & Plywood Summary (Single Column Stack) */}
 //                 <section className="bg-white rounded-xl shadow-sm border border-slate-300 p-6 space-y-6">
-//                     <h2 className="text-lg font-black text-slate-800 flex items-center gap-2 border-b pb-4 uppercase tracking-tight">
+//                     <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-4 uppercase tracking-tight">
 //                         <i className="fas fa-chart-pie text-blue-600" /> Fabrication & Material Summary
 //                     </h2>
 
@@ -603,7 +603,7 @@
 //                     <div className="space-y-4">
 //                         <div className="flex items-center gap-6">
 //                             <div className="flex flex-col">
-//                                 <label className="text-xs font-black text-slate-500 uppercase mb-1">Fabrication Rate</label>
+//                                 <label className="text-xs font-bold text-slate-500 uppercase mb-1">Fabrication Rate</label>
 //                                 <div className="flex gap-2">
 //                                     <input type="number" className="w-34 p-2 border border-slate-300 rounded-lg font-bold" placeholder='Rate' value={summary.fabricationRate || ""} onChange={(e) => setSummary({ ...summary, fabricationRate: Math.max(0, Number(e.target.value)) })} />
 //                                     <select className="p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-600 bg-slate-50" value={summary.unit} onChange={(e) => setSummary({ ...summary, unit: e.target.value })}>
@@ -615,12 +615,12 @@
 //                             </div>
 //                             <div className="flex-1 grid grid-cols-2 gap-4 mt-4">
 //                                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
-//                                     <span className="text-[10px] font-black text-slate-400 uppercase">Total Area:</span>
-//                                     <span className="font-black text-blue-600">{calculatedTotals.area} <small className="text-[8px] uppercase">{summary.unit}</small></span>
+//                                     <span className="text-[10px] font-bold text-slate-400 uppercase">Total Area:</span>
+//                                     <span className="font-bold text-blue-600">{calculatedTotals.area} <small className="text-[8px] uppercase">{summary.unit}</small></span>
 //                                 </div>
 //                                 <div className="p-3 bg-[#f1f8e9] rounded-xl border border-[#c8e6c9] flex justify-between items-center">
-//                                     <span className="text-[10px] font-black text-[#4caf50] uppercase">Total Cost:</span>
-//                                     <span className="font-black text-[#2e7d32]">₹ {calculatedTotals.cost}</span>
+//                                     <span className="text-[10px] font-bold text-[#4caf50] uppercase">Total Cost:</span>
+//                                     <span className="font-bold text-[#2e7d32]">₹ {calculatedTotals.cost}</span>
 //                                 </div>
 //                             </div>
 //                         </div>
@@ -628,13 +628,13 @@
 
 //                     {/* B. Plywood Sheet Configuration (One by One layout) */}
 //                     <div className="space-y-4 pt-4 border-t border-slate-100">
-//                         <label className="text-xs font-black text-slate-500 uppercase block tracking-wider">1. Plywood Sheet Configuration</label>
+//                         <label className="text-xs font-bold text-slate-500 uppercase block tracking-wider">1. Plywood Sheet Configuration</label>
 //                         <div className="flex items-center gap-6 bg-slate-50/50 p-4 rounded-xl border border-slate-200 w-max">
 //                             <div className="flex flex-col">
 //                                 <span className="text-[9px] font-bold text-slate-400 mb-1">HEIGHT (MM)</span>
 //                                 <input className="w-24 p-2 border border-slate-300 rounded-lg text-center font-bold text-slate-600" value={summary.plywoodSheetSizeH || ""} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeH: Math.max(0, Number(e.target.value)) })} />
 //                             </div>
-//                             <span className="mt-4 text-slate-300 font-black">×</span>
+//                             <span className="mt-4 text-slate-300 font-bold">×</span>
 //                             <div className="flex flex-col">
 //                                 <span className="text-[9px] font-bold text-slate-400 mb-1">WIDTH (MM)</span>
 //                                 <input className="w-24 p-2 border border-slate-300 rounded-lg text-center font-bold text-slate-600" value={summary.plywoodSheetSizeW || ""} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeW: Math.max(0, Number(e.target.value)) })} />
@@ -648,10 +648,10 @@
 
 //                     {/* C. Material Requirement Summary (One by One layout) */}
 //                     <div className="space-y-4 pt-4 border-t border-slate-100">
-//                         <label className="text-xs font-black text-slate-500 uppercase block tracking-wider">2. Material Requirement Summary</label>
+//                         <label className="text-xs font-bold text-slate-500 uppercase block tracking-wider">2. Material Requirement Summary</label>
 //                         <div className="max-w-2xl">
 //                             <table className="w-full text-xs border border-slate-200 rounded-lg overflow-hidden shadow-sm">
-//                                 <thead className="bg-[#e3f2fd] text-slate-700 font-black uppercase text-[10px]">
+//                                 <thead className="bg-[#e3f2fd] text-slate-700 font-bold uppercase text-[10px]">
 //                                     <tr>
 //                                         <th className="border border-slate-200 p-3 text-left">Plywood Thickness</th>
 //                                         <th className="border border-slate-200 p-3 text-center">Sheets Required</th>
@@ -662,7 +662,7 @@
 //                                         <tr key={idx} className="hover:bg-slate-50 transition-colors">
 //                                             <td className="border border-slate-200 p-3 font-bold text-slate-700">{thick} mm</td>
 //                                             <td className="border border-slate-200 p-3 text-center">
-//                                                 <span className="bg-slate-100 border border-slate-300 px-6 py-1 rounded-full font-black text-blue-600 text-sm">0</span>
+//                                                 <span className="bg-slate-100 border border-slate-300 px-6 py-1 rounded-full font-bold text-blue-600 text-sm">0</span>
 //                                             </td>
 //                                         </tr>
 //                                     ))}
@@ -678,7 +678,7 @@
 //                                                 {item.thickness} mm
 //                                             </td>
 //                                             <td className="border border-slate-200 p-3 text-center">
-//                                                 <span className="bg-blue-50 border border-blue-200 px-6 py-1 rounded-full font-black text-blue-600 text-sm">
+//                                                 <span className="bg-blue-50 border border-blue-200 px-6 py-1 rounded-full font-bold text-blue-600 text-sm">
 //                                                     {item.sheetsNeeded}
 //                                                 </span>
 //                                             </td>
@@ -1174,53 +1174,45 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
 
 
     return (
-        <div className="  text-slate-900 w-full">
+        <div className="bg-brand-surface text-text-main w-full">
 
             {/* 0. Image Preview Modal */}
             {previewImage && (
                 <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4" onClick={() => setPreviewImage(null)}>
                     <div className="relative max-w-4xl max-h-full">
                         <img src={previewImage} className="rounded-lg shadow-2xl border-4 border-white max-h-[85vh] object-contain" alt="Preview" />
-                        <button className="absolute -top-4 -right-4 bg-red-600 text-white w-10 h-10 rounded-full font-bold shadow-lg">×</button>
+                        <button className="absolute -top-4 -right-4 bg-brand-surface border border-ash-medium text-action-danger hover:text-white w-10 h-10 rounded-full font-bold shadow-lg">×</button>
                     </div>
                 </div>
             )}
 
 
-            <div className="sticky top-0 z-50 bg-white border-b border-slate-300 shadow-sm">
+            <div className="sticky top-0 z-50 bg-brand-surface border-b border-ash-light shadow-sm">
 
                 <header className="px-4 py-3 flex justify-between items-center w-full">
-                    {/* <div className='flex justify-between items-center gap-2'>
-                        <button type="button" onClick={() => navigate(-1)} className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2'>
-                            <i className="fas fa-arrow-left"></i>
-                        </button>
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                                <i className="fas fa-receipt mr-3 text-blue-600"></i>
-                                Cutlist – Site Entry
-                            </h1>
-                            {mode === "view" && <span>Cutlist No: {initialData.cutlistNo}</span>}
-
-                        </div>
-                    </div> */}
+                   
 
                     <div className='flex justify-between items-center gap-2'>
                         <button type="button" onClick={() => navigate(-1)}
-                         className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2'>
+                         className='bg-brand-ash border border-ash-medium text-text-muted hover:text-text-main hover:bg-brand-ash-dark flex items-center justify-between w-8 h-8  text-sm cursor-pointer rounded-md px-2'>
                             <i className="fas fa-arrow-left"></i>
                         </button>
 
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-2">
                             {/* Common Icon for both Heading and No */}
-                            <i className="fas fa-receipt mr-2 text-blue-600 text-3xl"></i>
+                            {/* <i className="fas fa-receipt mr-2 text-blue-600 text-3xl"></i> */}
+
+                            <div className="w-10 h-10 bg-brand-ash border border-ash-medium rounded-xl flex items-center justify-center shadow-sm shrink-0">
+                                <i className="fas fa-receipt text-action-primary text-xl"></i>
+                            </div>
 
                             <div className="flex flex-col">
-                                <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                                <h1 className="text-2xl font-bold text-text-main ">
                                     Cutlist – Site Entry
                                 </h1>
 
                                 {mode === "view" && (
-                                    <span className="text-sm font-semibold text-blue-600">
+                                    <span className="text-sm font-semibold text-action-primary">
                                         Cutlist No: {initialData?.cutlistNo}
                                     </span>
                                 )}
@@ -1232,7 +1224,10 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
 
                     <section className='flex gap-2 items-center'>
 
-                        <Button className="bg-[#43a047] hover:bg-[#2e7d32] text-white px-8 font-bold"
+                        <Button 
+                        // className="bg-[#43a047] hover:bg-[#2e7d32] text-white px-8 font-bold"
+                        className="h-10 px-8 shadow-md font-bold text-xs uppercase tracking-wide"
+                            variant="dark"
                             // onClick={() => onSubmit(header, rooms, summary, currentUser?.name || "")} 
                             onClick={() => {
                                 // 1. Filter the rooms before passing to onSubmit
@@ -1266,8 +1261,12 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                         </Button>
 
                         {handleGenerate &&
-                            <Button className="bg-[#43a047] hover:bg-[#2e7d32] text-white px-8 font-bold" onClick={handleGenerate} isLoading={isGeneratingPdf}>
-                                Generate Pdf
+                            <Button 
+                            // className="bg-[#43a047] hover:bg-[#2e7d32] text-white px-8 font-bold" 
+                            variant="ghost"
+                            className="h-10 px-6 font-bold text-xs border-2 border-ash-medium text-text-main shadow-md"
+                            onClick={handleGenerate} isLoading={isGeneratingPdf}>
+                                <i className="fas fa-file-pdf mr-2"></i> Generate Pdf
                             </Button>}
                     </section>
 
@@ -1275,18 +1274,19 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
             </div>
 
             <div className="w-full space-y-4 mt-3">
-                <section className="bg-white rounded-xl shadow-sm border border-slate-300 p-4 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <section className="bg-brand-surface rounded-xl shadow-sm border border-ash-medium p-4 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Project</label>
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Project</label>
                         <SearchSelectNew
                             options={projectsData.map((p: any) => ({ value: p._id, label: p.projectName }))}
                             placeholder="Select Project"
                             value={header.projectId || ""}
                             onValueChange={(val) => setHeader(p => ({ ...p, projectId: val, selectedQuoteId: null }))}
+                            // className='bg-brand-surface'
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Confirmed Quote</label>
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Confirmed Quote</label>
                         <SearchSelectNew
                             options={quotesData.map((q: any) => ({ value: q._id, label: q.quoteNo || "Select Quote" }))}
                             placeholder="Select Quote"
@@ -1295,38 +1295,45 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Version</label>
-                        <Input value={header.versionNo} disabled className="bg-slate-50 cursor-not-allowed font-bold text-slate-400" />
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Version</label>
+                        <Input value={header.versionNo} disabled className="bg-brand-ash/50 cursor-not-allowed font-bold text-text-soft" />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Client Name</label>
-                        <Input placeholder="Client Name" value={header.clientName} onChange={(e) => setHeader({ ...header, clientName: e.target.value })} />
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Client Name</label>
+                        <Input placeholder="Client Name" value={header.clientName} 
+                        onChange={(e) => setHeader({ ...header, clientName: e.target.value })}
+                        className='text-text-main bg-brand-surface border border-ash-medium focus:border-action-primary'
+                        />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Location</label>
-                        <Input placeholder="Location" value={header.location} onChange={(e) => setHeader({ ...header, location: e.target.value })} />
+                        <label className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Location</label>
+                        <Input placeholder="Location" value={header.location} 
+                        onChange={(e) => setHeader({ ...header, location: e.target.value })} 
+                        className='text-text-main bg-brand-surface border border-ash-medium focus:border-action-primary'
+                        
+                        />
                     </div>
                 </section>
 
                 {/* 2. Room Cards */}
                 {rooms.map((room, rIdx) => (
-                    <div key={rIdx} className="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
+                    <div key={rIdx} className="bg-brand-surface rounded-xl shadow-sm border border-ash-medium  overflow-hidden">
                         {/* bg-[#e3f2fd] */}
-                        <div className=" bg-[#fafbfc] px-6 py-3 border-b border-slate-300 flex justify-between items-center">
+                        <div className=" bg-brand-ash/30 px-6 py-3 border-b border-ash-light flex justify-between items-center">
 
                             <div className="flex gap-4 items-center">
-                                <span className="bg-blue-600 text-white w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold">{rIdx + 1}</span>
+                                <span className="bg-action-primary text-brand-surface w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold">{rIdx + 1}</span>
                                 {/* <div className="flex items-center gap-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase">Room:</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Room:</label>
                                     <input
                                         className="bg-transparent border-b border-blue-200 font-bold text-slate-800 text-sm focus:border-blue-500 outline-none w-32"
                                         value={room.roomName}
                                         onChange={(e) => { const n = [...rooms]; n[rIdx].roomName = e.target.value; setRooms(n); }} />
                                 </div> */}
                                 <div className="flex items-center gap-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase">Product:</label>
+                                    <label className="text-[10px] font-bold text-text-muted uppercase">Product:</label>
                                     <input
-                                        className="bg-transparent border-b border-blue-200 font-bold text-slate-800 text-sm focus:border-blue-500 outline-none w-36"
+                                        className="bg-transparent border-b-2 border-transparent hover:border-ash-medium focus:border-action-primary font-bold text-text-strong text-sm outline-none w-36"
                                         value={room.productName}
                                         placeholder='Enter Product Name'
                                         onChange={(e) => { const n = [...rooms]; n[rIdx].productName = e.target.value; setRooms(n); }} />
@@ -1340,32 +1347,32 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                         { label: 'Front', key: 'frontSideLaminateImage' }
                                     ].map((side) => (
                                         <div key={side.label} className="flex flex-col items-center">
-                                            <label className="text-[9px] font-black text-slate-500 uppercase mb-1">{side.label} Side Laminate Image</label>
+                                            <label className="text-[9px] font-bold text-text-soft uppercase mb-1">{side.label} Side Laminate Image</label>
                                             <div className="flex gap-1 items-center">
                                                 {room[side.key] ? (
                                                     <div className="flex flex-col gap-1 items-center group">
                                                         <img
                                                             src={room[side.key].url}
-                                                            className="w-10 h-10 object-cover rounded border-2 border-blue-400 cursor-zoom-in hover:scale-110 transition-transform shadow-md"
+                                                            className="w-10 h-10 object-cover rounded border border-ash-medium cursor-zoom-in hover:scale-110 transition-transform shadow-md"
                                                             onClick={() => setPreviewImage(room[side.key].url)}
                                                         />
 
                                                         <div className="flex  gap-2 opacity-0 group-hover:opacity-100 ">
                                                             {/* Change Image */}
-                                                            <label className="cursor-pointer !text-gray-600 hover:text-blue-600 text-[10px] font-bold">
+                                                            <label className="cursor-pointer bg-brand-surface border border-ash-medium text-text-muted hover:text-action-primary text-[10px] font-bold">
                                                                 <i className="fas fa-sync-alt" />
                                                                 <input type="file" className="hidden" onChange={(e) => e.target.files && handleImageAction(rIdx, side.key as any, e.target.files[0])} />
                                                             </label>
                                                             {/* Remove Image */}
-                                                            <button onClick={() => handleImageAction(rIdx, side.key as any, null)} className="text-red-500 hover:text-blue-600 text-[10px] font-bold">
+                                                            <button onClick={() => handleImageAction(rIdx, side.key as any, null)} className="bg-brand-surface border border-ash-medium text-action-danger hover:bg-action-danger hover:text-brand-surface text-[10px] font-bold">
                                                                 <i className="fas fa-trash" />
                                                             </button>
                                                         </div>
 
                                                     </div>
                                                 ) : (
-                                                    <div className="w-10 h-10 bg-white border-2 border-dashed border-slate-300 rounded flex items-center justify-center cursor-pointer hover:border-blue-400 relative">
-                                                        <i className="fas fa-camera text-slate-300 text-sm" />
+                                                    <div className="w-10 h-10 bg-brand-ash/50 border border-dashed border-ash-dark rounded flex items-center justify-center cursor-pointer hover:border-action-primary hover:bg-brand-ash hover:text-action-primary text-text-soft relative">
+                                                        <i className="fas fa-camera text-sm" />
                                                         <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => e.target.files && handleImageAction(rIdx, side.key as any, e.target.files[0])} />
                                                     </div>
                                                 )}
@@ -1379,7 +1386,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                 <button
                                     type="button"
                                     onClick={() => deleteRoom(rIdx)}
-                                    className=" p-2 text-red-600 hover:text-red-700 transition-colors"
+                                    className=" p-2 text-text-soft hover:text-action-danger hover:bg-brand-ash transition-colors"
                                     title="Delete Room"
                                 >
                                     <i className="fas fa-trash-alt cursor-pointer text-lg" />
@@ -1389,12 +1396,12 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
 
                         <div className="w-full overflow-x-auto">
                             <table className="w-full text-xs text-left border-collapse">
-                                <thead className="bg-[#e3f2fd] text-slate-700">
+                                <thead className="bg-brand-ash/30 text-text-muted">
                                     {/* <tr className="text-center font-bold">
-                                        <th className="border border-slate-300 p-3 w-12 text-center font-black">S No</th>
+                                        <th className="border border-slate-300 p-3 w-12 text-center font-bold">S No</th>
                                         <th colSpan={3} className="border border-slate-300 p-3 w-64 bg-[#e3f2fd]">
                                             <div className="flex flex-col items-center gap-1">
-                                                <span className="block font-black text-slate-700">Dimensions & Area</span>
+                                                <span className="block font-bold text-slate-700">Dimensions & Area</span>
                                                 <div className="flex gap-2 items-center text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                                                     <span>Height</span>
                                                     <span className="text-slate-300">|</span>
@@ -1415,39 +1422,39 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
 
 
                                     <tr className="text-center font-bold">
-                                        <th rowSpan={2} className="border border-slate-300 p-3 w-15 font-black">S No</th>
+                                        <th rowSpan={2} className="border border-ash-light p-3 w-15 font-bold">S No</th>
 
                                         {/* Main Grouping Header */}
-                                        <th colSpan={3} className="border border-slate-300 p-2 bg-[#d1e9ff] text-slate-800 uppercase tracking-widest text-[10px]">
+                                        <th colSpan={3} className="border border-ash-light p-2 bg-brand-ash/50 text-text-strong uppercase tracking-widest text-[10px]">
                                             Dimensions & Area
                                         </th>
 
-                                        <th rowSpan={2} className="border border-slate-300 p-3 w-32">Plywood Thickness</th>
-                                        <th rowSpan={2} className="border border-slate-300 p-3 w-24">Face Type</th>
-                                        <th rowSpan={2} className="border border-slate-300 p-3 w-32">Laminate Thickness</th>
-                                        <th rowSpan={2} className="border border-slate-300 p-3">Laminate Brand</th>
-                                        <th rowSpan={2} className="border border-slate-300 p-3">Laminate Name & Code</th>
-                                        <th rowSpan={2} className="border border-slate-300 p-1 w-16">Action</th>
+                                        <th rowSpan={2} className="border border-ash-light p-3 w-32">Plywood Thickness</th>
+                                        <th rowSpan={2} className="border border-ash-light p-3 w-24">Face Type</th>
+                                        <th rowSpan={2} className="border border-ash-light p-3 w-32">Laminate Thickness</th>
+                                        <th rowSpan={2} className="border border-ash-light p-3">Laminate Brand</th>
+                                        <th rowSpan={2} className="border border-ash-light p-3">Laminate Name & Code</th>
+                                        <th rowSpan={2} className="border border-ash-light p-1 w-16">Action</th>
                                     </tr>
 
                                     {/* Second Header Row: Individual Sub-labels */}
-                                    <tr className="text-center font-bold bg-[#e3f2fd]">
-                                        <th className="border border-slate-300 p-2 text-[10px] w-28">Height (mm)</th>
-                                        <th className="border border-slate-300 p-2 text-[10px] w-28">Width (mm)</th>
+                                    <tr className="text-center font-bold bg-brand-ash/20">
+                                        <th className="border border-ash-light p-2 text-[10px] w-28">Height (mm)</th>
+                                        <th className="border border-ash-light p-2 text-[10px] w-28">Width (mm)</th>
                                         {/* <th className="border border-slate-300 p-2 text-[10px] w-32">Conversion</th> */}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {room.items.map((item: any, iIdx: number) => (
                                         <React.Fragment key={iIdx}>
-                                            <tr className="bg-white">
-                                                <td rowSpan={2} className="border border-slate-300 p-3 text-center font-bold text-slate-400">{item.sNo}</td>
+                                            <tr className="bg-brand-surface hover:bg-brand-surface-hover transition-colors group/row">
+                                                <td rowSpan={2} className="border border-ash-light p-3 text-center font-bold text-text-soft">{item.sNo}</td>
 
 
                                                 {/* <td rowSpan={2} className="border border-slate-300 p-2">
                                                     <input
                                                         type="number"
-                                                        className="w-full p-2 bg-[#fffde7] border border-[#fbc02d] rounded-md font-bold text-center outline-none"
+                                                        className="w-full p-2 bg-brand-surface border border-ash-medium rounded-md font-bold text-center outline-none"
                                                         value={item.h}
                                                         onChange={(e) => {
                                                             const val = e.target.value;
@@ -1461,7 +1468,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                                 <td rowSpan={2} className="border border-slate-300 p-2">
                                                     <input
                                                         type="number"
-                                                        className="w-full p-2 bg-[#fffde7] border border-[#fbc02d] rounded-md font-bold text-center outline-none"
+                                                        className="w-full p-2 bg-brand-surface border border-ash-medium rounded-md font-bold text-center outline-none"
                                                         value={item.w}
                                                         onChange={(e) => {
                                                             const val = e.target.value;
@@ -1474,14 +1481,14 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
 
 
                                                 {/* MERGED MEASUREMENT COLUMN WITH CONVERSION */}
-                                                <td rowSpan={2} colSpan={3} className="border border-slate-300 p-2 bg-slate-50/30">
+                                                <td rowSpan={2} colSpan={3} className="border border-ash-light p-2 bg-brand-ash/10">
                                                     <div className="flex flex-col gap-2">
                                                         {/* Input Row */}
                                                         <div className="flex gap-1 items-center">
                                                             <input
                                                                 type="number"
                                                                 placeholder="H"
-                                                                className="w-1/2 p-2 bg-[#fffde7] border border-[#fbc02d] rounded-md font-bold text-center outline-none"
+                                                                className="w-1/2 p-2 bg-brand-surface border border-ash-medium rounded-md font-bold text-center outline-none"
                                                                 value={item.h || ""}
                                                                 onChange={(e) => {
                                                                     const n = [...rooms];
@@ -1495,7 +1502,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                                             <input
                                                                 type="number"
                                                                 placeholder="W"
-                                                                className="w-1/2 p-2 bg-[#fffde7] border border-[#fbc02d] rounded-md font-bold text-center outline-none"
+                                                                className="w-1/2 p-2 bg-brand-surface border border-ash-medium rounded-md font-bold text-center outline-none"
                                                                 value={item.w || ""}
                                                                 onChange={(e) => {
                                                                     const n = [...rooms];
@@ -1508,9 +1515,9 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                                         </div>
 
                                                         {/* Conversion & Area Display */}
-                                                        <div className="flex flex-col border-t border-slate-200 pt-2">
+                                                        <div className="flex flex-col border-t border-ash-medium/50 pt-2">
                                                             <select
-                                                                className="text-[10px] bg-transparent font-bold text-blue-600 outline-none cursor-pointer mb-1"
+                                                                className="text-[10px] bg-transparent font-bold text-action-primary outline-none cursor-pointer mb-1"
                                                                 value={item.displayUnit || 'sqft'}
                                                                 onChange={(e) => {
                                                                     const n = [...rooms];
@@ -1518,12 +1525,12 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                                                     setRooms(n);
                                                                 }}
                                                             >
-                                                                <option value="sqmm" className="py-2 text-slate-800 font-semibold">Area (Sq/mm)</option>
-                                                                <option value="sqm" className="py-2 text-slate-800 font-semibold">Area (Sq/m)</option>
-                                                                <option value="sqft" className="py-2 text-slate-800 font-semibold">Area (Sq/ft)</option>
+                                                                <option value="sqmm" className="py-2 text-text-main font-semibold">Area (Sq/mm)</option>
+                                                                <option value="sqm" className="py-2 text-text-main font-semibold">Area (Sq/m)</option>
+                                                                <option value="sqft" className="py-2 text-text-main font-semibold">Area (Sq/ft)</option>
                                                             </select>
 
-                                                            <div className="text-[11px] font-black text-slate-700 bg-white px-2 py-1 rounded border border-slate-100 text-center">
+                                                            <div className="text-[11px] font-bold text-text-strong bg-brand-ash/50 px-2 py-1 rounded border border-ash-medium text-center">
                                                                 {(() => {
                                                                     const h = parseFloat(item.h) || 0;
                                                                     const w = parseFloat(item.w) || 0;
@@ -1541,8 +1548,8 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                                 </td>
 
 
-                                                <td rowSpan={2} className="border border-slate-300 p-3 text-center">
-                                                    <input className="w-16 p-2 border border-slate-200 rounded-md text-center font-bold text-slate-600" value={item.plyThickness}
+                                                <td rowSpan={2} className="border border-ash-light p-3 text-center">
+                                                    <input className="w-16 p-2 border border-ash-medium/50 rounded-md text-center font-bold text-text-main focus:border-action-primary" value={item.plyThickness}
                                                         onChange={(e) => {
                                                             const value = e.target.value;
 
@@ -1556,36 +1563,36 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
 
                                                     />
                                                 </td>
-                                                <td className="border border-slate-300 p-3 font-black text-[#2e7d32] bg-[#f1f8e9]/50 text-center uppercase">Inner</td>
-                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.innerFace.laminateThickness} onChange={(e) => {
+                                                <td className="border border-ash-light p-3 font-bold text-action-primary bg-action-primary/5 text-center uppercase">Inner</td>
+                                                <td className="border border-ash-light p-3"><input className="w-full p-1  text-text-main focus:bg-brand-ash border-b border-ash-medium/50 bg-transparent outline-none" value={item.innerFace.laminateThickness} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].innerFace.laminateThickness = e.target.value; setRooms(n);
                                                 }} /></td>
-                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.innerFace.laminateBrand} onChange={(e) => {
+                                                <td className="border border-ash-light p-3"><input className="w-full p-1  text-text-main focus:bg-brand-ash border-b border-ash-medium/50 bg-transparent outline-none" value={item.innerFace.laminateBrand} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].innerFace.laminateBrand = e.target.value; setRooms(n);
                                                 }} /></td>
-                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" placeholder="Code and Name" value={item.innerFace.laminateNameCode} onChange={(e) => {
+                                                <td className="border border-ash-light p-3"><input className="w-full p-1 text-text-main focus:bg-brand-ash  border-b border-ash-medium/50 bg-transparent outline-none" placeholder="Code and Name" value={item.innerFace.laminateNameCode} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].innerFace.laminateNameCode = e.target.value; setRooms(n);
                                                 }} /></td>
 
-                                                <td rowSpan={2} className="border border-slate-300 p-1 text-center">
+                                                <td rowSpan={2} className="border border-ash-light p-1 text-center bg-brand-ash/10">
                                                     <button
                                                         type="button"
                                                         onClick={() => deleteItem(rIdx, iIdx)}
-                                                        className="text-red-600  cursor-pointer hover:text-red-700"
+                                                        className="text-text-soft hover:text-action-danger cursor-pointer"
                                                     >
                                                         <i className="fas fa-trash-alt text-[14px]" />
                                                     </button>
                                                 </td>
                                             </tr>
-                                            <tr className="bg-[#fcfcfc]">
-                                                <td className="border border-slate-300 p-3 font-black text-[#1565c0] bg-[#e3f2fd]/50 text-center uppercase">Outer</td>
-                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.outerFace.laminateThickness} onChange={(e) => {
+                                            <tr className="bg-brand-surface hover:bg-brand-surface-hover transition-colors">
+                                                <td className="border border-ash-light p-3 font-bold text-text-strong bg-brand-ash/30 text-center uppercase">Outer</td>
+                                                <td className="border border-ash-light p-3"><input className="w-full p-1 focus:bg-brand-ash border-b border-ash-medium text-text-main bg-transparent outline-none" value={item.outerFace.laminateThickness} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].outerFace.laminateThickness = e.target.value; setRooms(n);
                                                 }} /></td>
-                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" value={item.outerFace.laminateBrand} onChange={(e) => {
+                                                <td className="border border-ash-light p-3"><input className="w-full p-1 focus:bg-brand-ash border-b border-ash-medium text-text-main bg-transparent outline-none" value={item.outerFace.laminateBrand} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].outerFace.laminateBrand = e.target.value; setRooms(n);
                                                 }} /></td>
-                                                <td className="border border-slate-300 p-3"><input className="w-full p-1 border-b border-slate-200 bg-transparent outline-none" placeholder="Code and Name" value={item.outerFace.laminateNameCode} onChange={(e) => {
+                                                <td className="border border-ash-light p-3"><input className="w-full p-1 focus:bg-brand-ash border-b border-ash-mediumtext-text-main bg-transparent outline-none" placeholder="Code and Name" value={item.outerFace.laminateNameCode} onChange={(e) => {
                                                     const n = [...rooms]; n[rIdx].items[iIdx].outerFace.laminateNameCode = e.target.value; setRooms(n);
                                                 }} /></td>
                                             </tr>
@@ -1596,11 +1603,13 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                 {/* ADD THIS TFOOT FOR ADD ITEM BUTTON */}
                                 <tfoot>
                                     <tr>
-                                        <td colSpan={10} className="p-2 bg-slate-50 border border-slate-300">
+                                        <td colSpan={10} className="p-2 bg-brand-ash/30 border-t border-ash-medium">
                                             <button
                                                 type="button"
                                                 onClick={() => addItem(rIdx)}
-                                                className="flex cursor-pointer items-center gap-2 text-blue-600 font-bold text-[10px] uppercase tracking-wider hover:text-blue-800"
+                                                className="flex cursor-pointer items-center gap-2 text-action-primary hover:text-text-strong 
+                                                font-bold text-[10px] uppercase tracking-wider hover:bg-brand-surface border border-transparent
+                                                 hover:border-ash-medium"
                                             >
                                                 <i className="fas fa-plus-circle" /> Add Item
                                             </button>
@@ -1619,7 +1628,9 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                         type="button"
                         variant='outline'
                         onClick={addRoom}
-                        className="bg-white border-2 border-dashed border-blue-300 px-12 py-3 rounded-xl text-blue-600 font-bold flex items-center gap-3 hover:bg-blue-50 transition-all shadow-sm"
+                        // className="bg-white border-2 border-dashed border-blue-300 px-12 py-3 rounded-xl text-blue-600 font-bold flex items-center gap-3 hover:bg-blue-50 transition-all shadow-sm"
+                        className="bg-brand-surface border-2 border-dashed border-ash-dark px-12 py-3 rounded-xl text-text-main font-bold text-[11px] uppercase tracking-widest flex items-center gap-3
+                         hover:bg-brand-ash hover:border-action-primary hover:text-action-primary transition-all shadow-sm"
                     >
                         <i className="fas fa-plus" /> ADD NEW PRODUCT
                     </Button>
@@ -1627,19 +1638,19 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
 
 
                 {/* 3. Fabrication & Plywood Summary (Single Column Stack) */}
-                <section className="bg-white rounded-xl shadow-sm border border-slate-300 p-6 space-y-6">
-                    <h2 className="text-lg font-black text-slate-800 flex items-center gap-2 border-b pb-4 uppercase tracking-tight">
-                        <i className="fas fa-chart-pie text-blue-600" /> Fabrication & Material Summary
+                <section className="bg-brand-surface rounded-xl shadow-sm border border-ash-medium p-6 space-y-6">
+                    <h2 className="text-lg font-bold text-text-main flex items-center gap-2 border-b border-ash-light pb-4">
+                        <i className="fas fa-chart-pie text-text-main" /> Fabrication & Material Summary
                     </h2>
 
                     {/* A. Fabrication Calculation */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-6">
                             <div className="flex flex-col">
-                                <label className="text-xs font-black text-slate-500 uppercase mb-1">Fabrication Rate</label>
+                                <label className="text-xs font-bold text-text-muted mb-1">Fabrication Rate</label>
                                 <div className="flex gap-2">
-                                    <input type="number" className="w-34 p-2 border border-slate-300 rounded-lg font-bold" placeholder='Rate' value={summary.fabricationRate || ""} onChange={(e) => setSummary({ ...summary, fabricationRate: Math.max(0, Number(e.target.value)) })} />
-                                    <select className="p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-600 bg-slate-50" value={summary.unit} onChange={(e) => setSummary({ ...summary, unit: e.target.value })}>
+                                    <input type="number" className="w-34 p-2  bg-brand-surface border border-ash-medium  text-text-main rounded-lg font-medium" placeholder='Rate' value={summary.fabricationRate || ""} onChange={(e) => setSummary({ ...summary, fabricationRate: Math.max(0, Number(e.target.value)) })} />
+                                    <select className="p-2 bg-brand-ash border border-ash-medium text-text-strong rounded-lg text-xs font-bold" value={summary.unit} onChange={(e) => setSummary({ ...summary, unit: e.target.value })}>
                                         <option value="sqft">₹ per Sqft</option>
                                         <option value="sqm">₹ per Sqm</option>
                                         <option value="sqmm">₹ per Sqmm</option>
@@ -1647,47 +1658,47 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                 </div>
                             </div>
                             <div className="flex-1 grid grid-cols-2 gap-4 mt-4">
-                                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase">Total Area:</span>
-                                    <span className="font-black text-blue-600">{calculatedTotals.area} <small className="text-[8px] uppercase">{summary.unit}</small></span>
+                                <div className="p-3 bg-brand-ash/50 rounded-xl border border-ash-medium flex justify-between items-center">
+                                    <span className="text-[10px] font-bold text-text-muted uppercase">Total Area:</span>
+                                    <span className="font-bold text-text-main">{calculatedTotals.area} <small className="text-[8px] uppercase">{summary.unit}</small></span>
                                 </div>
-                                <div className="p-3 bg-[#f1f8e9] rounded-xl border border-[#c8e6c9] flex justify-between items-center">
-                                    <span className="text-[10px] font-black text-[#4caf50] uppercase">Total Cost:</span>
-                                    <span className="font-black text-[#2e7d32]">₹ {calculatedTotals.cost}</span>
+                                <div className="p-3 bg-brand-ash/50 rounded-xl border border-ash-medium flex justify-between items-center">
+                                    <span className="text-[10px] font-bold text-action-primary uppercase">Total Cost:</span>
+                                    <span className="font-bold text-text-main">₹ {calculatedTotals.cost}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* B. Plywood Sheet Configuration (One by One layout) */}
-                    <div className="space-y-4 pt-4 border-t border-slate-100">
-                        <label className="text-xs font-black text-slate-500 uppercase block tracking-wider">1. Plywood Sheet Configuration</label>
-                        <div className="flex items-center gap-6 bg-slate-50/50 p-4 rounded-xl border border-slate-200 w-max">
+                    <div className="space-y-4 pt-4 border-t border-ash-light">
+                        <label className="text-xs font-bold text-text-main uppercase block tracking-wider">1. Plywood Sheet Configuration</label>
+                        <div className="flex items-center gap-6 bg-brand-ash/30 p-4 rounded-xl border border-ash-medium w-max">
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-bold text-slate-400 mb-1">HEIGHT (MM)</span>
-                                <input className="w-24 p-2 border border-slate-300 rounded-lg text-center font-bold text-slate-600" value={summary.plywoodSheetSizeH || ""} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeH: Math.max(0, Number(e.target.value)) })} />
+                                <span className="text-[9px] font-bold text-text-muted mb-1">HEIGHT (MM)</span>
+                                <input className="w-24 p-2 bg-brand-surface border border-ash-medium focus:border-action-primary text-text-main rounded-lg text-center font-bold" value={summary.plywoodSheetSizeH || ""} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeH: Math.max(0, Number(e.target.value)) })} />
                             </div>
-                            <span className="mt-4 text-slate-300 font-black">×</span>
+                            <span className="mt-4 text-slate-300 font-bold">×</span>
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-bold text-slate-400 mb-1">WIDTH (MM)</span>
-                                <input className="w-24 p-2 border border-slate-300 rounded-lg text-center font-bold text-slate-600" value={summary.plywoodSheetSizeW || ""} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeW: Math.max(0, Number(e.target.value)) })} />
+                                <span className="text-[9px] font-bold text-text-muted mb-1">WIDTH (MM)</span>
+                                <input className="w-24 p-2 bg-brand-surface border border-ash-medium focus:border-action-primary text-text-main rounded-lg text-center font-bold" value={summary.plywoodSheetSizeW || ""} onChange={(e) => setSummary({ ...summary, plywoodSheetSizeW: Math.max(0, Number(e.target.value)) })} />
                             </div>
                             <div className="flex flex-col ml-4">
-                                <span className="text-[9px] font-bold text-slate-400 mb-1">KERF (MM)</span>
-                                <input type="number" className="w-16 p-2 border border-slate-300 rounded-lg text-center font-bold text-blue-600" value={summary.kerf || ""} onChange={(e) => setSummary({ ...summary, kerf: Math.max(0, Number(e.target.value)) })} />
+                                <span className="text-[9px] font-bold text-text-muted mb-1">KERF (MM)</span>
+                                <input type="number" className="w-16 p-2 bg-brand-surface border border-ash-medium focus:border-action-primary text-text-main rounded-lg text-center font-bold" value={summary.kerf || ""} onChange={(e) => setSummary({ ...summary, kerf: Math.max(0, Number(e.target.value)) })} />
                             </div>
                         </div>
                     </div>
 
                     {/* C. Material Requirement Summary (One by One layout) */}
-                    <div className="space-y-4 pt-4 border-t border-slate-100">
-                        <label className="text-xs font-black text-slate-500 uppercase block tracking-wider">2. Material Requirement Summary</label>
+                    <div className="space-y-4 pt-4 border-t border-ash-light">
+                        <label className="text-xs font-bold text-text-main uppercase block tracking-wider">2. Material Requirement Summary</label>
                         <div className="max-w-2xl">
-                            <table className="w-full text-xs border border-slate-200 rounded-lg overflow-hidden shadow-sm">
-                                <thead className="bg-[#e3f2fd] text-slate-700 font-black uppercase text-[10px]">
+                            <table className="w-full text-xs border border-ash-medium rounded-lg overflow-hidden shadow-sm">
+                                <thead className="bg-brand-ash/80 text-text-strong font-bold uppercase text-[10px] border-b border-ash-medium">
                                     <tr>
-                                        <th className="border border-slate-200 p-3 text-left">Plywood Thickness</th>
-                                        <th className="border border-slate-200 p-3 text-center">Sheets Required</th>
+                                        <th className="border border-ash-medium p-3 text-left">Plywood Thickness</th>
+                                        <th className="border border-ash-medium p-3 text-center">Sheets Required</th>
                                     </tr>
                                 </thead>
                                 {/* <tbody className="bg-white font-medium">
@@ -1695,7 +1706,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                         <tr key={idx} className="hover:bg-slate-50 transition-colors">
                                             <td className="border border-slate-200 p-3 font-bold text-slate-700">{thick} mm</td>
                                             <td className="border border-slate-200 p-3 text-center">
-                                                <span className="bg-slate-100 border border-slate-300 px-6 py-1 rounded-full font-black text-blue-600 text-sm">0</span>
+                                                <span className="bg-slate-100 border border-slate-300 px-6 py-1 rounded-full font-bold text-blue-600 text-sm">0</span>
                                             </td>
                                         </tr>
                                     ))}
@@ -1704,14 +1715,14 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
                                     )}
                                 </tbody> */}
 
-                                <tbody className="bg-white font-medium">
+                                <tbody className="bg-brand-surface font-medium text-text-main divide-y divide-ash-light">
                                     {summary.materialSummary.map((item: any, idx: number) => (
-                                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                                            <td className="border border-slate-200 p-3 font-bold text-slate-700">
+                                        <tr key={idx} className="hover:bg-brand-ash/30 transition-colors">
+                                            <td className=" p-3 font-bold ">
                                                 {item.thickness} mm
                                             </td>
-                                            <td className="border border-slate-200 p-3 text-center">
-                                                <span className="bg-blue-50 border border-blue-200 px-6 py-1 rounded-full font-black text-blue-600 text-sm">
+                                            <td className="border-l border-ash-light p-3 text-center">
+                                                <span className="bg-action-primary/10 border border-action-primary/20 px-6 py-1 rounded-full font-bold text-action-primary text-sm">
                                                     {item.sheetsNeeded}
                                                 </span>
                                             </td>
@@ -1720,7 +1731,7 @@ const CutlistForm: React.FC<any> = ({ mode, isGeneratingPdf, initialData, onSubm
 
                                     {summary.materialSummary.length === 0 && (
                                         <tr>
-                                            <td colSpan={2} className="p-4 text-center text-slate-400 italic font-bold">
+                                            <td colSpan={2} className="p-4 text-center text-text-soft bg-brand-ash/10 italic font-bold">
                                                 No valid measurements entered to calculate sheet requirements.
                                             </td>
                                         </tr>

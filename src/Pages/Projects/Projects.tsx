@@ -186,7 +186,9 @@ type ProjectType = {
 }
 
 // 1. Mapping Sidebar Keys to Backend Permission Keys
-const PERMISSION_MAPPING: Record<string, string | string[]> = {
+export const PERMISSION_MAPPING: Record<string, string | string[]> = {
+  PROJECTCONFIGURATION: "project_configuration",
+  ARCHIEVEDPROJECTS: "archieve_projects",
   HR: "hr",
   LOGISTICS: "logistics",
   PROCUREMENT: "procurement",
@@ -242,6 +244,8 @@ export const getProjectPaths = (organizationId: string | undefined): Record<stri
   if (!organizationId) return {};
   return {
     PROJECTS: `/organizations/${organizationId}/projects`,
+    PROJECTCONFIGURATION: `/organizations/${organizationId}/projects/projectconfiguration`,
+    ARCHIEVEDPROJECTS: `/organizations/${organizationId}/projects/archievedprojects`,
     ORGANIZATION: `/organizations/${organizationId}`,
     SHORTLIST: `/organizations/${organizationId}/projects/shortlistdesign`,
     COMMONORDER: `/organizations/${organizationId}/projects/commonorder`,

@@ -8,7 +8,15 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
-import InstantCostCalculation from './Pages/InstantCostCalculator/InstantCostCalculator';
+import DesignApprovalMain from './Pages/Stage Pages/DesignApproval/DesignApprovalMain';
+import DesignApprovalPublic from './Pages/Stage Pages/DesignApproval/DesignApprovalPublic';
+const ProjectConfiguration = lazy(() => import( './Pages/Projects/ProjectConfiguration'));
+const ArchivedProjects = lazy(() => import( './Pages/Projects/ArchivedProjects'));
+const ProjectOnboarding = lazy(() => import( './Pages/Stage Pages/Project_Onboarding/ProjectOnboarding'));
+const InstantCostCalculation = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculator'));
+const InstantCostCalculatorProductConfigMain = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculatorProductConfigMain'));
+const InstantCostCalculatorDimentionMain = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculatorDimentionMain'));
+const InstantCostCalculatorDimentionSingle = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculatorDimentionSingle'));
 const RateConfigBackupMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigBackupMain'));
 const RateConfigBackupSingle = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigBackupSingle'));
 const RateConfigVersionMain = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigVersionMain'));
@@ -568,6 +576,24 @@ function App() {
               <ProjectLists />
             </ProtectedRoutes>} />
 
+            <Route path="projectconfiguration" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="project_configuration"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+            >
+              <ProjectConfiguration />
+            </ProtectedRoutes>} />
+
+
+            <Route path="archievedprojects" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="archive_projects"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'create', 'edit', 'delete']}
+            >
+              <ArchivedProjects />
+            </ProtectedRoutes>} />
+
+
             <Route path="hr" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="hr"
               // ⭐ Allow entry if they can do ANY of these things
@@ -587,15 +613,108 @@ function App() {
 
 
             </Route>
-
+            {/* 
             <Route path="instantcostcalculation" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="instant_cost_calculation"
               // ⭐ Allow entry if they can do ANY of these things
               requiredAction={['list', 'create', 'edit', 'delete']}
             >
               <InstantCostCalculation />
-            </ProtectedRoutes>} />
+            </ProtectedRoutes>} >
 
+
+              <Route path="products" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="instant_cost_calculation"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+              >
+                <InstantCostCalculatorProductConfigMain />
+              </ProtectedRoutes>} ></Route>
+
+              <Route path="instant-cost-calculator/dimention/:categoryId" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="instant_cost_calculation"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+              >
+                <InstantCostCalculatorDimentionMain />
+              </ProtectedRoutes>} >
+
+                <Route path="single/:dimensionKey" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                  requiredDepartment="instant_cost_calculation"
+                  // ⭐ Allow entry if they can do ANY of these things
+                  requiredAction={['list', 'create', 'edit', 'delete']}
+                >
+                  <InstantCostCalculatorDimentionSingle />
+                </ProtectedRoutes>} ></Route>
+
+
+
+              </Route>
+
+
+            </Route> */}
+
+
+            {/* Parent wrapper for the base path. Note: No 'element' property here! */}
+            <Route path="instantcostcalculation">
+
+              {/* 1. The original calculator becomes the 'index' route (default page) */}
+              <Route
+                index
+                element={
+                  <ProtectedRoutes
+                    allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="instant_cost_calculation"
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+                  >
+                    <InstantCostCalculation />
+                  </ProtectedRoutes>
+                }
+              />
+
+              {/* 2. Products Page */}
+              <Route
+                path="products"
+                element={
+                  <ProtectedRoutes
+                    allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="instant_cost_calculation"
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+                  >
+                    <InstantCostCalculatorProductConfigMain />
+                  </ProtectedRoutes>
+                }
+              />
+
+              {/* 3. Dimension Main Page */}
+              <Route
+                path="instant-cost-calculator/dimention/:categoryId"
+                element={
+                  <ProtectedRoutes
+                    allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="instant_cost_calculation"
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+                  >
+                    <InstantCostCalculatorDimentionMain />
+                  </ProtectedRoutes>
+                }
+              />
+
+              {/* 4. Single Dimension Config Page (Flattened) */}
+              <Route
+                path="instant-cost-calculator/dimention/:categoryId/single/:dimensionKey"
+                element={
+                  <ProtectedRoutes
+                    allowedRoles={["owner", "CTO", "staff"]}
+                    requiredDepartment="instant_cost_calculation"
+                    requiredAction={['list', 'create', 'edit', 'delete']}
+                  >
+                    <InstantCostCalculatorDimentionSingle />
+                  </ProtectedRoutes>
+                }
+              />
+
+            </Route>
 
 
 
@@ -1998,6 +2117,17 @@ function App() {
               </ProtectedRoutes>
             } />
 
+            <Route path="onboarding" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
+                requiredDepartment="onboarding"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
+                <ProjectOnboarding />
+              </ProtectedRoutes>
+            } />
+
             <Route path="requirementform" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "client", "worker"]}
                 requiredDepartment="clientrequirement"
@@ -2064,6 +2194,18 @@ function App() {
                 </ProtectedRoutes>} /> */}
 
             </Route>
+
+
+             <Route path="designapproval" element={
+              <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
+                requiredDepartment="designapproval"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'create', 'edit', 'delete']}
+
+              >
+                <DesignApprovalMain />
+              </ProtectedRoutes>
+            } />
 
             <Route path="technicalconsultant" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
@@ -2585,6 +2727,7 @@ function App() {
           <Route path='/:organizationId/procurement/public' element={<PublicProcurementRatePage />} />
           <Route path='/:organizationId/logistics/public/:id' element={<LogisticsPublicSingle />} />
           <Route path='/:organizationId/pincode/acknowledgement/public/:id' element={<PincodeVendorPublicAcknowledgement />} />
+          <Route path='/:organizationId/design-approval/public/:projectId' element={<DesignApprovalPublic />} />
 
           <Route path='/subcontract/share/:subContractId' element={<PublicSubContract />} />
           <Route path='/privacy-policy' element={<PrivacyPolicy />} />

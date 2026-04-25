@@ -110,7 +110,7 @@ export default function OrganizationSettings() {
         <div className="flex flex-col w-full h-full bg-gradient-to-br from-blue-50 via-white to-blue-100 overflow-y-auto custom-scrollbar">
 
             {/* PROFESSIONAL HEADER SECTION */}
-            <div className="bg-white/80 backdrop-blur-md border-b border-blue-100 sticky top-0 z-20 w-full">
+            <div className="bg-white/80 backdrop-blur-md border-b border-blue-100 sticky top-0 z-10 w-full">
                 <div className="max-w-full mx-auto px-6 py-6">
                     <div className="flex flex-col gap-2">
                         <h1 className="text-3xl font-bold text-gray-900 flex items-center">

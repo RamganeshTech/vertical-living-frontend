@@ -401,7 +401,7 @@
 //                 </div>
 
 //                 <div className='flex gap-3'>
-                    
+
 //                         <Button
 //                             onClick={() => setShowForm(true)}
 //                             className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-transform active:scale-95"
@@ -409,7 +409,7 @@
 //                             <i className="fas fa-plus mr-2" />
 //                             New Project
 //                         </Button>
-                    
+
 //                     <StageGuide organizationId={organizationId!} stageName="project" />
 //                 </div>
 //             </header>
@@ -517,7 +517,7 @@
 //                     </div>
 
 //                     {/* RIGHT: PROJECT CARDS GRID */}
-                     
+
 //                         <div
 //                             // ref={setScrollRef}
 //                             className="flex-1 lg:overflow-y-auto lg:pr-2 pb-10 custom-scrollbar"
@@ -567,7 +567,7 @@
 //                                 </>
 //                             )}
 //                         </div>
-                
+
 //                 </main>
 //             )}
 //         </div>
@@ -580,9 +580,9 @@
 //  THIRD VERSION
 
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useParams, Outlet } from 'react-router-dom';
+import { useLocation, useParams, Outlet, useNavigate } from 'react-router-dom';
 import { useDebounce } from '../../Hooks/useDebounce';
-import { useDeleteProject, useGetAllProjects } from '../../apiList/projectApi';
+import { useDeleteProject, useGetAllProjects, useToggleProjectArchive } from '../../apiList/projectApi';
 import { toast } from '../../utils/toast';
 import { Button } from '../../components/ui/Button';
 import StageGuide from '../../shared/StageGuide';
@@ -592,6 +592,7 @@ import { Input } from '../../components/ui/Input';
 
 const ProjectLists = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const { organizationId } = useParams();
 
     const isDetailView = location.pathname.includes('/single') || location.pathname.includes('/create');
@@ -610,6 +611,15 @@ const ProjectLists = () => {
         dueDate: null,
         priority: "none",
         status: "Active",
+
+        clientName: "",
+        email: "",
+        whatsapp: "",
+        location: "",
+        budget: "",
+        designType: ""
+
+
     });
 
     // --- Filter States ---
@@ -637,16 +647,19 @@ const ProjectLists = () => {
         refetch
     } = useGetAllProjects({
         organizationId: organizationId || '',
-        limit: 100,
+        limit: 300,
         projectName: debouncedSearch || undefined,
         status: filters.status || undefined,
         priority: filters.priority || undefined,
         startDate: filters.startDate || undefined,
         endDate: filters.endDate || undefined,
         isCompleted: filters.isCompleted || undefined,
+        isArchived: false
     });
 
     const deleteProjectMutation = useDeleteProject();
+    const { mutateAsync: toggleArchive } = useToggleProjectArchive();
+
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -676,6 +689,32 @@ const ProjectLists = () => {
         }
     };
 
+
+    const handleToggleArchive = async (project: any) => {
+        try {
+            await toggleArchive({
+                projectId: project._id,
+                isArchived: !project.isArchived
+            });
+
+            refetch(); // 🔥 THIS IS THE KEY FIX
+
+            toast({
+                title: "Success",
+                description: project.isArchived
+                    ? "Project unarchived successfully"
+                    : "Project archived successfully"
+            });
+
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error?.response?.data?.message || "Failed to update archive status",
+                variant: "destructive"
+            });
+        }
+    };
+
     const handleEdit = (project: any, id: string) => {
         setEditProjectId(id);
         setIsEditing(true);
@@ -689,6 +728,13 @@ const ProjectLists = () => {
             dueDate: project.projectInformation?.dueDate ? new Date(project.projectInformation.dueDate) : null,
             priority: project.projectInformation?.priority || "none",
             status: project.projectInformation?.status || "Active",
+
+            clientName: project.projectInformation?.clientName || "",
+            email: project.projectInformation?.email || "",
+            whatsapp: project.projectInformation?.whatsapp || "",
+            location: project.projectInformation?.location || "",
+            budget: project.projectInformation?.budget || "",
+            designType: project.projectInformation?.designType || ""
         });
         setShowForm(true);
     };
@@ -707,6 +753,14 @@ const ProjectLists = () => {
             dueDate: null,
             priority: "none",
             status: "Active",
+
+            clientName: "",
+            email: "",
+            whatsapp: "",
+            location: "",
+            budget: "",
+            designType: ""
+
         });
     };
 
@@ -748,11 +802,34 @@ const ProjectLists = () => {
                     <p className="text-sm text-slate-500 mt-1">Manage and track your organization's projects</p>
                 </div>
 
-                <div className='flex gap-3'>
+                <div className='flex gap-3 items-center'>
+
+
                     <Button
-                    variant='white'
+                        variant='white' // Assuming 'white' acts as a secondary/outline variant in your Button component
+                        onClick={() => navigate(`/organizations/${organizationId}/projects/archievedprojects`)}
+                        className="border border-ash-medium text-text-main hover:bg-brand-surface-hover hover:text-action-primary transition-all shadow-sm"
+                        title="Manage Organization Configurations"
+                    >
+                        <i className="fa-solid fa-archive sm:mr-2" />
+                        <span className="hidden sm:inline">Archive</span>
+                    </Button>
+
+                    <Button
+                        variant='white' // Assuming 'white' acts as a secondary/outline variant in your Button component
+                        onClick={() => navigate(`/organizations/${organizationId}/projects/projectconfiguration`)}
+                        className="border border-ash-medium text-text-main hover:bg-brand-surface-hover hover:text-action-primary transition-all shadow-sm"
+                        title="Manage Organization Configurations"
+                    >
+                        <i className="fa-solid fa-gear sm:mr-2" />
+                        <span className="hidden sm:inline">Config</span>
+                    </Button>
+
+                    <Button
+                        variant='white'
                         onClick={() => setShowForm(true)}
-                        // className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-transform active:scale-95 border-0"
+                    // className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-transform active:scale-95 border-0"
+                    // className=''
                     >
                         <i className="fas fa-plus mr-2" />
                         New Project
@@ -846,11 +923,10 @@ const ProjectLists = () => {
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Completion</label>
                                 <button
                                     onClick={() => setFilters(f => ({ ...f, isCompleted: !f.isCompleted }))}
-                                    className={`flex cursor-pointer items-center gap-2 px-4 py-2 w-full rounded-lg text-sm font-medium transition-all border ${
-                                        filters.isCompleted
-                                            ? 'bg-slate-800 text-white border-slate-800'
-                                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                                    }`}
+                                    className={`flex cursor-pointer items-center gap-2 px-4 py-2 w-full rounded-lg text-sm font-medium transition-all border ${filters.isCompleted
+                                        ? 'bg-slate-800 text-white border-slate-800'
+                                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                                        }`}
                                 >
                                     <div className={`w-4 h-4 rounded flex items-center justify-center border ${filters.isCompleted ? 'bg-slate-800 border-slate-800' : 'border-slate-300'}`}>
                                         {filters.isCompleted && <i className="fa-solid fa-check text-[10px] text-white"></i>}
@@ -878,6 +954,8 @@ const ProjectLists = () => {
                                         <ProjectCard
                                             key={project._id}
                                             project={project}
+                                            isArchived={false}
+                                            onToggleArchive={() => handleToggleArchive(project)} // ✅ NEW
                                             organizationId={organizationId!}
                                             onEdit={() => handleEdit(project, project._id)}
                                             onDelete={() => handleDelete(project._id)}

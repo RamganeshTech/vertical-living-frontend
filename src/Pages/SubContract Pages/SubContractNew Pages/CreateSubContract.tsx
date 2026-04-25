@@ -59,29 +59,31 @@ const CreateSubContract = () => {
 
 
     return (
-        <div className="space-y-6 max-h-full overflow-y-auto">
-            <div className="flex gap-2">
-                <div onClick={() => navigate(-1)}
-                    className='bg-blue-50 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
-                    <i className='fas fa-arrow-left'></i>
+        <div className="space-y-6 max-h-full overflow-y-auto bg-brand-surface">
+            {/* <div className="flex gap-2"> */}
+            <div className="flex items-center gap-4 pb-4 border-b border-ash-light">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center justify-center w-9 h-9 rounded-lg border border-ash-medium bg-brand-surface text-text-muted hover:text-text-main hover:bg-brand-ash transition-all shadow-sm shrink-0"
+                    title="Go Back"
+                >
+                    <i className="fas fa-arrow-left text-sm"></i>
+                </button>
+                <div>
+                    <h1 className="text-xl sm:text-2xl font-bold text-text-main flex items-center gap-3">
+                        <div className="w-10 h-10 bg-brand-ash border border-ash-medium rounded-lg  items-center justify-center shadow-sm hidden sm:flex">
+                            <i className="fas fa-hard-hat text-action-primary"></i>
+                        </div>
+                        Create Sub Contract
+                    </h1>
+                    {/* <Breadcrumb paths={paths} /> */}
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center mb-2">
-                    <i className="fas fa-hard-hat mr-3 text-blue-600"></i>
-                    Create Sub Contract
-                </h1>
-                {/* <Breadcrumb paths={paths} /> */}
             </div>
 
             <div className="max-w-full mx-auto space-y-6">
-                {/* Sub Contract Form */}
-                {/* <SubContractForm
-                    organizationId={organizationId}
-                    mode="create"
-                    onSubmit={handleSubmit}
-                    isLoading={createMutation.isPending}
-                /> */}
 
-              
+
+
                 <SubContractForm
                     organizationId={organizationId}
                     mode="create"
@@ -95,30 +97,36 @@ const CreateSubContract = () => {
                     // <GenerateSubContractLink
                     //     subContractId={createdContractId}
                     // />
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center text-lg">
-                                <i className="fas fa-link mr-2 text-blue-600"></i>
-                                Generate Shareable Link
+                    <Card className="bg-brand-surface border border-ash-medium shadow-sm rounded-xl overflow-hidden mt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <CardHeader className="bg-brand-ash/50 border-b border-ash-light py-4 px-5">
+                            <CardTitle className="flex items-center text-base font-bold text-text-main">
+                                <div className="w-8 h-8 bg-brand-surface border border-ash-medium rounded-lg flex items-center justify-center shadow-sm mr-3">
+                                    <i className="fas fa-link text-action-primary text-sm"></i>
+                                </div>
+                                Shareable Link Generated
                             </CardTitle>
                         </CardHeader>
+
                         <CardContent>
                             <div className="space-y-4">
-                                <p className="text-sm text-gray-600">
-                                    Generate a shareable link for workers to submit their information for this sub contract.
+                                <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
+                                    Share this link with workers to submit their information.
                                 </p>
-
 
                                 <div className="space-y-3">
                                     <div className="flex gap-2">
                                         <Input
                                             value={shareableLink}
                                             readOnly
-                                            className="flex-1"
+                                            // className="flex-1"
+                                            className="w-full bg-brand-surface border-ash-medium text-text-main h-10 px-4 font-mono text-sm focus:ring-1 focus:ring-action-primary/20 transition-all"
+
                                         />
                                         <Button
                                             onClick={handleCopyLink}
-                                            variant="outline"
+                                            // variant="outline"
+                                            variant={copied ? "white" : "dark"}
+                                            className={`h-10 px-6 shadow-sm transition-all shrink-0 ${copied ? 'border-action-primary text-action-primary' : ''}`}
                                         >
                                             {copied ? (
                                                 <>
@@ -133,9 +141,9 @@ const CreateSubContract = () => {
                                             )}
                                         </Button>
                                     </div>
-                                    <div className="flex items-center gap-2 text-sm text-green-600">
-                                        <i className="fas fa-check-circle"></i>
-                                        <span>Link generated successfully! Share this with workers.</span>
+                                    <div className="flex items-center gap-2 text-xs font-bold text-text-main bg-brand-ash/50 border border-ash-light px-3 py-2 rounded-lg w-fit">
+                                        <i className="fas fa-check-circle text-action-primary"></i>
+                                        <span>Link generated and ready to share!</span>
                                     </div>
                                 </div>
 

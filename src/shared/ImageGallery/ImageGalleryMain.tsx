@@ -44,6 +44,12 @@ interface ImageGalleryProps {
   setEditingId?: (id: string | null) => void;
   setTempComment?: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   onUpdateComment?: (imageId: string, newComment: string) => void;
+  // popupClass?: string
+  popupWidth?: string | number;
+  popupHeight?: string | number;
+  overlayBg?: string,
+  imageClassName?: string,
+  popupPlacement?:string
 
 }
 
@@ -66,6 +72,16 @@ export function ImageGallery({
   setEditingId,
   setTempComment,
   onUpdateComment,
+  // popupClass
+
+  popupWidth = "70vw",
+  popupHeight = "70vh",
+
+  overlayBg = "bg-black/70",
+
+  imageClassName = "max-w-full max-h-full object-contain", // Default image fit
+
+  popupPlacement = "items-center justify-center",
 }: ImageGalleryProps) {
   const { organizationId } = useParams() as { organizationId: string }
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
@@ -352,7 +368,8 @@ export function ImageGallery({
         isPopupOpen && currentImage &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center"
+            // className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center"
+            className={`fixed inset-0 z-[9999] flex ${popupPlacement} ${overlayBg}`}
             onClick={handleBackgroundClick}
             style={{ margin: 0, padding: 0 }}
           >
@@ -420,17 +437,19 @@ export function ImageGallery({
             <div
               className="relative flex flex-col items-center justify-center"
               style={{
-                width: "70vw",
-                height: "70vh",
-                maxWidth: "70vw",
-                maxHeight: "70vh",
+                // ⭐ USE THE PROPS HERE ⭐
+                width: popupWidth,
+                height: popupHeight,
+                maxWidth: popupWidth,
+                maxHeight: popupHeight,
               }}
               onClick={(e) => e.stopPropagation()}
             >
               <img
                 src={currentImage?.url || NO_IMAGE}
                 alt={currentImage.originalName || `Image ${selectedImageIndex !== null ? selectedImageIndex + 1 : 1}`}
-                className="max-w-full max-h-full object-contain"
+                // className="max-w-full max-h-full object-contain"
+                className={imageClassName}
               />
 
               {/* {showTags && currentImage?.tags && currentImage?.tags?.length > 0 && (
@@ -450,7 +469,7 @@ export function ImageGallery({
 
 
               {/* Inside the Popup Modal container, under the img tag */}
-            {showTags &&  <div className="mt-4 w-full max-w-lg flex flex-col items-center">
+              {showTags && <div className="mt-4 w-full max-w-lg flex flex-col items-center">
                 <div className="flex items-center justify-between w-full mb-2">
                   <span className="text-white/70 text-xs font-medium uppercase tracking-widest">Tags</span>
                   {showTags && (
@@ -498,7 +517,7 @@ export function ImageGallery({
                 )}
               </div>
 
-      }
+              }
               {/* ✅ Show comments only if enabled */}
               {isComments && (
                 <div className="absolute bottom-0 w-full bg-black/40 text-white text-xs p-1">
@@ -532,7 +551,16 @@ export default function ImageGalleryExample({ imageFiles = [], height, refetch, 
   tempComment,
   setEditingId,
   setTempComment,
-  onUpdateComment
+  onUpdateComment,
+  // popupClass,
+
+  popupWidth,
+  popupHeight,
+
+  overlayBg,
+  imageClassName,
+  popupPlacement
+
 }:
   {
     isComments?: boolean, height: number, imageFiles: any,
@@ -545,6 +573,16 @@ export default function ImageGalleryExample({ imageFiles = [], height, refetch, 
     setEditingId?: (id: string | null) => void;
     setTempComment?: React.Dispatch<React.SetStateAction<Record<string, string>>>;
     onUpdateComment?: (imageId: string, newComment: string) => void;
+    // popupClass?: string
+
+    popupWidth?: string | number;
+    popupHeight?: string | number;
+
+    overlayBg?: string,
+    imageClassName?: string,
+    popupPlacement?:string
+
+
 
   }) {
   // console.log("imageFiles", imageFiles)
@@ -570,6 +608,13 @@ export default function ImageGalleryExample({ imageFiles = [], height, refetch, 
         setEditingId={setEditingId}
         setTempComment={setTempComment}
         onUpdateComment={onUpdateComment}
+        // ⭐ ADD THESE TWO PROPS WITH DEFAULT VALUES ⭐
+        popupWidth={popupWidth}
+        popupHeight={popupHeight}
+
+        overlayBg={overlayBg}
+        imageClassName={imageClassName}
+        popupPlacement={popupPlacement}
       />
 
     </>
