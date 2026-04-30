@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetSinglePayment, useSyncPaymentToAccounts, useUploadPaymentAccProof, useVerifyCashPayemtnAcc } from "../../../../apiList/Department Api/Accounting Api/paymentAccApi";
+import { useGetSinglePayment, useSyncPaymentToAccounts, useSyncPaymentToLogistics, useUploadPaymentAccProof, useVerifyCashPayemtnAcc } from "../../../../apiList/Department Api/Accounting Api/paymentAccApi";
 import { toast } from "../../../../utils/toast";
 import { Button } from "../../../../components/ui/Button";
 import { dateFormate } from "../../../../utils/dateFormator";
@@ -63,6 +63,7 @@ const PaymentAccSingle: React.FC = () => {
 
 
     const { mutateAsync: syncAccountsMutation, isPending: syncAccountsLoading } = useSyncPaymentToAccounts();
+    const { mutateAsync: syncLogisticsMutation, isPending: syncLogisticsLoading } = useSyncPaymentToLogistics();
     const { mutateAsync: verifyCashMutation, isPending: isVerifying } = useVerifyCashPayemtnAcc();
     const [modalStep, setModalStep] = useState<ModalStep>("SELECTION");
 
@@ -77,7 +78,19 @@ const PaymentAccSingle: React.FC = () => {
     const handleSyncToAccounts = async () => {
         try {
             await syncAccountsMutation({ id: id! });
+            refetch()
+
             toast({ title: "Success", description: "Bill sent to Accounts Department" });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+        }
+    }
+
+    const handleSyncToLogistics = async () => {
+        try {
+            await syncLogisticsMutation({ id: id! });
+            refetch()
+            toast({ title: "Success", description: "Sent to Logistics Department" });
         } catch (error: any) {
             toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
         }
@@ -236,6 +249,18 @@ const PaymentAccSingle: React.FC = () => {
                         </Button>
                         <InfoTooltip content="Click to send the payment to accounts department" type="info" position="bottom" />
                     </div>}
+
+                    {(canEdit || canCreate) && <div className="flex items-center space-y-1">
+                        <Button variant="dark" 
+                        disabled={data?.isSyncedWithLogistics}
+                            className={`${data?.isSyncedWithLogistics ? "!cursor-not-allowed" : ""}`}
+                            title={data?.isSyncedWithLogistics ? "Already sent to Logistics Dept" : ""}
+                            isLoading={syncLogisticsLoading} onClick={handleSyncToLogistics}>
+                            Send To Logistics Dept
+                        </Button>
+                        <InfoTooltip content="Click to Create the Record in Logistics department" type="info" position="bottom" />
+                    </div>}
+
                     <div className={`px-4 py-1.5 rounded-full text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} border-current/20 capitalize flex items-center gap-2`}>
                         <i className={`fas ${statusConfig.icon}`}></i>
                         {data.generalStatus}

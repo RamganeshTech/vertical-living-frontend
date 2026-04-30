@@ -130,7 +130,7 @@ const InventoryMain: React.FC = () => {
 
     return (
         <>
-            <div className="w-full max-h-full overflow-y-auto flex flex-col p-2 min-h-full bg-brand-main">
+            <div className="w-full max-h-full overflow-y-auto flex flex-col p-2 min-h-full bg-brand-surface">
                 {/* <div className="flex justify-between items-center"> */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-ash-light gap-4">
                     <div >
@@ -174,7 +174,7 @@ const InventoryMain: React.FC = () => {
                         <span className="text-sm text-gray-500">(Click to edit, changes save by clicking Enter)</span>
                     </div> */}
 
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-5 border-b border-ash-light pb-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-5 border-b border-ash-light pb-4 px-2">
                         <div className="w-8 h-8 rounded-lg bg-brand-ash border border-ash-light flex items-center justify-center shadow-sm">
                             <i className="fa-solid fa-list-check text-text-muted text-sm"></i>
                         </div>

@@ -10,7 +10,7 @@ import {
     // useUpdateProcurementTotalCost,
     useProcurementGeneratePdf,
     useDeleteProcurementPdf,
-    useSyncLogistics,
+    // useSyncLogistics,
     // useProcurementGenerateLink,
     useSyncProcurementToPaymentsSection,
     useCancelProcurementAutomation,
@@ -54,7 +54,7 @@ const ProcurementSub: React.FC = () => {
 
 
 
-    const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
+    // const { mutateAsync: syncLogistics, isPending: syncLogisticsLoading } = useSyncLogistics()
     // const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsProcurement()
 
     // const [editCost, setEditCost] = useState(false);
@@ -227,14 +227,14 @@ const ProcurementSub: React.FC = () => {
     };
 
 
-    const handleGenerateLogistics = async () => {
-        try {
-            await syncLogistics({ id });
-            toast({ title: "Success", description: "Details sent to Logistics Department" });
-        } catch (error: any) {
-            toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
-        }
-    }
+    // const handleGenerateLogistics = async () => {
+    //     try {
+    //         await syncLogistics({ id });
+    //         toast({ title: "Success", description: "Details sent to Logistics Department" });
+    //     } catch (error: any) {
+    //         toast({ variant: "destructive", title: "Error", description: error?.response?.data?.message || error?.message || "operation failed" });
+    //     }
+    // }
 
 
     const handleSyncToPayments = async () => {
@@ -349,11 +349,7 @@ const ProcurementSub: React.FC = () => {
                         </div> */}
 
                         <div className="flex gap-1 items-center">
-                            <InfoTooltip
-                                content="Click the button to send the details to  payments dept"
-                                position="bottom"
-                                className=""
-                            />
+                           
                             <Button
                                 variant="primary"
                                 disabled={data.isSyncWithPaymentsSection}
@@ -363,8 +359,13 @@ const ProcurementSub: React.FC = () => {
                             >
                                 Send To Payments
                             </Button>
+                             <InfoTooltip
+                                content="Click the button to send the details to  payments dept"
+                                position="bottom"
+                                className=""
+                            />
 
-                            <Button
+                            {/* <Button
                                 variant="primary"
                                 disabled={data.isSyncWithLogistics}
                                 isLoading={syncLogisticsLoading}
@@ -372,7 +373,7 @@ const ProcurementSub: React.FC = () => {
                                 onClick={handleGenerateLogistics}
                             >
                                 Send To Logistics
-                            </Button>
+                            </Button> */}
 
                             {/* <Button
                                 variant="danger"

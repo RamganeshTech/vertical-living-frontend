@@ -56,7 +56,9 @@ const PaymentConfirmationStage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { data, isLoading, isError: getAllError, refetch, error } = useGetPaymentConfirmation(projectId!);
+  const { data, isLoading, isError: getAllError, refetch, 
+    // error
+   } = useGetPaymentConfirmation(projectId!);
   const { mutateAsync: completeStage, isPending: completePending } = useCompletePaymentConfirmation();
   const { mutateAsync: deadLineAsync, isPending: deadLinePending } = useSetPaymentConfirmationDeadline();
 
@@ -172,42 +174,56 @@ const PaymentConfirmationStage: React.FC = () => {
 
       {/* Error Display - Doesn't hide header buttons */}
       {getAllError && (
-        // <div className="max-w-xl mx-auto p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center mb-6">
-        //   <div className="text-red-600 font-semibold mb-2">
-        //     ⚠️ Error Occurred
+
+
+        // <div className="max-w-xl mx-auto p-5 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mb-8">
+        //   <div className="text-action-danger text-2xl mb-3">
+        //     <i className="fa-solid fa-triangle-exclamation"></i>
         //   </div>
-        //   <p className="text-red-500 text-sm mb-4">
+        //   <div className="text-text-main font-bold mb-2">
+        //     Error Occurred
+        //   </div>
+        //   <p className="text-text-muted text-sm mb-5">
         //     {(error as any)?.response?.data?.message ||
         //       (error as any)?.message ||
         //       "Failed to load payment confirmation data"}
         //   </p>
         //   <Button
         //     onClick={() => refetch()}
-        //     className="bg-red-600 text-white px-4 py-2"
+        //     variant="outline"
+        //     className="hover:bg-brand-ash hover:text-action-danger hover:border-action-danger text-text-main border-ash-medium"
         //   >
         //     Retry
         //   </Button>
         // </div>
 
-        <div className="max-w-xl mx-auto p-5 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mb-8">
-          <div className="text-action-danger text-2xl mb-3">
-            <i className="fa-solid fa-triangle-exclamation"></i>
+        <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+          {/* Soft, neutral icon wrapper instead of a stark warning */}
+          <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+            <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
           </div>
-          <div className="text-text-main font-bold mb-2">
-            Error Occurred
+
+          {/* Professional, non-alarming title */}
+          <div className="text-text-strong text-lg font-bold mb-2">
+            Stage Not Yet Available
           </div>
-          <p className="text-text-muted text-sm mb-5">
-            {(error as any)?.response?.data?.message ||
-              (error as any)?.message ||
-              "Failed to load payment confirmation data"}
+
+          {/* Clear explanation of the business logic */}
+          <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+            {/* {(getAllError as any)?.response?.data?.message} */}
+            This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
           </p>
+
+          {/* Neutral action button */}
           <Button
             onClick={() => refetch()}
             variant="outline"
-            className="hover:bg-brand-ash hover:text-action-danger hover:border-action-danger text-text-main border-ash-medium"
+            className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
           >
-            Retry
+            <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
           </Button>
+
         </div>
       )}
 

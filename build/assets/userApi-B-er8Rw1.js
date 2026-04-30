@@ -1,1 +1,0 @@
-import{e as a,a1 as e}from"./index-CREPqSHR.js";const o=async()=>{try{let{data:t}=await e.post("/auth/logout");if(t.ok)return t.data}catch(t){throw t}},u=()=>a({mutationFn:o}),n=async t=>{const{data:r}=await e.post("/auth/v1/register/org-and-owner",t);if(!r.ok)throw new Error(r.message||"Registration failed");return r},i=()=>a({mutationFn:n});export{u as a,i as u};

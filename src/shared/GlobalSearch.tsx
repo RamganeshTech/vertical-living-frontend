@@ -62,7 +62,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ organizationId }) => {
     const hasPermissionForModule = (moduleKey: string) => {
         // --- RULE 1: ORGANIZATION RESTRICTED MODULES ---
         // ⚠️ REPLACE THESE WITH YOUR TWO ACTUAL MODULE KEYS ⚠️
-        const ORG_RESTRICTED_MODULES = ['LEADCOLLECTION', 'COSTCALCULATIONLEADFORM', "ALLORGS"];
+        const ORG_RESTRICTED_MODULES = ['LEADCOLLECTION', 'COSTCALCULATIONLEADFORM', "ALLORGS", "INSTAGRAMLEAD", "WHATSAPPLEAD"];
         const TARGET_ORG_ID = "684a57015e439b678e8f6918";
 
         // If the current module is one of the restricted ones...

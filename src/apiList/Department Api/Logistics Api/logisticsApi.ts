@@ -385,40 +385,83 @@ export const useGetSinglShipment = (shipmentId: string) => {
 export interface IAccountsEntry {
   organizationId: string;
   projectId: string;
-  fromDept: "logistics" | "procurement" | "hr" | "factory" ;
+  fromDept: "logistics" | "procurement" | "hr" | "factory";
   totalCost: number;
   upiId: string | null
   api?: AxiosInstance
 }
 
-export const useSyncAccountsLogistics = () => {
+// export const useSyncAccountsLogistics = () => {
+//   const { role } = useGetRole();
+//   const api = getApiForRole(role!);
+
+//   return useMutation({
+//     mutationFn: async ({ organizationId, projectId, fromDept, totalCost, upiId }: IAccountsEntry) => {
+//       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+//       if (!api) throw new Error("API instance not found for role");
+//       return await synAccountsFromLogistics({ organizationId, projectId, fromDept, totalCost, api, upiId });
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] })
+//     }
+//   });
+// };
+
+
+// const synAccountsFromLogistics = async ({
+//   api,
+//   organizationId,
+//   projectId,
+//   fromDept,
+//   totalCost,
+//   upiId
+// }: IAccountsEntry) => {
+//   const { data } = await api!.post(`/department/logistics/syncaccounting/${organizationId}/${projectId}`, { totalCost, fromDept, upiId });
+//   return data;
+// }
+
+
+
+// --- API Function ---
+export const syncAccountingFromLogisticsApi = async ({
+  shipmentId,
+  api
+}: {
+  shipmentId: string; // Adjust based on exactly what your controller expects in req.body
+  api: AxiosInstance;
+}) => {
+  const { data } = await api.post(
+    `/department/logistics/syncaccounting/${shipmentId}`
+  );
+  if (!data.ok) throw new Error(data.message || "Failed to sync logistics to accounting");
+  return data;
+};
+
+
+// --- React Query Hook ---
+export const useSyncAccountingFromLogistics = () => {
   const { role } = useGetRole();
   const api = getApiForRole(role!);
 
   return useMutation({
-    mutationFn: async ({ organizationId, projectId, fromDept, totalCost , upiId}: IAccountsEntry) => {
+    mutationFn: async ({
+      shipmentId
+    }: {
+      shipmentId: string
+    }) => {
       if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
       if (!api) throw new Error("API instance not found for role");
-      return await synAccountsFromLogistics({ organizationId, projectId, fromDept, totalCost, api, upiId });
+
+      return await syncAccountingFromLogisticsApi({ shipmentId, api });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] })
+      // Invalidate both logistics and accounting to refresh the UI
+      queryClient.invalidateQueries({ queryKey: ['logistics', 'shipments'] });
+      queryClient.invalidateQueries({ queryKey: ['accounting'] });
     }
   });
 };
 
-
-const synAccountsFromLogistics = async ({
-  api,
-  organizationId,
-  projectId,
-  fromDept,
-  totalCost,
-  upiId
-}: IAccountsEntry) => {
-  const { data } = await api!.post(`/department/logistics/syncaccounting/${organizationId}/${projectId}`, {totalCost, fromDept, upiId});
-  return data;
-}
 
 
 
@@ -427,13 +470,13 @@ const synAccountsFromLogistics = async ({
 
 export const useUpdateDriverLocation = () => {
   return useMutation({
-    mutationFn: async ({ 
-      shipmentId, 
-      latitude, 
-      longitude 
-    }: { 
-      shipmentId: string; 
-      latitude: number; 
+    mutationFn: async ({
+      shipmentId,
+      latitude,
+      longitude
+    }: {
+      shipmentId: string;
+      latitude: number;
       longitude: number;
     }) => {
       console.log("latitude", latitude)
@@ -518,7 +561,7 @@ export const useGetShipmentRouteHistory = ({
     },
     enabled: enabled && !!shipmentId && !!role && allowedRoles.includes(role),
     refetchOnMount: false,
-    });
+  });
 };
 
 
@@ -544,7 +587,7 @@ export const useGetShipmentByToken = (token: string) => {
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
-};  
+};
 
 
 

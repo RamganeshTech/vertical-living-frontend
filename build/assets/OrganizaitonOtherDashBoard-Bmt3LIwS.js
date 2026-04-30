@@ -1,1 +1,0 @@
-import{u as r,j as t}from"./index-CREPqSHR.js";import{O as s}from"./OrganizationDetails-_E5_xF_h.js";import"./orgApi-LKOmEyrq.js";import"./with-selector-DoqUTE6C.js";const m=()=>{const{organizationId:a}=r();return t.jsx("div",{children:t.jsx(s,{organizationId:a,showSettings:!1})})};export{m as default};

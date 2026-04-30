@@ -124,6 +124,15 @@ const syncPaymenttoAcc = async ({ id, api }: { id: string; api: AxiosInstance })
 };
 
 
+const syncPaymenttoLogistics = async ({ id, api }: { id: string; api: AxiosInstance }) => {
+    // We send billData as JSON. 
+    // Ensure 'billData.images' contains the array of *existing* image objects you want to keep.
+    const { data } = await api.post(`/department/accounting/payments/section/syncpaymenttologistics/${id}`);
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
 
 
 const verifyCashPayment = async ({ id, api, recipientName, phoneNo }: { id: string; recipientName: string, phoneNo: string, api: AxiosInstance }) => {
@@ -246,6 +255,25 @@ export const useSyncPaymentToAccounts = () => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
             if (!api) throw new Error("API instance not found for role");
             return await syncPaymenttoAcc({ id, api });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["accounting", "payments", "all"] });
+        },
+    });
+};
+
+
+
+export const useSyncPaymentToLogistics = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({ id }: { id: string }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
+            if (!api) throw new Error("API instance not found for role");
+            return await syncPaymenttoLogistics({ id, api });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["accounting", "payments", "all"] });

@@ -211,6 +211,8 @@ export const PERMISSION_MAPPING: Record<string, string | string[]> = {
 
   LEADCOLLECTION: "leadmodule",
   COSTCALCULATIONLEADFORM: "leadmodule",
+  INSTAGRAMLEAD: "leadmodule",
+  WHATSAPPLEAD: "leadmodule",
 
   RATECONIGPRESALES: "presalesmaterialrateconfig", // Add this line!
   RATECONIG: "materialrateconfig",
@@ -262,6 +264,8 @@ export const getProjectPaths = (organizationId: string | undefined): Record<stri
     PINCODEPROJECTSASSIGNMENT: `/organizations/${organizationId}/projects/pincodeprojectmain`,
     LEADCOLLECTION: `/organizations/${organizationId}/projects/publicleadcollection`,
     COSTCALCULATIONLEADFORM: `/organizations/${organizationId}/projects/publiccostcalculation`,
+    INSTAGRAMLEAD: `/organizations/${organizationId}/projects/instagram-leads`,
+    WHATSAPPLEAD: `/organizations/${organizationId}/projects/whatsapp-leads`,
     RATECONIGPRESALES: `/organizations/${organizationId}/projects/rateconfigpresales`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
@@ -364,7 +368,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
   // If NOT the special org → remove LEADCOLLECTION
   if (organizationId !== "684a57015e439b678e8f6918") {
-    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION" && key !== "COSTCALCULATIONLEADFORM");
+    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION" && key !== "COSTCALCULATIONLEADFORM" && key !== "INSTAGRAMLEAD" && key !== "WHATSAPPLEAD");
   }
   // =========================================================
   // 4. CONSTRUCT INITIAL SIDEBAR OBJECTS
@@ -441,7 +445,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     {
       id: "LEAD_COLLECTION",
       label: "Lead Collection",
-      keys: ["LEADCOLLECTION", "COSTCALCULATIONLEADFORM"]
+      keys: ["LEADCOLLECTION", "COSTCALCULATIONLEADFORM", "INSTAGRAMLEAD", "WHATSAPPLEAD"]
 
     },
     {

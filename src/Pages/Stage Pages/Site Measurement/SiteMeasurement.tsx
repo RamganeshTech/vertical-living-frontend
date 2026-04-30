@@ -237,37 +237,53 @@ function HomeInteriorProject() {
       </div>
 
       {getAllError && (
-        // <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-        //   <div className="text-red-600 font-semibold mb-2">
-        //     ⚠️ Error Occurred
+
+
+        // <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
+        //   <div className="text-action-danger text-3xl mb-3">
+        //     <i className="fa-solid fa-triangle-exclamation"></i>
         //   </div>
-        //   <p className="text-red-500 text-sm mb-4">
-        //     {(getAllError as any)?.response?.data?.message || "Failed to load data"}
+        //   <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
+        //   <p className="text-text-muted text-sm mb-5">
+        //     {(getAllError as any)?.response?.data?.message || "Failed to load site measurement data"}
         //   </p>
         //   <Button
+        //     isLoading={isLoading}
         //     onClick={() => refetch()}
-        //     className="bg-red-600 text-white px-4 py-2"
+        //     variant="outline"
+        //     className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
         //   >
         //     Retry
         //   </Button>
         // </div>
 
-        <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
-          <div className="text-action-danger text-3xl mb-3">
-            <i className="fa-solid fa-triangle-exclamation"></i>
+        <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+          {/* Soft, neutral icon wrapper instead of a stark warning */}
+          <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+            <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
           </div>
-          <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
-          <p className="text-text-muted text-sm mb-5">
-            {(getAllError as any)?.response?.data?.message || "Failed to load site measurement data"}
+
+          {/* Professional, non-alarming title */}
+          <div className="text-text-strong text-lg font-bold mb-2">
+            Stage Not Yet Available
+          </div>
+
+          {/* Clear explanation of the business logic */}
+          <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+            {/* {(getAllError as any)?.response?.data?.message} */}
+            This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
           </p>
+
+          {/* Neutral action button */}
           <Button
-            isLoading={isLoading}
             onClick={() => refetch()}
             variant="outline"
-            className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+            className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
           >
-            Retry
+            <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
           </Button>
+
         </div>
       )}
 
@@ -328,8 +344,8 @@ function HomeInteriorProject() {
               </div> */}
 
               <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                        <i className="fa-solid fa-file-contract text-2xl text-ash-dark"></i>
-                    </div>
+                <i className="fa-solid fa-file-contract text-2xl text-ash-dark"></i>
+              </div>
               <h3 className="text-lg font-bold text-text-main mb-2">No Site Details Added</h3>
               <p className="text-sm text-text-muted mb-6 max-w-sm mx-auto">Start by configuring the primary details and layout of the site.</p>
 

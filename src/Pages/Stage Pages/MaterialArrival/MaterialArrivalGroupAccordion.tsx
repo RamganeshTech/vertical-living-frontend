@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../../../components/ui/Button";
 // import { NO_IMAGE } from "../../../constants/constants";
-import { useToggleMaterialVerification, useUpdateStaffMaterialArrivalItemQuantity, useUpdateStaffMatArrivalItemImageV1, useDeleteStaffMatArrivalItemImageV1 } from "../../../apiList/Stage Api/materialArrivalNewApi"; // Adjust path
+import { useToggleMaterialVerification, useUpdateStaffMaterialArrivalItemQuantity, useUpdateStaffMatArrivalItemImageV1, useDeleteStaffMatArrivalItemImageV1, useSyncMaterialArrivalToAccounts } from "../../../apiList/Stage Api/materialArrivalNewApi"; // Adjust path
 import { toast } from "../../../utils/toast";
 import { dateFormate } from "../../../utils/dateFormator";
 import { useDebounce } from "../../../Hooks/useDebounce";
@@ -49,10 +49,39 @@ const MaterialArrivalGroupAccordion: React.FC<Props> = ({ orderGroup, projectId 
     // Default open if items exist
     const [isOpen, setIsOpen] = useState(true);
 
+    const { mutateAsync: syncToAccounts, isPending } = useSyncMaterialArrivalToAccounts();
+
+    // Handle the sync action
+    const handleSyncToAccounts = async (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevents the accordion from toggling when clicking the button
+        // if (orderGroup?.materialArrivalDeptNumber) {
+        //     syncToAccounts({
+        //         projectId,
+        //         payload: { materialArrivalDeptNumber: orderGroup.materialArrivalDeptNumber }
+        //     });
+        // }
+
+        try {
+            await syncToAccounts({
+                projectId,
+                payload: { materialArrivalDeptNumber: orderGroup.materialArrivalDeptNumber! }
+            });
+            toast({ title: "Success", description: "Details sent to Accounts Department" });
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error?.response?.data?.message || error?.message || "operation failed"
+            });
+        }
+    };
+
+
     // Calculate Group Stats
     const totalItems = orderGroup.subItems?.length || 0;
     const verifiedCount = orderGroup.subItems?.filter((i: any) => i.isVerified).length || 0;
     const isFullyVerified = totalItems > 0 && totalItems === verifiedCount;
+
 
     return (
         // <div className={`border border-gray-200 rounded-xl bg-white shadow-sm mb-6 transition-all duration-200 overflow-hidden ${isOpen ? 'ring-1 ring-gray-200' : ''}`}>
@@ -73,12 +102,25 @@ const MaterialArrivalGroupAccordion: React.FC<Props> = ({ orderGroup, projectId 
 
                     <div className="flex flex-col">
                         {/* 1. Main Title: Material Arrival ID */}
-                        {orderGroup?.materialArrivalDeptNumber && (
-                            // <h4 className="font-bold text-gray-900 text-base sm:text-lg tracking-tight leading-none">
-                            <h4 className="font-bold text-text-main text-lg tracking-tight leading-none mb-1.5 truncate">
-                                {orderGroup.materialArrivalDeptNumber}
-                            </h4>
-                        )}
+                        <div className="flex items-center gap-3 mb-1.5">
+                            {orderGroup?.materialArrivalDeptNumber && (
+                                // <h4 className="font-bold text-gray-900 text-base sm:text-lg tracking-tight leading-none">
+                                <h4 className="font-bold text-text-main text-lg tracking-tight leading-none mb-1.5 truncate">
+                                    {orderGroup.materialArrivalDeptNumber}
+                                </h4>
+                            )}
+
+
+                            {/* --- NEW SYNC BUTTON --- */}
+                            <Button
+                                onClick={handleSyncToAccounts}
+                                isLoading={isPending}
+                                variant="dark"
+                            // className="px-3 py-1 bg-gray-800 hover:bg-gray-900 text-white text-xs font-bold rounded flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Sync Accounts
+                            </Button>
+                        </div>
 
                         {/* 2. Subtitle: Reference to Original Order */}
                         <div className="flex items-center gap-1.5 mt-1">
@@ -444,7 +486,7 @@ const SubItemRow = ({ item, idx, projectId, orderNumber }: { item: IMaterialOrde
             </td>
 
 
-           
+
 
             {/* <td className="px-6 py-4 text-center align-middle">
                 <div
@@ -475,9 +517,8 @@ const SubItemRow = ({ item, idx, projectId, orderNumber }: { item: IMaterialOrde
 
             {/* 5. Arrived Qty Input */}
             <td className="px-4 py-4 text-center align-middle border-r border-ash-light">
-                <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1.5 border shadow-sm transition-all ${
-                    arrivedQty < item.orderedQuantity ? 'bg-brand-surface border-action-danger text-action-danger' : 'bg-brand-surface border-action-success/30 text-text-main'
-                }`}>
+                <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1.5 border shadow-sm transition-all ${arrivedQty < item.orderedQuantity ? 'bg-brand-surface border-action-danger text-action-danger' : 'bg-brand-surface border-action-success/30 text-text-main'
+                    }`}>
                     <input
                         type="number"
                         value={arrivedQty}
@@ -491,7 +532,7 @@ const SubItemRow = ({ item, idx, projectId, orderNumber }: { item: IMaterialOrde
                 </div>
             </td>
 
-        
+
 
             {/*  NEW VERSION */}
 
@@ -637,18 +678,18 @@ const SubItemRow = ({ item, idx, projectId, orderNumber }: { item: IMaterialOrde
                 <div className="fixed inset-0 bg-brand-main/90 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setShowImageModal(false)}>
                     <div className="relative max-w-4xl w-full bg-brand-surface border border-ash-medium rounded-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
                         <div className="absolute top-0 right-0 p-4 z-10">
-                            <button onClick={() => setShowImageModal(false)} 
-                            // className="bg-black/50 hover:bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
-                            className="bg-brand-surface/80 backdrop-blur-md border border-ash-medium text-text-main hover:bg-action-danger hover:text-white hover:border-action-danger rounded-full w-8 h-8 flex items-center justify-center transition-all shadow-md"
+                            <button onClick={() => setShowImageModal(false)}
+                                // className="bg-black/50 hover:bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                                className="bg-brand-surface/80 backdrop-blur-md border border-ash-medium text-text-main hover:bg-action-danger hover:text-white hover:border-action-danger rounded-full w-8 h-8 flex items-center justify-center transition-all shadow-md"
                             >
                                 <i className="fa-solid fa-times"></i>
                             </button>
                         </div>
                         {/* <div className="bg-gray-900 flex items-center justify-center min-h-[400px]"> */}
                         <div className="bg-brand-ash flex items-center justify-center min-h-[400px] border-b border-ash-medium p-4 sm:p-6">
-                            <img src={latestImage.url} alt="Full view" 
-                            // className="max-w-full max-h-[80vh] object-contain" 
-                            className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm bg-brand-surface border border-ash-light"
+                            <img src={latestImage.url} alt="Full view"
+                                // className="max-w-full max-h-[80vh] object-contain" 
+                                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm bg-brand-surface border border-ash-light"
                             />
                         </div>
                         {/* <div className="p-4 bg-white border-t flex justify-between items-center"> */}
@@ -737,7 +778,7 @@ const SubItemRow = ({ item, idx, projectId, orderNumber }: { item: IMaterialOrde
                                 onClick={(e) => { e.stopPropagation(); handleDelete((currentImage)._id); }}
                                 className="bg-brand-surface border border-action-danger text-action-danger hover:bg-action-danger hover:text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all"
                             >
-                               {isDeleting ? <i className="fas fa-circle-notch fa-spin"></i>:  <i className="fas fa-trash-can"></i>}
+                                {isDeleting ? <i className="fas fa-circle-notch fa-spin"></i> : <i className="fas fa-trash-can"></i>}
                             </button>
 
                             <button onClick={closePopup} className="bg-brand-surface border border-ash-medium text-text-main hover:bg-brand-ash rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all">

@@ -8,12 +8,16 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
-import DesignApprovalMain from './Pages/Stage Pages/DesignApproval/DesignApprovalMain';
-import DesignApprovalPublic from './Pages/Stage Pages/DesignApproval/DesignApprovalPublic';
-const ProjectConfiguration = lazy(() => import( './Pages/Projects/ProjectConfiguration'));
-const ArchivedProjects = lazy(() => import( './Pages/Projects/ArchivedProjects'));
-const ProjectOnboarding = lazy(() => import( './Pages/Stage Pages/Project_Onboarding/ProjectOnboarding'));
-const InstantCostCalculation = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculator'));
+const WhatsAppLeadsPage = lazy(() => import( './Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadMain'));
+const  WhatsAppLeadSingle  = lazy(() => import( './Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadSingle'));
+const InstagramLeadsPage = lazy(() => import('./Pages/Lead_pages/InstragramLead_Pages/InstagramLeadMain'));
+const InstagramLeadSingle = lazy(() => import('./Pages/Lead_pages/InstragramLead_Pages/InstagramLeadSingle'));
+const DesignApprovalMain = lazy(() => import('./Pages/Stage Pages/DesignApproval/DesignApprovalMain'));
+const DesignApprovalPublic = lazy(() => import('./Pages/Stage Pages/DesignApproval/DesignApprovalPublic'));
+const ProjectConfiguration = lazy(() => import('./Pages/Projects/ProjectConfiguration'));
+const ArchivedProjects = lazy(() => import('./Pages/Projects/ArchivedProjects'));
+const ProjectOnboarding = lazy(() => import('./Pages/Stage Pages/Project_Onboarding/ProjectOnboarding'));
+const InstantCostCalculation = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculatorMain'));
 const InstantCostCalculatorProductConfigMain = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculatorProductConfigMain'));
 const InstantCostCalculatorDimentionMain = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculatorDimentionMain'));
 const InstantCostCalculatorDimentionSingle = lazy(() => import('./Pages/InstantCostCalculator/InstantCostCalculatorDimentionSingle'));
@@ -41,10 +45,10 @@ const PincodeVendorPublicAcknowledgement = lazy(() => import('./Pages/Pincode_Pa
 const AccountingRecordMain = lazy(() => import('./Pages/Department Pages/AccountingRecords/AccountingRecordMain'));
 const AccountingRecordSingle = lazy(() => import('./Pages/Department Pages/AccountingRecords/AccountingRecordSingle'));
 const RateConfigDescription = lazy(() => import('./Pages/Quote Pages/RateConfig Pages/RateConfigDescription'));
-const PublicCostCalculationMain = lazy(() => import('./Pages/PublicCostCalculation_Pages/PublicCostCalculationMain'));
-const PublicCostCalculationSingle = lazy(() => import('./Pages/PublicCostCalculation_Pages/PublicCostCalculationSingle'));
-const PublicLeadCollectionMain = lazy(() => import('./Pages/PublicLeadCollection_pages/PublicLeadCollectionMain'));
-const PublicLeadCollectionSingle = lazy(() => import('./Pages/PublicLeadCollection_pages/PublicLeadCollectionSingle'));
+const PublicCostCalculationMain = lazy(() => import('./Pages/Lead_pages/PublicCostCalculation_Pages/PublicCostCalculationMain'));
+const PublicCostCalculationSingle = lazy(() => import('./Pages/Lead_pages/PublicCostCalculation_Pages/PublicCostCalculationSingle'));
+const PublicLeadCollectionMain = lazy(() => import('./Pages/Lead_pages/PublicLeadCollection_pages/PublicLeadCollectionMain'));
+const PublicLeadCollectionSingle = lazy(() => import('./Pages/Lead_pages/PublicLeadCollection_pages/PublicLeadCollectionSingle'));
 const LogisticsPublicSingle = lazy(() => import('./Pages/Department Pages/Logistics Pages/LogisticsPublicSingle'));
 const PublicPaymentTransactionMain = lazy(() => import('./Pages/publicPaymentTransaction/PublicPaymentTransactionMain'));
 const ShopMaterialDocumentMain = lazy(() => import('./Pages/ShopMaterialDocument_Pages/ShopMaterialDocumentMain'));
@@ -1476,6 +1480,47 @@ function App() {
             </Route>
 
 
+            <Route path="instagram-leads" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="leadmodule"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <InstagramLeadsPage />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="leadmodule"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <InstagramLeadSingle />
+              </ProtectedRoutes>} />
+
+            </Route>
+
+
+
+            <Route path="whatsapp-leads" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="leadmodule"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <WhatsAppLeadsPage />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="leadmodule"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <WhatsAppLeadSingle />
+              </ProtectedRoutes>} />
+
+            </Route>
+
+
+
+
             <Route path="rateconfigpresales" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="presalesmaterialrateconfig"
               // ⭐ Allow entry if they can do ANY of these things
@@ -2196,7 +2241,7 @@ function App() {
             </Route>
 
 
-             <Route path="designapproval" element={
+            <Route path="designapproval" element={
               <ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker", "client"]}
                 requiredDepartment="designapproval"
                 // ⭐ Allow entry if they can do ANY of these things

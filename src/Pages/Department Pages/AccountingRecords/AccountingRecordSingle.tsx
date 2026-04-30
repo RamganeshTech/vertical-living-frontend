@@ -1509,7 +1509,7 @@
 
 //  FOURTH VERSION
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 // --- Components ---
@@ -1520,6 +1520,7 @@ import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/Mat
 // --- Hooks & Utils ---
 import { dateFormate } from "../../../utils/dateFormator";
 import { useGetSingleAccounting } from "../../../apiList/Department Api/Accounting Api/accountingApi";
+import AccountProofBill from "./AccountProofBill";
 
 // --- Helper for Badge Colors ---
 const getStatusConfig = (status: string) => {
@@ -1539,6 +1540,8 @@ const getStatusConfig = (status: string) => {
 const AccountingRecordSingle: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+
+    const [showProof, setShowProof] = useState(false);
 
     // --- Fetch Data ---
     const { data: apiResponse, isLoading, isError, refetch } = useGetSingleAccounting(id!);
@@ -1578,7 +1581,7 @@ const AccountingRecordSingle: React.FC = () => {
         <div className="p-4 h-full overflow-y-auto custom-scrollbar space-y-6 bg-gray-50/50">
 
             {/* --- Header --- */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-4">
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-4">
                 <div className="flex gap-3 items-center">
                     <button
                         onClick={() => navigate(-1)}
@@ -1596,268 +1599,332 @@ const AccountingRecordSingle: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Status Badge (Hidden for Invoice if preferred, but usually good to show) */}
-                {showPaymentTable && (
-                    <div className={`px-4 py-2 rounded-lg text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border} capitalize flex items-center gap-2 shadow-sm`}>
-                        <i className={`fas ${statusConfig.icon}`}></i>
-                        {record.status}
-                    </div>
-                )}
-            </div>
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* Status Badge (Hidden for Invoice if preferred, but usually good to show) */}
+                    {showPaymentTable && (
+                        <div className={`px-4 py-2 rounded-lg text-sm font-bold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border} capitalize flex items-center gap-2 shadow-sm`}>
+                            <i className={`fas ${statusConfig.icon}`}></i>
+                            {record.status}
+                        </div>
+                    )}
 
-            {/* --- Overview Cards (Summary) --- */}
-            <div className={`grid grid-cols-1 ${showPaymentTable ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"} gap-4`}>
-                
-                {/* 1. Payee Details */}
-                <Card className="shadow-sm border-gray-200">
-                    <CardContent className="p-5">
-                        <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                                {isInvoiceType ? "Payer Details" : "Payee Details"}
-                            </h3>
-                            <i className="fas fa-user-circle text-blue-200 text-xl"></i>
-                        </div>
-                        <div className="font-bold text-gray-800 text-lg truncate" title={record.person?.name}>
-                            {record.person?.name || 'N/A'}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1 capitalize">
-                            {record.person?.model?.replace('AccountModel', '').replace('Model', '') || 'Unknown'}
-                        </div>
-                    </CardContent>
-                </Card>
+                    {/* 🆕 Toggle Button for Audit Bill */}
+                    {/* <button
+                        onClick={() => setShowProof(!showProof)}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border transition-all shadow-sm ${showProof
+                            ? 'bg-brand-ash-dark text-white border-brand-ash-dark hover:bg-gray-800'
+                            : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                            }`}
+                    >
+                        <i className={`fas ${showProof ? 'fa-eye-slash' : 'fa-receipt'}`}></i>
+                        {showProof ? 'Hide Audit Bill' : 'View Audit Bill'}
+                    </button> */}
 
-                {/* 2. Source Info */}
-                <Card className="shadow-sm border-gray-200">
-                    <CardContent className="p-5">
-                        <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                                {isInvoiceType ? "Invoice Info" : isExpenseType ? "Expense Info" : "Source Document"}
-                            </h3>
-                            <i className={`fas ${isInvoiceType ? 'fa-file-contract' : isExpenseType ? 'fa-receipt' : 'fa-file-invoice'} text-purple-200 text-xl`}></i>
-                        </div>
-                        <div className="font-bold text-gray-800">
-                            {source?.deptNumber || 'N/A'}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                            Date: {dateFormate(source?.deptGeneratedDate)}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* 3. Payment Info (Hidden for Invoices) */}
-                {showPaymentTable && (
-                    <Card className={`shadow-sm ${payment ? 'border-green-200 bg-green-50/30' : 'border-gray-200 bg-gray-50'}`}>
-                        <CardContent className="p-5">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Payment Record</h3>
-                                <i className={`fas fa-money-check-alt text-xl ${payment ? 'text-green-500' : 'text-gray-300'}`}></i>
-                            </div>
-                            {payment ? (
-                                <>
-                                    <div className="font-bold text-gray-800">
-                                        {payment.number}
-                                    </div>
-                                    <div className="text-xs text-gray-500 mt-1">
-                                        {payment.date ? `Paid: ${dateFormate(payment.date)}` : 'Processing...'}
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="text-sm text-gray-400 italic mt-2">
-                                    No payment record linked.
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                )}
-
-                {/* 4. Total Amount */}
-                <Card className="shadow-sm border-blue-200 bg-blue-50/30">
-                    <CardContent className="p-5 flex flex-col justify-center items-end h-full">
-                        <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">Grand Total</h3>
-                        <div className="text-2xl font-bold text-blue-700">
-                            ₹{source?.grandTotal?.toLocaleString('en-IN') || record.amount?.toLocaleString('en-IN')}
-                        </div>
-                        {source?.taxAmount > 0 && (
-                            <div className="text-xs text-blue-400 mt-1">
-                                (Incl. ₹{source.taxAmount} Tax)
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* ========================================================= */}
-            {/* TABLE 1: SOURCE ITEMS (Bill / Invoice Breakdown)          */}
-            {/* ========================================================= */}
-            {showSourceTable && (
-                <Card className="shadow-sm border-gray-200 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                        <h2 className="font-bold text-gray-800 flex items-center gap-2">
-                            <i className="fas fa-list text-blue-500"></i>
-                            {record.type} Items 
-                            {/* <span className="text-xs font-normal text-gray-500">(From {record.type})</span> */}
-                        </h2>
-                        <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                            {source?.items?.length || 0} Items
+                    <div className="flex items-center gap-3">
+                        {/* Label with Icon */}
+                        <span
+                            onClick={() => setShowProof(!showProof)}
+                            className={`text-sm font-bold flex items-center gap-2 cursor-pointer transition-colors ${showProof ? 'text-text-strong' : 'text-text-muted hover:text-text-main'
+                                }`}
+                        >
+                            <i className="fas fa-receipt"></i>
+                            Audit Bill
                         </span>
+
+                        {/* The Toggle Switch */}
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={showProof}
+                            onClick={() => setShowProof(!showProof)}
+                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-text-main focus-visible:ring-offset-2 shadow-inner ${showProof ? 'bg-text-strong' : 'bg-ash-medium'
+                                }`}
+                        >
+                            <span className="sr-only">Toggle Audit Bill</span>
+
+                            {/* The sliding knob */}
+                            <span
+                                aria-hidden="true"
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-brand-surface shadow-sm ring-0 transition duration-200 ease-in-out ${showProof ? 'translate-x-5' : 'translate-x-0'
+                                    }`}
+                            >
+                            </span>
+                        </button>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-gray-50 text-gray-600 font-semibold uppercase text-xs">
-                                <tr>
-                                    <th className="px-6 py-3 text-center w-16">S.No</th>
-                                    <th className="px-6 py-3">Item Name</th>
-                                    <th className="px-6 py-3">Unit</th>
-                                    <th className="px-6 py-3 text-center">Qty</th>
-                                    <th className="px-6 py-3 text-right">Rate</th>
-                                    <th className="px-6 py-3 text-right">Total Cost</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {(!source?.items || source.items.length === 0) ? (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-400 italic">
-                                            No items found in the source document.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    source.items.map((item: any, index: number) => (
-                                        <tr key={item._id || index} className="hover:bg-blue-50/30 transition-colors">
-                                            <td className="px-6 py-4 text-center text-gray-500">{index + 1}</td>
-                                            <td className="px-6 py-4 font-medium text-gray-800">{item.itemName || item.name}</td>
-                                            <td className="px-6 py-4 text-gray-500 text-xs uppercase">{item.unit || '-'}</td>
-                                            <td className="px-6 py-4 text-center text-gray-700 font-medium">{item.quantity}</td>
-                                            <td className="px-6 py-4 text-right text-gray-600 font-mono text-xs">{item.rate?.toLocaleString()}</td>
-                                            <td className="px-6 py-4 text-right font-bold text-blue-700 font-mono text-xs">
-                                                ₹{(item.totalCost || (item.rate * item.quantity))?.toLocaleString()}
-                                            </td>
-                                        </tr>
-                                    ))
+                </div>
+
+            </header>
+
+            <main className="flex  gap-6 h-full items-start">
+
+                {/* <section className={`flex flex-col gap-6 transition-all duration-300 w-full ${showProof ? 'lg:w-2/3 xl:w-3/4' : ''}`}> */}
+                <section className={`flex flex-col gap-6 transition-all duration-300 min-w-0 flex-1 ${showProof ? 'lg:w-2/3 xl:w-3/4' : 'w-full'}`}>
+                    {/* --- Overview Cards (Summary) --- */}
+                    <div className={`grid grid-cols-1 ${showPaymentTable ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"} gap-4`}>
+
+                        {/* 1. Payee Details */}
+                        <Card className="shadow-sm border-gray-200">
+                            <CardContent className="p-5">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        {isInvoiceType ? "Payer Details" : "Payee Details"}
+                                    </h3>
+                                    <i className="fas fa-user-circle text-blue-200 text-xl"></i>
+                                </div>
+                                <div className="font-bold text-gray-800 text-lg truncate" title={record.person?.name}>
+                                    {record.person?.name || 'N/A'}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1 capitalize">
+                                    {record.person?.model?.replace('AccountModel', '').replace('Model', '') || 'Unknown'}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* 2. Source Info */}
+                        <Card className="shadow-sm border-gray-200">
+                            <CardContent className="p-5">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                        {isInvoiceType ? "Invoice Info" : isExpenseType ? "Expense Info" : "Source Document"}
+                                    </h3>
+                                    <i className={`fas ${isInvoiceType ? 'fa-file-contract' : isExpenseType ? 'fa-receipt' : 'fa-file-invoice'} text-purple-200 text-xl`}></i>
+                                </div>
+                                <div className="font-bold text-gray-800">
+                                    {source?.deptNumber || 'N/A'}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                    Date: {dateFormate(source?.deptGeneratedDate)}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* 3. Payment Info (Hidden for Invoices) */}
+                        {showPaymentTable && (
+                            <Card className={`shadow-sm ${payment ? 'border-green-200 bg-green-50/30' : 'border-gray-200 bg-gray-50'}`}>
+                                <CardContent className="p-5">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Payment Record</h3>
+                                        <i className={`fas fa-money-check-alt text-xl ${payment ? 'text-green-500' : 'text-gray-300'}`}></i>
+                                    </div>
+                                    {payment ? (
+                                        <>
+                                            <div className="font-bold text-gray-800">
+                                                {payment.number}
+                                            </div>
+                                            <div className="text-xs text-gray-500 mt-1">
+                                                {payment.date ? `Paid: ${dateFormate(payment.date)}` : 'Processing...'}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-sm text-gray-400 italic mt-2">
+                                            No payment record linked.
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* 4. Total Amount */}
+                        <Card className="shadow-sm border-blue-200 bg-blue-50/30">
+                            <CardContent className="p-5 flex flex-col justify-center items-end h-full">
+                                <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">Grand Total</h3>
+                                <div className="text-2xl font-bold text-blue-700">
+                                    ₹{source?.grandTotal?.toLocaleString('en-IN') || record.amount?.toLocaleString('en-IN')}
+                                </div>
+                                {source?.taxAmount > 0 && (
+                                    <div className="text-xs text-blue-400 mt-1">
+                                        (Incl. ₹{source.taxAmount} Tax)
+                                    </div>
                                 )}
-                            </tbody>
-                        </table>
+                            </CardContent>
+                        </Card>
                     </div>
-                </Card>
-            )}
 
-            {/* ========================================================= */}
-            {/* EXPENSE VIEW: Description Only (No Item Table)            */}
-            {/* ========================================================= */}
-            {isExpenseType && (
-                <Card className="shadow-sm border-gray-200">
-                    <div className="px-6 py-4 border-b border-gray-100 bg-pink-50/50">
-                        <h2 className="font-bold text-gray-800 flex items-center gap-2">
-                            <i className="fas fa-info-circle text-pink-500"></i>
-                            Expense Details
-                        </h2>
-                    </div>
-                    <CardContent className="p-6">
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                            <h4 className="text-xs font-bold text-gray-400 uppercase mb-2">Description / Purpose</h4>
-                            <p className="text-gray-800 text-lg font-medium leading-relaxed">
-                                {source?.notes || "No description provided."}
+                    {/* ========================================================= */}
+                    {/* TABLE 1: SOURCE ITEMS (Bill / Invoice Breakdown)          */}
+                    {/* ========================================================= */}
+                    {showSourceTable && (
+                        <Card className="shadow-sm border-gray-200 overflow-hidden">
+                            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                                <h2 className="font-bold text-gray-800 flex items-center gap-2">
+                                    <i className="fas fa-list text-blue-500"></i>
+                                    {record.type} Items
+                                    {/* <span className="text-xs font-normal text-gray-500">(From {record.type})</span> */}
+                                </h2>
+                                <span className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
+                                    {source?.items?.length || 0} Items
+                                </span>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-600 font-semibold uppercase text-xs">
+                                        <tr>
+                                            <th className="px-6 py-3 text-center w-16">S.No</th>
+                                            <th className="px-6 py-3">Item Name</th>
+                                            <th className="px-6 py-3">Unit</th>
+                                            <th className="px-6 py-3 text-center">Qty</th>
+                                            <th className="px-6 py-3 text-right">Rate</th>
+                                            <th className="px-6 py-3 text-right">Total Cost</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {(!source?.items || source.items.length === 0) ? (
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-8 text-center text-gray-400 italic">
+                                                    No items found in the source document.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            source.items.map((item: any, index: number) => (
+                                                <tr key={item._id || index} className="hover:bg-blue-50/30 transition-colors">
+                                                    <td className="px-6 py-4 text-center text-gray-500">{index + 1}</td>
+                                                    <td className="px-6 py-4 font-medium text-gray-800">{item.itemName || item.name}</td>
+                                                    <td className="px-6 py-4 text-gray-500 text-xs uppercase">{item.unit || '-'}</td>
+                                                    <td className="px-6 py-4 text-center text-gray-700 font-medium">{item.quantity}</td>
+                                                    <td className="px-6 py-4 text-right text-gray-600 font-mono text-xs">{item.rate?.toLocaleString()}</td>
+                                                    <td className="px-6 py-4 text-right font-bold text-blue-700 font-mono text-xs">
+                                                        ₹{(item.totalCost || (item.rate * item.quantity))?.toLocaleString()}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* ========================================================= */}
+                    {/* EXPENSE VIEW: Description Only (No Item Table)            */}
+                    {/* ========================================================= */}
+                    {isExpenseType && (
+                        <Card className="shadow-sm border-gray-200">
+                            <div className="px-6 py-4 border-b border-gray-100 bg-pink-50/50">
+                                <h2 className="font-bold text-gray-800 flex items-center gap-2">
+                                    <i className="fas fa-info-circle text-pink-500"></i>
+                                    Expense Details
+                                </h2>
+                            </div>
+                            <CardContent className="p-6">
+                                <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase mb-2">Description / Purpose</h4>
+                                    <p className="text-gray-800 text-lg font-medium leading-relaxed">
+                                        {source?.notes || "No description provided."}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* ========================================================= */}
+                    {/* TABLE 2: PAYMENT BREAKDOWN (From Payment Record)          */}
+                    {/* ========================================================= */}
+                    {showPaymentTable && (
+                        <Card className="shadow-sm border-green-200 overflow-hidden">
+                            <div className="px-6 py-4 border-b border-green-100 bg-green-50/50 flex justify-between items-center">
+                                <h2 className="font-bold text-gray-800 flex items-center gap-2">
+                                    <i className="fas fa-money-bill-wave text-green-600"></i>
+                                    Payment Transactions
+                                </h2>
+                                <span className="px-3 py-1 bg-white border border-green-200 rounded-full text-xs font-medium text-green-600">
+                                    {payment?.items?.length || 0} Transactions
+                                </span>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-600 font-semibold uppercase text-xs">
+                                        <tr>
+                                            <th className="px-6 py-3 text-center w-16">#</th>
+                                            <th className="px-6 py-3">Item / Description</th>
+                                            <th className="px-6 py-3">Order ID</th>
+                                            <th className="px-6 py-3">Transaction ID</th>
+                                            <th className="px-6 py-3 text-right">Paid Amount</th>
+                                            <th className="px-6 py-3 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {(!payment?.items || payment.items.length === 0) ? (
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-8 text-center text-gray-400 italic">
+                                                    No transaction breakdown available.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            payment.items.map((pItem: any, index: number) => (
+                                                <tr key={pItem._id || index} className="hover:bg-green-50/30 transition-colors">
+                                                    <td className="px-6 py-4 text-center text-gray-500">{index + 1}</td>
+                                                    <td className="px-6 py-4 font-medium text-gray-800">{pItem.itemName || "Payment Item"}</td>
+
+                                                    {/* Order ID */}
+                                                    <td className="px-6 py-4">
+                                                        {pItem.orderId ? (
+                                                            <span className="font-mono text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600 block truncate w-28" title={pItem.orderId}>
+                                                                {pItem.orderId}
+                                                            </span>
+                                                        ) : <span className="text-gray-300">-</span>}
+                                                    </td>
+
+                                                    {/* Transaction ID */}
+                                                    <td className="px-6 py-4">
+                                                        {pItem.transactionId ? (
+                                                            <span className="font-mono text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100 block truncate w-28" title={pItem.transactionId}>
+                                                                {pItem.transactionId}
+                                                            </span>
+                                                        ) : <span className="text-xs text-gray-400 italic">Pending</span>}
+                                                    </td>
+
+                                                    {/* Paid Amount */}
+                                                    <td className="px-6 py-4 text-right font-mono text-xs text-gray-700 font-bold">
+                                                        {pItem.totalCost ? `₹${pItem.totalCost.toLocaleString()}` : '-'}
+                                                    </td>
+
+                                                    {/* Status */}
+                                                    <td className="px-6 py-4 text-center">
+                                                        {pItem.status === 'paid' ? (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">
+                                                                <i className="fas fa-check"></i> Paid
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-orange-100 text-orange-700 text-[10px] font-bold uppercase">
+                                                                <i className="fas fa-clock"></i> Pending
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* --- Source Notes (For Bills/Invoices) --- */}
+                    {!isExpenseType && source?.notes && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+                            <h4 className="text-sm font-bold text-yellow-800 mb-1 flex items-center gap-2">
+                                <i className="fas fa-sticky-note"></i> Notes
+                            </h4>
+                            <p className="text-sm text-yellow-800/90 leading-relaxed">
+                                {source.notes}
                             </p>
                         </div>
-                    </CardContent>
-                </Card>
-            )}
+                    )}
 
-            {/* ========================================================= */}
-            {/* TABLE 2: PAYMENT BREAKDOWN (From Payment Record)          */}
-            {/* ========================================================= */}
-            {showPaymentTable && (
-                <Card className="shadow-sm border-green-200 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-green-100 bg-green-50/50 flex justify-between items-center">
-                        <h2 className="font-bold text-gray-800 flex items-center gap-2">
-                            <i className="fas fa-money-bill-wave text-green-600"></i>
-                            Payment Transactions
-                        </h2>
-                        <span className="px-3 py-1 bg-white border border-green-200 rounded-full text-xs font-medium text-green-600">
-                            {payment?.items?.length || 0} Transactions
-                        </span>
-                    </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-gray-50 text-gray-600 font-semibold uppercase text-xs">
-                                <tr>
-                                    <th className="px-6 py-3 text-center w-16">#</th>
-                                    <th className="px-6 py-3">Item / Description</th>
-                                    <th className="px-6 py-3">Order ID</th>
-                                    <th className="px-6 py-3">Transaction ID</th>
-                                    <th className="px-6 py-3 text-right">Paid Amount</th>
-                                    <th className="px-6 py-3 text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {(!payment?.items || payment.items.length === 0) ? (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-400 italic">
-                                            No transaction breakdown available.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    payment.items.map((pItem: any, index: number) => (
-                                        <tr key={pItem._id || index} className="hover:bg-green-50/30 transition-colors">
-                                            <td className="px-6 py-4 text-center text-gray-500">{index + 1}</td>
-                                            <td className="px-6 py-4 font-medium text-gray-800">{pItem.itemName || "Payment Item"}</td>
-                                            
-                                            {/* Order ID */}
-                                            <td className="px-6 py-4">
-                                                {pItem.orderId ? (
-                                                    <span className="font-mono text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-600 block truncate w-28" title={pItem.orderId}>
-                                                        {pItem.orderId}
-                                                    </span>
-                                                ) : <span className="text-gray-300">-</span>}
-                                            </td>
 
-                                            {/* Transaction ID */}
-                                            <td className="px-6 py-4">
-                                                {pItem.transactionId ? (
-                                                    <span className="font-mono text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100 block truncate w-28" title={pItem.transactionId}>
-                                                        {pItem.transactionId}
-                                                    </span>
-                                                ) : <span className="text-xs text-gray-400 italic">Pending</span>}
-                                            </td>
+                </section>
 
-                                            {/* Paid Amount */}
-                                            <td className="px-6 py-4 text-right font-mono text-xs text-gray-700 font-bold">
-                                                {pItem.totalCost ? `₹${pItem.totalCost.toLocaleString()}` : '-'}
-                                            </td>
-
-                                            {/* Status */}
-                                            <td className="px-6 py-4 text-center">
-                                                {pItem.status === 'paid' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase">
-                                                        <i className="fas fa-check"></i> Paid
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-orange-100 text-orange-700 text-[10px] font-bold uppercase">
-                                                        <i className="fas fa-clock"></i> Pending
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </Card>
-            )}
-
-            {/* --- Source Notes (For Bills/Invoices) --- */}
-            {!isExpenseType && source?.notes && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
-                    <h4 className="text-sm font-bold text-yellow-800 mb-1 flex items-center gap-2">
-                        <i className="fas fa-sticky-note"></i> Notes
-                    </h4>
-                    <p className="text-sm text-yellow-800/90 leading-relaxed">
-                        {source.notes}
-                    </p>
-                </div>
-            )}
+                {/* 🆕 ASIDE: The Proof Bill (Visible only when toggled ON) */}
+                {showProof && (
+                    <aside className="w-full lg:w-1/3 xl:w-1/4 shrink-0 sticky top-4 transition-all duration-300">
+                        <AccountProofBill record={record} />
+                    </aside>
+                )}
+            </main >
         </div>
     );
 };

@@ -152,7 +152,7 @@
 
 
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 // Updated Exact Imports
@@ -171,11 +171,21 @@ const ProjectOnboarding: React.FC = () => {
 
 
     const navigate = useNavigate()
+    const [currentMainVideo, setCurrentMainVideo] = useState<any>(null);
 
     // 2. Fetch Data
     const { data: reqData, isLoading: reqLoading } = useGetAllRequirementInfo({ projectId: projectId! });
     const { data: orgData, isLoading: orgLoading } = useGetSingleOrganization(organizationId!);
     const { data: configData, isLoading: configLoading } = useGetProjectConfig(organizationId!);
+
+
+    // Initialize the main video when data loads
+    useEffect(() => {
+        if (configData?.videos && configData.videos.length > 0 && !currentMainVideo) {
+            setCurrentMainVideo(configData.videos[0]);
+        }
+    }, [configData, currentMainVideo]);
+
 
     // 3. Derived State
     const clientData = reqData?.clientData;
@@ -183,7 +193,10 @@ const ProjectOnboarding: React.FC = () => {
 
     // Video separation: First video is main, the rest go into a sub-grid
     const mainVideo = configData?.videos && configData.videos.length > 0 ? configData.videos[0] : null;
-    const additionalVideos = configData?.videos && configData.videos.length > 1 ? configData.videos.slice(1) : [];
+    // const additionalVideos = configData?.videos && configData.videos.length > 1 ? configData.videos.slice(1) : [];
+    const additionalVideos = configData?.videos
+        ? configData?.videos?.filter((vid: any) => vid?._id !== currentMainVideo?._id)
+        : [];
 
     const images = configData?.images || [];
 
@@ -255,17 +268,18 @@ const ProjectOnboarding: React.FC = () => {
             <main className="max-w-full mx-auto px-4 mt-6 sm:mt-8 space-y-12">
 
                 {/* Video Player Section */}
-                {mainVideo && (
+                {currentMainVideo && (
                     <section className="flex flex-col items-center">
                         {/* Main Video */}
                         <div className="w-full max-w-4xl bg-black rounded-xl overflow-hidden shadow-xl border border-ash-dark relative group ring-2 ring-ash-medium">
                             <video
+                                key={currentMainVideo.url}
                                 className="w-full aspect-video object-cover"
                                 controls
                                 controlsList="nodownload"
                                 preload="metadata"
                             >
-                                <source src={mainVideo.url} type={mainVideo.type || "video/mp4"} />
+                                <source src={currentMainVideo.url} type={currentMainVideo.type || "video/mp4"} />
                                 Your browser does not support the video tag.
                             </video>
                         </div>
@@ -278,11 +292,21 @@ const ProjectOnboarding: React.FC = () => {
                                 </h3>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     {additionalVideos.map((vid: any, idx: number) => (
-                                        <div key={vid._id || idx} className="bg-black rounded-lg overflow-hidden shadow-sm border border-ash-medium group cursor-pointer">
+                                        // <div key={vid._id || idx} className="bg-black rounded-lg overflow-hidden shadow-sm border border-ash-medium group cursor-pointer">
+                                        <div
+                                            key={vid._id || idx}
+                                            onClick={() => setCurrentMainVideo(vid)}
+                                            className="bg-black rounded-lg overflow-hidden shadow-sm border border-ash-medium group cursor-pointer relative"
+                                        >
+                                            {/* Optional: Add a play icon overlay to indicate it's a video thumbnail */}
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors z-10">
+                                         <i className="fas fa-play-circle text-brand-surface/80 text-3xl group-hover:text-brand-surface transition-colors drop-shadow-md"></i>
+                                    </div>
+
                                             <video
                                                 className="w-full aspect-video object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                                                controls
-                                                controlsList="nodownload"
+                                                // controls
+                                                // controlsList="nodownload"
                                                 preload="metadata"
                                             >
                                                 <source src={vid.url} type={vid.type || "video/mp4"} />
@@ -331,12 +355,6 @@ const ProjectOnboarding: React.FC = () => {
 
                 {/* Empty State */}
                 {!mainVideo && images.length === 0 && (
-                    // <div className="text-center py-20 bg-brand-surface rounded-xl border border-ash-light shadow-sm max-w-4xl mx-auto">
-                    //     <i className="fa-solid fa-folder-open text-text-soft text-5xl mb-4"></i>
-                    //     <h3 className="text-lg font-medium text-text-strong">No Onboarding Materials Yet</h3>
-                    //     <p className="text-sm text-text-muted mt-2">Your project materials will appear here once uploaded.</p>
-                    //     <Button variant="dark" className="mt-2" onClick={()=> navigate(`/organizations/${organizationId}/projects/projectconfiguration`)}>Project Onboarding Configuration</Button>
-                    // </div>
 
                     <div className="text-center py-20 px-4 bg-brand-surface rounded-xl border border-ash-light shadow-sm max-w-4xl mx-auto flex flex-col items-center">
                         {/* Enclosed the icon in a subtle circle to make it look like an illustration rather than floating text */}

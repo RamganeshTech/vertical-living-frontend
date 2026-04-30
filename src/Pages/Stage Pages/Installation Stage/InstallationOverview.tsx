@@ -62,7 +62,7 @@ export default function InstallationOverview() {
     isLoading,
     isError,
     refetch,
-    error: getAllError,
+    // error: getAllError,
   } = useGetInstallationDetails(projectId!);
 
   const { mutateAsync: completionStatus, isPending: completePending } = useCompleteInstallation();
@@ -185,43 +185,55 @@ export default function InstallationOverview() {
 
           {/* Child Route Check */}
           {isError ? (
-            // Error Block - Only error, no content
-            // <div className="max-w-xl mx-auto p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-            //   <div className="text-red-600 text-xl font-semibold mb-2">
-            //     ⚠️ Oops! An Error Occurred
+
+            // <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
+            //   <div className="text-action-danger text-3xl mb-3">
+            //     <i className="fa-solid fa-triangle-exclamation"></i>
             //   </div>
-            //   <p className="text-red-500 text-sm mb-4">
+            //   <div className="text-text-main text-lg font-bold mb-2">
+            //     Error Occurred
+            //   </div>
+            //   <p className="text-text-muted text-sm mb-5">
             //     {(getAllError as any)?.response?.data?.message || (getAllError as any)?.message || "Something went wrong"}
             //   </p>
 
             //   <Button
             //     isLoading={isLoading}
             //     onClick={() => refetch()}
-            //     className="bg-red-600 text-white hover:bg-red-700"
+            //     variant="outline"
+            //     className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
             //   >
             //     Retry
             //   </Button>
             // </div>
 
-            <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
-              <div className="text-action-danger text-3xl mb-3">
-                <i className="fa-solid fa-triangle-exclamation"></i>
+            <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+              {/* Soft, neutral icon wrapper instead of a stark warning */}
+              <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+                <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
               </div>
-              <div className="text-text-main text-lg font-bold mb-2">
-                Error Occurred
+
+              {/* Professional, non-alarming title */}
+              <div className="text-text-strong text-lg font-bold mb-2">
+                Stage Not Yet Available
               </div>
-              <p className="text-text-muted text-sm mb-5">
-                {(getAllError as any)?.response?.data?.message || (getAllError as any)?.message || "Something went wrong"}
+
+              {/* Clear explanation of the business logic */}
+              <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                {/* {(getAllError as any)?.response?.data?.message} */}
+                This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
               </p>
 
+              {/* Neutral action button */}
               <Button
-                isLoading={isLoading}
                 onClick={() => refetch()}
                 variant="outline"
-                className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+                className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
               >
-                Retry
+                <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
               </Button>
+
             </div>
           ) : (
             data && (
@@ -265,7 +277,7 @@ export default function InstallationOverview() {
                   <div className="w-full my-3">
                     <div className="flex items-center gap-3 mb-5 border-b border-ash-light pb-3">
                       <div className="w-8 h-8 rounded-lg bg-brand-ash border border-ash-medium flex items-center justify-center shadow-sm">
-                          <i className="fa-solid fa-images text-text-muted text-sm"></i>
+                        <i className="fa-solid fa-images text-text-muted text-sm"></i>
                       </div>
                       <h3 className="text-lg font-bold text-text-main">Installation Progress Gallery</h3>
                     </div>
@@ -306,8 +318,7 @@ export default function InstallationOverview() {
                                     > */}
 
                                     <span
-                                      className={`inline-flex px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border shadow-sm ${
-                                        task.status === "completed" || task.status === "pass"
+                                      className={`inline-flex px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border shadow-sm ${task.status === "completed" || task.status === "pass"
                                           ? "bg-brand-surface border-action-success/30 text-action-success"
                                           : task.status === "pending"
                                             ? "bg-brand-surface border-yellow-500/30 text-yellow-600"
@@ -316,7 +327,7 @@ export default function InstallationOverview() {
                                               : task.status === "submitted"
                                                 ? "bg-brand-surface border-purple-500/30 text-purple-600"
                                                 : "bg-brand-surface border-ash-medium text-text-muted"
-                                      }`}
+                                        }`}
                                     >
                                       {task.status}
                                     </span>
@@ -333,56 +344,56 @@ export default function InstallationOverview() {
                               </div>
 
 
-                              {(canCreate || canEdit) && 
-                              <div className="flex items-center gap-3">
-                                <div className="flex flex-col gap-1">
-                                  {/* <label className="text-xs font-medium text-gray-600">Update Status</label> */}
-                                  <label className="text-[10px] font-bold uppercase tracking-wider text-text-muted">Update Status</label>
-                                  <Select
-                                    onValueChange={(val) =>
-                                      handleStatusChange(task._id, val as "submitted" | "pending" | "inprogress")
-                                    }
-                                    value={task.status || ""}
-                                  >
-                                    {/* <SelectTrigger className="w-40 rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500 bg-white"> */}
-                                    <SelectTrigger className="w-full sm:w-40 rounded-lg border-ash-medium focus:ring-2 focus:ring-ash-medium bg-brand-surface text-text-main shadow-sm h-9">
-                                      <SelectValue placeholder="Select status" selectedValue={task.status || ""} />
-                                    </SelectTrigger>
-                                    <SelectContent className="!min-w-[120px] bg-brand-surface border-ash-medium">
-                                      <SelectItem value="pending">
-                                        <div className="flex items-center gap-2">
-                                          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                                          Pending
-                                        </div>
-                                      </SelectItem>
-                                      <SelectItem value="inprogress">
-                                        <div className="flex items-center gap-2">
-                                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                          In Progress
-                                        </div>
-                                      </SelectItem>
-                                      <SelectItem value="submitted">
-                                        <div className="flex items-center gap-2">
-                                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                          Submitted
-                                        </div>
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
+                              {(canCreate || canEdit) &&
+                                <div className="flex items-center gap-3">
+                                  <div className="flex flex-col gap-1">
+                                    {/* <label className="text-xs font-medium text-gray-600">Update Status</label> */}
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-text-muted">Update Status</label>
+                                    <Select
+                                      onValueChange={(val) =>
+                                        handleStatusChange(task._id, val as "submitted" | "pending" | "inprogress")
+                                      }
+                                      value={task.status || ""}
+                                    >
+                                      {/* <SelectTrigger className="w-40 rounded-xl border-gray-200 focus:ring-2 focus:ring-blue-500 bg-white"> */}
+                                      <SelectTrigger className="w-full sm:w-40 rounded-lg border-ash-medium focus:ring-2 focus:ring-ash-medium bg-brand-surface text-text-main shadow-sm h-9">
+                                        <SelectValue placeholder="Select status" selectedValue={task.status || ""} />
+                                      </SelectTrigger>
+                                      <SelectContent className="!min-w-[120px] bg-brand-surface border-ash-medium">
+                                        <SelectItem value="pending">
+                                          <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                            Pending
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="inprogress">
+                                          <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                            In Progress
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="submitted">
+                                          <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                            Submitted
+                                          </div>
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
 
-                                {/* {updateTaskStatus.isPending && (
+                                  {/* {updateTaskStatus.isPending && (
                                   <div className="flex items-center justify-center">
                                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                                   </div>
                                 )} */}
 
-                                {updateTaskStatus.isPending && updateTaskStatus.variables?.taskId === task._id && (
+                                  {updateTaskStatus.isPending && updateTaskStatus.variables?.taskId === task._id && (
                                     <div className="flex items-center justify-center shrink-0 mt-4">
                                       <i className="fas fa-circle-notch fa-spin text-text-muted text-lg"></i>
                                     </div>
                                   )}
-                              </div>}
+                                </div>}
                             </div>
 
                             {/* Image Number Badge */}
@@ -404,12 +415,12 @@ export default function InstallationOverview() {
                               // </div>
 
                               <div className="text-center py-8 border border-dashed border-ash-medium rounded-lg bg-brand-ash/30">
-                                        <div className="w-12 h-12 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
-                                            <i className="fa-solid fa-image text-ash-dark text-lg" />
-                                        </div>
-                                        <p className="text-sm font-bold text-text-main">No Images Uploaded</p>
-                                        <p className="text-[10px] uppercase tracking-wider font-bold text-text-muted mt-1">Images will appear here once added to this task.</p>
-                                    </div>
+                                <div className="w-12 h-12 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                                  <i className="fa-solid fa-image text-ash-dark text-lg" />
+                                </div>
+                                <p className="text-sm font-bold text-text-main">No Images Uploaded</p>
+                                <p className="text-[10px] uppercase tracking-wider font-bold text-text-muted mt-1">Images will appear here once added to this task.</p>
+                              </div>
                             )}
                           </div>
                         )
@@ -425,8 +436,8 @@ export default function InstallationOverview() {
                       // </div>
 
                       <div className="text-center py-16 border border-dashed border-ash-medium rounded-xl bg-brand-ash/50 mt-6">
-                         <div className="w-16 h-16 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                            <i className="fa-solid fa-images text-ash-dark text-2xl" />
+                        <div className="w-16 h-16 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                          <i className="fa-solid fa-images text-ash-dark text-2xl" />
                         </div>
                         <h3 className="text-lg font-bold text-text-main mb-1">No Installation Images Yet</h3>
                         <p className="text-sm text-text-muted">Images will appear here once they are uploaded to installation tasks.</p>
@@ -444,7 +455,7 @@ export default function InstallationOverview() {
 
                   <div className="text-center py-20 border border-dashed border-ash-medium rounded-xl bg-brand-ash/50 mt-6">
                     <div className="w-16 h-16 bg-brand-surface border border-ash-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
-                        <i className="fa-solid fa-clipboard-list text-ash-dark text-2xl" />
+                      <i className="fa-solid fa-clipboard-list text-ash-dark text-2xl" />
                     </div>
                     <h3 className="text-lg font-bold text-text-main mb-1">No Installation Tasks Found</h3>
                     <p className="text-sm text-text-muted">Tasks created in earlier stages will populate here.</p>

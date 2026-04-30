@@ -120,7 +120,7 @@ const WorkMainOverview = () => {
           )}
           {/* <i className="fas fa-digging mr-2"></i> Work Schedule Overview */}
           <div className="w-10 h-10 bg-brand-surface border border-ash-medium rounded-lg flex items-center justify-center shadow-sm mr-3">
-             <i className="fas fa-digging text-text-muted text-lg"></i>
+            <i className="fas fa-digging text-text-muted text-lg"></i>
           </div>
           <span className="leading-tight">Work Schedule Overview</span>
         </h2>
@@ -131,14 +131,14 @@ const WorkMainOverview = () => {
             onClick={handleCompletionStatus}
             // className="bg-green-600 h-10 hover:bg-green-700 text-white w-full sm:w-auto"
             variant="dark"
-                className="flex-1 sm:flex-none px-6 shadow-sm min-w-max"
+            className="flex-1 sm:flex-none px-6 shadow-sm min-w-max"
           >
             {/* <i className="fa-solid fa-circle-check mr-2" />
             Mark as Complete */}
 
             <i className="fa-solid fa-circle-check mr-2 text-action-success" />
-                <span className="hidden sm:inline">Mark Complete</span>
-                <span className="inline sm:hidden">Complete</span>
+            <span className="hidden sm:inline">Mark Complete</span>
+            <span className="inline sm:hidden">Complete</span>
           </Button>}
 
           {/* <ResetStageButton
@@ -169,42 +169,55 @@ const WorkMainOverview = () => {
 
       {/* ❌ Error Message - Hide other content */}
       {getAllError ? (
-        // <div className="max-w-xl mx-auto p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-        //   <div className="text-red-600 text-xl font-semibold mb-2">
-        //     ⚠️ An Error Occurred
-        //   </div>
-        //   <p className="text-red-500 text-sm mb-4">
-        //     {(getAllError as any)?.response?.data?.message ||
-        //       (getAllError as any)?.message ||
-        //       "Couldn't load data."}
-        //   </p>
-        //   <Button
-        //     isLoading={isLoading}
-        //     onClick={() => refetch()}
-        //     className="bg-red-600 text-white hover:bg-red-700 px-4 py-2"
-        //   >
-        //     Retry
-        //   </Button>
+
+
+        // <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
+        //     <div className="text-action-danger text-3xl mb-3">
+        //         <i className="fa-solid fa-triangle-exclamation"></i>
+        //     </div>
+        //     <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
+        //     <p className="text-text-muted text-sm mb-5">
+        //       {(getAllError as any)?.response?.data?.message ||
+        //         (getAllError as any)?.message ||
+        //         "Couldn't load data."}
+        //     </p>
+        //     <Button
+        //       isLoading={isLoading}
+        //       onClick={() => refetch()}
+        //       variant="outline"
+        //       className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+        //     >
+        //       Retry
+        //     </Button>
         // </div>
 
-        <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
-            <div className="text-action-danger text-3xl mb-3">
-                <i className="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
-            <p className="text-text-muted text-sm mb-5">
-              {(getAllError as any)?.response?.data?.message ||
-                (getAllError as any)?.message ||
-                "Couldn't load data."}
-            </p>
-            <Button
-              isLoading={isLoading}
-              onClick={() => refetch()}
-              variant="outline"
-              className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
-            >
-              Retry
-            </Button>
+        <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+          {/* Soft, neutral icon wrapper instead of a stark warning */}
+          <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+            <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
+          </div>
+
+          {/* Professional, non-alarming title */}
+          <div className="text-text-strong text-lg font-bold mb-2">
+            Stage Not Yet Available
+          </div>
+
+          {/* Clear explanation of the business logic */}
+          <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+            {/* {(getAllError as any)?.response?.data?.message} */}
+            This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
+          </p>
+
+          {/* Neutral action button */}
+          <Button
+            onClick={() => refetch()}
+            variant="outline"
+            className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
+          >
+            <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
+          </Button>
+
         </div>
 
       ) : (
@@ -216,7 +229,7 @@ const WorkMainOverview = () => {
               <span>Stage Timings</span>
             </div> */}
 
-            <Card className="p-5 shadow-sm border-2 border-ash-medium rounded-xl bg-brand-surface w-full">
+          <Card className="p-5 shadow-sm border-2 border-ash-medium rounded-xl bg-brand-surface w-full">
             <div className="flex items-center gap-2 text-text-main text-sm font-bold mb-4 uppercase tracking-wide border-b border-ash-light pb-3">
               <i className="fa-regular fa-clock text-ash-dark text-base" />
               <span>Stage Timings</span>
@@ -338,7 +351,7 @@ const WorkMainOverview = () => {
               <div className="flex items-center justify-between p-6 md:p-8">
                 <div className="flex items-center gap-6">
                   {/*  Updated icon styling to match page theme */}
-                <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 bg-brand-ash border border-ash-light rounded-xl flex items-center justify-center shadow-sm group-hover:border-ash-medium transition-colors">
+                  <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 bg-brand-ash border border-ash-light rounded-xl flex items-center justify-center shadow-sm group-hover:border-ash-medium transition-colors">
                     <i className="fas fa-calendar-check text-action-primary text-2xl" />
                   </div>
 
@@ -352,7 +365,7 @@ const WorkMainOverview = () => {
                     </p>
 
                     {/*  Added feature badges for better visual hierarchy */}
-                   <div className="flex flex-wrap gap-2 mt-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-surface border border-ash-medium text-text-main text-[10px] font-bold uppercase tracking-wider rounded shadow-sm">
                         <i className="fas fa-tasks text-action-primary" /> Task Tracking
                       </span>
@@ -367,7 +380,7 @@ const WorkMainOverview = () => {
                 </div>
 
                 {/*  Added arrow indicator for better UX */}
-               <div className="flex-shrink-0 self-end sm:self-auto w-10 h-10 rounded-full bg-brand-ash border border-ash-light flex items-center justify-center group-hover:bg-brand-surface group-hover:border-ash-medium transition-all shadow-sm">
+                <div className="flex-shrink-0 self-end sm:self-auto w-10 h-10 rounded-full bg-brand-ash border border-ash-light flex items-center justify-center group-hover:bg-brand-surface group-hover:border-ash-medium transition-all shadow-sm">
                   <i className="fas fa-arrow-right text-text-muted group-hover:text-action-primary group-hover:translate-x-0.5 transition-all text-sm" />
                 </div>
               </div>

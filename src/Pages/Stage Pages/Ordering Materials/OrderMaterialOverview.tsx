@@ -88,7 +88,9 @@ const OrderMaterialOverview = () => {
 
 
 
-    const { data, isLoading, isError, error: getAllError, refetch } = useGetAllOrderingMaterialHistory(projectId!);
+    const { data, isLoading, isError,
+        //  error: getAllError,
+          refetch } = useGetAllOrderingMaterialHistory(projectId!);
     const { mutateAsync: generateLink, isPending: generatePending } = useOrderHistoryGneratePdf()
     // const { mutateAsync: updatePdfStatus } = useUpdatePdfStatus()
     const { mutateAsync: submitOrder, isPending: isSubmitting } = useOrderHistorySubmitOrder()
@@ -602,27 +604,56 @@ const OrderMaterialOverview = () => {
             } */}
 
             {isError && (
-                <div className="flex-1 flex items-center justify-center">
-                    <div className="max-w-xl w-full p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center">
-                        <div className="text-action-danger text-3xl mb-3">
-                            <i className="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-                        <div className="text-text-main text-lg font-bold mb-2">
-                            Error Occurred
-                        </div>
-                        <p className="text-text-muted text-sm mb-5">
-                            {(getAllError as any)?.response?.data?.message || "Failed to load ordering material"}
-                        </p>
-                        <Button
-                            isLoading={isLoading}
-                            onClick={() => refetch()}
-                            variant="outline"
-                            className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
-                        >
-                            Retry
-                        </Button>
-                    </div>
-                </div>
+                // <div className="flex-1 flex items-center justify-center">
+                //     <div className="max-w-xl w-full p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center">
+                //         <div className="text-action-danger text-3xl mb-3">
+                //             <i className="fa-solid fa-triangle-exclamation"></i>
+                //         </div>
+                //         <div className="text-text-main text-lg font-bold mb-2">
+                //             Error Occurred
+                //         </div>
+                //         <p className="text-text-muted text-sm mb-5">
+                //             {(getAllError as any)?.response?.data?.message || "Failed to load ordering material"}
+                //         </p>
+                //         <Button
+                //             isLoading={isLoading}
+                //             onClick={() => refetch()}
+                //             variant="outline"
+                //             className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+                //         >
+                //             Retry
+                //         </Button>
+                //     </div>
+                // </div>
+
+                 <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+              {/* Soft, neutral icon wrapper instead of a stark warning */}
+              <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+                <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
+              </div>
+
+              {/* Professional, non-alarming title */}
+              <div className="text-text-strong text-lg font-bold mb-2">
+                Stage Not Yet Available
+              </div>
+
+              {/* Clear explanation of the business logic */}
+              <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                {/* {(getAllError as any)?.response?.data?.message} */}
+                This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
+              </p>
+
+              {/* Neutral action button */}
+              <Button
+                onClick={() => refetch()}
+                variant="outline"
+                className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
+              >
+                <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
+              </Button>
+
+            </div>
             )}
 
             {/* Main Content - Only show if no error */}

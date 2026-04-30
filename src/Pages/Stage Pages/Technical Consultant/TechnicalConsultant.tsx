@@ -260,22 +260,51 @@ const TechnicalConsultant: React.FC = () => {
             <div className=" flex flex-col bg-brand-surface rounded-xl p-2 shadow-md custom-scrollbar min-h-[200px] sm:min-h-[170px] md:min-h-[190px] lg:min-h-[340px] border border-ash-medium mb-2 flex-grow max-h-[70vh] sm:!max-h-[30vh] md:!max-h-[30vh] lg:!max-h-[42vh] xl:!max-h-[49vh] overflow-y-auto ">
                 <div className="flex flex-col-reverse overflow-y-auto custom-scrollbar  flex-grow p-2  md:!max-h-full space-y-reverse space-y-4">
                     {(getMessageIsError || getMessageError) && (
-                        <div className="flex h-full items-center justify-center py-10">
-                            <div className="text-center">
-                                <i className="fas fa-ban text-6xl text-action-danger mb-4"></i>
-                                <p className="text-lg text-text-main">
-                                    {(getMessageError as any)?.response?.data?.message ||
-                                        (getMessageError as any)?.message ||
-                                        "Failed to load messages, please try again"}
-                                </p>
-                                <Button
-                                    onClick={() => refetch()}
-                                    // className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-                                    className="border-ash-medium text-text-main hover:bg-brand-ash shadow-sm"
-                                >
-                                    <i className="fas fa-redo mr-2"></i> Retry
-                                </Button>
+                        // <div className="flex h-full items-center justify-center py-10">
+                        //     <div className="text-center">
+                        //         <i className="fas fa-ban text-6xl text-action-danger mb-4"></i>
+                        //         <p className="text-lg text-text-main">
+                        //             {(getMessageError as any)?.response?.data?.message ||
+                        //                 (getMessageError as any)?.message ||
+                        //                 "Failed to load messages, please try again"}
+                        //         </p>
+                        //         <Button
+                        //             onClick={() => refetch()}
+                        //             // className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                        //             className="border-ash-medium text-text-main hover:bg-brand-ash shadow-sm"
+                        //         >
+                        //             <i className="fas fa-redo mr-2"></i> Retry
+                        //         </Button>
+                        //     </div>
+                        // </div>
+
+                        <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+                            {/* Soft, neutral icon wrapper instead of a stark warning */}
+                            <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+                                <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
                             </div>
+
+                            {/* Professional, non-alarming title */}
+                            <div className="text-text-strong text-lg font-bold mb-2">
+                                Stage Not Yet Available
+                            </div>
+
+                            {/* Clear explanation of the business logic */}
+                            <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                                {/* {(getAllError as any)?.response?.data?.message} */}
+                                This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
+                            </p>
+
+                            {/* Neutral action button */}
+                            <Button
+                                onClick={() => refetch()}
+                                variant="outline"
+                                className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
+                            >
+                                <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
+                            </Button>
+
                         </div>
                     )}
 
@@ -326,19 +355,19 @@ const TechnicalConsultant: React.FC = () => {
                                                 <div className="opacity-0 scale-95 group-hover:opacity-100 transition-all duration-300">
                                                     {(msg.sender._id === userId || role === "owner" || role === "CTO") && (
                                                         <div className="flex gap-2">
-                                                            {canEdit && 
-                                                            // <Button variant="secondary" onClick={() => handleEdit(msg._id, msg.message)} className="text-text-main text-sm">
-                                                            //     <i className="fas fa-edit"></i>
-                                                            // </Button>
+                                                            {canEdit &&
+                                                                // <Button variant="secondary" onClick={() => handleEdit(msg._id, msg.message)} className="text-text-main text-sm">
+                                                                //     <i className="fas fa-edit"></i>
+                                                                // </Button>
 
-                                                            <button 
-                                                                onClick={() => handleEdit(msg._id, msg.message)} 
-                                                                className="text-text-muted hover:text-action-primary transition-colors px-2 py-1"
-                                                                title="Edit Message"
-                                                            >
-                                                                <i className="fas fa-edit"></i>
-                                                            </button>
-                                                            
+                                                                <button
+                                                                    onClick={() => handleEdit(msg._id, msg.message)}
+                                                                    className="text-text-muted hover:text-action-primary transition-colors px-2 py-1"
+                                                                    title="Edit Message"
+                                                                >
+                                                                    <i className="fas fa-edit"></i>
+                                                                </button>
+
                                                             }
                                                             {/* <Button variant="danger" isLoading={deletePending} onClick={() => handleDelete(msg._id)} className="text-white bg-red-600 text-sm">
                                                             <i className="fas fa-trash"></i>
@@ -364,11 +393,11 @@ const TechnicalConsultant: React.FC = () => {
                                                         </Button> */}
 
                                                         <Button variant="white" onClick={handleCancelEdit} className="border-ash-medium text-text-main shadow-sm">
-                                                        Cancel
-                                                    </Button>
-                                                    <Button variant="dark" isLoading={editPending} onClick={handleEditSubmit} className="shadow-sm">
-                                                        Save
-                                                    </Button>
+                                                            Cancel
+                                                        </Button>
+                                                        <Button variant="dark" isLoading={editPending} onClick={handleEditSubmit} className="shadow-sm">
+                                                            Save
+                                                        </Button>
                                                     </div>
                                                 </div>
                                             ) : (
@@ -414,7 +443,7 @@ const TechnicalConsultant: React.FC = () => {
 
                                                         <div className="flex items-center gap-1 shrink-0">
                                                             {att.type === "image" && (
-                                                                <Button 
+                                                                <Button
                                                                     size="sm"
                                                                     variant="white"
                                                                     onClick={() => {
@@ -426,10 +455,10 @@ const TechnicalConsultant: React.FC = () => {
                                                                     <i className="fas fa-eye text-xs"></i>
                                                                 </Button>
                                                             )}
-                                                            <Button 
-                                                                size="sm" 
+                                                            <Button
+                                                                size="sm"
                                                                 variant="white"
-                                                                onClick={() => downloadImage({ src: att?.url, alt: att?.originalName || "file.pdf" })} 
+                                                                onClick={() => downloadImage({ src: att?.url, alt: att?.originalName || "file.pdf" })}
                                                                 className="h-7 w-7 p-0 border-ash-medium text-text-muted hover:text-action-primary"
                                                             >
                                                                 <i className="fa-solid fa-download text-xs"></i>
@@ -448,39 +477,39 @@ const TechnicalConsultant: React.FC = () => {
             </div>
 
             {/* Message Input Area */}
-            {(canCreate || canEdit) && 
-            <div className="bg-brand-surface border border-ash-medium px-4 py-2 rounded-xl shadow-md">
-                {/* <Label htmlFor="message">Your Message</Label> */}
-                <Label htmlFor="message" className="text-[11px] font-bold uppercase tracking-wider text-text-muted mb-2.5 flex items-center gap-2">
-                            <i className="fa-solid fa-pen-nib"></i> Compose Message
-                        </Label>
+            {(canCreate || canEdit) &&
+                <div className="bg-brand-surface border border-ash-medium px-4 py-2 rounded-xl shadow-md">
+                    {/* <Label htmlFor="message">Your Message</Label> */}
+                    <Label htmlFor="message" className="text-[11px] font-bold uppercase tracking-wider text-text-muted mb-2.5 flex items-center gap-2">
+                        <i className="fa-solid fa-pen-nib"></i> Compose Message
+                    </Label>
 
-                <div className="flex flex-col sm:flex-row gap-2 mb-3">
-                    <Input
-                        id="message"
-                        placeholder="Write something..."
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                handleSend()
-                            }
-                        }}
-                        // className="flex-grow"
-                        className="flex-grow bg-brand-ash border-ash-medium text-text-main focus:ring-ash-medium placeholder:text-text-muted"
-                    />
-                    <Button
-                        isLoading={sendMessagePending}
-                        onClick={handleSend}
-                        variant="dark"
-                        // className="w-full sm:w-auto"
-                        className="w-full sm:w-auto px-8 shadow-sm shrink-0"
-                    >
-                        Send <i className="ml-2 fa-solid fa-paper-plane"></i>
-                    </Button>
-                </div>
+                    <div className="flex flex-col sm:flex-row gap-2 mb-3">
+                        <Input
+                            id="message"
+                            placeholder="Write something..."
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    handleSend()
+                                }
+                            }}
+                            // className="flex-grow"
+                            className="flex-grow bg-brand-ash border-ash-medium text-text-main focus:ring-ash-medium placeholder:text-text-muted"
+                        />
+                        <Button
+                            isLoading={sendMessagePending}
+                            onClick={handleSend}
+                            variant="dark"
+                            // className="w-full sm:w-auto"
+                            className="w-full sm:w-auto px-8 shadow-sm shrink-0"
+                        >
+                            Send <i className="ml-2 fa-solid fa-paper-plane"></i>
+                        </Button>
+                    </div>
 
-                {/* {(canCreate || canEdit) && <>  <Label>Attach Files (PDF or Image)</Label>
+                    {/* {(canCreate || canEdit) && <>  <Label>Attach Files (PDF or Image)</Label>
                 
                     <Input
                         type="file"
@@ -492,21 +521,21 @@ const TechnicalConsultant: React.FC = () => {
                 </>
                 } */}
 
-                <div className="pt-3 border-t border-ash-light">
-                            <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-2 flex items-center gap-2">
-                                <i className="fa-solid fa-paperclip"></i> Attach Files (PDF or Image)
-                            </Label>
-                            <Input
-                                id="file-upload"
-                                type="file"
-                                multiple
-                                accept=".pdf,image/*"
-                                onChange={(e) => setAttachments(Array.from(e.target.files || []))}
-                                className="w-full bg-brand-ash border border-ash-medium text-text-main file:bg-brand-surface file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
-                            />
-                        </div>
+                    <div className="pt-3 border-t border-ash-light">
+                        <Label className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-2 flex items-center gap-2">
+                            <i className="fa-solid fa-paperclip"></i> Attach Files (PDF or Image)
+                        </Label>
+                        <Input
+                            id="file-upload"
+                            type="file"
+                            multiple
+                            accept=".pdf,image/*"
+                            onChange={(e) => setAttachments(Array.from(e.target.files || []))}
+                            className="w-full bg-brand-ash border border-ash-medium text-text-main file:bg-brand-surface file:text-text-main file:border-ash-medium file:rounded-md file:px-3 file:py-1 file:mr-3 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-ash-medium transition-all shadow-sm"
+                        />
+                    </div>
 
-            </div>}
+                </div>}
 
             {/* Image Preview Modal */}
             {previewImage && (
@@ -519,12 +548,12 @@ const TechnicalConsultant: React.FC = () => {
                         className="bg-brand-surface p-2 sm:p-4 rounded-lg shadow-lg max-w-[90%] max-h-[90%] overflow-auto relative"
                     >
                         <div className="flex justify-end mb-2">
-                          <button
-                            onClick={() => setPreviewImage(null)}
-                            className="absolute -top-4 -right-4 bg-brand-surface border border-ash-medium text-text-main hover:bg-brand-ash rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all z-10"
-                        >
-                            <i className="fas fa-times text-lg"></i>
-                        </button>
+                            <button
+                                onClick={() => setPreviewImage(null)}
+                                className="absolute -top-4 -right-4 bg-brand-surface border border-ash-medium text-text-main hover:bg-brand-ash rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all z-10"
+                            >
+                                <i className="fas fa-times text-lg"></i>
+                            </button>
                         </div>
 
                         <div className="relative min-w-80 ">

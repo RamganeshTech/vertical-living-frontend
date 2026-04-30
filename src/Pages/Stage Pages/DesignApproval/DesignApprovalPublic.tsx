@@ -144,7 +144,7 @@ const DesignApprovalPublic: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen w-full  bg-brand-ash font-sans">
+        <div className="min-h-screen overflow-hidden w-full  bg-brand-ash font-sans">
             {/* ================= HEADER ================= */}
             <header className="sticky top-0 z-50 bg-brand-surface border-b border-ash-medium shadow-sm px-4 sm:px-8 py-4 flex justify-between items-center">
                 <div className="flex items-center gap-3">
@@ -223,8 +223,8 @@ const DesignApprovalPublic: React.FC = () => {
                                                     <ImageGalleryExample
                                                         imageFiles={imageFiles}
                                                         refetch={refetch}
-                                                        height={120}
-                                                        minWidth={120}
+                                                        height={100}
+                                                        minWidth={100}
                                                         maxWidth={200}
                                                     // popupWidth="100vw"
                                                     // popupHeight="90vh"
@@ -315,12 +315,12 @@ const DesignApprovalPublic: React.FC = () => {
                                                         className="w-full text-sm p-3 rounded-xl border border-ash-medium bg-brand-surface focus:ring-2 focus:ring-action-primary outline-none resize-none h-24 mb-6"
                                                     />
 
-                                                    <div className="flex gap-3">
+                                                    <div className="flex flex-wrap gap-3 ">
 
 
                                                         <Button
                                                             variant="outline"
-                                                            className="w-full border-ash-dark text-text-main hover:bg-brand-ash py-4 rounded-xl text-sm transition-colors"
+                                                            className="w-full !border-ash-dark text-text-main  hover:bg-brand-ash rounded-xl text-sm transition-colors"
                                                             isLoading={submitPending}
                                                             // Passing "Pending" keeps the phase active, but still updates the database with their text!
                                                             onClick={() => handleSubmit("Pending", phase._id)}
@@ -340,7 +340,7 @@ const DesignApprovalPublic: React.FC = () => {
                                                         </Button>
                                                         <Button
                                                             variant="outline"
-                                                            className="w-full border-action-danger text-text-main hover:text-text-main rounded-xl text-base transition-colors"
+                                                            className="w-full !border-ash-dark text-text-main hover:text-text-main rounded-xl text-base transition-colors"
                                                             isLoading={submitPending}
                                                             // onClick={() => handleSubmit("Revision_Requested")}
                                                             onClick={() => handleSubmit("Revision_Requested", phase._id)}
@@ -354,7 +354,7 @@ const DesignApprovalPublic: React.FC = () => {
                                     )}
 
                                     {/* RIGHT SIDE (Read-Only history for older phases) */}
-                                    {phase.feedbacks && phase.feedbacks.length > 0 && (
+                                    {/* {phase.feedbacks && phase.feedbacks.length > 0 && (
                                         <div className="w-full lg:w-1/3">
                                             <Card className="bg-brand-surface border-ash-medium p-5 rounded-2xl shadow-sm h-full">
                                                 <h3 className="text-lg font-bold text-text-strong mb-4">Past Feedback</h3>
@@ -364,10 +364,9 @@ const DesignApprovalPublic: React.FC = () => {
                                                         <p className="text-sm text-text-main mt-1 italic">"{phase.clientOverallComment}"</p>
                                                     </div>
                                                 )}
-                                                {/* You could map over specific file feedbacks here if desired! */}
                                             </Card>
                                         </div>
-                                    )}
+                                    )} */}
 
                                 </div>
                             );

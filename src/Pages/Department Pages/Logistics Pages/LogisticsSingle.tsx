@@ -249,7 +249,7 @@
 
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetSinglShipment, useSyncAccountsLogistics } from "../../../apiList/Department Api/Logistics Api/logisticsApi";
+import { useGetSinglShipment, useSyncAccountingFromLogistics } from "../../../apiList/Department Api/Logistics Api/logisticsApi";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Separator } from "../../../components/ui/Seperator";
 import { Badge } from "../../../components/ui/Badge";
@@ -301,7 +301,7 @@ const LogisticsSingle: React.FC = () => {
     const { id, organizationId } = useParams() as { id: string, organizationId: string };
     const navigate = useNavigate();
     const { data: shipment, isLoading, refetch } = useGetSinglShipment(id);
-    const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountsLogistics();
+    const { mutateAsync: syncAccounts, isPending: syncAccountsLoading } = useSyncAccountingFromLogistics();
 
     const [editingShipment, setEditingShipment] = useState<any | null>(null);
     const [showForm, setShowForm] = useState(false);
@@ -341,7 +341,7 @@ const LogisticsSingle: React.FC = () => {
 
 
     // 🚀 WebSocket for real-time location updates
-     useLogisticsWebSocket({
+    useLogisticsWebSocket({
         organizationId,
         enabled: !!shipment && ["in_transit", "pickedup"].includes(shipment?.shipmentStatus || ""),
         onLocationUpdate: (data) => {
@@ -361,17 +361,14 @@ const LogisticsSingle: React.FC = () => {
         }
     });
 
-    
+
 
     const handleGenerateAccounts = async () => {
         try {
             await syncAccounts({
-                fromDept: "logistics",
-                organizationId,
-                projectId: shipment?.projectId,
-                upiId: shipment?.vehicleDetails.driverUpiId || null,
-                totalCost: shipment?.vehicleDetails?.driverCharge
+                shipmentId: id
             });
+            refetch()
             toast({ title: "Success", description: "Details sent to Accounts Department" });
         } catch (error: any) {
             toast({
@@ -461,9 +458,13 @@ const LogisticsSingle: React.FC = () => {
 
 
                         <Button
-                            variant="primary"
+                            variant="dark"
+                            disabled={shipment?.isSyncWithAccounts}
+                            className={`${shipment?.isSyncWithAccounts ? "!cursor-not-allowed" : ""}`}
+                            title={shipment?.isSyncWithAccounts ? "Already sent to Accounts Dept" : ""}
                             isLoading={syncAccountsLoading}
                             onClick={handleGenerateAccounts}
+
                         >
                             Send To Accounts Dept
                         </Button>

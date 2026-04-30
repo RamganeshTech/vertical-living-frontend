@@ -50,7 +50,7 @@ export const wallSectionSop = [
 
 
 export default function QualityCheckOverview() {
-  const { projectId, organizationId } = useParams() as {projectId:string, organizationId:string}
+  const { projectId, organizationId } = useParams() as { projectId: string, organizationId: string }
   const location = useLocation();
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>();
   const navigate = useNavigate()
@@ -68,7 +68,7 @@ export default function QualityCheckOverview() {
     data,
     isLoading,
     isError,
-    error: getAllError,
+    // error: getAllError,
     refetch,
   } = useGetQualityCheckup(projectId);
 
@@ -127,60 +127,65 @@ export default function QualityCheckOverview() {
             </h2>
 
             {(canCreate || canEdit) && <>
-            <div className="!w-[100%] sm:!w-[100%] lg:!w-[50%] xl:!w-[65%] flex flex-col sm:flex-row gap-2 justify-end">
-              <Button
-                isLoading={completePending}
-                onClick={handleCompletionStatus}
-                // className="bg-green-600 h-10 hover:bg-green-700 text-white w-full sm:w-auto"
-                variant="dark"
-                        className="flex-1 sm:flex-none px-6 shadow-sm min-w-max"
-              >
-                <i className="fa-solid fa-circle-check mr-2"></i>
-                <span className="hidden sm:inline">Mark as Complete</span>
-                <span className="inline sm:hidden">Complete</span>
-              </Button>
+              <div className="!w-[100%] sm:!w-[100%] lg:!w-[50%] xl:!w-[65%] flex flex-col sm:flex-row gap-2 justify-end">
+                <Button
+                  isLoading={completePending}
+                  onClick={handleCompletionStatus}
+                  // className="bg-green-600 h-10 hover:bg-green-700 text-white w-full sm:w-auto"
+                  variant="dark"
+                  className="flex-1 sm:flex-none px-6 shadow-sm min-w-max"
+                >
+                  <i className="fa-solid fa-circle-check mr-2"></i>
+                  <span className="hidden sm:inline">Mark as Complete</span>
+                  <span className="inline sm:hidden">Complete</span>
+                </Button>
 
-              <ResetStageButton
-                projectId={projectId!}
-                stageNumber={12}
-                stagePath="qualitycheck"
-                className="w-full sm:w-auto"
-              />
+                <ResetStageButton
+                  projectId={projectId!}
+                  stageNumber={12}
+                  stagePath="qualitycheck"
+                  className="w-full sm:w-auto"
+                />
 
-              {/* {!getAllError && <ShareDocumentWhatsapp
+                {/* {!getAllError && <ShareDocumentWhatsapp
                 projectId={projectId!}
                 stageNumber="12"
                 className="w-full sm:w-fit"
                 isStageCompleted={data?.status}
               />} */}
 
-              <AssignStageStaff
-                stageName="QualityCheckupModel"
-                projectId={projectId!}
-                organizationId={organizationId!}
-                currentAssignedStaff={data?.assignedTo || null}
-                className="w-full sm:w-auto"
-              />
+                <AssignStageStaff
+                  stageName="QualityCheckupModel"
+                  projectId={projectId!}
+                  organizationId={organizationId!}
+                  currentAssignedStaff={data?.assignedTo || null}
+                  className="w-full sm:w-auto"
+                />
 
-            </div>
-              
+              </div>
+
 
 
 
             </>
             }
             <div className="w-full sm:w-auto flex justify-end sm:block">
-                <StageGuide
-                  organizationId={organizationId!}
-                  stageName="qualitycheck"
-                />
-              </div>
+              <StageGuide
+                organizationId={organizationId!}
+                stageName="qualitycheck"
+              />
+            </div>
           </div>
 
           {isError ? (
-            // <div className="max-w-xl mx-auto p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-            //   <div className="text-red-600 text-xl font-semibold mb-2">⚠️ Oops! An Error Occurred</div>
-            //   <p className="text-red-500 text-sm mb-4">
+
+
+            // <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
+            //   <div className="text-action-danger text-3xl mb-3">
+            //       <i className="fa-solid fa-triangle-exclamation"></i>
+            //   </div>
+            //   <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
+            //   <p className="text-text-muted text-sm mb-5">
             //     {(getAllError as any)?.response?.data?.message ||
             //       (getAllError as any)?.message ||
             //       "Failed to load, please try again"}
@@ -188,30 +193,40 @@ export default function QualityCheckOverview() {
             //   <Button
             //     isLoading={isLoading}
             //     onClick={() => refetch()}
-            //     className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 transition"
+            //     variant="outline"
+            //     className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
             //   >
             //     Retry
             //   </Button>
             // </div>
 
-            <div className="max-w-xl mx-auto p-6 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mt-8">
-              <div className="text-action-danger text-3xl mb-3">
-                  <i className="fa-solid fa-triangle-exclamation"></i>
+            <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+              {/* Soft, neutral icon wrapper instead of a stark warning */}
+              <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+                <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
               </div>
-              <div className="text-text-main text-lg font-bold mb-2">Error Occurred</div>
-              <p className="text-text-muted text-sm mb-5">
-                {(getAllError as any)?.response?.data?.message ||
-                  (getAllError as any)?.message ||
-                  "Failed to load, please try again"}
+
+              {/* Professional, non-alarming title */}
+              <div className="text-text-strong text-lg font-bold mb-2">
+                Stage Not Yet Available
+              </div>
+
+              {/* Clear explanation of the business logic */}
+              <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                {/* {(getAllError as any)?.response?.data?.message} */}
+                This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
               </p>
+
+              {/* Neutral action button */}
               <Button
-                isLoading={isLoading}
                 onClick={() => refetch()}
                 variant="outline"
-                className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+                className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
               >
-                Retry
+                <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
               </Button>
+
             </div>
           ) : (
             <>
@@ -222,7 +237,7 @@ export default function QualityCheckOverview() {
                   <span>Stage Timings</span>
                 </div> */}
 
-                <Card className="p-5 mb-8 shadow-none border-2 border-ash-medium rounded-xl bg-brand-surface w-full">
+              <Card className="p-5 mb-8 shadow-none border-2 border-ash-medium rounded-xl bg-brand-surface w-full">
                 <div className="flex items-center gap-2 text-text-main text-sm font-bold mb-4 uppercase tracking-wide border-b border-ash-light pb-3">
                   <i className="fa-regular fa-clock text-ash-dark text-base" />
                   <span>Stage Timings</span>
@@ -244,10 +259,10 @@ export default function QualityCheckOverview() {
               {/* <h3 className="text-xl text-blue-600 font-semibold mb-2">Rooms</h3> */}
 
               <div className="flex items-center gap-3 mb-5 border-b border-ash-light pb-3">
-                  <div className="w-8 h-8 rounded-lg bg-brand-surface border border-ash-medium flex items-center justify-center shadow-sm">
-                      <i className="fa-solid fa-door-open text-text-muted text-sm"></i>
-                  </div>
-                  <h3 className="text-lg font-bold text-text-main">Rooms Overview</h3>
+                <div className="w-8 h-8 rounded-lg bg-brand-surface border border-ash-medium flex items-center justify-center shadow-sm">
+                  <i className="fa-solid fa-door-open text-text-muted text-sm"></i>
+                </div>
+                <h3 className="text-lg font-bold text-text-main">Rooms Overview</h3>
               </div>
 
 
@@ -270,19 +285,19 @@ export default function QualityCheckOverview() {
                       <p className="text-xs text-gray-400">Click to view details</p> */}
 
                       <div className="flex items-start justify-between mb-4">
-                            <h3 className="text-base font-bold text-text-main capitalize leading-tight group-hover:text-action-primary transition-colors">
-                                {room?.roomName?.replace(/([A-Z])/g, " $1").trim()}
-                            </h3>
-                            <div className="w-8 h-8 rounded-full bg-brand-ash border border-ash-light flex items-center justify-center shrink-0">
-                                <i className="fa-solid fa-arrow-right text-text-muted text-[10px] -rotate-45 group-hover:rotate-0 transition-transform"></i>
-                            </div>
+                        <h3 className="text-base font-bold text-text-main capitalize leading-tight group-hover:text-action-primary transition-colors">
+                          {room?.roomName?.replace(/([A-Z])/g, " $1").trim()}
+                        </h3>
+                        <div className="w-8 h-8 rounded-full bg-brand-ash border border-ash-light flex items-center justify-center shrink-0">
+                          <i className="fa-solid fa-arrow-right text-text-muted text-[10px] -rotate-45 group-hover:rotate-0 transition-transform"></i>
                         </div>
+                      </div>
 
-                        <div className="mt-auto">
-                            <p className="text-sm font-bold text-text-main bg-brand-ash px-3 py-1.5 rounded-lg border border-ash-light w-fit shadow-sm">
-                                {room?.tasks?.length || 0} <span className="text-text-muted font-medium">tasks</span>
-                            </p>
-                        </div>
+                      <div className="mt-auto">
+                        <p className="text-sm font-bold text-text-main bg-brand-ash px-3 py-1.5 rounded-lg border border-ash-light w-fit shadow-sm">
+                          {room?.tasks?.length || 0} <span className="text-text-muted font-medium">tasks</span>
+                        </p>
+                      </div>
 
                     </Link>
                   ))
@@ -296,12 +311,12 @@ export default function QualityCheckOverview() {
                     </div> */}
 
                     <div className="col-span-full bg-brand-surface border border-dashed border-ash-medium rounded-xl h-full flex flex-col items-center justify-center py-16 shadow-sm">
-                    <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-4 shadow-sm">
+                      <div className="w-16 h-16 bg-brand-ash border border-ash-light rounded-full flex items-center justify-center mb-4 shadow-sm">
                         <i className="fas fa-door-open text-2xl text-ash-dark"></i>
+                      </div>
+                      <h2 className="text-lg font-bold text-text-main mb-1">No Rooms Found</h2>
+                      <p className="text-sm text-text-muted">Add rooms in client requirement stage</p>
                     </div>
-                    <h2 className="text-lg font-bold text-text-main mb-1">No Rooms Found</h2>
-                    <p className="text-sm text-text-muted">Add rooms in client requirement stage</p>
-                  </div>
 
                   </>
                 }

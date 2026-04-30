@@ -96,6 +96,49 @@ export const deleteMatArrImageByStaffV1 = async (
     return res.data;
 };
 
+// --- API Function ---
+export const syncMaterialArrivalToAccountsApi = async ({
+  projectId,
+  payload,
+  api
+}: {
+  projectId: string;
+  payload: { materialArrivalDeptNumber: string };
+  api: AxiosInstance;
+}) => {
+  const res = await api.put(`/materialarrivalcheck/syncmaterialarrival-with-accounts/${projectId}`, payload);
+  // Assuming this endpoint returns a direct standard response structure like your updateImage one
+  return res.data; 
+};
+
+// --- React Query Hook ---
+export const useSyncMaterialArrivalToAccounts = () => {
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+  const queryClient = useQueryClient();
+  // Matching your backend middleware roles for this specific route
+  const allowedRoles = ["owner", "staff", "CTO",]; 
+
+  return useMutation({
+    mutationFn: async ({
+      projectId,
+      payload
+    }: {
+      projectId: string;
+      payload: { materialArrivalDeptNumber: string };
+    }) => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed");
+      if (!api) throw new Error("API instance not available");
+
+      return await syncMaterialArrivalToAccountsApi({ projectId, payload, api });
+    },
+    onSuccess: (_, { projectId }) => {
+      // Invalidate the specific project's arrival data and the global accounting ledger
+      queryClient.invalidateQueries({ queryKey: ["material-arrival", projectId] });
+      queryClient.invalidateQueries({ queryKey: ['accounting'] }); 
+    },
+  });
+};
 
 
 

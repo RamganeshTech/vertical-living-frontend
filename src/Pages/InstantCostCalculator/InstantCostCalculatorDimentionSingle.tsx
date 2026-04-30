@@ -17,7 +17,7 @@ import { Label } from "../../components/ui/Label";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import SearchSelectNew from "../../components/ui/SearchSelectNew";
-import { useGetCostCalculatorProduct, useUpsertCostCalculatorProduct } from "../../apiList/Quote Api/RateConfig Api/instantCostCalculatorApi";
+import { useGetCostCalculatorProduct, useUpsertCostCalculatorProduct } from "../../apiList/Quote Api/RateConfig Api/instantCostCalculator_Api/instantCostCalculatorApi";
 import { toast } from "../../utils/toast";
 
 interface MaterialState {
@@ -343,7 +343,7 @@ export const InstantCostCalculatorDimentionSingle: React.FC = () => {
             const formatted = results.map((item: any) => {
                 // const brandOnly = item.data?.Brand || item.data?.BrandName || item.data?.brand || 'Unknown';
                 const brandOnly =
-                 item.data?.Brand || item.data?.BrandName || item.data?.brand || item.data?.brandName ||
+                    item.data?.Brand || item.data?.BrandName || item.data?.brand || item.data?.brandName ||
                     item.data?.["Brands light name"] || item.data?.["Brand "] || item.data?.["Brands "] ||
                     item.data?.["BRAND NAME "] || item.data?.["Brand Name"] || 'Unknown';
 
@@ -507,9 +507,9 @@ export const InstantCostCalculatorDimentionSingle: React.FC = () => {
             setIsFormDirty(false); // Optional UX reset
 
             toast({ title: "Success", description: "Saved Successfully" })
-        } catch (error:any) {
+        } catch (error: any) {
             console.error("Save failed", error);
-            toast({ title: "Error", description: error?.response?.data?.message || "something went wrong", variant:"destructive" })
+            toast({ title: "Error", description: error?.response?.data?.message || "something went wrong", variant: "destructive" })
 
         }
     };

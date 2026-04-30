@@ -19,7 +19,7 @@ import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 import StageGuide from "../../../shared/StageGuide";
 
 const SampleDesignModule: React.FC = () => {
-  const { projectId, organizationId } = useParams() as{projectId:string, organizationId:string};
+  const { projectId, organizationId } = useParams() as { projectId: string, organizationId: string };
   const { isMobile, openMobileSidebar } = useOutletContext<ProjectDetailsOutlet>()
   const navigate = useNavigate()
 
@@ -147,7 +147,7 @@ const SampleDesignModule: React.FC = () => {
         <div className="!w-[100%] sm:!w-[100%] lg:!w-[50%] xl:!w-[65%] flex flex-col sm:flex-row gap-3 justify-end">
           <div className="flex  flex-wrap md:flex-nowrap gap-2 justify-end">
             {(canCreate || canEdit) && <Button
-            variant="white"
+              variant="white"
               onClick={() => setShowAddRoomModal(true)}
               // className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-initial min-w-max"
               disabled={!!getAllError}
@@ -158,7 +158,7 @@ const SampleDesignModule: React.FC = () => {
             </Button>}
 
             {(canCreate || canEdit) && <Button
-            variant="dark"
+              variant="dark"
               isLoading={completePending}
               onClick={handleCompletionStatus}
               // className="bg-green-600 hover:bg-green-700 text-white flex-1 sm:flex-initial min-w-max"
@@ -226,23 +226,52 @@ const SampleDesignModule: React.FC = () => {
       )} */}
 
       {getAllError && (
-        <div className="max-w-xl mx-auto p-5 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mb-6">
-          <div className="text-action-danger text-2xl mb-3">
-            <i className="fa-solid fa-triangle-exclamation"></i>
+        // <div className="max-w-xl mx-auto p-5 bg-brand-surface border border-action-danger rounded-xl shadow-sm text-center mb-6">
+        //   <div className="text-action-danger text-2xl mb-3">
+        //     <i className="fa-solid fa-triangle-exclamation"></i>
+        //   </div>
+        //   <div className="text-text-main font-bold mb-2">
+        //     Error Occurred
+        //   </div>
+        //   <p className="text-text-muted text-sm mb-5">
+        //     {(getAllError as any)?.response?.data?.message || "Failed to load data"}
+        //   </p>
+        //   <Button
+        //     onClick={() => refetch()}
+        //     variant="outline"
+        //     className="hover:bg-brand-ash hover:text-action-danger hover:border-action-danger text-text-main border-ash-medium"
+        //   >
+        //     Retry
+        //   </Button>
+        // </div>
+
+        <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+          {/* Soft, neutral icon wrapper instead of a stark warning */}
+          <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+            <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
           </div>
-          <div className="text-text-main font-bold mb-2">
-            Error Occurred
+
+          {/* Professional, non-alarming title */}
+          <div className="text-text-strong text-lg font-bold mb-2">
+            Stage Not Yet Available
           </div>
-          <p className="text-text-muted text-sm mb-5">
-            {(getAllError as any)?.response?.data?.message || "Failed to load data"}
+
+          {/* Clear explanation of the business logic */}
+          <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+            {/* {(getAllError as any)?.response?.data?.message} */}
+            This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
           </p>
+
+          {/* Neutral action button */}
           <Button
             onClick={() => refetch()}
             variant="outline"
-            className="hover:bg-brand-ash hover:text-action-danger hover:border-action-danger text-text-main border-ash-medium"
+            className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
           >
-            Retry
+            <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
           </Button>
+
         </div>
       )}
 
@@ -256,7 +285,7 @@ const SampleDesignModule: React.FC = () => {
               <span>Stage Timings</span>
             </div> */}
 
-            <Card className="p-5 mb-6 w-full shadow-sm border border-ash-medium rounded-xl bg-brand-surface">
+          <Card className="p-5 mb-6 w-full shadow-sm border border-ash-medium rounded-xl bg-brand-surface">
             <div className="flex items-center gap-2 text-text-main text-sm font-bold mb-4 uppercase tracking-wide border-b border-ash-light pb-3">
               <i className="fa-regular fa-clock text-ash-dark text-base"></i>
               <span>Stage Timings</span>
@@ -284,11 +313,11 @@ const SampleDesignModule: React.FC = () => {
             </Link>
           </Card> */}
 
-          
 
 
 
-<Link to={`shortlist`} className="block mb-8 m-[2px]"> {/* Added m-[2px] to fix clipping */}
+
+          <Link to={`shortlist`} className="block mb-8 m-[2px]"> {/* Added m-[2px] to fix clipping */}
             <Card className="bg-brand-surface border border-ash-medium rounded-xl shadow-sm hover:border-text-muted hover:shadow-md transition-all cursor-pointer group">
               <div className="py-4 px-5 flex justify-between items-center">
                 <div className="flex items-center gap-4">
@@ -303,7 +332,7 @@ const SampleDesignModule: React.FC = () => {
               </div>
             </Card>
           </Link>
-         
+
 
           {/* Rooms Content */}
           {(!sampleDesign?.rooms || sampleDesign.rooms.length === 0) ? (
@@ -315,7 +344,7 @@ const SampleDesignModule: React.FC = () => {
               {/* <p className="text-gray-500 mb-6 max-w-md mx-auto">Start by adding a room to upload design files</p> */}
               <p className="text-sm text-text-muted mb-6 max-w-md mx-auto">Start by adding a room to organize and upload design files.</p>
               {(canCreate || canEdit) && <Button
-              variant="dark"
+                variant="dark"
                 onClick={() => setShowAddRoomModal(true)}
                 // className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 min-w-[200px]"
                 className="px-6"

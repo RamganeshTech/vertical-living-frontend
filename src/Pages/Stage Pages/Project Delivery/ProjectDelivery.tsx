@@ -146,7 +146,7 @@ export default function ProjectDeliveryPanel() {
     <div className="w-full sm:min-h-full sm:overflow-y-auto bg-brand-surface space-y-6 py-1 sm:py-0">
       {/* Header */}
       {/* <div className="flex flex-col sm:flex-row justify-between items-start lg:items-center gap-4pb-4"> */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 mb-8 pb-4 border-b border-ash-light">
+      <div className="flex flex-col sm:flex-row justify-between items-start lg:items-center gap-5 mb-8 pb-4 border-b border-ash-light">
         {/* <h2 className="text-2xl sm:text-3xl font-semibold text-blue-600 flex items-center"> */}
         <h2 className="text-xl sm:text-3xl font-bold text-text-main flex items-center">
           {isMobile && (
@@ -166,7 +166,9 @@ export default function ProjectDeliveryPanel() {
           Project Delivery
         </h2>
 
-        <> {(canCreate || canEdit) && <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <section className="flex gap-2 items-center">  
+        {(canCreate || canEdit) && 
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Button
             isLoading={completePending}
             onClick={handleCompletionStatus}
@@ -201,14 +203,19 @@ export default function ProjectDeliveryPanel() {
               stageName="projectdelivery"
             />
           </div>
-        </>
+        </section>
       </div>
 
       {/* If error, show only above header and handle block */}
       {fetchError ? (
-        // <div className="max-w-xl mx-auto bg-red-50 border border-red-200 rounded-lg shadow p-6 text-center">
-        //   <div className="text-red-600 text-xl font-bold mb-2">⚠️ Error Loading Data</div>
-        //   <p className="text-sm text-red-500 mb-4">
+
+
+        // <div className="max-w-xl mx-auto bg-brand-surface border border-action-danger rounded-xl shadow-sm p-6 text-center mt-8">
+        //   <div className="text-action-danger text-3xl font-bold mb-3">
+        //     <i className="fa-solid fa-triangle-exclamation"></i>
+        //   </div>
+        //   <div className="text-text-main text-lg font-bold mb-2">Error Loading Data</div>
+        //   <p className="text-sm text-text-muted mb-5">
         //     {(fetchError as any)?.response?.data?.message ||
         //       (fetchError as any)?.message ||
         //       "Something went wrong while fetching project delivery details."}
@@ -216,31 +223,42 @@ export default function ProjectDeliveryPanel() {
         //   <Button
         //     onClick={() => refetch()}
         //     isLoading={isLoading}
-        //     className="bg-red-600 hover:bg-red-700 text-white"
+        //     variant="outline"
+        //     className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
         //   >
         //     Retry
         //   </Button>
         // </div>
 
-        <div className="max-w-xl mx-auto bg-brand-surface border border-action-danger rounded-xl shadow-sm p-6 text-center mt-8">
-          <div className="text-action-danger text-3xl font-bold mb-3">
-            <i className="fa-solid fa-triangle-exclamation"></i>
+        <div className="max-w-xl mx-auto p-8 bg-brand-surface border-2 border-ash-medium rounded-xl shadow-sm text-center mt-8">
+
+          {/* Soft, neutral icon wrapper instead of a stark warning */}
+          <div className="w-16 h-16 bg-brand-surface-hover rounded-full flex items-center justify-center mx-auto mb-4 border border-ash-medium shadow-sm">
+            <i className="fa-solid fa-lock text-text-muted text-2xl"></i>
           </div>
-          <div className="text-text-main text-lg font-bold mb-2">Error Loading Data</div>
-          <p className="text-sm text-text-muted mb-5">
-            {(fetchError as any)?.response?.data?.message ||
-              (fetchError as any)?.message ||
-              "Something went wrong while fetching project delivery details."}
+
+          {/* Professional, non-alarming title */}
+          <div className="text-text-strong text-lg font-bold mb-2">
+            Stage Not Yet Available
+          </div>
+
+          {/* Clear explanation of the business logic */}
+          <p className="text-text-muted text-sm mb-6 max-w-md mx-auto leading-relaxed">
+            {/* {(getAllError as any)?.response?.data?.message} */}
+            This section is currently locked. Please ensure all required steps in the previous stage are fully completed before accessing this information.
           </p>
+
+          {/* Neutral action button */}
           <Button
             onClick={() => refetch()}
-            isLoading={isLoading}
             variant="outline"
-            className="border-ash-medium text-text-main hover:text-action-danger hover:border-action-danger hover:bg-brand-ash transition-all px-6 shadow-sm"
+            className="border-ash-medium text-text-main hover:text-action-primary hover:border-action-primary hover:bg-brand-surface-hover transition-all px-3 shadow-sm"
           >
-            Retry
+            <i className="fas fa-sync-alt mr-2 text-text-soft"></i> Refresh
           </Button>
+
         </div>
+
       ) : (
         <>
           {/* Stage Timer */}
@@ -468,8 +486,8 @@ export default function ProjectDeliveryPanel() {
                 onClick={() => handleConfirm("client")}
                 variant={data?.clientConfirmation ? "dark" : "outline"}
                 className={`w-full py-3.5 shadow-sm transition-all ${data?.clientConfirmation
-                    ? "bg-action-success border-action-success hover:bg-action-success/90"
-                    : "border-ash-medium text-text-main hover:bg-brand-ash"
+                  ? "bg-action-success border-action-success hover:bg-action-success/90"
+                  : "border-ash-medium text-text-main hover:bg-brand-ash"
                   }`}
               >
                 <i className={`fas ${data?.clientConfirmation ? "fa-check" : "fa-shield-halved"} mr-2`} />
@@ -482,8 +500,8 @@ export default function ProjectDeliveryPanel() {
                 onClick={() => handleConfirm("owner")}
                 variant={data?.ownerConfirmation ? "dark" : "outline"}
                 className={`w-full py-3.5 shadow-sm transition-all ${data?.ownerConfirmation
-                    ? "bg-action-success border-action-success hover:bg-action-success/90"
-                    : "border-ash-medium text-text-main hover:bg-brand-ash"
+                  ? "bg-action-success border-action-success hover:bg-action-success/90"
+                  : "border-ash-medium text-text-main hover:bg-brand-ash"
                   }`}
               >
                 <i className={`fas ${data?.ownerConfirmation ? "fa-check" : "fa-shield-halved"} mr-2`} />

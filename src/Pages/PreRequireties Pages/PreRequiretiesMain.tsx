@@ -313,24 +313,7 @@ const PrerequisitesPage: React.FC = () => {
 
     if (!data?.data) {
         return (
-            // <div className="container mx-auto px-4 py-8 max-w-4xl">
-            //     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            //         <div className="flex items-center">
-            //             <i className="fas fa-exclamation-circle text-yellow-600 mr-2"></i>
-            //             <p className="text-yellow-800">
-            //                 No prerequisites data found for this project. Please ensure the project exists and try again.
-            //             </p>
-            //         </div>
-            //     </div>
-            //     <div className="mt-4 text-center">
-            //         <button
-            //             onClick={() => refetch()}
-            //             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-            //         >
-            //             Refresh
-            //         </button>
-            //     </div>
-            // </div>
+           
 
             <div className="container mx-auto px-4 py-8 max-w-4xl">
                 <div className="bg-white border border-yellow-200 rounded-xl p-6 text-center shadow-sm">
