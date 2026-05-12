@@ -8,8 +8,10 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
-const WhatsAppLeadsPage = lazy(() => import( './Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadMain'));
-const  WhatsAppLeadSingle  = lazy(() => import( './Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadSingle'));
+const MetaLeadMain  = lazy(() => import( './Pages/Lead_pages/MetaLead_Pages/MetaLeadMain'));
+const MetaLeadSingle  = lazy(() => import( './Pages/Lead_pages/MetaLead_Pages/MetaLeadSingle'));
+const WhatsAppLeadsPage = lazy(() => import('./Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadMain'));
+const WhatsAppLeadSingle = lazy(() => import('./Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadSingle'));
 const InstagramLeadsPage = lazy(() => import('./Pages/Lead_pages/InstragramLead_Pages/InstagramLeadMain'));
 const InstagramLeadSingle = lazy(() => import('./Pages/Lead_pages/InstragramLead_Pages/InstagramLeadSingle'));
 const DesignApprovalMain = lazy(() => import('./Pages/Stage Pages/DesignApproval/DesignApprovalMain'));
@@ -974,30 +976,7 @@ function App() {
               </ProtectedRoutes>} />
             </Route>
 
-            <Route path="executionpartnermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
-              requiredDepartment="executionpartner"
-              // ⭐ Allow entry if they can do ANY of these things
-              requiredAction={['create', "list", "edit", "delete"]}
-            >
-              <ExecutionPartnerAccountsMain />
-            </ProtectedRoutes>} >
 
-              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
-                requiredDepartment="executionpartner"
-                // ⭐ Allow entry if they can do ANY of these things
-                requiredAction={['create', "list", "edit", "delete"]}
-              >
-                <ExpensePartnerAccSingle />
-              </ProtectedRoutes>} />
-
-              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
-                requiredDepartment="executionpartner"
-                // ⭐ Allow entry if they can do ANY of these things
-                requiredAction={['create']}
-              >
-                <CreateExpensePartnerAcc />
-              </ProtectedRoutes>} />
-            </Route>
 
             <Route path="expensemain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="expense"
@@ -1280,6 +1259,31 @@ function App() {
               </ProtectedRoutes>} />
             </Route>
 
+            <Route path="executionpartnermain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="executionpartner"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['create', "list", "edit", "delete"]}
+            >
+              <ExecutionPartnerAccountsMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="executionpartner"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create', "list", "edit", "delete"]}
+              >
+                <ExpensePartnerAccSingle />
+              </ProtectedRoutes>} />
+
+              <Route path="create" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="executionpartner"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['create']}
+              >
+                <CreateExpensePartnerAcc />
+              </ProtectedRoutes>} />
+            </Route>
+
 
             <Route path="subcontractmain" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff", "worker"]}
               requiredDepartment="subcontract"
@@ -1494,6 +1498,24 @@ function App() {
                 requiredAction={['list', 'edit', "create", "delete"]}
               >
                 <InstagramLeadSingle />
+              </ProtectedRoutes>} />
+
+            </Route>
+
+            <Route path="meta-leads" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="leadmodule"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <MetaLeadMain />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="leadmodule"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <MetaLeadSingle />
               </ProtectedRoutes>} />
 
             </Route>

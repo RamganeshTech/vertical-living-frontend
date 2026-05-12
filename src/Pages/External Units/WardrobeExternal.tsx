@@ -217,7 +217,7 @@ const WardrobeExternal: React.FC = () => {
     }
 
     try {
-      const { dimention, _id, ...withoutDimention } = selectedUnit
+      const {  _id, ...withoutDimention } = selectedUnit
       const unitToAdd = {
         ...withoutDimention,
         dimention: {

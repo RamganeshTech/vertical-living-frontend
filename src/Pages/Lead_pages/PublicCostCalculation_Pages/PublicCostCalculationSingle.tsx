@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetSinglePublicCostCalculation } from '../../../apiList/lead_api/publicCostCalculationApi';
+import { useGetSinglePublicCostCalculation } from '../../../apiList/marketing_api/lead_api/publicCostCalculationApi';
 import { Breadcrumb, type BreadcrumbItem } from '../../Department Pages/Breadcrumb';
 import { downloadImage } from '../../../utils/downloadFile';
 import { toast } from '../../../utils/toast';

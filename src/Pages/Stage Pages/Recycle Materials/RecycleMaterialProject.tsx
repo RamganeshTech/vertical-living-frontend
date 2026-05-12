@@ -16,7 +16,6 @@ const RecycleMaterialProject = () => {
     const { mutateAsync: updateSyncMaterial, isPending } = useUpdateRecycleMaterialManually();
     const { mutateAsync: updateMaterialQuantity } = useUpdateRecycleMaterialQuantity();
 
-
     const { role, permission } = useAuthCheck();
     // const canDelete = role === "owner" || permission?.inventory?.delete;
     // const canList = role === "owner" || permission?.inventory?.list;

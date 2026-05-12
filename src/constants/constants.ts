@@ -22,10 +22,13 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   COSTCALCULATIONLEADFORM: " Cost Calculation Leads",
   INSTAGRAMLEAD: "Instagram Leads",
   WHATSAPPLEAD: "Whatsapp Leads",
+    METALEAD: "Meta Leads",
   CUTLIST: "Cutlist Generation",
   PINCODE: `Pincode Master`,
   PINCODEMAPPING: `Pincode and Vendor Mapping`,
   PINCODEPROJECTSASSIGNMENT: "Partner Project Allocation",
+  EXECUTIONPARTNER: "Execution Partner",
+
 
   CALCULATOR: "Calculator",
   INSTANTCOSTCALCULATION: "Instant Cost Calculation",
@@ -76,11 +79,13 @@ export const SIDEBAR_ICONS: Record<string, string> = {
   LEADCOLLECTION: "fas fa-file-alt text-2xl",
   COSTCALCULATIONLEADFORM: "fas fa-calculator text-2xl",
   INSTAGRAMLEAD: "fas fa-instagram text-2xl",
+  METALEAD: "fas fa-facebook text-2xl",
   WHATSAPPLEAD: "fas fa-whatsapp text-2xl",
   CUTLIST: "fas fa-scissors text-2xl",
   PINCODE: `fas fa-map-marker-alt text-2xl`,
   PINCODEMAPPING: `fas fa-map text-2xl`,
   PINCODEPROJECTSASSIGNMENT: "fas fa-diagram-project text-2xl",
+  EXECUTIONPARTNER: "fas fa-digging text-2xl",
 
 
   CALCULATOR: "fas fa-calculator text-2xl",

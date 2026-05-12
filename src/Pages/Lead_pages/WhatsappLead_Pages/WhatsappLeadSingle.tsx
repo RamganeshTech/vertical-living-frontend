@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../apiList/lead_api/whatsaAppLeadApi';
+import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../apiList/marketing_api/lead_api/whatsaAppLeadApi';
 // import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../apiList/lead_api/whatsappLeadApi'; // Adjust path if needed
 
- const WhatsAppLeadSingle = () => {
+const WhatsAppLeadSingle = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
     // Fetch the single lead
     const { data: lead, isLoading, isError, error, refetch } = useGetSingleWhatsAppLead(id!);
-    
+
     // Mutation to update the status
     const updateStatusMutation = useUpdateWhatsAppLeadStatus();
 
@@ -59,14 +59,14 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
                     {(error as any)?.message || "We couldn't load the details for this lead. It may have been deleted."}
                 </p>
                 <div className="flex justify-center gap-4">
-                    <button 
-                        onClick={() => navigate(-1)} 
+                    <button
+                        onClick={() => navigate(-1)}
                         className="px-6 py-2 bg-brand-surface text-text-main border border-brand-ash rounded-lg hover:bg-brand-surface-hover transition-colors font-medium shadow-sm"
                     >
                         Go Back
                     </button>
-                    <button 
-                        onClick={() => refetch()} 
+                    <button
+                        onClick={() => refetch()}
                         className="px-6 py-2 bg-action-primary text-brand-surface rounded-lg hover:bg-action-primary-hover transition-colors font-medium shadow-sm"
                     >
                         Try Again
@@ -78,11 +78,11 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
 
     return (
         <div className="max-w-5xl mx-auto p-4 md:p-6 lg:p-8 space-y-6">
-            
+
             {/* Header / Navigation */}
             <div className="flex items-center justify-between mb-2">
-                <button 
-                    onClick={() => navigate(-1)} 
+                <button
+                    onClick={() => navigate(-1)}
                     className="flex items-center text-text-muted hover:text-text-strong transition-colors text-sm font-medium bg-brand-surface-hover px-3 py-1.5 rounded-lg border border-brand-ash"
                 >
                     <i className="fas fa-arrow-left mr-2"></i> Back to WhatsApp Leads
@@ -94,7 +94,7 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
 
             {/* Main Detail Card */}
             <div className="bg-brand-surface rounded-2xl border-2 border-ash-medium shadow-sm overflow-hidden">
-                
+
                 {/* Profile Header Section */}
                 <div className="p-6 md:p-8 border-b border-brand-ash flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-gradient-to-r from-brand-surface to-brand-surface-hover">
                     <div className="flex items-center gap-5">
@@ -107,7 +107,7 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
                                 {lead.customerName || "Unknown Contact"}
                             </h1>
                             <div className="flex items-center text-text-muted font-medium bg-brand-surface px-2.5 py-1 rounded-md border border-brand-ash w-fit">
-                                <i className="fas fa-phone-alt mr-2 text-xs"></i> 
+                                <i className="fas fa-phone-alt mr-2 text-xs"></i>
                                 {lead.phoneNumber}
                             </div>
                         </div>
@@ -144,14 +144,14 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
 
                 {/* Content Section */}
                 <div className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
+
                     {/* Left Column: Message Context */}
                     <div className="lg:col-span-2 space-y-8">
                         <div>
                             <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4 flex items-center border-b border-brand-ash pb-2">
                                 <i className="far fa-comment-dots mr-2"></i> Initial Inquiry
                             </h3>
-                            
+
                             {/* Chat Bubble Simulation */}
                             <div className="flex flex-col gap-2 max-w-2xl">
                                 <div className="bg-brand-surface-hover rounded-2xl rounded-tl-sm p-5 border border-brand-ash shadow-sm">
@@ -173,10 +173,10 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Meta Data Box */}
                         {lead.waMessageId && (
-                             <div className="bg-brand-surface-hover rounded-xl p-4 border border-brand-ash border-dashed inline-block">
+                            <div className="bg-brand-surface-hover rounded-xl p-4 border border-brand-ash border-dashed inline-block">
                                 <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mb-1">
                                     Message Reference ID
                                 </span>
@@ -189,7 +189,7 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
 
                     {/* Right Column: Metadata & Actions */}
                     <div className="space-y-8">
-                        
+
                         {/* Timeline */}
                         <div>
                             <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4 flex items-center border-b border-brand-ash pb-2">
@@ -210,7 +210,7 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
                                         {new Date(lead.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
-                                
+
                                 {/* Last Update */}
                                 <div className="relative pl-10 pt-2">
                                     <div className="absolute left-0 top-3 w-[14px] h-[14px] rounded-full bg-action-primary border-2 border-brand-surface shadow-sm z-10"></div>
@@ -232,17 +232,17 @@ import { useGetSingleWhatsAppLead, useUpdateWhatsAppLeadStatus } from '../../../
                             </h3>
                             <div className="space-y-3">
                                 {/* Open in WhatsApp Web / App */}
-                                <a 
-                                    href={`https://wa.me/${lead.phoneNumber.replace(/\D/g, '')}`} 
-                                    target="_blank" 
+                                <a
+                                    href={`https://wa.me/${lead.phoneNumber.replace(/\D/g, '')}`}
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#25D366] text-[#ffffff] rounded-xl hover:bg-[#20bd5a] transition-colors font-semibold shadow-sm"
                                 >
                                     <i className="fab fa-whatsapp text-lg"></i> Chat on WhatsApp
                                 </a>
-                                
+
                                 {/* Copy Phone Number */}
-                                <button 
+                                <button
                                     onClick={() => {
                                         navigator.clipboard.writeText(lead.phoneNumber);
                                         // Optional: Add a small toast notification here

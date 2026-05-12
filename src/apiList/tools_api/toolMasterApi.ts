@@ -114,7 +114,7 @@ export const useCreateToolV1 = () => {
         mutationFn: async (formData: FormData) => {
             if (!role || !allowedRoles.includes(role)) throw new Error("Unauthorized");
             if (!api) throw new Error("API instance not found for role");
-            return await createToolApi(formData, api);
+            return await createToolApiV1(formData, api);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["toolmaster"] });

@@ -572,7 +572,7 @@ const PreSalesQuoteType4: React.FC<PreSalesProps> = ({
                             dimention: {
                                 width: product.w || 0,
                                 height: product.h || 0,
-                                depth: product.depth || 0
+                                depth: product.d || 0
                             },
                             totals: product.totals || {
                                 furnitureTotal: product.productTotal || 0,

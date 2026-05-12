@@ -1,6 +1,8 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { useGetWhatsAppLeads, useUpdateWhatsAppLeadStatus } from '../../../apiList/lead_api/whatsaAppLeadApi';
+import { useGetWhatsAppLeads, useUpdateWhatsAppLeadStatus } from '../../../apiList/marketing_api/lead_api/whatsaAppLeadApi';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/Select';
+
 // import { useGetWhatsAppLeads, useUpdateWhatsAppLeadStatus } from '../../../apiList/lead_api/whatsappLeadApi'; // Adjust path if needed
 
 // Pre-defined stages for the Kanban Board
@@ -11,7 +13,7 @@ const WhatsAppLeadsPage = () => {
     const { organizationId } = useParams() as { organizationId: string };
 
     // View State: 'list' or 'kanban'
-    const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
+    const [viewMode, setViewMode] = useState<'list' | 'kanban' | "calendar">('list');
 
     const [filters, setFilters] = useState({
         search: '',
@@ -19,6 +21,7 @@ const WhatsAppLeadsPage = () => {
         startDate: '',
         endDate: ''
     });
+    const [updatingLeadId, setUpdatingLeadId] = useState<string | null>(null);
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -91,6 +94,42 @@ const WhatsAppLeadsPage = () => {
         }
     };
 
+    // ==========================================
+    // CALENDAR LOGIC & STATE
+    // ==========================================
+    const [currentMonthDate, setCurrentMonthDate] = useState(new Date());
+    const [selectedDateLeads, setSelectedDateLeads] = useState<{ date: string, leads: any[] } | null>(null);
+
+    // Group leads by YYYY-MM-DD
+    const leadsByDate = useMemo(() => {
+        const group: Record<string, any[]> = {};
+        filteredLeads.forEach(lead => {
+            const date = new Date(lead.createdAt);
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            if (!group[dateStr]) group[dateStr] = [];
+            group[dateStr].push(lead);
+        });
+        return group;
+    }, [filteredLeads]);
+
+    const handleInlineStatusChange = async (leadId: string, newStatus: string) => {
+        setUpdatingLeadId(leadId);
+        try {
+            await updateStatusMutation.mutateAsync({ id: leadId, status: newStatus });
+
+            // Optimistically update the local state of the modal so the user sees the change instantly
+            if (selectedDateLeads) {
+                setSelectedDateLeads({
+                    ...selectedDateLeads,
+                    leads: selectedDateLeads.leads.map(lead =>
+                        lead._id === leadId ? { ...lead, status: newStatus } : lead
+                    )
+                });
+            }
+        } finally {
+            setUpdatingLeadId(null);
+        }
+    };
 
     const isChildRoute = location.pathname.includes("single");
 
@@ -123,6 +162,12 @@ const WhatsAppLeadsPage = () => {
                         >
                             <i className="fas fa-columns mr-2 text-text-muted"></i> Kanban
                         </button>
+                        <button
+                            onClick={() => setViewMode('calendar')}
+                            className={`px-3 py-1.5 rounded-md cursor-pointer text-sm font-medium transition-colors ${viewMode === 'calendar' ? 'bg-brand-surface shadow-sm text-text-strong border border-brand-ash' : 'text-text-muted hover:text-text-main'}`}
+                        >
+                            <i className="far fa-calendar-alt mr-2 text-text-muted"></i> Calendar
+                        </button>
                     </div>
                 </div>
             </header>
@@ -146,7 +191,7 @@ const WhatsAppLeadsPage = () => {
                 <main className="flex flex-col sm:flex-row gap-6 min-h-[calc(100vh-120px)] sm:h-[calc(100vh-120px)]">
 
                     {/* Filters Sidebar */}
-                    <div className="w-full sm:w-80 flex-shrink-0 h-auto sm:h-full overflow-y-auto">
+                    {viewMode !== 'calendar' && <div className="w-full sm:w-80 flex-shrink-0 h-auto sm:h-full overflow-y-auto">
                         <div className="bg-brand-surface rounded-xl shadow-sm p-5 border border-brand-ash">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-semibold text-text-strong flex items-center">
@@ -215,7 +260,7 @@ const WhatsAppLeadsPage = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>}
 
                     {/* Main Content Area (List or Kanban) */}
                     <div className="flex-1 h-full overflow-hidden flex flex-col min-w-0">
@@ -231,7 +276,7 @@ const WhatsAppLeadsPage = () => {
                             </div>
                         ) : (
                             <>
-                                {viewMode === 'list' ? (
+                                {viewMode === 'list' && (
                                     /* ================= LIST VIEW ================= */
                                     <div
                                         ref={scrollContainerRef}
@@ -259,7 +304,10 @@ const WhatsAppLeadsPage = () => {
                                             ))}
                                         </div>
                                     </div>
-                                ) : (
+                                )
+                                }
+
+                                {viewMode === 'kanban' && (
                                     /* ================= KANBAN VIEW ================= */
                                     <div className="flex-1 overflow-x-auto h-full pb-4">
                                         <div className="flex gap-4 h-full min-w-max">
@@ -299,6 +347,19 @@ const WhatsAppLeadsPage = () => {
                                     </div>
                                 )}
 
+
+                                {viewMode === 'calendar' && (
+                                    <div className="flex-1 bg-brand-surface rounded-xl border border-brand-ash shadow-sm flex flex-col overflow-hidden">
+                                        <CalendarView
+                                            currentDate={currentMonthDate}
+                                            setCurrentDate={setCurrentMonthDate}
+                                            leadsByDate={leadsByDate}
+                                            onDateClick={(dateStr, dayLeads) => setSelectedDateLeads({ date: dateStr, leads: dayLeads })}
+                                        />
+                                    </div>
+                                )}
+
+
                                 {/* Infinite Scroll Loading Indicator */}
                                 {isFetchingNextPage && (
                                     <div className="flex justify-center py-4 bg-brand-surface border-t border-brand-ash rounded-b-xl">
@@ -331,11 +392,115 @@ const WhatsAppLeadsPage = () => {
                     </div>
                 </main>
             )}
+
+
+            {/* POPUP MODAL FOR CALENDAR DATE CLICK */}
+            {selectedDateLeads && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+
+                    {/* MODAL CARD: 
+                        1. max-h-[70vh] forces the modal to be shorter than the screen.
+                        2. overflow-hidden keeps the rounded corners clean.
+                    */}
+                    <div className="bg-brand-surface w-full max-w-2xl rounded-2xl border-2 border-brand-ash shadow-2xl flex flex-col max-h-[70vh] overflow-hidden animate-in fade-in zoom-in duration-200">
+
+                        {/* Modal Header */}
+                        <div className="p-5 border-b-2 border-brand-ash flex items-center justify-between bg-brand-surface-hover shrink-0">
+                            <div>
+                                <h2 className="text-xl font-bold text-text-strong flex items-center">
+                                    <i className="far fa-calendar-check mr-3 text-action-primary"></i>
+                                    Leads for {new Date(selectedDateLeads.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </h2>
+                                <p className="text-sm text-text-muted mt-1">Total: <span className="font-bold text-text-main">{selectedDateLeads.leads.length}</span> leads acquired</p>
+                            </div>
+                            <button
+                                onClick={() => setSelectedDateLeads(null)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-brand-ash text-text-muted hover:text-text-strong transition-colors cursor-pointer"
+                            >
+                                <i className="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+
+                        {/* Modal Content - SCROLLABLE LIST */}
+                        {/* overflow-y-auto brings the scrollbar back! */}
+                        <div className="flex-1 overflow-y-auto p-3">
+
+                            {/* pb-32 allows the very last dropdown to open into empty space without getting chopped off */}
+                            <div className="divide-y divide-brand-ash pb-32">
+                                {selectedDateLeads.leads.map((lead) => (
+                                    <div key={lead._id} className="p-4 hover:bg-brand-surface-hover transition-colors rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+                                        {/* Contact Info */}
+                                        <div className="flex items-center gap-4 truncate">
+                                            <div className="w-10 h-10 rounded-full bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center flex-shrink-0">
+                                                <i className="fab fa-whatsapp text-[#25D366]"></i>
+                                            </div>
+                                            <div className="truncate">
+                                                <h4 className="text-sm font-bold text-text-strong truncate">{lead.customerName || "Unknown"}</h4>
+                                                <p className="text-xs text-text-muted truncate">{lead.phoneNumber}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Actions & Interactive Status Badge */}
+                                        <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0 justify-between sm:justify-end">
+
+                                            {/* Custom Interactive Select for Stage */}
+                                            <div className="w-[140px]">
+                                                <Select
+                                                    value={lead.status}
+                                                    onValueChange={(val) => handleInlineStatusChange(lead._id, val)}
+                                                >
+                                                    <SelectTrigger className={`h-8 border-none shadow-sm focus:ring-1 focus:ring-brand-ash ${getStatusStyles(lead.status)}`}>
+                                                        <div className="flex items-center gap-2 w-full">
+                                                            {updatingLeadId === lead._id ? (
+                                                                <i className="fas fa-spinner fa-spin text-inherit"></i>
+                                                            ) : null}
+                                                            <SelectValue placeholder="Stage" selectedValue={lead.status} />
+                                                        </div>
+                                                    </SelectTrigger>
+
+                                                    {/* absolute & z-50 ensures the dropdown layers over the list items below it */}
+                                                    <SelectContent className="absolute z-50 mt-1 bg-brand-surface border border-brand-ash shadow-xl rounded-xl">
+                                                        {STAGES.map((stage) => (
+                                                            <SelectItem
+                                                                key={stage}
+                                                                value={stage}
+                                                                className="text-text-main font-semibold hover:bg-brand-surface-hover focus:bg-brand-surface-hover cursor-pointer"
+                                                            >
+                                                                {stage}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+
+                                            <button
+                                                onClick={() => navigate(`single/${lead._id}`)}
+                                                className="px-4 py-1.5 bg-brand-surface border border-brand-ash rounded-lg text-xs font-semibold text-text-main hover:bg-brand-ash hover:text-text-strong transition-colors cursor-pointer shadow-sm flex-shrink-0"
+                                            >
+                                                View <i className="fas fa-chevron-right ml-1 text-[10px]"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
 
 export default WhatsAppLeadsPage;
+
+
+
+
+
+
+
 
 // ==========================================
 // Helpers & Sub-components
@@ -430,6 +595,108 @@ const KanbanCard = ({ lead, onDragStart, isDragging, onClick }: { lead: any, onD
 
                 {/* Visual Indicator of Draggability */}
                 <i className="fas fa-grip-horizontal text-text-soft hover:text-text-muted transition-colors"></i>
+            </div>
+        </div>
+    );
+};
+
+
+
+
+// ==========================================
+// CUSTOM CALENDAR COMPONENT
+// ==========================================
+const CalendarView = ({ currentDate, setCurrentDate, leadsByDate, onDateClick }: {
+    currentDate: Date,
+    setCurrentDate: (d: Date) => void,
+    leadsByDate: Record<string, any[]>,
+    onDateClick: (date: string, leads: any[]) => void
+}) => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 is Sunday
+
+    const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+    const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Generate Calendar Grid
+    const days = [];
+    // Padding for days before the 1st of the month
+    for (let i = 0; i < firstDayOfMonth; i++) {
+        days.push(<div key={`empty-${i}`} className="bg-brand-surface-hover/50 border-r border-b border-brand-ash/50 min-h-[100px]"></div>);
+    }
+
+    // Actual Days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayLeads = leadsByDate[dateStr] || [];
+        const isToday = dateStr === todayStr;
+        const hasLeads = dayLeads.length > 0;
+
+        days.push(
+            <div
+                key={day}
+                onClick={() => hasLeads ? onDateClick(dateStr, dayLeads) : null}
+                className={`relative border-r border-b border-brand-ash min-h-[100px] p-2 transition-colors ${hasLeads ? 'cursor-pointer hover:bg-brand-surface-hover hover:shadow-inner' : 'bg-brand-surface'} ${isToday ? 'bg-action-primary/5' : ''}`}
+            >
+                <div className="flex justify-between items-start">
+                    <span className={`text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full ${isToday ? 'bg-action-primary text-brand-surface shadow-sm' : 'text-text-muted'}`}>
+                        {day}
+                    </span>
+                </div>
+
+                {hasLeads && (
+                    <div className="mt-2 flex flex-col gap-1">
+                        <div className="bg-action-success/10 border border-action-success/30 text-action-success text-xs font-bold px-2 py-1 rounded-md text-center shadow-sm flex items-center justify-center gap-1">
+                            <i className="fas fa-user-plus text-[10px]"></i> {dayLeads.length} Lead{dayLeads.length > 1 ? 's' : ''}
+                        </div>
+                        {/* Optional: Add small colored dots for lead statuses */}
+                        <div className="flex flex-wrap gap-1 mt-1 justify-center">
+                            {dayLeads.slice(0, 5).map((_: any, i: number) => (
+                                <div key={i} className="w-1.5 h-1.5 rounded-full bg-text-muted"></div>
+                            ))}
+                            {dayLeads.length > 5 && <span className="text-[8px] text-text-soft">+{dayLeads.length - 5}</span>}
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col h-full">
+            {/* Calendar Controls */}
+            <div className="flex items-center justify-between p-4 border-b border-brand-ash bg-brand-surface-hover">
+                <h2 className="text-lg font-bold text-text-strong">
+                    {currentDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
+                </h2>
+                <div className="flex gap-2">
+                    <button onClick={prevMonth} className="p-2 bg-brand-surface border border-brand-ash rounded-lg text-text-muted hover:text-text-strong hover:bg-brand-ash transition-colors">
+                        <i className="fas fa-chevron-left"></i>
+                    </button>
+                    <button onClick={() => setCurrentDate(new Date())} className="px-3 py-1.5 bg-brand-surface border border-brand-ash rounded-lg text-sm font-semibold text-text-main hover:bg-brand-ash transition-colors">
+                        Today
+                    </button>
+                    <button onClick={nextMonth} className="p-2 bg-brand-surface border border-brand-ash rounded-lg text-text-muted hover:text-text-strong hover:bg-brand-ash transition-colors">
+                        <i className="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            {/* Days of Week Header */}
+            <div className="grid grid-cols-7 border-b border-brand-ash bg-brand-surface-hover text-center py-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="text-xs font-bold text-text-muted uppercase tracking-wider">{day}</div>
+                ))}
+            </div>
+
+            {/* Grid */}
+            <div className="grid grid-cols-7 flex-1 overflow-y-auto bg-brand-surface border-l border-brand-ash">
+                {days}
             </div>
         </div>
     );

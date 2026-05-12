@@ -125,7 +125,7 @@ const PincodePartnerProjectform: React.FC<Props> = ({ mode, initialData, onSubmi
                 isLoading={quickCreate.isPending}
             />
 
-            <header className="flex-shrink-0 z-40 bg-white border-b border-slate-200 px-8 py-3 flex justify-between items-center shadow-sm">
+            <header className="flex-shrink-0 z-10 bg-white border-b border-slate-200 px-8 py-3 flex justify-between items-center shadow-sm">
                 <div className='flex items-center gap-5'>
                     <button type="button" onClick={() => navigate(-1)} className='bg-slate-50 hover:bg-slate-100 w-11 h-11 border border-slate-200 text-slate-600 rounded-2xl flex items-center justify-center transition-all cursor-pointer'>
                         <i className="fas fa-arrow-left text-sm"></i>

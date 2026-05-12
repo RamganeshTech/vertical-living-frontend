@@ -328,7 +328,7 @@ const CategoryMaterialGroup: React.FC<CategoryMaterialGroupProps> = ({
                                 <div className="flex items-center gap-6">
                                     <div className="flex flex-col">
                                         <span className="text-[12px] font-black text-slate-400 uppercase tracking-tighter">Size</span>
-                                        <span className="text-xs font-bold text-slate-700">{details.h}H × {details.w}W (FT)</span>
+                                        <span className="text-xs font-bold text-slate-700">{details.h}H × {details.w}W (FT) x {details.d}</span>
                                     </div>
                                     <span className="text-xl font-black text-emerald-600">₹{unitPrice.toLocaleString('en-IN')}</span>
                                 </div>

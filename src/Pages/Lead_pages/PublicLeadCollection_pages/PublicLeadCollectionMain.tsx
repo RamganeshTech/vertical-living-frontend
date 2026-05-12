@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useDebounce } from '../../../Hooks/useDebounce';
-import { useGetAllPublicLeads } from '../../../apiList/lead_api/publicLeadCollectionApi';
+import { useGetAllPublicLeads } from '../../../apiList/marketing_api/lead_api/publicLeadCollectionApi';
 // import { Button } from '../../components/ui/Button';
 
 const PublicLeadCollectionMain = () => {

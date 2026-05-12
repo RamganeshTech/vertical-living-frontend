@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useCreateTool } from '../../../apiList/tools_api/toolMasterApi';
+import {  useCreateToolV1 } from '../../../apiList/tools_api/toolMasterApi';
 import { toast } from '../../../utils/toast';
 import ToolMasterForm from './ToolMasterForm';
 // import { toast } from '../../../../utils/toast';
@@ -8,7 +8,8 @@ import ToolMasterForm from './ToolMasterForm';
 
 const CreateToolMaster = () => {
     const { organizationId } = useParams() as { organizationId: string };
-    const createToolMutation = useCreateTool();
+    // const createToolMutation = useCreateTool();
+    const createToolMutation = useCreateToolV1();
 
     // const handleSubmit = async (data: any, files: File[], warrentyImages:File[]) => {
     //     try {

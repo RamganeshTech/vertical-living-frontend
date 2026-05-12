@@ -15,54 +15,54 @@ import { toast } from "../../../utils/toast";
 const RequirementFormPublic: React.FC = () => {
   const { token, projectId } = useParams<{ token: string; projectId: string }>();
 
- const [formData, setFormData] = useState<IRequirementFormSchema>({
-  clientData: {
-    clientName: null,
-    email: null,
-    whatsapp: null,
-    location: null,
-  },
-  // isEditable: true,
-  // kitchen: {
-  //   layoutType: null,
-  //   kitchenPackage: null,
-  //   measurements: { top: null, left: null, right: null },
-  //   graniteCountertop: null,
-  //   numberOfShelves: null,
-  //   notes: null,
-  // },
-  // // livingHall: {
-  //   seatingStyle: null,
-  //   tvUnitDesignRequired: null,
-  //   falseCeilingRequired: null,
-  //   wallDecorStyle: null,
-  //   numberOfFans: null,
-  //   numberOfLights: null,
-  //   livingHallPackage: null,
-  //   notes: null,
-  // },
-  // bedroom: {
-  //   numberOfBedrooms: null,
-  //   bedType: null,
-  //   wardrobeIncluded: null,
-  //   falseCeilingRequired: null,
-  //   tvUnitRequired: null,
-  //   studyTableRequired: null,
-  //   bedroomPackage: null,
-  //   notes: null,
-  // },
-  // wardrobe: {
-  //   wardrobeType: null,
-  //   lengthInFeet: null,
-  //   heightInFeet: null,
-  //   mirrorIncluded: null,
-  //   wardrobePackage: null,
-  //   numberOfShelves: null,
-  //   numberOfDrawers: null,
-  //   notes: null,
-  // },
-  // additionalNotes: null,
-});
+  const [formData, setFormData] = useState<IRequirementFormSchema>({
+    clientData: {
+      clientName: null,
+      email: null,
+      whatsapp: null,
+      location: null,
+    },
+    // isEditable: true,
+    // kitchen: {
+    //   layoutType: null,
+    //   kitchenPackage: null,
+    //   measurements: { top: null, left: null, right: null },
+    //   graniteCountertop: null,
+    //   numberOfShelves: null,
+    //   notes: null,
+    // },
+    // // livingHall: {
+    //   seatingStyle: null,
+    //   tvUnitDesignRequired: null,
+    //   falseCeilingRequired: null,
+    //   wallDecorStyle: null,
+    //   numberOfFans: null,
+    //   numberOfLights: null,
+    //   livingHallPackage: null,
+    //   notes: null,
+    // },
+    // bedroom: {
+    //   numberOfBedrooms: null,
+    //   bedType: null,
+    //   wardrobeIncluded: null,
+    //   falseCeilingRequired: null,
+    //   tvUnitRequired: null,
+    //   studyTableRequired: null,
+    //   bedroomPackage: null,
+    //   notes: null,
+    // },
+    // wardrobe: {
+    //   wardrobeType: null,
+    //   lengthInFeet: null,
+    //   heightInFeet: null,
+    //   mirrorIncluded: null,
+    //   wardrobePackage: null,
+    //   numberOfShelves: null,
+    //   numberOfDrawers: null,
+    //   notes: null,
+    // },
+    // additionalNotes: null,
+  });
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -110,8 +110,8 @@ const RequirementFormPublic: React.FC = () => {
     }
 
 
-    if(email){
-      if(!email.includes("@")){
+    if (email) {
+      if (!email.includes("@")) {
         errors.email = "should contain @"
       }
     }
@@ -145,6 +145,9 @@ const RequirementFormPublic: React.FC = () => {
       toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to save the data", variant: "destructive" })
     }
   };
+
+
+  const isPositive = isSuccess || (error as any)?.response?.data?.message === "Form has already been submitted."
 
   const steps = [
     // {
@@ -242,12 +245,13 @@ const RequirementFormPublic: React.FC = () => {
               size="lg"
               onClick={handleSubmit}
               isLoading={isPending}
+              className={`${isPositive ? "bg-action-success text-brand-surface" : ""}`}
             >
-              Submit Requirement Form
+              {isPositive ? "Form submitted successfully" : "Submit Requirement Form"}
             </Button>
           </div>
 
-          {isSuccess && <p className="text-action-success mt-4">Form submitted successfully!</p>}
+          {/* {isSuccess && <p className="text-action-success mt-4">Form submitted successfully!</p>} */}
           {isError && <p className="text-action-error mt-4">{(error as any)?.response?.data?.message || (error as Error).message || "Form Submission Failed"}</p>}
         </div>
       ),

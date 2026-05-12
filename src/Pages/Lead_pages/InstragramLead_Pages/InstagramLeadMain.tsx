@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { useGetInstagramLeads, useUpdateInstagramLeadStatus } from '../../../apiList/lead_api/instagramLeadApi';
+import { useGetInstagramLeads, useUpdateInstagramLeadStatus } from '../../../apiList/marketing_api/lead_api/instagramLeadApi';
 // import { useGetInstagramLeads, useUpdateInstagramLeadStatus } from './hooks/useGetInstagramLeads'; // Adjust path
 
 // Pre-defined stages for the Kanban Board

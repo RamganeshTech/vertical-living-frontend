@@ -146,12 +146,12 @@ const BillAccountsMain = () => {
                     icon: 'fas fa-user text-blue-600',
                     onClick: () => navigate(`/organizations/${organizationId}/projects/vendormain`)
                 },
-                {
-                    label: 'Execution Partner',
-                    path: `/organizations/${organizationId}/projects/executionpartnermain`,
-                    icon: 'fas fa-digging text-blue-600',
-                    onClick: () => navigate(`/organizations/${organizationId}/projects/executionpartnermain`)
-                },
+                // {
+                //     label: 'Execution Partner',
+                //     path: `/organizations/${organizationId}/projects/executionpartnermain`,
+                //     icon: 'fas fa-digging text-blue-600',
+                //     onClick: () => navigate(`/organizations/${organizationId}/projects/executionpartnermain`)
+                // },
             ]
         }
 

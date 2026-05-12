@@ -358,6 +358,104 @@ export default function OrganizationSettings() {
 
 
                 </div>
+
+
+
+                <section>
+                    <h2 className="text-xl text-gray-600 font-semibold mb-4">Lead Credentials</h2>
+
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+                        <SettingCard
+                            label="Facebook Page Id"
+                            icon="fa-building"
+                            value={organization?.facebookPageId}
+                            isEditing={editingField === "facebookPageId"}
+                            onEdit={() => handleStartEdit("facebookPageId", organization?.facebookPageId)}
+                            onSave={() => handleSave("facebookPageId")}
+                            onCancel={() => setEditingField(null)}
+                            onChange={setTempValue}
+                            tempValue={tempValue}
+                            loading={updateMutation.isPending}
+                        />
+
+                        <SettingCard
+                            label="Meta Access Token"
+                            icon="fa-file-invoice"
+                            value={organization?.metaAccessToken}
+                            isEditing={editingField === "metaAccessToken"}
+                            onEdit={() => handleStartEdit("metaAccessToken", organization?.metaAccessToken)}
+                            onSave={() => handleSave("metaAccessToken")}
+                            onCancel={() => setEditingField(null)}
+                            onChange={setTempValue}
+                            tempValue={tempValue}
+                            loading={updateMutation.isPending}
+                        />
+
+
+                        <SettingCard
+                            label="Meta Verify Token"
+                            icon="fa-building"
+                            value={organization?.metaVerifyToken}
+                            isEditing={editingField === "metaVerifyToken"}
+                            onEdit={() => handleStartEdit("metaVerifyToken", organization?.metaVerifyToken)}
+                            onSave={() => handleSave("metaVerifyToken")}
+                            onCancel={() => setEditingField(null)}
+                            onChange={setTempValue}
+                            tempValue={tempValue}
+                            loading={updateMutation.isPending}
+
+                        />
+
+
+
+                        <SettingCard
+                            label="Meta Dataset Id"
+                            icon="fa-phone-alt"
+                            value={organization?.metaDatasetId}
+                            isEditing={editingField === "metaDatasetId"}
+                            onEdit={() => handleStartEdit("metaDatasetId", organization?.metaDatasetId)}
+                            onSave={() => handleSave("metaDatasetId")}
+                            onCancel={() => setEditingField(null)}
+                            onChange={setTempValue}
+                            tempValue={tempValue}
+                            loading={updateMutation.isPending}
+                        />
+
+                        <SettingCard
+                            label="Meta Dataset Token"
+                            icon="fa-phone-volume"
+                            value={organization?.metaDatasetToken}
+                            isEditing={editingField === "metaDatasetToken"}
+                            onEdit={() => handleStartEdit("metaDatasetToken", organization?.metaDatasetToken)}
+                            onSave={() => handleSave("metaDatasetToken")}
+                            onCancel={() => setEditingField(null)}
+                            onChange={setTempValue}
+                            tempValue={tempValue}
+                            loading={updateMutation.isPending}
+                        />
+
+
+
+                        {/* GROUP 2: CONTACT INFORMATION */}
+                        <SettingCard
+                            label="WhatsappPhone Number Id"
+                            icon="fa-envelope"
+                            value={organization?.whatsappPhoneNumberId}
+                            inputType="whatsappPhoneNumberId"
+                            isEditing={editingField === "whatsappPhoneNumberId"}
+                            onEdit={() => handleStartEdit("whatsappPhoneNumberId", organization?.whatsappPhoneNumberId)}
+                            onSave={() => handleSave("whatsappPhoneNumberId")}
+                            onCancel={() => setEditingField(null)}
+                            onChange={setTempValue}
+                            tempValue={tempValue}
+                            loading={updateMutation.isPending}
+                        />
+
+                    </div>
+                </section>
+
             </div>
 
 

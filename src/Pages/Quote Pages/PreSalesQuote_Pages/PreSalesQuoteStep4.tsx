@@ -632,6 +632,7 @@ export const PreSalesQuoteStep4: React.FC<PreSalesQuoteStep4Props> = ({
 }) => {
 
 
+    console.log("config", config)
     const { organizationId } = useParams()
 
 

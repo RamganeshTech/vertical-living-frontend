@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Outlet, useLocation, useParams } from 'react-router-dom';
 import { Button } from '../../../../components/ui/Button';
-import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
+// import { Breadcrumb, type BreadcrumbItem } from '../../Breadcrumb';
 import { toast } from '../../../../utils/toast';
 import { useDeleteExecutionPartner, useGetAllExecutionPartners } from '../../../../apiList/Department Api/Accounting Api/executionPartnerApi';
 import ExecutionPartnerAccList from './ExecutionPartnerAccList';
@@ -19,11 +19,11 @@ const ExecutionPartnerAccountsMain = () => {
     // Check if we're on a child route
     const isDetailView = location.pathname.includes('/single') || location.pathname.includes('/create');
 
-    const paths: BreadcrumbItem[] = [
-        { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
-        { label: "Bills", path: `/organizations/${organizationId}/projects/billmain` },
-        { label: "Execution Partner", path: `/organizations/${organizationId}/projects/executionpartnermain` },
-    ];
+    // const paths: BreadcrumbItem[] = [
+    //     { label: "Account", path: `/organizations/${organizationId}/projects/accounting` },
+    //     { label: "Bills", path: `/organizations/${organizationId}/projects/billmain` },
+    //     { label: "Execution Partner", path: `/organizations/${organizationId}/projects/executionpartnermain` },
+    // ];
 
 
 
@@ -150,7 +150,7 @@ const ExecutionPartnerAccountsMain = () => {
                         Execution Partners
                     </h1>
                     
-                    <Breadcrumb paths={paths} />
+                    {/* <Breadcrumb paths={paths} /> */}
                 </div>
 
 

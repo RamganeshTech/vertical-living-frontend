@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetSinglePublicLead } from '../../../apiList/lead_api/publicLeadCollectionApi';
+import { useGetSinglePublicLead } from '../../../apiList/marketing_api/lead_api/publicLeadCollectionApi';
 import { Breadcrumb, type BreadcrumbItem } from '../../Department Pages/Breadcrumb';
 
 const PublicLeadCollectionSingle: React.FC = () => {

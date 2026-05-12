@@ -202,17 +202,19 @@ export const PERMISSION_MAPPING: Record<string, string | string[]> = {
   // ACCOUNTING: "accounts" || "billing" || "payments",
   ACCOUNTING: ["accounts", "billing", "payments", "vendor", "customer", "invoice",
     "expense", "billtemplate", "purchaseorder",
-    "vendorpayment", "salesorder", "retailinvoice", "executionpartnermain"],
+    "vendorpayment", "salesorder", "retailinvoice",],
 
   CUTLIST: "cutlist",
   PINCODE: "pincode",
   PINCODEMAPPING: "pincodemappingmain",
   PINCODEPROJECTSASSIGNMENT: "pincodeproject",
+  EXECUTIONPARTNER: "executionpartner",
 
   LEADCOLLECTION: "leadmodule",
   COSTCALCULATIONLEADFORM: "leadmodule",
   INSTAGRAMLEAD: "leadmodule",
   WHATSAPPLEAD: "leadmodule",
+  METALEAD: "leadmodule",
 
   RATECONIGPRESALES: "presalesmaterialrateconfig", // Add this line!
   RATECONIG: "materialrateconfig",
@@ -262,9 +264,11 @@ export const getProjectPaths = (organizationId: string | undefined): Record<stri
     CUTLIST: `/organizations/${organizationId}/projects/cutlistmain`,
     PINCODE: `/organizations/${organizationId}/projects/pincodemain`,
     PINCODEPROJECTSASSIGNMENT: `/organizations/${organizationId}/projects/pincodeprojectmain`,
+    EXECUTIONPARTNER: `/organizations/${organizationId}/projects/executionpartnermain`,
     LEADCOLLECTION: `/organizations/${organizationId}/projects/publicleadcollection`,
     COSTCALCULATIONLEADFORM: `/organizations/${organizationId}/projects/publiccostcalculation`,
     INSTAGRAMLEAD: `/organizations/${organizationId}/projects/instagram-leads`,
+    METALEAD: `/organizations/${organizationId}/projects/meta-leads`,
     WHATSAPPLEAD: `/organizations/${organizationId}/projects/whatsapp-leads`,
     RATECONIGPRESALES: `/organizations/${organizationId}/projects/rateconfigpresales`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
@@ -368,7 +372,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
   // If NOT the special org → remove LEADCOLLECTION
   if (organizationId !== "684a57015e439b678e8f6918") {
-    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION" && key !== "COSTCALCULATIONLEADFORM" && key !== "INSTAGRAMLEAD" && key !== "WHATSAPPLEAD");
+    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION" && key !== "COSTCALCULATIONLEADFORM" && key !== "INSTAGRAMLEAD" && key !== "WHATSAPPLEAD" && key !== "METALEAD");
   }
   // =========================================================
   // 4. CONSTRUCT INITIAL SIDEBAR OBJECTS
@@ -445,13 +449,13 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     {
       id: "LEAD_COLLECTION",
       label: "Lead Collection",
-      keys: ["LEADCOLLECTION", "COSTCALCULATIONLEADFORM", "INSTAGRAMLEAD", "WHATSAPPLEAD"]
+      keys: ["LEADCOLLECTION", "COSTCALCULATIONLEADFORM", "INSTAGRAMLEAD", "WHATSAPPLEAD", "METALEAD"]
 
     },
     {
       id: "PINCODE_MODULE",
       label: "Pincode Module",
-      keys: ["PINCODE", "PINCODEPROJECTSASSIGNMENT"]
+      keys: ["PINCODE", "PINCODEPROJECTSASSIGNMENT", "EXECUTIONPARTNER"]
 
     }
   ];

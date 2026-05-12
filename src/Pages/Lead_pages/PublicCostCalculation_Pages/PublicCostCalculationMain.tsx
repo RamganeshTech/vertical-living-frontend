@@ -5,7 +5,7 @@ import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { useDebounce } from '../../../Hooks/useDebounce';
-import { useGetAllPublicCostCalculations } from '../../../apiList/lead_api/publicCostCalculationApi';
+import { useGetAllPublicCostCalculations } from '../../../apiList/marketing_api/lead_api/publicCostCalculationApi';
 import { dateFormate } from '../../../utils/dateFormator';
 
 const PublicCostCalculationMain = () => {

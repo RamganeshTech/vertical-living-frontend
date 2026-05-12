@@ -1,0 +1,650 @@
+import React, { useState, useRef, useMemo } from 'react';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { useGetMetaAdLeads, useUpdateMetaLeadStatus } from '../../../apiList/marketing_api/lead_api/metaLeadApi'; // Adjust import path
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/Select';
+
+// Pre-defined stages for the Kanban Board matching the backend logic
+const STAGES = ['New', 'Contacted', 'Qualified', 'Converted', 'Not Interested'];
+
+const MetaLeadsPage = () => {
+    const navigate = useNavigate();
+    const { organizationId } = useParams() as { organizationId: string };
+
+    // View State: 'list' or 'kanban' or 'calendar'
+    const [viewMode, setViewMode] = useState<'list' | 'kanban' | "calendar">('list');
+
+    const [filters, setFilters] = useState({
+        search: '',
+        status: '',
+        startDate: '',
+        endDate: ''
+    });
+    const [updatingLeadId, setUpdatingLeadId] = useState<string | null>(null);
+
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    // Queries & Mutations
+    const {
+        data,
+
+        isLoading,
+        isError,
+        error,
+        refetch
+    } = useGetMetaAdLeads({
+        organizationId,
+    });
+
+    const updateStatusMutation = useUpdateMetaLeadStatus();
+
+    // Flatten pages to get a single array of leads
+    const leads = data || []
+
+    // Client-side search filter (searching by name, email, or phone inside formFields)
+    const filteredLeads = leads.filter((lead: any) => {
+        const fullName = (lead.formFields?.full_name || '').toLowerCase();
+        const email = (lead.formFields?.email || '').toLowerCase();
+        const phone = lead.formFields?.phone_number || '';
+        const searchStr = filters.search.toLowerCase();
+
+        return fullName.includes(searchStr) || email.includes(searchStr) || phone.includes(searchStr);
+    });
+
+    const activeFiltersCount = Object.values(filters).filter(val => val !== '').length;
+
+    const clearFilters = () => {
+        setFilters({ search: '', status: '', startDate: '', endDate: '' });
+    };
+
+    // Drag and Drop Handlers for Kanban
+    const [draggedLeadId, setDraggedLeadId] = useState<string | null>(null);
+
+    const handleDragStart = (e: React.DragEvent, id: string) => {
+        e.dataTransfer.setData('text/plain', id);
+        setDraggedLeadId(id);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+    };
+
+    const handleDrop = async (e: React.DragEvent, newStatus: string) => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData('text/plain');
+        setDraggedLeadId(null);
+
+        if (id) {
+            const lead = filteredLeads.find((l:any) => l._id === id);
+            if (lead && lead.status !== newStatus) {
+                await updateStatusMutation.mutateAsync({ id, newStatus });
+            }
+        }
+    };
+
+    // ==========================================
+    // CALENDAR LOGIC & STATE
+    // ==========================================
+    const [currentMonthDate, setCurrentMonthDate] = useState(new Date());
+    const [selectedDateLeads, setSelectedDateLeads] = useState<{ date: string, leads: any[] } | null>(null);
+
+    // Group leads by YYYY-MM-DD
+    const leadsByDate = useMemo(() => {
+        const group: Record<string, any[]> = {};
+        filteredLeads.forEach((lead: any) => {
+            const date = new Date(lead.createdAt);
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            if (!group[dateStr]) group[dateStr] = [];
+            group[dateStr].push(lead);
+        });
+        return group;
+    }, [filteredLeads]);
+
+    const handleInlineStatusChange = async (leadId: string, newStatus: string) => {
+        setUpdatingLeadId(leadId);
+        try {
+            await updateStatusMutation.mutateAsync({ id: leadId, newStatus });
+
+            // Optimistically update the local state of the modal so the user sees the change instantly
+            if (selectedDateLeads) {
+                setSelectedDateLeads({
+                    ...selectedDateLeads,
+                    leads: selectedDateLeads.leads.map(lead =>
+                        lead._id === leadId ? { ...lead, status: newStatus } : lead
+                    )
+                });
+            }
+        } finally {
+            setUpdatingLeadId(null);
+        }
+    };
+
+    const isChildRoute = location.pathname.includes("single");
+
+    if (isChildRoute) return <Outlet />;
+
+    return (
+        <div className="space-y-0 h-full max-h-full overflow-y-auto bg-[#fdfdfd] text-text-main p-2">
+
+            {/* Header */}
+            <header className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 pb-4 border-b border-ash-medium">
+                <div>
+                    <h1 className="text-2xl font-semibold text-text-strong flex items-center">
+                        <i className="fab fa-facebook mr-3 font-bold text-[#1877F2]"></i> {/* Meta Brand Color */}
+                        Meta Ads Leads
+                    </h1>
+                </div>
+
+                <div className='flex items-center gap-3'>
+                    {/* View Switcher */}
+                    <div className="flex bg-brand-surface-hover rounded-lg border border-brand-ash p-1">
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`px-3 py-1.5 rounded-md cursor-pointer text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-brand-surface shadow-sm text-text-strong border border-brand-ash' : 'text-text-muted hover:text-text-main'}`}
+                        >
+                            <i className="fas fa-list mr-2 text-text-muted"></i> List
+                        </button>
+                        <button
+                            onClick={() => setViewMode('kanban')}
+                            className={`px-3 py-1.5 rounded-md cursor-pointer text-sm font-medium transition-colors ${viewMode === 'kanban' ? 'bg-brand-surface shadow-sm text-text-strong border border-brand-ash' : 'text-text-muted hover:text-text-main'}`}
+                        >
+                            <i className="fas fa-columns mr-2 text-text-muted"></i> Kanban
+                        </button>
+                        <button
+                            onClick={() => setViewMode('calendar')}
+                            className={`px-3 py-1.5 rounded-md cursor-pointer text-sm font-medium transition-colors ${viewMode === 'calendar' ? 'bg-brand-surface shadow-sm text-text-strong border border-brand-ash' : 'text-text-muted hover:text-text-main'}`}
+                        >
+                            <i className="far fa-calendar-alt mr-2 text-text-muted"></i> Calendar
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            {/* Loading / Error States */}
+            {isLoading ? (
+                <div className="flex justify-center items-center py-20">
+                    <div className="flex flex-col items-center text-text-muted gap-3">
+                        <i className="fa-solid fa-circle-notch fa-spin text-4xl"></i>
+                    </div>
+                </div>
+            ) : isError ? (
+                <div className="max-w-xl mx-auto mt-10 p-6 bg-action-danger/10 border border-action-danger/30 rounded-xl text-center">
+                    <div className="text-action-danger font-semibold mb-2 text-xl">⚠️ Error Occurred</div>
+                    <p className="text-text-muted mb-4">{(error as any)?.message || "Failed to load Meta Ads leads"}</p>
+                    <button onClick={() => refetch()} className="bg-action-danger text-brand-surface px-6 py-2 rounded-lg font-medium">
+                        Retry
+                    </button>
+                </div>
+            ) : (
+                <main className="flex flex-col sm:flex-row gap-6 min-h-[calc(100vh-120px)] sm:h-[calc(100vh-120px)]">
+
+                    {/* Filters Sidebar */}
+                    {viewMode !== 'calendar' && <div className="w-full sm:w-80 flex-shrink-0 h-auto sm:h-full overflow-y-auto">
+                        <div className="bg-brand-surface rounded-xl shadow-sm p-5 border border-brand-ash">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-lg font-semibold text-text-strong flex items-center">
+                                    <i className="fas fa-filter mr-2 text-text-muted"></i>
+                                    Filters
+                                </h3>
+                                {activeFiltersCount > 0 && (
+                                    <button onClick={clearFilters} className="text-sm text-text-muted hover:text-text-strong font-medium cursor-pointer transition-colors">
+                                        Clear ({activeFiltersCount})
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="space-y-5">
+                                {/* Search */}
+                                <div>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-search text-text-soft mr-2"></i> Search
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Name, Email, or Phone..."
+                                        value={filters.search}
+                                        onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-brand-ash rounded-lg focus:ring-1 focus:ring-text-main focus:border-text-main outline-none bg-brand-surface-hover text-text-main placeholder-text-soft transition-colors"
+                                    />
+                                </div>
+
+                                {/* Status Filter (Only useful in List View) */}
+                                {viewMode === 'list' && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-main mb-2">
+                                            <i className="fas fa-tasks text-text-soft mr-2"></i> Stage
+                                        </label>
+                                        <select
+                                            value={filters.status}
+                                            onChange={(e) => setFilters(f => ({ ...f, status: e.target.value }))}
+                                            className="w-full px-3 py-2 border border-brand-ash rounded-lg focus:ring-1 focus:ring-text-main focus:border-text-main outline-none bg-brand-surface-hover text-text-main transition-colors cursor-pointer"
+                                        >
+                                            <option value="">All Stages</option>
+                                            {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
+                                        </select>
+                                    </div>
+                                )}
+
+                                {/* Date Filters */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-medium text-text-muted mb-1">From</label>
+                                        <input
+                                            type="date"
+                                            value={filters.startDate}
+                                            onChange={(e) => setFilters(f => ({ ...f, startDate: e.target.value }))}
+                                            className="w-full px-2 py-2 border border-brand-ash rounded-lg focus:ring-1 focus:ring-text-main outline-none bg-brand-surface-hover text-sm text-text-main transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-text-muted mb-1">To</label>
+                                        <input
+                                            type="date"
+                                            value={filters.endDate}
+                                            onChange={(e) => setFilters(f => ({ ...f, endDate: e.target.value }))}
+                                            className="w-full px-2 py-2 border border-brand-ash rounded-lg focus:ring-1 focus:ring-text-main outline-none bg-brand-surface-hover text-sm text-text-main transition-colors"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>}
+
+                    {/* Main Content Area (List or Kanban) */}
+                    <div className="flex-1 h-full overflow-hidden flex flex-col min-w-0">
+                        {filteredLeads.length === 0 ? (
+                            <div className="flex-1 flex flex-col items-center justify-center bg-[#fefefe] rounded-xl border-2 border-ash-medium p-8 shadow-sm">
+                                <i className="fab fa-facebook text-5xl text-brand-ash-dark mb-4" />
+                                <h3 className="text-xl font-semibold text-text-strong mb-2">No Leads Found</h3>
+                                <p className="text-text-muted text-center max-w-md">
+                                    {activeFiltersCount > 0
+                                        ? 'No leads match your current filter criteria. Try adjusting your search or dates.'
+                                        : 'Your inbox is clear. Waiting for new Meta Ads inquiries to arrive.'}
+                                </p>
+                            </div>
+                        ) : (
+                            <>
+                                {viewMode === 'list' && (
+                                    /* ================= LIST VIEW ================= */
+                                    <div
+                                        ref={scrollContainerRef}
+                                        className="flex-1 overflow-y-auto bg-brand-surface rounded-xl border border-brand-ash shadow-sm"
+                                    >
+                                        {/* Table Header */}
+                                        <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-brand-surface-hover border-b border-brand-ash font-semibold text-text-strong text-sm sticky top-0 z-10 shadow-sm">
+                                            <div className="col-span-1 text-center">S.No</div>
+                                            <div className="col-span-3">Contact</div>
+                                            <div className="col-span-4">Ad Details</div>
+                                            <div className="col-span-2">Date</div>
+                                            <div className="col-span-2 text-center">Stage</div>
+                                        </div>
+
+                                        {/* Table Body */}
+                                        <div className="divide-y divide-brand-ash">
+                                            {filteredLeads.map((lead: any, index: number) => (
+                                                <LeadListRow
+                                                    key={lead._id}
+                                                    lead={lead}
+                                                    index={index}
+                                                    onClick={() => navigate(`single/${lead._id}`)}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                                }
+
+                                {viewMode === 'kanban' && (
+                                    /* ================= KANBAN VIEW ================= */
+                                    <div className="flex-1 overflow-x-auto h-full pb-4">
+                                        <div className="flex gap-4 h-full min-w-max">
+                                            {STAGES.map(stage => {
+                                                const stageLeads = filteredLeads.filter((l: any) => l.status === stage);
+                                                return (
+                                                    <div
+                                                        key={stage}
+                                                        onDragOver={handleDragOver}
+                                                        onDrop={(e) => handleDrop(e, stage)}
+                                                        className="w-80 flex flex-col bg-brand-surface-hover rounded-xl border border-brand-ash h-full shadow-sm"
+                                                    >
+                                                        {/* Column Header */}
+                                                        <div className="p-4 border-b border-brand-ash flex justify-between items-center bg-brand-surface-hover rounded-t-xl">
+                                                            <h3 className="font-semibold text-text-strong">{stage}</h3>
+                                                            <span className="px-2 py-0.5 bg-brand-surface text-text-muted text-xs font-semibold rounded-full border border-brand-ash">
+                                                                {stageLeads.length}
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Column Body (Scrollable) */}
+                                                        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                                                            {stageLeads.map((lead: any) => (
+                                                                <KanbanCard
+                                                                    key={lead._id}
+                                                                    lead={lead}
+                                                                    onDragStart={handleDragStart}
+                                                                    isDragging={draggedLeadId === lead._id}
+                                                                    onClick={() => navigate(`single/${lead._id}`)}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+
+                                {viewMode === 'calendar' && (
+                                    <div className="flex-1 bg-brand-surface rounded-xl border border-brand-ash shadow-sm flex flex-col overflow-hidden">
+                                        <CalendarView
+                                            currentDate={currentMonthDate}
+                                            setCurrentDate={setCurrentMonthDate}
+                                            leadsByDate={leadsByDate}
+                                            onDateClick={(dateStr, dayLeads) => setSelectedDateLeads({ date: dateStr, leads: dayLeads })}
+                                        />
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </main>
+            )}
+
+
+            {/* POPUP MODAL FOR CALENDAR DATE CLICK */}
+            {selectedDateLeads && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+                    <div className="bg-brand-surface w-full max-w-2xl rounded-2xl border-2 border-brand-ash shadow-2xl flex flex-col max-h-[70vh] overflow-hidden animate-in fade-in zoom-in duration-200">
+
+                        {/* Modal Header */}
+                        <div className="p-5 border-b-2 border-brand-ash flex items-center justify-between bg-brand-surface-hover shrink-0">
+                            <div>
+                                <h2 className="text-xl font-bold text-text-strong flex items-center">
+                                    <i className="far fa-calendar-check mr-3 text-action-primary"></i>
+                                    Leads for {new Date(selectedDateLeads.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </h2>
+                                <p className="text-sm text-text-muted mt-1">Total: <span className="font-bold text-text-main">{selectedDateLeads.leads.length}</span> leads acquired</p>
+                            </div>
+                            <button
+                                onClick={() => setSelectedDateLeads(null)}
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-brand-ash text-text-muted hover:text-text-strong transition-colors cursor-pointer"
+                            >
+                                <i className="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+
+                        {/* Modal Content - SCROLLABLE LIST */}
+                        <div className="flex-1 overflow-y-auto p-3">
+                            <div className="divide-y divide-brand-ash pb-32">
+                                {selectedDateLeads.leads.map((lead) => (
+                                    <div key={lead._id} className="p-4 hover:bg-brand-surface-hover transition-colors rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+                                        {/* Contact Info */}
+                                        <div className="flex items-center gap-4 truncate">
+                                            <div className="w-10 h-10 rounded-full bg-[#1877F2]/10 border border-[#1877F2]/20 flex items-center justify-center flex-shrink-0">
+                                                <i className="fab fa-facebook text-[#1877F2]"></i>
+                                            </div>
+                                            <div className="truncate">
+                                                <h4 className="text-sm font-bold text-text-strong truncate">{lead.formFields?.full_name || "Unknown"}</h4>
+                                                <p className="text-xs text-text-muted truncate">{lead.formFields?.phone_number || lead.formFields?.email || 'No contact info'}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Actions & Interactive Status Badge */}
+                                        <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0 justify-between sm:justify-end">
+
+                                            {/* Custom Interactive Select for Stage */}
+                                            <div className="w-[140px]">
+                                                <Select
+                                                    value={lead.status}
+                                                    onValueChange={(val) => handleInlineStatusChange(lead._id, val)}
+                                                >
+                                                    <SelectTrigger className={`h-8 border-none shadow-sm focus:ring-1 focus:ring-brand-ash ${getStatusStyles(lead.status)}`}>
+                                                        <div className="flex items-center gap-2 w-full">
+                                                            {updatingLeadId === lead._id ? (
+                                                                <i className="fas fa-spinner fa-spin text-inherit"></i>
+                                                            ) : null}
+                                                            <SelectValue placeholder="Stage" selectedValue={lead.status} />
+                                                        </div>
+                                                    </SelectTrigger>
+
+                                                    <SelectContent className="absolute z-50 mt-1 bg-brand-surface border border-brand-ash shadow-xl rounded-xl">
+                                                        {STAGES.map((stage) => (
+                                                            <SelectItem
+                                                                key={stage}
+                                                                value={stage}
+                                                                className="text-text-main font-semibold hover:bg-brand-surface-hover focus:bg-brand-surface-hover cursor-pointer"
+                                                            >
+                                                                {stage}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+
+                                            <button
+                                                onClick={() => navigate(`single/${lead._id}`)}
+                                                className="px-4 py-1.5 bg-brand-surface border border-brand-ash rounded-lg text-xs font-semibold text-text-main hover:bg-brand-ash hover:text-text-strong transition-colors cursor-pointer shadow-sm flex-shrink-0"
+                                            >
+                                                View <i className="fas fa-chevron-right ml-1 text-[10px]"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+        </div>
+    );
+};
+
+export default MetaLeadsPage;
+
+
+// ==========================================
+// Helpers & Sub-components
+// ==========================================
+
+const getStatusStyles = (status: string) => {
+    switch (status) {
+        case 'New': return 'bg-action-primary/10 text-action-primary border-action-primary/30';
+        case 'Contacted': return 'bg-action-warning/10 text-action-warning border-action-warning/30';
+        case 'Qualified': return 'bg-action-info/10 text-action-info border-action-info/30';
+        case 'Interested': return 'bg-action-success/10 text-action-success border-action-success/30';
+        case 'Not Interested': return 'bg-action-danger/10 text-action-danger border-action-danger/30';
+        case 'Converted': return 'bg-action-success text-brand-surface border-action-success';
+        default: return 'bg-brand-surface-hover text-text-main border-brand-ash-dark';
+    }
+};
+
+// --- List View Row ---
+const LeadListRow = ({ lead, index, onClick }: { lead: any, index: number, onClick: () => void }) => {
+    return (
+        <div
+            onClick={onClick}
+            className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-brand-surface-hover transition-colors cursor-pointer text-sm bg-brand-surface"
+        >
+            <div className="col-span-1 text-center font-medium text-text-muted">
+                {index + 1}
+            </div>
+
+            <div className="col-span-3 flex flex-col truncate pr-2">
+                <span className="font-semibold text-text-strong truncate">
+                    {lead.formFields?.full_name || "Unknown Contact"}
+                </span>
+                <span className="text-text-muted text-xs flex items-center truncate mt-0.5">
+                    <i className="fas fa-phone-alt mr-1.5 text-text-soft text-[10px]"></i>
+                    {lead.formFields?.phone_number || lead.formFields?.email || "No contact info"}
+                </span>
+            </div>
+
+            <div className="col-span-4 flex flex-col text-text-main truncate pr-4">
+                <span className="font-medium text-text-strong truncate">
+                    {lead.adName || "Meta Ad Campaign"}
+                </span>
+                <span className="text-text-muted text-xs truncate mt-0.5">
+                    {lead.formName || `Lead ID: ${lead.metaLeadId}`}
+                </span>
+            </div>
+
+            <div className="col-span-2 flex flex-col text-xs text-text-muted">
+                <span className="font-medium text-text-main">
+                    {new Date(lead.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </span>
+                <span className="mt-0.5">
+                    {new Date(lead.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+            </div>
+
+            <div className="col-span-2 flex justify-center">
+                <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getStatusStyles(lead.status)}`}>
+                    {lead.status}
+                </span>
+            </div>
+        </div>
+    );
+};
+
+// --- Kanban Card ---
+const KanbanCard = ({ lead, onDragStart, isDragging, onClick }: { lead: any, onDragStart: any, isDragging: boolean, onClick: () => void }) => {
+    return (
+        <div
+            draggable
+            onDragStart={(e) => onDragStart(e, lead._id)}
+            onClick={onClick}
+            className={`p-4 rounded-xl border bg-brand-surface cursor-grab active:cursor-grabbing hover:shadow-sm transition-all ${isDragging ? 'opacity-60 border-text-main border-dashed bg-brand-surface-hover' : 'border-brand-ash'}`}
+        >
+            <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center gap-2 truncate">
+                    <div className="w-8 h-8 rounded-full bg-[#1877F2]/10 border border-[#1877F2]/20 flex items-center justify-center flex-shrink-0">
+                        <i className="fab fa-facebook text-[#1877F2] text-sm"></i>
+                    </div>
+                    <div className="truncate">
+                        <h4 className="text-sm font-semibold text-text-strong truncate">{lead.formFields?.full_name || "Unknown Contact"}</h4>
+                        <p className="text-xs text-text-muted truncate">{lead.formFields?.phone_number || lead.formFields?.email || "No contact info"}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-brand-surface-hover rounded-lg p-3 mb-3 border border-brand-ash flex flex-col">
+                <p className="text-xs font-semibold text-text-strong truncate mb-1">
+                    {lead.adName || "Meta Ad Campaign"}
+                </p>
+                <p className="text-xs text-text-muted truncate">
+                    {lead.formName || `Form ID: ${lead.metaLeadId}`}
+                </p>
+            </div>
+
+            <div className="flex justify-between items-center text-xs mt-1">
+                <span className="text-text-muted font-medium flex items-center">
+                    <i className="far fa-clock mr-1.5 text-text-soft"></i>
+                    {new Date(lead.updatedAt || lead.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                </span>
+
+                {/* Visual Indicator of Draggability */}
+                <i className="fas fa-grip-horizontal text-text-soft hover:text-text-muted transition-colors"></i>
+            </div>
+        </div>
+    );
+};
+
+// ==========================================
+// CUSTOM CALENDAR COMPONENT
+// ==========================================
+const CalendarView = ({ currentDate, setCurrentDate, leadsByDate, onDateClick }: {
+    currentDate: Date,
+    setCurrentDate: (d: Date) => void,
+    leadsByDate: Record<string, any[]>,
+    onDateClick: (date: string, leads: any[]) => void
+}) => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 is Sunday
+
+    const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+    const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Generate Calendar Grid
+    const days = [];
+    // Padding for days before the 1st of the month
+    for (let i = 0; i < firstDayOfMonth; i++) {
+        days.push(<div key={`empty-${i}`} className="bg-brand-surface-hover/50 border-r border-b border-brand-ash/50 min-h-[100px]"></div>);
+    }
+
+    // Actual Days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayLeads = leadsByDate[dateStr] || [];
+        const isToday = dateStr === todayStr;
+        const hasLeads = dayLeads.length > 0;
+
+        days.push(
+            <div
+                key={day}
+                onClick={() => hasLeads ? onDateClick(dateStr, dayLeads) : null}
+                className={`relative border-r border-b border-brand-ash min-h-[100px] p-2 transition-colors ${hasLeads ? 'cursor-pointer hover:bg-brand-surface-hover hover:shadow-inner' : 'bg-brand-surface'} ${isToday ? 'bg-action-primary/5' : ''}`}
+            >
+                <div className="flex justify-between items-start">
+                    <span className={`text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full ${isToday ? 'bg-action-primary text-brand-surface shadow-sm' : 'text-text-muted'}`}>
+                        {day}
+                    </span>
+                </div>
+
+                {hasLeads && (
+                    <div className="mt-2 flex flex-col gap-1">
+                        <div className="bg-[#1877F2]/10 border border-[#1877F2]/30 text-[#1877F2] text-xs font-bold px-2 py-1 rounded-md text-center shadow-sm flex items-center justify-center gap-1">
+                            <i className="fas fa-user-plus text-[10px]"></i> {dayLeads.length} Lead{dayLeads.length > 1 ? 's' : ''}
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-1 justify-center">
+                            {dayLeads.slice(0, 5).map((_: any, i: number) => (
+                                <div key={i} className="w-1.5 h-1.5 rounded-full bg-text-muted"></div>
+                            ))}
+                            {dayLeads.length > 5 && <span className="text-[8px] text-text-soft">+{dayLeads.length - 5}</span>}
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col h-full">
+            {/* Calendar Controls */}
+            <div className="flex items-center justify-between p-4 border-b border-brand-ash bg-brand-surface-hover">
+                <h2 className="text-lg font-bold text-text-strong">
+                    {currentDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
+                </h2>
+                <div className="flex gap-2">
+                    <button onClick={prevMonth} className="p-2 bg-brand-surface border border-brand-ash rounded-lg text-text-muted hover:text-text-strong hover:bg-brand-ash transition-colors">
+                        <i className="fas fa-chevron-left"></i>
+                    </button>
+                    <button onClick={() => setCurrentDate(new Date())} className="px-3 py-1.5 bg-brand-surface border border-brand-ash rounded-lg text-sm font-semibold text-text-main hover:bg-brand-ash transition-colors">
+                        Today
+                    </button>
+                    <button onClick={nextMonth} className="p-2 bg-brand-surface border border-brand-ash rounded-lg text-text-muted hover:text-text-strong hover:bg-brand-ash transition-colors">
+                        <i className="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            {/* Days of Week Header */}
+            <div className="grid grid-cols-7 border-b border-brand-ash bg-brand-surface-hover text-center py-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="text-xs font-bold text-text-muted uppercase tracking-wider">{day}</div>
+                ))}
+            </div>
+
+            {/* Grid */}
+            <div className="grid grid-cols-7 flex-1 overflow-y-auto bg-brand-surface border-l border-brand-ash">
+                {days}
+            </div>
+        </div>
+    );
+};

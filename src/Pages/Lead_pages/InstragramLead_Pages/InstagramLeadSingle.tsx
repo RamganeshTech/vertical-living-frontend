@@ -226,7 +226,7 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetSingleInstagramLead, useUpdateInstagramLeadStatus } from '../../../apiList/lead_api/instagramLeadApi';
+import { useGetSingleInstagramLead, useUpdateInstagramLeadStatus } from '../../../apiList/marketing_api/lead_api/instagramLeadApi';
 import { toast } from '../../../utils/toast';
 
 const InstagramLeadSingle = () => {
@@ -408,7 +408,7 @@ const InstagramLeadSingle = () => {
                                 <i className="far fa-clock mr-2 text-text-muted"></i> Timeline
                             </h3>
                             <div className="bg-brand-surface-hover rounded-xl p-6 border border-brand-ash space-y-5 shadow-sm relative">
-                                
+
                                 {/* Vertical Timeline Line */}
                                 <div className="absolute left-[31px] top-7 bottom-7 w-0.5 bg-brand-ash"></div>
 
@@ -423,7 +423,7 @@ const InstagramLeadSingle = () => {
                                         {new Date(lead.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
-                                
+
                                 {/* Last Updated */}
                                 <div className="relative pl-12 pt-2">
                                     <div className="absolute left-0 top-3 w-3.5 h-3.5 rounded-full bg-action-primary border-2 border-brand-surface shadow-sm z-10"></div>
