@@ -136,7 +136,8 @@ const InviteStaffs: React.FC = () => {
         description: "Link copied to clipboard",
       })
       setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
+    } catch (e) {
+      console.log(e)
       toast({
         title: "Error",
         description: "Failed to copy link",

@@ -6,7 +6,7 @@ import { Input } from "../../../../components/ui/Input";
 // import {  } from "@/hooks/rateconfig";
 import { toast } from "../../../../utils/toast";
 import { Button } from "../../../../components/ui/Button";
-import { useCreateCategory, useDeleteCategory, useGetCategories } from "../../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
+import { useCreateCategory, useDeleteCategory, useGetCategoriesPreSales } from "../../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 import { Card, CardContent } from "../../../../components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../../components/ui/Dialog";
 import { useAuthCheck } from "../../../../Hooks/useAuthCheck";
@@ -60,7 +60,7 @@ export default function RateConfigPreSalesMain() {
 
     const toggleVisibility = (index: number, module: string) => {
         const updated = [...fields];
-        const currentVisibility = updated[index].visibleIn || [];
+        const currentVisibility = updated[index].visibleIn || ["presales"];
 
         if (currentVisibility.includes(module)) {
             updated[index].visibleIn = currentVisibility.filter(m => m !== module);
@@ -91,12 +91,13 @@ export default function RateConfigPreSalesMain() {
 
 
     const [categoryName, setCategoryName] = useState("");
-    const [fields, setFields] = useState([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] as string[] }]);
+    const [fields, setFields] = useState([{ key: "", oldKey: "", type: "string", required: false, visibleIn: ["presales"] as string[] }]);
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [isProductSpecific, setIsProductSpecific] = useState<boolean>(false);
+    const [isProductSpecific, setIsProductSpecific] = useState<boolean>(true);
     const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
 
-    const { data: categories, isLoading, refetch } = useGetCategories(organizationId!);
+    // const { data: categories, isLoading, refetch } = useGetCategories(organizationId!);
+    const { data: categories, isLoading, refetch } =  useGetCategoriesPreSales(organizationId!)
     const { mutateAsync: createCategory, isPending: createPending } = useCreateCategory();
     const { mutateAsync: deleteCategory, isPending } = useDeleteCategory();
     const { mutateAsync: updateCategory, isPending: updatePending } = useUpdateRateConfigCategory();
@@ -107,7 +108,7 @@ export default function RateConfigPreSalesMain() {
     ) || [];
 
     const handleAddField = () => {
-        setFields([...fields, { key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
+        setFields([...fields, { key: "", oldKey: "", type: "string", required: false, visibleIn: ["presales"] }]);
     };
 
     const handleRemoveField = (index: number) => {
@@ -192,7 +193,7 @@ export default function RateConfigPreSalesMain() {
                     key: f.key,
                     type: f.type,
                     required: f.required || false,
-                    visibleIn: f.visibleIn || [],
+                    visibleIn: f.visibleIn || ["presales"],
                     oldKey: f.oldKey // Will be undefined for brand new fields added during edit
                 }));
 
@@ -222,7 +223,7 @@ export default function RateConfigPreSalesMain() {
 
             setEditingCategoryId(null);
             setCategoryName("");
-            setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
+            setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: ["presales"] }]);
             setShowCreateForm(false);
             refetch()
         }
@@ -326,7 +327,7 @@ export default function RateConfigPreSalesMain() {
                     if (!open) {
                         setEditingCategoryId(null);
                         setCategoryName("");
-                        setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
+                        setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: ["presales"] }]);
                     }
                 }}
 

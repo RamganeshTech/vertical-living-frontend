@@ -51,6 +51,8 @@ export const getInstagramLeadById = async ({
     return data.data;
 };
 
+
+
 export const updateInstagramLeadStatus = async ({
     api,
     id,
@@ -61,6 +63,37 @@ export const updateInstagramLeadStatus = async ({
     status: string;
 }) => {
     const { data } = await api.patch(`/v1/lead/update-status/${id}`, { status });
+    if (!data.ok) throw new Error(data.message);
+    return data.data;
+};
+
+
+
+
+export const getInstagramLeadsByMeta = async ({
+    api,
+    organizationId
+}: {
+    api: AxiosInstance;
+    organizationId: string;
+}) => {
+    const params = new URLSearchParams({
+        organizationId
+    });
+
+    const { data } = await api.get(`/v1/lead/getall-by-meta?${params.toString()}`);
+    if (!data.ok) throw new Error(data.message);
+    return data?.data;
+};
+
+export const getInstagramLeadByIdByMeta = async ({
+    api,
+    id
+}: {
+    api: AxiosInstance;
+    id: string;
+}) => {
+    const { data } = await api.get(`/v1/lead/getsingle-by-meta/${id}`);
     if (!data.ok) throw new Error(data.message);
     return data.data;
 };
@@ -137,5 +170,57 @@ export const useUpdateInstagramLeadStatus = () => {
             // Invalidate the specific lead if it's currently open
             queryClient.invalidateQueries({ queryKey: ["instagramLead", variables.id] });
         }
+    });
+};
+
+
+
+
+
+
+
+// OFFICIAL meta api
+
+
+// Hook 1: Infinite Query for Kanban/Table with Filters
+export const useGetInstagramLeadsByMeta = (filters: {
+    organizationId: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+}) => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useQuery({
+        queryKey: ["instagramLeads-meta", filters],
+        queryFn: async () => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+
+            return await getInstagramLeadsByMeta({
+                api,
+               
+                organizationId: filters.organizationId
+            });
+        },
+        enabled: !!role && allowedRoles.includes(role) && !!api && !!filters.organizationId,
+    });
+};
+
+// Hook 2: Get Single Lead Details
+export const useGetSingleInstagramLeadByMeta = (id: string) => {
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useQuery({
+        queryKey: ["instagramLead-meta", id],
+        queryFn: async () => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+            if (!api) throw new Error("API instance not found for role");
+            return await getInstagramLeadByIdByMeta({ api, id });
+        },
+        enabled: !!role && allowedRoles.includes(role) && !!api && !!id,
     });
 };

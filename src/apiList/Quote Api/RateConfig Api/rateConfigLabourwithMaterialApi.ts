@@ -228,7 +228,7 @@ export const useGetSingleMaterialWithLabourCostByCategoryName = ({
     // Only run if both ID and Name are provided
     enabled: !!organizationId && !!categoryName,
     retry: false,
-    staleTime: 5 * 60 * 1000, // Optional: Cache for 5 minutes
+    // staleTime: 5 * 60 * 1000, // Optional: Cache for 5 minutes
   });
 };
 /* --------------------------- ITEM API FUNCTIONS --------------------------- */

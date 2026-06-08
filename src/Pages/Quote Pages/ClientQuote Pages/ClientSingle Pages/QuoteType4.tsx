@@ -316,6 +316,12 @@ const QuoteType4: React.FC<QuoteProps> = ({
                     <h2 className="text-lg font-bold text-[#0f4c81] border-b-2 border-[#2563eb] pb-2 mb-6 print-card">Execution Scope & Product Estimates</h2>
                     {furnitures?.map((furniture, idx) => {
                         const displayImage = localPreviews[furniture._id] || furniture.coreMaterials?.[0]?.imageUrl;
+
+                        const isNonModular = furniture.typeOfWork === "non-modular";
+
+                        console.log("furniture", idx + 1, furniture)
+
+
                         return (
                             <div key={furniture._id} className="mb-10 p-6 rounded-xl border-l-[6px] border-[#2563eb] bg-gradient-to-b from-[#fbfdff] to-[#f5f8ff] shadow-sm ">
                                 <div className="flex justify-between items-start mb-4">
@@ -325,7 +331,7 @@ const QuoteType4: React.FC<QuoteProps> = ({
                                     </div>
                                 </div>
 
-                                <div className="flex gap-5 mb-6">
+                                {!isNonModular && <div className="flex gap-5 mb-6">
                                     {usedIn === "quoteForClients" && <div className="w-[190px] border-2 border-dashed border-[#93c5fd] rounded-xl p-3 text-center bg-[#f8fbff] cursor-pointer print:border-none"
                                         onClick={() => handleImageClick(furniture._id)}>
                                         <strong className="block mb-2 text-[13px] text-[#1e3a8a] print:hidden">Product Image</strong>
@@ -417,38 +423,89 @@ const QuoteType4: React.FC<QuoteProps> = ({
                                             ))}
                                         </div>
                                     </div>
-                                </div>
+                                </div>}
 
                                 <div className="mt-3">
                                     <h2 className="font-bold text-sm text-gray-700 mt-5 mb-2">Execution Scope of Work</h2>
                                     <textarea
 
+                                        name={isNonModular ? "engineeringDescription" : "scopeOfWork"}
                                         className="overflow-hidden w-full min-h-[100px] p-4 text-sm leading-relaxed text-gray-700 bg-white border-2 border-gray-100 rounded-xl outline-none"
-                                        defaultValue={furniture?.scopeOfWork || `Comprehensive manufacturing and installation of ${furniture.furnitureName} as per the approved site measurements and material standards.`}
+                                        // defaultValue={furniture?.scopeOfWork || `Comprehensive manufacturing and installation of ${furniture.furnitureName} as per the approved site measurements and material standards.`}
+                                        defaultValue={isNonModular ? furniture.engineeringDescription : (furniture?.scopeOfWork || `Comprehensive manufacturing and installation of ${furniture.furnitureName} as per the approved site measurements and material standards.`)}
                                         onInput={(e) => autoExpand(e.currentTarget)}
                                         ref={(el) => adjustHeight(el)}
                                     // value={furniture?.scopeOfWork || `Comprehensive manufacturing and installation of ${furniture.furnitureName}.`}
                                     />
                                 </div>
 
-                                <h2 className="font-bold text-sm text-gray-700 mt-5 mb-2">Material & Brand Specifications</h2>
-                                {renderBrandSpecificationTable(furniture)}
 
-                                <div className="font-bold text-sm text-gray-700 mt-6 mb-2">Cost Break-Up</div>
-                                <table className="w-full border-collapse bg-white rounded-lg overflow-hidden border border-gray-100 text-sm">
-                                    <thead>
-                                        <tr className="bg-[#eef4ff] text-[#1e3a8a] text-left">
-                                            <th className="p-3">Description</th>
-                                            <th className="p-3 text-right">Amount (₹)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        <tr><td className="p-3">Core Materials (Plywood & Laminates)</td><td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>₹{furniture.totals.core.toLocaleString('en-IN')}</td></tr>
-                                        <tr><td className="p-3">Fittings & Accessories</td><td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>₹{furniture.totals.fittings.toLocaleString('en-IN')}</td></tr>
-                                        <tr><td className="p-3">Adhesives & Glues</td><td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>₹{furniture.totals.glues.toLocaleString('en-IN')}</td></tr>
-                                        <tr><td className="p-3">Non-Branded Materials</td><td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>₹{furniture.totals.nbms.toLocaleString('en-IN')}</td></tr>
-                                    </tbody>
-                                </table>
+                                {isNonModular && (
+                                    <div className="mt-6">
+                                        <h2 className="font-bold text-sm text-gray-700 mb-2">Execution Breakdown</h2>
+                                        <table className="w-full border-collapse bg-white rounded-lg overflow-hidden border border-gray-100 text-sm mb-6">
+                                            <thead>
+                                                <tr className="bg-[#eef4ff] text-[#1e3a8a] text-left">
+                                                    <th className="p-3 border-r border-blue-50/50">Work Description</th>
+                                                    <th className="p-3 text-center border-r border-blue-50/50">Area (Sq.ft)</th>
+                                                    <th className="p-3 text-right">Amount (₹)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                {(furniture.works || []).map((w: any, wIdx: number) => (
+                                                    <tr key={wIdx}>
+                                                        <td className="p-3 border-r border-gray-50">{w.workName}</td>
+                                                        <td className="p-3 text-center border-r border-gray-50">{w.totalSqft}</td>
+                                                        <td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>
+                                                            ₹{w.totalAmount?.toLocaleString("en-IN") || 0}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <h4 className="text-gray-700 font-bold text-xs mb-2">Inclusions</h4>
+                                                <textarea name="included" className={`${isBlurred ? "blur-sm" : ""} min-h-[100px] w-full text-xs leading-relaxed text-gray-600 bg-white p-4 rounded-xl border-2 border-gray-100 outline-none resize-none`}
+                                                defaultValue={furniture.included} onInput={(e) => autoExpand(e.currentTarget)} readOnly={!showSaveTemplateButton} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-gray-700 font-bold text-xs mb-2">Exclusions</h4>
+                                                <textarea name="excluded" className={`${isBlurred ? "blur-sm" : ""} min-h-[100px] w-full text-xs leading-relaxed text-gray-600 bg-white p-4 rounded-xl border-2 border-gray-100 outline-none resize-none`} 
+                                                defaultValue={furniture.excluded} onInput={(e) => autoExpand(e.currentTarget)} readOnly={!showSaveTemplateButton} />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <h4 className="text-gray-700 font-bold text-xs mb-2">Materials & Specifications</h4>
+                                                <textarea name="materialsAndBrands" className={`${isBlurred ? "blur-sm" : ""} min-h-[100px] w-full text-xs leading-relaxed text-gray-600 bg-white p-4 rounded-xl border-2 border-gray-100 outline-none resize-none`}
+                                                defaultValue={furniture.materialsAndBrands} onInput={(e) => autoExpand(e.currentTarget)} readOnly={!showSaveTemplateButton} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!isNonModular && (
+                                    <>
+                                        <h2 className="font-bold text-sm text-gray-700 mt-5 mb-2">Material & Brand Specifications</h2>
+                                        {renderBrandSpecificationTable(furniture)}
+
+                                        <div className="font-bold text-sm text-gray-700 mt-6 mb-2">Cost Break-Up</div>
+                                        <table className="w-full border-collapse bg-white rounded-lg overflow-hidden border border-gray-100 text-sm">
+                                            <thead>
+                                                <tr className="bg-[#eef4ff] text-[#1e3a8a] text-left">
+                                                    <th className="p-3">Description</th>
+                                                    <th className="p-3 text-right">Amount (₹)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                <tr><td className="p-3">Core Materials (Plywood & Laminates)</td><td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>₹{furniture.totals.core.toLocaleString('en-IN')}</td></tr>
+                                                <tr><td className="p-3">Fittings & Accessories</td><td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>₹{furniture.totals.fittings.toLocaleString('en-IN')}</td></tr>
+                                                <tr><td className="p-3">Adhesives & Glues</td><td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>₹{furniture.totals.glues.toLocaleString('en-IN')}</td></tr>
+                                                <tr><td className="p-3">Non-Branded Materials</td><td className={`${isBlurred ? "blur-sm" : ""} p-3 text-right font-medium`}>₹{furniture.totals.nbms.toLocaleString('en-IN')}</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </>
+                                )}
                             </div>
                         );
                     })}
@@ -565,7 +622,7 @@ const QuoteType4: React.FC<QuoteProps> = ({
                         })}
 
                         {/* 2. 🆕 Technical Hardwares (Common Materials) Gallery */}
-                        {hasCommonImages  && (
+                        {hasCommonImages && (
                             <div className="mb-10 p-6 rounded-xl border-l-[6px] border-[#2563eb] bg-gradient-to-b from-[#fbfdff] to-[#f5f8ff] shadow-sm">
                                 <h3 className="text-lg font-bold text-[#0f4c81] mb-6">
                                     Gallery: Technical Hardwares

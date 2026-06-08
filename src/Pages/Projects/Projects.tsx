@@ -215,6 +215,7 @@ export const PERMISSION_MAPPING: Record<string, string | string[]> = {
   INSTAGRAMLEAD: "leadmodule",
   WHATSAPPLEAD: "leadmodule",
   METALEAD: "leadmodule",
+  VERTICALLIVINGCONFIG: "leadmodule",
 
   RATECONIGPRESALES: "presalesmaterialrateconfig", // Add this line!
   RATECONIG: "materialrateconfig",
@@ -269,7 +270,9 @@ export const getProjectPaths = (organizationId: string | undefined): Record<stri
     COSTCALCULATIONLEADFORM: `/organizations/${organizationId}/projects/publiccostcalculation`,
     INSTAGRAMLEAD: `/organizations/${organizationId}/projects/instagram-leads`,
     METALEAD: `/organizations/${organizationId}/projects/meta-leads`,
+
     WHATSAPPLEAD: `/organizations/${organizationId}/projects/whatsapp-leads`,
+    VERTICALLIVINGCONFIG: `/organizations/${organizationId}/projects/vertical-living-configuration`,
     RATECONIGPRESALES: `/organizations/${organizationId}/projects/rateconfigpresales`,
     RATECONIG: `/organizations/${organizationId}/projects/rateconfig`,
     RATECONIGSTAFF: `/organizations/${organizationId}/projects/labourrateconfig`,
@@ -372,7 +375,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
 
   // If NOT the special org → remove LEADCOLLECTION
   if (organizationId !== "684a57015e439b678e8f6918") {
-    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION" && key !== "COSTCALCULATIONLEADFORM" && key !== "INSTAGRAMLEAD" && key !== "WHATSAPPLEAD" && key !== "METALEAD");
+    allowedKeys = allowedKeys.filter(key => key !== "LEADCOLLECTION" && key !== "COSTCALCULATIONLEADFORM" && key !== "INSTAGRAMLEAD" && key !== "WHATSAPPLEAD" && key !== "METALEAD" && key !== "VERTICALLIVINGCONFIG");
   }
   // =========================================================
   // 4. CONSTRUCT INITIAL SIDEBAR OBJECTS
@@ -449,7 +452,7 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     {
       id: "LEAD_COLLECTION",
       label: "Lead Collection",
-      keys: ["LEADCOLLECTION", "COSTCALCULATIONLEADFORM", "INSTAGRAMLEAD", "WHATSAPPLEAD", "METALEAD"]
+      keys: ["LEADCOLLECTION", "COSTCALCULATIONLEADFORM", "INSTAGRAMLEAD", "WHATSAPPLEAD", "METALEAD", "VERTICALLIVINGCONFIG"]
 
     },
     {

@@ -639,7 +639,7 @@ export default function RateConfigSub() {
 
                                     {/* 🆕 New Timeline Data Cell */}
                                     <td className="p-1 border border-gray-100 text-center whitespace-nowrap bg-gray-50/30">
-                                        <div className="flex flex-col items-center justify-center gap-0.5 max-w-[100px]">
+                                        <div className="flex flex-col items-center justify-center gap-0.5 max-w-[100%]">
                                             {/* 1. The Primary Date (Bold Slate) */}
                                             <span className="text-[11px] font-bold text-slate-700 tracking-tight">
                                                 {updatedDate}

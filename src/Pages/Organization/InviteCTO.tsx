@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar'
 import { COMPANY_DETAILS } from '../../constants/constants'
 import type { OrganizationOutletTypeProps } from './OrganizationChildren'
 import { useAuthCheck } from '../../Hooks/useAuthCheck'
+import { SidePanel } from '../../shared/SidePanel/SidePanel'
+import { useCreateCommonUser } from '../../apiList/commonAuthApi'
 
 const InviteCTO: React.FC = () => {
   const { organizationId } = useParams()
@@ -20,7 +22,7 @@ const InviteCTO: React.FC = () => {
   const { openMobileSidebar, isMobile } = useOutletContext<OrganizationOutletTypeProps>()
 
 
-  const { role, permission } = useAuthCheck();
+  const { role, permission, ownerId } = useAuthCheck();
 
 
   const canDelete = role === "owner" || permission?.invitecto?.delete;
@@ -33,9 +35,58 @@ const InviteCTO: React.FC = () => {
   const [inviteLink, setInviteLink] = useState("")
   const [copied, setCopied] = useState(false)
 
+
+
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+
+
+  // Form State
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phoneNo: '',
+    password: '',
+    role: 'CTO'
+  });
+
+
   const { data: CTOs, isLoading: CTOLoading, error: CTOError, isError: CTOIsError } = useGetCTOByOrganization(organizationId!)
+  const createUser = useCreateCommonUser();
+
   const removeCTO = useRemoveCTOFromOrganization()
   const inviteCTO = useInviteCTOToOrganization()
+
+  const handleCreateCTO = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Create the invite token (Mocking the structure your controller expects)
+    const inviteData = {
+      organizationId,
+      role: formData.role,
+      expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 Days
+      ownerId: ownerId
+    };
+
+    const inviteToken = btoa(JSON.stringify(inviteData));
+
+    try {
+      await createUser.mutateAsync({
+        ...formData,
+        invite: inviteToken
+      });
+
+      setIsPanelOpen(false);
+      setFormData({ name: '', email: '', phoneNo: '', password: '', role: 'CTO' });
+      toast({ title: "Success", description: "CTO created successfully" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to create CTO",
+        variant: "destructive"
+      });
+    }
+  };
+
 
   const handleRemoveCTO = async (CTOId: string, CTOName: string) => {
     if (window.confirm(`Are you sure you want to remove ${CTOName} from this organization?`)) {
@@ -151,10 +202,25 @@ const InviteCTO: React.FC = () => {
                   <i className="fas fa-user-tie text-blue-600 text-xl"></i>
                 </div>
               </div>
-              <div className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-lg">
-                <i className="fas fa-users mr-2"></i>
-                {CTOs?.length} {CTOs?.length > 1 ? "Members" : "Member"}
-              </div>
+
+
+              <section className='flex gap-2 items-center'>
+
+                <div className="text-gray-600 text-sm bg-gray-100 px-3 py-2 rounded-lg">
+                  <i className="fas fa-users mr-2"></i>
+                  {CTOs?.length} {CTOs?.length > 1 ? "Members" : "Member"}
+                </div>
+
+                <button
+                  onClick={() => setIsPanelOpen(true)}
+                  className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105"
+                  title="Add New Staff"
+                >
+                  <i className="fa-solid fa-plus text-lg"></i>
+                </button>
+              </section>
+
+
             </div>
           </div>
         </div>
@@ -279,6 +345,66 @@ const InviteCTO: React.FC = () => {
           )}
         </div>}
       </div>
+
+
+
+      {/* Reusable Side Panel with the Form */}
+      <SidePanel
+        isOpen={isPanelOpen}
+        onClose={() => setIsPanelOpen(false)}
+        title="Quick Create CTO"
+      >
+        <form onSubmit={handleCreateCTO} className="space-y-5">
+          <div className="space-y-2">
+            <Label>Full Name</Label>
+            <Input
+              required
+              placeholder="Enter CTO name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Email Address</Label>
+            <Input
+              required type="email"
+              placeholder="cto@company.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Phone Number</Label>
+            <Input
+              required
+              placeholder="e.g. 9876543210"
+              value={formData.phoneNo}
+              onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Password</Label>
+            <Input
+              required type="password"
+              placeholder="Set initial password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full h-12 mt-4 text-base bg-blue-600 hover:bg-blue-700"
+            isLoading={createUser.isPending}
+          >
+            Register CTO
+          </Button>
+
+          <p className="text-xs text-center text-gray-500 mt-4">
+            CTO will be assigned to the current organization automatically.
+          </p>
+        </form>
+      </SidePanel>
     </div>
   )
 }

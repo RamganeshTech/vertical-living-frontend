@@ -59,7 +59,7 @@ const ROOM_LIST = ["Living Room", "Kitchen", "Master Bedroom",
 const PRODUCT_CATALOG: Record<string, any[]> = {
     "Living Room": [
         { id: "grand_tv", label: "tv unit", name: "TV Unit", h: 6, w: 6, d:1.25 },
-        { id: "wardrobe", label: "wardrobe", name: "Wardrobe", h: 7, w: 6, d:2.5 },
+        { id: "wardrobe", label: "wardrobe", name: "Wardrobe", h: 7, w: 6, d: 2.5 },
         { id: "crockery", label: "crockery unit", name: "Crockery Unit", h: 3, w: 6, d:1.25 },
         { id: "bar_unit", label: "bar unit", name: "Bar Unit", h: 7, w: 3, d: 1.5 },
         { id: "book_shelf", label: "book shelf", name: "Book Shelf", h: 2.5, w: 3, d: 1 },
@@ -92,7 +92,7 @@ const PRODUCT_CATALOG: Record<string, any[]> = {
 
         { id: "dining_panel", label: "dining wall panelling", name: "Dining Wall Panelling", h: 8, w: 6, d: 0.1 },
 
-        { id: "side_table", label: "sideboard", name: "Side Table", h: 1.5, w: 1.5, d: 1.5 },
+        { id: "side_table", label: "side table", name: "Side Table", h: 1.5, w: 1.5, d: 1.5 },
         { id: "work_table", label: "study table", name: "Working Table", h: 2.5, w: 4, d: 2 },
         // { id: "temple", label: "pooja unit", name: "Pooja Unit", h: 5, w: 3 ,d:},
         // { id: "mini_tv", label: "mini tv unit", name: "Mini TV Unit", h: 4, w: 4 ,d:},
@@ -137,7 +137,7 @@ const PRODUCT_CATALOG: Record<string, any[]> = {
         { id: "shoe_rack", label: "shoe rack", name: "Shoe Rack", h: 2, w: 2.5, d: 1.25 },
 
 
-        { id: "mirror_shelf", label: "mirror with shelfs behind", name: "Mirror with Shelfs Behind", h: 3, w: 2, d: 1 },
+        { id: "mirror_shelf", label: "mirror with shelfs behind", name: "Mirror with Shelfs Behind", h: 3, w: 2, d: 0.5 },
         { id: "shower_partition", label: "shower glass partition", name: "Shower Glass Partition", h: 7, w: 3, d: 1 },
         { id: "wardrobe", label: "wardrobe", name: "Wardrobe", h: 7, w: 6, d: 2.5 },
         { id: "wallpaper", label: "wall paper", name: "Wall Paper", h: 10, w: 10, d: 0.01 },

@@ -32,6 +32,8 @@ export const useCreateCategory = () => {
     },
     onSuccess: (_, { organizationId }) => {
       queryClient.invalidateQueries({ queryKey: ["rateconfig", "categories", organizationId] });
+      queryClient.invalidateQueries({ queryKey: ["rateconfig", "presales", "categories", organizationId] });
+      queryClient.invalidateQueries({ queryKey: ["rateconfig", "internalquote", "categories", organizationId] });
     },
   });
 };
@@ -65,6 +67,67 @@ export const useGetCategories = (organizationId: string) => {
   });
 };
 
+
+const getCategoriesPreSales = async ({
+  api,
+  organizationId
+}: {
+  api: AxiosInstance;
+  organizationId: string;
+}) => {
+  const { data } = await api.get(`/quote/rateconfig/categories/v1/presales/${organizationId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useGetCategoriesPreSales = (organizationId: string) => {
+  const allowedRoles = ["owner", "CTO", "staff"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ["rateconfig", "presales", "categories", organizationId],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
+      if (!api) throw new Error("API instance not found for role");
+      return await getCategoriesPreSales({ api, organizationId });
+    },
+    enabled: !!organizationId,
+  });
+};
+
+
+
+const getCategoriesInternalQuote = async ({
+  api,
+  organizationId
+}: {
+  api: AxiosInstance;
+  organizationId: string;
+}) => {
+  const { data } = await api.get(`/quote/rateconfig/categories/v1/internalquote/${organizationId}`);
+  if (!data.ok) throw new Error(data.message);
+  return data.data;
+};
+
+export const useGetCategoriesInternalQuote = (organizationId: string) => {
+  const allowedRoles = ["owner", "CTO", "staff"];
+  const { role } = useGetRole();
+  const api = getApiForRole(role!);
+
+  return useQuery({
+    queryKey: ["rateconfig", "internalquote", "categories", organizationId],
+    queryFn: async () => {
+      if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
+      if (!api) throw new Error("API instance not found for role");
+      return await getCategoriesInternalQuote({ api, organizationId });
+    },
+    enabled: !!organizationId,
+  });
+};
+
+
+
 // 3. Delete Category
 const deleteCategory = async ({
   api,
@@ -91,6 +154,8 @@ export const useDeleteCategory = () => {
     },
     onSuccess: (_, { organizationId }) => {
       queryClient.invalidateQueries({ queryKey: ["rateconfig", "categories", organizationId] });
+      queryClient.invalidateQueries({ queryKey: ["rateconfig", "presales", "categories", organizationId] });
+      queryClient.invalidateQueries({ queryKey: ["rateconfig", "internalquote", "categories", organizationId] });
     },
   });
 };
@@ -273,7 +338,7 @@ export const useGetBrandsByCategoryForFittings = ({ categoryName, organizationId
       return await getItemsBycategoryNameForFittings({ api, organizationId, categoryName, itemName });
     },
     // Only fetch if the category is provided and the user has typed at least 3 characters
-    enabled: !!categoryName && !!itemName,
+    enabled: !!categoryName,
   });
 };
 

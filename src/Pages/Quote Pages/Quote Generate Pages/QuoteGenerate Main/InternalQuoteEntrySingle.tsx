@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-    // useCreateMaterialQuote,
     useEditMaterialQuote, useGetSingleInternalResidentialVersion,
     useUpdateInternalMainQuote
 } from '../../../../apiList/Quote Api/Internal_Quote_Api/internalquoteApi';
 import type { CoreMaterialRow, FurnitureBlock, SimpleItemRow } from './FurnitureForm';
-import { useGetLabourRateConfigCategories, useGetSingleLabourCost } from '../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi';
+// import { useGetLabourRateConfigCategories, useGetSingleLabourCost } from '../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi';
 import { Button } from '../../../../components/ui/Button';
 import FurnitureForm, { RATES } from './FurnitureForm';
 import { useAuthCheck } from '../../../../Hooks/useAuthCheck';
@@ -17,11 +16,10 @@ import CreateQuoteModal from './InternalQuote_New_Version/CreateQuoteModal';
 import { useGetProjects } from '../../../../apiList/projectApi';
 import SqftRateInternalWork from './SqftRateInternalwork';
 import { useDebounce } from '../../../../Hooks/useDebounce';
-// import { getItemsBycategoryNameForAllCategories } from '../../../../apiList/Quote Api/RateConfig Api/rateConfigApi';
-// import useGetRole from '../../../../Hooks/useGetRole';
 import { getApiForRole } from '../../../../utils/roleCheck';
 import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
 import { getMaterialBrand } from '../../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi';
+import { useGetSingleLabourCostByCategoryName } from '../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi';
 
 const InternalQuoteEntrySingle = () => {
     const navigate = useNavigate()
@@ -71,76 +69,6 @@ const InternalQuoteEntrySingle = () => {
         }
     };
 
-
-    //  OLD VERSION OF FETCHING THE BRANDS 
-    // const [commonMaterialBrands, setcommonMaterialBrands] = useState<Record<number, any[]>>({});
-    // const debounceTimers = useRef<Record<number, any>>({});
-
-    // const { role, permission } = useAuthCheck();
-
-    // const allowedRoles = ["owner", "CTO", "staff"];
-
-    // const api = getApiForRole(role!);
-
-
-
-    // useEffect(() => {
-    //     // Prime the options map with already saved data so labels show up on load
-    //     const initialMap: Record<number, any[]> = {};
-
-    //     data?.commonMaterials?.forEach((row: any, i: number) => {
-    //         if (row.brandId && row.brandName) {
-    //             initialMap[i] = [{
-    //                 label: row.brandName,
-    //                 value: String(row.brandId),
-    //                 rate: row.cost // Use existing cost as fallback
-    //             }];
-    //         }
-    //     });
-
-    //     setcommonMaterialBrands(prev => ({ ...prev, ...initialMap }));
-
-
-    // }, [data?.commonMaterials]);
-
-    // const fetchFittingsBrands = async (index: number, itemName: string) => {
-
-
-    //     if (!itemName) return;
-    //     try {
-
-    //         if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to fetch this data");
-    //         if (!api) throw new Error("API instance not found for role");
-
-
-    //         const results = await getItemsBycategoryNameForFittings({
-    //             api,
-    //             organizationId,
-    //             categoryName: "Accessories/Hardware",
-    //             itemName: itemName
-    //         });
-
-
-    //         console.log("results", results)
-
-    //         const formatted = results.map((item: any) => ({
-    //             label: item.data?.Brand,
-    //             // ✅ FIX: _id is at the top level, not inside item.data
-    //             // value: item?._id,
-    //             value: item?._id ? String(item._id) : "",
-    //             rate: item.data?.Rs
-    //         }));
-
-
-    //         console.log("formatted", formatted)
-
-    //         setcommonMaterialBrands(prev => ({ ...prev, [index]: formatted }));
-    //     } catch (error) {
-    //         console.error("Error fetching fitting brands:", error);
-    //     }
-    // };
-
-
     const [commonMaterialBrands, setcommonMaterialBrands] = useState<Record<number, any[]>>({});
     const debounceTimers = useRef<Record<number, any>>({});
 
@@ -152,7 +80,7 @@ const InternalQuoteEntrySingle = () => {
 
 
 
-    
+
     // 🆕 New fetch function for Non-Branded (Global Search)
     const fetchAllCategoryItems = async (index: number, itemName: string) => {
         if (!itemName) return;
@@ -232,15 +160,7 @@ const InternalQuoteEntrySingle = () => {
         });
 
         setcommonMaterialBrands(prev => ({ ...prev, ...initialMap }));
-
-
     }, []);
-
-
-
-
-
-
 
 
     useEffect(() => {
@@ -265,7 +185,12 @@ const InternalQuoteEntrySingle = () => {
                         glues: item.gluesTotal || 0,
                         nbms: item.nonBrandMaterialsTotal || 0,
                         furnitureTotal: item.furnitureTotal || 0,
-                    }
+                    },
+
+                    // ✅ 1. EXPLICITLY EXTRACT NON-MODULAR FIELDS ON LOAD
+                    typeOfWork: item?.typeOfWork || "modular",
+                    typeOfNonModularWork: item?.typeOfNonModularWork || null,
+                    works: item?.works && item?.works.length > 0 ? item?.works : [{ workName: "", totalSqft: 0, sqftRate: 0, labourRate: 0, totalAmount: 0 }],
                 }));
 
                 setFurnitures(transformedFurnitures);
@@ -301,6 +226,18 @@ const InternalQuoteEntrySingle = () => {
     const [tempFurnitureName, setTempFurnitureName] = useState("");
 
 
+    const [tempTypeOfWork, setTempTypeOfWork] = useState<"modular" | "non-modular">("modular");
+    const [tempTypeOfNonModularWork, setTempTypeOfNonModularWork] = useState<string>("");
+
+    // Static options for Non-Modular Dropdown
+    // const nonModularOptions: { label: string, value: string }[] = [
+    //     { label: "Civil Work", value: "civil" },
+    //     { label: "Electrical Work", value: "electrical" },
+    //     { label: "Plumbing Work", value: "plumbing" },
+    //     { label: "Painting Work", value: "painting" },
+    // ];
+
+
 
 
     // 1. Add this state at the top of your component
@@ -331,6 +268,11 @@ const InternalQuoteEntrySingle = () => {
     // 3. Update the Row Count logic to include Common Items
     const getTotalRowCount = () => {
         const furnitureRows = furnitures.reduce((acc, f) => {
+
+            if (f.typeOfWork === "non-modular") {
+                return acc + (f.works?.length || 0);
+            }
+
             return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
         }, 0);
         // Add common items to the total count for transport splitting
@@ -342,26 +284,6 @@ const InternalQuoteEntrySingle = () => {
 
     // Handler for Common Items
     const handleCommonItemChange = (i: number, key: keyof SimpleItemRow, value: any) => {
-        // const updated = [...commonMaterials];
-        // updated[i] = { ...updated[i], [key]: value };
-
-        // // Calculate rowTotal immediately for local feedback
-        // const base = (Number(updated[i].quantity) || 0) * (Number(updated[i].cost) || 0);
-        // const localProfitMultiplier = 1 + ((Number(updated[i].profitOnMaterial) || 0) / 100);
-        // const globalMultiplier = 1 + (globalProfitPercent / 100);
-
-        // // Note: Transport will be applied accurately by the useEffect automatically
-        // updated[i].rowTotal = base * localProfitMultiplier * globalMultiplier;
-
-        // // 👉 Auto-add new row on typing in last row
-        // const isLastRow = i === updated.length - 1;
-        // if (isLastRow && (updated[i].itemName || updated[i].cost)) {
-        //     updated.push(emptySimpleItem());
-        // }
-
-        // console.log("updated", updated)
-
-        // setCommonMaterials(updated);
 
 
         // ✅ Use the functional updater (prev) to ensure we always have the latest data
@@ -556,26 +478,55 @@ const InternalQuoteEntrySingle = () => {
     const canEdit = role === "owner" || permission?.internalquote?.edit;
 
 
-    const [selectedLabourCategory, setSelectedLabourCategory] = useState({
-        categoryId: "",
-        categoryName: ""
+    // const [selectedLabourCategory, setSelectedLabourCategory] = useState({
+    //     categoryId: "",
+    //     categoryName: ""
+    // });
+
+    // let { data: labourCost = 0 } = useGetSingleLabourCost({ organizationId, categoryId: selectedLabourCategory.categoryId });
+
+    // let { data: allLabourCategory = [] } = useGetLabourRateConfigCategories(organizationId);
+
+    // // 2. AUTO-SELECT EFFECT: Set the first category as default once data arrives
+    // useEffect(() => {
+    //     if (allLabourCategory && allLabourCategory?.length > 0 && !selectedLabourCategory.categoryId) {
+    //         const firstCategory = allLabourCategory[0];
+    //         setSelectedLabourCategory({
+    //             categoryId: firstCategory._id,
+    //             categoryName: firstCategory.name
+    //         });
+    //     }
+    // }, [allLabourCategory]); // Runs when the list is fetched
+
+
+
+    // ✅ 1. Pre-fetch all Labour Rates instantly on page load
+    const { data: labourCost = 0 } = useGetSingleLabourCostByCategoryName({
+        organizationId: organizationId!,
+        categoryName: "plywood"
     });
 
-    let { data: labourCost = 0 } = useGetSingleLabourCost({ organizationId, categoryId: selectedLabourCategory.categoryId });
+    const { data: civilLabourCost = 0 } = useGetSingleLabourCostByCategoryName({
+        organizationId: organizationId!,
+        categoryName: "civil"
+    });
 
-    let { data: allLabourCategory = [] } = useGetLabourRateConfigCategories(organizationId);
+    const { data: electricalLabourCost = 0 } = useGetSingleLabourCostByCategoryName({
+        organizationId: organizationId!,
+        categoryName: "electrical"
+    });
 
-    // 2. AUTO-SELECT EFFECT: Set the first category as default once data arrives
-    useEffect(() => {
-        if (allLabourCategory && allLabourCategory?.length > 0 && !selectedLabourCategory.categoryId) {
-            const firstCategory = allLabourCategory[0];
-            setSelectedLabourCategory({
-                categoryId: firstCategory._id,
-                categoryName: firstCategory.name
-            });
-        }
-    }, [allLabourCategory]); // Runs when the list is fetched
+    const { data: plumbingLabourCost = 0 } = useGetSingleLabourCostByCategoryName({
+        organizationId: organizationId!,
+        categoryName: "plumbing"
+    });
 
+    // Package the non-modular rates into a simple dictionary for easy lookup
+    const nonModularLabourRates: Record<string, number> = {
+        civil: civilLabourCost,
+        electrical: electricalLabourCost,
+        plumbing: plumbingLabourCost
+    };
 
 
     //  used when  we chagne the global transportationa and the global profit percentage
@@ -589,7 +540,8 @@ const InternalQuoteEntrySingle = () => {
         // const globalProfitMultiplier = 1 + (globalProfitPercent / 100);
 
         setFurnitures(prevFurnitures => prevFurnitures.map((f) => {
-            if (f.coreMaterials.length === 0) return f;
+
+
 
             // ✅ PRIORITY LOGIC: 
             // If Global Profit > 0, use it for everything.
@@ -609,10 +561,96 @@ const InternalQuoteEntrySingle = () => {
             // const effectiveProfitPercent = (f.furnitureProfit !== undefined && f.furnitureProfit > 0)
             //     ? f.furnitureProfit
             //     : globalProfitPercent;
-
-
-
             const profitMultiplier = 1 + (effectiveProfitPercent / 100);
+
+
+            // 🚀 2. BYPASS MODULAR LOGIC FOR NON-MODULAR WORKS
+            // if (f?.typeOfWork === "non-modular") {
+            //     const updatedWorks = (f.works || []).map(w => {
+            //         // const sqft = Number(w.totalSqft) || 0;
+            //         // const matRate = Number(w.sqftRate) || 0;
+            //         // const labRate = Number(w.labourRate) || 0;
+
+            //         // ✅ Extract ALL variables
+            //         const sqft = Number(w.totalSqft) || 0;
+            //         const matRate = Number(w.sqftRate) || 0;
+            //         const noofLabours = Number(w.noofLabours) || 0;
+            //         const noofDays = Number(w.noofDays) || 0;
+            //         const labRate = Number(w.labourRate) || 0;
+                    
+            //         // ✅ Separate the costs properly
+            //         const materialCost = sqft * matRate;
+            //         const labourCost = noofLabours * labRate * noofDays;
+
+            //         return {
+            //             ...w,
+            //             // totalAmount: Math.round(sqft * (matRate + labRate) * profitMultiplier)
+            //             // totalAmount: Math.round((sqft * (matRate + labRate) * profitMultiplier) + transportPerRow)
+            //             totalAmount: Math.round(((materialCost + labourCost) * profitMultiplier) + transportPerRow)
+            //         };
+            //     });
+
+            //     const nonModTotal = updatedWorks.reduce((s, r) => s + (r.totalAmount || 0), 0);
+
+            //     return {
+            //         ...f,
+            //         furnitureProfit: effectiveProfitPercent,
+            //         works: updatedWorks, // Safely save the recalculated works
+            //         totals: {
+            //             core: 0, fittings: 0, glues: 0, nbms: 0,
+            //             furnitureTotal: nonModTotal // Safely preserve the real total
+            //         }
+            //     };
+            // }
+
+          // 🚀 2. BYPASS MODULAR LOGIC FOR NON-MODULAR WORKS
+            if (f?.typeOfWork === "non-modular") {
+                const works = f.works || [];
+                const totalRows = works.length;
+
+                // 1. Pull labour inputs from the FIRST row (works[0])
+                const baseWork = works[0] || {};
+                const noofLabours = Number(baseWork.noofLabours) || 0;
+                const noofDays = Number(baseWork.noofDays) || 0;
+                const labRate = Number(baseWork.labourRate) || 0;
+                
+                // 2. Calculate Total Labour Cost and divide evenly
+                const totalLabourCost = noofLabours * noofDays * labRate;
+                const labourPerRow = totalRows > 0 ? totalLabourCost / totalRows : 0;
+
+                const updatedWorks = works.map(w => {
+                    const sqft = Number(w.totalSqft) || 0;
+                    const matRate = Number(w.sqftRate) || 0;
+                    const materialCost = sqft * matRate;
+
+                    return {
+                        ...w,
+                        // ✅ For useEffect: Math.round(((materialCost + labourPerRow) * profitMultiplier) + transportPerRow)
+                        // ✅ For spreadOverheads: Math.round((materialCost + labourPerRow) * profitMultiplier)
+                        totalAmount: Math.round(((materialCost + labourPerRow) * profitMultiplier) + transportPerRow) 
+                    };
+                });
+
+                const nonModTotal = updatedWorks.reduce((s, r) => s + (r.totalAmount || 0), 0);
+
+                return {
+                    ...f,
+                    furnitureProfit: effectiveProfitPercent,
+                    works: updatedWorks, 
+                    totals: {
+                        core: 0, fittings: 0, glues: 0, nbms: 0,
+                        furnitureTotal: nonModTotal 
+                    }
+                };
+            }
+
+
+            if (f.coreMaterials.length === 0) return f;
+
+
+
+
+
 
             // 1. MIRROR FurnitureForm LABOUR LOGIC
             // It takes carpenters/days from the first row (index 0)
@@ -741,74 +779,6 @@ const InternalQuoteEntrySingle = () => {
         ? furnitureTotal + commonTotal
         : 0;
 
-    // const grandTotal = furnitures.length > 0 ? furnitures?.reduce((sum, f) => sum + f?.totals?.furnitureTotal, 0) : 0;
-
-
-
-    //  NOW CURRENTLY THIS CREATE (HANDLE SUBMIT IS NOT USED ONLY THE HANDLE EDIT IS USED)
-
-    // const handleSubmit = async () => {
-    //     try {
-
-
-    //         if (!data.projectId) {
-    //             toast({ title: "Error", description: "Please select a project", variant: "destructive" });
-    //             return;
-    //         }
-
-    //         const formData = new FormData();
-
-    //         formData.append("furnitures", JSON.stringify(
-    //             furnitures.map((f) => {
-    //                 return {
-    //                     furnitureName: f.furnitureName,
-    //                     coreMaterials: f.coreMaterials.map(cm => {
-    //                         if (Object.values(cm).some(value => Boolean(value))) {
-    //                             const { imageUrl, previewUrl, ...rest } = cm;
-    //                             return rest;
-    //                         }
-    //                         return null;
-    //                     })
-    //                         .filter(Boolean),
-    //                     // fittingsAndAccessories: f.fittingsAndAccessories,
-    //                     // glues: f.glues,
-    //                     // nonBrandMaterials: f.nonBrandMaterials,
-    //                     fittingsAndAccessories: filterValidSimpleRows(f.fittingsAndAccessories),
-    //                     glues: filterValidSimpleRows(f.glues),
-    //                     nonBrandMaterials: filterValidSimpleRows(f.nonBrandMaterials),
-    //                     coreMaterialsTotal: f.totals.core,
-    //                     fittingsAndAccessoriesTotal: f.totals.fittings,
-    //                     gluesTotal: f.totals.glues,
-    //                     nonBrandMaterialsTotal: f.totals.nbms,
-    //                     furnitureTotal: f.totals.furnitureTotal,
-    //                 };
-    //             })
-    //         ));
-
-    //         furnitures.forEach((f, fIdx) => {
-    //             f.coreMaterials.forEach((cm, cmIdx) => {
-    //                 if (cm.imageUrl) {
-    //                     formData.append(`images[${fIdx}][${cmIdx}]`, cm.imageUrl);
-    //                 }
-    //             });
-    //         });
-
-    //         formData.append("grandTotal", grandTotal.toString());
-    //         // formData.append("quoteNo", `Q-${Date.now()}`); // optional
-    //         formData.append("notes", "Generated"); // optional
-
-    //         await createQuote({ organizationId, projectId: data.projectId, formData });
-
-    //         toast({ title: "Success", description: "Created Successfully, Visit in Quote Generator Section" });
-    //         // setFurnitures([])
-    //         // setQuoteType(null)
-
-    //     }
-    //     catch (error: any) {
-    //         toast({ title: "Error", description: error?.response?.data?.message || error?.message || "failed to generate the items", variant: "destructive" });
-    //     }
-    // };
-
     const handleEditSubmit = async (isManualSave: boolean = true) => {
         try {
             // if (!data?.projectId) {
@@ -821,7 +791,7 @@ const InternalQuoteEntrySingle = () => {
             // Prepare furnitures payload & attach new image files
             const furnituresPayload = furnitures.map((f, fIndex) => {
                 const coreMaterials = f.coreMaterials.map((cm, cmIndex) => {
-                    const {  newImageFile, ...rest } = cm as any;
+                    const { newImageFile, ...rest } = cm as any;
 
                     // Attach new image file if present
                     if (newImageFile) {
@@ -848,6 +818,13 @@ const InternalQuoteEntrySingle = () => {
                     gluesTotal: f.totals.glues,
                     nonBrandMaterialsTotal: f.totals.nbms,
                     furnitureTotal: f.totals.furnitureTotal,
+
+
+                    // ✅ NEW FIELDS ADDED HERE
+                    typeOfWork: f.typeOfWork,
+                    typeOfNonModularWork: f.typeOfNonModularWork,
+                    // works: f.works || [],
+                    works: (f.works || []).filter(w => w.workName && w.workName.trim() !== ""),
                 };
             });
 
@@ -894,9 +871,6 @@ const InternalQuoteEntrySingle = () => {
     };
 
 
-
-
-
     // 1. Wrap the changing data in your custom useDebounce hook
     // We watch furnitures, commonMaterials, and global overheads
     const debouncedFurnitures = useDebounce(furnitures, 700); // 2 second delay
@@ -931,7 +905,53 @@ const InternalQuoteEntrySingle = () => {
 
 
 
-    const addFurniture = (furnitureName: string) => {
+    const addFurniture = async (furnitureName: string) => {
+
+        if (!tempFurnitureName.trim()) return;
+
+        // Validation for Non-Modular
+        if (tempTypeOfWork === "non-modular" && !tempTypeOfNonModularWork) {
+            toast({ title: "Error", description: "Please select the type of Non-Modular work", variant: "destructive" });
+            return;
+        }
+
+
+        let defaultSqftRate = 0;
+        // ✅ Instantly grab the pre-fetched Labour Rate from our dictionary!
+        const defaultLabourRate = tempTypeOfWork === "non-modular" && tempTypeOfNonModularWork 
+            ? (nonModularLabourRates[tempTypeOfNonModularWork] || 0) 
+            : 0;
+
+        // ✅ AUTO-FETCH RATE FOR NON-MODULAR WORKS
+        if (tempTypeOfWork === "non-modular" && tempTypeOfNonModularWork) {
+            try {
+
+                if (!api) {
+                    throw Error("Api instance not found please login")
+                }
+                // We use your existing API to search by category (e.g., "civil")
+                const results = await getMaterialBrand({
+                    api, // Make sure 'api' is available in this component's scope
+                    organizationId,
+                    categoryName: tempTypeOfNonModularWork // e.g., "civil", "electrical"
+                });
+
+                if (results && results.length > 0) {
+                    // Grab the first object returned
+                    const firstItem = results[0];
+
+                    // Extract the Rs value (checking all your casing variations)
+                    const fetchedRate = firstItem.data?.Rs || firstItem.data?.rs || firstItem.data?.RS || firstItem.data?.rS || 0;
+                    defaultSqftRate = parseFloat(fetchedRate);
+                }
+            } catch (error) {
+                console.error(`Failed to fetch default rate for ${tempTypeOfNonModularWork}:`, error);
+                // We don't block creation on fail, it just defaults to 0
+            }
+        }
+
+
+
         setFurnitures(prev => [
             ...prev,
             {
@@ -946,8 +966,33 @@ const InternalQuoteEntrySingle = () => {
                 glues: [emptySimpleItem()],
                 nonBrandMaterials: [emptySimpleItem()],
                 totals: { core: 0, fittings: 0, glues: 0, nbms: 0, furnitureTotal: 0 },
+
+                // NEW FIELDS
+                typeOfWork: tempTypeOfWork,
+                typeOfNonModularWork: tempTypeOfWork === "non-modular" ? tempTypeOfNonModularWork : null,
+                works: tempTypeOfWork === "non-modular"
+                    ? [{
+                        workName: tempFurnitureName, // Pre-fill the name to save time
+                        totalSqft: 0,
+                        sqftRate: defaultSqftRate, // Insert the DB rate!
+                        noofLabours: 0,
+                        labourRate: defaultLabourRate,
+                        noofDays: 0, 
+                        totalAmount: 0
+                    }]
+                    : [],
+                // included: "",
+                // excluded: "",
+                // materialsAndBrands: "",
+                // engineeringDescription: "",
             }
         ]);
+
+
+        setTempFurnitureName("");
+        setTempTypeOfWork("modular");
+        setTempTypeOfNonModularWork("");
+        setModalOpen(false);
     };
 
     const handleRemoveFurniture = (indexToRemove: number) => {
@@ -1101,7 +1146,7 @@ const InternalQuoteEntrySingle = () => {
                                         onClick={() => setModalOpen(true)}
                                     >
                                         <i className="fas fa-add mr-1" />
-                                        Create Product
+                                        Create
                                     </Button>
                                 )}
                             </div>
@@ -1112,17 +1157,17 @@ const InternalQuoteEntrySingle = () => {
                         {isModalOpen && (
                             <div className="fixed inset-0 z-120 flex items-center justify-center bg-black/70 bg-opacity-40 backdrop-blur-sm transition">
                                 <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md relative animate-scaleIn">
-                                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Product</h3>
+                                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New {tempTypeOfWork === "modular" ? "Product" : "Work"}</h3>
 
                                     <input
                                         className="w-full border border-gray-300 rounded px-3 py-2 mb-4 outline-none focus:ring-2 focus:ring-blue-400"
-                                        placeholder="Enter Product Name"
+                                        placeholder={tempTypeOfWork === "modular" ? "Enter Product Name" : "Enter Work Name"}
                                         value={tempFurnitureName}
                                         autoFocus
                                         onChange={(e) => setTempFurnitureName(e.target.value)}
                                         onKeyDown={(e) => {
                                             if (e.key === "Enter") {
-                                                if (!tempFurnitureName.trim()) return;
+                                                if (!tempFurnitureName.trim() && tempTypeOfWork) return;
                                                 addFurniture(tempFurnitureName);
                                                 setTempFurnitureName("");
                                                 setModalOpen(false);
@@ -1130,16 +1175,125 @@ const InternalQuoteEntrySingle = () => {
                                         }}
                                     />
 
+
+                                    {/* Work Type Radio Buttons */}
+                                    {/* <div className="flex items-center gap-6 mb-5">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="typeOfWork"
+                                                value="modular"
+                                                checked={tempTypeOfWork === "modular"}
+                                                onChange={(e) => setTempTypeOfWork(e.target.value as "modular")}
+                                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">Modular Work</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="typeOfWork"
+                                                value="non-modular"
+                                                checked={tempTypeOfWork === "non-modular"}
+                                                onChange={(e) => setTempTypeOfWork(e.target.value as "non-modular")}
+                                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">Non-Modular Work</span>
+                                        </label>
+                                    </div> */}
+
+
+                                    {/* Work Type Radio Buttons */}
+                                    <div className="flex flex-wrap items-center gap-5 mb-6">
+                                        {/* 1. MODULAR */}
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="workCategory"
+                                                checked={tempTypeOfWork === "modular"}
+                                                onChange={() => {
+                                                    setTempTypeOfWork("modular");
+                                                    setTempTypeOfNonModularWork(""); // Reset non-modular type
+                                                }}
+                                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">Modular</span>
+                                        </label>
+
+                                        {/* 2. CIVIL */}
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="workCategory"
+                                                checked={tempTypeOfWork === "non-modular" && tempTypeOfNonModularWork === "civil"}
+                                                onChange={() => {
+                                                    setTempTypeOfWork("non-modular");
+                                                    setTempTypeOfNonModularWork("civil");
+                                                }}
+                                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">Civil</span>
+                                        </label>
+
+                                        {/* 3. ELECTRICAL */}
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="workCategory"
+                                                checked={tempTypeOfWork === "non-modular" && tempTypeOfNonModularWork === "electrical"}
+                                                onChange={() => {
+                                                    setTempTypeOfWork("non-modular");
+                                                    setTempTypeOfNonModularWork("electrical");
+                                                }}
+                                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">Electrical</span>
+                                        </label>
+
+                                        {/* 4. PLUMBING */}
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                name="workCategory"
+                                                checked={tempTypeOfWork === "non-modular" && tempTypeOfNonModularWork === "plumbing"}
+                                                onChange={() => {
+                                                    setTempTypeOfWork("non-modular");
+                                                    setTempTypeOfNonModularWork("plumbing");
+                                                }}
+                                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">Plumbing</span>
+                                        </label>
+                                    </div>
+
+
+                                    {/* Non-Modular Category Dropdown (Only shows if non-modular is selected) */}
+                                    {/* {tempTypeOfWork === "non-modular" && (
+                                        <div className="mb-4 relative z-[130]">
+                                            <label className="block text-xs font-semibold text-gray-500 mb-1">Select Work Category</label>
+                                            <SearchSelectNew
+                                                options={nonModularOptions}
+                                                value={tempTypeOfNonModularWork}
+                                                placeholder="e.g., Civil, Electrical..."
+                                                className="!overflow-visible relative z-[140]"
+                                                onValueChange={(val) => setTempTypeOfNonModularWork(String(val))}
+                                            />
+                                        </div>
+                                    )} */}
+
                                     <div className="flex justify-end gap-3 mt-4">
-                                        <Button variant="secondary" onClick={() => setModalOpen(false)}>
+                                        <Button variant="secondary" onClick={() => {
+                                            setModalOpen(false)
+                                            setTempTypeOfWork("modular");
+                                        }
+                                        }>
                                             Cancel
                                         </Button>
                                         <Button
                                             onClick={() => {
                                                 if (!tempFurnitureName.trim()) return;
                                                 addFurniture(tempFurnitureName);
-                                                setTempFurnitureName("");
-                                                setModalOpen(false);
+
                                             }}
                                         >
                                             Create
@@ -1172,6 +1326,10 @@ const InternalQuoteEntrySingle = () => {
                                     key={index}
                                     index={index}
                                     labourCost={labourCost}
+                                    // civilLabourCost={civilLabourCost}
+                                    // electricalLabourCost={electricalLabourCost}
+                                    // plumbingLabourCost={plumbingLabourCost}
+                                    nonModularLabourRates={nonModularLabourRates} // 🚀 Pass Civil/Elec/Plumb Cost Map
                                     data={furniture}
                                     duplicateFurniture={() => handleDuplicateFurniture(index)} // Pass the function
                                     updateFurniture={(updated) => {

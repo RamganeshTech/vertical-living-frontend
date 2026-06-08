@@ -8,6 +8,10 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
+// import InstagramLeadMainByMeta from './Pages/Lead_pages/InstragramLead_Pages/InstagramLeadByMeta_Pages/InstagramLeadMainByMeta';
+// import InstagramLeadSingleByMeta from './Pages/Lead_pages/InstragramLead_Pages/InstagramLeadByMeta_Pages/InstagramLeadSingleByMeta';
+// import { WhatsAppLeadMainByMeta } from './Pages/Lead_pages/InstragramLead_Pages/WhatsAppLeadMainByMeta';
+const VerticalLivingPdfConfiguration = lazy(() => import( './Pages/Lead_pages/VerticalLiving_Pages/VerticalLivingPdfConfiguration'));
 const MetaLeadMain  = lazy(() => import( './Pages/Lead_pages/MetaLead_Pages/MetaLeadMain'));
 const MetaLeadSingle  = lazy(() => import( './Pages/Lead_pages/MetaLead_Pages/MetaLeadSingle'));
 const WhatsAppLeadsPage = lazy(() => import('./Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadMain'));
@@ -1490,6 +1494,7 @@ function App() {
               requiredAction={['list', 'edit', "create", "delete"]}
             >
               <InstagramLeadsPage />
+              {/* <InstagramLeadMainByMeta />  */}
             </ProtectedRoutes>} >
 
               <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
@@ -1498,9 +1503,22 @@ function App() {
                 requiredAction={['list', 'edit', "create", "delete"]}
               >
                 <InstagramLeadSingle />
+                 {/* <InstagramLeadSingleByMeta /> */}
               </ProtectedRoutes>} />
 
             </Route>
+
+
+            {/* <Route path="whatsapp" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="leadmodule"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+               <InstagramLeadsPage /> 
+            </ProtectedRoutes>} /> */}
+              {/* <WhatsAppLeadMainByMeta />  */}
+
+           
 
             <Route path="meta-leads" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="leadmodule"
@@ -1517,6 +1535,19 @@ function App() {
               >
                 <MetaLeadSingle />
               </ProtectedRoutes>} />
+
+            </Route>
+
+
+             <Route path="vertical-living-configuration" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="leadmodule"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <VerticalLivingPdfConfiguration />
+            </ProtectedRoutes>} >
+
+            
 
             </Route>
 

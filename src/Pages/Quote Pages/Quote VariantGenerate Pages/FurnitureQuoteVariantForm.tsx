@@ -435,8 +435,7 @@ export const getRateForThickness = (thickness: number | string, list: { thicknes
 const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>((props, ref) => {
   const {
     data, index, brandOptions, innerOptions, outerOptions,
-    innerLaminateRatesByBrand, outerLaminateRatesByBrand, brandRatesByName, labourCost,
-    selectedBrand, selectedInnerBrand, selectedOuterBrand, onFurnitureChange,
+    innerLaminateRatesByBrand, outerLaminateRatesByBrand, brandRatesByName, labourCost, selectedBrand, selectedInnerBrand, selectedOuterBrand, onFurnitureChange,
     globalProfitPercent, onProfitOverride
   } = props;
 
@@ -691,10 +690,85 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>((props, r
   const fittingsTotal = fittings.reduce((sum, r) => sum + getSimpleTotal(r), 0);
   const gluesTotal = glues.reduce((sum, r) => sum + getSimpleTotal(r, true), 0);
   const nbmsTotal = nbms.reduce((sum, r) => sum + getSimpleTotal(r), 0);
-  const furnitureTotal = coreTotal + fittingsTotal + gluesTotal + nbmsTotal;
+  // const furnitureTotal = coreTotal + fittingsTotal + gluesTotal + nbmsTotal;
+
+  const furnitureTotal = data.typeOfWork === "non-modular"
+    ? (data.works || []).reduce((sum, w) => sum + (w.totalAmount || 0), 0)
+    : (coreTotal + fittingsTotal + gluesTotal + nbmsTotal);
 
   useImperativeHandle(ref, () => ({
     getUpdatedFurniture: () => {
+
+
+
+
+      // 🚀 1. IF NON-MODULAR: Skip modular math, apply profit, and return works
+      if (data.typeOfWork === "non-modular") {
+        const effectiveProfit = data?.furnitureProfit ?? globalProfitPercent;
+        const profitMultiplier = 1 + ((effectiveProfit || 0) / 100);
+
+        // const updatedWorks = (data.works || []).map(w => {
+
+
+        //     const sqft = Number(w.totalSqft) || 0;
+        //     const matRate = Number(w.sqftRate) || 0;
+        //     const noofLabours = Number(w.noofLabours) || 0;
+        //     const labRate = Number(w.labourRate) || 0;
+        //     const noofDays = Number(w.noofDays) || 0;
+
+        //     // ✅ Apply correct Days + Labours math
+        //     const materialCost = sqft * matRate;
+        //     const labourCost = noofLabours * labRate * noofDays;
+
+        //     return {
+        //         ...w,
+        //         totalAmount: Math.round((materialCost + labourCost) * profitMultiplier)
+        //     };
+        // });
+
+
+        const works = data.works || [];
+        const totalRows = works.length;
+
+        // Extract labour inputs from the FIRST row only
+        const baseWork = works[0] || {};
+        const noofLabours = Number(baseWork.noofLabours) || 0;
+        const noofDays = Number(baseWork.noofDays) || 0;
+        const labRate = Number(baseWork.labourRate) || 0;
+
+        // Calculate Total Labour Cost and divide evenly
+        const totalLabourCost = noofLabours * noofDays * labRate;
+        const labourPerRow = totalRows > 0 ? totalLabourCost / totalRows : 0;
+
+        const updatedWorks = works.map(w => {
+          const sqft = Number(w.totalSqft) || 0;
+          const matRate = Number(w.sqftRate) || 0;
+          const materialCost = sqft * matRate;
+
+          return {
+            ...w,
+            totalAmount: Math.round((materialCost + labourPerRow) * profitMultiplier)
+          };
+        });
+
+        const worksTotal = updatedWorks.reduce((sum, w) => sum + (w.totalAmount || 0), 0);
+
+        return {
+          ...data,
+          typeOfWork: "non-modular",
+          typeOfNonModularWork: data?.typeOfNonModularWork,
+          furnitureProfit: effectiveProfit,
+          works: updatedWorks, // ✅ Safely passing works array to the backend
+
+          // Zero out modular totals just to be clean
+          coreMaterialsTotal: 0,
+          fittingsAndAccessoriesTotal: 0,
+          gluesTotal: 0,
+          nonBrandMaterialsTotal: 0,
+          furnitureTotal: worksTotal,
+          totals: { core: 0, fittings: 0, glues: 0, nbms: 0, furnitureTotal: worksTotal }
+        };
+      }
 
 
       // 1. Calculate and round row totals for core materials
@@ -804,6 +878,60 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>((props, r
     )
   }
 
+
+  const renderNonModularVariant = () => {
+    const works = data.works || [];
+    const baseWork = works[0] || {}; // Used to display the spanned values
+
+    return (
+
+
+    <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mt-4">
+      <table className="min-w-full text-sm bg-white text-center">
+        <thead className="bg-blue-50 text-sm font-semibold text-gray-600">
+          <tr>
+            <th className="px-6 py-3 border-r border-ash-dark">Work Description</th>
+            <th className="px-6 py-3 border-r border-ash-dark">Sqft</th>
+            <th className="px-6 py-3 border-r border-ash-dark">Mat. Rate</th>
+            <th className="px-6 py-3 border-r border-ash-dark">No of Days</th>
+            <th className="px-6 py-3 border-r border-ash-dark">No of Labours</th>
+            <th className="px-6 py-3 border-r border-ash-dark">Lab. Rate</th>
+            <th className="px-6 py-3">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {(data.works || []).map((row, i) => (
+            <tr key={i} className="border-t hover:bg-gray-50">
+              <td className="p-3 border-r border-ash-dark font-medium text-gray-700">{row.workName || "—"}</td>
+              <td className="p-3 border-r border-ash-dark text-gray-600">{row.totalSqft}</td>
+              <td className="p-3 border-r border-ash-dark text-gray-600">₹{row.sqftRate}</td>
+              {/* <td className="p-3 border-r border-ash-dark text-gray-600">{row.noofDays}</td>
+              <td className="p-3 border-r border-ash-dark text-gray-600">{row.noofLabours}</td>
+              <td className="p-3 border-r border-ash-dark text-gray-600">₹{row.labourRate}</td> */}
+
+              {/* Spanned columns for row 0 */}
+              {i === 0 && (
+                <>
+                  <td rowSpan={works.length} className="p-3 border-r border-ash-dark text-gray-600 align-middle">
+                    {baseWork.noofDays || 0}
+                  </td>
+                  <td rowSpan={works.length} className="p-3 border-r border-ash-dark text-gray-600 align-middle">
+                    {baseWork.noofLabours || 0}
+                  </td>
+                  <td rowSpan={works.length} className="p-3 border-r border-ash-dark text-gray-600 align-middle">
+                    ₹{baseWork.labourRate || 0}
+                  </td>
+                </>
+              )}
+              <td className="p-3 font-bold text-gray-700">₹{row.totalAmount?.toLocaleString("en-IN")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    )
+  };
+
   return (
     <div className="shadow-lg p-6 my-6 border rounded-xl bg-white">
       <div className="flex justify-between items-center mb-6">
@@ -812,49 +940,55 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>((props, r
         <div className="flex flex-col gap-1">
           {/* Product Name */}
           <h2 className="text-2xl font-bold text-blue-700">
-            Product {index + 1}: {data.furnitureName}
+            {/* Product {index + 1}: {data.furnitureName} */}
+            {data.typeOfWork === "non-modular" ? "Work" : "Product"} {index + 1}: {data.furnitureName}
           </h2>
 
           {/* READ-ONLY DIMENSIONS LABELS */}
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-              Dimensions:
-            </span>
+          {data?.typeOfWork !== "non-modular" && (
 
-            <div className="flex items-center gap-2">
-              {/* Height Label */}
-              <div className="flex items-center bg-blue-50 border border-blue-100 rounded-md px-2 py-0.5">
-                <span className="text-[10px] font-bold text-blue-500 mr-1.5">H</span>
-                <span className="text-xs font-bold text-blue-700">
-                  {data.dimention?.height || 0} <small className="text-[9px] opacity-70">mm</small>
-                </span>
-              </div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                Dimensions:
+              </span>
 
-              {/* Width Label */}
-              <div className="flex items-center bg-green-50 border border-green-100 rounded-md px-2 py-0.5">
-                <span className="text-[10px] font-bold text-green-500 mr-1.5">W</span>
-                <span className="text-xs font-bold text-green-700">
-                  {data.dimention?.width || 0} <small className="text-[9px] opacity-70">mm</small>
-                </span>
-              </div>
+              <div className="flex items-center gap-2">
+                {/* Height Label */}
+                <div className="flex items-center bg-blue-50 border border-blue-100 rounded-md px-2 py-0.5">
+                  <span className="text-[10px] font-bold text-blue-500 mr-1.5">H</span>
+                  <span className="text-xs font-bold text-blue-700">
+                    {data.dimention?.height || 0} <small className="text-[9px] opacity-70">mm</small>
+                  </span>
+                </div>
 
-              {/* Depth Label */}
-              <div className="flex items-center bg-purple-50 border border-purple-100 rounded-md px-2 py-0.5">
-                <span className="text-[10px] font-bold text-purple-500 mr-1.5">D</span>
-                <span className="text-xs font-bold text-purple-700">
-                  {data.dimention?.depth || 0} <small className="text-[9px] opacity-70">mm</small>
-                </span>
+                {/* Width Label */}
+                <div className="flex items-center bg-green-50 border border-green-100 rounded-md px-2 py-0.5">
+                  <span className="text-[10px] font-bold text-green-500 mr-1.5">W</span>
+                  <span className="text-xs font-bold text-green-700">
+                    {data.dimention?.width || 0} <small className="text-[9px] opacity-70">mm</small>
+                  </span>
+                </div>
+
+                {/* Depth Label */}
+                <div className="flex items-center bg-purple-50 border border-purple-100 rounded-md px-2 py-0.5">
+                  <span className="text-[10px] font-bold text-purple-500 mr-1.5">D</span>
+                  <span className="text-xs font-bold text-purple-700">
+                    {data.dimention?.depth || 0} <small className="text-[9px] opacity-70">mm</small>
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
+
 
 
 
         <div className="flex items-center gap-6">
           <section className="flex flex-col items-end">
             <label className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">
-              Product Profit Override (%)
+              {/* Product Profit Override (%) */}
+              {data.typeOfWork === "non-modular" ? "Work Profit Overlay (%)" : "Product Profit Overlay (%)"}
             </label>
             <div className="flex items-center bg-blue-50 px-3 py-1 rounded-lg border border-blue-100 shadow-sm">
               <input
@@ -875,7 +1009,10 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>((props, r
             </div>
           </section>
           <div className="text-right">
-            <p className="text-[10px] font-bold text-green-500 uppercase">Grand Product Total</p>
+            {/* <p className="text-[10px] font-bold text-green-500 uppercase">Grand Product Total</p> */}
+            <p className="text-[10px] font-bold text-green-500 uppercase">
+              {data.typeOfWork === "non-modular" ? "Grand Work Total" : "Grand Product Total"}
+            </p>
             <p className="text-2xl font-black text-green-600">₹{Math.round(furnitureTotal).toLocaleString("en-IN")}</p>
           </div>
         </div>
@@ -893,156 +1030,169 @@ const FurnitureQuoteVariantForm = forwardRef<FurnitureQuoteRef, Props>((props, r
 
 
       {/* Brand Selectors */}
-      <div className="grid grid-cols-3 gap-6 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100 shadow-inner">
-        <div>
-          <label className="text-[10px] font-extrabold text-gray-400 uppercase mb-1 block">Plywood Brand</label>
-          <SearchSelectNew
-            options={brandOptions}
-            onValueChange={(val) => handleLocalBrandChange(val, 'plywood')}
-            value={coreSelectedBrandId || ""} // Use ID for selection state
-          />
-        </div>
+      {data?.typeOfWork !== "non-modular" && (
+        <div className="grid grid-cols-3 gap-6 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100 shadow-inner">
+          <div>
+            <label className="text-[10px] font-extrabold text-gray-400 uppercase mb-1 block">Plywood Brand</label>
+            <SearchSelectNew
+              options={brandOptions}
+              onValueChange={(val) => handleLocalBrandChange(val, 'plywood')}
+              value={coreSelectedBrandId || ""} // Use ID for selection state
+            />
+          </div>
 
-        <div>
-          <label className="text-[10px] font-extrabold text-blue-400 uppercase mb-1 block">Inner Laminate Brand</label>
-          <SearchSelectNew
-            options={innerOptions}
-            onValueChange={(val) => handleLocalBrandChange(val, 'inner')}
-            value={coreSelectedInnerBrandId || ""}
-          />
-        </div>
+          <div>
+            <label className="text-[10px] font-extrabold text-blue-400 uppercase mb-1 block">Inner Laminate Brand</label>
+            <SearchSelectNew
+              options={innerOptions}
+              onValueChange={(val) => handleLocalBrandChange(val, 'inner')}
+              value={coreSelectedInnerBrandId || ""}
+            />
+          </div>
 
-        <div>
-          <label className="text-[10px] font-extrabold text-orange-400 uppercase mb-1 block">Outer Laminate Brand</label>
-          <SearchSelectNew
-            options={outerOptions}
-            onValueChange={(val) => handleLocalBrandChange(val, 'outer')}
-            value={coreSelectedOuterBrandId || ""}
-          />
+          <div>
+            <label className="text-[10px] font-extrabold text-orange-400 uppercase mb-1 block">Outer Laminate Brand</label>
+            <SearchSelectNew
+              options={outerOptions}
+              onValueChange={(val) => handleLocalBrandChange(val, 'outer')}
+              value={coreSelectedOuterBrandId || ""}
+            />
+          </div>
         </div>
-      </div>
+      )}
+
 
 
       {/* --- SELECTED BRANDS RATE SUMMARY --- */}
-      <div className="grid grid-cols-3 gap-6 mb-8">
-        {/* Plywood Rates */}
-        <div className="border border-gray-200 bg-white rounded-lg shadow-sm p-3">
-          <h3 className="text-[11px] font-bold text-gray-500 uppercase mb-2 flex justify-between">
-            Plywood Rates: <span className="text-blue-600">{coreSelectedBrand || "None"}</span>
-          </h3>
-          <div className="max-h-[150px] overflow-y-auto border-t border-gray-100 pt-2">
-            <table className="min-w-full text-[11px]">
+      {data?.typeOfWork !== "non-modular" && (
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          {/* Plywood Rates */}
+          <div className="border border-gray-200 bg-white rounded-lg shadow-sm p-3">
+            <h3 className="text-[11px] font-bold text-gray-500 uppercase mb-2 flex justify-between">
+              Plywood Rates: <span className="text-blue-600">{coreSelectedBrand || "None"}</span>
+            </h3>
+            <div className="max-h-[150px] overflow-y-auto border-t border-gray-100 pt-2">
+              <table className="min-w-full text-[11px]">
+                <tbody>
+                  {(coreSelectedBrand ? brandRatesByName[coreSelectedBrand] : []).map((item, i) => (
+                    <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
+                      <td className="py-1 text-gray-600 font-medium">{item.thickness} mm</td>
+                      <td className="py-1 text-right font-bold text-green-700">₹{item.rs.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Inner Laminate Rates */}
+          <div className="border border-blue-100 bg-white rounded-lg shadow-sm p-3">
+            <h3 className="text-[11px] font-bold text-blue-500 uppercase mb-2 flex justify-between">
+              Inner Rates: <span className="text-blue-700">{coreSelectedInnerBrand || "None"}</span>
+            </h3>
+            <div className="max-h-[150px] overflow-y-auto border-t border-blue-50 pt-2">
+              <table className="min-w-full text-[11px]">
+                <tbody>
+                  {(coreSelectedInnerBrand ? innerLaminateRatesByBrand[coreSelectedInnerBrand] : []).map((item, i) => (
+                    <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-blue-50/30">
+                      <td className="py-1 text-gray-600 font-medium">{item.thickness} mm</td>
+                      <td className="py-1 text-right font-bold text-blue-700">₹{item.rs.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Outer Laminate Rates */}
+          <div className="border border-orange-100 bg-white rounded-lg shadow-sm p-3">
+            <h3 className="text-[11px] font-bold text-orange-500 uppercase mb-2 flex justify-between">
+              Outer Rates: <span className="text-orange-700">{coreSelectedOuterBrand || "None"}</span>
+            </h3>
+            <div className="max-h-[150px] overflow-y-auto border-t border-orange-50 pt-2">
+              <table className="min-w-full text-[11px]">
+                <tbody>
+                  {(coreSelectedOuterBrand ? outerLaminateRatesByBrand[coreSelectedOuterBrand] : []).map((item, i) => (
+                    <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-orange-50/30">
+                      <td className="py-1 text-gray-600 font-medium">{item.thickness} mm</td>
+                      <td className="py-1 text-right font-bold text-orange-700">₹{item.rs.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {data.typeOfWork === "non-modular" ? (
+        renderNonModularVariant()
+      ) : (
+        <>
+
+          {/* Core Materials Table */}
+          <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+            <table className="min-w-full text-sm text-center">
+              <thead className="bg-blue-50 text-gray-600 font-bold">
+                <tr>
+                  <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Image</th>
+                  <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Item Name</th>
+                  <th className="px-4 py-1 border-r border-gray-200" colSpan={2}>Plywood</th>
+                  <th className="px-4 py-1 border-r border-gray-200" colSpan={4}>Laminate</th>
+                  <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Carpenters/Day</th>
+                  <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Days</th>
+                  <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Profit % Material</th>
+                  <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Profit % Labour</th>
+                  <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Remarks</th>
+                  <th className="px-4 py-3" rowSpan={2}>Row Total</th>
+                </tr>
+                <tr className="border-t border-gray-200 bg-blue-50/50">
+                  <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Thk</th>
+                  <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Qty</th>
+                  <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Outer Thk</th>
+                  <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Outer Qty</th>
+                  <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Inner Thk</th>
+                  <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Inner Qty</th>
+
+                </tr>
+              </thead>
               <tbody>
-                {(coreSelectedBrand ? brandRatesByName[coreSelectedBrand] : []).map((item, i) => (
-                  <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
-                    <td className="py-1 text-gray-600 font-medium">{item.thickness} mm</td>
-                    <td className="py-1 text-right font-bold text-green-700">₹{item.rs.toFixed(2)}</td>
+                {coreMaterials.map((row, i) => (
+                  <tr key={i} className="border-t border-gray-100 hover:bg-gray-50/50 transition-colors">
+                    {i === 0 && <td rowSpan={coreMaterials.length} className="p-2 border-r border-gray-100 bg-white"><img src={row.imageUrl || NO_IMAGE} className="h-12 mx-auto rounded shadow-sm" /></td>}
+                    <td className="p-2 border-r border-gray-100 font-medium">{row.itemName || "—"}</td>
+                    <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.plywoodNos.thickness}</td>
+                    <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.plywoodNos.quantity}</td>
+
+                    <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.outerLaminate?.thickness || 0}</td>
+                    <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.outerLaminate?.quantity || 0}</td>
+
+
+                    <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.innerLaminate?.thickness || 0}</td>
+                    <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.innerLaminate?.quantity || 0}</td>
+
+                    {i === 0 && <><td rowSpan={coreMaterials.length} className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.carpenters}</td>
+                      <td rowSpan={coreMaterials.length} className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.days}</td></>}
+                    <td className="p-2 border-r border-gray-100">
+                      <input type="number" value={row.profitOnMaterial} onChange={(e) => { const u = [...coreMaterials]; u[i].profitOnMaterial = parseFloat(e.target.value) || 0; setCoreMaterials(u); onFurnitureChange(); }} className="w-16 border border-blue-100 rounded text-center py-1 font-semibold focus:ring-1 focus:ring-blue-400 outline-none" />
+                    </td>
+                    {i === 0 && <td rowSpan={coreMaterials.length} className="p-2 border-r border-gray-100">
+                      <input type="number" value={row.profitOnLabour} onChange={(e) => { const u = [...coreMaterials]; u[0].profitOnLabour = parseFloat(e.target.value) || 0; setCoreMaterials(u); onFurnitureChange(); }} className="w-16 border border-blue-100 rounded text-center py-1 font-semibold focus:ring-1 focus:ring-blue-400 outline-none" />
+                    </td>}
+                    <td className="p-2 border-r border-gray-100 text-gray-400 text-[11px] italic">{row.remarks || "—"}</td>
+                    <td className="p-2 font-bold text-green-600">₹{Math.round(calculateRowTotal(row, coreMaterials)).toLocaleString("en-IN")}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
 
-        {/* Inner Laminate Rates */}
-        <div className="border border-blue-100 bg-white rounded-lg shadow-sm p-3">
-          <h3 className="text-[11px] font-bold text-blue-500 uppercase mb-2 flex justify-between">
-            Inner Rates: <span className="text-blue-700">{coreSelectedInnerBrand || "None"}</span>
-          </h3>
-          <div className="max-h-[150px] overflow-y-auto border-t border-blue-50 pt-2">
-            <table className="min-w-full text-[11px]">
-              <tbody>
-                {(coreSelectedInnerBrand ? innerLaminateRatesByBrand[coreSelectedInnerBrand] : []).map((item, i) => (
-                  <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-blue-50/30">
-                    <td className="py-1 text-gray-600 font-medium">{item.thickness} mm</td>
-                    <td className="py-1 text-right font-bold text-blue-700">₹{item.rs.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Outer Laminate Rates */}
-        <div className="border border-orange-100 bg-white rounded-lg shadow-sm p-3">
-          <h3 className="text-[11px] font-bold text-orange-500 uppercase mb-2 flex justify-between">
-            Outer Rates: <span className="text-orange-700">{coreSelectedOuterBrand || "None"}</span>
-          </h3>
-          <div className="max-h-[150px] overflow-y-auto border-t border-orange-50 pt-2">
-            <table className="min-w-full text-[11px]">
-              <tbody>
-                {(coreSelectedOuterBrand ? outerLaminateRatesByBrand[coreSelectedOuterBrand] : []).map((item, i) => (
-                  <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-orange-50/30">
-                    <td className="py-1 text-gray-600 font-medium">{item.thickness} mm</td>
-                    <td className="py-1 text-right font-bold text-orange-700">₹{item.rs.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Core Materials Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-        <table className="min-w-full text-sm text-center">
-          <thead className="bg-blue-50 text-gray-600 font-bold">
-            <tr>
-              <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Image</th>
-              <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Item Name</th>
-              <th className="px-4 py-1 border-r border-gray-200" colSpan={2}>Plywood</th>
-              <th className="px-4 py-1 border-r border-gray-200" colSpan={4}>Laminate</th>
-              <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Carpenters/Day</th>
-              <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Days</th>
-              <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Profit % Material</th>
-              <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Profit % Labour</th>
-              <th className="px-4 py-3 border-r border-gray-200" rowSpan={2}>Remarks</th>
-              <th className="px-4 py-3" rowSpan={2}>Row Total</th>
-            </tr>
-            <tr className="border-t border-gray-200 bg-blue-50/50">
-              <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Thk</th>
-              <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Qty</th>
-              <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Outer Thk</th>
-              <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Outer Qty</th>
-              <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Inner Thk</th>
-              <th className="px-2 py-2 text-[10px] uppercase border-r border-gray-200">Inner Qty</th>
-
-            </tr>
-          </thead>
-          <tbody>
-            {coreMaterials.map((row, i) => (
-              <tr key={i} className="border-t border-gray-100 hover:bg-gray-50/50 transition-colors">
-                {i === 0 && <td rowSpan={coreMaterials.length} className="p-2 border-r border-gray-100 bg-white"><img src={row.imageUrl || NO_IMAGE} className="h-12 mx-auto rounded shadow-sm" /></td>}
-                <td className="p-2 border-r border-gray-100 font-medium">{row.itemName || "—"}</td>
-                <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.plywoodNos.thickness}</td>
-                <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.plywoodNos.quantity}</td>
-
-                <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.outerLaminate?.thickness || 0}</td>
-                <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.outerLaminate?.quantity || 0}</td>
-
-
-                <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.innerLaminate?.thickness || 0}</td>
-                <td className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.innerLaminate?.quantity || 0}</td>
-
-                {i === 0 && <><td rowSpan={coreMaterials.length} className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.carpenters}</td>
-                  <td rowSpan={coreMaterials.length} className="p-2 border-r border-gray-100 bg-gray-50 text-gray-500 font-mono">{row.days}</td></>}
-                <td className="p-2 border-r border-gray-100">
-                  <input type="number" value={row.profitOnMaterial} onChange={(e) => { const u = [...coreMaterials]; u[i].profitOnMaterial = parseFloat(e.target.value) || 0; setCoreMaterials(u); onFurnitureChange(); }} className="w-16 border border-blue-100 rounded text-center py-1 font-semibold focus:ring-1 focus:ring-blue-400 outline-none" />
-                </td>
-                {i === 0 && <td rowSpan={coreMaterials.length} className="p-2 border-r border-gray-100">
-                  <input type="number" value={row.profitOnLabour} onChange={(e) => { const u = [...coreMaterials]; u[0].profitOnLabour = parseFloat(e.target.value) || 0; setCoreMaterials(u); onFurnitureChange(); }} className="w-16 border border-blue-100 rounded text-center py-1 font-semibold focus:ring-1 focus:ring-blue-400 outline-none" />
-                </td>}
-                <td className="p-2 border-r border-gray-100 text-gray-400 text-[11px] italic">{row.remarks || "—"}</td>
-                <td className="p-2 font-bold text-green-600">₹{Math.round(calculateRowTotal(row, coreMaterials)).toLocaleString("en-IN")}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {renderSimpleSection("Fittings & Accessories", fittings, "Fittings")}
-      {renderSimpleSection("Glues", glues, "Glues")}
-      {renderSimpleSection("Non-Branded Materials", nbms, "NBMs")}
+          {renderSimpleSection("Fittings & Accessories", fittings, "Fittings")}
+          {renderSimpleSection("Glues", glues, "Glues")}
+          {renderSimpleSection("Non-Branded Materials", nbms, "NBMs")}
+        </>
+      )}
     </div>
   );
 });

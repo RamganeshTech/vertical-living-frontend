@@ -4,7 +4,7 @@ import { useParams, useNavigate, Outlet, useLocation } from "react-router-dom";
 import { Input } from "../../../components/ui/Input";
 import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
-import { useCreateCategory, useDeleteCategory, useGetCategories } from "../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
+import { useCreateCategory, useDeleteCategory,  useGetCategoriesInternalQuote } from "../../../apiList/Quote Api/RateConfig Api/rateConfigApi";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/Dialog";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
@@ -36,7 +36,7 @@ export default function RateConfigAdminMain() {
     const isChildRoute = location.pathname.includes("single") || location.pathname.includes("backup");
 
     const [categoryName, setCategoryName] = useState("");
-    const [fields, setFields] = useState([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] as string[] }]);
+    const [fields, setFields] = useState([{ key: "", oldKey: "", type: "string", required: false, visibleIn: ["materials"] as string[] }]);
     const [isProductSpecific, setIsProductSpecific] = useState<boolean>(false);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
@@ -44,7 +44,8 @@ export default function RateConfigAdminMain() {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
 
-    const { data: categories, isLoading, refetch } = useGetCategories(organizationId!);
+    // const { data: categories, isLoading, refetch } = useGetCategories(organizationId!);
+    const { data: categories, isLoading, refetch } = useGetCategoriesInternalQuote(organizationId!);
     const { mutateAsync: createCategory, isPending: createPending } = useCreateCategory();
     const { mutateAsync: deleteCategory, isPending } = useDeleteCategory();
     const { mutateAsync: updateCategory, isPending: updatePending } = useUpdateRateConfigCategory();
@@ -76,7 +77,7 @@ export default function RateConfigAdminMain() {
 
 
     const handleAddField = () => {
-        setFields([...fields, { key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
+        setFields([...fields, { key: "", oldKey: "", type: "string", required: false, visibleIn: ["materials"] }]);
     };
 
 
@@ -191,7 +192,7 @@ export default function RateConfigAdminMain() {
                     key: f.key,
                     type: f.type,
                     required: f.required || false,
-                    visibleIn: f.visibleIn || [],
+                    visibleIn: f.visibleIn || ["materials"],
                     oldKey: f.oldKey // Will be undefined for brand new fields added during edit
                 }));
 
@@ -217,7 +218,7 @@ export default function RateConfigAdminMain() {
 
             setEditingCategoryId(null);
             setCategoryName("");
-            setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
+            setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: ["materials"] }]);
             setShowCreateForm(false);
             refetch()
 
@@ -329,7 +330,7 @@ export default function RateConfigAdminMain() {
                     if (!open) {
                         setEditingCategoryId(null);
                         setCategoryName("");
-                        setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: [] }]);
+                        setFields([{ key: "", oldKey: "", type: "string", required: false, visibleIn: ["materials"] }]);
                     }
                 }}
 

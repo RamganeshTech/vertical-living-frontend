@@ -188,6 +188,16 @@ const ClientQuoteSingle = () => {
 
             // plywoodBrand: "",
             // laminateBrand: "",
+
+
+            // 🚀 NEW NON-MODULAR FIELDS ADDED HERE
+            typeOfWork: f.typeOfWork || "modular",
+            typeOfNonModularWork: f.typeOfNonModularWork || null,
+            works: f.works || [],
+            included: f.included || "",
+            excluded: f.excluded || "",
+            materialsAndBrands: f.materialsAndBrands || "",
+            engineeringDescription: f.engineeringDescription || "",
         }));
 
         setFurnitures(transformed);
@@ -383,7 +393,7 @@ const ClientQuoteSingle = () => {
                             {/* Template Selector */}
                             {!isSqftRateQuote && (
                                 <div className="w-full !min-w-24">
-                                    <Select onValueChange={(val:any) => setTemplateType(val)} value={templateType}>
+                                    <Select onValueChange={(val: any) => setTemplateType(val)} value={templateType}>
                                         <SelectTrigger className="h-10 w-full text-xs font-semibold bg-gray-50 border-gray-300">
                                             <SelectValue placeholder="Template Type" />
                                         </SelectTrigger>

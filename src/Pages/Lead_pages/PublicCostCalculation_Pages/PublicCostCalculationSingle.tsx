@@ -5,6 +5,17 @@ import { Breadcrumb, type BreadcrumbItem } from '../../Department Pages/Breadcru
 import { downloadImage } from '../../../utils/downloadFile';
 import { toast } from '../../../utils/toast';
 
+const formatTime = (time: string) => {
+    if (!time) return "";
+
+    return new Date(`1970-01-01T${time}`)
+        .toLocaleTimeString("en-IN", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+        });
+};
+
 const PublicCostCalculationSingle: React.FC = () => {
     const { organizationId, id } = useParams<{ organizationId: string; id: string }>();
     const navigate = useNavigate();
@@ -19,6 +30,8 @@ const PublicCostCalculationSingle: React.FC = () => {
             </div>
         </div>
     );
+
+
 
     if (error || !record) return <div className="p-20 text-center text-red-500 font-bold">Calculation details not found.</div>;
 
@@ -107,12 +120,28 @@ const PublicCostCalculationSingle: React.FC = () => {
                             {/* Details list with tighter spacing */}
                             <div className="pt-4 border-t border-slate-800 space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[10px] text-slate-500 font-medium uppercase">Carpet Area</span>
+                                    <span className="text-[11px] text-slate-500 font-bold">Carpet Area</span>
                                     <span className="text-[11px] font-bold text-slate-200">{record.carpetArea} SQFT</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[10px] text-slate-500 font-medium uppercase">Home Type</span>
+                                    <span className="text-[11px] text-slate-500 font-bold">Home Type</span>
                                     <span className="text-[11px] font-bold text-slate-200">{record.homeType}</span>
+                                </div>
+
+                                <div className="flex justify-between items-start gap-3">
+                                    <span className="text-[11px] text-slate-500 font-bold whitespace-nowrap">Preferred Time</span>
+                                    <span className="text-[11px] font-bold text-slate-200 text-right">
+                                        {record?.bestTimeFrom && record?.bestTimeTo
+                                            ? `${formatTime(record?.bestTimeFrom)} - ${formatTime(record?.bestTimeTo)}`
+                                            : "Not Specified"}
+                                    </span>
+                                </div>
+
+                                <div className="flex justify-between items-start gap-3">
+                                    <span className="text-[11px] text-slate-500 font-bold whitespace-nowrap">Detailed Address</span>
+                                    <span className="text-[11px] font-bold text-slate-200 text-right max-w-[180px] break-words">
+                                        {record?.detailedAddress || "Not Provided"}
+                                    </span>
                                 </div>
                             </div>
 

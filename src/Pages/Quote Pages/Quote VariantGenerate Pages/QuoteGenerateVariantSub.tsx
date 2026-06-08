@@ -1030,7 +1030,7 @@
 
 import React, { createRef, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {  useGenerateQuotePdf, useGetMaterialBrands, useGetMaterialQuoteSingleEntry } from "../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
+import { useGenerateQuotePdf, useGetMaterialBrands, useGetMaterialQuoteSingleEntry } from "../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi";
 import { type FurnitureBlock, type SimpleItemRow } from "../Quote Generate Pages/QuoteGenerate Main/FurnitureForm";
 import FurnitureQuoteVariantForm, { getRateForThickness, type FurnitureQuoteRef } from "./FurnitureQuoteVariantForm";
 import MaterialOverviewLoading from "../../Stage Pages/MaterialSelectionRoom/MaterailSelectionLoadings/MaterialOverviewLoading";
@@ -1038,7 +1038,7 @@ import { toast } from "../../../utils/toast";
 import { Button } from "../../../components/ui/Button";
 // import { downloadImage } from "../../../utils/downloadFile";
 import { Card } from "../../../components/ui/Card";
-import { useGetLabourRateConfigCategories, useGetSingleLabourCost } from "../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
+import {  useGetSingleLabourCostByCategoryName } from "../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi";
 import { useAuthCheck } from "../../../Hooks/useAuthCheck";
 // import { Label } from "../../../components/ui/Label";
 import SearchSelectNew from "../../../components/ui/SearchSelectNew";
@@ -1055,23 +1055,42 @@ const QuoteGenerateVariantSub = () => {
     let { data: innerLaminateBrands } = useGetMaterialBrands(organizationId!, "inner laminate"); // 🆕
     let { data: outerLaminateBrands } = useGetMaterialBrands(organizationId!, "outer laminate"); // 🆕
 
-    // console.log("materialBrands", materialBrands)
-    // console.log("innerLaminateBrands", innerLaminateBrands)
-    // console.log("outerLaminateBrands", outerLaminateBrands)
 
-    const [selectedLabourCategory, setSelectedLabourCategory] = useState({
-        categoryId: "",
-        categoryName: ""
+    // const [selectedLabourCategory, setSelectedLabourCategory] = useState({
+    //     categoryId: "",
+    //     categoryName: ""
+    // });
+
+    // let { data: labourCost = 0 } = useGetSingleLabourCost({ organizationId: organizationId!, categoryId: selectedLabourCategory.categoryId });
+
+    // let { data: allLabourCategory = [] } = useGetLabourRateConfigCategories(organizationId!);
+
+    // const allLabourCategoryOptions = (allLabourCategory || []).map((labour: any) => ({
+    //     value: labour._id,
+    //     label: labour.name,
+    // }))
+
+
+    // ✅ 1. Pre-fetch all Labour Rates instantly on page load
+    const { data: labourCost = 0 } = useGetSingleLabourCostByCategoryName({
+        organizationId: organizationId!,
+        categoryName: "plywood"
     });
 
-    let { data: labourCost = 0 } = useGetSingleLabourCost({ organizationId: organizationId!, categoryId: selectedLabourCategory.categoryId });
+    // const { data: civilLabourCost = 0 } = useGetSingleLabourCostByCategoryName({
+    //     organizationId: organizationId!,
+    //     categoryName: "civil"
+    // });
 
-    let { data: allLabourCategory = [] } = useGetLabourRateConfigCategories(organizationId!);
+    // const { data: electricalLabourCost = 0 } = useGetSingleLabourCostByCategoryName({
+    //     organizationId: organizationId!,
+    //     categoryName: "electrical"
+    // });
 
-    const allLabourCategoryOptions = (allLabourCategory || []).map((labour: any) => ({
-        value: labour._id,
-        label: labour.name,
-    }))
+    // const { data: plumbingLabourCost = 0 } = useGetSingleLabourCostByCategoryName({
+    //     organizationId: organizationId!,
+    //     categoryName: "plumbing"
+    // });
 
 
 
@@ -1092,20 +1111,6 @@ const QuoteGenerateVariantSub = () => {
     const [globalProfitPercent, setGlobalProfitPercent] = useState<number>(0);
 
 
-    // const handlePlywoodSelect = (val: string) => {
-    //     // val will be the ID because we set it as the 'value' in the options above
-    //     const selectedObj = plywoodOptions.find(opt => opt.value === val || opt.label === val);
-
-    //     if (selectedObj) {
-    //         setSelectedBrand(selectedObj.label); // Stores "Century" (String)
-    //         setSelectedBrandId(selectedObj.value); // Stores "697a..." (Object ID)
-    //     } else {
-    //         setSelectedBrand(val);
-    //         setSelectedBrandId(null);
-    //     }
-    // };
-
-
 
     // 3. Common Materials State
     const [commonMaterials, setCommonMaterials] = useState<SimpleItemRow[]>([]);
@@ -1113,24 +1118,6 @@ const QuoteGenerateVariantSub = () => {
     const [commonProfitOverride, setCommonProfitOverride] = useState<number>(0);
 
 
-
-    // old version
-    // useEffect(() => {
-    //     if (quote) {
-    //         setGlobalTransportation(quote?.globalTransportation || 0);
-    //         setGlobalProfitPercent(quote?.globalProfitPercent || 0);
-    //         setCommonProfitOverride(quote?.commonProfitOverride || 0)
-
-    //     }
-    // }, [quote]);
-
-
-    // // Initialize Common Materials from Quote data
-    // useEffect(() => {
-    //     if (quote?.commonMaterials) {
-    //         setCommonMaterials(quote.commonMaterials);
-    //     }
-    // }, [quote]);
 
 
     // New version
@@ -1248,27 +1235,6 @@ const QuoteGenerateVariantSub = () => {
     }, [brandRatesByName]);
 
 
-    // START OF LAMINATION
-    // const laminateRatesByBrand: Record<string, { thickness: string; rs: number }[]> = useMemo(() => {
-    //     if (!laminateBrands) return {};
-    //     const brandMap: Record<string, { thickness: string; rs: number }[]> = {};
-
-    //     laminateBrands.forEach((item: any) => {
-    //         const data = item?.data || {};
-    //         const brandRaw = data.Brand ?? data.brand;
-    //         const thicknessRaw = data["thickness (mm)"] || data.thickness || data.Thickness;
-    //         const rsRaw = data.Rs || data.rs;
-    //         if (brandRaw && thicknessRaw && rsRaw) {
-    //             const brand = String(brandRaw).trim();
-    //             const thickness = String(thicknessRaw).trim();
-    //             const rs = parseFloat(rsRaw);
-    //             if (!brandMap[brand]) brandMap[brand] = [];
-    //             brandMap[brand].push({ thickness, rs });
-    //         }
-    //     });
-
-    //     return brandMap;
-    // }, [laminateBrands]);
 
     // ✅ Brand dropdown options
     // const laminateBrandOptions = useMemo(() => Object.keys(laminateRatesByBrand), [laminateRatesByBrand]);
@@ -1277,40 +1243,69 @@ const QuoteGenerateVariantSub = () => {
     const [rawCostWithoutProfit, setRawCostWithoutProfit] = useState(0);
 
     const handleProductProfitOverride = (index: number, newProfit: number) => {
-        // setFurnitures(prev => {
-        //     const updated = [...prev];
-        //     updated[index] = {
-        //         ...updated[index],
-        //         furnitureProfit: newProfit
-        //     };
-        //     return updated;
-        // });
-        // setTimeout(() => updateGrandTotal(), 0);
-
 
         setFurnitures(prev => {
             const updated = [...prev];
             const targetFurniture = updated[index];
 
-            // ✅ RESET LOGIC: When this product's profit changes, 
-            // wipe all individual row margins for this product only.
-            updated[index] = {
-                ...targetFurniture,
-                furnitureProfit: newProfit,
-                coreMaterials: targetFurniture.coreMaterials.map(r => ({
-                    ...r,
-                    profitOnMaterial: 0,
-                    profitOnLabour: 0
-                })),
-                fittingsAndAccessories: targetFurniture.fittingsAndAccessories.map(i => ({
-                    ...i,
-                    profitOnMaterial: 0
-                })),
-                nonBrandMaterials: targetFurniture.nonBrandMaterials.map(i => ({
-                    ...i,
-                    profitOnMaterial: 0
-                }))
-            };
+
+            if (targetFurniture.typeOfWork === "non-modular") {
+                // ✅ FIX: Recalculate row amounts with the new profit!
+                const profitMultiplier = 1 + (newProfit / 100);
+                const recalculatedWorks = (targetFurniture.works || []).map(w => {
+                    // const sqft = Number(w.totalSqft) || 0;
+                    // const matRate = Number(w.sqftRate) || 0;
+                    // const labRate = Number(w.labourRate) || 0;
+
+                       const sqft = Number(w.totalSqft) || 0;
+                    const matRate = Number(w.sqftRate) || 0;
+                    const noofLabours = Number(w.noofLabours) || 0;
+                    const noofDays = Number(w.noofDays) || 0;
+                    const labRate = Number(w.labourRate) || 0;
+                    
+                    // ✅ Separate the costs properly
+                    const materialCost = sqft * matRate;
+                    const labourCost = noofLabours * labRate * noofDays;
+
+
+
+                    return {
+                        ...w,
+                        // totalAmount: Math.round(sqft * (matRate + labRate) * profitMultiplier)
+                        totalAmount: Math.round(((materialCost + labourCost) * profitMultiplier))
+
+                    };
+                });
+
+                const newTotal = recalculatedWorks.reduce((s, r) => s + (r.totalAmount || 0), 0);
+
+                updated[index] = {
+                    ...targetFurniture,
+                    furnitureProfit: newProfit,
+                    works: recalculatedWorks,
+                    totals: { ...targetFurniture.totals, furnitureTotal: newTotal }
+                };
+            } else {
+                // ✅ RESET LOGIC: When this product's profit changes, 
+                // wipe all individual row margins for this product only.
+                updated[index] = {
+                    ...targetFurniture,
+                    furnitureProfit: newProfit,
+                    coreMaterials: targetFurniture.coreMaterials.map(r => ({
+                        ...r,
+                        profitOnMaterial: 0,
+                        profitOnLabour: 0
+                    })),
+                    fittingsAndAccessories: targetFurniture.fittingsAndAccessories.map(i => ({
+                        ...i,
+                        profitOnMaterial: 0
+                    })),
+                    nonBrandMaterials: targetFurniture.nonBrandMaterials.map(i => ({
+                        ...i,
+                        profitOnMaterial: 0
+                    }))
+                };
+            }
             return updated;
         });
 
@@ -1355,19 +1350,6 @@ const QuoteGenerateVariantSub = () => {
         setRawCostWithoutProfit(calculateCostWithoutProfit()); // 👈 Add this line
     };
 
-    // const handleLabourCategory = (selectedId: string | null) => {
-    //     const selectedCategory = allLabourCategoryOptions.find((s: any) => s.value === selectedId);
-
-    //     if (selectedCategory) {
-    //         setSelectedLabourCategory({
-    //             categoryId: selectedCategory.value, // This is the _id
-    //             categoryName: selectedCategory.label // This is the name
-    //         });
-    //     } else {
-    //         setSelectedLabourCategory({ categoryId: "", categoryName: "" });
-    //     }
-    // };
-
 
 
     const { profitDifference, profitPercentage } = useMemo(() => {
@@ -1390,7 +1372,39 @@ const QuoteGenerateVariantSub = () => {
         const SHEET_SQFT = 32;
         let totalRawCost = 0;
 
+
+        
+
         updatedFurnitures.forEach(furniture => {
+
+           // ✅ REPLACED: Updated Non-Modular raw cost calculation
+            if (furniture.typeOfWork === "non-modular") {
+                const works = furniture.works || [];
+                const totalRows = works.length;
+                
+                // 1. Get Global Labour
+                const baseWork = works[0] || {};
+                const noofLabours = Number(baseWork.noofLabours) || 0;
+                const noofDays = Number(baseWork.noofDays) || 0;
+                const labRate = Number(baseWork.labourRate) || 0;
+                
+                // 2. Divide Labour Cost
+                const totalLabourCost = noofLabours * noofDays * labRate;
+                const labourPerRow = totalRows > 0 ? totalLabourCost / totalRows : 0;
+
+                const rawWorkCost = works.reduce((sum, w) => {
+                    const sqft = Number(w.totalSqft) || 0;
+                    const matRate = Number(w.sqftRate) || 0;
+                    const materialCost = sqft * matRate;
+                    
+                    // Math without profit multiplier
+                    return sum + materialCost + labourPerRow; 
+                }, 0);
+
+                totalRawCost += rawWorkCost;
+                return; // 🛑 CRITICAL: Exit loop early so it skips Plywood math
+            }
+
             // A. Brand Rates Mapping
             const plyRates = furniture.plywoodBrand ? (brandRatesByName[furniture.plywoodBrand] || []) : [];
             const innerRates = furniture.innerLaminateBrand ? (innerRatesByName[furniture.innerLaminateBrand] || []) : [];
@@ -1486,12 +1500,6 @@ const QuoteGenerateVariantSub = () => {
             <table className="min-w-full text-sm bg-white">
                 <thead className="bg-blue-50 text-blue-800 font-bold uppercase text-[11px]">
                     <tr>
-                        {/* <th className="px-6 py-3 border-r border-blue-100">Item Name</th>
-                        <th className="px-6 py-3 border-r border-blue-100">Description</th>
-                        <th className="px-6 py-3 border-r border-blue-100">Quantity</th>
-                        <th className="px-6 py-3 border-r border-blue-100">Cost</th>
-                        <th className="px-6 py-3 border-r border-blue-100 text-blue-600">Profit % (Edit)</th>
-                        <th className="px-6 py-3">Total (incl. Global)</th> */}
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Item Name</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Description</th>
                         <th className="text-center px-6 py-3 text-xs font-medium uppercase tracking-wider">Brand</th>
@@ -1556,6 +1564,7 @@ const QuoteGenerateVariantSub = () => {
 
         // A. Calculate Total Row Count across ALL products AND Common Materials
         const furnitureRowsCount = furnitures.reduce((acc, f) => {
+            if (f.typeOfWork === "non-modular") return acc + (f.works?.length || 0);
             return acc + f.coreMaterials.length + f.fittingsAndAccessories.length + f.glues.length + f.nonBrandMaterials.length;
         }, 0);
         const totalRowsCount = furnitureRowsCount + commonMaterials.length;
@@ -1565,6 +1574,74 @@ const QuoteGenerateVariantSub = () => {
 
         // 1. Calculate the new Furnitures Array
         const nextFurnitures = furnitures.map((f) => {
+
+            // ✅ HANDLE NON-MODULAR WORKS
+            // if (f?.typeOfWork === "non-modular") {
+            //     const profitMultiplier = 1 + ((globalProfitPercent || 0) / 100);
+            //     const updatedWorks = (f.works || []).map(w => {
+            //         const sqft = Number(w.totalSqft) || 0;
+            //         const matRate = Number(w.sqftRate) || 0;
+            //         const labRate = Number(w.labourRate) || 0;
+            //         return {
+            //             ...w,
+            //             totalAmount: Math.round(sqft * (matRate + labRate) * profitMultiplier)
+            //         };
+            //     });
+
+            //     const nonModTotal = updatedWorks.reduce((s, r) => s + (r.totalAmount || 0), 0);
+
+            //     return {
+            //         ...f,
+            //         works: updatedWorks,
+            //         furnitureProfit: globalProfitPercent,
+            //         totals: { ...f.totals, furnitureTotal: nonModTotal }
+            //     };
+            // }
+
+            // ✅ HANDLE NON-MODULAR WORKS
+            if (f?.typeOfWork === "non-modular") {
+                const works = f.works || [];
+                const totalRows = works.length;
+
+                // Priority Check: Use Global unless it is undefined/null, then fall back to furnitureProfit
+                const effectiveProfitPercent = (globalProfitPercent !== null && globalProfitPercent !== undefined)
+                    ? globalProfitPercent
+                    : (f.furnitureProfit || 0);
+
+                const profitMultiplier = 1 + (effectiveProfitPercent / 100);
+
+                // 1. Pull labour inputs from the FIRST row (works[0])
+                const baseWork = works[0] || {};
+                const noofLabours = Number(baseWork.noofLabours) || 0;
+                const noofDays = Number(baseWork.noofDays) || 0;
+                const labRate = Number(baseWork.labourRate) || 0;
+                
+                // 2. Calculate Total Labour Cost and divide evenly
+                const totalLabourCost = noofLabours * noofDays * labRate;
+                const labourPerRow = totalRows > 0 ? totalLabourCost / totalRows : 0;
+
+                const updatedWorks = works.map(w => {
+                    const sqft = Number(w.totalSqft) || 0;
+                    const matRate = Number(w.sqftRate) || 0;
+                    const materialCost = sqft * matRate;
+
+                    return {
+                        ...w,
+                        // ✅ Use corrected math: (Material + Shared Labour) * Profit + Transport
+                        totalAmount: Math.round(((materialCost + labourPerRow) * profitMultiplier) + transportPerRow)
+                    };
+                });
+
+                const nonModTotal = updatedWorks.reduce((s, r) => s + (r.totalAmount || 0), 0);
+
+                return {
+                    ...f,
+                    works: updatedWorks,
+                    furnitureProfit: effectiveProfitPercent,
+                    totals: { ...f.totals, furnitureTotal: nonModTotal }
+                };
+            }
+
             if (f.coreMaterials.length === 0) return f;
             // PRIORITY LOGIC: Update product's local state if Global is changed
 
@@ -1634,7 +1711,23 @@ const QuoteGenerateVariantSub = () => {
             const updatedFurnitures = furnitureRefs.current
                 .map(ref => ref.current)
                 .filter((ref): ref is FurnitureQuoteRef => ref !== null)
-                .map(ref => ref.getUpdatedFurniture());
+                // .map(ref => ref.getUpdatedFurniture());
+                .map((ref) => {
+                    const f = ref.getUpdatedFurniture();
+
+                    // ✅ 2. Scrape the latest text from the DOM for non-modular works
+                    if (f.typeOfWork === "non-modular") {
+                        const container = document.querySelector(`[data-furniture-container="${(f as any)._id}"]`);
+                        if (container) {
+                            f.engineeringDescription = (container.querySelector('textarea[name="engineeringDescription"]') as HTMLTextAreaElement)?.value || f.engineeringDescription;
+                            f.included = (container.querySelector('textarea[name="included"]') as HTMLTextAreaElement)?.value || f.included;
+                            f.excluded = (container.querySelector('textarea[name="excluded"]') as HTMLTextAreaElement)?.value || f.excluded;
+                            f.materialsAndBrands = (container.querySelector('textarea[name="materialsAndBrands"]') as HTMLTextAreaElement)?.value || f.materialsAndBrands;
+                        }
+                    }
+
+                    return f;
+                });
 
             // const updatedGrandTotal = updatedFurnitures.reduce(
             //     (sum, f) => sum + f.totals.furnitureTotal,
@@ -1722,90 +1815,6 @@ const QuoteGenerateVariantSub = () => {
     }
 
 
-
-
-    
-
-
-
-    //  old versiion
-
-    // useEffect(() => {
-    //     if (!quote?.furnitures) return;
-
-    //     const transformed: FurnitureBlock[] = quote.furnitures.map((f: any) => ({
-    //         furnitureName: f.furnitureName,
-    //         coreMaterials: f.coreMaterials || [],
-    //         fittingsAndAccessories: f.fittingsAndAccessories || [],
-    //         glues: f.glues || [],
-    //         nonBrandMaterials: f.nonBrandMaterials || [],
-    //         totals: {
-    //             core: f.coreMaterialsTotal || 0,
-    //             fittings: f.fittingsAndAccessoriesTotal || 0,
-    //             glues: f.gluesTotal || 0,
-    //             nbms: f.nonBrandMaterialsTotal || 0,
-    //             furnitureTotal: f.furnitureTotal || 0,
-    //         },
-
-
-    //         // ✅ FIX: Use furniture-specific brand IDs from the DB if they exist
-    //         // If not, it will default to null/global state
-    //         plywoodBrandId: f?.plywoodBrandId || null,
-    //         innerLaminateBrandId: f?.innerLaminateBrandId || null,
-    //         outerLaminateBrandId: f?.outerLaminateBrandId || null,
-
-
-    //         plywoodBrand: selectedBrand,
-    //         // laminateBrand: selectedLaminateBrand,
-    //         innerLaminateBrand: selectedInnerBrand,
-    //         outerLaminateBrand: selectedOuterBrand
-    //     }));
-
-    //     setFurnitures(transformed);
-    // }, [quote]);
-
-
-    //  second new versiion
-    //     useEffect(() => {
-    //     if (!quote?.furnitures || !brandOptions.length) return;
-
-    //     const transformed: FurnitureBlock[] = quote.furnitures.map((f: any) => {
-    //         // 1. Lookup Names for this specific furniture's IDs
-    //         const specificPlywood = brandOptions.find(opt => opt.value === f.plywoodBrandId);
-    //         const specificInner = innerOptions.find(opt => opt.value === f.innerLaminateBrandId);
-    //         const specificOuter = outerOptions.find(opt => opt.value === f.outerLaminateBrandId);
-
-    //         return {
-    //             furnitureName: f.furnitureName,
-    //             coreMaterials: f.coreMaterials || [],
-    //             fittingsAndAccessories: f.fittingsAndAccessories || [],
-    //             glues: f.glues || [],
-    //             nonBrandMaterials: f.nonBrandMaterials || [],
-    //             totals: {
-    //                 core: f.coreMaterialsTotal || 0,
-    //                 fittings: f.fittingsAndAccessoriesTotal || 0,
-    //                 glues: f.gluesTotal || 0,
-    //                 nbms: f.nonBrandMaterialsTotal || 0,
-    //                 furnitureTotal: f.furnitureTotal || 0,
-    //             },
-
-    //             // IDs: Use saved product ID or fallback to global ID
-    //             plywoodBrandId: f.plywoodBrandId || selectedBrandId,
-    //             innerLaminateBrandId: f.innerLaminateBrandId || selectedInnerBrandId,
-    //             outerLaminateBrandId: f.outerLaminateBrandId || selectedOuterBrandId,
-
-    //             // Names: Use looked-up name or fallback to global name
-    //             plywoodBrand: specificPlywood?.label || selectedBrand,
-    //             innerLaminateBrand: specificInner?.label || selectedInnerBrand,
-    //             outerLaminateBrand: specificOuter?.label || selectedOuterBrand
-    //         };
-    //     });
-
-    //     setFurnitures(transformed);
-
-    //     // We add dependencies for options so names load correctly once API data arrives
-    // }, [quote, brandOptions, innerOptions, outerOptions, selectedBrand, selectedInnerBrand, selectedOuterBrand]);
-
     const isInitialMount = useRef(true);
 
 
@@ -1880,62 +1889,16 @@ const QuoteGenerateVariantSub = () => {
     }, [furnitures]);
 
 
+
     // useEffect(() => {
-    //     // 1. Auto-select Plywood
-    //     if (!selectedBrandId && brandOptions?.length > 0) {
-    //         const first = brandOptions[0];
-    //         setSelectedBrand(first.label);   // Set the Name (e.g., "Century")
-    //         setSelectedBrandId(first.value); // Set the ID (e.g., "697a...")
+    //     if (selectedLabourCategory.categoryId === "" && allLabourCategoryOptions?.length > 0) {
+    //         setSelectedLabourCategory({
+    //             categoryId: allLabourCategoryOptions[0]?.value,
+    //             categoryName: allLabourCategoryOptions[0]?.label
+    //         });
     //     }
+    // }, [allLabourCategoryOptions]);
 
-    //     // 2. Auto-select Inner Laminate
-    //     if (!selectedInnerBrandId && innerOptions?.length > 0) {
-    //         const first = innerOptions[0];
-    //         setSelectedInnerBrand(first.label);
-    //         setSelectedInnerBrandId(first.value);
-    //     }
-
-    //     // 3. Auto-select Outer Laminate
-    //     if (!selectedOuterBrandId && outerOptions?.length > 0) {
-    //         const first = outerOptions[0];
-    //         setSelectedOuterBrand(first.label);
-    //         setSelectedOuterBrandId(first.value);
-    //     }
-    // }, [brandOptions, innerOptions, outerOptions]);
-
-
-
-    // nnn
-
-
-    useEffect(() => {
-        if (selectedLabourCategory.categoryId === "" && allLabourCategoryOptions?.length > 0) {
-            setSelectedLabourCategory({
-                categoryId: allLabourCategoryOptions[0]?.value,
-                categoryName: allLabourCategoryOptions[0]?.label
-            });
-        }
-    }, [allLabourCategoryOptions]);
-
-
-
-    // // START OF LAMINATE
-    // useEffect(() => {
-    //     if (!selectedLaminateBrand && laminateBrandOptions?.length > 0) {
-    //         setSelectedLaminateBrand(laminateBrandOptions[0]);
-    //     }
-    // }, [laminateBrandOptions]);
-
-
-
-    //     // Before rendering children, ensure refs are created for each furniture
-    // if (furnitureRefs?.current?.length !== furnitures.length) {
-    //   furnitureRefs.current = furnitures.map(
-    //     (_, i) => furnitureRefs.current[i] ?? createRef<FurnitureQuoteRef>()
-    //   );
-    // }
-
-    // END OF LAMINATE 
 
     return (
         <div className="p-2 max-h-full overflow-y-auto">
@@ -1963,34 +1926,15 @@ const QuoteGenerateVariantSub = () => {
                     {/* <div className="flex gap-2 items-center"> */}
 
 
-                       
 
-                        {(canCreate || canEdit) && <Button onClick={handleGenerateQuote} isLoading={quotePending} className="flex-shrink-0">
-                            Generate Quote for Client
-                        </Button>}
 
-                    {/* </div> */}
+                    {(canCreate || canEdit) && <Button onClick={handleGenerateQuote} isLoading={quotePending} className="flex-shrink-0">
+                        Generate Quote for Client
+                    </Button>}
 
-                    {/* Right - Generate Button */}
 
                 </div>
 
-                {/* Bottom Row - Brand Selection */}
-                {/* <div className="flex items-center gap-4">
-                    
-
-                    <div className="flex-1">
-                        <label className="text-xs font-medium text-gray-700 whitespace-nowrap">Laminate Brand:</label>
-                        <SearchSelect
-                            options={laminateBrandOptions}
-                            placeholder="Select Laminate Brand"
-                            searchPlaceholder="Search brands..."
-                            onSelect={setSelectedLaminateBrand}
-                            selectedValue={selectedLaminateBrand || ""}
-                            className="flex-1"
-                        />
-                    </div>
-                </div> */}
 
 
                 {/* Bottom Row - Three Way Brand Selection */}
@@ -2222,7 +2166,9 @@ const QuoteGenerateVariantSub = () => {
                                             className="w-16 text-right font-black focus:outline-none text-green-700 bg-green-50 rounded px-2 py-1 border border-green-100"
                                             value={globalProfitPercent}
                                             onChange={(e) => {
-                                                const val = parseFloat(e.target.value) || 0;
+                                                // const val = parseFloat(e.target.value) || 0;
+                                                    const val = Math.max(0, parseFloat(e.target.value) || 0);
+
                                                 setGlobalProfitPercent(val);
                                                 setCommonProfitOverride(val);
 
