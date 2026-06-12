@@ -313,7 +313,7 @@ const BillAccountsMain = () => {
     }
 
     return (
-        <div className="space-y-0 h-full">
+        <div className="space-y-0 h-full bg-brand-surface">
 
             <NavigationDDWithHeading
                 isOpen={isDropdownOpen}
@@ -326,8 +326,8 @@ const BillAccountsMain = () => {
             {/* Header */}
             <header className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-receipt mr-3 text-blue-600"></i>
+                    <h1 className="text-3xl font-bold text-text-main flex items-center">
+                        <i className="fas fa-receipt mr-3 text-text-muted"></i>
                         Bill Accounts
                     </h1>
                     {/* <p className="text-gray-600 mt-1">
@@ -344,8 +344,10 @@ const BillAccountsMain = () => {
                     {filteredNavigationItems.length > 0 && (
 
                         <Button
+                            variant='outline'
                             onClick={() => setIsDropdownOpen(true)}
                             // className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105"
+                            className="!text-text-muted hover:text-text-main hover:bg-brand-ash border-2 border-brand-ash"
 
                             title="invoices, expense..."
                         >
@@ -354,6 +356,7 @@ const BillAccountsMain = () => {
                     )}
 
                     {canCreate && <Button
+                        variant='dark'
                         onClick={() => navigate('create')}
                     >
                         <i className="fas fa-plus mr-2" />
@@ -372,19 +375,19 @@ const BillAccountsMain = () => {
             {/* Loading State */}
             {isLoading ? (
                 <div className="flex justify-center items-center py-12">
-                    <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+                    <i className="fas fa-spinner fa-spin text-action-primary text-4xl"></i>
                 </div>
             ) : isError ? (
-                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                    <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-brand-surface border border-action-danger rounded-lg shadow text-center">
+                    <div className="text-text-main font-semibold mb-2 text-xl sm:text-3xl">
                         ⚠️ Error Occurred
                     </div>
-                    <p className="text-red-500 mb-4 text-lg sm:text-xl">
+                    <p className="text-text-muted mb-4 text-lg sm:text-xl">
                         {(error as any)?.message || "Failed to load bills"}
                     </p>
                     <Button
                         onClick={() => refetch()}
-                        className="bg-red-600 text-white px-4 py-2"
+                        className="bg-action-danger text-brand-surface px-4 py-2"
                     >
                         Retry
                     </Button>
@@ -393,16 +396,16 @@ const BillAccountsMain = () => {
                 <main className="flex gap-2 !max-h-[90%]">
                     {/* Filters Sidebar */}
                     <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
-                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-lighter">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                                    <i className="fas fa-filter mr-2 text-blue-600"></i>
+                                <h3 className="text-lg font-semibold text-text-strong flex items-center">
+                                    <i className="fas fa-filter mr-2 text-action-primary"></i>
                                     Filters
                                 </h3>
                                 {activeFiltersCount > 0 && (
                                     <button
                                         onClick={clearFilters}
-                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                        className="text-sm text-action-primary hover:text-text-strong font-medium"
                                     >
                                         Clear All ({activeFiltersCount})
                                     </button>
@@ -412,8 +415,8 @@ const BillAccountsMain = () => {
                             <div className="space-y-6">
                                 {/* Search */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-search mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-search text-text-soft mr-2"></i>
                                         Search
                                     </label>
                                     <input
@@ -422,13 +425,13 @@ const BillAccountsMain = () => {
                                         placeholder="Bill number, vendor name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 bg-brand-surface border border-ash-medium text-text-main placeholder-text-soft rounded-lg focus:ring-2 focus:ring-action-primary focus:border-transparent"
                                     />
                                 </div>
 
                                 {/* Date Filter */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         From CreatedAt Date
                                     </label>
@@ -438,12 +441,13 @@ const BillAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdFromDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 bg-brand-surface border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-action-primary focus:border-transparent outline-none transition-shadow"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         To CreatedAt Date
                                     </label>
@@ -453,13 +457,14 @@ const BillAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdToDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 bg-brand-surface border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-action-primary focus:border-transparent outline-none transition-shadow"
                                     />
                                 </div>
 
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         From Bill Date
                                     </label>
@@ -469,12 +474,13 @@ const BillAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, billFromDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 bg-brand-surface border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-action-primary focus:border-transparent outline-none transition-shadow"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         To Bill Date
                                     </label>
@@ -484,13 +490,14 @@ const BillAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, billToDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 bg-brand-surface border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-action-primary focus:border-transparent outline-none transition-shadow"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-4">
-                                        <i className="fas fa-coins mr-2 text-gray-400"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-4">
+                                        <i className="fas fa-coins mr-2 text-text-soft"></i>
                                         Amount Range
                                     </label>
 
@@ -509,43 +516,52 @@ const BillAccountsMain = () => {
                                                     maxAmount: max,
                                                 }));
                                             }}
-                                            trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+                                            // trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+                                            trackStyle={[{ backgroundColor: "var(--action-primary)", height: 6 }]}
                                             handleStyle={[
                                                 {
-                                                    borderColor: "#3b82f6",
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    // borderColor: "#3b82f6",
+                                                    // backgroundColor: "#fff",
+                                                    // boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    borderColor: "var(--action-primary)",
+                                                    backgroundColor: "var(--bg-surface)",
+                                                    boxShadow: "0 2px 6px rgba(30, 41, 59, 0.2)",
                                                     width: 18,
                                                     height: 18,
                                                     marginTop: -6,
                                                     opacity: 1
                                                 },
                                                 {
-                                                    borderColor: "#3b82f6",
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    // borderColor: "#3b82f6",
+                                                    // backgroundColor: "#fff",
+                                                    // boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+
+                                                    borderColor: "var(--action-primary)",
+                                                    backgroundColor: "var(--bg-surface)",
+                                                    boxShadow: "0 2px 6px rgba(30, 41, 59, 0.2)",
                                                     width: 18,
                                                     height: 18,
                                                     marginTop: -6,
                                                     opacity: 1
                                                 },
                                             ]}
-                                            railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+                                            // railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+                                            railStyle={{ backgroundColor: "var(--bg-ash-dark)", height: 6 }}
                                         />
                                     </div>
 
                                     {/* Display Values */}
                                     <div className="flex justify-between items-center gap-2 text-sm">
                                         <div className="flex-1">
-                                            <span className="text-xs text-gray-500 block mb-1">Min</span>
-                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+                                            <span className="text-xs text-text-muted block mb-1">Min</span>
+                                            <div className="bg-brand-ash px-2 py-1.5 rounded border border-ash-medium font-semibold text-text-strong text-center text-xs">
                                                 ₹{Number(filters.minAmount).toLocaleString("en-IN")}
                                             </div>
                                         </div>
-                                        <div className="text-gray-300">—</div>
+                                        <div className="text-text-soft">—</div>
                                         <div className="flex-1">
                                             <span className="text-xs text-gray-500 block mb-1">Max</span>
-                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+                                            <div className="bg-brand-ash px-2 py-1.5 rounded border border-ash-medium font-semibold text-text-strong text-center text-xs">
                                                 ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
                                             </div>
                                         </div>
@@ -559,7 +575,8 @@ const BillAccountsMain = () => {
                                                 setFilters((f) => ({ ...f, minAmount: +e.target.value }))
                                             }
                                             placeholder="Min"
-                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            // className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-2 py-1 text-sm bg-brand-surface text-text-main placeholder-text-soft border border-ash-medium rounded focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                             min="0"
                                         />
                                         <input
@@ -569,7 +586,8 @@ const BillAccountsMain = () => {
                                                 setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
                                             }
                                             placeholder="Max"
-                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            // className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-2 py-1 text-sm bg-brand-surface text-text-main placeholder-text-soft border border-ash-medium rounded focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                             min="0"
                                         />
                                     </div>
@@ -579,7 +597,7 @@ const BillAccountsMain = () => {
 
                                 {/* Vendor ID Filter */}
                                 {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-user mr-2"></i>
                                         Vendor ID
                                     </label>
@@ -596,7 +614,7 @@ const BillAccountsMain = () => {
 
                                 {/* Sort By */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         Sort By
                                     </label>
                                     <select
@@ -604,7 +622,8 @@ const BillAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, sortBy: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 bg-brand-surface border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-action-primary focus:border-transparent outline-none transition-shadow"
                                     >
                                         <option value="createdAt">Created Date</option>
                                         <option value="billDate">Bill Date</option>
@@ -616,7 +635,7 @@ const BillAccountsMain = () => {
 
                                 {/* Sort Order */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         Sort Order
                                     </label>
                                     <select
@@ -624,7 +643,8 @@ const BillAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 bg-brand-surface border border-ash-medium text-text-main rounded-lg focus:ring-2 focus:ring-action-primary focus:border-transparent outline-none transition-shadow"
                                     >
                                         <option value="desc">Descending</option>
                                         <option value="asc">Ascending</option>
@@ -636,10 +656,10 @@ const BillAccountsMain = () => {
 
                     {/* No Bills Fallback */}
                     {canList && <> {bills.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-                            <i className="fas fa-file-bill text-5xl text-blue-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Bills Found</h3>
-                            <p className="text-sm text-gray-500">
+                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-brand-surface border border-ash-light rounded-xl text-center p-6">
+                            <i className="fas fa-file-bill text-5xl text-text-soft mb-4" />
+                            <h3 className="text-lg font-semibold text-text-strong mb-1">No Bills Found</h3>
+                            <p className="text-sm text-text-muted">
                                 {filters.search || filters.vendorId || filters.date
                                     ? 'Try adjusting your filters to find bills.'
                                     : 'Looks like there are no bills yet.'}
@@ -654,8 +674,9 @@ const BillAccountsMain = () => {
                             className="flex-1 !max-h-[100%] overflow-y-auto"
                         >
                             {/* Table Header */}
-                            <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
-                                <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+                            <div className="bg-brand-surface rounded-t-xl border border-ash-medium sticky top-0 z-10">
+                                {/* <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm"> */}
+                                <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-brand-ash border-b border-ash-light font-semibold text-text-strong text-sm">
                                     <div className="col-span-1 text-center">S.No</div>
                                     <div className="col-span-3">Vendor Name</div>
                                     <div className="col-span-2">Bill Number</div>
@@ -668,7 +689,7 @@ const BillAccountsMain = () => {
                             </div>
 
                             {/* Table Body */}
-                            <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
+                            <div className="bg-brand-surface rounded-b-xl border-x border-b border-ash-medium">
                                 {bills.map((bill: CreateBillPayload, index: number) => (
                                     <BillAccList key={bill._id}
                                         bill={bill} index={index} handleView={handleView}
@@ -681,7 +702,7 @@ const BillAccountsMain = () => {
                             {/* Loading indicator at the bottom */}
                             {isFetchingNextPage && (
                                 <div className="flex justify-center py-8">
-                                    <div className="flex items-center gap-2 text-blue-600">
+                                    <div className="flex items-center gap-2 text-action-primary">
                                         <i className="fas fa-spinner fa-spin text-2xl"></i>
                                         <span className="text-sm font-medium">Loading more bills...</span>
                                     </div>
@@ -691,7 +712,7 @@ const BillAccountsMain = () => {
                             {/* End of list indicator */}
                             {!hasNextPage && bills.length > 0 && (
                                 <div className="flex justify-center py-6">
-                                    <p className="text-gray-400 text-sm font-medium">
+                                    <p className="text-text-muted text-sm font-medium">
                                         <i className="fas fa-check-circle mr-2"></i>
                                         You've reached the end of the list
                                     </p>

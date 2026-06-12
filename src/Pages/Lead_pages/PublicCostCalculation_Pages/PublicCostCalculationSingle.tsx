@@ -112,7 +112,7 @@ const PublicCostCalculationSingle: React.FC = () => {
                                     <p className="text-3xl font-bold text-white tracking-tight">₹{record.estimate.toLocaleString('en-IN')}</p>
                                 </div>
                                 <div className="bg-blue-500/10 border border-blue-500/20 px-3 py-1.5 rounded-lg">
-                                    <p className="text-[8px] text-slate-500 uppercase font-bold leading-none mb-1">Finish Quality</p>
+                                    <p className="text-[8px] text-slate-500 uppercase font-bold leading-none mb-1">Selected Package</p>
                                     <p className="text-[10px] font-bold text-blue-400 uppercase leading-none">{record.finish}</p>
                                 </div>
                             </div>

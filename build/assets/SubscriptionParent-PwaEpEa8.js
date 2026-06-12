@@ -1,1 +1,0 @@
-import{e as r,j as i}from"./index-C4ywLEN_.js";import e from"./SubscriptionMain-Bo4JCIC9.js";import"./loadScript-B3Gdq1pJ.js";import"./toast-C2Ueq3AQ.js";import"./useMutation-Cvno6RFa.js";import"./roleCheck-CT1WXUa9.js";import"./Button-CtfMtZjv.js";const l=()=>{const{openMobileSidebar:t,isMobile:o}=r();return i.jsx(e,{openMobileSidebar:t,isMobile:o})};export{l as default};

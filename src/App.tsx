@@ -11,9 +11,9 @@ import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
 // import InstagramLeadMainByMeta from './Pages/Lead_pages/InstragramLead_Pages/InstagramLeadByMeta_Pages/InstagramLeadMainByMeta';
 // import InstagramLeadSingleByMeta from './Pages/Lead_pages/InstragramLead_Pages/InstagramLeadByMeta_Pages/InstagramLeadSingleByMeta';
 // import { WhatsAppLeadMainByMeta } from './Pages/Lead_pages/InstragramLead_Pages/WhatsAppLeadMainByMeta';
-const VerticalLivingPdfConfiguration = lazy(() => import( './Pages/Lead_pages/VerticalLiving_Pages/VerticalLivingPdfConfiguration'));
-const MetaLeadMain  = lazy(() => import( './Pages/Lead_pages/MetaLead_Pages/MetaLeadMain'));
-const MetaLeadSingle  = lazy(() => import( './Pages/Lead_pages/MetaLead_Pages/MetaLeadSingle'));
+const VerticalLivingPdfConfiguration = lazy(() => import('./Pages/Lead_pages/VerticalLiving_Pages/VerticalLivingPdfConfiguration'));
+const MetaLeadMain = lazy(() => import('./Pages/Lead_pages/MetaLead_Pages/MetaLeadMain'));
+const MetaLeadSingle = lazy(() => import('./Pages/Lead_pages/MetaLead_Pages/MetaLeadSingle'));
 const WhatsAppLeadsPage = lazy(() => import('./Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadMain'));
 const WhatsAppLeadSingle = lazy(() => import('./Pages/Lead_pages/WhatsappLead_Pages/WhatsappLeadSingle'));
 const InstagramLeadsPage = lazy(() => import('./Pages/Lead_pages/InstragramLead_Pages/InstagramLeadMain'));
@@ -107,7 +107,7 @@ const SubContractMain = lazy(() => import('./Pages/SubContract Pages/SubContract
 const CreateSubContract = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/CreateSubContract'));
 const SingleSubContract = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/SingleSubContract'));
 const PublicSubContract = lazy(() => import('./Pages/SubContract Pages/SubContractNew Pages/PublicSubContract'));
-const IssueDiscussionMain = lazy(() => import('./Pages/Stage Pages/Issue Discussion Pages/IssueDiscussionPage'));
+const TicketOperationMain = lazy(() => import('./Pages/Stage Pages/Ticekt_Operation_Pages/TicketOperationMain'));
 const VendorPaymentAccMain = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentAccMain'));
 const VendorPaymentSingle = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Payment Pages/VendorPaymentSingle'));
 const CreateVendorPaymentAcc = lazy(() => import('./Pages/Department Pages/Accounting Pages/Vendor Payment Pages/CreateVendorPaymentAcc'));
@@ -1503,7 +1503,7 @@ function App() {
                 requiredAction={['list', 'edit', "create", "delete"]}
               >
                 <InstagramLeadSingle />
-                 {/* <InstagramLeadSingleByMeta /> */}
+                {/* <InstagramLeadSingleByMeta /> */}
               </ProtectedRoutes>} />
 
             </Route>
@@ -1516,9 +1516,9 @@ function App() {
             >
                <InstagramLeadsPage /> 
             </ProtectedRoutes>} /> */}
-              {/* <WhatsAppLeadMainByMeta />  */}
+            {/* <WhatsAppLeadMainByMeta />  */}
 
-           
+
 
             <Route path="meta-leads" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="leadmodule"
@@ -1539,7 +1539,7 @@ function App() {
             </Route>
 
 
-             <Route path="vertical-living-configuration" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+            <Route path="vertical-living-configuration" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="leadmodule"
               // ⭐ Allow entry if they can do ANY of these things
               requiredAction={['list', 'edit', "create", "delete"]}
@@ -1547,7 +1547,7 @@ function App() {
               <VerticalLivingPdfConfiguration />
             </ProtectedRoutes>} >
 
-            
+
 
             </Route>
 
@@ -2809,7 +2809,7 @@ function App() {
           </ProtectedRoutes>} />
 
           <Route path="/:organizationId/ticket" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}>
-            <IssueDiscussionMain />
+            <TicketOperationMain />
           </ProtectedRoutes>} />
 
 

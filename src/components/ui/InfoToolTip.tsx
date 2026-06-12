@@ -86,13 +86,13 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({
         const baseClasses = `
       w-4 h-4 rounded-full flex items-center justify-center 
       font-medium cursor-pointer transition-all duration-200 
-      border border-blue-500 bg-transparent hover:bg-blue-50
+      border-2 border-brand-ash bg-transparent hover:bg-brand-ash
       text-xs
     `;
 
         return `${baseClasses} ${isSticky
-            ? 'bg-blue-50 ring-1 ring-blue-400 text-blue-600'
-            : 'text-blue-500 hover:text-blue-600'
+            ? 'bg-brand-ash/20 ring-1 ring-brand-ash text-text-muted'
+            : 'text-text-muted hover:text-text-main'
             }`;
     };
 
@@ -112,13 +112,13 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({
             {(isVisible || isSticky) && (
                 <div className={getPositionClasses()}>
                     <div className={`
-            bg-white text-gray-700 px-2 py-1 rounded-md shadow-lg border border-gray-200
+            bg-brand-surface text-text-main px-2 py-1 rounded-md shadow-lg border border-brand-ash
             text-xs leading-relaxed break-words whitespace-normal
             
 !min-w-[100px] sm:!min-w-[150px] md:!min-w-[200px]
 !max-w-[400px] sm:!max-w-[500px] md:!max-w-[600px]
  ${className}
-            ${isSticky ? 'border-blue-300 ring-1 ring-blue-200' : ''}
+            ${isSticky ? 'border-brand-ash-dark ring-1 ring-brand-ash' : ''}
           `}>
                         <div className="flex items-start gap-1">
                             <div className="flex-1 break-words">
@@ -129,7 +129,7 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({
                                     className="
                                     cursor-pointer
                     flex-shrink-0 w-3 h-3 md:w-3.5 md:h-3.5
-                    bg-transparent hover:bg-gray-100 text-gray-500 hover:text-gray-700
+                    bg-transparent hover:bg-brand-ash-dark text-text-muted hover:text-text-main
                     rounded flex items-center justify-center 
                     text-[10px] font-bold transition-colors border-0
                   "
@@ -144,7 +144,7 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({
 
                         {/* Tooltip arrow */}
                         <div className={`
-              absolute w-1.5 h-1.5 bg-white border border-gray-200 transform rotate-45
+              absolute w-1.5 h-1.5 bg-brand-surface border border-brand-ash transform rotate-45
               ${position === 'top' ? 'top-full left-1/2 -translate-x-1/2 -translate-y-0.5 border-t-0 border-l-0' : ''}
               ${position === 'bottom' ? 'bottom-full left-1/2 -translate-x-1/2 translate-y-0.5 border-b-0 border-r-0' : ''}
               ${position === 'left' ? 'left-full top-1/2 -translate-y-1/2 -translate-x-0.5 border-b-0 border-l-0' : ''}

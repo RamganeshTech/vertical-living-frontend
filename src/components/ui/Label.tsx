@@ -5,5 +5,5 @@
   }
 
   export const Label: React.FC<LabelProps> = ({ className = "", ...props }) => {
-    return <label className={`text-sm font-medium text-gray-700 ${className}`} {...props} />
+    return <label className={`text-sm font-medium text-text-muted ${className}`} {...props} />
   }

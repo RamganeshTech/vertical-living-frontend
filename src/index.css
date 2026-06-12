@@ -65,6 +65,7 @@ html {
   --color-action-primary: var(--action-primary);
   --color-action-success: var(--action-success);
   --color-action-danger: var(--action-danger);
+  --color-action-secondary: var(--action-secondary);
 }
 
 :root {

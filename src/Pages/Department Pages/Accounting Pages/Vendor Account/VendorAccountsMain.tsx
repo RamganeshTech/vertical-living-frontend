@@ -141,30 +141,273 @@ const VendorAccountsMain = () => {
         return <Outlet />;
     }
 
+    // return (
+    //     <div className="space-y-4 h-full">
+    //         {/* Header */}
+    //         <div className="flex justify-between items-center">
+    //             <div>
+    //                 <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+    //                     <i className="fas fa-users mr-3 text-blue-600"></i>
+    //                     Vendor Accounts
+    //                 </h1>
+    //                 {/* <p className="text-gray-600 mt-1">
+    //                     Manage your business and individual vendors
+    //                 </p> */}
+    //                 <Breadcrumb paths={paths} />
+    //             </div>
+
+
+    //             <div className='flex items-center gap-2'>
+
+    //                 {canCreate && <Button
+    //                     onClick={() => navigate('create')}
+    //                 >
+    //                     <i className="fas fa-plus mr-2" />
+    //                     Add Vendor
+    //                 </Button>}
+
+    //                 <div className="w-full sm:w-auto flex justify-end sm:block">
+    //                     <StageGuide
+    //                         organizationId={organizationId!}
+    //                         stageName="vendor"
+    //                     />
+    //                 </div>
+    //             </div>
+    //         </div>
+
+    //         {/* Loading State */}
+    //         {isLoading ? (
+    //             <div className="flex justify-center items-center py-12">
+    //                 <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+    //             </div>
+    //         ) : isError ? (
+    //             <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+    //                 <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+    //                     ⚠️ Error Occurred
+    //                 </div>
+    //                 <p className="text-red-500 mb-4 text-lg sm:text-xl">
+    //                     {(error as any)?.message || "Failed to load vendors"}
+    //                 </p>
+    //                 <Button
+    //                     onClick={() => refetch()}
+    //                     className="bg-red-600 text-white px-4 py-2"
+    //                 >
+    //                     Retry
+    //                 </Button>
+    //             </div>
+    //         ) : (
+    //             <main className="flex gap-2 !max-h-[90%]">
+    //                 {/* Filters Sidebar */}
+    //                 <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
+    //                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                         <div className="flex items-center justify-between mb-6">
+    //                             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+    //                                 <i className="fas fa-filter mr-2 text-blue-600"></i>
+    //                                 Filters
+    //                             </h3>
+    //                             {activeFiltersCount > 0 && (
+    //                                 <button
+    //                                     onClick={clearFilters}
+    //                                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+    //                                 >
+    //                                     Clear All ({activeFiltersCount})
+    //                                 </button>
+    //                             )}
+    //                         </div>
+
+    //                         <div className="space-y-6">
+    //                             {/* Search */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-search mr-2"></i>
+    //                                     Search
+    //                                 </label>
+    //                                 <input
+    //                                     type="text"
+    //                                     autoFocus
+    //                                     placeholder="Name, phone, company..."
+    //                                     value={filters.search}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     From CreatedAt Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.createdFromDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     To CreatedAt Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.createdToDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, createdToDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+
+    //                             {/* vendor Type */}
+    //                             {/* <div>
+    //                                     <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                         vendor Type
+    //                                     </label>
+    //                                     <select
+    //                                         value={filters.vendorType}
+    //                                         onChange={(e) => setFilters(f => ({ ...f, customerType: e.target.value as any }))}
+    //                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                     >
+    //                                         <option value="">All Types</option>
+    //                                         <option value="business">Business</option>
+    //                                         <option value="individual">Individual</option>
+    //                                     </select>
+    //                                 </div> */}
+
+    //                             {/* Sort By */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Sort By
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.sortBy}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, sortBy: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="createdAt">Created Date</option>
+    //                                     <option value="firstName">First Name</option>
+    //                                     <option value="companyName">Company Name</option>
+    //                                     <option value="email">Email</option>
+    //                                 </select>
+    //                             </div>
+
+    //                             {/* Sort Order */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Sort Order
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.sortOrder}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="desc">Descending</option>
+    //                                     <option value="asc">Ascending</option>
+    //                                 </select>
+    //                             </div>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+
+    //                 {/* No vendorss Fallback */}
+    //                 {canList && <>  {vendors.length === 0 ? (
+    //                     <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+    //                         <i className="fas fa-user-slash text-5xl text-blue-300 mb-4" />
+    //                         <h3 className="text-lg font-semibold text-blue-800 mb-1">No vendorss Found</h3>
+    //                         <p className="text-sm text-gray-500">
+    //                             {filters.search
+    //                                 ? 'Try adjusting your filters to find vendorss.'
+    //                                 : 'Looks like there are no vendorss yet.'}
+    //                             <br />
+    //                             Click on <strong>"Add vendors"</strong> to get started 🚀
+    //                         </p>
+    //                     </div>
+    //                 ) : (
+    //                     <div
+    //                         ref={scrollContainerRef}
+    //                         className="flex-1 max-h-[100%] overflow-y-auto"
+    //                     >
+    //                         {/* Table Header */}
+    //                         <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
+    //                             <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+    //                                 <div className="col-span-1 text-center">S.No</div>
+    //                                 <div className="col-span-3 text-center">Vendor Name</div>
+    //                                 <div className="col-span-2 text-center">Company Name</div>
+    //                                 <div className="col-span-2 text-center">Phone</div>
+    //                                 <div className="col-span-2 text-center">Created At</div>
+    //                                 <div className="col-span-2 text-center">Actions</div>
+    //                             </div>
+    //                         </div>
+
+    //                         {/* Table Body */}
+    //                         <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
+    //                             {vendors.map((vendor, index) => (
+    //                                 <VendorAccList
+    //                                     key={vendor._id}
+    //                                     vendor={vendor}
+    //                                     index={index}
+    //                                     onView={() => handleView(vendor._id)}
+    //                                     onDelete={() =>
+    //                                         handleDelete(vendor._id)
+    //                                     }
+    //                                     isDeleting={deleteVendorMutation.isPending && deleteVendorMutation.variables === vendor._id}
+    //                                 />
+    //                             ))}
+    //                         </div>
+
+    //                         {/* Loading indicator */}
+    //                         {isFetchingNextPage && (
+    //                             <div className="flex justify-center py-8">
+    //                                 <div className="flex items-center gap-2 text-blue-600">
+    //                                     <i className="fas fa-spinner fa-spin text-2xl"></i>
+    //                                     <span className="text-sm font-medium">Loading more vendors...</span>
+    //                                 </div>
+    //                             </div>
+    //                         )}
+
+    //                         {/* End reached */}
+    //                         {!hasNextPage && vendors.length > 0 && (
+    //                             <div className="flex justify-center py-6">
+    //                                 <p className="text-gray-400 text-sm font-medium">
+    //                                     <i className="fas fa-check-circle mr-2"></i>
+    //                                     You've reached the end of the list
+    //                                 </p>
+    //                             </div>
+    //                         )}
+    //                     </div>
+
+    //                 )}
+    //                 </>}
+
+    //             </main>
+    //         )}
+    //     </div>
+    // );
+
     return (
-        <div className="space-y-4 h-full">
+        <div className="space-y-2 h-full bg-brand-surface">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-users mr-3 text-blue-600"></i>
+                    <h1 className="text-3xl font-bold text-text-main flex items-center">
+                        <i className="fas fa-users mr-3 text-action-primary"></i>
                         Vendor Accounts
                     </h1>
-                    {/* <p className="text-gray-600 mt-1">
-                        Manage your business and individual vendors
-                    </p> */}
                     <Breadcrumb paths={paths} />
                 </div>
 
-
                 <div className='flex items-center gap-2'>
-
-                    {canCreate && <Button
-                        onClick={() => navigate('create')}
-                    >
-                        <i className="fas fa-plus mr-2" />
-                        Add Vendor
-                    </Button>}
+                    {canCreate && (
+                        <Button variant='dark' onClick={() => navigate('create')}>
+                            <i className="fas fa-plus mr-2" />
+                            Add Vendor
+                        </Button>
+                    )}
 
                     <div className="w-full sm:w-auto flex justify-end sm:block">
                         <StageGuide
@@ -178,19 +421,19 @@ const VendorAccountsMain = () => {
             {/* Loading State */}
             {isLoading ? (
                 <div className="flex justify-center items-center py-12">
-                    <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+                    <i className="fas fa-spinner fa-spin text-action-primary text-4xl"></i>
                 </div>
             ) : isError ? (
-                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                    <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-brand-surface border border-action-danger rounded-lg shadow-sm text-center">
+                    <div className="text-action-danger font-semibold mb-2 text-xl sm:text-3xl">
                         ⚠️ Error Occurred
                     </div>
-                    <p className="text-red-500 mb-4 text-lg sm:text-xl">
+                    <p className="text-action-danger mb-4 text-lg sm:text-xl">
                         {(error as any)?.message || "Failed to load vendors"}
                     </p>
                     <Button
                         onClick={() => refetch()}
-                        className="bg-red-600 text-white px-4 py-2"
+                        className="bg-action-danger hover:opacity-90 transition-opacity text-brand-surface px-4 py-2"
                     >
                         Retry
                     </Button>
@@ -198,17 +441,17 @@ const VendorAccountsMain = () => {
             ) : (
                 <main className="flex gap-2 !max-h-[90%]">
                     {/* Filters Sidebar */}
-                    <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
-                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto custom-scrollbar">
+                        <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                                    <i className="fas fa-filter mr-2 text-blue-600"></i>
+                                <h3 className="text-lg font-semibold text-text-main flex items-center">
+                                    <i className="fas fa-filter mr-2 text-action-primary"></i>
                                     Filters
                                 </h3>
                                 {activeFiltersCount > 0 && (
                                     <button
                                         onClick={clearFilters}
-                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                        className="text-sm text-action-primary hover:text-action-primary-hover font-medium transition-colors"
                                     >
                                         Clear All ({activeFiltersCount})
                                     </button>
@@ -218,8 +461,8 @@ const VendorAccountsMain = () => {
                             <div className="space-y-6">
                                 {/* Search */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-search mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-search mr-2 text-text-soft"></i>
                                         Search
                                     </label>
                                     <input
@@ -228,13 +471,13 @@ const VendorAccountsMain = () => {
                                         placeholder="Name, phone, company..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         From CreatedAt Date
                                     </label>
                                     <input
@@ -243,13 +486,13 @@ const VendorAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdFromDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         To CreatedAt Date
                                     </label>
                                     <input
@@ -258,36 +501,19 @@ const VendorAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdToDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     />
                                 </div>
 
-
-                                {/* vendor Type */}
-                                {/* <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            vendor Type
-                                        </label>
-                                        <select
-                                            value={filters.vendorType}
-                                            onChange={(e) => setFilters(f => ({ ...f, customerType: e.target.value as any }))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        >
-                                            <option value="">All Types</option>
-                                            <option value="business">Business</option>
-                                            <option value="individual">Individual</option>
-                                        </select>
-                                    </div> */}
-
                                 {/* Sort By */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         Sort By
                                     </label>
                                     <select
                                         value={filters.sortBy}
                                         onChange={(e) => setFilters(f => ({ ...f, sortBy: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     >
                                         <option value="createdAt">Created Date</option>
                                         <option value="firstName">First Name</option>
@@ -298,13 +524,13 @@ const VendorAccountsMain = () => {
 
                                 {/* Sort Order */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         Sort Order
                                     </label>
                                     <select
                                         value={filters.sortOrder}
                                         onChange={(e) => setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     >
                                         <option value="desc">Descending</option>
                                         <option value="asc">Ascending</option>
@@ -314,80 +540,77 @@ const VendorAccountsMain = () => {
                         </div>
                     </div>
 
-                    {/* No vendorss Fallback */}
-                    {canList && <>  {vendors.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-                            <i className="fas fa-user-slash text-5xl text-blue-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No vendorss Found</h3>
-                            <p className="text-sm text-gray-500">
-                                {filters.search
-                                    ? 'Try adjusting your filters to find vendorss.'
-                                    : 'Looks like there are no vendorss yet.'}
-                                <br />
-                                Click on <strong>"Add vendors"</strong> to get started 🚀
-                            </p>
-                        </div>
-                    ) : (
-                        <div
-                            ref={scrollContainerRef}
-                            className="flex-1 max-h-[100%] overflow-y-auto"
-                        >
-                            {/* Table Header */}
-                            <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
-                                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
-                                    <div className="col-span-1 text-center">S.No</div>
-                                    <div className="col-span-3 text-center">Vendor Name</div>
-                                    <div className="col-span-2 text-center">Company Name</div>
-                                    <div className="col-span-2 text-center">Phone</div>
-                                    <div className="col-span-2 text-center">Created At</div>
-                                    <div className="col-span-2 text-center">Actions</div>
-                                </div>
+                    {/* No vendors Fallback */}
+                    {canList && <>
+                        {vendors.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-brand-surface border border-ash-medium rounded-xl text-center p-6 shadow-sm">
+                                <i className="fas fa-user-slash text-5xl text-text-soft mb-4" />
+                                <h3 className="text-lg font-semibold text-text-main mb-1">No Vendors Found</h3>
+                                <p className="text-sm text-text-muted">
+                                    {filters.search
+                                        ? 'Try adjusting your filters to find vendors.'
+                                        : 'Looks like there are no vendors yet.'}
+                                    <br />
+                                    Click on <strong className="text-text-strong">"Add Vendor"</strong> to get started 🚀
+                                </p>
                             </div>
-
-                            {/* Table Body */}
-                            <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
-                                {vendors.map((vendor, index) => (
-                                    <VendorAccList
-                                        key={vendor._id}
-                                        vendor={vendor}
-                                        index={index}
-                                        onView={() => handleView(vendor._id)}
-                                        onDelete={() =>
-                                            handleDelete(vendor._id)
-                                        }
-                                        isDeleting={deleteVendorMutation.isPending && deleteVendorMutation.variables === vendor._id}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Loading indicator */}
-                            {isFetchingNextPage && (
-                                <div className="flex justify-center py-8">
-                                    <div className="flex items-center gap-2 text-blue-600">
-                                        <i className="fas fa-spinner fa-spin text-2xl"></i>
-                                        <span className="text-sm font-medium">Loading more vendors...</span>
+                        ) : (
+                            <div
+                                ref={scrollContainerRef}
+                                className="flex-1 max-h-[100%] overflow-y-auto custom-scrollbar"
+                            >
+                                {/* Table Header */}
+                                <div className="bg-brand-surface rounded-t-xl border border-ash-medium sticky top-0 z-10">
+                                    <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-brand-surface-hover border-b border-ash-medium font-semibold text-text-strong text-sm">
+                                        <div className="col-span-1 text-center">S.No</div>
+                                        <div className="col-span-3 text-center">Vendor Name</div>
+                                        <div className="col-span-2 text-center">Company Name</div>
+                                        <div className="col-span-2 text-center">Phone</div>
+                                        <div className="col-span-2 text-center">Created At</div>
+                                        <div className="col-span-2 text-center">Actions</div>
                                     </div>
                                 </div>
-                            )}
 
-                            {/* End reached */}
-                            {!hasNextPage && vendors.length > 0 && (
-                                <div className="flex justify-center py-6">
-                                    <p className="text-gray-400 text-sm font-medium">
-                                        <i className="fas fa-check-circle mr-2"></i>
-                                        You've reached the end of the list
-                                    </p>
+                                {/* Table Body */}
+                                <div className="bg-brand-surface rounded-b-xl border-x border-b border-ash-medium">
+                                    {vendors.map((vendor, index) => (
+                                        <VendorAccList
+                                            key={vendor._id}
+                                            vendor={vendor}
+                                            index={index}
+                                            onView={() => handleView(vendor._id)}
+                                            onDelete={() => handleDelete(vendor._id)}
+                                            isDeleting={deleteVendorMutation.isPending && deleteVendorMutation.variables === vendor._id}
+                                        />
+                                    ))}
                                 </div>
-                            )}
-                        </div>
 
-                    )}
+                                {/* Loading indicator */}
+                                {isFetchingNextPage && (
+                                    <div className="flex justify-center py-8">
+                                        <div className="flex items-center gap-2 text-action-primary">
+                                            <i className="fas fa-spinner fa-spin text-2xl"></i>
+                                            <span className="text-sm font-medium">Loading more vendors...</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* End reached */}
+                                {!hasNextPage && vendors.length > 0 && (
+                                    <div className="flex justify-center py-6">
+                                        <p className="text-text-muted text-sm font-medium flex items-center">
+                                            <i className="fas fa-check-circle mr-2"></i>
+                                            You've reached the end of the list
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </>}
-
                 </main>
             )}
         </div>
-    );
+    )
 };
 
 export default VendorAccountsMain;

@@ -570,15 +570,15 @@ const AccountingMain = () => {
     ];
 
     return (
-      <div className="min-h-full bg-white p-4 font-sans overflow-y-auto">
+      <div className="min-h-full bg-brand-surface p-4 font-sans overflow-y-auto">
             {/* --- Minimalist Header --- */}
-            <header className="flex justify-between items-center pb-8 border-b border-gray-100 mb-10">
+            <header className="flex justify-between items-center pb-8 border-b border-ash-light mb-10">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-money-bill-wave mr-3 text-blue-600"></i>
+                    <h1 className="text-3xl font-bold text-text-main flex items-center">
+                        <i className="fas fa-money-bill-wave mr-3"></i>
                         Accounting Department 
                     </h1>
-                    <p className="text-gray-600 mt-1 text-sm font-medium">
+                    <p className="text-text-muted mt-1 text-sm font-medium">
                         Manage your Bills, Payments and Accounting records here
                     </p>
                 </div>
@@ -590,36 +590,36 @@ const AccountingMain = () => {
                     <div 
                         key={idx}
                         onClick={() => navigate(item.path)}
-                        className={`group relative cursor-pointer bg-white border border-slate-100 rounded-[2.5rem] p-10 shadow-md transition-all duration-500 overflow-hidden ${item.cardTint} hover:shadow-2xl hover:-translate-y-3 flex flex-col justify-between h-[420px]`}
+                        className={`group relative cursor-pointer bg-brand-surface border border-ash-medium rounded-[2.5rem] p-10 shadow-md transition-all duration-500 overflow-hidden ${item.cardTint} hover:shadow-2xl hover:-translate-y-3 flex flex-col justify-between h-[420px]`}
                     >
                         {/* 1. Decorative background icon (Watermark) */}
                         <i className={`fas ${item.icon} absolute -right-6 -bottom-6 text-9xl opacity-[0.03] group-hover:opacity-[0.07] group-hover:scale-110 transition-all duration-700`}></i>
 
                         {/* 2. Top Right Accent Dot */}
                         <div className="absolute top-0 right-0 p-8">
-                           <div className={`w-2 h-2 rounded-full bg-slate-200 group-hover:scale-150 transition-all ${item.hoverBg.replace('group-hover:', '')}`}></div>
+                           <div className={`w-2 h-2 rounded-full bg-ash-dark group-hover:scale-150 transition-all ${item.hoverBg.replace('group-hover:', '')}`}></div>
                         </div>
 
                         <div>
                             {/* 3. Icon Wrapper */}
-                            <div className={`w-20 h-20 ${item.iconBg} rounded-3xl flex items-center justify-center text-3xl mb-10 transition-all duration-500 ${item.hoverBg} group-hover:text-white group-hover:rotate-[10deg] shadow-sm relative z-10`}>
+                            <div className={`w-20 h-20 ${item.iconBg} rounded-3xl flex items-center justify-center text-3xl mb-10 transition-all duration-500 ${item.hoverBg} group-hover:text-brand-surface group-hover:rotate-[10deg] shadow-sm relative z-10`}>
                                 <i className={`fas ${item.icon}`}></i>
                             </div>
 
-                            <h2 className="text-3xl font-bold text-slate-800 mb-4 tracking-tight relative z-10">
+                            <h2 className="text-3xl font-bold text-text-main mb-4 tracking-tight relative z-10">
                                 {item.title}
                             </h2>
-                            <p className="text-slate-500 text-base leading-relaxed font-medium relative z-10">
+                            <p className="text-text-muted text-base leading-relaxed font-medium relative z-10">
                                 {item.desc}
                             </p>
                         </div>
 
                         {/* 4. Professional Footer Link */}
-                        <div className="flex items-center justify-between pt-8 border-t border-slate-100 relative z-10">
-                            <span className="text-sm font-black uppercase tracking-tighter text-slate-400 group-hover:text-slate-900 transition-colors">
+                        <div className="flex items-center justify-between pt-8 border-t border-ash-light relative z-10">
+                            <span className="text-sm font-bold uppercase tracking-tighter text-text-soft group-hover:text-text-strong transition-colors">
                                 Explore Module
                             </span>
-                            <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-300 shadow-inner">
+                            <div className="w-12 h-12 rounded-full bg-brand-ash flex items-center justify-center text-text-soft group-hover:bg-action-primary group-hover:text-brand-surface transition-all duration-300 shadow-inner">
                                 <i className="fas fa-arrow-right"></i>
                             </div>
                         </div>

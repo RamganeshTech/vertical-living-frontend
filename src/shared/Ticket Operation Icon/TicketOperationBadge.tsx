@@ -1,7 +1,7 @@
 // components/TicketOperationBadge.tsx
-import React, { useEffect,  useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { socket } from '../../lib/socket';
-import { useGetUnreadTicketCount } from '../../apiList/Stage Api/issueDiscussionApi';
+import { useGetUnreadTicketCount } from '../../apiList/Stage Api/ticketOperationApi';
 import { useCurrentSupervisor } from '../../Hooks/useCurrentSupervisor';
 
 
@@ -12,7 +12,7 @@ interface Props {
 
 export const TicketOperationBadge: React.FC<Props> = React.memo(({ size = 'small', organizationId }) => {
     // const { data: unreadCount, isLoading } = useGetUnreadTicketCount({ organizationId });
-    const { data:count, isLoading } = useGetUnreadTicketCount({ organizationId });
+    const { data: count, isLoading } = useGetUnreadTicketCount({ organizationId });
     const currentUser = useCurrentSupervisor();
 
     // console.log('calling 📊 Unread count updated:',);
@@ -22,7 +22,7 @@ export const TicketOperationBadge: React.FC<Props> = React.memo(({ size = 'small
     //     console.log("userId form ticket notfication", userId)
     //     if (!userId || !socket || !organizationId) return;
 
-   
+
     //     // socket.on("connect", () => {   
     //     //     socket.emit("join_ticket_discussion", { organizationId });
     //     // });
@@ -53,7 +53,7 @@ export const TicketOperationBadge: React.FC<Props> = React.memo(({ size = 'small
 
     const [unreadCount, setUnreadCount] = useState<number>(0);
 
-      useEffect(() => {
+    useEffect(() => {
         if (typeof count === 'number') {
             setUnreadCount(count);
         }
@@ -61,7 +61,7 @@ export const TicketOperationBadge: React.FC<Props> = React.memo(({ size = 'small
 
 
 
-    
+
     useEffect(() => {
         const userId = currentUser?.id;
         if (!userId || !socket || !organizationId) return;

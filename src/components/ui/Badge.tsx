@@ -1,7 +1,7 @@
 import type React from "react"
 
 interface BadgeProps {
-  variant?: "default" | "secondary" | "outline" | "success"
+  variant?: "default" | "secondary" | "outline" | "success" | "dark"
   className?: string
   children: React.ReactNode
 }
@@ -13,10 +13,13 @@ export const Badge: React.FC<BadgeProps> = ({ variant = "default", className = "
     default: "bg-blue-100 text-blue-800",
     secondary: "bg-gray-100 text-gray-800",
     outline: "border border-blue-200 text-blue-700",
-    success: "bg-violet-100 text-violet-800"
+    success: "bg-violet-100 text-violet-800",
+    dark: "bg-brand-ash text-text-main"
   }
 
   const computedClassName = `${baseStyles} ${variantStyles[variant]} ${className}`.trim()
 
-  return <span className={computedClassName}>{children}</span>
+  return <span
+  className={computedClassName}
+  >{children}</span>
 }

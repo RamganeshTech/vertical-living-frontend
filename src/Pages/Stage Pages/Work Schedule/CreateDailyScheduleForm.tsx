@@ -356,6 +356,8 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
             remarks: "",
             gatekeeping: "block",
         },
+
+
     })
 
     const [correctionMode, setCorrectionMode] = useState(false);
@@ -461,6 +463,17 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
         })
 
 
+        if (editData?.comparison) {
+            if (editData?.comparison?.plannedImage) {
+                const tempPlannedImage = editData?.comparison?.plannedImage
+                setPlannedImage({ name: tempPlannedImage?.orginalName, url: tempPlannedImage?.url })
+            }
+
+            if (editData?.comparison?.actualImage) {
+                const tempActualImage = editData?.comparison?.actualImage
+                setActualImage({ name: tempActualImage?.orginalName, url: tempActualImage?.url })
+            }
+        }
 
         if (editData?.dailyTasks) {
             const initialRawInputs: { [key: number]: string } = {};
@@ -2064,10 +2077,10 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                 >
                                     <i className="fas fa-upload mr-2 text-text-muted"></i> Pick Actual
                                 </Button>
-                                <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={resetSlider} 
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={resetSlider}
                                     className="flex-1 sm:flex-none text-text-muted hover:text-text-main hover:bg-brand-ash transition-colors"
                                 >
                                     <i className="fas fa-rotate-right mr-2"></i> Reset
@@ -2084,21 +2097,12 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                     onMouseUp={handleSliderMouseUp}
                                     onMouseLeave={handleSliderMouseUp}
                                 >
-                                    {/* Planned Image (Left Side) */}
                                     {plannedImage.url && (
                                         <div
                                             className="absolute top-0 left-0 h-full overflow-visible"
                                             style={{ width: `${sliderPosition}%` }}
                                         >
-                                            {/* <img
-                                                src={plannedImage.url || NO_IMAGE}
-                                                alt="Planned"
-                                                className="h-full object-cover"
-                                                style={{
-                                                    width: "100%", // Fixed width to prevent scaling
-                                                    maxWidth: "none", // Allow image to extend beyond container
-                                                }}
-                                            /> */}
+                                            
 
 
                                             <img
@@ -2124,7 +2128,6 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                         </div>
                                     )}
 
-                                    {/* Actual Image (Right Side) */}
                                     {actualImage.url && (
                                         <div
                                             className="absolute top-0 right-0 h-full overflow-hidden"
@@ -2141,9 +2144,8 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                             />
 
 
-                                           
 
-                                            {/* <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-sm"> */}
+
                                             <div className="absolute bottom-2 right-2 bg-brand-surface/90 backdrop-blur-sm border border-ash-medium shadow-sm text-text-main px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider pointer-events-none">
                                                 Actual
                                             </div>
@@ -2157,8 +2159,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                         </div>
                                     )}
 
-                                    {/* Slider Handle */}
-                                    <div
+=                                    <div
                                         className="absolute top-0 h-full w-1 bg-brand-surface shadow-lg cursor-col-resize z-10"
                                         style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
                                     >
@@ -2186,7 +2187,7 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                         {/* <p className="text-sm text-gray-600 mt-2 text-center">Drag the circle to reveal differences</p> */}
                         <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted mt-3 text-center flex items-center justify-center gap-2">
                             <i className="fas fa-info-circle"></i> Drag the center circle to reveal differences
-                        </p>a
+                        </p>
 
 
                         {/* Hidden file inputs */}
@@ -2229,8 +2230,8 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                 </div>
                                 <div className="flex items-center gap-2 bg-brand-surface px-3 py-1.5 rounded-full border border-ash-light shadow-sm">
                                     <div className={`w-2.5 h-2.5 rounded-full ${formData.supervisorCheck.status === 'approved' ? 'bg-action-success' :
-                                            formData.supervisorCheck.status === 'needs_changes' ? 'bg-orange-500' :
-                                                'bg-text-muted'
+                                        formData.supervisorCheck.status === 'needs_changes' ? 'bg-orange-500' :
+                                            'bg-text-muted'
                                         }`}></div>
                                     <span className="text-[11px] font-bold uppercase tracking-wider text-text-main">{formatSupervisorStatus()}</span>
                                 </div>
@@ -2307,15 +2308,15 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                         />
                                         <Label
                                             htmlFor="approved"
-        //                                     className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
-        // ${formData.supervisorCheck.status === "approved"
-        //                                             ? "border-green-600 bg-green-100 text-green-800 font-semibold"
-        //                                             : "border-gray-300 text-green-700 hover:border-green-400 hover:bg-green-50"}`}
+                                            //                                     className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
+                                            // ${formData.supervisorCheck.status === "approved"
+                                            //                                             ? "border-green-600 bg-green-100 text-green-800 font-semibold"
+                                            //                                             : "border-gray-300 text-green-700 hover:border-green-400 hover:bg-green-50"}`}
 
-        className={`px-4 py-2 rounded-lg cursor-pointer border transition-all text-xs font-bold uppercase tracking-wider shadow-sm flex-1 text-center sm:flex-none
+                                            className={`px-4 py-2 rounded-lg cursor-pointer border transition-all text-xs font-bold uppercase tracking-wider shadow-sm flex-1 text-center sm:flex-none
                                             ${formData.supervisorCheck.status === "approved"
-                                                ? "border-action-success bg-action-success/10 text-action-success"
-                                                : "border-ash-medium bg-brand-surface text-text-muted hover:border-action-success/50 hover:bg-action-success/5 hover:text-action-success"}`}
+                                                    ? "border-action-success bg-action-success/10 text-action-success"
+                                                    : "border-ash-medium bg-brand-surface text-text-muted hover:border-action-success/50 hover:bg-action-success/5 hover:text-action-success"}`}
 
                                         >
                                             Approve
@@ -2335,15 +2336,15 @@ const CreateDailyScheduleForm: React.FC<CreateDailyScheduleFormProps> = ({
                                         />
                                         <Label
                                             htmlFor="needs_changes"
-        //                                     className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
-        // ${formData.supervisorCheck.status === "needs_changes"
-        //                                             ? "border-orange-600 bg-orange-100 text-orange-800 font-semibold"
-        //                                             : "border-gray-300 text-orange-700 hover:border-orange-400 hover:bg-orange-50"}`}
+                                            //                                     className={`px-4 py-2 rounded-xl cursor-pointer border-2 transition-colors
+                                            // ${formData.supervisorCheck.status === "needs_changes"
+                                            //                                             ? "border-orange-600 bg-orange-100 text-orange-800 font-semibold"
+                                            //                                             : "border-gray-300 text-orange-700 hover:border-orange-400 hover:bg-orange-50"}`}
 
-        className={`px-4 py-2 rounded-lg cursor-pointer border transition-all text-xs font-bold uppercase tracking-wider shadow-sm flex-1 text-center sm:flex-none
+                                            className={`px-4 py-2 rounded-lg cursor-pointer border transition-all text-xs font-bold uppercase tracking-wider shadow-sm flex-1 text-center sm:flex-none
                                             ${formData.supervisorCheck.status === "needs_changes"
-                                                ? "border-orange-500 bg-orange-500/10 text-orange-600"
-                                                : "border-ash-medium bg-brand-surface text-text-muted hover:border-orange-500/50 hover:bg-orange-500/5 hover:text-orange-500"}`}
+                                                    ? "border-orange-500 bg-orange-500/10 text-orange-600"
+                                                    : "border-ash-medium bg-brand-surface text-text-muted hover:border-orange-500/50 hover:bg-orange-500/5 hover:text-orange-500"}`}
                                         >
                                             Changes Required
                                         </Label>

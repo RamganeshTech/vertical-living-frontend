@@ -567,36 +567,10 @@ const AccountingRecordMain: React.FC = () => {
     }));
 
 
-
-// const BILLING_RELATED_MODULES = [
-//         "billing",
-//         "vendor",
-//         "customer",
-//         "invoice",
-//         "expense",
-//         "billtemplate",
-//         "purchaseorder",
-//         "vendorpayment",
-//         "salesorder",
-//         "retailinvoice",
-//     ];
-
-
     const { role, permission } = useAuthCheck();
     // const canDelete = role === "owner" || permission?.records?.delete;
     const canList = role === "owner" || permission?.records?.list;
-    // const showBilling = role === "owner" || permission?.billing?.create || permission?.billing?.list || permission?.billing?.delete || permission?.billing?.edit;
-    // const showPayments = role === "owner" || permission?.payments?.create || permission?.payments?.list || permission?.payments?.delete || permission?.payments?.edit
-    //  const showBilling = role === "owner" || BILLING_RELATED_MODULES.some(moduleKey => {
-    //     const modulePerms = permission?.[moduleKey];
-        
-    //     // If no permission object for this module, skip
-    //     if (!modulePerms) return false;
-
-    //     // Check if ANY action (list, create, edit, delete) is true
-    //     return Object.values(modulePerms).some(val => val === true);
-    // });
-
+   
 
     const AVAILABLE_SECTIONS = ["Retail Invoice", "Invoice", "Bill", "Expense"]
 
@@ -689,361 +663,628 @@ const AccountingRecordMain: React.FC = () => {
     const isSubPage = location.pathname.includes("single");
     if (isSubPage) return <Outlet />;
 
+    // return (
+    //     <div className="p-2 space-y-4 h-full">
+
+         
+    //         {/* --- Header --- */}
+    //         <header className="flex justify-between items-center pb-2">
+    //             <div>
+    //                 <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+    //                     <i className="fas fa-money-bill-wave mr-3 text-blue-600"></i>
+    //                     Records 
+    //                 </h1>
+    //                 <p className="text-gray-600 mt-1 text-sm">
+    //                     Manage your project’s financial transactions and accounting records
+    //                 </p>
+    //             </div>
+
+    //             <div className="flex gap-2 items-center">
+
+    //                 <div className="w-full sm:w-auto flex justify-end sm:block">
+    //                     <StageGuide
+    //                         organizationId={organizationId!}
+    //                         stageName="accounts"
+    //                     />
+    //                 </div>
+
+    //             </div>
+    //         </header>
+
+    //         {/* --- Content Area --- */}
+    //         {isLoading ? (
+    //             <MaterialOverviewLoading />
+    //         ) : isError ? (
+    //             <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+    //                 <div className="text-red-600 font-semibold mb-2 text-xl">⚠️ Error Occurred</div>
+    //                 <p className="text-red-500 mb-4 text-lg">{(error as any)?.message || "Failed to load data"}</p>
+    //                 <Button onClick={() => refetch()} className="bg-red-600 text-white px-4 py-2">Retry</Button>
+    //             </div>
+    //         ) : (
+    //             <main className="flex gap-4 h-[calc(100%-90px)]">
+
+
+
+
+    //                 {/* --- Filter Sidebar --- */}
+    //                 <div className="xl:w-72 w-64 flex-shrink-0 overflow-y-auto custom-scrollbar">
+    //                     <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+    //                         <div className="flex items-center justify-between mb-6">
+    //                             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+    //                                 <i className="fas fa-filter mr-2 text-blue-600"></i>
+    //                                 Filters
+    //                             </h3>
+    //                             {activeFiltersCount > 0 && (
+    //                                 <button
+    //                                     onClick={clearFilters}
+    //                                     className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 font-medium"
+    //                                 >
+    //                                     Clear All
+    //                                 </button>
+    //                             )}
+    //                         </div>
+
+    //                         <div className="space-y-6">
+
+    //                             {/* 1. Status Filter */}
+    //                             {/* <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+    //                                 <select
+    //                                     value={filters.status || ''}
+    //                                     onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+    //                                 >
+    //                                     <option value="">All Status</option>
+    //                                     <option value="pending">Pending</option>
+    //                                     <option value="paid">Paid</option>
+    //                                     <option value="cancelled">Cancelled</option>
+    //                                 </select>
+    //                             </div> */}
+
+
+
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+
+    //                                 <input
+    //                                     type="text"
+    //                                     placeholder="Search Record No, Name"
+    //                                     value={filters.search}
+    //                                     autoFocus
+    //                                     onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+
+    //                                 // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+    //                                 />
+    //                             </div>
+
+    //                             {/* 2. Department (Source) Filter */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">Sections</label>
+    //                                 <select
+    //                                     value={filters.fromDept || ''}
+    //                                     onChange={(e) => setFilters((f) => ({ ...f, fromDept: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+    //                                 >
+    //                                     <option value="">All Section</option>
+    //                                     {AVAILABLE_SECTIONS.map(option => {
+    //                                         return <option value={option}>{option}</option>
+    //                                     })}
+    //                                 </select>
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">Project</label>
+    //                                 <select
+    //                                     value={filters?.projectId || ''}
+    //                                     onChange={(e) => {
+    //                                         const selected = projects?.find((p: any) => p._id === e.target.value);
+    //                                         if (selected) {
+    //                                             setFilters(prev => ({
+    //                                                 ...prev,
+    //                                                 projectId: selected._id,
+    //                                                 projectName: selected.projectName,
+    //                                             }));
+    //                                         } else {
+    //                                             setFilters(prev => ({ ...prev, projectId: "", projectName: "" }));
+    //                                         }
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+    //                                 >
+    //                                     <option value="">All Projects</option>
+    //                                     {projects?.map((project: any) => (
+    //                                         <option key={project._id} value={project._id}>{project.projectName}</option>
+    //                                     ))}
+    //                                 </select>
+    //                             </div>
+
+
+
+    //                             {/* 5. Date Range Filter */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+    //                                 <div className="space-y-2">
+    //                                     <div>
+    //                                         <span className="text-xs text-gray-500 mb-1 block">From</span>
+    //                                         <input
+    //                                             type="date"
+    //                                             value={filters.startDate}
+    //                                             onChange={(e) => setFilters(f => ({ ...f, startDate: e.target.value }))}
+    //                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+    //                                         />
+    //                                     </div>
+    //                                     <div>
+    //                                         <span className="text-xs text-gray-500 mb-1 block">To</span>
+    //                                         <input
+    //                                             type="date"
+    //                                             value={filters.endDate}
+    //                                             onChange={(e) => setFilters(f => ({ ...f, endDate: e.target.value }))}
+    //                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+    //                                         />
+    //                                     </div>
+    //                                 </div>
+    //                             </div>
+
+    //                             {/* 6. Amount Range Slider */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Amount Range
+    //                                 </label>
+
+    //                                 {/* Slider */}
+    //                                 <div className="px-2 mb-3 pt-2">
+    //                                     <Slider
+    //                                         range
+    //                                         min={0}
+    //                                         max={100000}
+    //                                         step={500}
+    //                                         value={[Number(filters.minAmount), Number(filters.maxAmount)]}
+    //                                         onChange={(value) => {
+    //                                             const [min, max] = value as [number, number];
+    //                                             setFilters((f) => ({
+    //                                                 ...f,
+    //                                                 minAmount: min,
+    //                                                 maxAmount: max,
+    //                                             }));
+    //                                         }}
+    //                                         trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+    //                                         handleStyle={[
+    //                                             {
+    //                                                 borderColor: "#3b82f6",
+    //                                                 backgroundColor: "#fff",
+    //                                                 boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+    //                                                 width: 18,
+    //                                                 height: 18,
+    //                                                 marginTop: -6,
+    //                                                 opacity: 1
+    //                                             },
+    //                                             {
+    //                                                 borderColor: "#3b82f6",
+    //                                                 backgroundColor: "#fff",
+    //                                                 boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+    //                                                 width: 18,
+    //                                                 height: 18,
+    //                                                 marginTop: -6,
+    //                                                 opacity: 1
+    //                                             },
+    //                                         ]}
+    //                                         railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+    //                                     />
+    //                                 </div>
+
+    //                                 {/* Display Values */}
+    //                                 <div className="flex justify-between items-center gap-2 text-sm">
+    //                                     <div className="flex-1">
+    //                                         <span className="text-xs text-gray-500 block mb-1">Min</span>
+    //                                         <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+    //                                             ₹{Number(filters.minAmount).toLocaleString("en-IN")}
+    //                                         </div>
+    //                                     </div>
+    //                                     <div className="text-gray-300">—</div>
+    //                                     <div className="flex-1">
+    //                                         <span className="text-xs text-gray-500 block mb-1">Max</span>
+    //                                         <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+    //                                             ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+
+    //                                 {/* Manual Input Fields */}
+    //                                 <div className="flex gap-2 items-center mt-3">
+    //                                     <input
+    //                                         type="number"
+    //                                         value={filters.minAmount}
+    //                                         onChange={(e) =>
+    //                                             setFilters((f) => ({ ...f, minAmount: +e.target.value }))
+    //                                         }
+    //                                         placeholder="Min"
+    //                                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+    //                                         min="0"
+    //                                     />
+    //                                     <input
+    //                                         type="number"
+    //                                         value={filters.maxAmount}
+    //                                         onChange={(e) =>
+    //                                             setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
+    //                                         }
+    //                                         placeholder="Max"
+    //                                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+    //                                         min="0"
+    //                                     />
+    //                                 </div>
+    //                             </div>
+
+    //                         </div>
+    //                     </div>
+    //                 </div>
+
+    //                 {/* --- List View --- */}
+    //                 {canList && <> {records.length === 0 ? (
+    //                     <div className="flex-1 flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200 text-center p-6">
+    //                         <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+    //                             <i className="fas fa-file-invoice-dollar text-3xl text-blue-400" />
+    //                         </div>
+    //                         <h3 className="text-lg font-semibold text-gray-800 mb-1">No Records Found</h3>
+    //                         <p className="text-sm text-gray-500 max-w-md">
+    //                             {activeFiltersCount > 0
+    //                                 ? "Try adjusting your filters or search query."
+    //                                 : "Transactions from Bills, Expenses, and Payments will appear here automatically."}
+    //                         </p>
+    //                     </div>
+    //                 ) : (
+    //                     <div
+    //                         ref={scrollContainerRef}
+    //                         className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto custom-scrollbar flex flex-col"
+    //                     >
+    //                         {/* Sticky Header */}
+    //                         <div className="sticky top-0 z-10 bg-white border-b border-blue-200 shadow-sm">
+    //                             <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm uppercase tracking-wider">
+    //                                 <div className="col-span-1 text-center">#</div>
+    //                                 <div className="col-span-2">Acc.Rec No</div>
+    //                                 <div className="col-span-2">Dept.Rec No</div>
+    //                                 <div className="col-span-3">Vendor/ Customer</div>
+    //                                 <div className="col-span-2">Date</div>
+    //                                 <div className="col-span-2 ">Amount</div>
+    //                                 <div className="col-span-1">Status</div>
+    //                                 <div className="col-span-1 text-center">Action</div>
+    //                             </div>
+    //                         </div>
+
+    //                         {/* List Items */}
+    //                         <div className="divide-y divide-gray-100">
+    //                             {records.map((record: any, index: number) => (
+    //                                 <AccountingAccList
+    //                                     key={record._id}
+    //                                     data={record}
+    //                                     index={index}
+    //                                     onView={() => navigate(`single/${record._id}`)}
+    //                                 />
+    //                             ))}
+    //                         </div>
+
+    //                         {/* Loading Indicator */}
+    //                         {isFetchingNextPage && (
+    //                             <div className="flex justify-center py-6 bg-gray-50 border-t border-gray-100">
+    //                                 <div className="flex items-center gap-2 text-blue-600">
+    //                                     <i className="fas fa-spinner fa-spin text-xl"></i>
+    //                                     <span className="text-sm font-medium">Loading more records...</span>
+    //                                 </div>
+    //                             </div>
+    //                         )}
+
+    //                         {/* End of List */}
+    //                         {!hasNextPage && records.length > 0 && (
+    //                             <div className="flex justify-center py-6 bg-gray-50 border-t border-gray-100">
+    //                                 <p className="text-gray-400 text-sm font-medium flex items-center">
+    //                                     <i className="fas fa-check-circle mr-2"></i>
+    //                                     All records loaded
+    //                                 </p>
+    //                             </div>
+    //                         )}
+    //                     </div>
+    //                 )}</>}
+    //             </main>
+    //         )}
+    //     </div>
+    // );
+
     return (
-        <div className="p-2 space-y-4 h-full">
+        <div className="p-2 space-y-4 h-full bg-brand-main/20">
 
-            {/* Navigation Dropdown */}
-            {/* <NavigationDDWithHeading
-                isOpen={isDropdownOpen}
-                onClose={() => setIsDropdownOpen(false)}
-                heading="Accounts"
-                sections={navigationItemNew}
-            /> */}
-
-            {/* --- Header --- */}
-            <header className="flex justify-between items-center pb-2">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-money-bill-wave mr-3 text-blue-600"></i>
-                        Records 
-                    </h1>
-                    <p className="text-gray-600 mt-1 text-sm">
-                        Manage your project’s financial transactions and accounting records
-                    </p>
-                </div>
-
-                <div className="flex gap-2 items-center">
-
-
-                    {/* {showPayments && <Button onClick={() => navigate(`/organizations/${organizationId}/projects/paymentmain`)}>
-                        <i className="fas fa-money-check-alt mr-2 text-white"></i>
-                        Payments
-                    </Button>}
-
-                    {showBilling && <Button variant='secondary' onClick={() => navigate(`/organizations/${organizationId}/projects/billmain`)}>
-                        <i className="fas fa-receipt mr-2 text-blue-600"></i>
-                        Billing
-                    </Button>
-                    } */}
-
-
-
-
-                    <div className="w-full sm:w-auto flex justify-end sm:block">
-                        <StageGuide
-                            organizationId={organizationId!}
-                            stageName="accounts"
-                        />
-                    </div>
-
-
-                    {/* <button
-                        onClick={() => setIsDropdownOpen(true)}
-                        className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white p-2.5 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105"
-                        title="Quick Navigation"
-                    >
-                        <i className="fas fa-plus text-lg"></i>
-                    </button> */}
-                </div>
-            </header>
-
-            {/* --- Content Area --- */}
-            {isLoading ? (
-                <MaterialOverviewLoading />
-            ) : isError ? (
-                <div className="max-w-xl mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                    <div className="text-red-600 font-semibold mb-2 text-xl">⚠️ Error Occurred</div>
-                    <p className="text-red-500 mb-4 text-lg">{(error as any)?.message || "Failed to load data"}</p>
-                    <Button onClick={() => refetch()} className="bg-red-600 text-white px-4 py-2">Retry</Button>
-                </div>
-            ) : (
-                <main className="flex gap-4 h-[calc(100%-90px)]">
-
-
-
-
-                    {/* --- Filter Sidebar --- */}
-                    <div className="xl:w-72 w-64 flex-shrink-0 overflow-y-auto custom-scrollbar">
-                        <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                                    <i className="fas fa-filter mr-2 text-blue-600"></i>
-                                    Filters
-                                </h3>
-                                {activeFiltersCount > 0 && (
-                                    <button
-                                        onClick={clearFilters}
-                                        className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 font-medium"
-                                    >
-                                        Clear All
-                                    </button>
-                                )}
-                            </div>
-
-                            <div className="space-y-6">
-
-                                {/* 1. Status Filter */}
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                    <select
-                                        value={filters.status || ''}
-                                        onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-                                    >
-                                        <option value="">All Status</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="paid">Paid</option>
-                                        <option value="cancelled">Cancelled</option>
-                                    </select>
-                                </div> */}
-
-
-
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
-
-                                    <input
-                                        type="text"
-                                        placeholder="Search Record No, Name"
-                                        value={filters.search}
-                                        autoFocus
-                                        onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-
-                                    // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-
-                                {/* 2. Department (Source) Filter */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Sections</label>
-                                    <select
-                                        value={filters.fromDept || ''}
-                                        onChange={(e) => setFilters((f) => ({ ...f, fromDept: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-                                    >
-                                        <option value="">All Section</option>
-                                        {AVAILABLE_SECTIONS.map(option => {
-                                            return <option value={option}>{option}</option>
-                                        })}
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Project</label>
-                                    <select
-                                        value={filters?.projectId || ''}
-                                        onChange={(e) => {
-                                            const selected = projects?.find((p: any) => p._id === e.target.value);
-                                            if (selected) {
-                                                setFilters(prev => ({
-                                                    ...prev,
-                                                    projectId: selected._id,
-                                                    projectName: selected.projectName,
-                                                }));
-                                            } else {
-                                                setFilters(prev => ({ ...prev, projectId: "", projectName: "" }));
-                                            }
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-                                    >
-                                        <option value="">All Projects</option>
-                                        {projects?.map((project: any) => (
-                                            <option key={project._id} value={project._id}>{project.projectName}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-
-
-                                {/* 5. Date Range Filter */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
-                                    <div className="space-y-2">
-                                        <div>
-                                            <span className="text-xs text-gray-500 mb-1 block">From</span>
-                                            <input
-                                                type="date"
-                                                value={filters.startDate}
-                                                onChange={(e) => setFilters(f => ({ ...f, startDate: e.target.value }))}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                                            />
-                                        </div>
-                                        <div>
-                                            <span className="text-xs text-gray-500 mb-1 block">To</span>
-                                            <input
-                                                type="date"
-                                                value={filters.endDate}
-                                                onChange={(e) => setFilters(f => ({ ...f, endDate: e.target.value }))}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* 6. Amount Range Slider */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Amount Range
-                                    </label>
-
-                                    {/* Slider */}
-                                    <div className="px-2 mb-3 pt-2">
-                                        <Slider
-                                            range
-                                            min={0}
-                                            max={100000}
-                                            step={500}
-                                            value={[Number(filters.minAmount), Number(filters.maxAmount)]}
-                                            onChange={(value) => {
-                                                const [min, max] = value as [number, number];
-                                                setFilters((f) => ({
-                                                    ...f,
-                                                    minAmount: min,
-                                                    maxAmount: max,
-                                                }));
-                                            }}
-                                            trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
-                                            handleStyle={[
-                                                {
-                                                    borderColor: "#3b82f6",
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
-                                                    width: 18,
-                                                    height: 18,
-                                                    marginTop: -6,
-                                                    opacity: 1
-                                                },
-                                                {
-                                                    borderColor: "#3b82f6",
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
-                                                    width: 18,
-                                                    height: 18,
-                                                    marginTop: -6,
-                                                    opacity: 1
-                                                },
-                                            ]}
-                                            railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
-                                        />
-                                    </div>
-
-                                    {/* Display Values */}
-                                    <div className="flex justify-between items-center gap-2 text-sm">
-                                        <div className="flex-1">
-                                            <span className="text-xs text-gray-500 block mb-1">Min</span>
-                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
-                                                ₹{Number(filters.minAmount).toLocaleString("en-IN")}
-                                            </div>
-                                        </div>
-                                        <div className="text-gray-300">—</div>
-                                        <div className="flex-1">
-                                            <span className="text-xs text-gray-500 block mb-1">Max</span>
-                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
-                                                ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Manual Input Fields */}
-                                    <div className="flex gap-2 items-center mt-3">
-                                        <input
-                                            type="number"
-                                            value={filters.minAmount}
-                                            onChange={(e) =>
-                                                setFilters((f) => ({ ...f, minAmount: +e.target.value }))
-                                            }
-                                            placeholder="Min"
-                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                                            min="0"
-                                        />
-                                        <input
-                                            type="number"
-                                            value={filters.maxAmount}
-                                            onChange={(e) =>
-                                                setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
-                                            }
-                                            placeholder="Max"
-                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                                            min="0"
-                                        />
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* --- List View --- */}
-                    {canList && <> {records.length === 0 ? (
-                        <div className="flex-1 flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200 text-center p-6">
-                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                                <i className="fas fa-file-invoice-dollar text-3xl text-blue-400" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">No Records Found</h3>
-                            <p className="text-sm text-gray-500 max-w-md">
-                                {activeFiltersCount > 0
-                                    ? "Try adjusting your filters or search query."
-                                    : "Transactions from Bills, Expenses, and Payments will appear here automatically."}
-                            </p>
-                        </div>
-                    ) : (
-                        <div
-                            ref={scrollContainerRef}
-                            className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto custom-scrollbar flex flex-col"
-                        >
-                            {/* Sticky Header */}
-                            <div className="sticky top-0 z-10 bg-white border-b border-blue-200 shadow-sm">
-                                <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm uppercase tracking-wider">
-                                    <div className="col-span-1 text-center">#</div>
-                                    <div className="col-span-2">Acc.Rec No</div>
-                                    <div className="col-span-2">Dept.Rec No</div>
-                                    <div className="col-span-3">Vendor/ Customer</div>
-                                    <div className="col-span-2">Date</div>
-                                    <div className="col-span-2 ">Amount</div>
-                                    <div className="col-span-1">Status</div>
-                                    <div className="col-span-1 text-center">Action</div>
-                                </div>
-                            </div>
-
-                            {/* List Items */}
-                            <div className="divide-y divide-gray-100">
-                                {records.map((record: any, index: number) => (
-                                    <AccountingAccList
-                                        key={record._id}
-                                        data={record}
-                                        index={index}
-                                        onView={() => navigate(`single/${record._id}`)}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Loading Indicator */}
-                            {isFetchingNextPage && (
-                                <div className="flex justify-center py-6 bg-gray-50 border-t border-gray-100">
-                                    <div className="flex items-center gap-2 text-blue-600">
-                                        <i className="fas fa-spinner fa-spin text-xl"></i>
-                                        <span className="text-sm font-medium">Loading more records...</span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* End of List */}
-                            {!hasNextPage && records.length > 0 && (
-                                <div className="flex justify-center py-6 bg-gray-50 border-t border-gray-100">
-                                    <p className="text-gray-400 text-sm font-medium flex items-center">
-                                        <i className="fas fa-check-circle mr-2"></i>
-                                        All records loaded
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    )}</>}
-                </main>
-            )}
+    {/* --- Header --- */}
+    <header className="flex justify-between items-center pb-2">
+        <div>
+            <h1 className="text-3xl font-bold text-text-main flex items-center">
+                <i className="fas fa-money-bill-wave mr-3 text-action-primary"></i>
+                Records 
+            </h1>
+            <p className="text-text-muted mt-1 text-sm">
+                Manage your project’s financial transactions and accounting records
+            </p>
         </div>
-    );
+
+        <div className="flex gap-2 items-center">
+            <div className="w-full sm:w-auto flex justify-end sm:block">
+                <StageGuide
+                    organizationId={organizationId!}
+                    stageName="accounts"
+                />
+            </div>
+        </div>
+    </header>
+
+    {/* --- Content Area --- */}
+    {isLoading ? (
+        <MaterialOverviewLoading />
+    ) : isError ? (
+        <div className="max-w-xl mx-auto mt-4 p-4 bg-brand-surface border border-action-danger rounded-lg shadow-sm text-center">
+            <div className="text-action-danger font-semibold mb-2 text-xl">⚠️ Error Occurred</div>
+            <p className="text-action-danger mb-4 text-lg">{(error as any)?.message || "Failed to load data"}</p>
+            <Button onClick={() => refetch()} className="bg-action-danger hover:opacity-90 text-brand-surface px-4 py-2 transition-opacity">Retry</Button>
+        </div>
+    ) : (
+        <main className="flex gap-4 h-[calc(100%-90px)]">
+
+            {/* --- Filter Sidebar --- */}
+            <div className="xl:w-72 w-64 flex-shrink-0 overflow-y-auto custom-scrollbar">
+                <div className="bg-brand-surface rounded-xl shadow-sm p-5 border border-ash-light">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-text-main flex items-center">
+                            <i className="fas fa-filter mr-2 text-action-primary"></i>
+                            Filters
+                        </h3>
+                        {activeFiltersCount > 0 && (
+                            <button
+                                onClick={clearFilters}
+                                className="text-sm text-action-primary cursor-pointer hover:text-action-primary-hover transition-colors font-medium"
+                            >
+                                Clear All
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-medium text-text-main mb-2">Search</label>
+                            <input
+                                type="text"
+                                placeholder="Search Record No, Name"
+                                value={filters.search}
+                                autoFocus
+                                onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+                                className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
+                            />
+                        </div>
+
+                        {/* 2. Department (Source) Filter */}
+                        <div>
+                            <label className="block text-sm font-medium text-text-main mb-2">Sections</label>
+                            <select
+                                value={filters.fromDept || ''}
+                                onChange={(e) => setFilters((f) => ({ ...f, fromDept: e.target.value }))}
+                                className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
+                            >
+                                <option value="">All Section</option>
+                                {AVAILABLE_SECTIONS.map(option => {
+                                    return <option key={option} value={option}>{option}</option>
+                                })}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-text-main mb-2">Project</label>
+                            <select
+                                value={filters?.projectId || ''}
+                                onChange={(e) => {
+                                    const selected = projects?.find((p: any) => p._id === e.target.value);
+                                    if (selected) {
+                                        setFilters(prev => ({
+                                            ...prev,
+                                            projectId: selected._id,
+                                            projectName: selected.projectName,
+                                        }));
+                                    } else {
+                                        setFilters(prev => ({ ...prev, projectId: "", projectName: "" }));
+                                    }
+                                }}
+                                className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
+                            >
+                                <option value="">All Projects</option>
+                                {projects?.map((project: any) => (
+                                    <option key={project._id} value={project._id}>{project.projectName}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* 5. Date Range Filter */}
+                        <div>
+                            <label className="block text-sm font-medium text-text-main mb-2">Date Range</label>
+                            <div className="space-y-2">
+                                <div>
+                                    <span className="text-xs text-text-muted mb-1 block">From</span>
+                                    <input
+                                        type="date"
+                                        value={filters.startDate}
+                                        onChange={(e) => setFilters(f => ({ ...f, startDate: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none text-sm transition-shadow"
+                                    />
+                                </div>
+                                <div>
+                                    <span className="text-xs text-text-muted mb-1 block">To</span>
+                                    <input
+                                        type="date"
+                                        value={filters.endDate}
+                                        onChange={(e) => setFilters(f => ({ ...f, endDate: e.target.value }))}
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none text-sm transition-shadow"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 6. Amount Range Slider */}
+                        <div>
+                            <label className="block text-sm font-medium text-text-main mb-2">
+                                Amount Range
+                            </label>
+
+                            {/* Slider */}
+                            <div className="px-2 mb-3 pt-2">
+                                <Slider
+                                    range
+                                    min={0}
+                                    max={100000}
+                                    step={500}
+                                    value={[Number(filters.minAmount), Number(filters.maxAmount)]}
+                                    onChange={(value) => {
+                                        const [min, max] = value as [number, number];
+                                        setFilters((f) => ({
+                                            ...f,
+                                            minAmount: min,
+                                            maxAmount: max,
+                                        }));
+                                    }}
+                                    trackStyle={[{ backgroundColor: "var(--action-primary)", height: 6 }]}
+                                    handleStyle={[
+                                        {
+                                            borderColor: "var(--action-primary)",
+                                            backgroundColor: "var(--bg-surface)",
+                                            boxShadow: "0 2px 6px rgba(30, 41, 59, 0.2)",
+                                            width: 18,
+                                            height: 18,
+                                            marginTop: -6,
+                                            opacity: 1
+                                        },
+                                        {
+                                            borderColor: "var(--action-primary)",
+                                            backgroundColor: "var(--bg-surface)",
+                                            boxShadow: "0 2px 6px rgba(30, 41, 59, 0.2)",
+                                            width: 18,
+                                            height: 18,
+                                            marginTop: -6,
+                                            opacity: 1
+                                        },
+                                    ]}
+                                    railStyle={{ backgroundColor: "var(--bg-ash-dark)", height: 6 }}
+                                />
+                            </div>
+
+                            {/* Display Values */}
+                            <div className="flex justify-between items-center gap-2 text-sm">
+                                <div className="flex-1">
+                                    <span className="text-xs text-text-muted block mb-1">Min</span>
+                                    <div className="bg-brand-ash px-2 py-1.5 rounded border border-ash-medium font-semibold text-text-strong text-center text-xs">
+                                        ₹{Number(filters.minAmount).toLocaleString("en-IN")}
+                                    </div>
+                                </div>
+                                <div className="text-text-soft">—</div>
+                                <div className="flex-1">
+                                    <span className="text-xs text-text-muted block mb-1">Max</span>
+                                    <div className="bg-brand-ash px-2 py-1.5 rounded border border-ash-medium font-semibold text-text-strong text-center text-xs">
+                                        ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Manual Input Fields */}
+                            <div className="flex gap-2 items-center mt-3">
+                                <input
+                                    type="number"
+                                    value={filters.minAmount}
+                                    onChange={(e) =>
+                                        setFilters((f) => ({ ...f, minAmount: +e.target.value }))
+                                    }
+                                    placeholder="Min"
+                                    className="w-full px-2 py-1 text-sm border border-ash-medium bg-brand-surface text-text-main rounded focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
+                                    min="0"
+                                />
+                                <input
+                                    type="number"
+                                    value={filters.maxAmount}
+                                    onChange={(e) =>
+                                        setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
+                                    }
+                                    placeholder="Max"
+                                    className="w-full px-2 py-1 text-sm border border-ash-medium bg-brand-surface text-text-main rounded focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
+                                    min="0"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* --- List View --- */}
+            {canList && <> 
+                {records.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center bg-brand-surface rounded-xl border border-ash-medium text-center p-6 shadow-sm">
+                        <div className="w-16 h-16 bg-brand-ash rounded-full flex items-center justify-center mb-4">
+                            <i className="fas fa-file-invoice-dollar text-3xl text-text-soft" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-text-main mb-1">No Records Found</h3>
+                        <p className="text-sm text-text-muted max-w-md">
+                            {activeFiltersCount > 0
+                                ? "Try adjusting your filters or search query."
+                                : "Transactions from Bills, Expenses, and Payments will appear here automatically."}
+                        </p>
+                    </div>
+                ) : (
+                    <div
+                        ref={scrollContainerRef}
+                        className="flex-1 bg-brand-surface rounded-xl shadow-sm border border-ash-light overflow-y-auto custom-scrollbar flex flex-col"
+                    >
+                        {/* Sticky Header */}
+                        <div className="sticky top-0 z-10 bg-brand-surface border-b border-ash-medium shadow-sm">
+                            <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-brand-surface-hover font-semibold text-text-strong text-sm uppercase tracking-wider">
+                                <div className="col-span-1 text-center">S.No</div>
+                                <div className="col-span-2">Acc.Rec No</div>
+                                <div className="col-span-2">Dept.Rec No</div>
+                                <div className="col-span-3">Vendor/ Customer</div>
+                                <div className="col-span-2">Date</div>
+                                <div className="col-span-2 ">Amount</div>
+                                <div className="col-span-1">Status</div>
+                                <div className="col-span-1 text-center">Action</div>
+                            </div>
+                        </div>
+
+                        {/* List Items */}
+                        <div className="divide-y divide-ash-light">
+                            {records.map((record: any, index: number) => (
+                                <AccountingAccList
+                                    key={record._id}
+                                    data={record}
+                                    index={index}
+                                    onView={() => navigate(`single/${record._id}`)}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Loading Indicator */}
+                        {isFetchingNextPage && (
+                            <div className="flex justify-center py-6 bg-brand-ash border-t border-ash-light">
+                                <div className="flex items-center gap-2 text-action-primary">
+                                    <i className="fas fa-spinner fa-spin text-xl"></i>
+                                    <span className="text-sm font-medium">Loading more records...</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* End of List */}
+                        {!hasNextPage && records.length > 0 && (
+                            <div className="flex justify-center py-6 bg-brand-ash border-t border-ash-light">
+                                <p className="text-text-muted text-sm font-medium flex items-center">
+                                    <i className="fas fa-check-circle mr-2"></i>
+                                    All records loaded
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </>}
+        </main>
+    )}
+</div>
+    )
 };
 
 

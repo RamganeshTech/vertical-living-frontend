@@ -434,6 +434,8 @@ const DailySchedulePage: React.FC = () => {
 
     const doc = scheduleData.find((schedule: any) => schedule._id === scheduleId);
 
+    console.log("editing doc", doc)
+
     if (doc) {
       setEditingTask(doc);  // this will now contain the entire document
       setShowTaskForm(true);
@@ -723,7 +725,6 @@ const DailySchedulePage: React.FC = () => {
               className="bg-brand-surface border border-ash-medium rounded-xl shadow-2xl p-5 sm:p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in duration-200 flex-1 sm:flex-none relative"
               >
                 <div className="flex justify-between items-center mb-6 pb-4 border-b border-ash-light">
-                  {/* <h3 className="text-xl font-bold">Tasks for {selectedDate.toLocaleDateString()}</h3> */}
                   <h3 className="text-lg sm:text-xl font-bold text-text-main flex items-center gap-2">
                     <i className="fa-regular fa-calendar-check text-text-muted"></i>
                     Tasks for {selectedDate.toLocaleDateString()}

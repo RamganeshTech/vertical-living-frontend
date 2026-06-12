@@ -56,15 +56,15 @@ interface BillAccountFormProps {
 
 
 export const getSourceStatusLabel = (status?: string) => {
-        if (!status) return "";
+    if (!status) return "";
 
-        const map: Record<string, string> = {
-            CREATED_WITHOUT_ORDER_MATERIAL: "Created Without Material Order",
-            CREATED_FROM_ORDER_MATERIAL: "Created From Ordered Material"
-        };
-
-        return map[status] || status.split("_").join(" ");
+    const map: Record<string, string> = {
+        CREATED_WITHOUT_ORDER_MATERIAL: "Created Without Material Order",
+        CREATED_FROM_ORDER_MATERIAL: "Created From Ordered Material"
     };
+
+    return map[status] || status.split("_").join(" ");
+};
 
 
 const BillAccountForm: React.FC<BillAccountFormProps> = ({
@@ -315,7 +315,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
     };
 
 
-    
+
 
 
     // --- FILE HANDLERS (NEW FILES ONLY) ---
@@ -428,24 +428,24 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
     return (
         <div className="max-w-full mx-auto space-y-2">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-white border-b border-gray-200 pb-4 pt-2 mb-6 flex justify-between items-center">
+            <header className="sticky top-0 z-20 bg-brand-surface border-b border-ash-medium pb-4 pt-2 mb-6 flex justify-between items-center">
                 {/* <header className="flex  justify-between items-center"> */}
                 <div className='flex justify-between items-center gap-2'>
-                    <button type="button" onClick={() => navigate(-1)} className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2'>
+                    <button type="button" onClick={() => navigate(-1)} className='bg-brand-ash hover:bg-brand-ash-dark flex items-center justify-between w-8 h-8 border border-ash-medium text-text-main text-sm cursor-pointer rounded-md px-2'>
                         <i className="fas fa-arrow-left"></i>
                     </button>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                            <i className="fas fa-receipt mr-3 text-blue-600"></i>
+                        <h1 className="text-3xl font-bold text-text-strong flex items-center gap-2">
+                            <i className="fas fa-receipt mr-1 text-text-main"></i>
                             {isCreateMode ? 'Create Bill' : isEditMode ? 'Update Bill' : 'View Bill'}
 
                             {initialData?.sourceStatus && (
-                                <Badge variant="success">
+                                <Badge variant="dark">
                                     {getSourceStatusLabel(initialData.sourceStatus)}
                                 </Badge>
                             )}
                         </h1>
-                        <p className="text-gray-600 mt-1">
+                        <p className="text-text-muted mt-1">
                             {isCreateMode ? 'Fill in details' : isEditMode ? 'Update details' : 'Bill details'}
                         </p>
                     </div>
@@ -470,14 +470,15 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         />
                     </div>} */}
 
-                    {(isReadOnly && (canEdit || canCreate)) && <div className="flex items-center space-y-1">
+                    {(isReadOnly && (canEdit || canCreate)) && <div className="flex items-center space-y-1 space-x-2">
                         <Button
-                            variant="primary"
+                            variant="white"
                             className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}
                             title={initialData?.isSyncWithPaymentsSection ? "already sent to payment" : ""}
                             isLoading={syncPaymentsLoading}
                             // disabled={initialData?.isSyncWithPaymentsSection}
                             onClick={handleSyncToPayments}
+
                         >
                             Send To Payments Section
                         </Button>
@@ -491,7 +492,13 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
 
 
                     {(isReadOnly && canEdit) && (
-                        <Button type="button" onClick={toggleEdit} className={isReadOnly ? "bg-blue-600 text-white" : "bg-gray-500 hover:bg-gray-500 text-white"}>
+                        <Button type="button" onClick={toggleEdit}
+                            variant='dark'
+                            // className={isReadOnly ? "bg-blue-600 text-white" : "bg-gray-500 hover:bg-gray-500 text-white"}
+                            // className={isReadOnly ? "!bg-action-primary !text-brand-surface" : "!bg-action-secondary hover:!bg-action-secondary-hover text-text-strong"}
+                            
+                        >
+
                             <i className="fas fa-edit mr-2"></i>Edit
                         </Button>
                     )}
@@ -502,18 +509,28 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         (isEditMode && canEdit)) && (
                             <div className="flex justify-end items-center gap-4">
 
-                                <Button type="button" onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2" disabled={isSubmitting}>
+                                <Button type="button" onClick={handleSubmit}
+                                    // className="bg-blue-600 text-white px-6 py-2" 
+                                    variant='dark'
+                                    className="bg-action-primary  text-brand-surface px-6 py-2 transition-colors"
+
+                                    disabled={isSubmitting}>
                                     {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <>{isCreateMode ? 'Create Bill' : 'Update Bill'}</>}
                                 </Button>
 
-                                <Button variant='outline' type="button" onClick={() => {
+                                <Button type="button" onClick={() => {
                                     if (isCreateMode) {
                                         navigate(-1)
                                     }
                                     else {
                                         toggleEdit()
                                     }
-                                }} className="bg-gray-500 hover:bg-gray-500 text-white px-6 py-2">
+                                }}
+
+                                    // className="bg-brand-ash px-6 py-2"
+                                    className="!bg-action-secondary hover:!bg-action-secondary-hover !text-text-strong px-6 py-2 border border-ash-medium transition-colors"
+
+                                >
                                     Cancel</Button>
 
 
@@ -530,7 +547,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
             <form className="space-y-6">
 
                 {/* Details Section */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <Label>Vendor</Label>
@@ -538,11 +555,13 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                 options={VendorOptions}
                                 value={formData.vendorId ? formData.vendorId : ""}
                                 onValueChange={handleVendorChange}
-                                className="w-full" placeholder="Select Vendor" />
+                                className="w-full !text-text-main" placeholder="Select Vendor" />
                         </div>
                         <div>
                             <div className='flex items-center gap-1'>
-                                <input type="checkbox" id='vendornameinp' checked={enableVendorInput} onChange={() => setEnableVendorInput(p => !p)} disabled={isReadOnly} />
+                                <input type="checkbox" id='vendornameinp' checked={enableVendorInput} onChange={() => setEnableVendorInput(p => !p)} disabled={isReadOnly}
+
+                                    className="accent-action-primary" />
                                 <Label className='cursor-pointer' htmlFor='vendornameinp'>Manual Entry</Label>
                             </div>
                             <input
@@ -551,11 +570,11 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                 value={formData.vendorName}
                                 onChange={e => { if (enableVendorInput) handleInputChange(e) }}
                                 disabled={isReadOnly || !enableVendorInput}
-                                className="w-full px-3 py-2 border rounded-lg"
+                                className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg"
                                 placeholder="Vendor Name" />
                         </div>
-                        <div><Label>Bill Date</Label><input type="date" name="billDate" value={formData.billDate} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border rounded-lg" /></div>
-                        <div><Label>Due Date</Label><input type="date" name="dueDate" value={formData.dueDate} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border rounded-lg" /></div>
+                        <div><Label>Bill Date</Label><input type="date" name="billDate" value={formData.billDate} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg" /></div>
+                        <div><Label>Due Date</Label><input type="date" name="dueDate" value={formData.dueDate} onChange={handleInputChange} disabled={isReadOnly} className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg" /></div>
 
                         <div>
                             <Label>Project</Label>
@@ -573,7 +592,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                         setFormData(prev => ({ ...prev, projectId: null, projectName: null }));
                                     }
                                 }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main disabled:bg-brand-ash outline-none transition-shadow"
                             >
                                 <option value="">Select Projects</option>
                                 {projects?.map((project: any) => (
@@ -614,7 +633,8 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                 value={formData?.paymentType || ''}
                                 onChange={handleInputChange}
                                 disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white disabled:cursor-not-allowed"
+                                // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main disabled:bg-brand-ash disabled:cursor-not-allowed outline-none transition-shadow"
                             >
                                 <option value="">Select Payment Type</option>
                                 {PAYMENTTYPES?.map((type: any) => (
@@ -636,7 +656,8 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                 }
                                 }
                                 disabled={isReadOnly || formData.paymentType !== "pay advanced, balance later"}
-                                className="w-full px-3 py-2 border rounded-lg disabled:cursor-not-allowed"
+                                // className="w-full px-3 py-2 border rounded-lg disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg bg-brand-surface text-text-main focus:ring-2 focus:ring-action-primary disabled:bg-brand-ash disabled:cursor-not-allowed outline-none transition-shadow"
                                 placeholder="Advanced Amount"
                             />
                         </div>
@@ -646,20 +667,22 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                             <Textarea name="subject" value={formData.subject}
                                 onChange={handleInputChange}
                                 disabled={isReadOnly}
-                                className="w-full px-3 py-2 border rounded-lg" />
+                                // className="w-full px-3 py-2 border rounded-lg" />
+                                className="w-full px-3 py-2 border !border-ash-medium rounded-lg !bg-brand-surface !text-text-main focus:ring-2 focus:!ring-action-primary disabled:bg-brand-ash outline-none transition-shadow"
+                            />
                         </div>
                     </div>
                 </div>
 
                 {/* Items Section */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-900 flex items-center"><i className="fas fa-list mr-2 text-blue-600"></i> Items <span className="text-red-500 ml-1">*</span></h2>
-                        {!isReadOnly && <Button type="button" onClick={handleAddItem} variant='primary'><i className="fas fa-plus mr-2"></i> Add Item</Button>}
+                        <h2 className="text-xl font-semibold text-text-strong flex items-center"><i className="fas fa-list mr-2 text-action-primary"></i> Items <span className="text-action-danger ml-1">*</span></h2>
+                        {!isReadOnly && <Button type="button" variant="dark" onClick={handleAddItem}><i className="fas fa-plus mr-2"></i> Add Item</Button>}
                     </div>
                     <div className="overflow-x-auto">
                         {/* Table Header */}
-                        <div className="grid grid-cols-14 gap-3 mb-2 px-4 py-3 bg-gray-100 rounded-lg font-semibold text-sm">
+                        <div className="grid grid-cols-14 gap-3 mb-2 px-4 py-3 bg-brand-ash rounded-lg font-semibold text-text-strong text-sm">
                             <div className="col-span-1">#</div>
                             <div className="col-span-4 text-center">Item Name</div>
                             <div className="col-span-2 text-center">Unit</div>
@@ -671,13 +694,13 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         {/* Rows */}
                         <div className="space-y-2">
                             {formData.items.map((item, index) => (
-                                <div key={index} className="grid grid-cols-14 gap-3 px-4 py-3 bg-white rounded-lg items-center">
-                                    <div className="col-span-1">{index + 1}</div>
+                                <div key={index} className="grid grid-cols-14 gap-3 px-4 py-3 bg-brand-surface border border-ash-medium rounded-lg items-center">
+                                    <div className="col-span-1 text-text-muted">{index + 1}</div>
                                     <div className="col-span-4 ">
                                         <input value={item.itemName}
                                             onChange={e => handleItemChange(index, 'itemName', e.target.value)}
                                             disabled={isReadOnly}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-100"
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main text-sm disabled:bg-brand-ash"
                                         />
                                     </div>
 
@@ -686,7 +709,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                             value={item.unit}
                                             onChange={(e) => handleItemChange(index, 'unit', e.target.value)}
                                             disabled={isReadOnly}
-                                            className="w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 bg-white text-sm disabled:bg-gray-100"
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-md focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main disabled:bg-brand-ash"
                                         >
                                             {ORDERMATERIAL_UNIT_OPTIONS.map((unitOption) => (
                                                 <option key={unitOption} value={unitOption}>{unitOption}</option>
@@ -698,7 +721,7 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                         <input type="number" value={item.quantity}
                                             onChange={e => handleItemChange(index, 'quantity', e.target.value)}
                                             disabled={isReadOnly}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-100"
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main disabled:bg-brand-ash"
                                         />
                                     </div>
 
@@ -707,30 +730,30 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                             value={item.rate || ""}
                                             onChange={e => handleItemChange(index, 'rate', Math.max(0, Number(e.target.value)))}
                                             disabled={isReadOnly}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-gray-100"
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main disabled:bg-brand-ash"
                                         /></div>
-                                    <div className="col-span-2 text-center">₹{item.totalCost.toFixed(2)}</div>
-                                    <div className="col-span-1 text-center">{!isReadOnly && <i className="fas fa-trash text-red-500 cursor-pointer" onClick={() => handleRemoveItem(index)}></i>}</div>
+                                    <div className="col-span-2 text-center text-text-strong">₹{item.totalCost.toFixed(2)}</div>
+                                    <div className="col-span-1 text-center">{!isReadOnly && <i className="fas fa-trash text-action-danger cursor-pointer" onClick={() => handleRemoveItem(index)}></i>}</div>
                                 </div>
                             ))}
                         </div>
-                        <div className="grid grid-cols-12 gap-3 px-4 py-3 bg-blue-50 rounded-lg mt-4 font-semibold">
+                        <div className="grid grid-cols-12 gap-3 px-4 py-3 text-text-main rounded-lg mt-4 font-semibold">
                             <div className="col-span-9 text-right">Subtotal:</div>
-                            <div className="col-span-2 text-right text-blue-600">₹{calculatedTotals.totalAmount.toFixed(2)}</div>
+                            <div className="col-span-2 text-right text-action-primary">₹{calculatedTotals.totalAmount.toFixed(2)}</div>
                         </div>
                     </div>
                 </div>
 
 
                 {/* Discount and Tax */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-calculator mr-2 text-blue-600"></i>
+                <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
+                    <h2 className="text-xl font-semibold text-text-strong mb-4 flex items-center">
+                        <i className="fas fa-calculator mr-2 text-action-primary"></i>
                         Discount & Tax
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-text-main mb-1">
                                 Discount Percentage (%)
                             </label>
                             <input
@@ -742,12 +765,13 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                 min="0"
                                 max="100"
                                 step="0.01"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main disabled:bg-brand-ash disabled:cursor-not-allowed outline-none transition-shadow"
                                 placeholder="0.00"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-text-main mb-1">
                                 Tax Percentage (%)
                             </label>
                             <input
@@ -759,7 +783,8 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                 min="0"
                                 max="100"
                                 step="0.01"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                // className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main disabled:bg-brand-ash disabled:cursor-not-allowed outline-none transition-shadow"
                                 placeholder="0.00"
                             />
                         </div>
@@ -767,31 +792,31 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 </div>
 
                 {/* Totals Summary */}
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm p-6 border border-blue-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <div className="bg-brand-surface-hover rounded-xl shadow-sm p-6 border border-ash-medium">
+                    <h2 className="text-xl font-semibold text-text-strong mb-4 flex items-center">
                         <i className="fas fa-receipt mr-2 text-blue-600"></i>
                         Bill Summary
                     </h2>
                     <div className="space-y-3">
-                        <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                            <span className="text-gray-700 font-medium">Subtotal:</span>
-                            <span className="text-xl font-semibold text-gray-900">
+                        <div className="flex justify-between items-center py-2 border-b border-ash-medium">
+                            <span className="text-text-main font-medium">Subtotal:</span>
+                            <span className="text-xl font-semibold text-text-strong">
                                 ₹{calculatedTotals.totalAmount.toFixed(2)}
                             </span>
                         </div>
                         {formData.discountPercentage > 0 && (
-                            <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                                <span className="text-gray-700 font-medium">
+                            <div className="flex justify-between items-center py-2 border-b border-ash-medium">
+                                <span className="text-text-main font-medium">
                                     Discount ({formData.discountPercentage}%):
                                 </span>
-                                <span className="text-xl font-semibold text-green-600">
+                                <span className="text-xl font-semibold text-action-success">
                                     -₹{calculatedTotals.discountAmount.toFixed(2)}
                                 </span>
                             </div>
                         )}
                         {formData.taxPercentage > 0 && (
-                            <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                                <span className="text-gray-700 font-medium">
+                            <div className="flex justify-between items-center py-2 border-b border-ash-medium">
+                                <span className="text-text-main font-medium">
                                     Tax ({formData.taxPercentage}%):
                                 </span>
                                 <span className="text-xl font-semibold text-gray-900">
@@ -803,9 +828,9 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
 
                         {formData.paymentType === "pay advanced, balance later" && (
                             <>
-                                <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                                    <span className="text-gray-700 font-medium">Advance Amount (Need To Pay):</span>
-                                    <span className="text-xl font-semibold text-green-600">
+                                <div className="flex justify-between items-center py-2 border-b border-ash-medium">
+                                    <span className="text-text-main font-medium">Advance Amount (Need To Pay):</span>
+                                    <span className="text-xl font-semibold text-action-success">
                                         ₹{(formData.advancedAmount || 0)}
                                     </span>
                                 </div>
@@ -813,9 +838,9 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                         )}
 
 
-                        <div className="flex justify-between items-center py-3 bg-blue-100 px-4 rounded-lg">
-                            <span className="text-lg font-bold text-gray-900">Grand Total:</span>
-                            <span className="text-2xl font-bold text-blue-600">
+                        <div className="flex justify-between items-center py-3 bg-brand-ash px-4 rounded-lg">
+                            <span className="text-lg font-bold text-text-strong">Grand Total:</span>
+                            <span className="text-2xl font-bold text-action-primary">
                                 ₹{calculatedTotals.grandTotal.toFixed(2)}
                             </span>
                         </div>
@@ -824,19 +849,20 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
 
                 {/* --- DISPLAY EXISTING DOCUMENTS (From InitialData ONLY) --- */}
                 {isReadOnly && initialData && initialData.images && initialData.images.length > 0 && (
-                    <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <section className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
 
-                        <div className="flex justify-between items-center mb-4 border-b pb-2">
+                        <div className="flex justify-between items-center mb-4 border-b border-ash-medium pb-2">
                             <h3 className="text-lg font-semibold flex items-center">
-                                <i className="fas fa-folder-open mr-2 text-blue-500"></i> Existing Documents
+                                <i className="fas fa-folder-open mr-2 text-text-strong"></i> Existing Documents
                             </h3>
 
                             {/* ACTION GROUP: Upload Controls on the Right */}
                             <div className="flex items-center gap-2">
                                 {/* 1. The Select Button (Icon Only or Small Text) */}
                                 <div className="relative">
-                                    <button className="text-xs cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-1.5 px-3 rounded flex items-center gap-2 border border-gray-300 transition-all">
-                                        <i className="fas fa-plus text-blue-500"></i>
+                                    <button className="text-xs cursor-pointer bg-brand-ash hover:bg-brand-ash-dark text-text-strong
+                                     font-bold py-1.5 px-3 rounded flex items-center gap-2 border border-ash-medium transition-all">
+                                        <i className="fas fa-plus text-text-strong"></i>
                                         {formData.images.length > 0 ? `${formData.images.length} Selected` : 'Select Files'}
                                     </button>
                                     <input
@@ -854,7 +880,8 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                         type="button"
                                         onClick={handleQuickUploadClick}
                                         disabled={isSubmitting}
-                                        className="text-xs cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow-sm transition-all flex items-center gap-2"
+                                        // className="text-xs cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow-sm transition-all flex items-center gap-2"
+                                        className="text-xs cursor-pointer bg-action-primary hover:bg-action-primary-hover text-brand-surface font-bold py-1.5 px-4 rounded shadow-sm transition-all flex items-center gap-2"
                                     >
                                         {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-cloud-upload-alt"></i>}
                                         Upload Now
@@ -929,36 +956,36 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                     (<>
                         {
                             (currentMode === 'create' || currentMode === 'edit' || (currentMode === 'view' && initialData?.images?.length === 0)) &&
-                            <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                            <section className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
                                 <h3 className="text-lg font-semibold mb-4 pb-2 border-b flex justify-between items-center">
-                                    <span><i className="fas fa-cloud-upload-alt mr-2 text-blue-500"></i> {isCreateMode ? 'Upload Hot Copy of Bill' : 'Add Hot Copy of Bill'}</span>
-                                    {isReadOnly && <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">View Mode Upload</span>}
+                                    <span><i className="fas fa-cloud-upload-alt mr-2 text-text-main"></i> {isCreateMode ? 'Upload Hot Copy of Bill' : 'Add Hot Copy of Bill'}</span>
+                                    {isReadOnly && <span className="text-xs bg-brand-ash text-text-strong px-2 py-1 rounded">View Mode Upload</span>}
                                 </h3>
 
                                 {/* Upload Area */}
-                                <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 bg-gray-50 flex flex-col items-center justify-center">
+                                <div className="relative w-full h-32 border-2 border-dashed border-ash-medium rounded-lg hover:border-action-primary bg-brand-ash flex flex-col items-center justify-center">
                                     <input type="file" multiple accept="image/*,.pdf" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
-                                    <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                    <p className="text-sm text-gray-600">Click to upload files</p>
+                                    <i className="fas fa-cloud-upload-alt text-3xl text-text-muted mb-2"></i>
+                                    <p className="text-sm text-text-muted">Click to upload files</p>
                                 </div>
 
                                 {/* Preview New Files */}
                                 {formData.images.length > 0 && (
                                     <div className="mt-4 space-y-2">
                                         {formData.images.map((file, index) => (
-                                            <div key={index} className="flex items-center justify-between p-2 bg-white border rounded shadow-sm">
+                                            <div key={index} className="flex items-center justify-between p-2 bg-brand-surface border border-ash-medium rounded shadow-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <i className={`fas ${file.type.includes('pdf') ? 'fa-file-pdf text-red-500' : 'fa-file-image text-blue-500'}`}></i>
-                                                    <span className="text-sm text-gray-700">{file.name}</span>
+                                                    <i className={`fas ${file.type.includes('pdf') ? 'fa-file-pdf text-action-danger' : 'fa-file-image text-text-main'}`}></i>
+                                                    <span className="text-sm text-text-muted">{file.name}</span>
                                                 </div>
-                                                <button type="button" onClick={() => removeFile(index)} className="text-red-500 px-2"><i className="fas fa-times"></i></button>
+                                                <button type="button" onClick={() => removeFile(index)} className="text-action-danger px-2"><i className="fas fa-times"></i></button>
                                             </div>
                                         ))}
 
                                         {/* Quick Upload Button (View Mode Only) */}
                                         {isReadOnly && (
                                             <div className="flex justify-end mt-2">
-                                                <Button type="button" onClick={handleQuickUploadClick} disabled={isSubmitting} className="">
+                                                <Button type="button" onClick={handleQuickUploadClick} variant='dark' disabled={isSubmitting} className="bg-action-primary text-brand-surface">
                                                     {isSubmitting ? 'Uploading...' : 'Upload Files Now'}
                                                 </Button>
                                             </div>
@@ -1013,23 +1040,23 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                     <>
                         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                             <div className="flex-1">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                <h3 className="text-lg font-semibold text-text-strong mb-1">
                                     Invoice Pdf
                                 </h3>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-text-muted">
                                     Generate a PDF document for the invoice
                                 </p>
                             </div>
                         </div>
 
-                        <Card className="border-green-200 bg-green-50">
+                        <Card className="border border-action-success bg-brand-surface">
                             <CardContent className="p-6">
                                 <div className="flex justify-between items-center">
                                     <div className="flex items-center gap-3">
-                                        <i className="fas fa-check-circle text-green-600 text-2xl"></i>
+                                        <i className="fas fa-check-circle text-action-success text-2xl"></i>
                                         <div>
-                                            <h4 className="font-semibold text-green-900">{initialData.pdfData.originalName}</h4>
-                                            <p className="text-sm text-green-700">Invoice PDF is ready</p>
+                                            <h4 className="font-semibold text-text-strong">{initialData.pdfData.originalName}</h4>
+                                            <p className="text-sm text-action-success">Invoice PDF is ready</p>
                                         </div>
                                     </div>
                                     <div className='gap-2 flex items-center'>
@@ -1037,16 +1064,19 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                                             type="button"
                                             variant="outline"
                                             onClick={() => window.open(initialData.pdfData.url, "_blank")}
-                                            className=""
+                                            // className=""
+                                            className="border-ash-medium text-text-strong hover:bg-brand-ash transition-colors"
                                         >
                                             View PDF
                                         </Button>
 
                                         <Button
                                             type="button"
-                                            variant="primary"
+                                            variant="dark"
                                             onClick={() => downloadImage({ src: initialData.pdfData.url, alt: initialData.pdfData.originalName })}
-                                            className=""
+                                            // className=""
+                                            // className="bg-action-primary text-brand-surface hover:bg-action-primary-hover transition-colors"
+                                            
                                         >
                                             download PDF
                                         </Button>
@@ -1059,10 +1089,18 @@ const BillAccountForm: React.FC<BillAccountFormProps> = ({
                 )
                     :
                     <>
-                        {(!isCreateMode && !isEditMode) && <div className="shadow-md flex flex-col items-center justify-center min-h-[150px] w-full bg-white rounded-xl text-center p-6">
-                            <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-blue-800 mb-1">If No Pdf Found, just click on edit button and update the bill</h3>
-                        </div>}
+                        {(!isCreateMode && !isEditMode) &&
+                            // <div className="shadow-md flex flex-col items-center justify-center min-h-[150px] w-full bg-white rounded-xl text-center p-6">
+                            //     <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
+                            //     <h3 className="text-lg font-semibold text-blue-800 mb-1">If No Pdf Found, just click on edit button and update the bill</h3>
+                            // </div>
+
+                            <div className="shadow-sm flex flex-col items-center justify-center min-h-[150px] w-full bg-brand-surface border border-ash-light rounded-xl text-center p-6">
+                                <i className="fas fa-file-invoice text-5xl text-text-soft mb-4" />
+                                <h3 className="text-lg font-semibold text-text-strong mb-1">If No Pdf Found, just click on edit button and update the bill</h3>
+                            </div>
+
+                        }
                     </>
                 }
 

@@ -162,7 +162,7 @@ const BillAccSingle = () => {
 
 
     if (isLoading) return <MaterialOverviewLoading />;
-    if (isError) return <div className="p-10 text-center text-red-500">Error: {(error as any).message}</div>;
+    if (isError) return <div className="p-10 text-center text-action-danger">Error: {(error as any).message}</div>;
 
     return (
         <main className='max-h-full overflow-y-auto'>
