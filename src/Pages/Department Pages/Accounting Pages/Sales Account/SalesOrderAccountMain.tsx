@@ -154,56 +154,373 @@ const SalesOrderAccountMain = () => {
         return <Outlet />;
     }
 
+    // return (
+    //     <div className="space-y-0 h-full">
+    //         {/* Header */}
+    //         <div className="flex justify-between items-center">
+    //             <div>
+    //                 <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+    //                     <i className="fas fa-file-invoice mr-3 text-blue-600"></i>
+    //                     Sales Order
+    //                 </h1>
+    //                 {/* <p className="text-gray-600 mt-1">
+    //                     Manage your organization sales
+    //                 </p> */}
+    //                 <Breadcrumb paths={paths} />
+
+    //             </div>
+
+    //             <div className='flex items-center gap-2'>
+               
+    //             {canCreate && <Button
+    //                 onClick={() => navigate('create')}
+    //             >
+    //                 <i className="fas fa-plus mr-2" />
+    //                 Create Sales Order
+    //             </Button>}
+
+    //             <div className="w-full sm:w-auto flex justify-end sm:block">
+    //                 <StageGuide
+    //                     organizationId={organizationId!}
+    //                     stageName="salesorder"
+    //                 />
+    //             </div>
+    //             </div>
+    //         </div>
+
+    //         {/* Loading State */}
+    //         {isLoading ? (
+    //             <div className="flex justify-center items-center py-12">
+    //                 <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+    //             </div>
+    //         ) : isError ? (
+    //             <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+    //                 <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+    //                     ⚠️ Error Occurred
+    //                 </div>
+    //                 <p className="text-red-500 mb-4 text-lg sm:text-xl">
+    //                     {(error as any)?.message || "Failed to load orders"}
+    //                 </p>
+    //                 <Button
+    //                     onClick={() => refetch()}
+    //                     className="bg-red-600 text-white px-4 py-2"
+    //                 >
+    //                     Retry
+    //                 </Button>
+    //             </div>
+    //         ) : (
+    //             <main className="flex gap-2 !max-h-[90%]">
+    //                 {/* Filters Sidebar */}
+    //                 <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
+    //                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                         <div className="flex items-center justify-between mb-6">
+    //                             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+    //                                 <i className="fas fa-filter mr-2 text-blue-600"></i>
+    //                                 Filters
+    //                             </h3>
+    //                             {activeFiltersCount > 0 && (
+    //                                 <button
+    //                                     onClick={clearFilters}
+    //                                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+    //                                 >
+    //                                     Clear All ({activeFiltersCount})
+    //                                 </button>
+    //                             )}
+    //                         </div>
+
+    //                         <div className="space-y-6">
+    //                             {/* Search */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-search mr-2"></i>
+    //                                     Search
+    //                                 </label>
+    //                                 <input
+    //                                     type="text"
+    //                                     autoFocus
+    //                                     placeholder="customer name"
+    //                                     value={filters.search}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             {/* Date Filter */}
+    //                             {/* <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     Filter by Created At
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.date}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, date: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     Filter by Sales Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.salesOrderDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, salesOrderDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div> */}
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     From CreatedAt Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.createdFromDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     To CreatedAt Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.createdToDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, createdToDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     From Sales Order Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.fromSalesOrderDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, fromSalesOrderDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     To Sales Order Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.toSalesOrderDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, toSalesOrderDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+
+
+    //                             {/* Customer ID Filter */}
+    //                             {/* <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-user mr-2"></i>
+    //                                     Customer ID
+    //                                 </label>
+    //                                 <input
+    //                                     type="text"
+    //                                     placeholder="Enter customer ID..."
+    //                                     value={filters.customerId}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, customerId: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div> */}
+
+    //                             {/* Sort By */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Sort By
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.sortBy}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, sortBy: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="createdAt">Created Date</option>
+    //                                     <option value="sale">Sales Date</option>
+    //                                     <option value="grandTotal">Grand Total</option>
+    //                                     <option value="customerName">Customer Name</option>
+    //                                 </select>
+    //                             </div>
+
+    //                             {/* Sort Order */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Sort Order
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.sortOrder}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="desc">Descending</option>
+    //                                     <option value="asc">Ascending</option>
+    //                                 </select>
+    //                             </div>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+
+    //                 {canList && <>                {salesOrder.length === 0 ? (
+    //                     <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+    //                         <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
+    //                         <h3 className="text-lg font-semibold text-blue-800 mb-1">No Sales Order Found</h3>
+    //                         <p className="text-sm text-gray-500">
+    //                             {filters.search || filters.customerId
+    //                                 ? 'Try adjusting your filters to find orders.'
+    //                                 : 'Looks like there are no orders yet.'}
+    //                             <br />
+    //                             Click on <strong>Create Order</strong> to get started 🚀
+    //                         </p>
+    //                     </div>
+    //                 ) : (
+
+    //                     <div
+    //                         ref={scrollContainerRef}
+    //                         className="flex-1 !max-h-[100%] overflow-y-auto"
+    //                     >
+    //                         {/* Table Header */}
+    //                         <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
+    //                             <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+    //                                 <div className="col-span-1 text-center">S.No</div>
+    //                                 <div className="col-span-3">Customer Name</div>
+    //                                 <div className="col-span-2">Sales Date</div>
+    //                                 <div className="col-span-2">Created At</div>
+    //                                 <div className="col-span-2">Grand Total</div>
+    //                                 <div className="col-span-1 text-center">Items</div>
+    //                                 <div className="col-span-1 text-center">Actions</div>
+    //                             </div>
+    //                         </div>
+
+    //                         {/* Table Body */}
+    //                         <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
+    //                             {salesOrder.map((salesData: any, index: number) => (
+    //                                 <SalesOrderAccList key={salesData._id} salesData={salesData} index={index} handleView={handleView} handleDelete={handleDelete} deleteSalesMutation={deleteSalesMutation} />
+    //                             ))}
+    //                         </div>
+
+    //                         {/* Loading indicator at the bottom */}
+    //                         {isFetchingNextPage && (
+    //                             <div className="flex justify-center py-8">
+    //                                 <div className="flex items-center gap-2 text-blue-600">
+    //                                     <i className="fas fa-spinner fa-spin text-2xl"></i>
+    //                                     <span className="text-sm font-medium">Loading more orders...</span>
+    //                                 </div>
+    //                             </div>
+    //                         )}
+
+    //                         {/* End of list indicator */}
+    //                         {!hasNextPage && salesOrder.length > 0 && (
+    //                             <div className="flex justify-center py-6">
+    //                                 <p className="text-gray-400 text-sm font-medium">
+    //                                     <i className="fas fa-check-circle mr-2"></i>
+    //                                     You've reached the end of the list
+    //                                 </p>
+    //                             </div>
+    //                         )}
+
+    //                         {/* Total count */}
+    //                         {/* {salesOrder.length > 0 && (
+    //                             <div className="flex justify-center py-4">
+    //                                 <p className="text-gray-500 text-sm">
+    //                                     Showing {salesOrder.length} of {totalOrders} orders
+    //                                 </p>
+    //                             </div>
+    //                         )} */}
+    //                     </div>
+    //                 )}
+    //                 </>}
+    //             </main>
+    //         )}
+    //     </div>
+    // );
+
+
+
+
+
     return (
-        <div className="space-y-0 h-full">
+        <div className="space-y-0 h-full bg-brand-surface">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center pb-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-file-invoice mr-3 text-blue-600"></i>
+                    <h1 className="text-3xl font-bold text-text-main flex items-center">
+                        <i className="fas fa-file-invoice mr-3 text-action-primary"></i>
                         Sales Order
                     </h1>
-                    {/* <p className="text-gray-600 mt-1">
-                        Manage your organization sales
-                    </p> */}
                     <Breadcrumb paths={paths} />
-
                 </div>
 
                 <div className='flex items-center gap-2'>
-               
-                {canCreate && <Button
-                    onClick={() => navigate('create')}
-                >
-                    <i className="fas fa-plus mr-2" />
-                    Create Sales Order
-                </Button>}
+                    {canCreate && (
+                        <Button
+                            variant="dark"
+                            onClick={() => navigate('create')}
+                        >
+                            <i className="fas fa-plus mr-2" />
+                            Create Sales Order
+                        </Button>
+                    )}
 
-                <div className="w-full sm:w-auto flex justify-end sm:block">
-                    <StageGuide
-                        organizationId={organizationId!}
-                        stageName="salesorder"
-                    />
-                </div>
+                    <div className="w-full sm:w-auto flex justify-end sm:block">
+                        <StageGuide
+                            organizationId={organizationId!}
+                            stageName="salesorder"
+                        />
+                    </div>
                 </div>
             </div>
 
             {/* Loading State */}
             {isLoading ? (
                 <div className="flex justify-center items-center py-12">
-                    <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+                    <i className="fas fa-spinner fa-spin text-action-primary text-4xl"></i>
                 </div>
             ) : isError ? (
-                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                    <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-brand-surface border border-action-danger rounded-lg shadow-sm text-center">
+                    <div className="text-action-danger font-semibold mb-2 text-xl sm:text-3xl">
                         ⚠️ Error Occurred
                     </div>
-                    <p className="text-red-500 mb-4 text-lg sm:text-xl">
+                    <p className="text-action-danger mb-4 text-lg sm:text-xl">
                         {(error as any)?.message || "Failed to load orders"}
                     </p>
                     <Button
                         onClick={() => refetch()}
-                        className="bg-red-600 text-white px-4 py-2"
+                        className="bg-action-danger hover:opacity-90 transition-opacity text-brand-surface px-4 py-2"
                     >
                         Retry
                     </Button>
@@ -211,17 +528,17 @@ const SalesOrderAccountMain = () => {
             ) : (
                 <main className="flex gap-2 !max-h-[90%]">
                     {/* Filters Sidebar */}
-                    <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
-                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto custom-scrollbar">
+                        <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                                    <i className="fas fa-filter mr-2 text-blue-600"></i>
+                                <h3 className="text-lg font-semibold text-text-main flex items-center">
+                                    <i className="fas fa-filter mr-2 text-action-primary"></i>
                                     Filters
                                 </h3>
                                 {activeFiltersCount > 0 && (
                                     <button
                                         onClick={clearFilters}
-                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                        className="text-sm text-action-primary hover:text-action-primary-hover font-medium transition-colors"
                                     >
                                         Clear All ({activeFiltersCount})
                                     </button>
@@ -231,8 +548,8 @@ const SalesOrderAccountMain = () => {
                             <div className="space-y-6">
                                 {/* Search */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-search mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-search mr-2 text-text-soft"></i>
                                         Search
                                     </label>
                                     <input
@@ -241,44 +558,13 @@ const SalesOrderAccountMain = () => {
                                         placeholder="customer name"
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div>
-
-                                {/* Date Filter */}
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
-                                        Filter by Created At
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={filters.date}
-                                        onChange={(e) => {
-                                            setFilters(f => ({ ...f, date: e.target.value }));
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main placeholder-text-soft rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
-                                        Filter by Sales Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={filters.salesOrderDate}
-                                        onChange={(e) => {
-                                            setFilters(f => ({ ...f, salesOrderDate: e.target.value }));
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div> */}
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         From CreatedAt Date
                                     </label>
                                     <input
@@ -287,13 +573,13 @@ const SalesOrderAccountMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdFromDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         To CreatedAt Date
                                     </label>
                                     <input
@@ -302,14 +588,14 @@ const SalesOrderAccountMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdToDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     />
                                 </div>
 
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         From Sales Order Date
                                     </label>
                                     <input
@@ -318,13 +604,13 @@ const SalesOrderAccountMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, fromSalesOrderDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         To Sales Order Date
                                     </label>
                                     <input
@@ -333,32 +619,13 @@ const SalesOrderAccountMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, toSalesOrderDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     />
                                 </div>
 
-
-
-                                {/* Customer ID Filter */}
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-user mr-2"></i>
-                                        Customer ID
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter customer ID..."
-                                        value={filters.customerId}
-                                        onChange={(e) => {
-                                            setFilters(f => ({ ...f, customerId: e.target.value }));
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div> */}
-
                                 {/* Sort By */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         Sort By
                                     </label>
                                     <select
@@ -366,7 +633,7 @@ const SalesOrderAccountMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, sortBy: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     >
                                         <option value="createdAt">Created Date</option>
                                         <option value="sale">Sales Date</option>
@@ -377,7 +644,7 @@ const SalesOrderAccountMain = () => {
 
                                 {/* Sort Order */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         Sort Order
                                     </label>
                                     <select
@@ -385,7 +652,7 @@ const SalesOrderAccountMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium bg-brand-surface text-text-main rounded-lg focus:ring-2 focus:ring-action-primary outline-none transition-shadow"
                                     >
                                         <option value="desc">Descending</option>
                                         <option value="asc">Ascending</option>
@@ -395,27 +662,27 @@ const SalesOrderAccountMain = () => {
                         </div>
                     </div>
 
-                    {canList && <>                {salesOrder.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-                            <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Sales Order Found</h3>
-                            <p className="text-sm text-gray-500">
+                    {canList && <>                    {salesOrder.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-brand-surface border border-ash-medium rounded-xl text-center p-6 shadow-sm">
+                            <i className="fas fa-file-invoice text-5xl text-text-soft mb-4" />
+                            <h3 className="text-lg font-semibold text-text-main mb-1">No Sales Order Found</h3>
+                            <p className="text-sm text-text-muted">
                                 {filters.search || filters.customerId
                                     ? 'Try adjusting your filters to find orders.'
                                     : 'Looks like there are no orders yet.'}
                                 <br />
-                                Click on <strong>Create Order</strong> to get started 🚀
+                                Click on <strong className="text-text-strong">Create Order</strong> to get started 🚀
                             </p>
                         </div>
                     ) : (
 
                         <div
                             ref={scrollContainerRef}
-                            className="flex-1 !max-h-[100%] overflow-y-auto"
+                            className="flex-1 !max-h-[100%] overflow-y-auto custom-scrollbar"
                         >
                             {/* Table Header */}
-                            <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
-                                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+                            <div className="bg-brand-surface rounded-t-xl border border-ash-medium sticky top-0 z-10">
+                                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-brand-surface-hover border-b border-ash-medium font-semibold text-text-strong text-sm">
                                     <div className="col-span-1 text-center">S.No</div>
                                     <div className="col-span-3">Customer Name</div>
                                     <div className="col-span-2">Sales Date</div>
@@ -427,7 +694,7 @@ const SalesOrderAccountMain = () => {
                             </div>
 
                             {/* Table Body */}
-                            <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
+                            <div className="bg-brand-surface rounded-b-xl border-x border-b border-ash-medium">
                                 {salesOrder.map((salesData: any, index: number) => (
                                     <SalesOrderAccList key={salesData._id} salesData={salesData} index={index} handleView={handleView} handleDelete={handleDelete} deleteSalesMutation={deleteSalesMutation} />
                                 ))}
@@ -436,7 +703,7 @@ const SalesOrderAccountMain = () => {
                             {/* Loading indicator at the bottom */}
                             {isFetchingNextPage && (
                                 <div className="flex justify-center py-8">
-                                    <div className="flex items-center gap-2 text-blue-600">
+                                    <div className="flex items-center gap-2 text-action-primary">
                                         <i className="fas fa-spinner fa-spin text-2xl"></i>
                                         <span className="text-sm font-medium">Loading more orders...</span>
                                     </div>
@@ -446,21 +713,12 @@ const SalesOrderAccountMain = () => {
                             {/* End of list indicator */}
                             {!hasNextPage && salesOrder.length > 0 && (
                                 <div className="flex justify-center py-6">
-                                    <p className="text-gray-400 text-sm font-medium">
+                                    <p className="text-text-muted text-sm font-medium">
                                         <i className="fas fa-check-circle mr-2"></i>
                                         You've reached the end of the list
                                     </p>
                                 </div>
                             )}
-
-                            {/* Total count */}
-                            {/* {salesOrder.length > 0 && (
-                                <div className="flex justify-center py-4">
-                                    <p className="text-gray-500 text-sm">
-                                        Showing {salesOrder.length} of {totalOrders} orders
-                                    </p>
-                                </div>
-                            )} */}
                         </div>
                     )}
                     </>}

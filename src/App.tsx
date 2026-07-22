@@ -8,6 +8,11 @@ import ProtectedRoutes from './lib/ProtectedRoutes';
 import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
+import MetaReviewDemoDashboard from './Pages/Lead_pages/MetaLead_Pages/MetaReviewDemoDashboard';
+const PremiseMain = lazy(() => import( './Pages/eb_pages/premises_pages/PremiseMain'));
+const TariffMain = lazy(() => import( './Pages/eb_pages/tariff_pages/TariffMain'));
+const EbLogMain = lazy(() => import( './Pages/eb_pages/EbLogMain'));
+const EbDashboardMain = lazy(() => import( './Pages/eb_pages/dashboards/EbDashboardMain'));
 // import InstagramLeadMainByMeta from './Pages/Lead_pages/InstragramLead_Pages/InstagramLeadByMeta_Pages/InstagramLeadMainByMeta';
 // import InstagramLeadSingleByMeta from './Pages/Lead_pages/InstragramLead_Pages/InstagramLeadByMeta_Pages/InstagramLeadSingleByMeta';
 // import { WhatsAppLeadMainByMeta } from './Pages/Lead_pages/InstragramLead_Pages/WhatsAppLeadMainByMeta';
@@ -1538,6 +1543,18 @@ function App() {
 
             </Route>
 
+            <Route path="meta-leads-main" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="leadmodule"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <MetaReviewDemoDashboard />
+            </ProtectedRoutes>} >
+
+            </Route>
+
+
+
 
             <Route path="vertical-living-configuration" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="leadmodule"
@@ -1570,6 +1587,43 @@ function App() {
               </ProtectedRoutes>} />
 
             </Route>
+
+
+             <Route path="premises" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="premises"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <PremiseMain />
+            </ProtectedRoutes>} />
+
+
+            <Route path="eb-dashboard" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="eb"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <EbDashboardMain />
+            </ProtectedRoutes>} />
+
+            <Route path="eb-log" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="eb"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <EbLogMain />
+            </ProtectedRoutes>} />
+
+            <Route path="tariff" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+              requiredDepartment="tariff"
+              // ⭐ Allow entry if they can do ANY of these things
+              requiredAction={['list', 'edit', "create", "delete"]}
+            >
+              <TariffMain />
+            </ProtectedRoutes>} />
+
+
+            
 
 
 

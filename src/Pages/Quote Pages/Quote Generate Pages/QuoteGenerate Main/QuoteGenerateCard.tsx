@@ -46,6 +46,12 @@ const QuoteGenerateCard: React.FC<Props> = ({ quote, organizationId,
     const handleDelete = async (id: string) => {
         try {
 
+            const confirmed = window.confirm(
+                "Are you sure you want to delete this quote? This action cannot be undone."
+            );
+
+            if (!confirmed) return;
+
             await deleteQuote({
                 id: id!,
                 organizationId: organizationId!,

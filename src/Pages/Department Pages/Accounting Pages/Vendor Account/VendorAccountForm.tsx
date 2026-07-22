@@ -742,7 +742,7 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
             {/* --- Header --- */}
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => navigate(-1)} className='bg-brand-surface hover:bg-brand-surface-hover w-9 h-9 flex items-center justify-center border border-ash-medium rounded-full shadow-sm transition-colors'>
+                    <button onClick={() => navigate(-1)} className='cursor-poiner bg-brand-surface hover:bg-brand-surface-hover w-9 h-9 flex items-center justify-center border border-ash-medium rounded-full shadow-sm transition-colors'>
                         <i className="fas fa-arrow-left text-text-main"></i>
                     </button>
                     <h1 className="text-2xl font-bold text-text-main flex items-center gap-3">
@@ -754,7 +754,7 @@ const VendorAccountForm: React.FC<VendorFormProps> = ({
                 </div>
                 <div className="flex gap-3">
                     {(currentMode === 'view' && canEdit) && (
-                        <Button  onClick={() => setCurrentMode('update')} variant='dark' className="bg-action-primary hover:bg-action-primary-hover text-brand-surface shadow-sm transition-colors">
+                        <Button  onClick={() => setCurrentMode('update')} variant='dark' className="text-brand-surface shadow-sm transition-colors">
                             <i className="fas fa-edit mr-2"></i> Edit Details
                         </Button>
                     )}

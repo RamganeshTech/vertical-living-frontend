@@ -674,17 +674,17 @@ const FurnitureForm: React.FC<Props> = ({
     const isTyping = updatedWorks[i].workName || updatedWorks[i].totalSqft || updatedWorks[i].sqftRate;
 
     if (isLastRow && isTyping) {
-        // We push a new row. We only need the base material fields.
-        // Labour fields are strictly handled by index 0.
-        updatedWorks.push({ 
-            workName: "", 
-            totalSqft: 0, 
-            sqftRate: updatedWorks[i].sqftRate || 0, // Smart fallback: copy previous rate
-            labourRate: 0, 
-            noofDays: 0, 
-            noofLabours: 0, 
-            totalAmount: 0 
-        });
+      // We push a new row. We only need the base material fields.
+      // Labour fields are strictly handled by index 0.
+      updatedWorks.push({
+        workName: "",
+        totalSqft: 0,
+        sqftRate: updatedWorks[i].sqftRate || 0, // Smart fallback: copy previous rate
+        labourRate: 0,
+        noofDays: 0,
+        noofLabours: 0,
+        totalAmount: 0
+      });
     }
 
 
@@ -919,7 +919,7 @@ const FurnitureForm: React.FC<Props> = ({
                   <td className="p-2 text-center">
                     <Button variant="danger" size="sm" className="px-2 py-1 text-xs" onClick={() => {
                       const updatedWorks = [...works];
-                      
+
                       // If removing the 0th row, we must transfer its labour data to the new 0th row
                       // BEFORE we actually delete it, so the data isn't lost!
                       if (i === 0 && updatedWorks.length > 1) {
@@ -930,20 +930,20 @@ const FurnitureForm: React.FC<Props> = ({
 
                       // Remove the row
                       updatedWorks.splice(i, 1);
-                      
+
                       // Use the centralized handler to recalculate ALL remaining rows
                       // This ensures the new 'totalRows' count is applied!
-                      
+
                       const totalRows = updatedWorks.length;
                       const baseWork = updatedWorks[0] || {};
                       const noofLabours = Number(baseWork.noofLabours) || 0;
                       const noofDays = Number(baseWork.noofDays) || 0;
                       const labRate = Number(baseWork.labourRate) || 0;
-                      
+
                       const totalLabourCost = noofLabours * noofDays * labRate;
                       const labourPerRow = totalRows > 0 ? totalLabourCost / totalRows : 0;
                       const profitMultiplier = 1 + (data.furnitureProfit || 0) / 100;
-                      
+
                       const fullyRecalculatedWorks = updatedWorks.map((w: any) => {
                         const sqft = Number(w.totalSqft) || 0;
                         const matRate = Number(w.sqftRate) || 0;
@@ -1279,7 +1279,7 @@ const FurnitureForm: React.FC<Props> = ({
             </tr>
           </thead>
           <tbody>
-            {data.coreMaterials.map((row, i) => (
+            {data.coreMaterials?.map((row, i) => (
               <tr key={i}
                 className="group relative border-none !border-b-1 px-4 py-2 transition-all duration-150 hover:bg-gray-50"
               >
@@ -1510,7 +1510,7 @@ const FurnitureForm: React.FC<Props> = ({
         <h3 className="font-semibold text-md mb-2">
           {title} - Total: ₹{
 
-            (data as any)?.totals[
+            (data as any)?.totals?.[
               // kind === "fittingsAndAccessories" ? "fittings" : kind
               kind === "fittingsAndAccessories"
                 ? "fittings"
@@ -1545,7 +1545,7 @@ const FurnitureForm: React.FC<Props> = ({
 
             </thead>
             <tbody className="!overflow-visible">
-              {data[kind].map((row, i) => (
+              {data?.[kind]?.map((row, i) => (
                 <tr key={i}
                   className="group relative border-none !border-b-1 px-4 !py-2 transition-all duration-150 hover:bg-gray-50 hover:z-[100] focus-within:z-[100]"
                 >
@@ -1929,7 +1929,7 @@ const FurnitureForm: React.FC<Props> = ({
 
         <div className="text-right text-xl text-green-700 font-bold ml-4">
           {/* Product Total: ₹{Math.round(data.totals.furnitureTotal).toLocaleString("en-IN")} */}
-          {data?.typeOfWork === "non-modular" ? "Work Total:" : "Product Total:"} ₹{Math.round(data.totals.furnitureTotal).toLocaleString("en-IN")}
+          {data?.typeOfWork === "non-modular" ? "Work Total:" : "Product Total:"} ₹{Math.round(data?.totals?.furnitureTotal).toLocaleString("en-IN")}
         </div>
       </div>
 

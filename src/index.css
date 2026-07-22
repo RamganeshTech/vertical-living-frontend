@@ -84,7 +84,7 @@ html {
 
 
   /* --text-main: #1e293b; */
-  --text-strong: #0f172a;       /* Headings, Titles */
+  --text-strong: #0f172a;       /* dont use this for the headings it is too black */
   --text-main: #343d49;
   /* Was #1e293b - much softer on the eyes */
   --text-muted: #64748b;

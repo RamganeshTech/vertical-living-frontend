@@ -41,79 +41,147 @@ const ExpenseList: React.FC<ExpenseAccListProps> = ({
     
 
 
+    // return (
+    //     <div onClick={onView} className="grid  cursor-pointer grid-cols-16 gap-4 px-6 py-4 border-b border-gray-100  hover:bg-[#f9fcff] transition-colors items-center">
+    //         {/* S.No */}
+    //         <div className="col-span-1 text-center text-sm font-medium text-gray-600">
+    //             {index + 1}
+    //         </div>
+
+    //         {/* expense Number */}
+    //         <div className="col-span-2 text-center">
+    //             <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-mono font-semibold">
+    //                 {expense.expenseNumber}
+    //             </span>
+    //         </div>
+
+    //         {/* Vendor Name */}
+    //         <div className="col-span-3 text-center">
+    //             <p className="font-medium text-gray-900">{expense.vendorName}</p>
+    //         </div>
+
+    //         {/* Amount */}
+    //         <div className="col-span-2 text-center">
+    //             <span className="text-lg font-bold text-green-600">
+    //                 ₹{expense.amount.toLocaleString()}
+    //             </span>
+    //         </div>
+
+    //         {/* Payment Date */}
+    //         <div className="col-span-2 text-center text-sm text-gray-600">
+    //             {/* {new Date(expense.dateOfPayment).toLocaleDateString('en-US', {
+    //                 month: 'short',
+    //                 day: 'numeric',
+    //                 year: 'numeric'
+    //             })} */}
+    //             <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+
+    //             {dateFormate(expense.expenseDate)}
+    //         </div>
+
+    //         {/* Paid Through */}
+    //         <div className="col-span-2 text-center">
+    //             <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
+    //                 {expense.payThrough ?
+    //                     <>
+    //                         <i className="fas fa-credit-card mr-1"></i>
+    //                         {expense.payThrough}
+    //                     </> : "-"}
+    //             </span>
+    //         </div>
+
+    //         {/* Created At */}
+    //         <div className="col-span-2 text-center text-sm text-gray-500">
+    //             {/* {new Date(expense.createdAt).toLocaleDateString('en-US', {
+    //                 month: 'short',
+    //                 day: 'numeric',
+    //                 year: 'numeric'
+    //             })} */}
+    //             <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+
+    //             {dateFormate(expense.createdAt)}
+
+    //         </div>
+
+    //         {/* Actions */}
+    //         <div className="col-span-2 flex justify-center gap-2">
+
+    //             {canDelete && <button
+    //                 onClick={onDelete}
+    //                 disabled={isDeleting}
+    //                 className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+    //                 title="Delete Expense"
+    //             >
+    //                 <i className={`fas ${isDeleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
+    //             </button>}
+    //         </div>
+    //     </div>
+    // );
+
+
+
+
     return (
-        <div onClick={onView} className="grid  cursor-pointer grid-cols-16 gap-4 px-6 py-4 border-b border-gray-100  hover:bg-[#f9fcff] transition-colors items-center">
+        <div onClick={onView} className="grid cursor-pointer grid-cols-16 gap-4 px-6 py-4 border-b border-ash-light hover:bg-brand-surface-hover transition-colors items-center">
             {/* S.No */}
-            <div className="col-span-1 text-center text-sm font-medium text-gray-600">
+            <div className="col-span-1 text-center text-sm font-medium text-text-muted">
                 {index + 1}
             </div>
 
             {/* expense Number */}
             <div className="col-span-2 text-center">
-                <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-mono font-semibold">
+                <span className="inline-flex items-center px-2 py-1 rounded-md bg-brand-ash border border-ash-medium text-text-strong text-xs font-mono font-semibold">
                     {expense.expenseNumber}
                 </span>
             </div>
 
             {/* Vendor Name */}
             <div className="col-span-3 text-center">
-                <p className="font-medium text-gray-900">{expense.vendorName}</p>
+                <p className="font-medium text-text-strong">{expense.vendorName}</p>
             </div>
 
             {/* Amount */}
             <div className="col-span-2 text-center">
-                <span className="text-lg font-bold text-green-600">
+                <span className="text-lg font-bold text-action-success">
                     ₹{expense.amount.toLocaleString()}
                 </span>
             </div>
 
             {/* Payment Date */}
-            <div className="col-span-2 text-center text-sm text-gray-600">
-                {/* {new Date(expense.dateOfPayment).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                })} */}
-                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
-
+            <div className="col-span-2 text-center text-sm text-text-muted">
+                <i className="fas fa-calendar-alt text-text-soft mr-2"></i>
                 {dateFormate(expense.expenseDate)}
             </div>
 
             {/* Paid Through */}
             <div className="col-span-2 text-center">
-                <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
+                <span className="inline-flex items-center px-2 py-1 rounded-full bg-brand-ash border border-ash-light text-text-main text-xs font-medium">
                     {expense.payThrough ?
                         <>
-                            <i className="fas fa-credit-card mr-1"></i>
+                            <i className="fas fa-credit-card mr-1 text-text-soft"></i>
                             {expense.payThrough}
                         </> : "-"}
                 </span>
             </div>
 
             {/* Created At */}
-            <div className="col-span-2 text-center text-sm text-gray-500">
-                {/* {new Date(expense.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                })} */}
-                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
-
+            <div className="col-span-2 text-center text-sm text-text-muted">
+                <i className="fas fa-calendar-alt text-text-soft mr-2"></i>
                 {dateFormate(expense.createdAt)}
-
             </div>
 
             {/* Actions */}
             <div className="col-span-2 flex justify-center gap-2">
-
-                {canDelete && <button
-                    onClick={onDelete}
-                    disabled={isDeleting}
-                    className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                    title="Delete Expense"
-                >
-                    <i className={`fas ${isDeleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
-                </button>}
+                {canDelete && (
+                    <button
+                        onClick={onDelete}
+                        disabled={isDeleting}
+                        className="p-2 text-action-danger cursor-pointer hover:bg-brand-ash rounded-lg transition-colors disabled:opacity-50"
+                        title="Delete Expense"
+                    >
+                        <i className={`fas ${isDeleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
+                    </button>
+                )}
             </div>
         </div>
     );

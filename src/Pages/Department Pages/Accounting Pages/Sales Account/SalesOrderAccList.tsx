@@ -22,67 +22,134 @@ const SalesOrderAccList: React.FC<Props> = ({ salesData, index, handleView, hand
     const canDelete = role === "owner" || permission?.salesorder?.delete
 
 
+    // return (
+    //     <div
+    //         className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
+    //         onClick={() => handleView((salesData as any)._id)}
+    //     >
+    //         {/* S.No */}
+    //         <div className="col-span-1 text-center text-gray-600 font-medium">
+    //             {index + 1}
+    //         </div>
+
+    //         {/* Customer Name */}
+    //         <div className="col-span-3">
+    //             <div className="flex items-center gap-2">
+    //                 <i className="fas fa-user text-blue-600 text-sm"></i>
+    //                 <span className="font-medium text-gray-900 truncate">
+    //                     {salesData.customerName || 'N/A'}
+    //                 </span>
+    //             </div>
+    //         </div>
+
+    //         {/* salesData Number */}
+    //         <div className="col-span-2">
+    //             <span className="fas fa-calendar-alt text-gray-400 mr-2">
+    //                 {dateFormate(salesData.salesOrderDate) || 'N/A'}
+    //             </span>
+    //         </div>
+
+    //         {/* Created At */}
+    //         <div className="col-span-2 text-gray-600 text-sm">
+    //             <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+    //             {dateFormate((salesData as any).createdAt)}
+    //         </div>
+
+    //         {/* Grand Total */}
+    //         <div className="col-span-2 font-semibold text-green-600">
+    //             ₹{salesData.grandTotal?.toFixed(2) || '0.00'}
+    //         </div>
+
+    //         {/* Items Count */}
+    //         <div className="col-span-1 text-center">
+    //             <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+    //                 {salesData.items?.length || 0}
+    //             </span>
+    //         </div>
+
+    //         {/* Actions */}
+    //         <div className="col-span-1 flex justify-center gap-2">
+    //             {/* <button
+    //                 onClick={() => handleView(salesData._id)}
+    //                 className="p-2 cursor-pointer text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+    //                 title="View salesData"
+    //             >
+    //                 <i className="fas fa-eye"></i>
+    //             </button> */}
+    //             {canDelete && <button
+    //                 onClick={(e) => {
+    //                     e.stopPropagation()
+    //                     handleDelete((salesData as any)._id)
+    //                 }}
+    //                 disabled={deleteSalesMutation.isPending}
+    //                 className="p-2 cursor-pointer text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    //                 title="Delete salesData"
+    //             >
+    //                 {deleteSalesMutation.isPending ? (
+    //                     <i className="fas fa-spinner fa-spin"></i>
+    //                 ) : (
+    //                     <i className="fas fa-trash"></i>
+    //                 )}
+    //             </button>}
+    //         </div>
+    //     </div>
+    // )
+
+
+
     return (
         <div
-            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] transition-colors items-center last:border-b-0"
+            className="grid cursor-pointer grid-cols-12 gap-4 px-6 py-4 border-b border-ash-light hover:bg-brand-surface-hover transition-colors items-center last:border-b-0"
             onClick={() => handleView((salesData as any)._id)}
         >
             {/* S.No */}
-            <div className="col-span-1 text-center text-gray-600 font-medium">
+            <div className="col-span-1 text-center text-text-muted font-medium">
                 {index + 1}
             </div>
 
             {/* Customer Name */}
             <div className="col-span-3">
                 <div className="flex items-center gap-2">
-                    <i className="fas fa-user text-blue-600 text-sm"></i>
-                    <span className="font-medium text-gray-900 truncate">
+                    <i className="fas fa-user text-action-primary text-sm"></i>
+                    <span className="font-medium text-text-strong truncate">
                         {salesData.customerName || 'N/A'}
                     </span>
                 </div>
             </div>
 
-            {/* salesData Number */}
-            <div className="col-span-2">
-                <span className="fas fa-calendar-alt text-gray-400 mr-2">
-                    {dateFormate(salesData.salesOrderDate) || 'N/A'}
-                </span>
+            {/* Sales Date (Fixed FontAwesome bug here) */}
+            <div className="col-span-2 text-text-main text-sm">
+                <i className="fas fa-calendar-alt text-text-soft mr-2"></i>
+                {dateFormate(salesData.salesOrderDate) || 'N/A'}
             </div>
 
             {/* Created At */}
-            <div className="col-span-2 text-gray-600 text-sm">
-                <i className="fas fa-calendar-alt text-gray-400 mr-2"></i>
+            <div className="col-span-2 text-text-main text-sm">
+                <i className="fas fa-calendar-alt text-text-soft mr-2"></i>
                 {dateFormate((salesData as any).createdAt)}
             </div>
 
             {/* Grand Total */}
-            <div className="col-span-2 font-semibold text-green-600">
+            <div className="col-span-2 font-semibold text-action-success">
                 ₹{salesData.grandTotal?.toFixed(2) || '0.00'}
             </div>
 
             {/* Items Count */}
             <div className="col-span-1 text-center">
-                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                <span className="px-2 py-1 bg-brand-ash border border-ash-light text-text-muted rounded-full text-xs font-medium">
                     {salesData.items?.length || 0}
                 </span>
             </div>
 
             {/* Actions */}
             <div className="col-span-1 flex justify-center gap-2">
-                {/* <button
-                    onClick={() => handleView(salesData._id)}
-                    className="p-2 cursor-pointer text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                    title="View salesData"
-                >
-                    <i className="fas fa-eye"></i>
-                </button> */}
                 {canDelete && <button
                     onClick={(e) => {
                         e.stopPropagation()
                         handleDelete((salesData as any)._id)
                     }}
                     disabled={deleteSalesMutation.isPending}
-                    className="p-2 cursor-pointer text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 cursor-pointer text-action-danger hover:bg-brand-ash rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Delete salesData"
                 >
                     {deleteSalesMutation.isPending ? (

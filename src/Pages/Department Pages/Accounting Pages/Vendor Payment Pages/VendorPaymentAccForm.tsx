@@ -405,27 +405,545 @@ const VendorPaymentAccForm: React.FC<Props> = ({
     const toggleEdit = () => setCurrentMode(p => p === 'view' ? 'edit' : 'view');
 
 
+    // return (
+    //     <div className="max-w-full mx-auto space-y-2">
+    //         {/* Header */}
+    //         <header className="sticky top-0 z-20 bg-white border-b border-gray-200 pb-4 pt-2 mb-6 flex justify-between items-center">
+    //             {/* <header className="flex justify-between items-center"> */}
+    //             <div className='flex justify-between items-center gap-2'>
+    //                 <button
+    //                     type="button"
+    //                     onClick={() => navigate(-1)}
+    //                     className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
+
+    //                     <i className="fas fa-arrow-left"></i>
+
+    //                 </button>
+    //                 <div>
+
+    //                     <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+    //                         <i className="fas fa-credit-card mr-3 text-blue-600"></i>
+    //                         {isCreateMode ? 'Create Vendor Payment Order' : isEditMode ? 'Update Vendor Payment  Order' : 'View Vendor Payment Order'}
+    //                     </h1>
+    //                     <p className="text-gray-600 mt-1">
+    //                         {isCreateMode ? 'Fill in the details to create a new order' :
+    //                             isEditMode ? 'Update the Vendor Payment details' :
+    //                                 'Vendor Payment details'}
+    //                     </p>
+    //                 </div>
+    //             </div>
+
+
+
+    //             <div className='flex gap-2 items-center'>
+    //                 {(isReadOnly && (canEdit || canCreate)) && <div className="flex items-center">
+    //                     <Button
+    //                         variant="primary"
+    //                         className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}
+    //                         title={initialData?.isSyncWithPaymentsSection ? "already sent to payment" : ""}
+    //                         isLoading={syncPaymentsLoading}
+    //                         disabled={initialData?.isSyncWithPaymentsSection}
+    //                         onClick={handleSyncToPayments}
+    //                     >
+    //                         Send To Payments Section
+    //                     </Button>
+
+    //                     <InfoTooltip
+    //                         content="Click the button to send the vendor payment order to Payments section"
+    //                         type="info"
+    //                         position="bottom"
+    //                     />
+    //                 </div>}
+
+
+    //                 {(currentMode === "view" && canEdit) && (
+    //                     <div className="flex justify-end">
+    //                         <Button onClick={toggleEdit} className="bg-blue-600 text-white px-6 py-2">
+    //                             Edit
+    //                         </Button>
+    //                     </div>
+    //                 )}
+
+
+    //             </div>
+
+    //             {(isCreateMode || isEditMode) && (
+    //                 <div className="flex justify-end items-center gap-4">
+
+    //                     <Button type="button" onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2" disabled={isSubmitting}>
+    //                         {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <>{isCreateMode ? 'Create' : 'Update'}</>}
+    //                     </Button>
+
+    //                     <Button variant='outline' type="button" onClick={() => {
+    //                         if (isCreateMode) {
+    //                             navigate(-1)
+    //                         }
+    //                         else {
+    //                             toggleEdit()
+    //                         }
+    //                     }} className="bg-gray-500 hover:bg-gray-500 text-white px-6 py-2">
+    //                         Cancel</Button>
+
+
+    //                 </div>
+    //             )}
+
+
+    //             {/* old version */}
+    //             {/* {!isReadOnly && (
+    //                 <div className="flex justify-end gap-4 pt-6">
+    //                     <Button
+    //                         type="button"
+    //                         onClick={() => navigate(-1)}
+    //                         className="bg-gray-500 text-white px-6 py-2"
+    //                         disabled={isSubmitting}
+    //                     >
+    //                         <i className="fas fa-times mr-2"></i>
+    //                         Cancel
+    //                     </Button>
+    //                     <Button
+    //                         type="submit"
+    //                         className="bg-blue-600 text-white px-6 py-2"
+    //                         disabled={isSubmitting}
+    //                     >
+    //                         {isSubmitting ? (
+    //                             <>
+    //                                 <i className="fas fa-spinner fa-spin mr-2"></i>
+    //                                 {isCreateMode ? 'Creating...' : 'Updating...'}
+    //                             </>
+    //                         ) : (
+    //                             <>
+    //                                 <i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i>
+    //                                 {isCreateMode ? 'Create' : 'Update'}
+    //                             </>
+    //                         )}
+    //                     </Button>
+    //                 </div>
+    //             )} */}
+    //         </header>
+
+    //         <form onSubmit={handleSubmit} className="space-y-6">
+    //             {/* VendorPayment Details */}
+    //             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    //                     <i className="fas fa-file-alt mr-2 text-blue-600"></i>
+    //                     Vendor Payment Details
+    //                 </h2>
+    //                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    //                     <div>
+    //                         <Label>Vendor</Label>
+    //                         <SearchSelectNew
+    //                             options={VendorOptions}
+    //                             placeholder="Select Vendor"
+    //                             searchPlaceholder="Search Vendor..."
+    //                             value={formData?.vendorId || undefined}
+    //                             onValueChange={(value) => handleVendorChange(value)}
+    //                             searchBy="name"
+    //                             displayFormat="simple"
+    //                             className="w-full"
+    //                         />
+    //                     </div>
+
+
+    //                     <div className=''>
+    //                         <div className='flex items-center gap-1'>
+    //                             <input type="checkbox" className='cursor-pointer' checked={enableVendorInput} id="enableName" onChange={() => setEnableVendorInput((p) => (!p))} />
+    //                             <Label htmlFor='enableName' className='cursor-pointer'>Click the check box to enter the name manually, if not available from the drop down</Label>
+    //                         </div>
+    //                         <input
+    //                             type="text"
+    //                             name="vendorName"
+    //                             value={formData.vendorName // user can edit manually
+    //                                 // show from formData but not editable
+    //                             }
+    //                             onChange={(e) => {
+    //                                 if (enableVendorInput) handleInputChange(e); // only update if manual input is enabled
+    //                             }}
+    //                             disabled={isReadOnly || !enableVendorInput} // only enable if checkbox is checked
+
+    //                             required
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                             placeholder="Enter Vendor name"
+    //                         />
+    //                     </div>
+
+
+    //                     {/* <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Remarks
+    //                         </label>
+    //                         <input
+    //                             type="text"
+    //                             name="subject"
+    //                             value={formData.subject}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                             placeholder="Enter Remarks"
+    //                         />
+    //                     </div> */}
+
+    //                     <div>
+    //                         <Label>Project</Label>
+    //                         <select
+    //                             value={formData?.projectId || ''}
+    //                             disabled={isReadOnly}
+    //                             onChange={(e) => {
+    //                                 const selected = projects?.find((p: any) => p._id === e.target.value);
+    //                                 if (selected) {
+    //                                     setFormData(prev => ({
+    //                                         ...prev,
+    //                                         projectId: selected._id,
+    //                                         projectName: selected.projectName,
+    //                                     }));
+    //                                 } else {
+    //                                     setFormData(prev => ({ ...prev, projectId: null, projectName: null }));
+    //                                 }
+    //                             }}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                         >
+    //                             <option value="">Select Projects</option>
+    //                             {projects?.map((project: any) => (
+    //                                 <option key={project._id} value={project._id}>{project.projectName}</option>
+    //                             ))}
+    //                         </select>
+    //                     </div>
+
+
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Date
+    //                         </label>
+    //                         <input
+    //                             type="date"
+    //                             name="vendorPaymentDate"
+    //                             value={formData.vendorPaymentDate}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                         />
+    //                     </div>
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Payment Mode
+    //                         </label>
+    //                         <select
+    //                             name="paymentMode"
+    //                             value={formData.paymentMode}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                         >
+    //                             <option value="">Select Payment Mode</option>
+    //                             {paymentModeOptions.map((option) => (
+    //                                 <option key={option.value} value={option.value}>
+    //                                     {option.label}
+    //                                 </option>
+    //                             ))}
+    //                         </select>
+    //                     </div>
+
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Payment Terms
+    //                         </label>
+    //                         <select
+    //                             name="paymentTerms"
+    //                             value={formData.paymentTerms}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                         >
+    //                             <option value="">Select Payment Term</option>
+    //                             {paymentTermsOptions.map((option) => (
+    //                                 <option key={option} value={option}>
+    //                                     {option}
+    //                                 </option>
+    //                             ))}
+    //                         </select>
+    //                     </div>
+
+    //                     {/* Paid Through */}
+    //                     {/* <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Paid Through
+    //                         </label>
+    //                         <select
+    //                             name="paidThrough"
+    //                             value={formData.paidThrough}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                         >
+    //                             <option value="">Select Account</option>
+    //                             {paidThroughOptions.map((option) => (
+    //                                 <option key={option.value} value={option.value}>
+    //                                     {option.label}
+    //                                 </option>
+    //                             ))}
+    //                         </select>
+    //                     </div> */}
+
+
+    //                 </div>
+    //             </div>
+
+    //             {/* Items Section */}
+    //             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                 <div className="flex justify-between items-center mb-4">
+    //                     <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+    //                         <i className="fas fa-list mr-2 text-blue-600"></i>
+    //                         Items <span className="text-red-500 ml-1">*</span>
+    //                     </h2>
+
+    //                     {!isReadOnly && (
+    //                         <Button
+    //                             type="button"
+    //                             onClick={handleAddItem}
+    //                             variant='primary'
+    //                         >
+    //                             <i className="fas fa-plus mr-2"></i>
+    //                             Add Item
+    //                         </Button>
+    //                     )}
+    //                 </div>
+
+    //                 {(formData?.items?.length === 0 && initialMode === "view") ? (
+    //                     <div className="text-center py-8 text-gray-500">
+    //                         <i className="fas fa-inbox text-4xl mb-2"></i>
+    //                         <p>No items added yet. Start typing to add items.</p>
+    //                         {/* <Button
+    //                             type="button"
+    //                             onClick={handleAddItem}
+    //                             className="mt-4 bg-blue-600 text-white"
+    //                         >
+    //                             <i className="fas fa-plus mr-2"></i>
+    //                             Add First Item
+    //                         </Button> */}
+    //                     </div>
+    //                 ) : (
+    //                     <div className="overflow-x-auto">
+    //                         {/* Table Header */}
+    //                         <div className="grid grid-cols-10 gap-3 mb-2 px-4 py-3 bg-gray-100 rounded-lg font-semibold text-gray-700 text-sm">
+    //                             <div className="col-span-1 text-center">#</div>
+    //                             <div className="col-span-3 text-center">Item Name<span className="text-red-500">*</span></div>
+    //                             <div className="col-span-3 text-center">Bill Amount</div>
+    //                             {/* <div className="col-span-2 text-center">Amount Due <span className="text-red-500">*</span></div>
+    //                             <div className="col-span-2 text-center">Payment Date</div> */}
+    //                             <div className="col-span-3 text-center">Action</div>
+    //                         </div>
+
+    //                         {/* Table Rows */}
+    //                         <div className="space-y-2">
+    //                             {formData.items.map((item, index) => (
+    //                                 <div
+    //                                     key={index}
+    //                                     className="grid grid-cols-10 gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors items-center"
+    //                                 >
+    //                                     {/* Row Number */}
+    //                                     <div className="col-span-1 text-center text-gray-600 font-medium">
+    //                                         {index + 1}
+    //                                     </div>
+
+    //                                     {/* Item Name */}
+    //                                     <div className="col-span-3">
+    //                                         <input
+    //                                             type="itemName"
+    //                                             value={item.itemName}
+    //                                             onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
+    //                                             disabled={isReadOnly}
+    //                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+    //                                             placeholder="Enter item name"
+    //                                         />
+    //                                     </div>
+
+    //                                     {/* Quantity */}
+    //                                     <div className="col-span-3">
+    //                                         <input
+    //                                             type="number"
+    //                                             value={item.billAmount}
+    //                                             onChange={(e) => handleItemChange(index, 'billAmount', e.target.value)}
+    //                                             disabled={isReadOnly}
+    //                                             min="0"
+    //                                             step="1"
+    //                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+    //                                             placeholder="0"
+    //                                         />
+    //                                     </div>
+
+
+    //                                     {/* Total */}
+    //                                     {/* <div className="col-span-2 text-center font-semibold text-gray-900">
+    //                                         ₹{item..toFixed(2)}
+    //                                     </div> */}
+
+    //                                     {/* Delete Button */}
+    //                                     <div className="col-span-3 text-center">
+    //                                         {!isReadOnly && (
+    //                                             <button
+    //                                                 type="button"
+    //                                                 onClick={() => handleRemoveItem(index)}
+    //                                                 disabled={formData.items.length === 1}
+    //                                                 className="text-red-600 cursor-pointer hover:text-red-800 disabled:text-gray-400 disabled:cursor-not-allowed p-2 rounded-full hover:bg-red-50 transition-colors"
+    //                                                 title={formData.items.length === 1 ? "Cannot delete last item" : "Delete item"}
+    //                                             >
+    //                                                 <i className="fas fa-trash"></i>
+    //                                             </button>
+    //                                         )}
+    //                                     </div>
+    //                                 </div>
+    //                             ))}
+    //                         </div>
+
+    //                         {/* Summary Row */}
+    //                         <section className="px-8 py-3 bg-blue-50 rounded-lg mt-4 font-semibold text-gray-800">
+    //                             <div className="text-right">
+    //                                 Total:
+    //                                 <span className="ml-3 text-right text-blue-600 text-lg">
+    //                                     ₹{calculatedTotals.totalAmount.toFixed(2)}
+    //                                 </span>
+    //                             </div>
+
+    //                             {/* <div className="col-span-1"></div> */}
+    //                         </section>
+
+
+    //                     </div>
+    //                 )}
+    //             </div>
+
+    //             {/* Discount and Tax */}
+    //             {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    //                     <i className="fas fa-calculator mr-2 text-blue-600"></i>
+    //                     Discount & Tax
+    //                 </h2>
+    //                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Discount Percentage (%)
+    //                         </label>
+    //                         <input
+    //                             type="number"
+    //                             name="discountPercentage"
+    //                             value={formData.discountPercentage}
+    //                             onChange={handleNumberChange}
+    //                             disabled={isReadOnly}
+    //                             min="0"
+    //                             max="100"
+    //                             step="0.01"
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                             placeholder="0.00"
+    //                         />
+    //                     </div>
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Tax Percentage (%)
+    //                         </label>
+    //                         <input
+    //                             type="number"
+    //                             name="taxPercentage"
+    //                             value={formData.taxPercentage}
+    //                             onChange={handleNumberChange}
+    //                             disabled={isReadOnly}
+    //                             min="0"
+    //                             max="100"
+    //                             step="0.01"
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                             placeholder="0.00"
+    //                         />
+    //                     </div>
+    //                 </div>
+    //             </div>
+
+    //             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm p-6 border border-blue-100">
+    //                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    //                     <i className="fas fa-receipt mr-2 text-blue-600"></i>
+    //                     VendorPayment Summary
+    //                 </h2>
+    //                 <div className="space-y-3">
+    //                     <div className="flex justify-between items-center py-2 border-b border-blue-200">
+    //                         <span className="text-gray-700 font-medium">Subtotal:</span>
+    //                         <span className="text-xl font-semibold text-gray-900">
+    //                             ₹{calculatedTotals.totalAmount.toFixed(2)}
+    //                         </span>
+    //                     </div>
+    //                     {formData.discountPercentage > 0 && (
+    //                         <div className="flex justify-between items-center py-2 border-b border-blue-200">
+    //                             <span className="text-gray-700 font-medium">
+    //                                 Discount ({formData.discountPercentage}%):
+    //                             </span>
+    //                             <span className="text-xl font-semibold text-green-600">
+    //                                 -₹{calculatedTotals.discountAmount.toFixed(2)}
+    //                             </span>
+    //                         </div>
+    //                     )}
+    //                     {formData.taxPercentage > 0 && (
+    //                         <div className="flex justify-between items-center py-2 border-b border-blue-200">
+    //                             <span className="text-gray-700 font-medium">
+    //                                 Tax ({formData.taxPercentage}%):
+    //                             </span>
+    //                             <span className="text-xl font-semibold text-gray-900">
+    //                                 ₹{calculatedTotals.taxAmount.toFixed(2)}
+    //                             </span>
+    //                         </div>
+    //                     )}
+    //                     <div className="flex justify-between items-center py-3 bg-blue-100 px-4 rounded-lg">
+    //                         <span className="text-lg font-bold text-gray-900">Grand Total:</span>
+    //                         <span className="text-2xl font-bold text-blue-600">
+    //                             ₹{calculatedTotals.grandTotal.toFixed(2)}
+    //                         </span>
+    //                     </div>
+    //                 </div>
+    //             </div> */}
+
+    //             {/* Additional Information */}
+    //             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    //                     <i className="fas fa-comment-alt mr-2 text-blue-600"></i>
+    //                     Additional Information
+    //                 </h2>
+    //                 <div className="space-y-4">
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Notes
+    //                         </label>
+    //                         <textarea
+    //                             name="notes"
+    //                             value={formData.notes}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             rows={3}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none"
+    //                             placeholder="Add any notes for the Vendor..."
+    //                         />
+    //                     </div>
+
+    //                 </div>
+    //             </div>
+
+
+    //         </form>
+    //     </div>
+    // );
+
     return (
-        <div className="max-w-full mx-auto space-y-2">
+        <div className="max-w-full mx-auto space-y-2 bg-brand-surface h-full">
             {/* Header */}
-            <header className="sticky top-0 z-20 bg-white border-b border-gray-200 pb-4 pt-2 mb-6 flex justify-between items-center">
-                {/* <header className="flex justify-between items-center"> */}
+            <header className="sticky top-0 z-20 bg-brand-surface border-b border-ash-medium pb-4 pt-2 mb-6 flex justify-between items-center">
                 <div className='flex justify-between items-center gap-2'>
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
-
+                        className='bg-brand-ash hover:bg-brand-ash-dark flex items-center justify-between w-8 h-8 border border-ash-medium text-text-main text-sm cursor-pointer rounded-md px-2 transition-colors'>
                         <i className="fas fa-arrow-left"></i>
-
                     </button>
                     <div>
-
-                        <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                            <i className="fas fa-credit-card mr-3 text-blue-600"></i>
+                        <h1 className="text-3xl font-bold text-text-main flex items-center">
+                            <i className="fas fa-credit-card mr-3 text-action-primary"></i>
                             {isCreateMode ? 'Create Vendor Payment Order' : isEditMode ? 'Update Vendor Payment  Order' : 'View Vendor Payment Order'}
                         </h1>
-                        <p className="text-gray-600 mt-1">
+                        <p className="text-text-muted mt-1">
                             {isCreateMode ? 'Fill in the details to create a new order' :
                                 isEditMode ? 'Update the Vendor Payment details' :
                                     'Vendor Payment details'}
@@ -433,13 +951,11 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                     </div>
                 </div>
 
-
-
                 <div className='flex gap-2 items-center'>
                     {(isReadOnly && (canEdit || canCreate)) && <div className="flex items-center">
                         <Button
-                            variant="primary"
-                            className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed" : ""}`}
+                            variant="dark"
+                            className={`${initialData?.isSyncWithPaymentsSection ? "!cursor-not-allowed !opacity-50" : ""}`}
                             title={initialData?.isSyncWithPaymentsSection ? "already sent to payment" : ""}
                             isLoading={syncPaymentsLoading}
                             disabled={initialData?.isSyncWithPaymentsSection}
@@ -455,22 +971,18 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                         />
                     </div>}
 
-
                     {(currentMode === "view" && canEdit) && (
                         <div className="flex justify-end">
-                            <Button onClick={toggleEdit} className="bg-blue-600 text-white px-6 py-2">
+                            <Button onClick={toggleEdit} variant="dark" className="px-6 py-2">
                                 Edit
                             </Button>
                         </div>
                     )}
-
-
                 </div>
 
                 {(isCreateMode || isEditMode) && (
                     <div className="flex justify-end items-center gap-4">
-
-                        <Button type="button" onClick={handleSubmit} className="bg-blue-600 text-white px-6 py-2" disabled={isSubmitting}>
+                        <Button type="button" onClick={handleSubmit} variant="dark" className="px-6 py-2" disabled={isSubmitting}>
                             {isSubmitting ? <i className="fas fa-spinner fa-spin"></i> : <>{isCreateMode ? 'Create' : 'Update'}</>}
                         </Button>
 
@@ -481,57 +993,23 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                             else {
                                 toggleEdit()
                             }
-                        }} className="bg-gray-500 hover:bg-gray-500 text-white px-6 py-2">
-                            Cancel</Button>
-
-
-                    </div>
-                )}
-
-
-                {/* old version */}
-                {/* {!isReadOnly && (
-                    <div className="flex justify-end gap-4 pt-6">
-                        <Button
-                            type="button"
-                            onClick={() => navigate(-1)}
-                            className="bg-gray-500 text-white px-6 py-2"
-                            disabled={isSubmitting}
-                        >
-                            <i className="fas fa-times mr-2"></i>
+                        }} className="px-6 py-2 border-ash-medium text-text-main hover:bg-brand-ash transition-colors">
                             Cancel
                         </Button>
-                        <Button
-                            type="submit"
-                            className="bg-blue-600 text-white px-6 py-2"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <i className="fas fa-spinner fa-spin mr-2"></i>
-                                    {isCreateMode ? 'Creating...' : 'Updating...'}
-                                </>
-                            ) : (
-                                <>
-                                    <i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i>
-                                    {isCreateMode ? 'Create' : 'Update'}
-                                </>
-                            )}
-                        </Button>
                     </div>
-                )} */}
+                )}
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* VendorPayment Details */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-file-alt mr-2 text-blue-600"></i>
+                <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
+                    <h2 className="text-xl font-semibold text-text-main mb-4 flex items-center">
+                        <i className="fas fa-file-alt mr-2 text-action-primary"></i>
                         Vendor Payment Details
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <Label>Vendor</Label>
+                            <Label className="text-text-main">Vendor</Label>
                             <SearchSelectNew
                                 options={VendorOptions}
                                 placeholder="Select Vendor"
@@ -540,51 +1018,31 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 onValueChange={(value) => handleVendorChange(value)}
                                 searchBy="name"
                                 displayFormat="simple"
-                                className="w-full"
+                                className="w-full text-text-main"
                             />
                         </div>
 
-
                         <div className=''>
                             <div className='flex items-center gap-1'>
-                                <input type="checkbox" className='cursor-pointer' checked={enableVendorInput} id="enableName" onChange={() => setEnableVendorInput((p) => (!p))} />
-                                <Label htmlFor='enableName' className='cursor-pointer'>Click the check box to enter the name manually, if not available from the drop down</Label>
+                                <input type="checkbox" className='cursor-pointer accent-action-primary' checked={enableVendorInput} id="enableName" onChange={() => setEnableVendorInput((p) => (!p))} />
+                                <Label htmlFor='enableName' className='cursor-pointer text-text-muted text-sm'>Click the check box to enter the name manually, if not available from the drop down</Label>
                             </div>
                             <input
                                 type="text"
                                 name="vendorName"
-                                value={formData.vendorName // user can edit manually
-                                    // show from formData but not editable
-                                }
+                                value={formData.vendorName}
                                 onChange={(e) => {
-                                    if (enableVendorInput) handleInputChange(e); // only update if manual input is enabled
+                                    if (enableVendorInput) handleInputChange(e);
                                 }}
-                                disabled={isReadOnly || !enableVendorInput} // only enable if checkbox is checked
-
+                                disabled={isReadOnly || !enableVendorInput}
                                 required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main placeholder-text-soft disabled:bg-brand-ash disabled:text-text-muted disabled:cursor-not-allowed transition-shadow"
                                 placeholder="Enter Vendor name"
                             />
                         </div>
 
-
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Remarks
-                            </label>
-                            <input
-                                type="text"
-                                name="subject"
-                                value={formData.subject}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="Enter Remarks"
-                            />
-                        </div> */}
-
                         <div>
-                            <Label>Project</Label>
+                            <Label className="text-text-main">Project</Label>
                             <select
                                 value={formData?.projectId || ''}
                                 disabled={isReadOnly}
@@ -600,7 +1058,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                         setFormData(prev => ({ ...prev, projectId: null, projectName: null }));
                                     }
                                 }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main disabled:bg-brand-ash disabled:text-text-muted disabled:cursor-not-allowed transition-shadow"
                             >
                                 <option value="">Select Projects</option>
                                 {projects?.map((project: any) => (
@@ -609,9 +1067,8 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                             </select>
                         </div>
 
-
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-text-main mb-1">
                                 Date
                             </label>
                             <input
@@ -620,11 +1077,11 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 value={formData.vendorPaymentDate}
                                 onChange={handleInputChange}
                                 disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main disabled:bg-brand-ash disabled:text-text-muted disabled:cursor-not-allowed transition-shadow"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-text-main mb-1">
                                 Payment Mode
                             </label>
                             <select
@@ -632,7 +1089,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 value={formData.paymentMode}
                                 onChange={handleInputChange}
                                 disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main disabled:bg-brand-ash disabled:text-text-muted disabled:cursor-not-allowed transition-shadow"
                             >
                                 <option value="">Select Payment Mode</option>
                                 {paymentModeOptions.map((option) => (
@@ -644,7 +1101,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-text-main mb-1">
                                 Payment Terms
                             </label>
                             <select
@@ -652,7 +1109,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 value={formData.paymentTerms}
                                 onChange={handleInputChange}
                                 disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main disabled:bg-brand-ash disabled:text-text-muted disabled:cursor-not-allowed transition-shadow"
                             >
                                 <option value="">Select Payment Term</option>
                                 {paymentTermsOptions.map((option) => (
@@ -662,45 +1119,22 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 ))}
                             </select>
                         </div>
-
-                        {/* Paid Through */}
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Paid Through
-                            </label>
-                            <select
-                                name="paidThrough"
-                                value={formData.paidThrough}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            >
-                                <option value="">Select Account</option>
-                                {paidThroughOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div> */}
-
-
                     </div>
                 </div>
 
                 {/* Items Section */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                            <i className="fas fa-list mr-2 text-blue-600"></i>
-                            Items <span className="text-red-500 ml-1">*</span>
+                        <h2 className="text-xl font-semibold text-text-main flex items-center">
+                            <i className="fas fa-list mr-2 text-action-primary"></i>
+                            Items <span className="text-action-danger ml-1">*</span>
                         </h2>
 
                         {!isReadOnly && (
                             <Button
                                 type="button"
                                 onClick={handleAddItem}
-                                variant='primary'
+                                variant="dark"
                             >
                                 <i className="fas fa-plus mr-2"></i>
                                 Add Item
@@ -709,27 +1143,17 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                     </div>
 
                     {(formData?.items?.length === 0 && initialMode === "view") ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-text-soft">
                             <i className="fas fa-inbox text-4xl mb-2"></i>
                             <p>No items added yet. Start typing to add items.</p>
-                            {/* <Button
-                                type="button"
-                                onClick={handleAddItem}
-                                className="mt-4 bg-blue-600 text-white"
-                            >
-                                <i className="fas fa-plus mr-2"></i>
-                                Add First Item
-                            </Button> */}
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
+                        <div className="overflow-x-auto custom-scrollbar">
                             {/* Table Header */}
-                            <div className="grid grid-cols-10 gap-3 mb-2 px-4 py-3 bg-gray-100 rounded-lg font-semibold text-gray-700 text-sm">
+                            <div className="grid grid-cols-10 gap-3 mb-2 px-4 py-3 bg-brand-ash rounded-lg font-semibold text-text-muted text-sm uppercase tracking-wide">
                                 <div className="col-span-1 text-center">#</div>
-                                <div className="col-span-3 text-center">Item Name<span className="text-red-500">*</span></div>
+                                <div className="col-span-3 text-center">Item Name<span className="text-action-danger ml-1">*</span></div>
                                 <div className="col-span-3 text-center">Bill Amount</div>
-                                {/* <div className="col-span-2 text-center">Amount Due <span className="text-red-500">*</span></div>
-                                <div className="col-span-2 text-center">Payment Date</div> */}
                                 <div className="col-span-3 text-center">Action</div>
                             </div>
 
@@ -738,10 +1162,10 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 {formData.items.map((item, index) => (
                                     <div
                                         key={index}
-                                        className="grid grid-cols-10 gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors items-center"
+                                        className="grid grid-cols-10 gap-3 px-4 py-3 bg-brand-surface border border-ash-medium rounded-lg hover:border-action-primary transition-colors items-center"
                                     >
                                         {/* Row Number */}
-                                        <div className="col-span-1 text-center text-gray-600 font-medium">
+                                        <div className="col-span-1 text-center text-text-muted font-medium">
                                             {index + 1}
                                         </div>
 
@@ -752,12 +1176,12 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                                 value={item.itemName}
                                                 onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
                                                 disabled={isReadOnly}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+                                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main placeholder-text-soft disabled:bg-brand-ash disabled:text-text-muted disabled:cursor-not-allowed text-sm transition-shadow"
                                                 placeholder="Enter item name"
                                             />
                                         </div>
 
-                                        {/* Quantity */}
+                                        {/* Quantity / Bill Amount */}
                                         <div className="col-span-3">
                                             <input
                                                 type="number"
@@ -766,16 +1190,10 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                                 disabled={isReadOnly}
                                                 min="0"
                                                 step="1"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+                                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main placeholder-text-soft disabled:bg-brand-ash disabled:text-text-muted disabled:cursor-not-allowed text-sm transition-shadow"
                                                 placeholder="0"
                                             />
                                         </div>
-
-
-                                        {/* Total */}
-                                        {/* <div className="col-span-2 text-center font-semibold text-gray-900">
-                                            ₹{item..toFixed(2)}
-                                        </div> */}
 
                                         {/* Delete Button */}
                                         <div className="col-span-3 text-center">
@@ -784,7 +1202,7 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                                     type="button"
                                                     onClick={() => handleRemoveItem(index)}
                                                     disabled={formData.items.length === 1}
-                                                    className="text-red-600 cursor-pointer hover:text-red-800 disabled:text-gray-400 disabled:cursor-not-allowed p-2 rounded-full hover:bg-red-50 transition-colors"
+                                                    className="text-action-danger cursor-pointer hover:opacity-80 disabled:text-text-soft disabled:cursor-not-allowed p-2 rounded-full hover:bg-brand-ash transition-colors"
                                                     title={formData.items.length === 1 ? "Cannot delete last item" : "Delete item"}
                                                 >
                                                     <i className="fas fa-trash"></i>
@@ -796,116 +1214,28 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                             </div>
 
                             {/* Summary Row */}
-                            <section className="px-8 py-3 bg-blue-50 rounded-lg mt-4 font-semibold text-gray-800">
-                                <div className="text-right">
-                                    Total:
-                                    <span className="ml-3 text-right text-blue-600 text-lg">
+                            <section className="px-8 py-4 bg-brand-surface-hover border border-ash-medium rounded-lg mt-4 font-semibold text-text-main">
+                                <div className="text-right flex justify-end items-center gap-3">
+                                    <span>Total:</span>
+                                    <span className="text-action-primary text-xl font-bold">
                                         ₹{calculatedTotals.totalAmount.toFixed(2)}
                                     </span>
                                 </div>
-
-                                {/* <div className="col-span-1"></div> */}
                             </section>
-
 
                         </div>
                     )}
                 </div>
 
-                {/* Discount and Tax */}
-                {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-calculator mr-2 text-blue-600"></i>
-                        Discount & Tax
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Discount Percentage (%)
-                            </label>
-                            <input
-                                type="number"
-                                name="discountPercentage"
-                                value={formData.discountPercentage}
-                                onChange={handleNumberChange}
-                                disabled={isReadOnly}
-                                min="0"
-                                max="100"
-                                step="0.01"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="0.00"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Tax Percentage (%)
-                            </label>
-                            <input
-                                type="number"
-                                name="taxPercentage"
-                                value={formData.taxPercentage}
-                                onChange={handleNumberChange}
-                                disabled={isReadOnly}
-                                min="0"
-                                max="100"
-                                step="0.01"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="0.00"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm p-6 border border-blue-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-receipt mr-2 text-blue-600"></i>
-                        VendorPayment Summary
-                    </h2>
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                            <span className="text-gray-700 font-medium">Subtotal:</span>
-                            <span className="text-xl font-semibold text-gray-900">
-                                ₹{calculatedTotals.totalAmount.toFixed(2)}
-                            </span>
-                        </div>
-                        {formData.discountPercentage > 0 && (
-                            <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                                <span className="text-gray-700 font-medium">
-                                    Discount ({formData.discountPercentage}%):
-                                </span>
-                                <span className="text-xl font-semibold text-green-600">
-                                    -₹{calculatedTotals.discountAmount.toFixed(2)}
-                                </span>
-                            </div>
-                        )}
-                        {formData.taxPercentage > 0 && (
-                            <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                                <span className="text-gray-700 font-medium">
-                                    Tax ({formData.taxPercentage}%):
-                                </span>
-                                <span className="text-xl font-semibold text-gray-900">
-                                    ₹{calculatedTotals.taxAmount.toFixed(2)}
-                                </span>
-                            </div>
-                        )}
-                        <div className="flex justify-between items-center py-3 bg-blue-100 px-4 rounded-lg">
-                            <span className="text-lg font-bold text-gray-900">Grand Total:</span>
-                            <span className="text-2xl font-bold text-blue-600">
-                                ₹{calculatedTotals.grandTotal.toFixed(2)}
-                            </span>
-                        </div>
-                    </div>
-                </div> */}
-
                 {/* Additional Information */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-comment-alt mr-2 text-blue-600"></i>
+                <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-light">
+                    <h2 className="text-xl font-semibold text-text-main mb-4 flex items-center">
+                        <i className="fas fa-comment-alt mr-2 text-action-primary"></i>
                         Additional Information
                     </h2>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-text-main mb-1">
                                 Notes
                             </label>
                             <textarea
@@ -914,18 +1244,15 @@ const VendorPaymentAccForm: React.FC<Props> = ({
                                 onChange={handleInputChange}
                                 disabled={isReadOnly}
                                 rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none"
+                                className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main placeholder-text-soft disabled:bg-brand-ash disabled:text-text-muted disabled:cursor-not-allowed resize-none transition-shadow"
                                 placeholder="Add any notes for the Vendor..."
                             />
                         </div>
-
                     </div>
                 </div>
-
-
             </form>
         </div>
-    );
+    )
 };
 
 export default VendorPaymentAccForm;

@@ -15,8 +15,46 @@ import StageGuide from '../../../../shared/StageGuide';
 
 // --- MINI PREVIEW COMPONENT ---
 const TemplateMiniPreview = ({ components }: { components: any[] }) => {
+    // return (
+    //     <div className="w-full relative bg-white border border-gray-200 shadow-inner rounded overflow-hidden" style={{ paddingTop: '141.4%' }}>
+    //         {/* Aspect Ratio for A4 (1 : 1.414) */}
+    //         <div className="absolute inset-0 p-2">
+    //             {components.slice(0, 10).map((comp, i) => {
+    //                 const left = (comp.x / 794) * 100;
+    //                 const top = (comp.y / 1123) * 100;
+    //                 const width = comp.style?.width ? (comp.style.width / 794) * 100 : 20;
+    //                 const height = comp.style?.height && comp.style.height !== 'auto' ? (comp.style.height / 1123) * 100 : 2;
+
+    //                 let bgClass = 'bg-gray-200';
+    //                 if (comp.type === 'image') bgClass = 'bg-blue-100 border border-blue-200';
+    //                 if (comp.type === 'table') bgClass = 'bg-green-50 border border-green-200 grid place-items-center';
+    //                 if (comp.type === 'text' && comp.style?.fontSize > 16) bgClass = 'bg-gray-800';
+
+    //                 return (
+    //                     <div
+    //                         key={i}
+    //                         className={`absolute rounded-sm ${bgClass}`}
+    //                         style={{
+    //                             left: `${left}%`,
+    //                             top: `${top}%`,
+    //                             width: `${width}%`,
+    //                             height: `${Math.max(height, 2)}%`,
+    //                             opacity: 0.7
+    //                         }}
+    //                     >
+    //                         {comp.type === 'table' && <i className="fas fa-table text-[6px] text-green-400"></i>}
+    //                     </div>
+    //                 );
+    //             })}
+    //         </div>
+    //     </div>
+    // );
+
+
+
+    // --- MINI PREVIEW COMPONENT ---
     return (
-        <div className="w-full relative bg-white border border-gray-200 shadow-inner rounded overflow-hidden" style={{ paddingTop: '141.4%' }}>
+        <div className="w-full relative bg-brand-surface border border-ash-medium shadow-inner rounded overflow-hidden" style={{ paddingTop: '141.4%' }}>
             {/* Aspect Ratio for A4 (1 : 1.414) */}
             <div className="absolute inset-0 p-2">
                 {components.slice(0, 10).map((comp, i) => {
@@ -25,10 +63,13 @@ const TemplateMiniPreview = ({ components }: { components: any[] }) => {
                     const width = comp.style?.width ? (comp.style.width / 794) * 100 : 20;
                     const height = comp.style?.height && comp.style.height !== 'auto' ? (comp.style.height / 1123) * 100 : 2;
 
-                    let bgClass = 'bg-gray-200';
-                    if (comp.type === 'image') bgClass = 'bg-blue-100 border border-blue-200';
-                    if (comp.type === 'table') bgClass = 'bg-green-50 border border-green-200 grid place-items-center';
-                    if (comp.type === 'text' && comp.style?.fontSize > 16) bgClass = 'bg-gray-800';
+                    // Base text line placeholder
+                    let bgClass = 'bg-ash-medium'; 
+                    
+                    // Specific block placeholders using semantic ash/action palette
+                    if (comp.type === 'image') bgClass = 'bg-brand-ash-dark border border-ash-dark';
+                    if (comp.type === 'table') bgClass = 'bg-action-secondary border border-ash-medium grid place-items-center';
+                    if (comp.type === 'text' && comp.style?.fontSize > 16) bgClass = 'bg-text-strong';
 
                     return (
                         <div
@@ -42,7 +83,7 @@ const TemplateMiniPreview = ({ components }: { components: any[] }) => {
                                 opacity: 0.7
                             }}
                         >
-                            {comp.type === 'table' && <i className="fas fa-table text-[6px] text-green-400"></i>}
+                            {comp.type === 'table' && <i className="fas fa-table text-[6px] text-text-muted"></i>}
                         </div>
                     );
                 })}
@@ -149,31 +190,242 @@ const TemplateBillMain = () => {
     const isDetailView = location.pathname.includes('/single') || location.pathname.includes('/create');
     if (isDetailView) return <Outlet />;
 
+    // return (
+    //     <div className="space-y-0 h-full flex flex-col bg-gray-50/50">
+
+    //         {/* --- HEADER --- */}
+    //         <header className="flex justify-between items-center p-4 bg-white border-b border-gray-200">
+
+    //             <div className="flex gap-2 items-center">
+    //                 <div>
+    //                     <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+    //                         <i className="fas fa-file-invoice mr-3 text-blue-600"></i>
+    //                         Bill Templates
+    //                     </h1>
+    //                     <Breadcrumb paths={paths} />
+    //                 </div>
+
+    //                 {/* <p className="text-xs text-gray-500 mt-1">Design billing layouts</p> */}
+    //             </div>
+
+    //             <section className='flex gap-2 items-center'>
+
+    //                 {canCreate && <div className="flex gap-2">
+    //                     <Button onClick={() => navigate(`create`)}>
+    //                         <i className="fas fa-plus mr-2"></i> Create Template
+    //                     </Button>
+    //                 </div>}
+
+    //                 <div className="w-full sm:w-auto flex justify-end sm:block">
+    //                     <StageGuide
+    //                         organizationId={organizationId!}
+    //                         stageName="billtemplate"
+    //                     />
+    //                 </div>
+    //             </section>
+    //         </header>
+
+    //         {/* --- LOADING / ERROR --- */}
+    //         {isLoading ? (
+    //             <div className="flex h-full items-center justify-center text-gray-500">
+    //                 <i className="fa-solid fa-spinner fa-spin mr-2 text-2xl"></i> Loading Templates...
+    //             </div>
+    //         ) : isError ? (
+    //             <div className="max-w-xl mx-auto mt-10 p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+    //                 <div className="text-red-600 font-semibold mb-2 text-xl">⚠️ Error Occurred</div>
+    //                 <p className="text-red-500 mb-4">{(error as any)?.message || "Failed to load templates."}</p>
+    //                 <Button onClick={() => refetch()} className="bg-red-600 text-white">Retry</Button>
+    //             </div>
+    //         ) : (
+    //             <main className="flex flex-col xl:flex-row gap-0 flex-1 overflow-hidden">
+
+    //                 {/* --- LEFT SIDEBAR (FILTERS) --- */}
+    //                 <div className="xl:w-80 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4">
+    //                     <div className="flex items-center justify-between mb-6">
+    //                         <h3 className="text-md font-bold text-gray-900 flex items-center">
+    //                             <i className="fas fa-filter mr-2 text-blue-600"></i> Filters
+    //                         </h3>
+    //                         {activeFiltersCount > 0 && (
+    //                             <button onClick={clearFilters} className="text-xs text-blue-600 hover:underline font-medium">
+    //                                 Clear All
+    //                             </button>
+    //                         )}
+    //                     </div>
+
+    //                     <div className="space-y-5">
+    //                         {/* Search */}
+    //                         <div>
+    //                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Search</label>
+    //                             <div className="relative">
+    //                                 <i className="fas fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+    //                                 <input
+    //                                     type="text"
+    //                                     placeholder="Template name..."
+    //                                     value={filters.search}
+    //                                     onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+    //                                     className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+    //                                 />
+    //                             </div>
+    //                         </div>
+
+    //                         {/* Date Range */}
+    //                         <div>
+    //                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Date Range</label>
+    //                             <div className="space-y-2">
+    //                                 <input
+    //                                     type="date"
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none"
+    //                                     value={filters.createdFromDate}
+    //                                     onChange={(e) => setFilters(prev => ({ ...prev, createdFromDate: e.target.value }))}
+    //                                 />
+    //                                 <input
+    //                                     type="date"
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none"
+    //                                     value={filters.createdToDate}
+    //                                     onChange={(e) => setFilters(prev => ({ ...prev, createdToDate: e.target.value }))}
+    //                                 />
+    //                             </div>
+    //                         </div>
+
+    //                         {/* Sorting */}
+    //                         <div>
+    //                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Sort By</label>
+    //                             <select
+    //                                 value={filters.sortBy}
+    //                                 onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value }))}
+    //                                 className="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none bg-white"
+    //                             >
+    //                                 <option value="createdAt">Created Date</option>
+    //                                 <option value="templateName">Name</option>
+    //                                 <option value="updatedAt">Last Updated</option>
+    //                             </select>
+    //                         </div>
+
+    //                         <div>
+    //                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Order</label>
+    //                             <select
+    //                                 value={filters.sortOrder}
+    //                                 onChange={(e) => setFilters(prev => ({ ...prev, sortOrder: e.target.value as 'asc' | 'desc' }))}
+    //                                 className="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none bg-white"
+    //                             >
+    //                                 <option value="desc">Newest First</option>
+    //                                 <option value="asc">Oldest First</option>
+    //                             </select>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+
+    //                 {/* --- RIGHT CONTENT (GRID) --- */}
+    //                 {canList && <div
+    //                     ref={scrollContainerRef}
+    //                     className="flex-1 overflow-y-auto bg-gray-50/50 p-4"
+    //                 >
+    //                     {templates.length === 0 ? (
+    //                         <div className="flex flex-col items-center justify-center h-full text-center">
+    //                             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+    //                                 <i className="fas fa-folder-open text-4xl text-gray-400" />
+    //                             </div>
+    //                             <h3 className="text-lg font-semibold text-gray-700">No Templates Found</h3>
+    //                             <p className="text-sm text-gray-500 mt-1">
+    //                                 {filters.search
+    //                                     ? `No matches for "${filters.search}"`
+    //                                     : "Create a new template to get started."}
+    //                             </p>
+    //                         </div>
+    //                     ) : (
+    //                         <>
+    //                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+    //                                 {templates.map((template: any) => (
+    //                                     <div
+    //                                         key={template._id}
+    //                                         onClick={() => handleCardClick(template._id)}
+    //                                         className="group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-xl hover:border-blue-400 transition-all duration-300 cursor-pointer flex flex-col overflow-hidden"
+    //                                     >
+    //                                         {/* CARD PREVIEW AREA */}
+    //                                         <div className="p-4 bg-gray-50 border-b border-gray-100 group-hover:bg-blue-50/30 transition-colors">
+    //                                             <div className="w-3/4 mx-auto shadow-lg transform group-hover:scale-105 transition-transform duration-300 bg-white">
+    //                                                 {/* Mini Preview */}
+    //                                                 <TemplateMiniPreview components={template.layout?.[0]?.components || []} />
+    //                                             </div>
+    //                                         </div>
+
+    //                                         {/* CARD FOOTER INFO */}
+    //                                         <div className="p-4 flex flex-col gap-2">
+    //                                             <div className="flex justify-between items-start">
+    //                                                 <h4 className="font-bold text-gray-800 line-clamp-1 group-hover:text-blue-600 transition-colors text-sm">
+    //                                                     {template.templateName}
+    //                                                 </h4>
+    //                                                 {template.isDefault && (
+    //                                                     <Badge variant="success" className="text-[10px] px-1.5 py-0.5">Default</Badge>
+    //                                                 )}
+    //                                             </div>
+
+    //                                             <div className="flex justify-between items-center text-xs text-gray-500 mt-1">
+    //                                                 <span className="flex items-center gap-1">
+    //                                                     <i className="far fa-calendar"></i>
+    //                                                     {dateFormate(template.createdAt)}
+    //                                                 </span>
+    //                                                 <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full">
+    //                                                     <i className="fas fa-layer-group"></i>
+    //                                                     {template.layout?.[0]?.components?.length || 0}
+    //                                                 </span>
+    //                                             </div>
+    //                                         </div>
+    //                                     </div>
+    //                                 ))}
+    //                             </div>
+
+    //                             {/* LOADING INDICATOR */}
+    //                             {isFetchingNextPage && (
+    //                                 <div className="flex justify-center py-8">
+    //                                     <div className="flex items-center gap-2 text-blue-600">
+    //                                         <i className="fas fa-spinner fa-spin text-xl"></i>
+    //                                         <span className="text-sm font-medium">Loading more templates...</span>
+    //                                     </div>
+    //                                 </div>
+    //                             )}
+
+    //                             {/* END OF LIST */}
+    //                             {!hasNextPage && templates.length > 0 && (
+    //                                 <div className="flex justify-center py-6 text-gray-400 text-xs">
+    //                                     <p>End of list</p>
+    //                                 </div>
+    //                             )}
+    //                         </>
+    //                     )}
+    //                 </div>}
+    //             </main>
+    //         )}
+    //     </div>
+    // );
+
+
+
+
+
     return (
-        <div className="space-y-0 h-full flex flex-col bg-gray-50/50">
+        <div className="space-y-0 h-full flex flex-col bg-brand-surface">
 
             {/* --- HEADER --- */}
-            <header className="flex justify-between items-center p-4 bg-white border-b border-gray-200">
-
+            <header className="flex justify-between items-center p-4 border-b border-ash-medium">
                 <div className="flex gap-2 items-center">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                            <i className="fas fa-file-invoice mr-3 text-blue-600"></i>
+                        <h1 className="text-2xl font-bold text-text-main flex items-center">
+                            <i className="fas fa-file-invoice mr-3 text-action-primary"></i>
                             Bill Templates
                         </h1>
                         <Breadcrumb paths={paths} />
                     </div>
-
-                    {/* <p className="text-xs text-gray-500 mt-1">Design billing layouts</p> */}
                 </div>
 
                 <section className='flex gap-2 items-center'>
-
-                    {canCreate && <div className="flex gap-2">
-                        <Button onClick={() => navigate(`create`)}>
-                            <i className="fas fa-plus mr-2"></i> Create Template
-                        </Button>
-                    </div>}
+                    {canCreate && (
+                        <div className="flex gap-2">
+                            <Button onClick={() => navigate(`create`)} variant="dark">
+                                <i className="fas fa-plus mr-2"></i> Create Template
+                            </Button>
+                        </div>
+                    )}
 
                     <div className="w-full sm:w-auto flex justify-end sm:block">
                         <StageGuide
@@ -186,26 +438,26 @@ const TemplateBillMain = () => {
 
             {/* --- LOADING / ERROR --- */}
             {isLoading ? (
-                <div className="flex h-full items-center justify-center text-gray-500">
-                    <i className="fa-solid fa-spinner fa-spin mr-2 text-2xl"></i> Loading Templates...
+                <div className="flex h-full items-center justify-center text-text-muted">
+                    <i className="fa-solid fa-spinner fa-spin mr-2 text-2xl text-action-primary"></i> Loading Templates...
                 </div>
             ) : isError ? (
-                <div className="max-w-xl mx-auto mt-10 p-6 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                    <div className="text-red-600 font-semibold mb-2 text-xl">⚠️ Error Occurred</div>
-                    <p className="text-red-500 mb-4">{(error as any)?.message || "Failed to load templates."}</p>
-                    <Button onClick={() => refetch()} className="bg-red-600 text-white">Retry</Button>
+                <div className="max-w-xl mx-auto mt-10 p-6 bg-brand-ash border border-ash-medium rounded-lg shadow text-center">
+                    <div className="text-action-danger font-semibold mb-2 text-xl">⚠️ Error Occurred</div>
+                    <p className="text-action-danger opacity-90 mb-4">{(error as any)?.message || "Failed to load templates."}</p>
+                    <Button onClick={() => refetch()} variant="dark">Retry</Button>
                 </div>
             ) : (
                 <main className="flex flex-col xl:flex-row gap-0 flex-1 overflow-hidden">
 
                     {/* --- LEFT SIDEBAR (FILTERS) --- */}
-                    <div className="xl:w-80 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4">
+                    <div className="xl:w-80 flex-shrink-0 border-r border-ash-medium overflow-y-auto p-4">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-md font-bold text-gray-900 flex items-center">
-                                <i className="fas fa-filter mr-2 text-blue-600"></i> Filters
+                            <h3 className="text-md font-bold text-text-strong flex items-center">
+                                <i className="fas fa-filter mr-2 text-action-primary"></i> Filters
                             </h3>
                             {activeFiltersCount > 0 && (
-                                <button onClick={clearFilters} className="text-xs text-blue-600 hover:underline font-medium">
+                                <button onClick={clearFilters} className="text-xs text-action-primary hover:text-text-strong transition-colors font-medium">
                                     Clear All
                                 </button>
                             )}
@@ -214,32 +466,32 @@ const TemplateBillMain = () => {
                         <div className="space-y-5">
                             {/* Search */}
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Search</label>
+                                <label className="block text-xs font-bold text-text-strong uppercase mb-1">Search</label>
                                 <div className="relative">
-                                    <i className="fas fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                                    <i className="fas fa-search absolute left-3 top-2.5 text-text-soft text-xs"></i>
                                     <input
                                         type="text"
                                         placeholder="Template name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                                        className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="w-full pl-8 pr-3 py-2 border border-ash-medium rounded text-sm focus:ring-2 focus:ring-action-primary outline-none bg-brand-surface text-text-main placeholder-text-soft"
                                     />
                                 </div>
                             </div>
 
                             {/* Date Range */}
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Date Range</label>
+                                <label className="block text-xs font-bold text-text-strong uppercase mb-1">Date Range</label>
                                 <div className="space-y-2">
                                     <input
                                         type="date"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded text-sm outline-none bg-brand-surface text-text-main"
                                         value={filters.createdFromDate}
                                         onChange={(e) => setFilters(prev => ({ ...prev, createdFromDate: e.target.value }))}
                                     />
                                     <input
                                         type="date"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded text-sm outline-none bg-brand-surface text-text-main"
                                         value={filters.createdToDate}
                                         onChange={(e) => setFilters(prev => ({ ...prev, createdToDate: e.target.value }))}
                                     />
@@ -248,11 +500,11 @@ const TemplateBillMain = () => {
 
                             {/* Sorting */}
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Sort By</label>
+                                <label className="block text-xs font-bold text-text-strong uppercase mb-1">Sort By</label>
                                 <select
                                     value={filters.sortBy}
                                     onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value }))}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none bg-white"
+                                    className="w-full px-3 py-2 border border-ash-medium rounded text-sm outline-none bg-brand-surface text-text-main"
                                 >
                                     <option value="createdAt">Created Date</option>
                                     <option value="templateName">Name</option>
@@ -261,11 +513,11 @@ const TemplateBillMain = () => {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Order</label>
+                                <label className="block text-xs font-bold text-text-strong uppercase mb-1">Order</label>
                                 <select
                                     value={filters.sortOrder}
                                     onChange={(e) => setFilters(prev => ({ ...prev, sortOrder: e.target.value as 'asc' | 'desc' }))}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm outline-none bg-white"
+                                    className="w-full px-3 py-2 border border-ash-medium rounded text-sm outline-none bg-brand-surface text-text-main"
                                 >
                                     <option value="desc">Newest First</option>
                                     <option value="asc">Oldest First</option>
@@ -275,84 +527,86 @@ const TemplateBillMain = () => {
                     </div>
 
                     {/* --- RIGHT CONTENT (GRID) --- */}
-                    {canList && <div
-                        ref={scrollContainerRef}
-                        className="flex-1 overflow-y-auto bg-gray-50/50 p-4"
-                    >
-                        {templates.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-full text-center">
-                                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                    <i className="fas fa-folder-open text-4xl text-gray-400" />
+                    {canList && (
+                        <div
+                            ref={scrollContainerRef}
+                            className="flex-1 overflow-y-auto p-4"
+                        >
+                            {templates.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center h-full text-center border border-ash-lighter rounded-xl bg-brand-surface p-6">
+                                    <div className="w-24 h-24 bg-brand-ash rounded-full flex items-center justify-center mb-4">
+                                        <i className="fas fa-folder-open text-4xl text-text-soft" />
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-text-strong">No Templates Found</h3>
+                                    <p className="text-sm text-text-muted mt-1">
+                                        {filters.search
+                                            ? `No matches for "${filters.search}"`
+                                            : "Create a new template to get started."}
+                                    </p>
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-700">No Templates Found</h3>
-                                <p className="text-sm text-gray-500 mt-1">
-                                    {filters.search
-                                        ? `No matches for "${filters.search}"`
-                                        : "Create a new template to get started."}
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
-                                    {templates.map((template: any) => (
-                                        <div
-                                            key={template._id}
-                                            onClick={() => handleCardClick(template._id)}
-                                            className="group bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-xl hover:border-blue-400 transition-all duration-300 cursor-pointer flex flex-col overflow-hidden"
-                                        >
-                                            {/* CARD PREVIEW AREA */}
-                                            <div className="p-4 bg-gray-50 border-b border-gray-100 group-hover:bg-blue-50/30 transition-colors">
-                                                <div className="w-3/4 mx-auto shadow-lg transform group-hover:scale-105 transition-transform duration-300 bg-white">
-                                                    {/* Mini Preview */}
-                                                    <TemplateMiniPreview components={template.layout?.[0]?.components || []} />
+                            ) : (
+                                <>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+                                        {templates.map((template: any) => (
+                                            <div
+                                                key={template._id}
+                                                onClick={() => handleCardClick(template._id)}
+                                                className="group bg-brand-surface rounded-xl shadow-sm border border-ash-light hover:shadow-xl hover:border-action-primary transition-all duration-300 cursor-pointer flex flex-col overflow-hidden"
+                                            >
+                                                {/* CARD PREVIEW AREA */}
+                                                <div className="p-4 bg-brand-ash border-b border-ash-medium group-hover:bg-brand-surface-hover transition-colors">
+                                                    <div className="w-3/4 mx-auto shadow-md transform group-hover:scale-105 transition-transform duration-300 bg-brand-surface">
+                                                        {/* Mini Preview */}
+                                                        <TemplateMiniPreview components={template.layout?.[0]?.components || []} />
+                                                    </div>
+                                                </div>
+
+                                                {/* CARD FOOTER INFO */}
+                                                <div className="p-4 flex flex-col gap-2">
+                                                    <div className="flex justify-between items-start">
+                                                        <h4 className="font-bold text-text-strong line-clamp-1 group-hover:text-action-primary transition-colors text-sm">
+                                                            {template.templateName}
+                                                        </h4>
+                                                        {template.isDefault && (
+                                                            <Badge variant="success" className="text-[10px] px-1.5 py-0.5">Default</Badge>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex justify-between items-center text-xs text-text-muted mt-1">
+                                                        <span className="flex items-center gap-1">
+                                                            <i className="far fa-calendar"></i>
+                                                            {dateFormate(template.createdAt)}
+                                                        </span>
+                                                        <span className="flex items-center gap-1 bg-brand-ash px-2 py-0.5 rounded-full text-text-strong">
+                                                            <i className="fas fa-layer-group text-text-soft"></i>
+                                                            {template.layout?.[0]?.components?.length || 0}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        ))}
+                                    </div>
 
-                                            {/* CARD FOOTER INFO */}
-                                            <div className="p-4 flex flex-col gap-2">
-                                                <div className="flex justify-between items-start">
-                                                    <h4 className="font-bold text-gray-800 line-clamp-1 group-hover:text-blue-600 transition-colors text-sm">
-                                                        {template.templateName}
-                                                    </h4>
-                                                    {template.isDefault && (
-                                                        <Badge variant="success" className="text-[10px] px-1.5 py-0.5">Default</Badge>
-                                                    )}
-                                                </div>
-
-                                                <div className="flex justify-between items-center text-xs text-gray-500 mt-1">
-                                                    <span className="flex items-center gap-1">
-                                                        <i className="far fa-calendar"></i>
-                                                        {dateFormate(template.createdAt)}
-                                                    </span>
-                                                    <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full">
-                                                        <i className="fas fa-layer-group"></i>
-                                                        {template.layout?.[0]?.components?.length || 0}
-                                                    </span>
-                                                </div>
+                                    {/* LOADING INDICATOR */}
+                                    {isFetchingNextPage && (
+                                        <div className="flex justify-center py-8">
+                                            <div className="flex items-center gap-2 text-action-primary">
+                                                <i className="fas fa-spinner fa-spin text-xl"></i>
+                                                <span className="text-sm font-medium">Loading more templates...</span>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
+                                    )}
 
-                                {/* LOADING INDICATOR */}
-                                {isFetchingNextPage && (
-                                    <div className="flex justify-center py-8">
-                                        <div className="flex items-center gap-2 text-blue-600">
-                                            <i className="fas fa-spinner fa-spin text-xl"></i>
-                                            <span className="text-sm font-medium">Loading more templates...</span>
+                                    {/* END OF LIST */}
+                                    {!hasNextPage && templates.length > 0 && (
+                                        <div className="flex justify-center py-6 text-text-soft text-xs">
+                                            <p>End of list</p>
                                         </div>
-                                    </div>
-                                )}
-
-                                {/* END OF LIST */}
-                                {!hasNextPage && templates.length > 0 && (
-                                    <div className="flex justify-center py-6 text-gray-400 text-xs">
-                                        <p>End of list</p>
-                                    </div>
-                                )}
-                            </>
-                        )}
-                    </div>}
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    )}
                 </main>
             )}
         </div>

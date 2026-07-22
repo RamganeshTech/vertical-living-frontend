@@ -182,30 +182,380 @@ const RetailInvoiceAccountsMain = () => {
         return <Outlet />;
     }
 
+    // return (
+    //     <div className="space-y-0 h-full">
+    //         {/* Header */}
+    //         <div className="flex justify-between items-center">
+    //             <div>
+    //                 <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+    //                     <i className="fas fa-file-invoice mr-3 text-blue-600"></i>
+    //                     Retail Invoice Accounts
+    //                 </h1>
+    //                 {/* <p className="text-gray-600 mt-1">
+    //                     Manage your Retail invoices
+    //                 </p> */}
+    //                 <Breadcrumb paths={paths} />
+
+    //             </div>
+
+    //             <div className='flex items-center gap-2'>
+
+    //                 {canCreate && <Button
+    //                     onClick={() => navigate('create')}
+    //                 >
+    //                     <i className="fas fa-plus mr-2" />
+    //                     Create Retail Invoice
+    //                 </Button>}
+
+    //                 <div className="w-full sm:w-auto flex justify-end sm:block">
+    //                     <StageGuide
+    //                         organizationId={organizationId!}
+    //                         stageName="retailinvoice"
+    //                     />
+    //                 </div>
+    //             </div>
+    //         </div>
+
+    //         {/* Loading State */}
+    //         {isLoading ? (
+    //             <div className="flex justify-center items-center py-12">
+    //                 <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+    //             </div>
+    //         ) : isError ? (
+    //             <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+    //                 <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+    //                     ⚠️ Error Occurred
+    //                 </div>
+    //                 <p className="text-red-500 mb-4 text-lg sm:text-xl">
+    //                     {(error as any)?.message || "Failed to load invoices"}
+    //                 </p>
+    //                 <Button
+    //                     onClick={() => refetch()}
+    //                     className="bg-red-600 text-white px-4 py-2"
+    //                 >
+    //                     Retry
+    //                 </Button>
+    //             </div>
+    //         ) : (
+    //             <main className="flex gap-2 !max-h-[90%]">
+    //                 {/* Filters Sidebar */}
+    //                 <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
+    //                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                         <div className="flex items-center justify-between mb-6">
+    //                             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+    //                                 <i className="fas fa-filter mr-2 text-blue-600"></i>
+    //                                 Filters
+    //                             </h3>
+    //                             {activeFiltersCount > 0 && (
+    //                                 <button
+    //                                     onClick={clearFilters}
+    //                                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+    //                                 >
+    //                                     Clear All ({activeFiltersCount})
+    //                                 </button>
+    //                             )}
+    //                         </div>
+
+    //                         <div className="space-y-6">
+    //                             {/* Search */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-search mr-2"></i>
+    //                                     Search
+    //                                 </label>
+    //                                 <input
+    //                                     type="text"
+    //                                     autoFocus
+    //                                     placeholder="Invoice number, customer name..."
+    //                                     value={filters.search}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+                            
+
+
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     From CreatedAt Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.createdFromDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     To CreatedAt Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.createdToDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, createdToDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     From Invoice Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.fromInvoiceDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, fromInvoiceDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     To Invoice Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.toInvoiceDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, toInvoiceDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+                               
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-4">
+    //                                     <i className="fas fa-coins mr-2 text-gray-400"></i>
+    //                                     Amount Range
+    //                                 </label>
+
+    //                                 <div className="px-2 mb-3">
+    //                                     <Slider
+    //                                         range
+    //                                         min={0}
+    //                                         max={1000000}
+    //                                         step={500}
+    //                                         value={[Number(filters.minAmount), Number(filters.maxAmount)]}
+    //                                         onChange={(value) => {
+    //                                             const [min, max] = value as [number, number];
+    //                                             setFilters((f) => ({
+    //                                                 ...f,
+    //                                                 minAmount: min,
+    //                                                 maxAmount: max,
+    //                                             }));
+    //                                         }}
+    //                                         trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+    //                                         handleStyle={[
+    //                                             {
+    //                                                 borderColor: "#3b82f6",
+    //                                                 backgroundColor: "#fff",
+    //                                                 boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+    //                                                 width: 18,
+    //                                                 height: 18,
+    //                                                 marginTop: -6,
+    //                                                 opacity: 1
+    //                                             },
+    //                                             {
+    //                                                 borderColor: "#3b82f6",
+    //                                                 backgroundColor: "#fff",
+    //                                                 boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+    //                                                 width: 18,
+    //                                                 height: 18,
+    //                                                 marginTop: -6,
+    //                                                 opacity: 1
+    //                                             },
+    //                                         ]}
+    //                                         railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+    //                                     />
+    //                                 </div>
+
+    //                                 {/* Display Values */}
+    //                                 <div className="flex justify-between items-center gap-2 text-sm">
+    //                                     <div className="flex-1">
+    //                                         <span className="text-xs text-gray-500 block mb-1">Min</span>
+    //                                         <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+    //                                             ₹{Number(filters.minAmount).toLocaleString("en-IN")}
+    //                                         </div>
+    //                                     </div>
+    //                                     <div className="text-gray-300">—</div>
+    //                                     <div className="flex-1">
+    //                                         <span className="text-xs text-gray-500 block mb-1">Max</span>
+    //                                         <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+    //                                             ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+
+    //                                 <div className="flex gap-2 items-center mt-3">
+    //                                     <input
+    //                                         type="number"
+    //                                         value={filters.minAmount}
+    //                                         onChange={(e) =>
+    //                                             setFilters((f) => ({ ...f, minAmount: +e.target.value }))
+    //                                         }
+    //                                         placeholder="Min"
+    //                                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+    //                                         min="0"
+    //                                     />
+    //                                     <input
+    //                                         type="number"
+    //                                         value={filters.maxAmount}
+    //                                         onChange={(e) =>
+    //                                             setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
+    //                                         }
+    //                                         placeholder="Max"
+    //                                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+    //                                         min="0"
+    //                                     />
+    //                                 </div>
+    //                             </div>
+
+    //                             {/* Sort By */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Sort By
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.sortBy}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, sortBy: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="createdAt">Created Date</option>
+    //                                     <option value="invoiceDate">Invoice Date</option>
+    //                                     <option value="dueDate">Due Date</option>
+    //                                     <option value="grandTotal">Grand Total</option>
+    //                                     <option value="customerName">Customer Name</option>
+    //                                 </select>
+    //                             </div>
+
+    //                             {/* Sort Order */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Sort Order
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.sortOrder}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="desc">Descending</option>
+    //                                     <option value="asc">Ascending</option>
+    //                                 </select>
+    //                             </div>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+
+    //                 {canList && <>  {invoices.length === 0 ? (
+    //                     <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+    //                         <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
+    //                         <h3 className="text-lg font-semibold text-blue-800 mb-1">No Invoices Found</h3>
+    //                         <p className="text-sm text-gray-500">
+    //                             {filters.search || filters.customerId
+    //                                 ? 'Try adjusting your filters to find invoices.'
+    //                                 : 'Looks like there are no invoices yet.'}
+    //                             <br />
+    //                             Click on <strong>"Create Invoice"</strong> to get started 🚀
+    //                         </p>
+    //                     </div>
+    //                 ) : (
+
+    //                     <div
+    //                         ref={scrollContainerRef}
+    //                         className="flex-1 !max-h-[100%] overflow-y-auto"
+    //                     >
+    //                         {/* Table Header */}
+    //                         <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
+    //                             <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+    //                                 <div className="col-span-1 text-center">S.No</div>
+    //                                 <div className="col-span-3">Customer Name</div>
+    //                                 <div className="col-span-2">Invoice Number</div>
+    //                                 <div className="col-span-2">Invoice Date</div>
+    //                                 <div className="col-span-2">Created At</div>
+    //                                 <div className="col-span-2">Grand Total</div>
+    //                                 <div className="col-span-1 text-center">Items</div>
+    //                                 <div className="col-span-1 text-center">Actions</div>
+    //                             </div>
+    //                         </div>
+
+    //                         {/* Table Body */}
+    //                         <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
+    //                             {invoices.map((invoice: any, index: number) => (
+    //                                 <RetailInvoiceAccList key={invoice._id} invoice={invoice} index={index} handleView={handleView} handleDelete={handleDelete} deleteInvoiceMutation={deleteInvoiceMutation} />
+    //                             ))}
+    //                         </div>
+
+    //                         {/* Loading indicator at the bottom */}
+    //                         {isFetchingNextPage && (
+    //                             <div className="flex justify-center py-8">
+    //                                 <div className="flex items-center gap-2 text-blue-600">
+    //                                     <i className="fas fa-spinner fa-spin text-2xl"></i>
+    //                                     <span className="text-sm font-medium">Loading more invoices...</span>
+    //                                 </div>
+    //                             </div>
+    //                         )}
+
+    //                         {/* End of list indicator */}
+    //                         {!hasNextPage && invoices.length > 0 && (
+    //                             <div className="flex justify-center py-6">
+    //                                 <p className="text-gray-400 text-sm font-medium">
+    //                                     <i className="fas fa-check-circle mr-2"></i>
+    //                                     You've reached the end of the list
+    //                                 </p>
+    //                             </div>
+    //                         )}
+
+    //                     </div>
+    //                 )}
+    //                 </>}
+    //             </main>
+    //         )}
+    //     </div>
+    // );
+
+
     return (
-        <div className="space-y-0 h-full">
+        <div className="space-y-0 h-full text-text-main">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-file-invoice mr-3 text-blue-600"></i>
+                    <h1 className="text-3xl font-bold text-text-strong flex items-center">
+                        <i className="fas fa-file-invoice mr-3 text-action-primary"></i>
                         Retail Invoice Accounts
                     </h1>
-                    {/* <p className="text-gray-600 mt-1">
-                        Manage your Retail invoices
-                    </p> */}
                     <Breadcrumb paths={paths} />
-
                 </div>
 
                 <div className='flex items-center gap-2'>
-
-                    {canCreate && <Button
-                        onClick={() => navigate('create')}
-                    >
-                        <i className="fas fa-plus mr-2" />
-                        Create Retail Invoice
-                    </Button>}
+                    {canCreate && (
+                        <Button
+                            onClick={() => navigate('create')}
+                            variant="dark"
+                        >
+                            <i className="fas fa-plus mr-2" />
+                            Create Retail Invoice
+                        </Button>
+                    )}
 
                     <div className="w-full sm:w-auto flex justify-end sm:block">
                         <StageGuide
@@ -219,19 +569,20 @@ const RetailInvoiceAccountsMain = () => {
             {/* Loading State */}
             {isLoading ? (
                 <div className="flex justify-center items-center py-12">
-                    <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+                    <i className="fas fa-spinner fa-spin text-action-primary text-4xl"></i>
                 </div>
             ) : isError ? (
-                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                    <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-brand-ash border border-ash-medium rounded-lg shadow text-center">
+                    <div className="text-action-danger font-semibold mb-2 text-xl sm:text-3xl">
                         ⚠️ Error Occurred
                     </div>
-                    <p className="text-red-500 mb-4 text-lg sm:text-xl">
+                    <p className="text-action-danger mb-4 text-lg sm:text-xl opacity-90">
                         {(error as any)?.message || "Failed to load invoices"}
                     </p>
                     <Button
                         onClick={() => refetch()}
-                        className="bg-red-600 text-white px-4 py-2"
+                        variant="dark"
+                        className="px-4 py-2"
                     >
                         Retry
                     </Button>
@@ -240,16 +591,16 @@ const RetailInvoiceAccountsMain = () => {
                 <main className="flex gap-2 !max-h-[90%]">
                     {/* Filters Sidebar */}
                     <div className="xl:w-80 flex-shrink-0 !max-h-[100%] overflow-y-auto">
-                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-lighter">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                                    <i className="fas fa-filter mr-2 text-blue-600"></i>
+                                <h3 className="text-lg font-semibold text-text-strong flex items-center">
+                                    <i className="fas fa-filter mr-2 text-action-primary"></i>
                                     Filters
                                 </h3>
                                 {activeFiltersCount > 0 && (
                                     <button
                                         onClick={clearFilters}
-                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                        className="text-sm text-action-primary hover:text-text-strong transition-colors font-medium"
                                     >
                                         Clear All ({activeFiltersCount})
                                     </button>
@@ -259,7 +610,7 @@ const RetailInvoiceAccountsMain = () => {
                             <div className="space-y-6">
                                 {/* Search */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-search mr-2"></i>
                                         Search
                                     </label>
@@ -269,30 +620,12 @@ const RetailInvoiceAccountsMain = () => {
                                         placeholder="Invoice number, customer name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main placeholder-text-soft"
                                     />
                                 </div>
 
-                                {/* Date Filter */}
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
-                                        Filter by Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={filters.date}
-                                        onChange={(e) => {
-                                            setFilters(f => ({ ...f, date: e.target.value }));
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div> */}
-
-
-
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         From CreatedAt Date
                                     </label>
@@ -302,12 +635,12 @@ const RetailInvoiceAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdFromDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         To CreatedAt Date
                                     </label>
@@ -317,13 +650,12 @@ const RetailInvoiceAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdToDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     />
                                 </div>
 
-
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         From Invoice Date
                                     </label>
@@ -333,12 +665,12 @@ const RetailInvoiceAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, fromInvoiceDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         <i className="fas fa-calendar mr-2"></i>
                                         To Invoice Date
                                     </label>
@@ -348,31 +680,13 @@ const RetailInvoiceAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, toInvoiceDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     />
                                 </div>
 
-                                {/* Customer ID Filter */}
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-user mr-2"></i>
-                                        Customer ID
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter customer ID..."
-                                        value={filters.customerId}
-                                        onChange={(e) => {
-                                            setFilters(f => ({ ...f, customerId: e.target.value }));
-                                        }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
-                                </div> */}
-
-
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-4">
-                                        <i className="fas fa-coins mr-2 text-gray-400"></i>
+                                    <label className="block text-sm font-medium text-text-main mb-4">
+                                        <i className="fas fa-coins mr-2 text-text-soft"></i>
                                         Amount Range
                                     </label>
 
@@ -391,43 +705,43 @@ const RetailInvoiceAccountsMain = () => {
                                                     maxAmount: max,
                                                 }));
                                             }}
-                                            trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+                                            trackStyle={[{ backgroundColor: "#1e293b", height: 6 }]} // Replaced blue hex with dark primary
                                             handleStyle={[
                                                 {
-                                                    borderColor: "#3b82f6",
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    borderColor: "#1e293b",
+                                                    backgroundColor: "#ffffff",
+                                                    boxShadow: "0 2px 6px rgba(30, 41, 59, 0.4)",
                                                     width: 18,
                                                     height: 18,
                                                     marginTop: -6,
                                                     opacity: 1
                                                 },
                                                 {
-                                                    borderColor: "#3b82f6",
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    borderColor: "#1e293b",
+                                                    backgroundColor: "#ffffff",
+                                                    boxShadow: "0 2px 6px rgba(30, 41, 59, 0.4)",
                                                     width: 18,
                                                     height: 18,
                                                     marginTop: -6,
                                                     opacity: 1
                                                 },
                                             ]}
-                                            railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+                                            railStyle={{ backgroundColor: "#e5e5e5", height: 6 }} // Using ash-medium equivalent
                                         />
                                     </div>
 
                                     {/* Display Values */}
                                     <div className="flex justify-between items-center gap-2 text-sm">
                                         <div className="flex-1">
-                                            <span className="text-xs text-gray-500 block mb-1">Min</span>
-                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+                                            <span className="text-xs text-text-muted block mb-1">Min</span>
+                                            <div className="bg-brand-ash px-2 py-1.5 rounded border border-ash-medium font-semibold text-text-strong text-center text-xs">
                                                 ₹{Number(filters.minAmount).toLocaleString("en-IN")}
                                             </div>
                                         </div>
-                                        <div className="text-gray-300">—</div>
+                                        <div className="text-text-soft">—</div>
                                         <div className="flex-1">
-                                            <span className="text-xs text-gray-500 block mb-1">Max</span>
-                                            <div className="bg-blue-50 px-2 py-1.5 rounded border border-blue-100 font-semibold text-blue-700 text-center text-xs">
+                                            <span className="text-xs text-text-muted block mb-1">Max</span>
+                                            <div className="bg-brand-ash px-2 py-1.5 rounded border border-ash-medium font-semibold text-text-strong text-center text-xs">
                                                 ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
                                             </div>
                                         </div>
@@ -441,7 +755,7 @@ const RetailInvoiceAccountsMain = () => {
                                                 setFilters((f) => ({ ...f, minAmount: +e.target.value }))
                                             }
                                             placeholder="Min"
-                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-2 py-1 text-sm border border-ash-medium rounded focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main"
                                             min="0"
                                         />
                                         <input
@@ -451,7 +765,7 @@ const RetailInvoiceAccountsMain = () => {
                                                 setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
                                             }
                                             placeholder="Max"
-                                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-2 py-1 text-sm border border-ash-medium rounded focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main"
                                             min="0"
                                         />
                                     </div>
@@ -459,7 +773,7 @@ const RetailInvoiceAccountsMain = () => {
 
                                 {/* Sort By */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         Sort By
                                     </label>
                                     <select
@@ -467,7 +781,7 @@ const RetailInvoiceAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, sortBy: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     >
                                         <option value="createdAt">Created Date</option>
                                         <option value="invoiceDate">Invoice Date</option>
@@ -479,7 +793,7 @@ const RetailInvoiceAccountsMain = () => {
 
                                 {/* Sort Order */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-main mb-2">
                                         Sort Order
                                     </label>
                                     <select
@@ -487,7 +801,7 @@ const RetailInvoiceAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     >
                                         <option value="desc">Descending</option>
                                         <option value="asc">Ascending</option>
@@ -497,11 +811,12 @@ const RetailInvoiceAccountsMain = () => {
                         </div>
                     </div>
 
-                    {canList && <>  {invoices.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-                            <i className="fas fa-file-invoice text-5xl text-blue-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Invoices Found</h3>
-                            <p className="text-sm text-gray-500">
+                    {canList && <>  
+                    {invoices.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-brand-surface rounded-xl text-center p-6 border border-ash-lighter">
+                            <i className="fas fa-file-invoice text-5xl text-text-soft mb-4" />
+                            <h3 className="text-lg font-semibold text-text-strong mb-1">No Invoices Found</h3>
+                            <p className="text-sm text-text-muted">
                                 {filters.search || filters.customerId
                                     ? 'Try adjusting your filters to find invoices.'
                                     : 'Looks like there are no invoices yet.'}
@@ -510,17 +825,16 @@ const RetailInvoiceAccountsMain = () => {
                             </p>
                         </div>
                     ) : (
-
                         <div
                             ref={scrollContainerRef}
                             className="flex-1 !max-h-[100%] overflow-y-auto"
                         >
                             {/* Table Header */}
-                            <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
-                                <div className="grid grid-cols-14 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+                            <div className="bg-brand-surface rounded-t-xl border border-ash-light sticky top-0 z-10">
+                                <div className="grid grid-cols-15 gap-4 px-6 py-4 bg-brand-ash font-semibold text-text-strong text-sm">
                                     <div className="col-span-1 text-center">S.No</div>
                                     <div className="col-span-3">Customer Name</div>
-                                    <div className="col-span-2">Invoice Number</div>
+                                    <div className="col-span-3">Invoice Number</div>
                                     <div className="col-span-2">Invoice Date</div>
                                     <div className="col-span-2">Created At</div>
                                     <div className="col-span-2">Grand Total</div>
@@ -530,7 +844,7 @@ const RetailInvoiceAccountsMain = () => {
                             </div>
 
                             {/* Table Body */}
-                            <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
+                            <div className="bg-brand-surface rounded-b-xl border-x border-b border-ash-light">
                                 {invoices.map((invoice: any, index: number) => (
                                     <RetailInvoiceAccList key={invoice._id} invoice={invoice} index={index} handleView={handleView} handleDelete={handleDelete} deleteInvoiceMutation={deleteInvoiceMutation} />
                                 ))}
@@ -539,7 +853,7 @@ const RetailInvoiceAccountsMain = () => {
                             {/* Loading indicator at the bottom */}
                             {isFetchingNextPage && (
                                 <div className="flex justify-center py-8">
-                                    <div className="flex items-center gap-2 text-blue-600">
+                                    <div className="flex items-center gap-2 text-action-primary">
                                         <i className="fas fa-spinner fa-spin text-2xl"></i>
                                         <span className="text-sm font-medium">Loading more invoices...</span>
                                     </div>
@@ -549,21 +863,13 @@ const RetailInvoiceAccountsMain = () => {
                             {/* End of list indicator */}
                             {!hasNextPage && invoices.length > 0 && (
                                 <div className="flex justify-center py-6">
-                                    <p className="text-gray-400 text-sm font-medium">
+                                    <p className="text-text-soft text-sm font-medium">
                                         <i className="fas fa-check-circle mr-2"></i>
                                         You've reached the end of the list
                                     </p>
                                 </div>
                             )}
 
-                            {/* Total count */}
-                            {/* {invoices.length > 0 && (
-                                <div className="flex justify-center py-4">
-                                    <p className="text-gray-500 text-sm">
-                                        Showing {invoices.length} of {totalInvoices} invoices
-                                    </p>
-                                </div>
-                            )} */}
                         </div>
                     )}
                     </>}
@@ -571,6 +877,7 @@ const RetailInvoiceAccountsMain = () => {
             )}
         </div>
     );
+
 };
 
 export default RetailInvoiceAccountsMain;

@@ -40,61 +40,144 @@ const CustomerAccList: React.FC<Props> = ({
     // const customerTypeLabel =
     //     customer.customerType === "business" ? "Business" : "Individual";
 
+    // return (
+    //     <div
+    //         className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] items-center transition-colors last:border-b-0"
+    //         onClick={() => onView(customer._id)}
+
+    //     >
+    //         {/* Serial No */}
+    //         <div className="col-span-1 text-center text-gray-600 font-medium">
+    //             {index + 1}
+    //         </div>
+
+    //         {/* Customer Name */}
+    //         <div className="col-span-3 text-center truncate font-medium text-gray-900 flex items-center gap-2">
+    //             {displayName ?
+    //                 <span className=" block mx-auto">{displayName}</span>
+    //                 : "-"
+    //             }
+    //         </div>
+
+    //         {/* Customer Type */}
+    //         {/* <div className="col-span-2 text-center">
+    //             <span
+    //                 className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${customer.customerType === "business"
+    //                     ? "bg-blue-100 text-blue-800"
+    //                     : "bg-green-100 text-green-800"
+    //                     }`}
+    //             >
+    //                 {customerTypeLabel}
+    //             </span>
+    //         </div> */}
+
+    //         <div className="col-span-2 text-sm text-gray-700 truncate text-center">
+    //             {/* <i className="fas fa-envelope text-gray-400 mr-2"></i> */}
+    //             {customer.companyName ? customer.companyName : "-"}
+    //         </div>
+
+
+    //         {/* Email */}
+    //         <div className="col-span-2 text-sm text-gray-700 truncate text-center">
+    //             {/* <i className="fas fa-envelope text-gray-400 mr-2"></i> */}
+    //             {customer.email ? customer.email : "-"}
+    //         </div>
+
+    //         {/* Phone */}
+    //         {/* <div className="col-span-2 text-sm text-gray-700 truncate text-center">
+    //             <i className="fas fa-phone text-gray-400 mr-2"></i>
+    //             {phone ? phone : "-"}
+    //         </div> */}
+
+    //         <div className="col-span-2 text-sm text-gray-700 flex flex-col items-center gap-1">
+
+    //             {/* Work Phone */}
+    //             {workPhone && (
+    //                 <div className="flex items-center gap-2">
+    //                     <i className="fas fa-phone text-gray-400"></i>
+    //                     <span>{workPhone}</span>
+    //                 </div>
+    //             )}
+
+    //             {/* Mobile Phone */}
+    //             {mobilePhone && (
+    //                 <div className="flex items-center gap-2">
+    //                     <i className="fas fa-mobile-alt text-gray-400"></i>
+    //                     <span>{mobilePhone}</span>
+    //                 </div>
+    //             )}
+
+    //             {/* If nothing exists */}
+    //             {!workPhone && !mobilePhone && <span>-</span>}
+    //         </div>
+
+    //         {/* Created At */}
+    //         <div className="col-span-2 text-sm text-gray-600 whitespace-nowrap text-center">
+    //             <i className="fas fa-calendar-alt mr-2 text-gray-400"></i>
+    //             {dateFormate(customer.createdAt)}
+    //         </div>
+
+    //         {/* Actions */}
+    //         <div className="col-span-2 flex justify-center gap-2">
+    //             {/* <button
+    //                 onClick={() => onView(customer._id)}
+    //                 className="p-2 text-blue-600 hover:bg-blue-100 rounded transition"
+    //                 title="View Customer"
+    //             >
+    //                 <i className="fas fa-eye" />
+    //             </button> */}
+    //             {canDelete && <button
+    //                 onClick={(e) => {
+    //                     e.stopPropagation()
+    //                     onDelete(customer._id)
+    //                 }}
+    //                 className="p-2 text-red-600 hover:bg-red-100 rounded transition"
+    //                 disabled={isDeleting}
+    //                 title="Delete Customer"
+    //             >
+    //                 {isDeleting ? (
+    //                     <i className="fas fa-spinner fa-spin" />
+    //                 ) : (
+    //                     <i className="fas fa-trash" />
+    //                 )}
+    //             </button>}
+    //         </div>
+    //     </div>
+    // );
+
     return (
         <div
-            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-[#f9fcff] items-center transition-colors last:border-b-0"
+            className="grid cursor-pointer grid-cols-14 gap-4 px-6 py-4 border-b border-ash-light hover:bg-brand-surface-hover items-center transition-colors last:border-b-0"
             onClick={() => onView(customer._id)}
-
         >
             {/* Serial No */}
-            <div className="col-span-1 text-center text-gray-600 font-medium">
+            <div className="col-span-1 text-center text-text-muted font-medium">
                 {index + 1}
             </div>
 
             {/* Customer Name */}
-            <div className="col-span-3 text-center truncate font-medium text-gray-900 flex items-center gap-2">
+            <div className="col-span-3 text-center truncate font-medium text-text-strong flex items-center gap-2">
                 {displayName ?
                     <span className=" block mx-auto">{displayName}</span>
                     : "-"
                 }
             </div>
 
-            {/* Customer Type */}
-            {/* <div className="col-span-2 text-center">
-                <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${customer.customerType === "business"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-green-100 text-green-800"
-                        }`}
-                >
-                    {customerTypeLabel}
-                </span>
-            </div> */}
-
-            <div className="col-span-2 text-sm text-gray-700 truncate text-center">
-                {/* <i className="fas fa-envelope text-gray-400 mr-2"></i> */}
+            {/* Company Name */}
+            <div className="col-span-2 text-sm text-text-main truncate text-center">
                 {customer.companyName ? customer.companyName : "-"}
             </div>
 
-
             {/* Email */}
-            <div className="col-span-2 text-sm text-gray-700 truncate text-center">
-                {/* <i className="fas fa-envelope text-gray-400 mr-2"></i> */}
+            <div className="col-span-2 text-sm text-text-main truncate text-center">
                 {customer.email ? customer.email : "-"}
             </div>
 
-            {/* Phone */}
-            {/* <div className="col-span-2 text-sm text-gray-700 truncate text-center">
-                <i className="fas fa-phone text-gray-400 mr-2"></i>
-                {phone ? phone : "-"}
-            </div> */}
-
-            <div className="col-span-2 text-sm text-gray-700 flex flex-col items-center gap-1">
-
+            <div className="col-span-2 text-sm text-text-main flex flex-col items-center gap-1">
                 {/* Work Phone */}
                 {workPhone && (
                     <div className="flex items-center gap-2">
-                        <i className="fas fa-phone text-gray-400"></i>
+                        <i className="fas fa-phone text-text-soft"></i>
                         <span>{workPhone}</span>
                     </div>
                 )}
@@ -102,7 +185,7 @@ const CustomerAccList: React.FC<Props> = ({
                 {/* Mobile Phone */}
                 {mobilePhone && (
                     <div className="flex items-center gap-2">
-                        <i className="fas fa-mobile-alt text-gray-400"></i>
+                        <i className="fas fa-mobile-alt text-text-soft"></i>
                         <span>{mobilePhone}</span>
                     </div>
                 )}
@@ -112,26 +195,19 @@ const CustomerAccList: React.FC<Props> = ({
             </div>
 
             {/* Created At */}
-            <div className="col-span-2 text-sm text-gray-600 whitespace-nowrap text-center">
-                <i className="fas fa-calendar-alt mr-2 text-gray-400"></i>
+            <div className="col-span-2 text-sm text-text-muted whitespace-nowrap text-center">
+                <i className="fas fa-calendar-alt mr-2 text-text-soft"></i>
                 {dateFormate(customer.createdAt)}
             </div>
 
             {/* Actions */}
             <div className="col-span-2 flex justify-center gap-2">
-                {/* <button
-                    onClick={() => onView(customer._id)}
-                    className="p-2 text-blue-600 hover:bg-blue-100 rounded transition"
-                    title="View Customer"
-                >
-                    <i className="fas fa-eye" />
-                </button> */}
                 {canDelete && <button
                     onClick={(e) => {
                         e.stopPropagation()
                         onDelete(customer._id)
                     }}
-                    className="p-2 text-red-600 hover:bg-red-100 rounded transition"
+                    className="p-2 cursor-pointer text-action-danger hover:bg-brand-ash rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isDeleting}
                     title="Delete Customer"
                 >

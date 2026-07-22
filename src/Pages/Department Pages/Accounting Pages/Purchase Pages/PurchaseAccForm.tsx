@@ -298,424 +298,652 @@ const PurchaseAccForm: React.FC<PurchaseAccFormProps> = ({
     const isCreateMode = currentMode === 'create';
     const isEditMode = currentMode === 'edit';
 
-    return (
-        <div className="max-w-full mx-auto space-y-2">
-            {/* Header */}
-            <header className="flex justify-between items-center">
-                <div className='flex justify-between items-center gap-2'>
-                    <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
+    // return (
 
-                        <i className="fas fa-arrow-left"></i>
 
-                    </button>
+    //     <div className="max-w-full mx-auto space-y-2">
+    //         {/* Header */}
+    //         <header className="flex justify-between items-center">
+    //             <div className='flex justify-between items-center gap-2'>
+    //                 <button
+    //                     type="button"
+    //                     onClick={() => navigate(-1)}
+    //                     className='bg-blue-100 hover:bg-slate-300 flex items-center justify-between w-8 h-8 border border-[#a6aab8] text-sm cursor-pointer rounded-md px-2 '>
+
+    //                     <i className="fas fa-arrow-left"></i>
+
+    //                 </button>
+    //                 <div>
+
+    //                     <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+    //                         <i className="fas fa-wallet mr-3 text-blue-600"></i>
+    //                         {isCreateMode ? 'Create Order' : isEditMode ? 'Update Order' : 'View Order'}
+    //                     </h1>
+    //                     <p className="text-gray-600 mt-1">
+    //                         {isCreateMode ? 'Fill in the details to create a new Purchase' :
+    //                             isEditMode ? 'Update the Purchase details' :
+    //                                 'Purchase details'}
+    //                     </p>
+    //                 </div>
+    //             </div>
+               
+    //         </header>
+
+    //         <form onSubmit={handleSubmit} className="space-y-6">
+    //             {/* purchase Details */}
+    //             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    //                     <i className="fas fa-file-alt mr-2 text-blue-600"></i>
+    //                     purchase Details
+    //                 </h2>
+    //                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    //                     <div>
+    //                         <Label>Vendor</Label>
+    //                         <SearchSelectNew
+    //                             options={VendorOptions}
+    //                             placeholder="Select Vendor"
+    //                             searchPlaceholder="Search Vendor..."
+    //                             value={formData?.vendorId || undefined}
+    //                             onValueChange={(value) => handleVendorChange(value)}
+    //                             searchBy="name"
+    //                             displayFormat="simple"
+    //                             className="w-full"
+    //                         />
+    //                     </div>
+
+
+    //                     <div className=''>
+    //                         <div className='flex items-center gap-1'>
+    //                             <input type="checkbox" className='cursor-pointer' checked={enableVendorInput} id="enableName" onChange={() => setEnableVendorInput((p) => (!p))} />
+    //                             <Label htmlFor='enableName' className='cursor-pointer'>Click the check box to enter the name manually, if not available from the drop down</Label>
+    //                         </div>
+    //                         <input
+    //                             type="text"
+    //                             name="vendorName"
+    //                             value={
+    //                                 enableVendorInput
+    //                                     ? formData.vendorName // user can edit manually
+    //                                     : "" // show from formData but not editable
+    //                             }
+    //                             onChange={(e) => {
+    //                                 if (enableVendorInput) handleInputChange(e); // only update if manual input is enabled
+    //                             }}
+    //                             disabled={isReadOnly || !enableVendorInput} // only enable if checkbox is checked
+
+    //                             required
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                             placeholder="Enter Vendor name"
+    //                         />
+    //                     </div>
+
+
+    //                     {/* <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Remarks
+    //                         </label>
+    //                         <input
+    //                             type="text"
+    //                             name="subject"
+    //                             value={formData.subject}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                             placeholder="Enter Remarks"
+    //                         />
+    //                     </div> */}
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Purchase Date
+    //                         </label>
+    //                         <input
+    //                             type="date"
+    //                             name="purchaseDate"
+    //                             value={formData.purchaseDate}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                         />
+    //                     </div>
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             DeliveryDate Date
+    //                         </label>
+    //                         <input
+    //                             type="date"
+    //                             name="deliveryDate"
+    //                             value={formData.deliveryDate}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                         />
+    //                     </div>
+    //                 </div>
+    //             </div>
+
+    //             {/* Items Section */}
+    //             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                 <div className="flex justify-between items-center mb-4">
+    //                     <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+    //                         <i className="fas fa-list mr-2 text-blue-600"></i>
+    //                         Items <span className="text-red-500 ml-1">*</span>
+    //                     </h2>
+
+    //                     {!isReadOnly && (
+    //                         <Button
+    //                             type="button"
+    //                             onClick={handleAddItem}
+    //                             variant='primary'
+    //                         >
+    //                             <i className="fas fa-plus mr-2"></i>
+    //                             Add Item
+    //                         </Button>
+    //                     )}
+    //                 </div>
+
+    //                 {(formData?.items?.length === 0 && initialMode === "view") ? (
+    //                     <div className="text-center py-8 text-gray-500">
+    //                         <i className="fas fa-inbox text-4xl mb-2"></i>
+    //                         <p>No items added yet.</p>
+    //                         {/* <Button
+    //                             type="button"
+    //                             onClick={handleAddItem}
+    //                             className="mt-4 bg-blue-600 text-white"
+    //                         >
+    //                             <i className="fas fa-plus mr-2"></i>
+    //                             Add First Item
+    //                         </Button> */}
+    //                     </div>
+    //                 ) : (
+    //                     <div className="overflow-x-auto">
+    //                         {/* Table Header */}
+    //                         <div className="grid grid-cols-12 gap-3 mb-2 px-4 py-3 bg-gray-100 rounded-lg font-semibold text-gray-700 text-sm">
+    //                             <div className="col-span-1 text-center">#</div>
+    //                             <div className="col-span-4 text-center">Item Name <span className="text-red-500">*</span></div>
+    //                             <div className="col-span-2 text-center">Quantity</div>
+    //                             <div className="col-span-2 text-center">Rate <span className="text-red-500">*</span></div>
+    //                             <div className="col-span-2 text-center">Total</div>
+    //                             <div className="col-span-1 text-center">Action</div>
+    //                         </div>
+
+    //                         {/* Table Rows */}
+    //                         <div className="space-y-2">
+    //                             {formData.items.map((item, index) => (
+    //                                 <div
+    //                                     key={index}
+    //                                     className="grid grid-cols-12 gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors items-center"
+    //                                 >
+    //                                     {/* Row Number */}
+    //                                     <div className="col-span-1 text-center text-gray-600 font-medium">
+    //                                         {index + 1}
+    //                                     </div>
+
+    //                                     {/* Item Name */}
+    //                                     <div className="col-span-4">
+    //                                         <input
+    //                                             type="text"
+    //                                             value={item.itemName}
+    //                                             onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
+    //                                             disabled={isReadOnly}
+    //                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+    //                                             placeholder="Enter item name"
+    //                                         />
+    //                                     </div>
+
+    //                                     {/* Quantity */}
+    //                                     <div className="col-span-2">
+    //                                         <input
+    //                                             type="number"
+    //                                             value={item.quantity}
+    //                                             onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+    //                                             disabled={isReadOnly}
+    //                                             min="0"
+    //                                             step="1"
+    //                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+    //                                             placeholder="0"
+    //                                         />
+    //                                     </div>
+
+    //                                     {/* Rate */}
+    //                                     <div className="col-span-2">
+    //                                         <input
+    //                                             type="number"
+    //                                             value={item.rate}
+    //                                             onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
+    //                                             disabled={isReadOnly}
+    //                                             min="0"
+    //                                             step="0.01"
+    //                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+    //                                             placeholder="0.00"
+    //                                         />
+    //                                     </div>
+
+    //                                     {/* Total */}
+    //                                     <div className="col-span-2 text-center font-semibold text-gray-900">
+    //                                         ₹{item.totalCost.toFixed(2)}
+    //                                     </div>
+
+    //                                     {/* Delete Button */}
+    //                                     <div className="col-span-1 text-center">
+    //                                         {!isReadOnly && (
+    //                                             <button
+    //                                                 type="button"
+    //                                                 onClick={() => handleRemoveItem(index)}
+    //                                                 disabled={formData.items.length === 1}
+    //                                                 className="text-red-600 cursor-pointer hover:text-red-800 disabled:text-gray-400 disabled:cursor-not-allowed p-2 rounded-full hover:bg-red-50 transition-colors"
+    //                                                 title={formData.items.length === 1 ? "Cannot delete last item" : "Delete item"}
+    //                                             >
+    //                                                 <i className="fas fa-trash"></i>
+    //                                             </button>
+    //                                         )}
+    //                                     </div>
+    //                                 </div>
+    //                             ))}
+    //                         </div>
+
+    //                         {/* Summary Row */}
+    //                         <div className="grid grid-cols-12 gap-3 px-4 py-3 bg-blue-50 rounded-lg mt-4 font-semibold text-gray-800">
+    //                             <div className="col-span-9 text-right">Subtotal:</div>
+    //                             <div className="col-span-2 text-right text-blue-600 text-lg">
+    //                                 ₹{calculatedTotals.totalAmount.toFixed(2)}
+    //                             </div>
+    //                             <div className="col-span-1"></div>
+    //                         </div>
+    //                     </div>
+    //                 )}
+    //             </div>
+
+    //             {/* Discount and Tax */}
+    //             {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    //                     <i className="fas fa-calculator mr-2 text-blue-600"></i>
+    //                     Discount & Tax
+    //                 </h2>
+    //                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Discount Percentage (%)
+    //                         </label>
+    //                         <input
+    //                             type="number"
+    //                             name="discountPercentage"
+    //                             value={formData.discountPercentage}
+    //                             onChange={handleNumberChange}
+    //                             disabled={isReadOnly}
+    //                             min="0"
+    //                             max="100"
+    //                             step="0.01"
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                             placeholder="0.00"
+    //                         />
+    //                     </div>
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Tax Percentage (%)
+    //                         </label>
+    //                         <input
+    //                             type="number"
+    //                             name="taxPercentage"
+    //                             value={formData.taxPercentage}
+    //                             onChange={handleNumberChange}
+    //                             disabled={isReadOnly}
+    //                             min="0"
+    //                             max="100"
+    //                             step="0.01"
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+    //                             placeholder="0.00"
+    //                         />
+    //                     </div>
+    //                 </div>
+    //             </div>
+
+    //             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm p-6 border border-blue-100">
+    //                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    //                     <i className="fas fa-receipt mr-2 text-blue-600"></i>
+    //                     Purchase Summary
+    //                 </h2>
+    //                 <div className="space-y-3">
+    //                     <div className="flex justify-between items-center py-2 border-b border-blue-200">
+    //                         <span className="text-gray-700 font-medium">Subtotal:</span>
+    //                         <span className="text-xl font-semibold text-gray-900">
+    //                             ₹{calculatedTotals.totalAmount.toFixed(2)}
+    //                         </span>
+    //                     </div>
+    //                     {formData.discountPercentage > 0 && (
+    //                         <div className="flex justify-between items-center py-2 border-b border-blue-200">
+    //                             <span className="text-gray-700 font-medium">
+    //                                 Discount ({formData.discountPercentage}%):
+    //                             </span>
+    //                             <span className="text-xl font-semibold text-green-600">
+    //                                 -₹{calculatedTotals.discountAmount.toFixed(2)}
+    //                             </span>
+    //                         </div>
+    //                     )}
+    //                     {formData.taxPercentage > 0 && (
+    //                         <div className="flex justify-between items-center py-2 border-b border-blue-200">
+    //                             <span className="text-gray-700 font-medium">
+    //                                 Tax ({formData.taxPercentage}%):
+    //                             </span>
+    //                             <span className="text-xl font-semibold text-gray-900">
+    //                                 ₹{calculatedTotals.taxAmount.toFixed(2)}
+    //                             </span>
+    //                         </div>
+    //                     )}
+    //                     <div className="flex justify-between items-center py-3 bg-blue-100 px-4 rounded-lg">
+    //                         <span className="text-lg font-bold text-gray-900">Grand Total:</span>
+    //                         <span className="text-2xl font-bold text-blue-600">
+    //                             ₹{calculatedTotals.grandTotal.toFixed(2)}
+    //                         </span>
+    //                     </div>
+    //                 </div>
+    //             </div> */}
+
+    //             {/* Additional Information */}
+    //             <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    //                     <i className="fas fa-comment-alt mr-2 text-blue-600"></i>
+    //                     Additional Information
+    //                 </h2>
+    //                 <div className="space-y-4">
+    //                     <div>
+    //                         <label className="block text-sm font-medium text-gray-700 mb-1">
+    //                             Notes
+    //                         </label>
+    //                         <textarea
+    //                             name="notes"
+    //                             value={formData.notes}
+    //                             onChange={handleInputChange}
+    //                             disabled={isReadOnly}
+    //                             rows={3}
+    //                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none"
+    //                             placeholder="Add any notes for the Vendor..."
+    //                         />
+    //                     </div>
+
+    //                 </div>
+    //             </div>
+
+    //             {/* Action Buttons */}
+    //             {(!isReadOnly && (canCreate || canEdit)) && (
+    //                 <div className="flex justify-end gap-4 pt-6">
+    //                     <Button
+    //                         type="button"
+    //                         onClick={() => navigate(-1)}
+    //                         className="bg-gray-500 text-white px-6 py-2"
+    //                         disabled={isSubmitting}
+    //                     >
+    //                         <i className="fas fa-times mr-2"></i>
+    //                         Cancel
+    //                     </Button>
+    //                     <Button
+    //                         type="submit"
+    //                         className="bg-blue-600 text-white px-6 py-2"
+    //                         disabled={isSubmitting}
+    //                     >
+    //                         {isSubmitting ? (
+    //                             <>
+    //                                 <i className="fas fa-spinner fa-spin mr-2"></i>
+    //                                 {isCreateMode ? 'Creating...' : 'Updating...'}
+    //                             </>
+    //                         ) : (
+    //                             <>
+    //                                 <i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i>
+    //                                 {isCreateMode ? 'Create Order' : 'Update Order'}
+    //                             </>
+    //                         )}
+    //                     </Button>
+    //                 </div>
+    //             )}
+    //         </form>
+    //     </div>
+    // );
+
+
+
+    return ( <div className="max-w-full mx-auto space-y-2 bg-brand-surface">
+        {/* Header */}
+        <header className="flex justify-between items-center">
+            <div className='flex justify-between items-center gap-2'>
+                <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className='bg-brand-ash hover:bg-brand-ash-dark flex items-center justify-center w-8 h-8 border border-ash-medium text-text-main text-sm cursor-pointer rounded-md transition-colors'>
+                    <i className="fas fa-arrow-left"></i>
+                </button>
+                <div>
+                    <h1 className="text-3xl font-bold text-text-strong flex items-center">
+                        <i className="fas fa-wallet mr-3 text-text-main"></i>
+                        {isCreateMode ? 'Create Order' : isEditMode ? 'Update Order' : 'View Order'}
+                    </h1>
+                    <p className="text-text-muted mt-1">
+                        {isCreateMode ? 'Fill in the details to create a new Purchase' :
+                            isEditMode ? 'Update the Purchase details' :
+                                'Purchase details'}
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Purchase Details */}
+            <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-lighter">
+                <h2 className="text-xl font-semibold text-text-strong mb-4 flex items-center">
+                    <i className="fas fa-file-alt mr-2 text-text-main"></i>
+                    Purchase Details
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                        <Label className="text-text-strong">Vendor</Label>
+                        <SearchSelectNew
+                            options={VendorOptions}
+                            placeholder="Select Vendor"
+                            searchPlaceholder="Search Vendor..."
+                            value={formData?.vendorId || undefined}
+                            onValueChange={(value) => handleVendorChange(value)}
+                            searchBy="name"
+                            displayFormat="simple"
+                            className="w-full"
+                        />
+                    </div>
 
-                        <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                            <i className="fas fa-wallet mr-3 text-blue-600"></i>
-                            {isCreateMode ? 'Create Order' : isEditMode ? 'Update Order' : 'View Order'}
-                        </h1>
-                        <p className="text-gray-600 mt-1">
-                            {isCreateMode ? 'Fill in the details to create a new Purchase' :
-                                isEditMode ? 'Update the Purchase details' :
-                                    'Purchase details'}
-                        </p>
+                    <div>
+                        <div className='flex items-center gap-1 mb-1'>
+                            <input type="checkbox"
+                            //  className='cursor-pointer text-action-primary focus:ring-action-primary border-ash-medium' 
+                            className='cursor-pointer w-4 h-4 accent-text-main  border-ash-medium rounded focus:ring-ash-dark'
+                             
+                             checked={enableVendorInput} id="enableName" onChange={() => setEnableVendorInput((p) => (!p))} />
+                            <Label htmlFor='enableName' className='cursor-pointer text-text-muted text-sm'>Click to enter name manually if not in dropdown</Label>
+                        </div>
+                        <input
+                            type="text"
+                            name="vendorName"
+                            value={formData.vendorName}
+                            onChange={(e) => {
+                                if (enableVendorInput) handleInputChange(e); 
+                            }}
+                            disabled={isReadOnly || !enableVendorInput}
+                            required
+                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary disabled:bg-brand-ash disabled:text-text-soft disabled:cursor-not-allowed text-text-main bg-brand-surface placeholder-text-soft"
+                            placeholder="Enter Vendor name"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-text-strong mb-1">
+                            Purchase Date
+                        </label>
+                        <input
+                            type="date"
+                            name="purchaseDate"
+                            value={formData.purchaseDate}
+                            onChange={handleInputChange}
+                            disabled={isReadOnly}
+                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary disabled:bg-brand-ash disabled:text-text-soft disabled:cursor-not-allowed text-text-main bg-brand-surface"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-text-strong mb-1">
+                            Delivery Date
+                        </label>
+                        <input
+                            type="date"
+                            name="deliveryDate"
+                            value={formData.deliveryDate}
+                            onChange={handleInputChange}
+                            disabled={isReadOnly}
+                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary disabled:bg-brand-ash disabled:text-text-soft disabled:cursor-not-allowed text-text-main bg-brand-surface"
+                        />
                     </div>
                 </div>
-                {/* <div className="flex gap-2">
-                    {currentMode === 'view' && (
-                        <Button
-                            type="button"
-                            onClick={handleEdit}
-                            className="bg-blue-600 text-white"
-                        >
-                            <i className="fas fa-edit mr-2"></i>
-                            Edit
-                        </Button>
-                    )}
-                    {currentMode === 'edit' && (
-                        <Button
-                            type="button"
-                            onClick={handleCancelEdit}
-                            className="bg-gray-500 text-white"
-                        >
-                            <i className="fas fa-times mr-2"></i>
-                            Cancel
-                        </Button>
-                    )}
+            </div>
 
-                </div> */}
-            </header>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {/* purchase Details */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-file-alt mr-2 text-blue-600"></i>
-                        purchase Details
+            {/* Items Section */}
+            <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-lighter">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold text-text-strong flex items-center">
+                        <i className="fas fa-list mr-2 text-action-primary"></i>
+                        Items <span className="text-action-danger ml-1">*</span>
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <Label>Vendor</Label>
-                            <SearchSelectNew
-                                options={VendorOptions}
-                                placeholder="Select Vendor"
-                                searchPlaceholder="Search Vendor..."
-                                value={formData?.vendorId || undefined}
-                                onValueChange={(value) => handleVendorChange(value)}
-                                searchBy="name"
-                                displayFormat="simple"
-                                className="w-full"
-                            />
-                        </div>
 
-
-                        <div className=''>
-                            <div className='flex items-center gap-1'>
-                                <input type="checkbox" className='cursor-pointer' checked={enableVendorInput} id="enableName" onChange={() => setEnableVendorInput((p) => (!p))} />
-                                <Label htmlFor='enableName' className='cursor-pointer'>Click the check box to enter the name manually, if not available from the drop down</Label>
-                            </div>
-                            <input
-                                type="text"
-                                name="vendorName"
-                                value={
-                                    enableVendorInput
-                                        ? formData.vendorName // user can edit manually
-                                        : "" // show from formData but not editable
-                                }
-                                onChange={(e) => {
-                                    if (enableVendorInput) handleInputChange(e); // only update if manual input is enabled
-                                }}
-                                disabled={isReadOnly || !enableVendorInput} // only enable if checkbox is checked
-
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="Enter Vendor name"
-                            />
-                        </div>
-
-
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Remarks
-                            </label>
-                            <input
-                                type="text"
-                                name="subject"
-                                value={formData.subject}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="Enter Remarks"
-                            />
-                        </div> */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Purchase Date
-                            </label>
-                            <input
-                                type="date"
-                                name="purchaseDate"
-                                value={formData.purchaseDate}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                DeliveryDate Date
-                            </label>
-                            <input
-                                type="date"
-                                name="deliveryDate"
-                                value={formData.deliveryDate}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            />
-                        </div>
-                    </div>
+                    {!isReadOnly && (
+                        <Button
+                            type="button"
+                            onClick={handleAddItem}
+                            variant='dark'
+                        >
+                            <i className="fas fa-plus mr-2"></i>
+                            Add Item
+                        </Button>
+                    )}
                 </div>
 
-                {/* Items Section */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                            <i className="fas fa-list mr-2 text-blue-600"></i>
-                            Items <span className="text-red-500 ml-1">*</span>
-                        </h2>
-
-                        {!isReadOnly && (
-                            <Button
-                                type="button"
-                                onClick={handleAddItem}
-                                variant='primary'
-                            >
-                                <i className="fas fa-plus mr-2"></i>
-                                Add Item
-                            </Button>
-                        )}
+                {formData.items.length === 0 ? (
+                    <div className="text-center py-8 text-text-muted">
+                        <i className="fas fa-inbox text-4xl mb-2 text-text-soft"></i>
+                        <p>No items added yet.</p>
                     </div>
-
-                    {(formData?.items?.length === 0 && initialMode === "view") ? (
-                        <div className="text-center py-8 text-gray-500">
-                            <i className="fas fa-inbox text-4xl mb-2"></i>
-                            <p>No items added yet.</p>
-                            {/* <Button
-                                type="button"
-                                onClick={handleAddItem}
-                                className="mt-4 bg-blue-600 text-white"
-                            >
-                                <i className="fas fa-plus mr-2"></i>
-                                Add First Item
-                            </Button> */}
+                ) : (
+                    <div className="overflow-x-auto">
+                        <div className="grid grid-cols-12 gap-3 mb-2 px-4 py-3 bg-brand-ash rounded-lg font-semibold text-text-strong text-sm">
+                            <div className="col-span-1 text-center">#</div>
+                            <div className="col-span-4 text-center">Item Name <span className="text-action-danger">*</span></div>
+                            <div className="col-span-2 text-center">Quantity</div>
+                            <div className="col-span-2 text-center">Rate <span className="text-action-danger">*</span></div>
+                            <div className="col-span-2 text-center">Total</div>
+                            <div className="col-span-1 text-center">Action</div>
                         </div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            {/* Table Header */}
-                            <div className="grid grid-cols-12 gap-3 mb-2 px-4 py-3 bg-gray-100 rounded-lg font-semibold text-gray-700 text-sm">
-                                <div className="col-span-1 text-center">#</div>
-                                <div className="col-span-4 text-center">Item Name <span className="text-red-500">*</span></div>
-                                <div className="col-span-2 text-center">Quantity</div>
-                                <div className="col-span-2 text-center">Rate <span className="text-red-500">*</span></div>
-                                <div className="col-span-2 text-center">Total</div>
-                                <div className="col-span-1 text-center">Action</div>
-                            </div>
 
-                            {/* Table Rows */}
-                            <div className="space-y-2">
-                                {formData.items.map((item, index) => (
-                                    <div
-                                        key={index}
-                                        className="grid grid-cols-12 gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 transition-colors items-center"
-                                    >
-                                        {/* Row Number */}
-                                        <div className="col-span-1 text-center text-gray-600 font-medium">
-                                            {index + 1}
-                                        </div>
-
-                                        {/* Item Name */}
-                                        <div className="col-span-4">
-                                            <input
-                                                type="text"
-                                                value={item.itemName}
-                                                onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
-                                                disabled={isReadOnly}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
-                                                placeholder="Enter item name"
-                                            />
-                                        </div>
-
-                                        {/* Quantity */}
-                                        <div className="col-span-2">
-                                            <input
-                                                type="number"
-                                                value={item.quantity}
-                                                onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                                                disabled={isReadOnly}
-                                                min="0"
-                                                step="1"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
-                                                placeholder="0"
-                                            />
-                                        </div>
-
-                                        {/* Rate */}
-                                        <div className="col-span-2">
-                                            <input
-                                                type="number"
-                                                value={item.rate}
-                                                onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
-                                                disabled={isReadOnly}
-                                                min="0"
-                                                step="0.01"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
-                                                placeholder="0.00"
-                                            />
-                                        </div>
-
-                                        {/* Total */}
-                                        <div className="col-span-2 text-center font-semibold text-gray-900">
-                                            ₹{item.totalCost.toFixed(2)}
-                                        </div>
-
-                                        {/* Delete Button */}
-                                        <div className="col-span-1 text-center">
-                                            {!isReadOnly && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveItem(index)}
-                                                    disabled={formData.items.length === 1}
-                                                    className="text-red-600 cursor-pointer hover:text-red-800 disabled:text-gray-400 disabled:cursor-not-allowed p-2 rounded-full hover:bg-red-50 transition-colors"
-                                                    title={formData.items.length === 1 ? "Cannot delete last item" : "Delete item"}
-                                                >
-                                                    <i className="fas fa-trash"></i>
-                                                </button>
-                                            )}
-                                        </div>
+                        <div className="space-y-2">
+                            {formData.items.map((item, index) => (
+                                <div key={index} className="grid grid-cols-12 gap-3 px-4 py-3 bg-brand-surface border border-ash-medium rounded-lg hover:border-action-primary transition-colors items-center">
+                                    <div className="col-span-1 text-center text-text-muted font-medium">{index + 1}</div>
+                                    <div className="col-span-4">
+                                        <input
+                                            type="text"
+                                            value={item.itemName}
+                                            onChange={(e) => handleItemChange(index, 'itemName', e.target.value)}
+                                            disabled={isReadOnly}
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary disabled:bg-brand-ash disabled:text-text-soft disabled:cursor-not-allowed text-sm text-text-main bg-brand-surface placeholder-text-soft"
+                                            placeholder="Enter item name"
+                                        />
                                     </div>
-                                ))}
-                            </div>
-
-                            {/* Summary Row */}
-                            <div className="grid grid-cols-12 gap-3 px-4 py-3 bg-blue-50 rounded-lg mt-4 font-semibold text-gray-800">
-                                <div className="col-span-9 text-right">Subtotal:</div>
-                                <div className="col-span-2 text-right text-blue-600 text-lg">
-                                    ₹{calculatedTotals.totalAmount.toFixed(2)}
+                                    <div className="col-span-2">
+                                        <input
+                                            type="number"
+                                            value={item.quantity}
+                                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                                            disabled={isReadOnly}
+                                            min="0"
+                                            step="1"
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary disabled:bg-brand-ash disabled:text-text-soft disabled:cursor-not-allowed text-sm text-text-main bg-brand-surface"
+                                            placeholder="0"
+                                        />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <input
+                                            type="number"
+                                            value={item.rate}
+                                            onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
+                                            disabled={isReadOnly}
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary disabled:bg-brand-ash disabled:text-text-soft disabled:cursor-not-allowed text-sm text-text-main bg-brand-surface"
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                    <div className="col-span-2 text-center font-semibold text-text-strong">₹{item.totalCost.toFixed(2)}</div>
+                                    <div className="col-span-1 text-center">
+                                        {!isReadOnly && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveItem(index)}
+                                                disabled={formData.items.length === 1}
+                                                className="text-action-danger hover:text-red-700 disabled:text-text-soft disabled:cursor-not-allowed p-2 rounded-full hover:bg-brand-ash transition-colors"
+                                            >
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="col-span-1"></div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Discount and Tax */}
-                {/* <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-calculator mr-2 text-blue-600"></i>
-                        Discount & Tax
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Discount Percentage (%)
-                            </label>
-                            <input
-                                type="number"
-                                name="discountPercentage"
-                                value={formData.discountPercentage}
-                                onChange={handleNumberChange}
-                                disabled={isReadOnly}
-                                min="0"
-                                max="100"
-                                step="0.01"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="0.00"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Tax Percentage (%)
-                            </label>
-                            <input
-                                type="number"
-                                name="taxPercentage"
-                                value={formData.taxPercentage}
-                                onChange={handleNumberChange}
-                                disabled={isReadOnly}
-                                min="0"
-                                max="100"
-                                step="0.01"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                placeholder="0.00"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm p-6 border border-blue-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-receipt mr-2 text-blue-600"></i>
-                        Purchase Summary
-                    </h2>
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                            <span className="text-gray-700 font-medium">Subtotal:</span>
-                            <span className="text-xl font-semibold text-gray-900">
-                                ₹{calculatedTotals.totalAmount.toFixed(2)}
-                            </span>
-                        </div>
-                        {formData.discountPercentage > 0 && (
-                            <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                                <span className="text-gray-700 font-medium">
-                                    Discount ({formData.discountPercentage}%):
-                                </span>
-                                <span className="text-xl font-semibold text-green-600">
-                                    -₹{calculatedTotals.discountAmount.toFixed(2)}
-                                </span>
-                            </div>
-                        )}
-                        {formData.taxPercentage > 0 && (
-                            <div className="flex justify-between items-center py-2 border-b border-blue-200">
-                                <span className="text-gray-700 font-medium">
-                                    Tax ({formData.taxPercentage}%):
-                                </span>
-                                <span className="text-xl font-semibold text-gray-900">
-                                    ₹{calculatedTotals.taxAmount.toFixed(2)}
-                                </span>
-                            </div>
-                        )}
-                        <div className="flex justify-between items-center py-3 bg-blue-100 px-4 rounded-lg">
-                            <span className="text-lg font-bold text-gray-900">Grand Total:</span>
-                            <span className="text-2xl font-bold text-blue-600">
-                                ₹{calculatedTotals.grandTotal.toFixed(2)}
-                            </span>
-                        </div>
-                    </div>
-                </div> */}
-
-                {/* Additional Information */}
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                        <i className="fas fa-comment-alt mr-2 text-blue-600"></i>
-                        Additional Information
-                    </h2>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Notes
-                            </label>
-                            <textarea
-                                name="notes"
-                                value={formData.notes}
-                                onChange={handleInputChange}
-                                disabled={isReadOnly}
-                                rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none"
-                                placeholder="Add any notes for the Vendor..."
-                            />
+                            ))}
                         </div>
 
-                    </div>
-                </div>
-
-                {/* Action Buttons */}
-                {(!isReadOnly && (canCreate || canEdit)) && (
-                    <div className="flex justify-end gap-4 pt-6">
-                        <Button
-                            type="button"
-                            onClick={() => navigate(-1)}
-                            className="bg-gray-500 text-white px-6 py-2"
-                            disabled={isSubmitting}
-                        >
-                            <i className="fas fa-times mr-2"></i>
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            className="bg-blue-600 text-white px-6 py-2"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <i className="fas fa-spinner fa-spin mr-2"></i>
-                                    {isCreateMode ? 'Creating...' : 'Updating...'}
-                                </>
-                            ) : (
-                                <>
-                                    <i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i>
-                                    {isCreateMode ? 'Create Order' : 'Update Order'}
-                                </>
-                            )}
-                        </Button>
+                        <div className="grid grid-cols-12 gap-3 px-4 py-3 bg-brand-ash rounded-lg mt-4 font-semibold text-text-strong">
+                            <div className="col-span-9 text-right">Subtotal:</div>
+                            <div className="col-span-2 text-center text-text-strong text-lg">₹{calculatedTotals.totalAmount.toFixed(2)}</div>
+                            <div className="col-span-1"></div>
+                        </div>
                     </div>
                 )}
-            </form>
-        </div>
-    );
+            </div>
+
+            {/* Additional Information */}
+            <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-lighter">
+                <h2 className="text-xl font-semibold text-text-strong mb-4 flex items-center">
+                    <i className="fas fa-comment-alt mr-2 text-text-main"></i>
+                    Additional Information
+                </h2>
+                <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleInputChange}
+                    disabled={isReadOnly}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary disabled:bg-brand-ash disabled:text-text-soft disabled:cursor-not-allowed resize-none text-text-main bg-brand-surface placeholder-text-soft"
+                    placeholder="Add any notes for the Vendor..."
+                />
+            </div>
+
+            {/* Action Buttons */}
+            {(!isReadOnly && (canCreate || canEdit)) && (
+                <div className="flex justify-end gap-4 pt-6">
+                    <Button
+                        type="button"
+                        variant='secondary'
+                        onClick={() => navigate(-1)}
+                        className="px-6 py-2"
+                        disabled={isSubmitting}
+                    >
+                        <i className="fas fa-times mr-2"></i>
+                        Cancel
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="dark"
+                        className="px-6 py-2"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? (
+                            <><i className="fas fa-spinner fa-spin mr-2"></i> {isCreateMode ? 'Creating...' : 'Updating...'}</>
+                        ) : (
+                            <><i className={`fas ${isCreateMode ? 'fa-plus' : 'fa-save'} mr-2`}></i> {isCreateMode ? 'Create Order' : 'Update Order'}</>
+                        )}
+                    </Button>
+                </div>
+            )}
+        </form>
+    </div>
+    )
 };
 
 export default PurchaseAccForm;

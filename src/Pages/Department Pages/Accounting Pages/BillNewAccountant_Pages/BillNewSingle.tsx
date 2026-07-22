@@ -48,7 +48,7 @@ function useUndoRedo<T>(initialState: T) {
 
     // Explicit setter for async updates
     const updateState = (value: T | ((val: T) => T)) => {
-        const nextState = typeof value === 'function' ? (value as Function)(state) : value;
+        const nextState = typeof value === 'function' ? (value as any)(state) : value;
         if (JSON.stringify(state) === JSON.stringify(nextState)) return;
         const newHistory = history.slice(0, index + 1);
         newHistory.push(nextState);
@@ -297,13 +297,13 @@ const BillNewSingle: React.FC<BillNewSingleProps> = ({ mode }) => {
     const { data: billData, isLoading: isBillLoading } = useGetBillNewById({ id: id || '' });
     const { data: projects } = useGetProjects(organizationId!);
 
-    
-            const { role, permission } = useAuthCheck();
-            // const canList = role === "owner" || permission?.billtemplate?.list;
-            const canCreate = role === "owner" || permission?.billtemplate?.create
-            const canEdit = role === "owner" || permission?.billtemplate?.edit
-            // const canDelete = role === "owner" || permission?.billtemplate?.delete
-        
+
+    const { role, permission } = useAuthCheck();
+    // const canList = role === "owner" || permission?.billtemplate?.list;
+    const canCreate = role === "owner" || permission?.billtemplate?.create
+    const canEdit = role === "owner" || permission?.billtemplate?.edit
+    // const canDelete = role === "owner" || permission?.billtemplate?.delete
+
 
     // --- STATE ---
     const { state: components = [], setState: setComponents, undo, redo, canUndo, canRedo, reset: resetHistory } = useUndoRedo<ComponentItem[]>([]);
@@ -321,9 +321,25 @@ const BillNewSingle: React.FC<BillNewSingleProps> = ({ mode }) => {
 
     // --- SHORTCUTS ---
     useEffect(() => {
+        // const h = (e: KeyboardEvent) => {
+        //     if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+        //     if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); redo(); }
+        // };
+
+
         const h = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
-            if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); redo(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    redo();
+                } else {
+                    undo();
+                }
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+                e.preventDefault();
+                redo();
+            }
         };
         window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h);
     }, [undo, redo]);
@@ -444,37 +460,136 @@ const BillNewSingle: React.FC<BillNewSingleProps> = ({ mode }) => {
     if (mode === 'edit' && isBillLoading) return <div className="p-10 text-center">Loading...</div>;
     const activeComp = components.find(c => c.id === selectedId);
 
+    // return (
+    //     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
+    //         {/* HEADER */}
+    //         <div className="bg-white border-b px-4 py-2 shadow-sm z-30">
+    //             <div className="flex justify-between items-center mb-2">
+    //                 <div className="flex items-center gap-3">
+    //                     <button onClick={() => navigate(-1)}><i className="fa-solid fa-arrow-left text-gray-500"></i></button>
+    //                     <input className="font-bold text-gray-700 outline-none border-b border-transparent hover:border-gray-300 focus:border-blue-500 w-48" value={billMeta.customerName} onChange={(e) => setBillMeta({ ...billMeta, customerName: e.target.value })} placeholder="Customer Name" />
+    //                     <select className="text-sm border border-gray-300 rounded px-2 py-1 w-48" value={billMeta.projectId} onChange={(e) => setBillMeta({ ...billMeta, projectId: e.target.value })}>
+    //                         <option value="">Select Project</option>
+    //                         {projects?.map((p: any) => <option key={p._id} value={p._id}>{p.projectName}</option>)}
+    //                     </select>
+    //                 </div>
+    //                 <div className="flex gap-2">
+    //                     <Button variant="outline" onClick={() => setShowTemplates(!showTemplates)}>{showTemplates ? 'Hide' : 'Show'} Templates</Button>
+    //                    {(canCreate || canEdit) && <Button onClick={handleSave} isLoading={createMutation.isPending || updateMutation.isPending}>Save Bill</Button>}
+    //                 </div>
+    //             </div>
+
+    //             {/* TOOLBAR */}
+    //             <div className="flex items-center gap-2 border-t pt-2">
+    //                 <button onClick={undo} disabled={!canUndo} className={`btn-tool ${!canUndo ? 'opacity-50' : ''}`} title="Undo (Ctrl+Z)"><i className="fa-solid fa-rotate-left"></i></button>
+    //                 <button onClick={redo} disabled={!canRedo} className={`btn-tool ${!canRedo ? 'opacity-50' : ''}`} title="Redo (Ctrl+Y)"><i className="fa-solid fa-rotate-right"></i></button>
+    //                 <div className="w-px h-6 bg-gray-300 mx-2"></div>
+    //                 <button onClick={() => addBlock('text')} className="btn-tool"><i className="fa-solid fa-font"></i> Text</button>
+    //                 <button onClick={() => addBlock('data-field')} className="btn-tool"><i className="fa-solid fa-database"></i> Field</button>
+    //                 <div className="relative">
+    //                     <button onClick={() => setShowTableGrid(!showTableGrid)} className="btn-tool"><i className="fa-solid fa-table"></i> Table</button>
+    //                     {showTableGrid && <TableGridSelector onSelect={addTable} />}
+    //                 </div>
+    //                 <button onClick={() => fileInputRef.current?.click()} className="btn-tool"><i className="fa-regular fa-image"></i> Image</button>
+    //                 <input type="file" ref={fileInputRef} className="hidden" onChange={handleImageUpload} />
+    //             </div>
+    //         </div>
+
+    //         {/* TEMPLATE DRAWER */}
+    //         {showTemplates && <TemplateDrawer organizationId={organizationId!} onSelect={handleTemplateSelect} onClose={() => setShowTemplates(false)} />}
+
+    //         {/* CANVAS */}
+    //         <div className="flex-1 bg-gray-200 overflow-auto p-8 relative" onClick={() => { setSelectedId(null); setActiveCell(null); }}>
+    //             <DndContext sensors={sensors} onDragEnd={(e) => {
+    //                 const { active, delta } = e;
+    //                 setComponents(prev => prev.map(c => c.id === active.id ? { ...c, x: c.x + delta.x, y: c.y + delta.y } : c));
+    //             }}>
+    //                 <div className="mx-auto bg-white shadow-2xl relative" style={{ width: 794, minHeight: 1123, height: 'auto' }}>
+    //                     {billMeta.pdfData && <div className="absolute inset-0 z-0 pointer-events-none"><img src={billMeta.pdfData.url} className="w-full h-full opacity-50 object-cover" /></div>}
+    //                     {components.map(comp => (
+    //                         <DraggableBlock
+    //                             key={comp.id}
+    //                             component={comp}
+    //                             isSelected={comp.id === selectedId}
+    //                             activeCell={comp.id === selectedId ? activeCell : null}
+    //                             onClick={() => setSelectedId(comp.id)}
+    //                             onCellSelect={(r: number, c: number) => { setSelectedId(comp.id); setActiveCell({ r, c }); }}
+    //                             onUpdateValue={(val: any) => updateComp(comp.id, 'value', val)}
+    //                             onUpdateMeta={(field: string, val: any) => updateComp(comp.id, field, val, field === 'label' ? false : true)} // Hacky check
+    //                             onResize={(w: number, h: number) => setComponents(prev => prev.map(c => c.id === comp.id ? { ...c, style: { ...c.style, width: w, height: h } } : c))}
+    //                             onDelete={() => { setComponents(prev => prev.filter(c => c.id !== comp.id)); setSelectedId(null); }}
+    //                         />
+    //                     ))}
+    //                 </div>
+    //             </DndContext>
+    //         </div>
+
+    //         {selectedId && activeComp && (
+    //             <PropertySidebar
+    //                 component={activeComp}
+    //                 activeCell={activeComp.type === 'table' ? activeCell : null}
+    //                 onUpdate={(k: string, v: any, isStyle = false) => updateComp(selectedId, k, v, isStyle)}
+    //                 onUpdateCell={(r: number, c: number, k: string, v: any) => updateCell(selectedId, r, c, k, v)}
+    //                 onDelete={() => { setComponents(prev => prev.filter(c => c.id !== selectedId)); setSelectedId(null); }}
+    //                 onClose={() => setSelectedId(null)}
+    //             />
+    //         )}
+    //     </div>
+    // );
+
+
+
+
     return (
-        <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
+        <div className="h-screen flex flex-col bg-brand-ash overflow-hidden">
             {/* HEADER */}
-            <div className="bg-white border-b px-4 py-2 shadow-sm z-30">
+            <div className="bg-brand-surface border-b border-ash-medium px-4 py-2 shadow-sm z-30">
                 <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-3">
-                        <button onClick={() => navigate(-1)}><i className="fa-solid fa-arrow-left text-gray-500"></i></button>
-                        <input className="font-bold text-gray-700 outline-none border-b border-transparent hover:border-gray-300 focus:border-blue-500 w-48" value={billMeta.customerName} onChange={(e) => setBillMeta({ ...billMeta, customerName: e.target.value })} placeholder="Customer Name" />
-                        <select className="text-sm border border-gray-300 rounded px-2 py-1 w-48" value={billMeta.projectId} onChange={(e) => setBillMeta({ ...billMeta, projectId: e.target.value })}>
+                        <button onClick={() => navigate(-1)}>
+                            <i className="fa-solid fa-arrow-left text-text-muted hover:text-text-main transition-colors"></i>
+                        </button>
+                        <input
+                            className="font-bold text-text-main bg-transparent outline-none border-b border-transparent hover:border-ash-medium focus:border-action-primary placeholder-text-soft w-48 transition-colors"
+                            value={billMeta.customerName}
+                            onChange={(e) => setBillMeta({ ...billMeta, customerName: e.target.value })}
+                            placeholder="Customer Name"
+                        />
+                        <select
+                            className="text-sm border border-ash-medium bg-brand-surface text-text-main rounded px-2 py-1 w-48 outline-none focus:border-action-primary transition-colors"
+                            value={billMeta.projectId}
+                            onChange={(e) => setBillMeta({ ...billMeta, projectId: e.target.value })}
+                        >
                             <option value="">Select Project</option>
                             {projects?.map((p: any) => <option key={p._id} value={p._id}>{p.projectName}</option>)}
                         </select>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setShowTemplates(!showTemplates)}>{showTemplates ? 'Hide' : 'Show'} Templates</Button>
-                       {(canCreate || canEdit) && <Button onClick={handleSave} isLoading={createMutation.isPending || updateMutation.isPending}>Save Bill</Button>}
+                        <Button variant="outline" onClick={() => setShowTemplates(!showTemplates)}>
+                            {showTemplates ? 'Hide' : 'Show'} Templates
+                        </Button>
+                        {(canCreate || canEdit) && (
+                            <Button variant="dark" onClick={handleSave} isLoading={createMutation.isPending || updateMutation.isPending}>
+                                Save Bill
+                            </Button>
+                        )}
                     </div>
                 </div>
 
                 {/* TOOLBAR */}
-                <div className="flex items-center gap-2 border-t pt-2">
-                    <button onClick={undo} disabled={!canUndo} className={`btn-tool ${!canUndo ? 'opacity-50' : ''}`} title="Undo (Ctrl+Z)"><i className="fa-solid fa-rotate-left"></i></button>
-                    <button onClick={redo} disabled={!canRedo} className={`btn-tool ${!canRedo ? 'opacity-50' : ''}`} title="Redo (Ctrl+Y)"><i className="fa-solid fa-rotate-right"></i></button>
-                    <div className="w-px h-6 bg-gray-300 mx-2"></div>
-                    <button onClick={() => addBlock('text')} className="btn-tool"><i className="fa-solid fa-font"></i> Text</button>
-                    <button onClick={() => addBlock('data-field')} className="btn-tool"><i className="fa-solid fa-database"></i> Field</button>
+                <div className="flex items-center gap-2 border-t border-ash-medium pt-2">
+                    <button onClick={undo} disabled={!canUndo} className={`btn-tool text-text-main hover:text-action-primary transition-colors ${!canUndo ? 'opacity-50 cursor-not-allowed' : ''}`} title="Undo (Ctrl+Z)"><i className="fa-solid fa-rotate-left"></i></button>
+                    <button onClick={redo} disabled={!canRedo} className={`btn-tool text-text-main hover:text-action-primary transition-colors ${!canRedo ? 'opacity-50 cursor-not-allowed' : ''}`} title="Redo (Ctrl+Y)"><i className="fa-solid fa-rotate-right"></i></button>
+
+                    <div className="w-px h-6 bg-ash-medium mx-2"></div>
+
+                    <button onClick={() => addBlock('text')} className="btn-tool text-text-main hover:text-action-primary transition-colors"><i className="fa-solid fa-font"></i> Text</button>
+                    <button onClick={() => addBlock('data-field')} className="btn-tool text-text-main hover:text-action-primary transition-colors"><i className="fa-solid fa-database"></i> Field</button>
                     <div className="relative">
-                        <button onClick={() => setShowTableGrid(!showTableGrid)} className="btn-tool"><i className="fa-solid fa-table"></i> Table</button>
+                        <button onClick={() => setShowTableGrid(!showTableGrid)} className="btn-tool text-text-main hover:text-action-primary transition-colors"><i className="fa-solid fa-table"></i> Table</button>
                         {showTableGrid && <TableGridSelector onSelect={addTable} />}
                     </div>
-                    <button onClick={() => fileInputRef.current?.click()} className="btn-tool"><i className="fa-regular fa-image"></i> Image</button>
+                    <button onClick={() => fileInputRef.current?.click()} className="btn-tool text-text-main hover:text-action-primary transition-colors"><i className="fa-regular fa-image"></i> Image</button>
                     <input type="file" ref={fileInputRef} className="hidden" onChange={handleImageUpload} />
                 </div>
             </div>
@@ -483,12 +598,12 @@ const BillNewSingle: React.FC<BillNewSingleProps> = ({ mode }) => {
             {showTemplates && <TemplateDrawer organizationId={organizationId!} onSelect={handleTemplateSelect} onClose={() => setShowTemplates(false)} />}
 
             {/* CANVAS */}
-            <div className="flex-1 bg-gray-200 overflow-auto p-8 relative" onClick={() => { setSelectedId(null); setActiveCell(null); }}>
+            <div className="flex-1 bg-ash-light overflow-auto p-8 relative" onClick={() => { setSelectedId(null); setActiveCell(null); }}>
                 <DndContext sensors={sensors} onDragEnd={(e) => {
                     const { active, delta } = e;
                     setComponents(prev => prev.map(c => c.id === active.id ? { ...c, x: c.x + delta.x, y: c.y + delta.y } : c));
                 }}>
-                    <div className="mx-auto bg-white shadow-2xl relative" style={{ width: 794, minHeight: 1123, height: 'auto' }}>
+                    <div className="mx-auto bg-brand-surface shadow-2xl relative" style={{ width: 794, minHeight: 1123, height: 'auto' }}>
                         {billMeta.pdfData && <div className="absolute inset-0 z-0 pointer-events-none"><img src={billMeta.pdfData.url} className="w-full h-full opacity-50 object-cover" /></div>}
                         {components.map(comp => (
                             <DraggableBlock

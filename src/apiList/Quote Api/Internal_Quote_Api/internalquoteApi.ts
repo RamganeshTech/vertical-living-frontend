@@ -128,6 +128,38 @@ export const updateSqftRateInternalQuote = async ({
 };
 
 
+export const getProductSpecificInternalQuote = async ({
+    api,
+    organizationId,
+}: {
+    api: AxiosInstance;
+    organizationId: string;
+}) => {
+    const { data } = await api.get(`quote/quotegenerate/get/product-specific/${organizationId}`);
+    if (!data.ok) throw new Error(data?.message || "Failed to fetch quotes");
+    return data.data;
+};
+
+export const toggleProductSpecificInternalQuote = async ({
+    api,
+    quoteId,
+    isProductSpecific,
+}: {
+    api: AxiosInstance;
+    quoteId: string;
+    isProductSpecific: boolean;
+}) => {
+    const { data } = await api.patch(
+        `quote/quotegenerate/toggle/product-specific/${quoteId}`,
+        { isProductSpecific }
+    );
+    if (!data.ok) throw new Error(data?.message || "Failed to update quote");
+    return data.data;
+};
+
+
+
+
 export const copyInternalQuote = async ({
     api,
     id,
@@ -366,3 +398,49 @@ export const useCopyInternalQuote = () => {
     });
 };
 
+
+
+export const useGetProductSpecificInternalQuotes = (organizationId: string) => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useQuery({
+        queryKey: ["material-items", "product-specific"],
+        queryFn: async () => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to create quotes");
+            if (!api) throw new Error("API instance for role not found");
+
+            return await getProductSpecificInternalQuote({ api, organizationId })
+        },
+        enabled: !!organizationId
+    });
+};
+
+
+
+export const useToggleProductSpecificInternalQuote = () => {
+    const allowedRoles = ["owner", "staff", "CTO"];
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useMutation({
+        mutationFn: async ({
+            quoteId,
+            isProductSpecific,
+        }: {
+            quoteId: string;
+            isProductSpecific: boolean;
+        }) => {
+            if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to update quotes");
+            if (!api) throw new Error("API instance for role not found");
+
+            return await toggleProductSpecificInternalQuote({ api, quoteId, isProductSpecific });
+        },
+        onSuccess: () => {
+            // Refresh the dropdown list so it reflects the new flag immediately
+            queryClient.invalidateQueries({ queryKey: ["material-items", "product-specific"] });
+            // queryClient.invalidateQueries({ queryKey: ["material-items",  quoteId] });
+        },
+    });
+};

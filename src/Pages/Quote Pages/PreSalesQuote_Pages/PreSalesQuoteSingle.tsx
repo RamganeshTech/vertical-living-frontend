@@ -821,52 +821,7 @@ export default function PreSalesQuoteSingle() {
         <div className="h-screen max-h-full overflow-y-auto bg-[#F8FAFC] flex flex-col">
 
 
-            {/* 🔹 ADD THIS STYLE BLOCK HERE */}
-            {/* <style>
-                {`
-                @media print {
-                    
-                    body * {
-                        visibility: hidden !important;
-                    }
-
-                    
-                    #printable-quote, #printable-quote * {
-                        visibility: visible !important;
-                    }
-
-                    
-                    #printable-quote {
-                        position: absolute !important;
-                        left: 0 !important;
-                        top: 0 !important;
-                        width: 100% !important;
-                        margin: 0 !important;
-                        padding: 20px !important; 
-                        border: none !important;
-                        box-shadow: none !important;
-                    }
-
-                    
-                    html, body {
-                        height: auto !important;
-                        overflow: visible !important;
-                        background: white !important;
-                    }
-
-                    
-                    * {
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                    }
-
-                    
-                    header, .no-print, button, nav {
-                        display: none !important;
-                    }
-                }
-                `}
-            </style> */}
+           
 
 
             {isModalOpen && (

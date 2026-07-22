@@ -25,8 +25,8 @@ const ORG_MODULES = [
 
     "pincode",
     "pincodeMapping",
-    
-    
+
+
     "subcontract",
     "cutlist",
     // "materialquote",
@@ -50,6 +50,9 @@ const ORG_MODULES = [
     "productinventory",
     "invitecto",
     "invitestaff",
+
+
+    "premises", "tariff", "eb"
 
 ];
 

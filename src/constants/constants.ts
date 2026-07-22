@@ -49,6 +49,11 @@ export const SIDEBAR_LABELS: Record<string, string> = {
   SINGLESTAFFTASK: "Tasks",
   MATERIALINVENTORY: "Product Inventory",
 
+  EBLOG: "EB Logs",
+  PREMISES: "Premises",
+  EBDASHBOARD: "EB Dashboard",
+  TARIFF: "Tariff Settings"
+
   // NOTIFICATION: "Notification",
 
   // ISSUES: "Issues",
@@ -106,6 +111,11 @@ export const SIDEBAR_ICONS: Record<string, string> = {
   SINGLESTAFFTASK: "fas fa-object-group text-2xl",
   MATERIALINVENTORY: "fa-solid fa-object-group text-2xl",
   // NOTIFICATION: "fas fa-message",
+
+  EBLOG: "fas fa-bolt",
+  PREMISES: "fas fa-building",
+  EBDASHBOARD: "fas fa-chart-pie",
+  TARIFF: "fas fa-file-invoice"
 
   // ISSUES: "fa-solid fa-bug text-2xl",
   // COLLABORATION: "fa-solid fa-user-group text-2xl",

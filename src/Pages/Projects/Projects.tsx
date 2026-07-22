@@ -232,6 +232,10 @@ export const PERMISSION_MAPPING: Record<string, string | string[]> = {
   SUBCONTRACT: "subcontract",
 
   INSTANTCOSTCALCULATION: "instant_cost_calculation",
+  EBLOG: "eb",
+  PREMISES: "premises",
+  EBDASHBOARD: "eb",
+  TARIFF: "tariff",
 
 
   STAFFTASK: "stafftask",
@@ -287,6 +291,11 @@ export const getProjectPaths = (organizationId: string | undefined): Record<stri
     STAFFTASK: `/organizations/${organizationId}/projects/stafftask`,
     SINGLESTAFFTASK: `/organizations/${organizationId}/projects/associatedstafftask`,
     MATERIALINVENTORY: `/organizations/${organizationId}/projects/materialinventory`,
+
+    EBLOG: `/organizations/${organizationId}/projects/eb-log`,
+    PREMISES: `/organizations/${organizationId}/projects/premises`,
+    // EBDASHBOARD: `/organizations/${organizationId}/projects/eb-dashboard`,
+    TARIFF: `/organizations/${organizationId}/projects/tariff`,
   };
 };
 
@@ -459,6 +468,14 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
       id: "PINCODE_MODULE",
       label: "Pincode Module",
       keys: ["PINCODE", "PINCODEPROJECTSASSIGNMENT", "EXECUTIONPARTNER"]
+
+    },
+    {
+      id: "EB_MODULE",
+      label: "EB Management",
+      // keys: ["EBDASHBOARD", "PREMISES", "EBLOG","TARIFF",]
+      keys: [ "PREMISES", "EBLOG","TARIFF",]
+
 
     }
   ];

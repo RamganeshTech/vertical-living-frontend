@@ -180,30 +180,400 @@ const ExpenseAccountsMain = () => {
         return <Outlet />;
     }
 
+    // return (
+    //     <div className="space-y-4 h-full">
+    //         {/* Header */}
+    //         <div className="flex justify-between items-center">
+    //             <div>
+    //                 <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+    //                     <i className="fas fa-receipt mr-3 text-blue-600"></i>
+    //                     Expense Accounts
+    //                 </h1>
+    //                 <Breadcrumb paths={paths} />
+    //             </div>
+
+    //             <div className="flex items-center gap-3">
+    //                 {canCreate && <Button onClick={() => navigate('create')}>
+    //                     <i className="fas fa-plus mr-2" />
+    //                     Create Expense
+    //                 </Button>}
+
+    //                 <div className="w-full sm:w-auto flex justify-end sm:block">
+    //                     <StageGuide
+    //                         organizationId={organizationId!}
+    //                         stageName="expense"
+    //                     />
+    //                 </div>
+    //             </div>
+    //         </div>
+
+            
+
+    //         {/* Loading State */}
+    //         {isLoading ? (
+    //             <div className="flex justify-center items-center py-12">
+    //                 <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+    //             </div>
+    //         ) : isError ? (
+    //             <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
+    //                 <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+    //                     ⚠️ Error Occurred
+    //                 </div>
+    //                 <p className="text-red-500 mb-4 text-lg sm:text-xl">
+    //                     {(error as any)?.message || "Failed to load expenses"}
+    //                 </p>
+    //                 <Button
+    //                     onClick={() => refetch()}
+    //                     className="bg-red-600 text-white px-4 py-2"
+    //                 >
+    //                     Retry
+    //                 </Button>
+    //             </div>
+    //         ) : (
+    //             <main className="flex gap-2 !max-h-[88%]">
+    //                 {/* Filters Sidebar */}
+    //                 <div className="xl:w-80 flex-shrink-0 !max-h-[90%] overflow-y-auto ">
+    //                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+    //                         <div className="flex items-center justify-between mb-6">
+    //                             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+    //                                 <i className="fas fa-filter mr-2 text-blue-600"></i>
+    //                                 Filters
+    //                             </h3>
+    //                             {activeFiltersCount > 0 && (
+    //                                 <button
+    //                                     onClick={clearFilters}
+    //                                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+    //                                 >
+    //                                     Clear All ({activeFiltersCount})
+    //                                 </button>
+    //                             )}
+    //                         </div>
+
+    //                         <div className="space-y-6">
+    //                             {/* Search by Invoice Number */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-search mr-2"></i>
+    //                                     Search
+    //                                 </label>
+    //                                 <input
+    //                                     type="text"
+    //                                     autoFocus
+    //                                     placeholder="Search by vendor name..."
+    //                                     value={filters.search}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+                                
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     From CreatedAt Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.createdFromDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, createdFromDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     To CreatedAt Date
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.createdToDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, createdToDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     From Date of Payment
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.expenseDateFromDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, expenseDateFromDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-calendar mr-2"></i>
+    //                                     To Date of Payment
+    //                                 </label>
+    //                                 <input
+    //                                     type="date"
+    //                                     value={filters.expenseDateToDate}
+    //                                     onChange={(e) => {
+    //                                         setFilters(f => ({ ...f, expenseDateToDate: e.target.value }));
+    //                                     }}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 />
+    //                             </div>
+
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Amount Range
+    //                                 </label>
+
+    //                                 {/* Slider */}
+    //                                 <div className="px-2 mb-3">
+    //                                     <Slider
+    //                                         range
+    //                                         min={0}
+    //                                         max={1000000}
+    //                                         step={500}
+    //                                         value={[Number(filters.minAmount), Number(filters.maxAmount)]}
+    //                                         onChange={(value) => {
+    //                                             const [min, max] = value as [number, number];
+    //                                             setFilters((f) => ({
+    //                                                 ...f,
+    //                                                 minAmount: min,
+    //                                                 maxAmount: max,
+    //                                             }));
+    //                                         }}
+    //                                         trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+    //                                         handleStyle={[
+    //                                             {
+    //                                                 borderColor: "#3b82f6",
+    //                                                 backgroundColor: "#fff",
+    //                                                 boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+    //                                                 width: 18,
+    //                                                 height: 18,
+    //                                                 marginTop: -6,
+    //                                             },
+    //                                             {
+    //                                                 borderColor: "#3b82f6",
+    //                                                 backgroundColor: "#fff",
+    //                                                 boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+    //                                                 width: 18,
+    //                                                 height: 18,
+    //                                                 marginTop: -6,
+    //                                             },
+    //                                         ]}
+    //                                         railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+    //                                     />
+    //                                 </div>
+
+    //                                 {/* Display Values */}
+    //                                 <div className="flex justify-between items-center gap-2 text-sm">
+    //                                     <div className="flex-1">
+    //                                         <span className="text-xs text-gray-500 block mb-1">Min</span>
+    //                                         <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+    //                                             ₹{Number(filters.minAmount).toLocaleString("en-IN")}
+    //                                         </div>
+    //                                     </div>
+    //                                     <div className="text-gray-400 mt-5">—</div>
+    //                                     <div className="flex-1">
+    //                                         <span className="text-xs text-gray-500 block mb-1">Max</span>
+    //                                         <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+    //                                             ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+
+    //                                 {/* Manual Input Fields */}
+    //                                 <div className="flex gap-3 items-center mt-3">
+    //                                     <input
+    //                                         type="number"
+    //                                         value={filters.minAmount}
+    //                                         onChange={(e) =>
+    //                                             setFilters((f) => ({ ...f, minAmount: +e.target.value }))
+    //                                         }
+    //                                         placeholder="Min Amount"
+    //                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+    //                                         min="0"
+    //                                         step="500"
+    //                                     />
+    //                                     <input
+    //                                         type="number"
+    //                                         value={filters.maxAmount}
+    //                                         onChange={(e) =>
+    //                                             setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
+    //                                         }
+    //                                         placeholder="Max Amount"
+    //                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+    //                                         min="0"
+    //                                         step="500"
+    //                                     />
+    //                                 </div>
+    //                             </div>
+
+    //                             {/* Paid Through */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-credit-card mr-2"></i>
+    //                                     Payment Method
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.payThrough}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, payThrough: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="">All Methods</option>
+    //                                     <option value="Cash">Cash</option>
+    //                                     <option value="Bank Transfer">Bank Transfer</option>
+    //                                     <option value="Credit Card">Credit Card</option>
+    //                                     <option value="Debit Card">Debit Card</option>
+    //                                     <option value="Check">Check</option>
+    //                                     <option value="UPI">UPI</option>
+    //                                     <option value="Other">Other</option>
+    //                                 </select>
+    //                             </div>
+
+    //                             {/* Sort By */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     <i className="fas fa-sort mr-2"></i>
+    //                                     Sort By
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.sortBy}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, sortBy: e.target.value }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="createdAt">Created Date</option>
+    //                                     <option value="expenseDate">Payment Date</option>
+    //                                     <option value="amount">Amount</option>
+    //                                     <option value="vendorName">Vendor Name</option>
+    //                                     {/* <option value="invoiceNumber">Invoice Number</option> */}
+    //                                 </select>
+    //                             </div>
+
+    //                             {/* Sort Order */}
+    //                             <div>
+    //                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+    //                                     Sort Order
+    //                                 </label>
+    //                                 <select
+    //                                     value={filters.sortOrder}
+    //                                     onChange={(e) => setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }))}
+    //                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    //                                 >
+    //                                     <option value="desc">Descending</option>
+    //                                     <option value="asc">Ascending</option>
+    //                                 </select>
+    //                             </div>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+
+    //                 {/* No Expenses Fallback */}
+    //                 {canList && <>        {expenses.length === 0 ? (
+    //                     <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
+    //                         <i className="fas fa-receipt text-5xl text-blue-300 mb-4" />
+    //                         <h3 className="text-lg font-semibold text-blue-800 mb-1">No Expenses Found</h3>
+    //                         <p className="text-sm text-gray-500">
+    //                             {activeFiltersCount > 0
+    //                                 ? 'Try adjusting your filters to find expenses.'
+    //                                 : 'Looks like there are no expenses yet.'}
+    //                             <br />
+    //                             Click on <strong>"Add Expense"</strong> to get started 🚀
+    //                         </p>
+    //                     </div>
+    //                 ) : (
+    //                     <div
+    //                         ref={scrollContainerRef}
+    //                         className="flex-1 max-h-[100%] overflow-y-auto"
+    //                     >
+    //                         {/* Table Header */}
+    //                         <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
+    //                             <div className="grid grid-cols-16 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
+    //                                 <div className="col-span-1 text-center">S.No</div>
+    //                                 <div className="col-span-2 text-center">Expense #</div>
+    //                                 <div className="col-span-3 text-center">Vendor Name</div>
+    //                                 <div className="col-span-2 text-center">Amount</div>
+    //                                 <div className="col-span-2 text-center">Expense Date</div>
+    //                                 <div className="col-span-2 text-center">Paid Through</div>
+    //                                 <div className="col-span-2 text-center">Created At</div>
+    //                                 <div className="col-span-2 text-center">Actions</div>
+    //                             </div>
+    //                         </div>
+
+    //                         {/* Table Body */}
+    //                         <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
+    //                             {expenses.map((expense, index) => (
+    //                                 <ExpenseList
+    //                                     key={expense._id}
+    //                                     expense={expense}
+    //                                     index={index}
+    //                                     onView={() => handleView(expense._id)}
+    //                                     // onEdit={() => handleEdit(expense._id)}
+    //                                     onDelete={(e: any) => {
+    //                                         e.stopPropagation()
+    //                                         handleDelete(expense._id)
+    //                                     }}
+    //                                     isDeleting={deleteExpenseMutation.isPending && deleteExpenseMutation.variables.id === expense._id}
+    //                                 />
+    //                             ))}
+    //                         </div>
+
+    //                         {/* Loading indicator */}
+    //                         {isFetchingNextPage && (
+    //                             <div className="flex justify-center py-8">
+    //                                 <div className="flex items-center gap-2 text-blue-600">
+    //                                     <i className="fas fa-spinner fa-spin text-2xl"></i>
+    //                                     <span className="text-sm font-medium">Loading more expenses...</span>
+    //                                 </div>
+    //                             </div>
+    //                         )}
+
+    //                         {/* End reached */}
+    //                         {!hasNextPage && expenses.length > 0 && (
+    //                             <div className="flex justify-center py-6">
+    //                                 <p className="text-gray-400 text-sm font-medium">
+    //                                     <i className="fas fa-check-circle mr-2"></i>
+    //                                     You've reached the end of the list
+    //                                 </p>
+    //                             </div>
+    //                         )}
+    //                     </div>
+    //                 )}
+    //                 </>}
+    //             </main>
+    //         )}
+    //     </div>
+    // );
+
+
+
     return (
-        <div className="space-y-4 h-full">
+        <div className="space-y-4 h-full bg-brand-surface">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center p-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                        <i className="fas fa-receipt mr-3 text-blue-600"></i>
+                    <h1 className="text-3xl font-bold text-text-main flex items-center">
+                        <i className="fas fa-receipt mr-3 text-action-primary"></i>
                         Expense Accounts
                     </h1>
                     <Breadcrumb paths={paths} />
                 </div>
 
                 <div className="flex items-center gap-3">
-                    {/* <Button
-                        onClick={() => navigate('statistics')}
-                        variant="outline"
-                    >
-                        <i className="fas fa-chart-bar mr-2" />
-                        Statistics
-                    </Button> */}
-                    {canCreate && <Button onClick={() => navigate('create')}>
-                        <i className="fas fa-plus mr-2" />
-                        Create Expense
-                    </Button>}
+                    {canCreate && (
+                        <Button onClick={() => navigate('create')} variant="dark">
+                            <i className="fas fa-plus mr-2" />
+                            Create Expense
+                        </Button>
+                    )}
 
                     <div className="w-full sm:w-auto flex justify-end sm:block">
                         <StageGuide
@@ -214,75 +584,41 @@ const ExpenseAccountsMain = () => {
                 </div>
             </div>
 
-            {/* Summary Cards */}
-            {/* {!isLoading && expenses.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-blue-100 text-sm font-medium">Total Expenses</p>
-                                <p className="text-3xl font-bold mt-1">{totalExpenses}</p>
-                            </div>
-                            <i className="fas fa-file-invoice text-4xl text-blue-200 opacity-50"></i>
-                        </div>
-                    </div>
-                    <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-green-100 text-sm font-medium">Total Amount</p>
-                                <p className="text-3xl font-bold mt-1">${totalAmount.toLocaleString()}</p>
-                            </div>
-                            <i className="fas fa-dollar-sign text-4xl text-green-200 opacity-50"></i>
-                        </div>
-                    </div>
-                    <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-purple-100 text-sm font-medium">Average Expense</p>
-                                <p className="text-3xl font-bold mt-1">
-                                    ${expenses.length > 0 ? (totalAmount / expenses.length).toFixed(2) : '0'}
-                                </p>
-                            </div>
-                            <i className="fas fa-chart-line text-4xl text-purple-200 opacity-50"></i>
-                        </div>
-                    </div>
-                </div>
-            )} */}
-
             {/* Loading State */}
             {isLoading ? (
                 <div className="flex justify-center items-center py-12">
-                    <i className="fas fa-spinner fa-spin text-blue-600 text-4xl"></i>
+                    <i className="fas fa-spinner fa-spin text-action-primary text-4xl"></i>
                 </div>
             ) : isError ? (
-                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-red-50 border border-red-200 rounded-lg shadow text-center">
-                    <div className="text-red-600 font-semibold mb-2 text-xl sm:text-3xl">
+                <div className="max-w-xl sm:min-w-[80%] mx-auto mt-4 p-4 bg-brand-ash border border-ash-medium rounded-lg shadow text-center">
+                    <div className="text-action-danger font-semibold mb-2 text-xl sm:text-3xl">
                         ⚠️ Error Occurred
                     </div>
-                    <p className="text-red-500 mb-4 text-lg sm:text-xl">
+                    <p className="text-action-danger opacity-90 mb-4 text-lg sm:text-xl">
                         {(error as any)?.message || "Failed to load expenses"}
                     </p>
                     <Button
                         onClick={() => refetch()}
-                        className="bg-red-600 text-white px-4 py-2"
+                        variant="dark"
+                        className="px-4 py-2"
                     >
                         Retry
                     </Button>
                 </div>
             ) : (
-                <main className="flex gap-2 !max-h-[88%]">
+                <main className="flex gap-2 !max-h-[88%] px-4">
                     {/* Filters Sidebar */}
                     <div className="xl:w-80 flex-shrink-0 !max-h-[90%] overflow-y-auto ">
-                        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div className="bg-brand-surface rounded-xl shadow-sm p-6 border border-ash-lighter">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                                    <i className="fas fa-filter mr-2 text-blue-600"></i>
+                                <h3 className="text-lg font-semibold text-text-strong flex items-center">
+                                    <i className="fas fa-filter mr-2 text-action-primary"></i>
                                     Filters
                                 </h3>
                                 {activeFiltersCount > 0 && (
                                     <button
                                         onClick={clearFilters}
-                                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                        className="text-sm text-action-primary hover:text-text-strong font-medium transition-colors"
                                     >
                                         Clear All ({activeFiltersCount})
                                     </button>
@@ -290,10 +626,10 @@ const ExpenseAccountsMain = () => {
                             </div>
 
                             <div className="space-y-6">
-                                {/* Search by Invoice Number */}
+                                {/* Search by Vendor Name */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-search mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-strong mb-2">
+                                        <i className="fas fa-search mr-2 text-text-soft"></i>
                                         Search
                                     </label>
                                     <input
@@ -302,65 +638,14 @@ const ExpenseAccountsMain = () => {
                                         placeholder="Search by vendor name..."
                                         value={filters.search}
                                         onChange={(e) => setFilters(f => ({ ...f, search: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main placeholder-text-soft"
                                     />
                                 </div>
 
-                                {/* Date Range */}
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
-                                        Date Range
-                                    </label>
-                                    <div className="space-y-2">
-                                        <input
-                                            type="date"
-                                            value={filters.startDate}
-                                            onChange={(e) => setFilters(f => ({ ...f, startDate: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Start Date"
-                                        />
-                                        <input
-                                            type="date"
-                                            value={filters.endDate}
-                                            onChange={(e) => setFilters(f => ({ ...f, endDate: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            placeholder="End Date"
-                                        />
-                                    </div>
-                                </div> */}
-
-                                {/* Amount Range */}
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-dollar-sign mr-2"></i>
-                                        Amount Range
-                                    </label>
-                                    <div className="space-y-2">
-                                        <input
-                                            type="number"
-                                            placeholder="Min Amount"
-                                            value={filters.minAmount}
-                                            onChange={(e) => setFilters(f => ({ ...f, minAmount: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            min="0"
-                                            step="0.01"
-                                        />
-                                        <input
-                                            type="number"
-                                            placeholder="Max Amount"
-                                            value={filters.maxAmount}
-                                            onChange={(e) => setFilters(f => ({ ...f, maxAmount: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            min="0"
-                                            step="0.01"
-                                        />
-                                    </div>
-                                </div> */}
-
+                                {/* CreatedAt Dates */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-strong mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         From CreatedAt Date
                                     </label>
                                     <input
@@ -369,13 +654,13 @@ const ExpenseAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdFromDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-strong mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         To CreatedAt Date
                                     </label>
                                     <input
@@ -384,14 +669,14 @@ const ExpenseAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, createdToDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     />
                                 </div>
 
-
+                                {/* Date of Payment */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-strong mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         From Date of Payment
                                     </label>
                                     <input
@@ -400,13 +685,13 @@ const ExpenseAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, expenseDateFromDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-calendar mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-strong mb-2">
+                                        <i className="fas fa-calendar mr-2 text-text-soft"></i>
                                         To Date of Payment
                                     </label>
                                     <input
@@ -415,16 +700,17 @@ const ExpenseAccountsMain = () => {
                                         onChange={(e) => {
                                             setFilters(f => ({ ...f, expenseDateToDate: e.target.value }));
                                         }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     />
                                 </div>
 
+                                {/* Amount Range Slider */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-strong mb-4">
+                                        <i className="fas fa-coins mr-2 text-text-soft"></i>
                                         Amount Range
                                     </label>
 
-                                    {/* Slider */}
                                     <div className="px-2 mb-3">
                                         <Slider
                                             range
@@ -440,41 +726,43 @@ const ExpenseAccountsMain = () => {
                                                     maxAmount: max,
                                                 }));
                                             }}
-                                            trackStyle={[{ backgroundColor: "#3b82f6", height: 6 }]}
+                                            trackStyle={[{ backgroundColor: "var(--action-primary)", height: 6 }]}
                                             handleStyle={[
                                                 {
-                                                    borderColor: "#3b82f6",
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    borderColor: "var(--action-primary)",
+                                                    backgroundColor: "#ffffff",
+                                                    boxShadow: "0 2px 6px rgba(30, 41, 59, 0.4)",
                                                     width: 18,
                                                     height: 18,
                                                     marginTop: -6,
+                                                    opacity: 1
                                                 },
                                                 {
-                                                    borderColor: "#3b82f6",
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                                                    borderColor: "var(--action-primary)",
+                                                    backgroundColor: "#ffffff",
+                                                    boxShadow: "0 2px 6px rgba(30, 41, 59, 0.4)",
                                                     width: 18,
                                                     height: 18,
                                                     marginTop: -6,
+                                                    opacity: 1
                                                 },
                                             ]}
-                                            railStyle={{ backgroundColor: "#e5e7eb", height: 6 }}
+                                            railStyle={{ backgroundColor: "var(--border-ash-medium)", height: 6 }}
                                         />
                                     </div>
 
                                     {/* Display Values */}
                                     <div className="flex justify-between items-center gap-2 text-sm">
                                         <div className="flex-1">
-                                            <span className="text-xs text-gray-500 block mb-1">Min</span>
-                                            <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+                                            <span className="text-xs text-text-muted block mb-1">Min</span>
+                                            <div className="bg-brand-ash border border-ash-medium px-3 py-2 rounded-lg font-semibold text-text-strong text-center">
                                                 ₹{Number(filters.minAmount).toLocaleString("en-IN")}
                                             </div>
                                         </div>
-                                        <div className="text-gray-400 mt-5">—</div>
+                                        <div className="text-text-soft mt-5">—</div>
                                         <div className="flex-1">
-                                            <span className="text-xs text-gray-500 block mb-1">Max</span>
-                                            <div className="bg-blue-50 px-3 py-2 rounded-lg font-semibold text-blue-700 text-center">
+                                            <span className="text-xs text-text-muted block mb-1">Max</span>
+                                            <div className="bg-brand-ash border border-ash-medium px-3 py-2 rounded-lg font-semibold text-text-strong text-center">
                                                 ₹{Number(filters.maxAmount).toLocaleString("en-IN")}
                                             </div>
                                         </div>
@@ -489,7 +777,7 @@ const ExpenseAccountsMain = () => {
                                                 setFilters((f) => ({ ...f, minAmount: +e.target.value }))
                                             }
                                             placeholder="Min Amount"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main"
                                             min="0"
                                             step="500"
                                         />
@@ -500,7 +788,7 @@ const ExpenseAccountsMain = () => {
                                                 setFilters((f) => ({ ...f, maxAmount: +e.target.value }))
                                             }
                                             placeholder="Max Amount"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary bg-brand-surface text-text-main"
                                             min="0"
                                             step="500"
                                         />
@@ -509,14 +797,14 @@ const ExpenseAccountsMain = () => {
 
                                 {/* Paid Through */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-credit-card mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-strong mb-2">
+                                        <i className="fas fa-credit-card mr-2 text-text-soft"></i>
                                         Payment Method
                                     </label>
                                     <select
                                         value={filters.payThrough}
                                         onChange={(e) => setFilters(f => ({ ...f, payThrough: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     >
                                         <option value="">All Methods</option>
                                         <option value="Cash">Cash</option>
@@ -531,32 +819,31 @@ const ExpenseAccountsMain = () => {
 
                                 {/* Sort By */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-sort mr-2"></i>
+                                    <label className="block text-sm font-medium text-text-strong mb-2">
+                                        <i className="fas fa-sort mr-2 text-text-soft"></i>
                                         Sort By
                                     </label>
                                     <select
                                         value={filters.sortBy}
                                         onChange={(e) => setFilters(f => ({ ...f, sortBy: e.target.value }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     >
                                         <option value="createdAt">Created Date</option>
                                         <option value="expenseDate">Payment Date</option>
                                         <option value="amount">Amount</option>
                                         <option value="vendorName">Vendor Name</option>
-                                        {/* <option value="invoiceNumber">Invoice Number</option> */}
                                     </select>
                                 </div>
 
                                 {/* Sort Order */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-text-strong mb-2">
                                         Sort Order
                                     </label>
                                     <select
                                         value={filters.sortOrder}
                                         onChange={(e) => setFilters(f => ({ ...f, sortOrder: e.target.value as 'asc' | 'desc' }))}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-ash-medium rounded-lg focus:ring-2 focus:ring-action-primary focus:border-action-primary bg-brand-surface text-text-main"
                                     >
                                         <option value="desc">Descending</option>
                                         <option value="asc">Ascending</option>
@@ -567,76 +854,76 @@ const ExpenseAccountsMain = () => {
                     </div>
 
                     {/* No Expenses Fallback */}
-                    {canList && <>        {expenses.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-white rounded-xl text-center p-6">
-                            <i className="fas fa-receipt text-5xl text-blue-300 mb-4" />
-                            <h3 className="text-lg font-semibold text-blue-800 mb-1">No Expenses Found</h3>
-                            <p className="text-sm text-gray-500">
-                                {activeFiltersCount > 0
-                                    ? 'Try adjusting your filters to find expenses.'
-                                    : 'Looks like there are no expenses yet.'}
-                                <br />
-                                Click on <strong>"Add Expense"</strong> to get started 🚀
-                            </p>
-                        </div>
-                    ) : (
-                        <div
-                            ref={scrollContainerRef}
-                            className="flex-1 max-h-[100%] overflow-y-auto"
-                        >
-                            {/* Table Header */}
-                            <div className="bg-white rounded-t-xl border border-gray-200 sticky top-0 z-10">
-                                <div className="grid grid-cols-16 gap-4 px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 font-semibold text-gray-700 text-sm">
-                                    <div className="col-span-1 text-center">S.No</div>
-                                    <div className="col-span-2 text-center">Expense #</div>
-                                    <div className="col-span-3 text-center">Vendor Name</div>
-                                    <div className="col-span-2 text-center">Amount</div>
-                                    <div className="col-span-2 text-center">Expense Date</div>
-                                    <div className="col-span-2 text-center">Paid Through</div>
-                                    <div className="col-span-2 text-center">Created At</div>
-                                    <div className="col-span-2 text-center">Actions</div>
-                                </div>
+                    {canList && <>
+                        {expenses.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center min-h-[300px] w-full bg-brand-surface border border-ash-lighter rounded-xl text-center p-6">
+                                <i className="fas fa-receipt text-5xl text-text-soft mb-4" />
+                                <h3 className="text-lg font-semibold text-text-strong mb-1">No Expenses Found</h3>
+                                <p className="text-sm text-text-muted">
+                                    {activeFiltersCount > 0
+                                        ? 'Try adjusting your filters to find expenses.'
+                                        : 'Looks like there are no expenses yet.'}
+                                    <br />
+                                    Click on <strong>"Add Expense"</strong> to get started 🚀
+                                </p>
                             </div>
-
-                            {/* Table Body */}
-                            <div className="bg-white rounded-b-xl border-x border-b border-gray-200">
-                                {expenses.map((expense, index) => (
-                                    <ExpenseList
-                                        key={expense._id}
-                                        expense={expense}
-                                        index={index}
-                                        onView={() => handleView(expense._id)}
-                                        // onEdit={() => handleEdit(expense._id)}
-                                        onDelete={(e: any) => {
-                                            e.stopPropagation()
-                                            handleDelete(expense._id)
-                                        }}
-                                        isDeleting={deleteExpenseMutation.isPending && deleteExpenseMutation.variables.id === expense._id}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Loading indicator */}
-                            {isFetchingNextPage && (
-                                <div className="flex justify-center py-8">
-                                    <div className="flex items-center gap-2 text-blue-600">
-                                        <i className="fas fa-spinner fa-spin text-2xl"></i>
-                                        <span className="text-sm font-medium">Loading more expenses...</span>
+                        ) : (
+                            <div
+                                ref={scrollContainerRef}
+                                className="flex-1 max-h-[100%] overflow-y-auto"
+                            >
+                                {/* Table Header */}
+                                <div className="bg-brand-surface rounded-t-xl border border-ash-light sticky top-0 z-10">
+                                    <div className="grid grid-cols-16 gap-4 px-6 py-4 bg-brand-ash font-semibold text-text-strong text-sm">
+                                        <div className="col-span-1 text-center">S.No</div>
+                                        <div className="col-span-2 text-center">Expense #</div>
+                                        <div className="col-span-3 text-center">Vendor Name</div>
+                                        <div className="col-span-2 text-center">Amount</div>
+                                        <div className="col-span-2 text-center">Expense Date</div>
+                                        <div className="col-span-2 text-center">Paid Through</div>
+                                        <div className="col-span-2 text-center">Created At</div>
+                                        <div className="col-span-2 text-center">Actions</div>
                                     </div>
                                 </div>
-                            )}
 
-                            {/* End reached */}
-                            {!hasNextPage && expenses.length > 0 && (
-                                <div className="flex justify-center py-6">
-                                    <p className="text-gray-400 text-sm font-medium">
-                                        <i className="fas fa-check-circle mr-2"></i>
-                                        You've reached the end of the list
-                                    </p>
+                                {/* Table Body */}
+                                <div className="bg-brand-surface rounded-b-xl border-x border-b border-ash-light">
+                                    {expenses.map((expense, index) => (
+                                        <ExpenseList
+                                            key={expense._id}
+                                            expense={expense}
+                                            index={index}
+                                            onView={() => handleView(expense._id)}
+                                            onDelete={(e: any) => {
+                                                e.stopPropagation()
+                                                handleDelete(expense._id)
+                                            }}
+                                            isDeleting={deleteExpenseMutation.isPending && deleteExpenseMutation.variables.id === expense._id}
+                                        />
+                                    ))}
                                 </div>
-                            )}
-                        </div>
-                    )}
+
+                                {/* Loading indicator */}
+                                {isFetchingNextPage && (
+                                    <div className="flex justify-center py-8">
+                                        <div className="flex items-center gap-2 text-action-primary">
+                                            <i className="fas fa-spinner fa-spin text-2xl"></i>
+                                            <span className="text-sm font-medium">Loading more expenses...</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* End reached */}
+                                {!hasNextPage && expenses.length > 0 && (
+                                    <div className="flex justify-center py-6">
+                                        <p className="text-text-soft text-sm font-medium">
+                                            <i className="fas fa-check-circle mr-2"></i>
+                                            You've reached the end of the list
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </>}
                 </main>
             )}

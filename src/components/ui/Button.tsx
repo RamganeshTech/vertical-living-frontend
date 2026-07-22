@@ -21,12 +21,12 @@
     const variantStyles = {
       primary: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm",
       secondary: "bg-blue-100 hover:bg-blue-200 text-blue-700",
-      outline: "border border-blue-200 hover:bg-blue-50 text-blue-600",
+      outline: "border border-blue-200 hover:bg-blue-50 text-text-main",
       danger: "border border-red-200 bg-red-600 text-white",
       ghost: "hover:bg-gray-100 text-gray-700",
       link: "text-blue-600 hover:underline p-0 h-auto",
       // dark: "bg-[#1a1a1a] hover:bg-gray-900 text-white shadow-sm", // Added dark variant
-      dark: "bg-[#1e293b] text-brand-surface hover:bg-action-primary-hover transition-colors", // Added dark variant
+      dark: "bg-[#1e293b] opacity-90 text-brand-surface hover:bg-action-primary-hover transition-colors", // Added dark variant
       white: "bg-white border border-gray-200 text-gray-800 shadow-sm hover:border-gray-300 hover:bg-gray-50 hover:shadow-md",
     }
 

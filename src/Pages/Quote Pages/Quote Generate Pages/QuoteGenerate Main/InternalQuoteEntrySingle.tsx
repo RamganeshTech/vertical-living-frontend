@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-    useEditMaterialQuote, useGetSingleInternalResidentialVersion,
+    useEditMaterialQuote, useGetProductSpecificInternalQuotes, useGetSingleInternalResidentialVersion,
+    useToggleProductSpecificInternalQuote,
     useUpdateInternalMainQuote
 } from '../../../../apiList/Quote Api/Internal_Quote_Api/internalquoteApi';
 import type { CoreMaterialRow, FurnitureBlock, SimpleItemRow } from './FurnitureForm';
@@ -20,6 +21,7 @@ import { getApiForRole } from '../../../../utils/roleCheck';
 import SearchSelectNew from '../../../../components/ui/SearchSelectNew';
 import { getMaterialBrand } from '../../../../apiList/Quote Api/QuoteVariant Api/quoteVariantApi';
 import { useGetSingleLabourCostByCategoryName } from '../../../../apiList/Quote Api/RateConfig Api/labourRateconfigApi';
+import { Label } from 'recharts';
 
 const InternalQuoteEntrySingle = () => {
     const navigate = useNavigate()
@@ -44,8 +46,23 @@ const InternalQuoteEntrySingle = () => {
         projectId: ''
     });
 
+    // New state for the "copy from existing product quote" dropdown
+    const [selectedProductQuoteId, setSelectedProductQuoteId] = useState<string>("");
+    const [isProductSpecific, setIsProductSpecific] = useState<boolean>(data?.isProductSpecific || false);
+
+
+    // Pull the list of product-specific quotes (organizationId must already be in scope)
+    const { data: productSpecificQuotes } = useGetProductSpecificInternalQuotes(organizationId);
+    const toggleProductSpecificMutation = useToggleProductSpecificInternalQuote();
+    const togglePending = toggleProductSpecificMutation.isPending;
+
+    const productQuoteOptions = (productSpecificQuotes || []).map((q: any) => ({
+        value: q._id,
+        label: `${q.mainQuoteName || "Untitled"} · #${q.quoteNo || "N/A"} · ₹${q.grandTotal ?? 0}`,
+    }));
+
     const handleUpdateSubmit = async () => {
-        console.log("Submitting Form Data:", formData); // CHECK THIS LOG
+        // console.log("Submitting Form Data:", formData); // CHECK THIS LOG
         if (!formData.mainQuoteName || !formData.projectId || !formData.quoteCategory) {
             return toast({ title: "Error", description: "Please fill all fields", variant: "destructive" });
         }
@@ -163,9 +180,13 @@ const InternalQuoteEntrySingle = () => {
     }, []);
 
 
+    // const hasLoadedFurnituresRef = useRef(false);
+
     useEffect(() => {
         // if (quoteType === "null" || quoteType === null || quoteType === "residential" || quoteType === "basic") {
-        if (quoteType === "basic") {
+            console.log("SYNC EFFECT FIRED, data.furnitures length:", data?.furnitures?.length);
+
+        if (quoteType === "basic" ) {
             //   if(data?.furnitures) setFurnitures(data?.furnitures)
 
             if (data?.furnitures && Array.isArray(data.furnitures)) {
@@ -194,10 +215,21 @@ const InternalQuoteEntrySingle = () => {
                 }));
 
                 setFurnitures(transformedFurnitures);
+                // hasLoadedFurnituresRef.current = true; // ✅ never overwrite local state again after this
+
             }
         }
 
     }, [data])
+
+    // useEffect(() => {
+    //     hasLoadedFurnituresRef.current = false;
+    // }, [id]);
+
+    // Keep it in sync if `data` refetches/updates from elsewhere
+    useEffect(() => {
+        setIsProductSpecific(data?.isProductSpecific || false);
+    }, [data?.isProductSpecific]);
 
     // Inside InternalQuoteEntrySingle
     const [globalTransportation, setGlobalTransportation] = useState<number>(
@@ -577,7 +609,7 @@ const InternalQuoteEntrySingle = () => {
             //         const noofLabours = Number(w.noofLabours) || 0;
             //         const noofDays = Number(w.noofDays) || 0;
             //         const labRate = Number(w.labourRate) || 0;
-                    
+
             //         // ✅ Separate the costs properly
             //         const materialCost = sqft * matRate;
             //         const labourCost = noofLabours * labRate * noofDays;
@@ -603,7 +635,7 @@ const InternalQuoteEntrySingle = () => {
             //     };
             // }
 
-          // 🚀 2. BYPASS MODULAR LOGIC FOR NON-MODULAR WORKS
+            // 🚀 2. BYPASS MODULAR LOGIC FOR NON-MODULAR WORKS
             if (f?.typeOfWork === "non-modular") {
                 const works = f.works || [];
                 const totalRows = works.length;
@@ -613,7 +645,7 @@ const InternalQuoteEntrySingle = () => {
                 const noofLabours = Number(baseWork.noofLabours) || 0;
                 const noofDays = Number(baseWork.noofDays) || 0;
                 const labRate = Number(baseWork.labourRate) || 0;
-                
+
                 // 2. Calculate Total Labour Cost and divide evenly
                 const totalLabourCost = noofLabours * noofDays * labRate;
                 const labourPerRow = totalRows > 0 ? totalLabourCost / totalRows : 0;
@@ -627,7 +659,7 @@ const InternalQuoteEntrySingle = () => {
                         ...w,
                         // ✅ For useEffect: Math.round(((materialCost + labourPerRow) * profitMultiplier) + transportPerRow)
                         // ✅ For spreadOverheads: Math.round((materialCost + labourPerRow) * profitMultiplier)
-                        totalAmount: Math.round(((materialCost + labourPerRow) * profitMultiplier) + transportPerRow) 
+                        totalAmount: Math.round(((materialCost + labourPerRow) * profitMultiplier) + transportPerRow)
                     };
                 });
 
@@ -636,10 +668,10 @@ const InternalQuoteEntrySingle = () => {
                 return {
                     ...f,
                     furnitureProfit: effectiveProfitPercent,
-                    works: updatedWorks, 
+                    works: updatedWorks,
                     totals: {
                         core: 0, fittings: 0, glues: 0, nbms: 0,
-                        furnitureTotal: nonModTotal 
+                        furnitureTotal: nonModTotal
                     }
                 };
             }
@@ -871,6 +903,30 @@ const InternalQuoteEntrySingle = () => {
     };
 
 
+
+    const handleToggleSubmit = async (newValue: boolean) => {
+        // Optimistic flip
+        setIsProductSpecific(newValue);
+
+        try {
+            if (!data?._id) {
+                throw new Error("Quote ID not found");
+            }
+
+            await toggleProductSpecificMutation.mutateAsync({
+                quoteId: data._id,
+                isProductSpecific: newValue,
+            });
+
+            toast({ title: "Updated!", description: "Quote edited successfully." });
+        } catch (error: any) {
+            // Revert optimistic change on failure
+            setIsProductSpecific(!newValue);
+
+            toast({ title: "Error", description: error?.response?.data?.message || error?.message || "Failed to Update the Quote", variant: "destructive" });
+        }
+    };
+
     // 1. Wrap the changing data in your custom useDebounce hook
     // We watch furnitures, commonMaterials, and global overheads
     const debouncedFurnitures = useDebounce(furnitures, 700); // 2 second delay
@@ -905,6 +961,19 @@ const InternalQuoteEntrySingle = () => {
 
 
 
+    const stripIds = (obj: any): any => {
+        if (Array.isArray(obj)) return obj.map(stripIds);
+        if (obj && typeof obj === "object") {
+            const clone: any = {};
+            for (const key in obj) {
+                if (key === "_id") continue;
+                clone[key] = stripIds(obj[key]);
+            }
+            return clone;
+        }
+        return obj;
+    };
+
     const addFurniture = async (furnitureName: string) => {
 
         if (!tempFurnitureName.trim()) return;
@@ -916,10 +985,112 @@ const InternalQuoteEntrySingle = () => {
         }
 
 
+        // ---- NEW: If a product quote was selected, copy its first furniture wholesale ----
+        if (tempTypeOfWork === "modular" && selectedProductQuoteId) {
+            const selectedQuote = (productSpecificQuotes || []).find(
+                (q: any) => q._id === selectedProductQuoteId
+            );
+            // const sourceFurniture = selectedQuote?.furnitures?.[0];
+            const sourceFurnitures = selectedQuote?.furnitures || [];
+
+
+            if (sourceFurnitures.length > 0) {
+                // const clonedFurniture = stripIds(sourceFurniture);
+
+                // // Overwrite only the name with whatever's currently in the input
+                // // (lets the user rename it before saving, as requested)
+                // clonedFurniture.furnitureName = furnitureName;
+
+                // // Keep dimensions as-is from source; ensure shape is always present
+                // clonedFurniture.dimention = {
+                //     height: sourceFurniture?.dimention?.height ?? 0,
+                //     width: sourceFurniture?.dimention?.width ?? 0,
+                //     depth: sourceFurniture?.dimention?.depth ?? 0,
+                // };
+
+                // // Force these explicitly since we're copying a "modular" product
+                // clonedFurniture.typeOfWork = "modular";
+                // clonedFurniture.typeOfNonModularWork = null;
+                // clonedFurniture.works = [];
+
+                // clonedFurniture.totals = {
+                //     core: sourceFurniture?.coreMaterialsTotal ?? 0,
+                //     fittings: sourceFurniture?.fittingsAndAccessoriesTotal ?? 0,
+                //     glues: sourceFurniture?.gluesTotal ?? 0,
+                //     nbms: sourceFurniture?.nonBrandMaterialsTotal ?? 0,
+                //     furnitureTotal: sourceFurniture?.furnitureTotal ?? 0,
+                // };
+
+
+                // console.log("furnitres we have added", sourceFurnitures)
+
+                const normalizeArray = (arr: any[] | undefined, emptyFactory: () => any) =>
+                    Array.isArray(arr) && arr.length > 0 ? arr : [emptyFactory()];
+
+                const clonedFurnitures = sourceFurnitures?.map((sourceFurniture: any, idx: number) => {
+                    const stripped = stripIds(sourceFurniture);
+
+                    console.log('source coreMaterials:', sourceFurniture?.coreMaterials, sourceFurniture?.fittingsAndAccessories);
+
+
+                    return {
+                        furnitureName: idx === 0 ? furnitureName : stripped.furnitureName,
+                        dimention: {
+                            height: sourceFurniture?.dimention?.height ?? 0,
+                            width: sourceFurniture?.dimention?.width ?? 0,
+                            depth: sourceFurniture?.dimention?.depth ?? 0,
+                        },
+
+                        // ALWAYS guarantee arrays exist, never undefined/empty
+                        coreMaterials: normalizeArray(stripped?.coreMaterials, emptyCoreMaterial),
+                        fittingsAndAccessories: normalizeArray(stripped?.fittingsAndAccessories, emptySimpleItem),
+                        glues: normalizeArray(stripped?.glues, emptySimpleItem),
+                        nonBrandMaterials: normalizeArray(stripped?.nonBrandMaterials, emptySimpleItem),
+
+                        // frontend shape, mapped from backend flat fields
+                        totals: {
+                            core: sourceFurniture?.coreMaterialsTotal ?? 0,
+                            fittings: sourceFurniture?.fittingsAndAccessoriesTotal ?? 0,
+                            glues: sourceFurniture?.gluesTotal ?? 0,
+                            nbms: sourceFurniture?.nonBrandMaterialsTotal ?? 0,
+                            furnitureTotal: sourceFurniture?.furnitureTotal ?? 0,
+                        },
+
+                        furnitureProfit: sourceFurniture?.furnitureProfit ?? 0,
+                        fabricationCost: sourceFurniture?.fabricationCost ?? 0,
+
+                        typeOfWork: "modular",
+                        typeOfNonModularWork: null,
+                        works: [],
+                    };
+                });
+
+
+                // console.log("2222222222222")
+                // console.log("clonedFuntires after cloning what we are gettnig ", clonedFurnitures)
+                // setFurnitures(prev => [...prev, clonedFurniture]);
+                setFurnitures(prev => [...prev, ...clonedFurnitures]);
+
+                // Reset modal state
+                setTempFurnitureName("");
+                setTempTypeOfWork("modular");
+                setTempTypeOfNonModularWork("");
+                setSelectedProductQuoteId("");
+                setModalOpen(false);
+                return; // ⬅️ skip the normal empty-furniture creation path below
+            }
+        }
+
+
+
+        // ---- END NEW BLOCK ----
+
+
+
         let defaultSqftRate = 0;
         // ✅ Instantly grab the pre-fetched Labour Rate from our dictionary!
-        const defaultLabourRate = tempTypeOfWork === "non-modular" && tempTypeOfNonModularWork 
-            ? (nonModularLabourRates[tempTypeOfNonModularWork] || 0) 
+        const defaultLabourRate = tempTypeOfWork === "non-modular" && tempTypeOfNonModularWork
+            ? (nonModularLabourRates[tempTypeOfNonModularWork] || 0)
             : 0;
 
         // ✅ AUTO-FETCH RATE FOR NON-MODULAR WORKS
@@ -977,7 +1148,7 @@ const InternalQuoteEntrySingle = () => {
                         sqftRate: defaultSqftRate, // Insert the DB rate!
                         noofLabours: 0,
                         labourRate: defaultLabourRate,
-                        noofDays: 0, 
+                        noofDays: 0,
                         totalAmount: 0
                     }]
                     : [],
@@ -1100,6 +1271,26 @@ const InternalQuoteEntrySingle = () => {
 
 
 
+                                {/* NEW: Product-Specific Toggle */}
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">
+                                        Product Specific
+                                    </span>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={isProductSpecific}
+                                            disabled={togglePending}
+                                            onChange={(e) => handleToggleSubmit(e.target.checked)}
+                                            className="sr-only peer"
+                                        />
+                                        <div className="w-9 h-5 bg-gray-300 rounded-full peer-checked:bg-blue-600 transition-colors duration-200 peer-disabled:opacity-50" />
+                                        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 peer-checked:translate-x-4" />
+                                    </label>
+                                </div>
+
+                                <div className="h-8 w-px bg-gray-300" />
+
                                 {editPending && (
                                     <span className="text-[10px] text-blue-500 animate-pulse font-bold uppercase">
                                         <i className="fas fa-sync fa-spin mr-1" /> Auto-saving...
@@ -1176,31 +1367,34 @@ const InternalQuoteEntrySingle = () => {
                                     />
 
 
-                                    {/* Work Type Radio Buttons */}
-                                    {/* <div className="flex items-center gap-6 mb-5">
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                name="typeOfWork"
-                                                value="modular"
-                                                checked={tempTypeOfWork === "modular"}
-                                                onChange={(e) => setTempTypeOfWork(e.target.value as "modular")}
-                                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    {/* NEW: Copy-from-existing-product dropdown — modular only */}
+                                    {tempTypeOfWork === "modular" && (
+                                        <div className="space-y-2 mb-4">
+                                            <Label className="text-[10px] uppercase font-black text-gray-400">
+                                                Copy From Existing Product (optional)
+                                            </Label>
+                                            <SearchSelectNew
+                                                options={productQuoteOptions}
+                                                placeholder="Select a saved product quote..."
+                                                value={selectedProductQuoteId}
+                                                onValueChange={(val) => {
+                                                    setSelectedProductQuoteId(String(val));
+
+                                                    const selectedQuote = (productSpecificQuotes || []).find(
+                                                        (q: any) => q._id === val
+                                                    );
+
+                                                    const firstFurniture = selectedQuote?.furnitures?.[0];
+                                                    if (firstFurniture?.furnitureName) {
+                                                        setTempFurnitureName(firstFurniture.furnitureName);
+                                                    }
+                                                }}
                                             />
-                                            <span className="text-sm font-medium text-gray-700">Modular Work</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                name="typeOfWork"
-                                                value="non-modular"
-                                                checked={tempTypeOfWork === "non-modular"}
-                                                onChange={(e) => setTempTypeOfWork(e.target.value as "non-modular")}
-                                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                                            />
-                                            <span className="text-sm font-medium text-gray-700">Non-Modular Work</span>
-                                        </label>
-                                    </div> */}
+                                        </div>
+                                    )}
+
+
+
 
 
                                     {/* Work Type Radio Buttons */}
@@ -1267,19 +1461,7 @@ const InternalQuoteEntrySingle = () => {
                                     </div>
 
 
-                                    {/* Non-Modular Category Dropdown (Only shows if non-modular is selected) */}
-                                    {/* {tempTypeOfWork === "non-modular" && (
-                                        <div className="mb-4 relative z-[130]">
-                                            <label className="block text-xs font-semibold text-gray-500 mb-1">Select Work Category</label>
-                                            <SearchSelectNew
-                                                options={nonModularOptions}
-                                                value={tempTypeOfNonModularWork}
-                                                placeholder="e.g., Civil, Electrical..."
-                                                className="!overflow-visible relative z-[140]"
-                                                onValueChange={(val) => setTempTypeOfNonModularWork(String(val))}
-                                            />
-                                        </div>
-                                    )} */}
+
 
                                     <div className="flex justify-end gap-3 mt-4">
                                         <Button variant="secondary" onClick={() => {

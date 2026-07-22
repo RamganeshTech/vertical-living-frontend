@@ -75,7 +75,7 @@ const CreateQuoteModal: React.FC<CreateQuoteModalProps> = ({
                                 {QUOTE_TYPE?.map((option) => (
                                     <SelectItem className='text-md' key={option} value={option.toString()}>
                                         {option === "sqft_rate" ? "Sqft Rate" :
-                                            option[0].toUpperCase() + option.slice(1)}
+                                            option[0]?.toUpperCase() + option?.slice(1)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -140,7 +140,7 @@ const CreateQuoteModal: React.FC<CreateQuoteModalProps> = ({
                         onClick={() => {
                             // e.preventDefault();
                             // e.stopPropagation()
-                            console.log("Submit button triggered inside Modal");
+                            // console.log("Submit button triggered inside Modal");
                             handleSubmit()
                         }}
                     >
