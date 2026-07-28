@@ -13,7 +13,7 @@ export interface IPremises {
     consumerNumber?: string;
     tariffId?: any;
     sanctionedLoad?: number;
-    billingCycleStartDate?: Date;
+    billingCycleStartDate?: string;
     isActive: boolean;
     createdAt: string;
     updatedAt: string;
@@ -53,7 +53,7 @@ export const useGetPremises = (organizationId?: string) => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useQuery({
@@ -79,6 +79,37 @@ export const useGetPremises = (organizationId?: string) => {
     });
 };
 
+
+export const useGetPremiseById = (premiseId?: string) => {
+    // const { currentRole } = useAuthData();
+
+
+    const { role } = useGetRole();
+    const api = getApiForRole(role!);
+
+    return useQuery({
+        queryKey: ['premise', premiseId],
+        queryFn: async () => {
+            try {
+                // checkPermission(currentRole, GET_ROLES);
+
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!api) throw new Error("API instance not found for role");
+
+
+                const { data } = await api.get<BaseResponse<IPremises>>(`/premises/get-single/${premiseId}`);
+
+                if (!data.ok) throw new Error(data.message || 'Failed to fetch premises');
+                return data.data as IPremises;
+            } catch (error: any) {
+                const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
+                throw new Error(errorMessage);
+            }
+        },
+        enabled: !!premiseId, // Only run the query if organizationId is provided
+    });
+};
+
 // ============================
 // CREATE PREMISES
 // ============================
@@ -86,7 +117,7 @@ export const useCreatePremises = () => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useMutation({
@@ -120,7 +151,7 @@ export const useUpdatePremises = () => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useMutation({
@@ -154,7 +185,7 @@ export const useDeletePremises = () => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useMutation({

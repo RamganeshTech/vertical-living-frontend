@@ -6,19 +6,6 @@ import { SidePanel } from '../../../shared/SidePanel/SidePanel';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import SearchSelectNew from '../../../components/ui/SearchSelectNew';
-// import { Button } from '../../shared/ui/Button';
-// import { Input } from '../../shared/ui/Input';
-// import { SideModal } from '../../shared/ui/SideModal';
-// import { toast } from '../../shared/ui/ToastContext';
-
-// // Adjust path based on your structure
-// import {
-//     useCreatePremises,
-//     useUpdatePremises,
-//     type IPremises
-// } from '../../api_services/eb_api/premisesApi';
-// import { useGetTariffs } from '../../api_services/eb_api/tariffApi';
-// import { SearchSelect } from '../../shared/ui/SearchSelect';
 
 interface PremisesModalProps {
     isOpen: boolean;

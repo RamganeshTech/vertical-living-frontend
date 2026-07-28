@@ -19,6 +19,7 @@ export interface ITariff {
     fixedChargePerKw: number;
     slabs: ITariffSlab[];
     isActive: boolean;
+    isTelescopic: boolean;
     createdAt: string;
     updatedAt: string;
 }

@@ -85,7 +85,7 @@ export const useGetAllEBLogs = (
 export const useGetEBLogById = (organizationId?: string, logId?: string) => {
     // const { currentRole } = useAuthData();
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
 
@@ -97,7 +97,7 @@ export const useGetEBLogById = (organizationId?: string, logId?: string) => {
 
                 // Fixed the double slash '//get/' from your routes to a single slash here
 
-                  if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
                 if (!api) throw new Error("API instance not found for role");
 
                 const { data } = await api.get<BaseResponse<IEBLog>>(`/eb/logs/get/${organizationId}/${logId}`);
@@ -120,7 +120,7 @@ export const useCreateEBLog = () => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useMutation({
@@ -135,7 +135,7 @@ export const useCreateEBLog = () => {
                 // checkPermission(currentRole, MODIFY_ROLES);
 
 
-                    if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
                 if (!api) throw new Error("API instance not found for role");
 
                 const { data } = await api.post<BaseResponse<IEBLog>>(`/eb/logs/create/${organizationId}`, payload);
@@ -160,7 +160,7 @@ export const useUpdateEBLog = () => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useMutation({
@@ -177,7 +177,7 @@ export const useUpdateEBLog = () => {
                 // checkPermission(currentRole, MODIFY_ROLES);
 
 
-                    if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
                 if (!api) throw new Error("API instance not found for role");
 
                 const { data } = await api.put<BaseResponse<IEBLog>>(`/eb/logs/update/${organizationId}/${logId}`, payload);
@@ -203,7 +203,7 @@ export const useDeleteEBLog = () => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useMutation({
@@ -212,7 +212,7 @@ export const useDeleteEBLog = () => {
                 // checkPermission(currentRole, MODIFY_ROLES);
 
 
-                    if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
                 if (!api) throw new Error("API instance not found for role");
 
                 const { data } = await api.delete<BaseResponse<null>>(`/eb/logs/delete/${organizationId}/${logId}`);
@@ -263,7 +263,7 @@ export const useGetEBDashboardOverview = (organizationId?: string) => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useQuery({
@@ -272,7 +272,7 @@ export const useGetEBDashboardOverview = (organizationId?: string) => {
             try {
                 // checkPermission(currentRole, allowe);
 
-                 if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
                 if (!api) throw new Error("API instance not found for role");
 
 
@@ -301,7 +301,7 @@ export const useGetEBPremisesAnalytics = (organizationId?: string) => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useQuery({
@@ -310,7 +310,7 @@ export const useGetEBPremisesAnalytics = (organizationId?: string) => {
             try {
                 // checkPermission(currentRole, allowe);
 
-                 if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
                 if (!api) throw new Error("API instance not found for role");
 
 
@@ -363,7 +363,7 @@ export const useGetPremisesEBConsumptionChart = (
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useQuery({
@@ -373,7 +373,7 @@ export const useGetPremisesEBConsumptionChart = (
             try {
                 // checkPermission(currentRole, allowe);
 
-                 if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
                 if (!api) throw new Error("API instance not found for role");
 
 
@@ -412,7 +412,7 @@ export const useGetEBBillKpis = (organizationId?: string) => {
     // const { currentRole } = useAuthData();
 
 
-     const { role } = useGetRole();
+    const { role } = useGetRole();
     const api = getApiForRole(role!);
 
     return useQuery({
@@ -421,7 +421,7 @@ export const useGetEBBillKpis = (organizationId?: string) => {
             try {
                 // checkPermission(currentRole, allowe);
 
-                 if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
                 if (!api) throw new Error("API instance not found for role");
 
 
@@ -437,5 +437,68 @@ export const useGetEBBillKpis = (organizationId?: string) => {
             }
         },
         enabled: !!organizationId,
+    });
+};
+
+
+
+export interface IEBPremiseCharge {
+    view: string,
+    rangeStart: string,
+    rangeEnd: string,
+    series: { label: string; value: number }[]; // Typed the series based on standard Recharts expectations
+    selectedRangeTotalCost: number
+    currentYearTotalCost: number
+}
+
+interface UseGetEbPremisesChargeProps {
+    organizationId: string;
+    premisesId: string;
+    view: 'monthly' | 'yearly';
+    year?: string;
+    fromYear?: string;
+    toYear?: string;
+}
+
+export const useGetEbPremisesCharge = ({ 
+    organizationId, 
+    premisesId, 
+    view, 
+    year, 
+    fromYear, 
+    toYear 
+}: UseGetEbPremisesChargeProps) => {
+    const { role } = useGetRole(); // Adjust based on your actual auth hooks
+    const api = getApiForRole(role!);
+
+    return useQuery({
+        // Add filters to queryKey so it refetches when they change
+        queryKey: ['ebBillKpis', organizationId, premisesId, view, year, fromYear, toYear],
+        queryFn: async () => {
+            try {
+                if (!role || !allowedRoles.includes(role)) throw new Error("Not allowed to make this API call");
+                if (!api) throw new Error("API instance not found for role");
+
+                // Construct query params
+                const params = new URLSearchParams();
+                params.append('view', view);
+                if (view === 'monthly' && year) params.append('year', year);
+                if (view === 'yearly' && fromYear && toYear) {
+                    params.append('fromYear', fromYear);
+                    params.append('toYear', toYear);
+                }
+
+                const { data } = await api.get<BaseResponse<IEBPremiseCharge>>(
+                    `/eb/logs/analytics/${organizationId}/${premisesId}/charge?${params.toString()}`
+                );
+
+                if (!data.ok) throw new Error(data.message || 'Failed to fetch billing KPIs');
+                return data.data as IEBPremiseCharge;
+            } catch (error: any) {
+                const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
+                throw new Error(errorMessage);
+            }
+        },
+        enabled: !!organizationId && !!premisesId,
     });
 };

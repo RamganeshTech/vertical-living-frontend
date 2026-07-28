@@ -294,7 +294,7 @@ export const getProjectPaths = (organizationId: string | undefined): Record<stri
 
     EBLOG: `/organizations/${organizationId}/projects/eb-log`,
     PREMISES: `/organizations/${organizationId}/projects/premises`,
-    // EBDASHBOARD: `/organizations/${organizationId}/projects/eb-dashboard`,
+    EBDASHBOARD: `/organizations/${organizationId}/projects/eb-dashboard`,
     TARIFF: `/organizations/${organizationId}/projects/tariff`,
   };
 };
@@ -473,8 +473,8 @@ const Projects: React.FC<ProjectType> = ({ projectId, setProjectId }) => {
     {
       id: "EB_MODULE",
       label: "EB Management",
-      // keys: ["EBDASHBOARD", "PREMISES", "EBLOG","TARIFF",]
-      keys: [ "PREMISES", "EBLOG","TARIFF",]
+      keys: ["EBDASHBOARD", "PREMISES", "EBLOG","TARIFF",]
+      // keys: [ "PREMISES", "EBLOG","TARIFF",]
 
 
     }

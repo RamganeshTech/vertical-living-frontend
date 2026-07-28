@@ -9,10 +9,11 @@ import { socket } from './lib/socket';
 import { useCurrentSupervisor } from './Hooks/useCurrentSupervisor';
 import PrivacyPolicy from './Pages/Home/PrivacyPolicy';
 import MetaReviewDemoDashboard from './Pages/Lead_pages/MetaLead_Pages/MetaReviewDemoDashboard';
-const PremiseMain = lazy(() => import( './Pages/eb_pages/premises_pages/PremiseMain'));
-const TariffMain = lazy(() => import( './Pages/eb_pages/tariff_pages/TariffMain'));
-const EbLogMain = lazy(() => import( './Pages/eb_pages/EbLogMain'));
-const EbDashboardMain = lazy(() => import( './Pages/eb_pages/dashboards/EbDashboardMain'));
+import PremisesSingle from './Pages/eb_pages/premises_pages/PremisesSingle';
+const PremiseMain = lazy(() => import('./Pages/eb_pages/premises_pages/PremiseMain'));
+const TariffMain = lazy(() => import('./Pages/eb_pages/tariff_pages/TariffMain'));
+const EbLogMain = lazy(() => import('./Pages/eb_pages/EbLogMain'));
+const EbDashboardMain = lazy(() => import('./Pages/eb_pages/dashboards/EbDashboardMain'));
 // import InstagramLeadMainByMeta from './Pages/Lead_pages/InstragramLead_Pages/InstagramLeadByMeta_Pages/InstagramLeadMainByMeta';
 // import InstagramLeadSingleByMeta from './Pages/Lead_pages/InstragramLead_Pages/InstagramLeadByMeta_Pages/InstagramLeadSingleByMeta';
 // import { WhatsAppLeadMainByMeta } from './Pages/Lead_pages/InstragramLead_Pages/WhatsAppLeadMainByMeta';
@@ -1589,13 +1590,24 @@ function App() {
             </Route>
 
 
-             <Route path="premises" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+            <Route path="premises" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
               requiredDepartment="premises"
               // ⭐ Allow entry if they can do ANY of these things
               requiredAction={['list', 'edit', "create", "delete"]}
             >
               <PremiseMain />
-            </ProtectedRoutes>} />
+            </ProtectedRoutes>} >
+
+              <Route path="single/:id" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
+                requiredDepartment="premises"
+                // ⭐ Allow entry if they can do ANY of these things
+                requiredAction={['list', 'edit', "create", "delete"]}
+              >
+                <PremisesSingle />
+              </ProtectedRoutes>} />
+
+
+            </Route>
 
 
             <Route path="eb-dashboard" element={<ProtectedRoutes allowedRoles={["owner", "CTO", "staff"]}
@@ -1623,7 +1635,7 @@ function App() {
             </ProtectedRoutes>} />
 
 
-            
+
 
 
 
